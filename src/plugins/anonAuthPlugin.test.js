@@ -1,0 +1,192 @@
+import Rx from 'rx';
+import register, {
+	anonAuth$,
+	getAnonymousCode$,
+	getAnonymousAccessToken$,
+	requestAuthorizer,
+} from './anonAuthPlugin';
+
+// silence expected console logging output
+console.log = () => {};
+
+const oauth = {
+	key: '1234',
+	secret: 'asdf',
+};
+const DUMMY_HEADERS = {};
+const GOOD_MOCK_FETCH_RESULT = Promise.resolve({
+	text: () => Promise.resolve('{}')
+});
+const BAD_MOCK_FETCH_RESULT = Promise.resolve({ text: () => Promise.resolve(undefined) });
+
+const ANONYMOUS_AUTH_URL = 'auth_fakeout';
+const ANONYMOUS_ACCESS_URL = 'access_fakeout';
+const MOCK_CODE = 'mock_anon_code';
+
+describe('getAnonymousCode$', () => {
+	it('sets ANONYMOUS_AUTH_URL as opts.url', function(done) {
+		// given the config, the mocked request function should return the auth url in code.url
+		spyOn(global, 'fetch').and.callFake((url, opts) => {
+			expect(url.startsWith(ANONYMOUS_AUTH_URL)).toBe(true);
+			return GOOD_MOCK_FETCH_RESULT;
+		});
+		getAnonymousCode$({ oauth, ANONYMOUS_AUTH_URL })().subscribe(done);
+	});
+	it('returns null code when response cannot be JSON parsed', function(done) {
+		spyOn(global, 'fetch').and.callFake((url, opts) => BAD_MOCK_FETCH_RESULT);
+
+		const getCode$ = getAnonymousCode$({ oauth, ANONYMOUS_AUTH_URL })();
+		getCode$.subscribe(code => {
+			expect(code).toBeNull();
+			done();
+		});
+	});
+
+});
+
+describe('getAnonymousToken$', () => {
+	it('sets ANONYMOUS_ACCESS_URL as opts.url', function(done) {
+		spyOn(global, 'fetch').and.callFake((url, opts) => {
+			expect(url.startsWith(ANONYMOUS_ACCESS_URL)).toBe(true);
+			return GOOD_MOCK_FETCH_RESULT;
+		});
+		const getToken$ = getAnonymousAccessToken$({ oauth, ANONYMOUS_ACCESS_URL }, null);
+		getToken$(DUMMY_HEADERS)(MOCK_CODE).subscribe(done);
+	});
+	it('throws an error when no oauth.key is supplied', function() {
+		const oauthNoKey = { ...oauth };
+		delete oauthNoKey.key;
+		expect(() => getAnonymousAccessToken$({ oauth: oauthNoKey, ANONYMOUS_ACCESS_URL }, null))
+			.toThrowError(ReferenceError);
+	});
+	it('throws an error when no oauth.secret is supplied', function() {
+		const oauthNoSecret = { ...oauth };
+		delete oauthNoSecret.secret;
+		expect(() => getAnonymousAccessToken$({ oauth: oauthNoSecret, ANONYMOUS_ACCESS_URL }, null))
+			.toThrowError(ReferenceError);
+	});
+	it('throws an error when no access code is supplied to the final curried function', function() {
+		const code = null;
+		const getToken$ = getAnonymousAccessToken$({ oauth, ANONYMOUS_ACCESS_URL }, null);
+		expect(() => getToken$(DUMMY_HEADERS)(code)).toThrowError(ReferenceError);
+	});
+	it('throws an error when response cannot be JSON parsed', function(done) {
+		spyOn(global, 'fetch').and.callFake((url, opts) => BAD_MOCK_FETCH_RESULT);
+		const getToken$ = getAnonymousAccessToken$({ oauth, ANONYMOUS_ACCESS_URL }, null);
+		getToken$(DUMMY_HEADERS)(MOCK_CODE)
+			.catch(err => {
+				expect(err).toEqual(jasmine.any(Error));
+				return Rx.Observable.just(null);
+			})
+			.subscribe(done);
+	});
+});
+
+describe('anonAuth$', () => {
+	it('returns token when provided URLs and oauth info', function(done) {
+		spyOn(global, 'fetch').and.callFake((url, opts) => {
+			if (url.startsWith(ANONYMOUS_AUTH_URL)) {
+				return Promise.resolve({
+					text: () => Promise.resolve('{ "code": 1234 }')
+				});
+			}
+			if (url.startsWith(ANONYMOUS_ACCESS_URL)) {
+				return Promise.resolve({
+					text: () => Promise.resolve('{ "oauth_token": "good_token" }')
+				});
+			}
+		});
+		const auth$ = anonAuth$({ oauth, ANONYMOUS_AUTH_URL, ANONYMOUS_ACCESS_URL }, null);
+		const DUMMY_REQUEST = { headers: DUMMY_HEADERS };
+
+		auth$(DUMMY_REQUEST).subscribe(auth => {
+			expect(auth.oauth_token).toBe('good_token');
+			done();
+		});
+	});
+});
+describe('requestAuthorizer', () => {
+	const auth$ = anonAuth$({ oauth, ANONYMOUS_AUTH_URL, ANONYMOUS_ACCESS_URL }, null);
+	const authorizeRequest$ = requestAuthorizer(auth$);
+	it('does not try to fetch when provided a request with an oauth token in state', function(done) {
+		spyOn(global, 'fetch').and.callFake((url, opts) => {
+			if (url.startsWith(ANONYMOUS_AUTH_URL)) {
+				return Promise.resolve({
+					text: () => Promise.resolve('{ "code": 1234 }')
+				});
+			}
+			if (url.startsWith(ANONYMOUS_ACCESS_URL)) {
+				return Promise.resolve({
+					text: () => Promise.resolve('{ "oauth_token": "good_token" }')
+				});
+			}
+		});
+		const DUMMY_REQUEST = {
+			headers: DUMMY_HEADERS,
+			state: {
+				oauth_token: 'good_token'
+			},
+		};
+
+		authorizeRequest$(DUMMY_REQUEST).subscribe(request => {
+			expect(global.fetch).not.toHaveBeenCalled();
+			done();
+		});
+	});
+	it('calls fetch when provided a request without an oauth token in state', function(done) {
+		spyOn(global, 'fetch').and.callFake((url, opts) => {
+			if (url.startsWith(ANONYMOUS_AUTH_URL)) {
+				return Promise.resolve({
+					text: () => Promise.resolve('{ "code": 1234 }')
+				});
+			}
+			if (url.startsWith(ANONYMOUS_ACCESS_URL)) {
+				return Promise.resolve({
+					text: () => Promise.resolve('{ "oauth_token": "good_token" }')
+				});
+			}
+		});
+		const DUMMY_REQUEST = {
+			headers: DUMMY_HEADERS,
+			state: {},
+		};
+
+		authorizeRequest$(DUMMY_REQUEST).subscribe(request => {
+			expect(global.fetch).toHaveBeenCalled();
+			done();
+		});
+	});
+});
+describe('register', () => {
+	const MOCK_SERVER = {
+		decorate() {},
+		route() {},
+	};
+	const spyable = {
+		next() {}
+	};
+	const options = {
+		ANONYMOUS_AUTH_URL: '',
+		ANONYMOUS_ACCESS_URL: '',
+		oauth: {
+			key: '1234',
+			secret: 'abcd',
+		},
+	};
+	it('calls next', () => {
+		spyOn(spyable, 'next');
+		register(MOCK_SERVER, options, spyable.next);
+		expect(spyable.next).toHaveBeenCalled();
+	});
+	it('calls server.route with an object', () => {
+		spyOn(MOCK_SERVER, 'route');
+		register(MOCK_SERVER, options, spyable.next);
+		expect(MOCK_SERVER.route).toHaveBeenCalledWith(jasmine.any(Object));
+	});
+	it('calls server.decorate to add a method to `request`', () => {
+		spyOn(MOCK_SERVER, 'decorate');
+		register(MOCK_SERVER, options, spyable.next);
+		expect(MOCK_SERVER.decorate)
+			.toHaveBeenCalledWith('request', jasmine.any(String), jasmine.any(Function), { apply: true });
+	});
+});

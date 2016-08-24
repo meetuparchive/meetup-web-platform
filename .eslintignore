@@ -1,0 +1,8 @@
+build/
+infrastructure/
+coverage/
+node_modules/
+src/assets/
+svg/
+training/
+*.log
