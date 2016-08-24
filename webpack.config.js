@@ -14,7 +14,10 @@ module.exports = {
 		'middleware/post': [path.resolve(paths.middleware, 'post')],
 		'middleware/auth': [path.resolve(paths.middleware, 'auth')],
 		'middleware/cache': [path.resolve(paths.middleware, 'cache')],
+		'middleware/sync': [path.resolve(paths.middleware, 'sync')],
 		'api-proxy': [path.resolve(paths.src, 'api-proxy')],
+		'util/rxUtils': [path.resolve(paths.src, 'util', 'rxUtils')],
+		'actions/authActionCreators': [path.resolve(paths.src, 'actions', 'authActionCreators')],
 	},
 
 	output: {

@@ -4,9 +4,13 @@ import Accepts from 'accepts';
 import apiProxy$ from './api-proxy';
 import { duotones, getDuotoneUrls } from './util/duotone';
 
-const localeCodes = require('../webpack/webpack.settings.js').localeCodes;
-
-export default function getRoutes(renderRequestMap, { API_SERVER_ROOT_URL, PHOTO_SCALER_SALT }) {
+export default function getRoutes(
+	renderRequestMap,
+	{
+		API_SERVER_ROOT_URL,
+		PHOTO_SCALER_SALT,
+		localeCodes
+	}) {
 	const proxyApiRequest$ = apiProxy$({
 		baseUrl: API_SERVER_ROOT_URL,
 		duotoneUrls: getDuotoneUrls(duotones, PHOTO_SCALER_SALT),

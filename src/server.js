@@ -1,7 +1,7 @@
 import https from 'https';
 import Hapi from 'hapi';
 
-import './globals';
+import './util/globals';
 
 import getConfig from './util/config';
 import getPlugins from './plugins';
@@ -70,7 +70,12 @@ export function server(routes, connection, plugins=[]) {
  *   features in the additional routes
  * @return {Promise} the Promise returned by Hapi's `server.connection` method
  */
-export default function start(renderRequestMap, routes=[], plugins=[]) {
+export default function start(renderRequestMap, options) {
+	const {
+		routes,
+		plugins,
+		localeCodes,
+	} = options;
 	// source maps make for better stack traces - we might not want this in
 	// production if it makes anything slower, though
 	// (process.env.NODE_ENV === 'production')
@@ -79,6 +84,7 @@ export default function start(renderRequestMap, routes=[], plugins=[]) {
 	return getConfig()
 		.then(configureEnv)
 		.then(config => {
+			config.localeCodes = localeCodes || ['en-US'];
 			const baseRoutes = getRoutes(renderRequestMap, config);
 			const finalRoutes = [ ...routes, ...baseRoutes ];
 

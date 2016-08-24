@@ -2,7 +2,7 @@ import externalRequest from 'request';
 import Rx from 'rx';
 const externalRequest$ = Rx.Observable.fromNodeCallback(externalRequest);
 
-import { catchAndReturn$ } from '../src/util/rxUtils';
+import { catchAndReturn$ } from './util/rxUtils';
 import { duotoneRef } from './util/duotone';
 
 /**
