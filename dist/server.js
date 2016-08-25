@@ -1,5 +1,14 @@
-module.exports =
-/******/ (function(modules) { // webpackBootstrap
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory(require("accepts"), require("boom"), require("chalk"), require("crypto"), require("good"), require("hapi"), require("https"), require("node-fetch"), require("request"), require("rx"), require("source-map-support"), require("url-search-params"));
+	else if(typeof define === 'function' && define.amd)
+		define("meetup-web-platform", ["accepts", "boom", "chalk", "crypto", "good", "hapi", "https", "node-fetch", "request", "rx", "source-map-support", "url-search-params"], factory);
+	else if(typeof exports === 'object')
+		exports["meetup-web-platform"] = factory(require("accepts"), require("boom"), require("chalk"), require("crypto"), require("good"), require("hapi"), require("https"), require("node-fetch"), require("request"), require("rx"), require("source-map-support"), require("url-search-params"));
+	else
+		root["meetup-web-platform"] = factory(root["accepts"], root["boom"], root["chalk"], root["crypto"], root["good"], root["hapi"], root["https"], root["node-fetch"], root["request"], root["rx"], root["source-map-support"], root["url-search-params"]);
+})(this, function(__WEBPACK_EXTERNAL_MODULE_23__, __WEBPACK_EXTERNAL_MODULE_9__, __WEBPACK_EXTERNAL_MODULE_24__, __WEBPACK_EXTERNAL_MODULE_7__, __WEBPACK_EXTERNAL_MODULE_25__, __WEBPACK_EXTERNAL_MODULE_26__, __WEBPACK_EXTERNAL_MODULE_27__, __WEBPACK_EXTERNAL_MODULE_30__, __WEBPACK_EXTERNAL_MODULE_8__, __WEBPACK_EXTERNAL_MODULE_0__, __WEBPACK_EXTERNAL_MODULE_33__, __WEBPACK_EXTERNAL_MODULE_34__) {
+return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 
@@ -1248,4 +1257,6 @@ module.exports = __webpack_require__(14);
 
 
 /***/ }
-/******/ ]);
+/******/ ])
+});
+;

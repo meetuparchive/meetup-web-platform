@@ -1,5 +1,14 @@
-module.exports =
-/******/ (function(modules) { // webpackBootstrap
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory(require("idb"), require("redux"), require("rx"));
+	else if(typeof define === 'function' && define.amd)
+		define("meetup-web-platform", ["idb", "redux", "rx"], factory);
+	else if(typeof exports === 'object')
+		exports["meetup-web-platform"] = factory(require("idb"), require("redux"), require("rx"));
+	else
+		root["meetup-web-platform"] = factory(root["idb"], root["redux"], root["rx"]);
+})(this, function(__WEBPACK_EXTERNAL_MODULE_28__, __WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_0__) {
+return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 
@@ -403,4 +412,6 @@ module.exports = __webpack_require__(11);
 
 /***/ }
 
-/******/ });
+/******/ })
+});
+;

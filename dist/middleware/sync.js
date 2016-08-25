@@ -1,5 +1,14 @@
-module.exports =
-/******/ (function(modules) { // webpackBootstrap
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory(require("react-router-redux"), require("react-router/lib/match"), require("redux"), require("rx"));
+	else if(typeof define === 'function' && define.amd)
+		define("meetup-web-platform", ["react-router-redux", "react-router/lib/match", "redux", "rx"], factory);
+	else if(typeof exports === 'object')
+		exports["meetup-web-platform"] = factory(require("react-router-redux"), require("react-router/lib/match"), require("redux"), require("rx"));
+	else
+		root["meetup-web-platform"] = factory(root["react-router-redux"], root["react-router/lib/match"], root["redux"], root["rx"]);
+})(this, function(__WEBPACK_EXTERNAL_MODULE_31__, __WEBPACK_EXTERNAL_MODULE_32__, __WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_0__) {
+return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 
@@ -365,4 +374,6 @@ var fetchQueries = function fetchQueries(oauth_token, apiUrl, method) {
 
 /***/ }
 
-/******/ });
+/******/ })
+});
+;
