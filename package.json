@@ -2,7 +2,9 @@
   "name": "meetup-web-platform",
   "version": "1.0.0",
   "description": "A collection of Node web application utilities developed for the Meetup web platform",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "test": "jest",
     "build": "webpack"
@@ -41,6 +43,7 @@
     "eslint-loader": "^1.5.0",
     "eslint-plugin-react": "^6.1.2",
     "good": "^7.0.1",
+    "good-squeeze": "^4.0.0",
     "hapi": "^14.2.0",
     "idb": "^1.1.4",
     "inert": "^4.0.2",
