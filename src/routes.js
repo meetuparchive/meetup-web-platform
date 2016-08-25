@@ -47,7 +47,7 @@ export default function getRoutes(
 		path: '/{wild*}',
 		handler: (request, reply) => {
 			const requestLanguage = Accepts(request).language(localeCodes) || 'en-US';
-			request.log(['info'], requestLanguage);
+			request.log(['info'], renderRequestMap[requestLanguage]);
 			const render$ = request.authorize()  // `authorize()` method is supplied by anonAuthPlugin
 				.flatMap(renderRequestMap[requestLanguage]);
 
