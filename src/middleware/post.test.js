@@ -1,5 +1,5 @@
-import { MOCK_APP_STATE, MOCK_POST_ACTION } from 'platform-web/util/mocks/app';
-import { middlewareDispatcher } from 'platform-web/util/testUtils';
+import { MOCK_APP_STATE, MOCK_POST_ACTION } from '../util/mocks/app';
+import { middlewareDispatcher } from '../util/testUtils';
 import PostMiddleware from './post';
 import * as fetchUtils from '../util/fetchUtils';  // used for mocking
 
