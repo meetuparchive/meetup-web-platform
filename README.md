@@ -17,7 +17,7 @@ Hapi `plugins` to register, all provided by the specific web application.
 ### Usage
 
 ```js
-import startServer from `platform-web/server';
+import startServer from `meetup-web-platform/server';
 
 // ...
 
