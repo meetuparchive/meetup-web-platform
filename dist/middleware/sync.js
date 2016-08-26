@@ -7,7 +7,7 @@
 		exports["meetup-web-platform"] = factory(require("react-router-redux"), require("react-router/lib/match"), require("redux"), require("rx"));
 	else
 		root["meetup-web-platform"] = factory(root["react-router-redux"], root["react-router/lib/match"], root["redux"], root["rx"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_31__, __WEBPACK_EXTERNAL_MODULE_32__, __WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_0__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_35__, __WEBPACK_EXTERNAL_MODULE_36__, __WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_0__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -71,7 +71,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 40);
+/******/ 	return __webpack_require__(__webpack_require__.s = 44);
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -90,7 +90,7 @@ module.exports = require("redux");
 
 /***/ },
 
-/***/ 13:
+/***/ 14:
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -98,11 +98,11 @@ module.exports = require("redux");
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_rx___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_rx__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_redux__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_redux___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_redux__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_react_router_redux__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_react_router_redux__ = __webpack_require__(35);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_react_router_redux___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_react_router_redux__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__actions_syncActionCreators__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__util_routeUtils__ = __webpack_require__(22);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__util_fetchUtils__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__actions_syncActionCreators__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__util_routeUtils__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__util_fetchUtils__ = __webpack_require__(7);
 /**
  * Sync middleware will hit the API when the server first renders the page and
  * when the router updates the app location.
@@ -183,7 +183,7 @@ var getSyncMiddleware = function getSyncMiddleware(routes) {
 
 /***/ },
 
-/***/ 16:
+/***/ 19:
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -227,13 +227,13 @@ function locationSync(location) {
 
 /***/ },
 
-/***/ 22:
+/***/ 25:
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_rx__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_rx___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_rx__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_router_lib_match__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_router_lib_match__ = __webpack_require__(36);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_router_lib_match___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react_router_lib_match__);
 /* harmony export */ exports["a"] = activeRouteQueries$;var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -301,29 +301,29 @@ function activeRouteQueries$(routes, _ref5) {
 
 /***/ },
 
-/***/ 31:
+/***/ 35:
 /***/ function(module, exports) {
 
 module.exports = require("react-router-redux");
 
 /***/ },
 
-/***/ 32:
+/***/ 36:
 /***/ function(module, exports) {
 
 module.exports = require("react-router/lib/match");
 
 /***/ },
 
-/***/ 40:
+/***/ 44:
 /***/ function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(13);
+module.exports = __webpack_require__(14);
 
 
 /***/ },
 
-/***/ 6:
+/***/ 7:
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";

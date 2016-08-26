@@ -17,6 +17,9 @@ module.exports = {
 		'middleware/sync': [path.resolve(paths.middleware, 'sync')],
 		'api-proxy': [path.resolve(paths.src, 'api-proxy')],
 		'util/rxUtils': [path.resolve(paths.src, 'util', 'rxUtils')],
+		'util/testUtils': [path.resolve(paths.src, 'util', 'testUtils')],
+		'util/mocks/app': [path.resolve(paths.src, 'util', 'mocks', 'app')],
+		'util/mocks/api': [path.resolve(paths.src, 'util', 'mocks', 'api')],
 		'actions/authActionCreators': [path.resolve(paths.src, 'actions', 'authActionCreators')],
 	},
 

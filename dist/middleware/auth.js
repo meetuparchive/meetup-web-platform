@@ -7,7 +7,7 @@
 		exports["meetup-web-platform"] = factory(require("js-cookie"), require("redux"), require("rx"));
 	else
 		root["meetup-web-platform"] = factory(root["js-cookie"], root["redux"], root["rx"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_29__, __WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_0__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_32__, __WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_0__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -71,7 +71,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 37);
+/******/ 	return __webpack_require__(__webpack_require__.s = 41);
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -90,11 +90,11 @@ module.exports = require("redux");
 
 /***/ },
 
-/***/ 10:
+/***/ 11:
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_js_cookie__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_js_cookie__ = __webpack_require__(32);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_js_cookie___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_js_cookie__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_rx__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_rx___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_rx__);
@@ -184,18 +184,10 @@ var AuthMiddleware = function AuthMiddleware(store) {
 
 /***/ },
 
-/***/ 29:
+/***/ 32:
 /***/ function(module, exports) {
 
 module.exports = require("js-cookie");
-
-/***/ },
-
-/***/ 37:
-/***/ function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(10);
-
 
 /***/ },
 
@@ -283,6 +275,14 @@ function logoutError() {
 		type: 'LOGOUT_ERROR'
 	};
 }
+
+/***/ },
+
+/***/ 41:
+/***/ function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(11);
+
 
 /***/ }
 
