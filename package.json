@@ -44,6 +44,7 @@
     "eslint-loader": "^1.5.0",
     "eslint-plugin-react": "^6.1.2",
     "good": "^7.0.1",
+    "good-console": "^6.1.2",
     "good-squeeze": "^4.0.0",
     "hapi": "^14.2.0",
     "idb": "^1.1.4",
