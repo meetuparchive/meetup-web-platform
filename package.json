@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "A collection of Node web application utilities developed for the Meetup web platform",
   "files": [
-    "src"
+    "src",
+    "dist"
   ],
   "scripts": {
     "test": "jest",
