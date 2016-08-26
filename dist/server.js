@@ -1098,6 +1098,7 @@ function getRoutes(renderRequestMap, _ref) {
 		path: '/{wild*}',
 		handler: function handler(request, reply) {
 			var requestLanguage = __WEBPACK_IMPORTED_MODULE_1_accepts___default()(request).language(localeCodes) || 'en-US';
+			request.log(['info'], renderRequestMap[requestLanguage]);
 			var render$ = request.authorize() // `authorize()` method is supplied by anonAuthPlugin
 			.flatMap(renderRequestMap[requestLanguage]);
 
