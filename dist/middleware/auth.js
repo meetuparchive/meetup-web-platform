@@ -79,14 +79,14 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ 0:
 /***/ function(module, exports) {
 
-module.exports = require("rx");
+eval("module.exports = require(\"rx\");\n\n//////////////////\n// WEBPACK FOOTER\n// external \"rx\"\n// module id = 0\n// module chunks = 0 1 2 3 4 7\n\n//# sourceURL=webpack:///external_%22rx%22?");
 
 /***/ },
 
 /***/ 1:
 /***/ function(module, exports) {
 
-module.exports = require("redux");
+eval("module.exports = require(\"redux\");\n\n//////////////////\n// WEBPACK FOOTER\n// external \"redux\"\n// module id = 1\n// module chunks = 1 3 4 5\n\n//# sourceURL=webpack:///external_%22redux%22?");
 
 /***/ },
 
@@ -94,100 +94,14 @@ module.exports = require("redux");
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_js_cookie__ = __webpack_require__(31);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_js_cookie___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_js_cookie__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_rx__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_rx___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_rx__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_redux__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_redux___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_redux__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__actions_authActionCreators__ = __webpack_require__(4);
-/**
- * Auth middle handles all the server communication and cookie managmenet
- * related to login actions.
- *
- * We assume that the login API provides *both* an auth token and the member
- * object corresponding to the login credentials
- *
- * @module AuthMiddleware
- */
-
-
-
-
-
-/**
- * login sub responds to only the most recent login request, and can be disposed
- * by a logout
- * @const
- */
-var loginSub = new __WEBPACK_IMPORTED_MODULE_1_rx___default.a.SerialDisposable();
-loginSub.setDisposable(__WEBPACK_IMPORTED_MODULE_1_rx___default.a.Disposable.empty);
-
-/**
- * There are 6 login-related actions:
- *
- * 1. 'LOGIN_REQUEST' - send credentials for login
- * 2. 'LOGIN_SUCCESS' - updates local state/cookie from api response
- * 3. 'LOGIN_ERROR' - server failed to login user with supplied credentials
- * 4. 'LOGOUT_REQUEST' - return to default state and request anonymous
- *   auth token from server
- * 5. 'LOGOUT_SUCCESS' - new anonymous auth token returned
- * 6. 'LOGOUT_ERROR' - server failed to get anonymous auth token - fatal
- */
-var AuthMiddleware = function AuthMiddleware(store) {
-	return function (next) {
-		return function (action) {
-			var actions = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2_redux__["bindActionCreators"])({
-				logoutSuccess: __WEBPACK_IMPORTED_MODULE_3__actions_authActionCreators__["logoutSuccess"],
-				logoutError: __WEBPACK_IMPORTED_MODULE_3__actions_authActionCreators__["logoutError"]
-			}, store.dispatch);
-
-			var oauth_token = void 0,
-			    response = void 0;
-			switch (action.type) {
-				case 'LOGIN_SUCCESS':
-					response = action.payload;
-					oauth_token = response.value.oauth_token;
-					__WEBPACK_IMPORTED_MODULE_0_js_cookie___default.a.set('oauth_token', oauth_token);
-					__WEBPACK_IMPORTED_MODULE_0_js_cookie___default.a.remove('anonymous');
-					// re-sync the page
-					store.dispatch(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__actions_authActionCreators__["configureAuth"])({ oauth_token: oauth_token }));
-					break;
-				case 'LOGIN_ERROR':
-					break;
-				case 'LOGOUT_REQUEST':
-					__WEBPACK_IMPORTED_MODULE_0_js_cookie___default.a.remove('oauth_token');
-					fetch('/anon') // application server route to serve anonymous tokens
-					.then(function (response) {
-						return response.json();
-					}).catch(function (e) {
-						return Promise.reject([e]);
-					}).then(actions.logoutSuccess, actions.logoutError);
-					break;
-				case 'LOGOUT_SUCCESS':
-					response = action.payload;
-					oauth_token = response.access_token;
-					__WEBPACK_IMPORTED_MODULE_0_js_cookie___default.a.set('oauth_token', oauth_token);
-					__WEBPACK_IMPORTED_MODULE_0_js_cookie___default.a.set('anonymous', true);
-					// re-sync the page
-					store.dispatch(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__actions_authActionCreators__["configureAuth"])({ anonymous: true, oauth_token: oauth_token }));
-					break;
-				case 'LOGOUT_ERROR':
-					break;
-			}
-			return next(action);
-		};
-	};
-};
-
-/* harmony default export */ exports["default"] = AuthMiddleware;
+eval("/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_js_cookie__ = __webpack_require__(31);\n/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_js_cookie___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_js_cookie__);\n/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_rx__ = __webpack_require__(0);\n/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_rx___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_rx__);\n/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_redux__ = __webpack_require__(1);\n/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_redux___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_redux__);\n/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__actions_authActionCreators__ = __webpack_require__(4);\n/**\n * Auth middle handles all the server communication and cookie managmenet\n * related to login actions.\n *\n * We assume that the login API provides *both* an auth token and the member\n * object corresponding to the login credentials\n *\n * @module AuthMiddleware\n */\n\n\n\n\n\n/**\n * login sub responds to only the most recent login request, and can be disposed\n * by a logout\n * @const\n */\nvar loginSub = new __WEBPACK_IMPORTED_MODULE_1_rx___default.a.SerialDisposable();\nloginSub.setDisposable(__WEBPACK_IMPORTED_MODULE_1_rx___default.a.Disposable.empty);\n\n/**\n * There are 6 login-related actions:\n *\n * 1. 'LOGIN_REQUEST' - send credentials for login\n * 2. 'LOGIN_SUCCESS' - updates local state/cookie from api response\n * 3. 'LOGIN_ERROR' - server failed to login user with supplied credentials\n * 4. 'LOGOUT_REQUEST' - return to default state and request anonymous\n *   auth token from server\n * 5. 'LOGOUT_SUCCESS' - new anonymous auth token returned\n * 6. 'LOGOUT_ERROR' - server failed to get anonymous auth token - fatal\n */\nvar AuthMiddleware = function AuthMiddleware(store) {\n\treturn function (next) {\n\t\treturn function (action) {\n\t\t\tvar actions = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2_redux__[\"bindActionCreators\"])({\n\t\t\t\tlogoutSuccess: __WEBPACK_IMPORTED_MODULE_3__actions_authActionCreators__[\"logoutSuccess\"],\n\t\t\t\tlogoutError: __WEBPACK_IMPORTED_MODULE_3__actions_authActionCreators__[\"logoutError\"]\n\t\t\t}, store.dispatch);\n\n\t\t\tvar oauth_token = void 0,\n\t\t\t    response = void 0;\n\t\t\tswitch (action.type) {\n\t\t\t\tcase 'LOGIN_SUCCESS':\n\t\t\t\t\tresponse = action.payload;\n\t\t\t\t\toauth_token = response.value.oauth_token;\n\t\t\t\t\t__WEBPACK_IMPORTED_MODULE_0_js_cookie___default.a.set('oauth_token', oauth_token);\n\t\t\t\t\t__WEBPACK_IMPORTED_MODULE_0_js_cookie___default.a.remove('anonymous');\n\t\t\t\t\t// re-sync the page\n\t\t\t\t\tstore.dispatch(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__actions_authActionCreators__[\"configureAuth\"])({ oauth_token: oauth_token }));\n\t\t\t\t\tbreak;\n\t\t\t\tcase 'LOGIN_ERROR':\n\t\t\t\t\tbreak;\n\t\t\t\tcase 'LOGOUT_REQUEST':\n\t\t\t\t\t__WEBPACK_IMPORTED_MODULE_0_js_cookie___default.a.remove('oauth_token');\n\t\t\t\t\tfetch('/anon') // application server route to serve anonymous tokens\n\t\t\t\t\t.then(function (response) {\n\t\t\t\t\t\treturn response.json();\n\t\t\t\t\t}).catch(function (e) {\n\t\t\t\t\t\treturn Promise.reject([e]);\n\t\t\t\t\t}).then(actions.logoutSuccess, actions.logoutError);\n\t\t\t\t\tbreak;\n\t\t\t\tcase 'LOGOUT_SUCCESS':\n\t\t\t\t\tresponse = action.payload;\n\t\t\t\t\toauth_token = response.access_token;\n\t\t\t\t\t__WEBPACK_IMPORTED_MODULE_0_js_cookie___default.a.set('oauth_token', oauth_token);\n\t\t\t\t\t__WEBPACK_IMPORTED_MODULE_0_js_cookie___default.a.set('anonymous', true);\n\t\t\t\t\t// re-sync the page\n\t\t\t\t\tstore.dispatch(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__actions_authActionCreators__[\"configureAuth\"])({ anonymous: true, oauth_token: oauth_token }));\n\t\t\t\t\tbreak;\n\t\t\t\tcase 'LOGOUT_ERROR':\n\t\t\t\t\tbreak;\n\t\t\t}\n\t\t\treturn next(action);\n\t\t};\n\t};\n};\n\n/* harmony default export */ exports[\"default\"] = AuthMiddleware;\n\n//////////////////\n// WEBPACK FOOTER\n// ./src/middleware/auth.js\n// module id = 11\n// module chunks = 3\n\n//# sourceURL=webpack:///./src/middleware/auth.js?");
 
 /***/ },
 
 /***/ 31:
 /***/ function(module, exports) {
 
-module.exports = require("js-cookie");
+eval("module.exports = require(\"js-cookie\");\n\n//////////////////\n// WEBPACK FOOTER\n// external \"js-cookie\"\n// module id = 31\n// module chunks = 3\n\n//# sourceURL=webpack:///external_%22js-cookie%22?");
 
 /***/ },
 
@@ -195,94 +109,14 @@ module.exports = require("js-cookie");
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony export */ exports["loginPost"] = loginPost;/* harmony export */ exports["configureAuth"] = configureAuth;/* harmony export */ exports["loginSuccess"] = loginSuccess;/* harmony export */ exports["loginError"] = loginError;/* harmony export */ exports["logoutRequest"] = logoutRequest;/* harmony export */ exports["logoutSuccess"] = logoutSuccess;/* harmony export */ exports["logoutError"] = logoutError;/**
- * @module authActionCreators
- */
-
-/**
- * Create a 'POST' action with onSuccess that parses the API response and
- * returns either a loginError action (API successfully returned, but the
- * response indicates login failure) or a loginSuccess action. onError always
- * returns a loginError action
- * @param {Object} params object with 'email' and 'password' props
- */
-function loginPost(params) {
-	var LOGIN_REF = 'login';
-	return {
-		type: 'LOGIN_POST',
-		payload: {
-			query: {
-				type: 'login',
-				params: params,
-				ref: LOGIN_REF
-			},
-			onSuccess: function onSuccess(_ref) {
-				var queries = _ref.queries;
-				var responses = _ref.responses;
-
-				// get the response `value`
-				var response = responses.slice()[0][LOGIN_REF];
-				// check for errors reported by API (will be handled by loginError)
-
-				if (response.value.errors) {
-					return loginError(response.value.errors);
-				}
-				// otherwise return the action
-				return loginSuccess(response);
-			},
-			onError: loginError
-		}
-	};
-}
-
-function configureAuth(auth, isServer) {
-	return {
-		type: 'CONFIGURE_AUTH',
-		payload: auth,
-		meta: isServer
-	};
-}
-
-function loginSuccess(response) {
-	return {
-		type: 'LOGIN_SUCCESS',
-		payload: response
-	};
-}
-
-function loginError(response) {
-	return {
-		type: 'LOGIN_ERROR',
-		payload: response
-	};
-}
-
-function logoutRequest() {
-	return {
-		type: 'LOGOUT_REQUEST'
-	};
-}
-
-function logoutSuccess(auth) {
-	return {
-		type: 'LOGOUT_SUCCESS',
-		payload: auth
-	};
-}
-
-function logoutError() {
-	return {
-		type: 'LOGOUT_ERROR'
-	};
-}
+eval("/* harmony export */ exports[\"loginPost\"] = loginPost;/* harmony export */ exports[\"configureAuth\"] = configureAuth;/* harmony export */ exports[\"loginSuccess\"] = loginSuccess;/* harmony export */ exports[\"loginError\"] = loginError;/* harmony export */ exports[\"logoutRequest\"] = logoutRequest;/* harmony export */ exports[\"logoutSuccess\"] = logoutSuccess;/* harmony export */ exports[\"logoutError\"] = logoutError;/**\n * @module authActionCreators\n */\n\n/**\n * Create a 'POST' action with onSuccess that parses the API response and\n * returns either a loginError action (API successfully returned, but the\n * response indicates login failure) or a loginSuccess action. onError always\n * returns a loginError action\n * @param {Object} params object with 'email' and 'password' props\n */\nfunction loginPost(params) {\n\tvar LOGIN_REF = 'login';\n\treturn {\n\t\ttype: 'LOGIN_POST',\n\t\tpayload: {\n\t\t\tquery: {\n\t\t\t\ttype: 'login',\n\t\t\t\tparams: params,\n\t\t\t\tref: LOGIN_REF\n\t\t\t},\n\t\t\tonSuccess: function onSuccess(_ref) {\n\t\t\t\tvar queries = _ref.queries;\n\t\t\t\tvar responses = _ref.responses;\n\n\t\t\t\t// get the response `value`\n\t\t\t\tvar response = responses.slice()[0][LOGIN_REF];\n\t\t\t\t// check for errors reported by API (will be handled by loginError)\n\n\t\t\t\tif (response.value.errors) {\n\t\t\t\t\treturn loginError(response.value.errors);\n\t\t\t\t}\n\t\t\t\t// otherwise return the action\n\t\t\t\treturn loginSuccess(response);\n\t\t\t},\n\t\t\tonError: loginError\n\t\t}\n\t};\n}\n\nfunction configureAuth(auth, isServer) {\n\treturn {\n\t\ttype: 'CONFIGURE_AUTH',\n\t\tpayload: auth,\n\t\tmeta: isServer\n\t};\n}\n\nfunction loginSuccess(response) {\n\treturn {\n\t\ttype: 'LOGIN_SUCCESS',\n\t\tpayload: response\n\t};\n}\n\nfunction loginError(response) {\n\treturn {\n\t\ttype: 'LOGIN_ERROR',\n\t\tpayload: response\n\t};\n}\n\nfunction logoutRequest() {\n\treturn {\n\t\ttype: 'LOGOUT_REQUEST'\n\t};\n}\n\nfunction logoutSuccess(auth) {\n\treturn {\n\t\ttype: 'LOGOUT_SUCCESS',\n\t\tpayload: auth\n\t};\n}\n\nfunction logoutError() {\n\treturn {\n\t\ttype: 'LOGOUT_ERROR'\n\t};\n}\n\n//////////////////\n// WEBPACK FOOTER\n// ./src/actions/authActionCreators.js\n// module id = 4\n// module chunks = 3 10\n\n//# sourceURL=webpack:///./src/actions/authActionCreators.js?");
 
 /***/ },
 
 /***/ 40:
 /***/ function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(11);
-
+eval("module.exports = __webpack_require__(11);\n\n\n//////////////////\n// WEBPACK FOOTER\n// multi middleware/auth\n// module id = 40\n// module chunks = 3\n\n//# sourceURL=webpack:///multi_middleware/auth?");
 
 /***/ }
 

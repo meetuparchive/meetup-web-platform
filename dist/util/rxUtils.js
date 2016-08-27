@@ -79,7 +79,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ 0:
 /***/ function(module, exports) {
 
-module.exports = require("rx");
+eval("module.exports = require(\"rx\");\n\n//////////////////\n// WEBPACK FOOTER\n// external \"rx\"\n// module id = 0\n// module chunks = 0 1 2 3 4 7\n\n//# sourceURL=webpack:///external_%22rx%22?");
 
 /***/ },
 
@@ -87,41 +87,14 @@ module.exports = require("rx");
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_rx__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_rx___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_rx__);
-
-/* harmony export */ __webpack_require__.d(exports, "catchAndReturn$", function() { return catchAndReturn$; });
-/**
- * Utilities to help with Observable sequences
- *
- * @module rxUtils
- */
-
-/**
- * utility to log errors and return a curried fallback value
- *
- * @param {Object} errorResponse anything to return in an observable
- * @param {Object} log (optional) A logging function
- * @param {Error} error (in curried return function) The error to handle
- * @returns {Observable} single-element observable
- */
-var catchAndReturn$ = function catchAndReturn$(errorResponse, log) {
-  return function (error) {
-    log = log || console.log;
-    console.warn('Error: ' + error.message);
-    log(['error'], error.stack);
-
-    return __WEBPACK_IMPORTED_MODULE_0_rx___default.a.Observable.just(errorResponse || { error: error });
-  };
-};
+eval("/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_rx__ = __webpack_require__(0);\n/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_rx___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_rx__);\n\n/* harmony export */ __webpack_require__.d(exports, \"catchAndReturn$\", function() { return catchAndReturn$; });\n/**\n * Utilities to help with Observable sequences\n *\n * @module rxUtils\n */\n\n/**\n * utility to log errors and return a curried fallback value\n *\n * @param {Object} errorResponse anything to return in an observable\n * @param {Object} log (optional) A logging function\n * @param {Error} error (in curried return function) The error to handle\n * @returns {Observable} single-element observable\n */\nvar catchAndReturn$ = function catchAndReturn$(errorResponse, log) {\n  return function (error) {\n    log = log || console.log;\n    console.warn('Error: ' + error.message);\n    log(['error'], error.stack);\n\n    return __WEBPACK_IMPORTED_MODULE_0_rx___default.a.Observable.just(errorResponse || { error: error });\n  };\n};\n\n//////////////////\n// WEBPACK FOOTER\n// ./src/util/rxUtils.js\n// module id = 2\n// module chunks = 0 2 7\n\n//# sourceURL=webpack:///./src/util/rxUtils.js?");
 
 /***/ },
 
 /***/ 47:
 /***/ function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(2);
-
+eval("module.exports = __webpack_require__(2);\n\n\n//////////////////\n// WEBPACK FOOTER\n// multi util/rxUtils\n// module id = 47\n// module chunks = 7\n\n//# sourceURL=webpack:///multi_util/rxUtils?");
 
 /***/ }
 

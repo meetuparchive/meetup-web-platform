@@ -31,6 +31,8 @@ module.exports = {
 		filename: '[name].js',
 	},
 
+	devtool: 'eval',
+
 	module: {
 		loaders: [
 			{
