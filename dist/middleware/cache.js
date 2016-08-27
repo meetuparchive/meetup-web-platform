@@ -1,13 +1,13 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("idb"), require("redux"), require("rx"));
+		module.exports = factory(require("redux"), require("rx"));
 	else if(typeof define === 'function' && define.amd)
-		define("meetup-web-platform", ["idb", "redux", "rx"], factory);
+		define("meetup-web-platform", ["redux", "rx"], factory);
 	else if(typeof exports === 'object')
-		exports["meetup-web-platform"] = factory(require("idb"), require("redux"), require("rx"));
+		exports["meetup-web-platform"] = factory(require("redux"), require("rx"));
 	else
-		root["meetup-web-platform"] = factory(root["idb"], root["redux"], root["rx"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_31__, __WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_0__) {
+		root["meetup-web-platform"] = factory(root["redux"], root["rx"]);
+})(this, function(__WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_0__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -71,7 +71,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 42);
+/******/ 	return __webpack_require__(__webpack_require__.s = 41);
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -160,41 +160,6 @@ function makeCache() {
 	}
 
 	// tap into/create the mup-web database, with a `cache` store
-	var idb = __webpack_require__(31);
-	var DB_NAME = 'mup-web';
-	var DB_VERSION = 1;
-	var CACHE_STORE_NAME = 'cache';
-	var dbPromise = idb.open(DB_NAME, DB_VERSION, function (upgradeDB) {
-		upgradeDB.createObjectStore(CACHE_STORE_NAME);
-	});
-	return {
-		get: function get(key) {
-			return dbPromise.then(function (db) {
-				return db.transaction(CACHE_STORE_NAME).objectStore(CACHE_STORE_NAME).get(key);
-			});
-		},
-		set: function set(key, val) {
-			return dbPromise.then(function (db) {
-				var tx = db.transaction(CACHE_STORE_NAME, 'readwrite');
-				tx.objectStore(CACHE_STORE_NAME).put(val, key);
-				return tx.complete;
-			});
-		},
-		delete: function _delete(key) {
-			return dbPromise.then(function (db) {
-				var tx = db.transaction(CACHE_STORE_NAME, 'readwrite');
-				tx.objectStore(CACHE_STORE_NAME).delete(key);
-				return tx.complete;
-			});
-		},
-		clear: function clear() {
-			return dbPromise.then(function (db) {
-				var tx = db.transaction(CACHE_STORE_NAME, 'readwrite');
-				tx.objectStore(CACHE_STORE_NAME).clear();
-				return tx.complete;
-			});
-		}
-	};
 }
 
 /**
@@ -397,14 +362,7 @@ function cacheClear() {
 
 /***/ },
 
-/***/ 31:
-/***/ function(module, exports) {
-
-module.exports = require("idb");
-
-/***/ },
-
-/***/ 42:
+/***/ 41:
 /***/ function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__(12);

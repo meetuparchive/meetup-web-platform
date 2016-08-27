@@ -49,7 +49,9 @@ module.exports = {
 
 	target: 'node',
 
-	externals: [nodeExternals()],
+	externals: [
+		nodeExternals(),
+	],
 
 	resolve: {
 		// module name extensions
