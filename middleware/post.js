@@ -1,14 +1,5 @@
-(function webpackUniversalModuleDefinition(root, factory) {
-	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("redux"));
-	else if(typeof define === 'function' && define.amd)
-		define("meetup-web-platform", ["redux"], factory);
-	else if(typeof exports === 'object')
-		exports["meetup-web-platform"] = factory(require("redux"));
-	else
-		root["meetup-web-platform"] = factory(root["redux"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_1__) {
-return /******/ (function(modules) { // webpackBootstrap
+module.exports =
+/******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 
@@ -106,6 +97,4 @@ eval("\n/* harmony export */ __webpack_require__.d(exports, \"a\", function() { 
 
 /***/ }
 
-/******/ })
-});
-;
+/******/ });

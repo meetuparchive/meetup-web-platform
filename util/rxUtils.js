@@ -1,14 +1,5 @@
-(function webpackUniversalModuleDefinition(root, factory) {
-	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("rx"));
-	else if(typeof define === 'function' && define.amd)
-		define("meetup-web-platform", ["rx"], factory);
-	else if(typeof exports === 'object')
-		exports["meetup-web-platform"] = factory(require("rx"));
-	else
-		root["meetup-web-platform"] = factory(root["rx"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_0__) {
-return /******/ (function(modules) { // webpackBootstrap
+module.exports =
+/******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 
@@ -98,6 +89,4 @@ eval("module.exports = __webpack_require__(2);\n\n\n//////////////////\n// WEBPA
 
 /***/ }
 
-/******/ })
-});
-;
+/******/ });

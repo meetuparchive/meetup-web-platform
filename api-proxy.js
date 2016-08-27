@@ -1,14 +1,5 @@
-(function webpackUniversalModuleDefinition(root, factory) {
-	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("crypto"), require("request"), require("rx"));
-	else if(typeof define === 'function' && define.amd)
-		define("meetup-web-platform", ["crypto", "request", "rx"], factory);
-	else if(typeof exports === 'object')
-		exports["meetup-web-platform"] = factory(require("crypto"), require("request"), require("rx"));
-	else
-		root["meetup-web-platform"] = factory(root["crypto"], root["request"], root["rx"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_8__, __WEBPACK_EXTERNAL_MODULE_9__, __WEBPACK_EXTERNAL_MODULE_0__) {
-return /******/ (function(modules) { // webpackBootstrap
+module.exports =
+/******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 
@@ -128,6 +119,4 @@ eval("module.exports = require(\"request\");\n\n//////////////////\n// WEBPACK F
 
 /***/ }
 
-/******/ })
-});
-;
+/******/ });

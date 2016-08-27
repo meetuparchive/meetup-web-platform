@@ -1,14 +1,5 @@
-(function webpackUniversalModuleDefinition(root, factory) {
-	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory();
-	else if(typeof define === 'function' && define.amd)
-		define("meetup-web-platform", [], factory);
-	else if(typeof exports === 'object')
-		exports["meetup-web-platform"] = factory();
-	else
-		root["meetup-web-platform"] = factory();
-})(this, function() {
-return /******/ (function(modules) { // webpackBootstrap
+module.exports =
+/******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 
@@ -91,6 +82,4 @@ eval("/* harmony export */ exports[\"loginPost\"] = loginPost;/* harmony export 
 
 /***/ }
 
-/******/ })
-});
-;
+/******/ });

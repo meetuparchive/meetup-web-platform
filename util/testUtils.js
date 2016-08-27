@@ -1,14 +1,5 @@
-(function webpackUniversalModuleDefinition(root, factory) {
-	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("react-addons-test-utils"));
-	else if(typeof define === 'function' && define.amd)
-		define("meetup-web-platform", ["react-addons-test-utils"], factory);
-	else if(typeof exports === 'object')
-		exports["meetup-web-platform"] = factory(require("react-addons-test-utils"));
-	else
-		root["meetup-web-platform"] = factory(root["react-addons-test-utils"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_33__) {
-return /******/ (function(modules) { // webpackBootstrap
+module.exports =
+/******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 
@@ -98,6 +89,4 @@ eval("module.exports = __webpack_require__(17);\n\n\n//////////////////\n// WEBP
 
 /***/ }
 
-/******/ })
-});
-;
+/******/ });

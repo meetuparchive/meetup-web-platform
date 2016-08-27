@@ -1,14 +1,5 @@
-(function webpackUniversalModuleDefinition(root, factory) {
-	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("accepts"), require("boom"), require("chalk"), require("crypto"), require("good"), require("hapi"), require("https"), require("node-fetch"), require("request"), require("rx"), require("source-map-support"), require("url-search-params"));
-	else if(typeof define === 'function' && define.amd)
-		define("meetup-web-platform", ["accepts", "boom", "chalk", "crypto", "good", "hapi", "https", "node-fetch", "request", "rx", "source-map-support", "url-search-params"], factory);
-	else if(typeof exports === 'object')
-		exports["meetup-web-platform"] = factory(require("accepts"), require("boom"), require("chalk"), require("crypto"), require("good"), require("hapi"), require("https"), require("node-fetch"), require("request"), require("rx"), require("source-map-support"), require("url-search-params"));
-	else
-		root["meetup-web-platform"] = factory(root["accepts"], root["boom"], root["chalk"], root["crypto"], root["good"], root["hapi"], root["https"], root["node-fetch"], root["request"], root["rx"], root["source-map-support"], root["url-search-params"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_26__, __WEBPACK_EXTERNAL_MODULE_10__, __WEBPACK_EXTERNAL_MODULE_27__, __WEBPACK_EXTERNAL_MODULE_8__, __WEBPACK_EXTERNAL_MODULE_28__, __WEBPACK_EXTERNAL_MODULE_29__, __WEBPACK_EXTERNAL_MODULE_30__, __WEBPACK_EXTERNAL_MODULE_32__, __WEBPACK_EXTERNAL_MODULE_9__, __WEBPACK_EXTERNAL_MODULE_0__, __WEBPACK_EXTERNAL_MODULE_36__, __WEBPACK_EXTERNAL_MODULE_37__) {
-return /******/ (function(modules) { // webpackBootstrap
+module.exports =
+/******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 
@@ -239,6 +230,4 @@ eval("module.exports = require(\"url-search-params\");\n\n//////////////////\n//
 eval("module.exports = __webpack_require__(15);\n\n\n//////////////////\n// WEBPACK FOOTER\n// multi server\n// module id = 44\n// module chunks = 0\n\n//# sourceURL=webpack:///multi_server?");
 
 /***/ }
-/******/ ])
-});
-;
+/******/ ]);

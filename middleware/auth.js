@@ -1,14 +1,5 @@
-(function webpackUniversalModuleDefinition(root, factory) {
-	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("js-cookie"), require("redux"), require("rx"));
-	else if(typeof define === 'function' && define.amd)
-		define("meetup-web-platform", ["js-cookie", "redux", "rx"], factory);
-	else if(typeof exports === 'object')
-		exports["meetup-web-platform"] = factory(require("js-cookie"), require("redux"), require("rx"));
-	else
-		root["meetup-web-platform"] = factory(root["js-cookie"], root["redux"], root["rx"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_31__, __WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_0__) {
-return /******/ (function(modules) { // webpackBootstrap
+module.exports =
+/******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 
@@ -120,6 +111,4 @@ eval("module.exports = __webpack_require__(11);\n\n\n//////////////////\n// WEBP
 
 /***/ }
 
-/******/ })
-});
-;
+/******/ });

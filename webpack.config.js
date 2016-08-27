@@ -24,7 +24,7 @@ module.exports = {
 	},
 
 	output: {
-		libraryTarget: 'umd',
+		libraryTarget: 'commonjs2',
 		library: 'meetup-web-platform',
 		umdNamedDefine: true,
 		path: __dirname,
