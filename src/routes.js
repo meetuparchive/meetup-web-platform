@@ -13,7 +13,7 @@ export default function getRoutes(
 		localeCodes
 	}) {
 
-	console.log(chalk.green(`Supported languages: ${Object.keys(renderRequestMap)}`));
+	console.log(chalk.green(`Supported languages:\n${Object.keys(renderRequestMap).join('\n')}`));
 	const proxyApiRequest$ = apiProxy$({
 		baseUrl: API_SERVER_ROOT_URL,
 		duotoneUrls: getDuotoneUrls(duotones, PHOTO_SCALER_SALT),
@@ -51,7 +51,7 @@ export default function getRoutes(
 		handler: (request, reply) => {
 			const requestLanguage = Accepts(request).language(localeCodes) || 'en-US';
 
-			console.log(chalk.green(`Rendering ${renderRequestMap[requestLanguage]}`));
+			request.log(['info'], chalk.green(`Rendering ${request.url} in ${requestLanguage}`));
 			const render$ = request.authorize()  // `authorize()` method is supplied by anonAuthPlugin
 				.flatMap(renderRequestMap[requestLanguage]);
 
@@ -60,6 +60,7 @@ export default function getRoutes(
 					// response is sent when this function returns (`nextTick`)
 					const response = reply(result).code(statusCode);
 
+					request.log(['info'], chalk.green('HTML response ready'));
 					if (reply.request.app.setCookies) {
 						// when auth cookies are generated on the server rather than the
 						// original browser request, we need to send the new cookies
@@ -71,6 +72,8 @@ export default function getRoutes(
 							anonymous,
 						} = reply.request.state;
 						const yearOfMilliseconds = 1000 * 60 * 60 * 24 * 365;
+
+						request.log(['info'], chalk.green(`Setting cookies ${Object.keys(reply.request.state)}`));
 						response.state('oauth_token', oauth_token, { ttl: expires_in * 1000 });
 						response.state('refresh_token', refresh_token, { ttl: yearOfMilliseconds * 2 });
 						response.state('anonymous', anonymous.toString(), { ttl: yearOfMilliseconds * 2 });
