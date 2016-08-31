@@ -47,12 +47,30 @@ export default function getRoutes(
 		path: '/{wild*}',
 		handler: (request, reply) => {
 			const requestLanguage = Accepts(request).language(localeCodes) || 'en-US';
-			request.log(['info'], renderRequestMap[requestLanguage]);
 			const render$ = request.authorize()  // `authorize()` method is supplied by anonAuthPlugin
 				.flatMap(renderRequestMap[requestLanguage]);
 
 			render$.subscribe(
-				({ result, statusCode }) => reply(result).code(statusCode),
+				({ result, statusCode }) => {
+					// response is sent when this function returns (`nextTick`)
+					const response = reply(result).code(statusCode);
+
+					if (reply.request.app.setCookies) {
+						// when auth cookies are generated on the server rather than the
+						// original browser request, we need to send the new cookies
+						// back to the browser in the response
+						const {
+							oauth_token,
+							refresh_token,
+							expires_in,
+							anonymous,
+						} = reply.request.state;
+						const yearOfMilliseconds = 1000 * 60 * 60 * 24 * 365;
+						response.state('oauth_token', oauth_token, { ttl: expires_in * 1000 });
+						response.state('refresh_token', refresh_token, { ttl: yearOfMilliseconds * 2 });
+						response.state('anonymous', anonymous.toString(), { ttl: yearOfMilliseconds * 2 });
+					}
+				},
 				(err) => { reply(Boom.badImplementation(err.message)); }
 			);
 		}

@@ -40,7 +40,7 @@ const PostMiddleware = store => next => action => {
 			auth,
 		} = store.getState();
 
-		fetchQueries(auth.oauth_token, config.apiUrl, 'POST')([query])
+		fetchQueries(config.apiUrl, { method: 'POST', auth })([query])
 			.then(actions.onSuccess)
 			.catch(actions.onError);
 	}

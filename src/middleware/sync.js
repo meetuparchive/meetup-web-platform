@@ -65,9 +65,10 @@ const getSyncMiddleware = routes => store => next => action => {
 			auth,
 			config,
 		} = store.getState();
+		// should read auth from cookie if on browser, only read from state if on server
 
 		const apiFetch$ = Rx.Observable.just(action.payload)
-			.flatMap(fetchQueries(auth.oauth_token, config.apiUrl, 'GET'));
+			.flatMap(fetchQueries(config.apiUrl, { method: 'GET', auth }));
 
 		// dispatch the sync action
 		navRenderSub.setDisposable(

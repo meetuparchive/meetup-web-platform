@@ -13,7 +13,7 @@ const oauth = {
 	key: '1234',
 	secret: 'asdf',
 };
-const DUMMY_HEADERS = {};
+const MOCK_HEADERS = {};
 const GOOD_MOCK_FETCH_RESULT = Promise.resolve({
 	text: () => Promise.resolve('{}')
 });
@@ -21,7 +21,7 @@ const BAD_MOCK_FETCH_RESULT = Promise.resolve({ text: () => Promise.resolve(unde
 
 const ANONYMOUS_AUTH_URL = 'auth_fakeout';
 const ANONYMOUS_ACCESS_URL = 'access_fakeout';
-const MOCK_CODE = 'mock_anon_code';
+const MOCK_CODE = { grant_type: 'anonymous_code', token: 'mock_anon_code' };
 
 describe('getAnonymousCode$', () => {
 	it('sets ANONYMOUS_AUTH_URL as opts.url', function(done) {
@@ -36,8 +36,8 @@ describe('getAnonymousCode$', () => {
 		spyOn(global, 'fetch').and.callFake((url, opts) => BAD_MOCK_FETCH_RESULT);
 
 		const getCode$ = getAnonymousCode$({ oauth, ANONYMOUS_AUTH_URL })();
-		getCode$.subscribe(code => {
-			expect(code).toBeNull();
+		getCode$.subscribe(({ grant_type, token }) => {
+			expect(token).toBeNull();
 			done();
 		});
 	});
@@ -51,7 +51,7 @@ describe('getAnonymousToken$', () => {
 			return GOOD_MOCK_FETCH_RESULT;
 		});
 		const getToken$ = getAnonymousAccessToken$({ oauth, ANONYMOUS_ACCESS_URL }, null);
-		getToken$(DUMMY_HEADERS)(MOCK_CODE).subscribe(done);
+		getToken$(MOCK_HEADERS)(MOCK_CODE).subscribe(done);
 	});
 	it('throws an error when no oauth.key is supplied', function() {
 		const oauthNoKey = { ...oauth };
@@ -66,14 +66,14 @@ describe('getAnonymousToken$', () => {
 			.toThrowError(ReferenceError);
 	});
 	it('throws an error when no access code is supplied to the final curried function', function() {
-		const code = null;
+		const token = null;
 		const getToken$ = getAnonymousAccessToken$({ oauth, ANONYMOUS_ACCESS_URL }, null);
-		expect(() => getToken$(DUMMY_HEADERS)(code)).toThrowError(ReferenceError);
+		expect(() => getToken$(MOCK_HEADERS)({ ...MOCK_CODE, token })).toThrowError(ReferenceError);
 	});
 	it('throws an error when response cannot be JSON parsed', function(done) {
 		spyOn(global, 'fetch').and.callFake((url, opts) => BAD_MOCK_FETCH_RESULT);
 		const getToken$ = getAnonymousAccessToken$({ oauth, ANONYMOUS_ACCESS_URL }, null);
-		getToken$(DUMMY_HEADERS)(MOCK_CODE)
+		getToken$(MOCK_HEADERS)(MOCK_CODE)
 			.catch(err => {
 				expect(err).toEqual(jasmine.any(Error));
 				return Rx.Observable.just(null);
@@ -97,9 +97,9 @@ describe('anonAuth$', () => {
 			}
 		});
 		const auth$ = anonAuth$({ oauth, ANONYMOUS_AUTH_URL, ANONYMOUS_ACCESS_URL }, null);
-		const DUMMY_REQUEST = { headers: DUMMY_HEADERS };
+		const MOCK_REQUEST = { headers: MOCK_HEADERS, state: {}, app: {}, log: () => {} };
 
-		auth$(DUMMY_REQUEST).subscribe(auth => {
+		auth$(MOCK_REQUEST).subscribe(auth => {
 			expect(auth.oauth_token).toBe('good_token');
 			done();
 		});
@@ -121,14 +121,16 @@ describe('requestAuthorizer', () => {
 				});
 			}
 		});
-		const DUMMY_REQUEST = {
-			headers: DUMMY_HEADERS,
+		const MOCK_REQUEST = {
+			headers: MOCK_HEADERS,
 			state: {
 				oauth_token: 'good_token'
 			},
+			app: {},
+			log: () => {},
 		};
 
-		authorizeRequest$(DUMMY_REQUEST).subscribe(request => {
+		authorizeRequest$(MOCK_REQUEST).subscribe(request => {
 			expect(global.fetch).not.toHaveBeenCalled();
 			done();
 		});
@@ -146,12 +148,14 @@ describe('requestAuthorizer', () => {
 				});
 			}
 		});
-		const DUMMY_REQUEST = {
-			headers: DUMMY_HEADERS,
+		const MOCK_REQUEST = {
+			headers: MOCK_HEADERS,
 			state: {},
+			app: {},
+			log: () => {},
 		};
 
-		authorizeRequest$(DUMMY_REQUEST).subscribe(request => {
+		authorizeRequest$(MOCK_REQUEST).subscribe(request => {
 			expect(global.fetch).toHaveBeenCalled();
 			done();
 		});
@@ -190,3 +194,4 @@ describe('register', () => {
 			.toHaveBeenCalledWith('request', jasmine.any(String), jasmine.any(Function), { apply: true });
 	});
 });
+

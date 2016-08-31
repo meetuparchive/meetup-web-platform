@@ -1,4 +1,5 @@
 import chalk from 'chalk';
+import { ANONYMOUS_AUTH_APP_PATH } from '../middleware/auth';
 /**
  * Start the server with a config
  *
@@ -18,6 +19,7 @@ export default function getConfig(overrideConfig) {
 		ANONYMOUS_AUTH_URL: process.env.ANONYMOUS_AUTH_URL || 'https://secure.dev.meetup.com/oauth2/authorize',
 		ANONYMOUS_ACCESS_URL: process.env.ANONYMOUS_ACCESS_URL || 'https://secure.dev.meetup.com/oauth2/access',
 		PHOTO_SCALER_SALT: process.env.PHOTO_SCALER_SALT,
+		ANONYMOUS_AUTH_APP_PATH,
 		oauth: {
 			secret: process.env.MUPWEB_OAUTH_SECRET,
 			key: process.env.MUPWEB_OAUTH_KEY,

@@ -2,7 +2,6 @@ import { middlewareDispatcher } from '../util/testUtils';
 import { MOCK_APP_STATE } from '../util/mocks/app';
 import AuthMiddleware from './auth';
 import * as authActionCreators from '../actions/authActionCreators';
-import Cookies from 'js-cookie';  // only used for mocking
 
 /**
  * Middleware tests require a mock `dispatch` method and a mock `createStore`.
@@ -26,20 +25,20 @@ describe('AuthMiddleware', () => {
 		expect(authDispatcher(MOCK_APP_STATE, this.loginSuccessAction))
 			.toEqual(this.loginSuccessAction);  // end of dispatch chain is the action
 	});
-	it('creates auth cookie on LOGIN_SUCCESS', function() {
-		spyOn(Cookies, 'set');
+	it('dispatches configureAuth on LOGIN_SUCCESS', function() {
+		spyOn(authActionCreators, 'configureAuth');
 		authDispatcher(MOCK_APP_STATE, this.loginSuccessAction);
-		expect(Cookies.set).toHaveBeenCalled();
+		expect(authActionCreators.configureAuth).toHaveBeenCalled();
 	});
 	it('dispatches configureAuth on LOGIN_SUCCESS', function() {
 		spyOn(authActionCreators, 'configureAuth');
 		authDispatcher(MOCK_APP_STATE, this.loginSuccessAction);
 		expect(authActionCreators.configureAuth).toHaveBeenCalled();
 	});
-	it('removes auth cookie on LOGOUT_REQUEST', function() {
-		spyOn(Cookies, 'remove');
+	it('dispatches configureAuth on LOGOUT_REQUEST', function() {
+		spyOn(authActionCreators, 'configureAuth');
 		authDispatcher(MOCK_APP_STATE, this.logoutAction);
-		expect(Cookies.remove).toHaveBeenCalled();
+		expect(authActionCreators.configureAuth).toHaveBeenCalled();
 	});
 });
 

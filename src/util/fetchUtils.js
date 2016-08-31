@@ -7,17 +7,24 @@
  * Wrapper around `fetch` to send an array of queries to the server. It ensures
  * that the request will have the required Oauth access token and constructs
  * the `fetch` call arguments based on the request method
- * @param {String} oauth_token
  * @param {String} apiUrl the general-purpose endpoint for API calls to the
  *   application server
- * @param {String} method (Optional) "get", "post", "delete", or "patch"
+ * @param {Object} options {
+ *     method: "get", "post", "delete", or "patch",
+ *     auth: { oauth_token },
+ *   }
  * @return {Promise} resolves with a `{queries, responses}` object
  */
-export const fetchQueries = (oauth_token, apiUrl, method) => queries => {
-	if (!oauth_token) {
-		return Promise.reject(new Error(`No access token provided - cannot ${method} request to API`));
+export const fetchQueries = (apiUrl, options) => queries => {
+	options.method = options.method || 'GET';
+	const {
+		auth,
+		method,
+	} = options;
+
+	if (!auth.oauth_token) {
+		console.log('No access token provided - hope there\'s a refresh token');
 	}
-	method = method || 'GET';
 	const isPost = method.toLowerCase() === 'post';
 
 	const params = new URLSearchParams();
@@ -26,7 +33,7 @@ export const fetchQueries = (oauth_token, apiUrl, method) => queries => {
 	const fetchConfig = {
 		method,
 		headers: {
-			Authorization: `Bearer ${oauth_token}`,
+			Authorization: `Bearer ${auth.oauth_token}`,
 			'content-type': isPost ? 'application/x-www-form-urlencoded' : 'text/plain',
 		}
 	};

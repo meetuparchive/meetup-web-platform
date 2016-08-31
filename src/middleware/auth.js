@@ -16,6 +16,8 @@ import {
 	configureAuth,
 } from '../actions/authActionCreators';
 
+export const ANONYMOUS_AUTH_APP_PATH = '/anon';
+
 /**
  * login sub responds to only the most recent login request, and can be disposed
  * by a logout
@@ -39,39 +41,82 @@ const AuthMiddleware = store => next => action => {
 	const actions = bindActionCreators({
 		logoutSuccess,
 		logoutError,
+		configureAuth,
 	}, store.dispatch);
-
-	let oauth_token,
-		response;
+	let response;
 	switch (action.type) {
 	case 'LOGIN_SUCCESS':
+		// parse the login API endpoint response and dispatch
+		// configure auth action
 		response = action.payload;
-		oauth_token = response.value.oauth_token;
-		Cookies.set('oauth_token', oauth_token);
-		Cookies.remove('anonymous');
-		// re-sync the page
-		store.dispatch(configureAuth(({ oauth_token })));
+		actions.configureAuth(({
+			oauth_token: response.value.oauth_token,  // currently does not expire
+			expires_in: response.value.expires_in || 60 * 60,  // seconds
+			refresh_token: response.value.refresh_token,
+			anonymous: false,
+		}));
 		break;
 	case 'LOGIN_ERROR':
 		break;
 	case 'LOGOUT_REQUEST':
-		Cookies.remove('oauth_token');
-		fetch('/anon')  // application server route to serve anonymous tokens
+		// immediately clear auth information so no more private data is accessible
+		// - this will put the app in limbo, unable to request any more data until
+		// a new token is provided by `LOGOUT_SUCESS` or a full refresh
+		actions.configureAuth({
+			anonymous: true
+		});
+		// Go get a new anonymous oauth token
+		fetch(ANONYMOUS_AUTH_APP_PATH)
 			.then(response => response.json())
 			.catch(e => Promise.reject([e]))
 			.then(actions.logoutSuccess, actions.logoutError);
 		break;
 	case 'LOGOUT_SUCCESS':
+		// anonymous auth has returned new anon oauth token
 		response = action.payload;
-		oauth_token = response.access_token;
-		Cookies.set('oauth_token', oauth_token);
-		Cookies.set('anonymous', true);
 		// re-sync the page
-		store.dispatch(configureAuth(({ anonymous: true, oauth_token })));
+		actions.configureAuth({
+			anonymous: true,
+			oauth_token: response.access_token,
+			refresh_token: response.refresh_token,
+			expires_in: response.expires_in,
+		});
 		break;
 	case 'LOGOUT_ERROR':
 		break;
+	case 'CONFIGURE_AUTH':
+		// The middleware sets cookies based on `configureAuth` actions, but only
+		// in the browser. `action.meta` is a Boolean indicating whether the
+		// action was dispatched from the server or the browser. If it's from the
+		// server, we should not set cookies
+		if (!action.meta) {
+			const {
+				oauth_token,
+				expires_in,  // in seconds
+				refresh_token,
+				anonymous,
+			} = action.payload;
+			const expires = expires_in ? 1 / 24 / 3600 * expires_in : 365;  // lifetime in *days*
+
+			Cookies.set(
+				'oauth_token',
+				oauth_token || '',
+				{ expires }
+			);
+			Cookies.set(
+				'refresh_token',
+				refresh_token || '',
+				{ expires: 5 * 365 }  // 5 year expiration - 'permanent'
+			);
+			Cookies.set(
+				'anonymous',
+				anonymous || '',
+				{ expires: 5 * 365 }  // 'permanent', but refreshes with every login/logout
+			);
+		}
+		break;
 	}
+
 	return next(action);
 };
 

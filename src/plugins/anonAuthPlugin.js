@@ -1,4 +1,5 @@
 import Boom from 'boom';
+import chalk from 'chalk';
 import Rx from 'rx';
 
 /**
@@ -11,6 +12,34 @@ function tryJSON(response) {
 		throw new Error(`API responded with error code ${status}`);
 	}
 	return response.text().then(text => JSON.parse(text));
+}
+
+function verifyAuth([request, auth]) {
+	const keys = Object.keys(auth);
+	if (!keys.length) {
+		const errorMessage = 'No auth info provided';
+		console.error(
+			chalk.red(errorMessage),
+			': application can not fetch data.',
+			'You might be able to recover by clearing cookies and refreshing'
+		);
+		throw new Error(errorMessage);
+	}
+	// there are secret tokens in `auth`, be careful with logging
+	request.log(['auth'], `Authorizing with keys: ${JSON.stringify(keys)}`);
+}
+
+function injectAuthIntoRequest([request, auth]) {
+	// update request with auth info
+	request.state.oauth_token = auth.access_token;  // this endpoint provides 'access_token' instead of 'oauth_token'
+	request.state.refresh_token = auth.refresh_token;  // use to get new oauth upon expiration
+	request.state.expires_in = auth.expires_in;  // TTL for oauth token (in seconds)
+	request.state.anonymous = true;
+
+	// special prop in `request.app` to indicate that this is a new,
+	// server-provided token, not from the original request, so the cookies
+	// will need to be set in the response
+	request.app.setCookies = true;
 }
 
 /**
@@ -36,20 +65,9 @@ export const requestAuthorizer = auth$ => request => {
 		request$,
 		request$
 			.zip(deferredAuth$)
-			.do(([request, auth]) => {
-				if (Object.keys(auth).length) {
-					console.log(`injecting auth tokens: ${JSON.stringify(auth)}`);
-				} else {
-					console.log('No auth info provided - application will not fetch data');
-				}
-
-			})
-			.map(([request, auth]) => {
-				// this endpoint provides 'access_token' instead of 'oauth_token'
-				request.state.oauth_token = auth.access_token;
-				request.state.anonymous = true;
-				return request;
-			})
+			.do(verifyAuth)
+			.do(injectAuthIntoRequest)
+			.map(([request, auth]) => request)  // throw away auth info
 	);
 };
 
@@ -60,7 +78,7 @@ export const requestAuthorizer = auth$ => request => {
  * @param {Object} config { ANONYMOUS_AUTH_URL, oauth }
  * @param {String} redirect_uri Return url after anonymous grant
  */
-export function getAnonymousCode$({ANONYMOUS_AUTH_URL, oauth }, redirect_uri) {
+export function getAnonymousCode$({ ANONYMOUS_AUTH_URL, oauth }, redirect_uri) {
 	if (!oauth.key) {
 		throw new ReferenceError('OAuth consumer key is required');
 	}
@@ -85,7 +103,10 @@ export function getAnonymousCode$({ANONYMOUS_AUTH_URL, oauth }, redirect_uri) {
 			console.log(error.stack);
 			return Rx.Observable.just({ code: null });
 		})
-		.map(({ code }) => code);
+		.map(({ code }) => ({
+			grant_type: 'anonymous_code',
+			token: code
+		}));
 	};
 }
 
@@ -108,7 +129,6 @@ export const getAnonymousAccessToken$ = ({ ANONYMOUS_ACCESS_URL, oauth }, redire
 	const params = {
 		client_id: oauth.key,
 		client_secret: oauth.secret,
-		grant_type: 'anonymous_code',
 		redirect_uri
 	};
 	return headers => {
@@ -127,11 +147,20 @@ export const getAnonymousAccessToken$ = ({ ANONYMOUS_ACCESS_URL, oauth }, redire
 				return accessParams;
 			}, new URLSearchParams());
 
-		return code => {
-			if (!code) {
+		return ({ grant_type, token }) => {
+
+			if (!token) {
 				throw new ReferenceError('No auth code provided - cannot obtain access token');
 			}
-			accessParams.append('code', code);
+
+			accessParams.append('grant_type', grant_type);
+			if (grant_type === 'anonymous_code') {
+				accessParams.append('code', token);
+			}
+			if (grant_type === 'refresh_token') {
+				accessParams.append('refresh_token', token);
+			}
+
 			const url = `${ANONYMOUS_ACCESS_URL}?${accessParams}`;
 
 			console.log(`Fetching anonymous access_token from ${ANONYMOUS_ACCESS_URL}`);
@@ -159,12 +188,20 @@ export const anonAuth$ = config => {
 	const code$ = getAnonymousCode$(config, redirect_uri);
 	const token$ = getAnonymousAccessToken$(config, redirect_uri);
 
-	return request => code$()
-		.flatMap(token$(request.headers))
-		.catch(error => {
-			console.log(error.stack);
-			return Rx.Observable.just({});  // failure results in empty object response - bad time
-		});
+	// if the request has a refresh_token, use it. Otherwise, get a new anonymous code
+	return request => Rx.Observable.if(
+		() => request.state.refresh_token,
+		Rx.Observable.just({
+			grant_type: 'refresh_token',
+			token: request.state.refresh_token
+		}),
+		code$()
+	)
+	.flatMap(token$(request.headers))
+	.catch(error => {
+		console.log(error.stack);
+		return Rx.Observable.just({});  // failure results in empty object response - bad time
+	});
 };
 
 /**
@@ -193,7 +230,7 @@ export default function register(server, options, next) {
 
 	server.route({
 		method: 'GET',
-		path: options.path || '/anon',
+		path: options.ANONYMOUS_AUTH_APP_PATH,
 		handler: (request, reply) => {
 			auth$(request).subscribe(
 				auth => {
@@ -207,7 +244,7 @@ export default function register(server, options, next) {
 	next();
 }
 register.attributes = {
-	name: 'anonAuth plugin',
+	name: 'anonAuth',
 	version: '1.0.0',
 };
 
