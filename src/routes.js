@@ -51,7 +51,8 @@ export default function getRoutes(
 		handler: (request, reply) => {
 			const requestLanguage = Accepts(request).language(localeCodes) || 'en-US';
 
-			request.log(['info'], chalk.green(`Rendering ${request.url} in ${requestLanguage}`));
+			request.log(['info'], chalk.green(`Request received for ${request.url.href} (${requestLanguage})`));
+			request.log(['info'], chalk.green(`${typeof renderRequestMap[requestLanguage]}`));
 			const render$ = request.authorize()  // `authorize()` method is supplied by anonAuthPlugin
 				.flatMap(renderRequestMap[requestLanguage]);
 
