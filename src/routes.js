@@ -1,5 +1,6 @@
-import Boom from 'boom';
 import Accepts from 'accepts';
+import Boom from 'boom';
+import chalk from 'chalk';
 
 import apiProxy$ from './api-proxy';
 import { duotones, getDuotoneUrls } from './util/duotone';
@@ -11,6 +12,8 @@ export default function getRoutes(
 		PHOTO_SCALER_SALT,
 		localeCodes
 	}) {
+
+	console.log(chalk.green(`Supported languages: ${Object.keys(renderRequestMap)}`));
 	const proxyApiRequest$ = apiProxy$({
 		baseUrl: API_SERVER_ROOT_URL,
 		duotoneUrls: getDuotoneUrls(duotones, PHOTO_SCALER_SALT),
@@ -47,6 +50,8 @@ export default function getRoutes(
 		path: '/{wild*}',
 		handler: (request, reply) => {
 			const requestLanguage = Accepts(request).language(localeCodes) || 'en-US';
+
+			console.log(chalk.green(`Rendering ${renderRequestMap[requestLanguage]}`));
 			const render$ = request.authorize()  // `authorize()` method is supplied by anonAuthPlugin
 				.flatMap(renderRequestMap[requestLanguage]);
 
