@@ -40,7 +40,7 @@ all the API-specific translations happen on the server.
 
 ## Middleware
 
-### Auth `src/middleware/auth.js`
+### Auth `middleware/auth.js`
 
 _in development - API will provide most auth needs_
 
@@ -59,7 +59,7 @@ regular data API - the current branch implements it as part of the API server, r
 - delete auth cookie (not currently implemented)
 - clearing local state is not a side effect, so it's handled directly by the `auth` reducer in `coreReducers`
 
-### Sync `src/middleware/sync.js`
+### Sync `middleware/sync.js`
 
 This middleware is currently only responsible for fetching the data from the API server on initial render or client-side
 user navigation.
@@ -82,7 +82,7 @@ any "pending" API requests will *not be processed*. This is a Very Good Thing be
 one login request can be processed, but it's less likely to be an issue there since it's rare that users would be trying
 to log in repeatedly without waiting for previous login requests to be processed.
 
-### Cache
+### Cache `middleware/cache.js`
 
 The cache middleware provides optimistic `state` updates for any data specified
 by active route queries, similar to the SyncMiddleware, but using locally
