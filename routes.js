@@ -2,7 +2,7 @@ import Accepts from 'accepts';
 import Boom from 'boom';
 import chalk from 'chalk';
 
-import apiProxy$ from './api-proxy';
+import apiProxy$ from './apiProxy/api-proxy';
 import { duotones, getDuotoneUrls } from './util/duotone';
 
 export default function getRoutes(
