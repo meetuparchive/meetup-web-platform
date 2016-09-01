@@ -19,7 +19,7 @@
     "automock": false,
     "coverageDirectory": "<rootDir>/coverage",
     "setupFiles": [
-      "<rootDir>/globals.js"
+      "<rootDir>/util/globals.js"
     ],
     "moduleFileExtensions": [
       "js",
