@@ -1,6 +1,6 @@
 import Boom from 'boom';
 import chalk from 'chalk';
-import Rx from 'rx';
+import Rx from 'rxjs';
 
 /**
  * @module anonAuthPlugin
@@ -59,7 +59,7 @@ export const requestAuthorizer = auth$ => request => {
 		() => auth$(request)
 	);
 
-	const request$ = Rx.Observable.just(request);
+	const request$ = Rx.Observable.of(request);
 	return Rx.Observable.if(
 		() => request.state.oauth_token,
 		request$,
@@ -101,7 +101,7 @@ export function getAnonymousCode$({ ANONYMOUS_AUTH_URL, oauth }, redirect_uri) {
 		.flatMap(tryJSON)
 		.catch(error => {
 			console.log(error.stack);
-			return Rx.Observable.just({ code: null });
+			return Rx.Observable.of({ code: null });
 		})
 		.map(({ code }) => ({
 			grant_type: 'anonymous_code',
@@ -191,7 +191,7 @@ export const anonAuth$ = config => {
 	// if the request has a refresh_token, use it. Otherwise, get a new anonymous code
 	return request => Rx.Observable.if(
 		() => request.state.refresh_token,
-		Rx.Observable.just({
+		Rx.Observable.of({
 			grant_type: 'refresh_token',
 			token: request.state.refresh_token
 		}),
@@ -200,7 +200,7 @@ export const anonAuth$ = config => {
 	.flatMap(token$(request.headers))
 	.catch(error => {
 		console.log(error.stack);
-		return Rx.Observable.just({});  // failure results in empty object response - bad time
+		return Rx.Observable.of({});  // failure results in empty object response - bad time
 	});
 };
 

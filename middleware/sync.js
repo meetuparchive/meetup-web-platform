@@ -9,7 +9,7 @@
  * @module SyncMiddleware
  */
 
-import Rx from 'rx';
+import Rx from 'rxjs';
 import { bindActionCreators } from 'redux';
 import { LOCATION_CHANGE } from 'react-router-redux';
 import {
@@ -23,11 +23,11 @@ import { activeRouteQueries$ } from '../util/routeUtils';
 import { fetchQueries } from '../util/fetchUtils';
 
 /**
- * navRenderSub lives for the entire request, but only responds to the most
+ * apiFetchSub lives for the entire request, but only responds to the most
  * recent routing action, so it's a module-scoped 'SerialDisposable', which
  * will take care of disposing previous subscriptions automatically
  */
-const navRenderSub = new Rx.SerialDisposable();
+let apiFetchSub = new Rx.Subscription();
 
 /**
  * The middleware is exported as a getter because it needs the application's
@@ -67,16 +67,14 @@ const getSyncMiddleware = routes => store => next => action => {
 		} = store.getState();
 		// should read auth from cookie if on browser, only read from state if on server
 
-		const apiFetch$ = Rx.Observable.just(action.payload)
+		const apiFetch$ = Rx.Observable.of(action.payload)
 			.flatMap(fetchQueries(config.apiUrl, { method: 'GET', auth }));
 
-		// dispatch the sync action
-		navRenderSub.setDisposable(
-			apiFetch$.subscribe(
-				actions.apiSuccess,
-				actions.apiError,
-				actions.apiComplete
-			)
+		apiFetchSub.unsubscribe();  // tear down existing subscriptions
+		apiFetchSub = apiFetch$.subscribe(
+			actions.apiSuccess,
+			actions.apiError,
+			actions.apiComplete
 		);
 	}
 

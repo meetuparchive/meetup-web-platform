@@ -1,6 +1,6 @@
 import externalRequest from 'request';
-import Rx from 'rx';
-const externalRequest$ = Rx.Observable.fromNodeCallback(externalRequest);
+import Rx from 'rxjs';
+const externalRequest$ = Rx.Observable.bindNodeCallback(externalRequest);
 
 import { catchAndReturn$ } from './util/rxUtils';
 import { duotoneRef } from './util/duotone';
@@ -285,13 +285,13 @@ const apiProxy$ = ({ baseUrl, duotoneUrls }) => {
 			.map(apiConfigToRequestOptions)     // API-specific args for api request
 			.do(externalRequestOpts => request.log(['api'], JSON.stringify(externalRequestOpts.url)))  // logging
 			.concatMap(externalRequestOpts => externalRequest$(externalRequestOpts))  // make the API calls - keep order
-			.map(([response, body]) => body)       // ignore Response object, just process body string
-			.map(parseApiResponse)                 // parse into plain object
-			.catch(catchAndReturn$())  // return error object instead of response
-			.zipIterable(queries)                  // zip the apiResponse with corresponding query
-			.map(apiResponseToQueryResponse)       // convert apiResponse to app-ready queryResponse
-			.map(setApiResponseDuotones)      // special duotone prop
-			.toArray();                            // group all responses into a single array - fan-in
+			.map(([response, body]) => body)    // ignore Response object, just process body string
+			.map(parseApiResponse)              // parse into plain object
+			.catch(catchAndReturn$())           // return error object instead of response
+			.zip(Rx.Observable.from(queries))   // zip the apiResponse with corresponding query
+			.map(apiResponseToQueryResponse)    // convert apiResponse to app-ready queryResponse
+			.map(setApiResponseDuotones)        // special duotone prop
+			.toArray();                         // group all responses into a single array - fan-in
 	};
 };
 
