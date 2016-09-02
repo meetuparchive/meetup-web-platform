@@ -10,31 +10,49 @@ import {
 import { activeRouteQueries$ } from '../util/routeUtils';
 import { fetchQueries } from '../util/fetchUtils';
 
-export const getNavEpic = routes => (action$, store) =>
-	action$.ofType(LOCATION_CHANGE, '@@server/RENDER', 'LOCATION_SYNC')
-		.map(({ payload }) => payload)  // payload is `location`
-		.flatMap(location => activeRouteQueries$(routes, { location }))
-		.filter(queries => queries)
-		.map(apiRequest);
+/**
+ * Navigation actions will provide the `location` as the payload, which this
+ * epic will use to collect the current Reactive Queries associated with the
+ * active routes.
+ *
+ * These queries will then be dispatched in the payload of `apiRequest`
+ * @param {Object} routes The application's React Router routes
+ * @returns {Function} an Epic function
+ */
+export const getNavEpic = routes => {
+	const activeQueries$ = activeRouteQueries$(routes);
+	return (action$, store) =>
+		action$.ofType(LOCATION_CHANGE, '@@server/RENDER', 'LOCATION_SYNC')
+			.map(({ payload }) => payload)  // extract the `location` from the action payload
+			.flatMap(activeQueries$)        // find the queries for the location
+			.map(apiRequest);               // dispatch apiRequest with all queries
+};
 
+/**
+ * Listen for actions that should cause the application state to reload based
+ * on the current routing location
+ *
+ * The action can have a Boolean `meta` prop to indicate if the action was
+ * dispatched on the server. If so, the application will _not_ be reloaded
+ */
 export const resetLocationEpic = (action$, store) =>
 	action$.ofType('CONFIGURE_AUTH')
-		.filter(({ meta }) => !meta)
+		.filter(({ meta }) => !meta)  // throw out any server-side actions
 		.map(() => locationSync(store.getState().routing.locationBeforeTransitions));
 
+/**
+ * Listen for actions that provide queries to send to the api
+ */
 export const fetchQueriesEpic = (action$, store) =>
 	action$.ofType('API_REQUEST')
-		.map(({ payload }) => payload)
-		.flatMap(queries => {
-			const {
-				config,
-				auth,
-			} = store.getState();
+		.map(({ payload }) => payload)  // payload contains the queries array
+		.flatMap(queries => {           // set up the fetch call to the app server
+			const { config, auth } = store.getState();
 			const fetch = fetchQueries(config.apiUrl, { method: 'GET', auth });
-			return Observable.fromPromise(fetch(queries))
-				.takeUntil(action$.ofType(LOCATION_CHANGE, 'LOCATION_SYNC'))
-				.map(apiSuccess)
-				.catch(err => Observable.of(apiError(err)))
-				.flatMap(action => Observable.of(action, apiComplete()));
+			return Observable.fromPromise(fetch(queries))  // call fetch
+				.takeUntil(action$.ofType(LOCATION_CHANGE, 'LOCATION_SYNC'))  // cancel this fetch when nav happens
+				.map(apiSuccess)                             // dispatch apiSuccess with server response
+				.catch(err => Observable.of(apiError(err)))  // ... or apiError
+				.flatMap(action => Observable.of(action, apiComplete()));  // dispatch apiComplete after resolution
 		});
 
