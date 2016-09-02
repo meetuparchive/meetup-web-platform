@@ -34,7 +34,7 @@ export const apiRequestEpic = (action$, store) =>
 				auth,
 			} = store.getState();
 			const fetch = fetchQueries(config.apiUrl, { method: 'GET', auth });
-			return fetch(queries)
+			return Rx.Observable.fromPromise(fetch(queries))
 				.map(apiSuccess)
 				.catch(apiError)
 				.flatMap(action => Rx.Observable.of(action, apiComplete()))
