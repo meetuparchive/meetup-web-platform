@@ -23,9 +23,10 @@ import { activeRouteQueries$ } from '../util/routeUtils';
 import { fetchQueries } from '../util/fetchUtils';
 
 /**
- * apiFetchSub lives for the entire request, but only responds to the most
- * recent routing action, so it's a module-scoped 'SerialDisposable', which
- * will take care of disposing previous subscriptions automatically
+ * We want to make sure there is always and only one data-fetching subscription
+ * open at a time, so we create an empty subscription that is scoped to the
+ * request. When a new fetch happens, this subscription will get replaced with
+ * a new subscription.
  */
 let apiFetchSub = new Rx.Subscription();
 
@@ -70,7 +71,10 @@ const getSyncMiddleware = routes => store => next => action => {
 		const apiFetch$ = Rx.Observable.of(action.payload)
 			.flatMap(fetchQueries(config.apiUrl, { method: 'GET', auth }));
 
-		apiFetchSub.unsubscribe();  // tear down existing subscriptions
+		// Before creating a new subscription, we need to destroy any
+		// existing subscriptions
+		apiFetchSub.unsubscribe();
+		// Now, set up the subscription to the new fetch
 		apiFetchSub = apiFetch$.subscribe(
 			actions.apiSuccess,
 			actions.apiError,
