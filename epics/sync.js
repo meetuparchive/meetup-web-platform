@@ -1,6 +1,8 @@
+import { LOCATION_CHANGE } from 'react-router-redux';
+
 function getSyncEpic(routes) {
 	return action$ =>
-		action$.filter(action => action.type === 'LOCATION_CHANGE')
+		action$.filter(action => action.type === LOCATION_CHANGE)
 			.delay(1000)
 			.mapTo({ type: 'PONG' });
 }
