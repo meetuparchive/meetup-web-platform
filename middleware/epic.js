@@ -1,11 +1,17 @@
 import { combineEpics, createEpicMiddleware } from 'redux-observable';
 
-import getSyncEpic from '../epics/sync';
+import {
+	getNavQueriesEpic,
+	authResetEpic,
+	apiRequestEpic,
+} from '../epics/sync';
 
 const getEpicMiddleware = routes => {
-	const syncEpic = getSyncEpic(routes);
+	const navRequestEpic = getNavQueriesEpic(routes);
 	const rootEpic = combineEpics(
-		syncEpic
+		navRequestEpic,
+		authResetEpic,
+		apiRequestEpic
 	);
 
 	return createEpicMiddleware(rootEpic);
