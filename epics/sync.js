@@ -35,10 +35,10 @@ export const apiRequestEpic = (action$, store) =>
 			} = store.getState();
 			const fetch = fetchQueries(config.apiUrl, { method: 'GET', auth });
 			return Rx.Observable.fromPromise(fetch(queries))
+				.takeUntil(action$.ofType(LOCATION_CHANGE, 'LOCATION_SYNC'))
 				.map(apiSuccess)
 				.catch(apiError)
-				.flatMap(action => Rx.Observable.of(action, apiComplete()))
-				.takeUntil(action$.ofType(LOCATION_CHANGE, 'LOCATION_SYNC'));
+				.flatMap(action => Rx.Observable.of(action, apiComplete()));
 		});
 
 /*
