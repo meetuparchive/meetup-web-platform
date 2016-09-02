@@ -10,8 +10,7 @@ import {
 import { activeRouteQueries$ } from '../util/routeUtils';
 import { fetchQueries } from '../util/fetchUtils';
 
-
-export const getNavQueriesEpic = routes => (action$, store) =>
+export const getNavEpic = routes => (action$, store) =>
 	action$.ofType(LOCATION_CHANGE, '@@server/RENDER', 'LOCATION_SYNC')
 		.map(({ payload }) => payload)  // payload is `location`
 		.flatMap(location => activeRouteQueries$(routes, { location }))
@@ -19,13 +18,13 @@ export const getNavQueriesEpic = routes => (action$, store) =>
 		.filter(queries => queries)
 		.map(apiRequest);
 
-export const authResetEpic = (action$, store) =>
+export const resetLocationEpic = (action$, store) =>
 	action$.ofType('CONFIGURE_AUTH')
 		.filter(({ meta }) => !meta)
 		.delay(0)
 		.map(() => locationSync(store.getState().routing.locationBeforeTransitions));
 
-export const apiRequestEpic = (action$, store) =>
+export const fetchQueriesEpic = (action$, store) =>
 	action$.ofType('API_REQUEST')
 		.map(({ payload }) => payload)
 		.flatMap(queries => {
@@ -37,7 +36,7 @@ export const apiRequestEpic = (action$, store) =>
 			return Rx.Observable.fromPromise(fetch(queries))
 				.takeUntil(action$.ofType(LOCATION_CHANGE, 'LOCATION_SYNC'))
 				.map(apiSuccess)
-				.catch(apiError)
+				.catch(err => Rx.Observable.of(apiError(err)))
 				.flatMap(action => Rx.Observable.of(action, apiComplete()));
 		});
 
