@@ -1,4 +1,5 @@
 import { Observable } from 'rxjs';
+import { combineEpics } from 'redux-observable';
 import { LOCATION_CHANGE } from 'react-router-redux';
 import {
 	apiRequest,
@@ -55,4 +56,12 @@ export const fetchQueriesEpic = (action$, store) =>
 				.catch(err => Observable.of(apiError(err)))  // ... or apiError
 				.flatMap(action => Observable.of(action, apiComplete()));  // dispatch apiComplete after resolution
 		});
+
+export default function getSyncEpic(routes) {
+	return combineEpics(
+		getNavEpic(routes),
+		resetLocationEpic,
+		fetchQueriesEpic
+	);
+}
 

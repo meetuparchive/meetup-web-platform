@@ -1,29 +1,17 @@
 import { combineEpics, createEpicMiddleware } from 'redux-observable';
 
-import {
-	getNavEpic,
-	resetLocationEpic,
-	fetchQueriesEpic,
-} from '../epics/sync';
+import getSyncEpic from '../epics/sync';
 
 /**
  * The middleware is exported as a getter because it needs the application's
- * routes in order to sync correctly.
- *
- * The middleware itself - passes the queries to the application server, which
- * will make necessary calls to the API
+ * routes in order to set up the nav-related epic(s) that are part of the
+ * final middleware
  */
-
-const getEpicMiddleware = routes => {
-	const navRequestEpic = getNavEpic(routes);
-	const rootEpic = combineEpics(
-		navRequestEpic,
-		resetLocationEpic,
-		fetchQueriesEpic
-	);
-
-	return createEpicMiddleware(rootEpic);
-};
+const getEpicMiddleware = routes => createEpicMiddleware(
+	combineEpics(
+		getSyncEpic(routes)
+	)
+);
 
 export default getEpicMiddleware;
 
