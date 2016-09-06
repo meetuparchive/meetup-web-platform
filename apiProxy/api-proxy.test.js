@@ -4,11 +4,11 @@ import {
 	MOCK_API_PROBLEM,
 	MOCK_AUTH_HEADER,
 	MOCK_RENDERPROPS,
-} from './util/mocks/app';
+} from '../util/mocks/app';
 import {
 	MOCK_DUOTONE_URLS,
 	MOCK_GROUP,
-} from './util/mocks/api';
+} from '../util/mocks/api';
 import {
 	parseRequest,
 	parseApiResponse,

@@ -2,8 +2,9 @@ import externalRequest from 'request';
 import Rx from 'rx';
 const externalRequest$ = Rx.Observable.fromNodeCallback(externalRequest);
 
-import { catchAndReturn$ } from './util/rxUtils';
-import { duotoneRef } from './util/duotone';
+import * as apiConfigCreators from './apiConfigCreators';
+import { catchAndReturn$ } from '../util/rxUtils';
+import { duotoneRef } from '../util/duotone';
 
 /**
  * Given the current request and API server host, proxy the request to the API
@@ -54,48 +55,12 @@ export const parseApiResponse = response => {
  * @param {Object} query a query object from the application
  * @return {Object} the arguments for api request, including endpoint
  */
-export function queryToApiConfig({ type, params, ref, single }) {
-	let pathExtension;
-	switch (type) {
-	case 'home': {
-		params.fields = params.fields ? `${params.fields},photo_gradient` : 'photo_gradient';
-		return {
-			endpoint: 'self/home',
-			params
-		};
-	}
-	case 'group':
-		params.fields = params.fields ? `${params.fields},photo_gradient` : 'photo_gradient';
-		if (params.self) {
-			return {
-				endpoint: 'self/groups',
-				params
-			};
-		}
-		return {
-			endpoint: params.urlname,
-			params
-		};
-	case 'event':
-		pathExtension = params.id ? `/${params.id}` : '';
-		params.fields = ['rsvp_sample'];
-		return {
-			endpoint: `${params.urlname}/events${pathExtension}`,
-			params
-		};
-	case 'member':
-		return {
-			endpoint: `2/member/${params.id}`,
-			params
-		};
-	case 'login':
-		return {
-			endpoint: 'sessions',
-			params
-		};
-	default:
+export function queryToApiConfig({ type, params }) {
+	const configCreator = apiConfigCreators[type];
+	if (!configCreator) {
 		throw new ReferenceError(`No API specified for query type ${type}`);
 	}
+	return configCreator(params);
 }
 
 /**
