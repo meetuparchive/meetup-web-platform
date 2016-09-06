@@ -37,12 +37,13 @@ export const getNavEpic = routes => {
  * dispatched on the server. If so, the application will _not_ be reloaded
  */
 export const resetLocationEpic = (action$, store) =>
-	action$.ofType('CONFIGURE_AUTH')
+	action$.ofType('CONFIGURE_AUTH')  // auth changes imply privacy changes - reload
 		.filter(({ meta }) => !meta)  // throw out any server-side actions
 		.map(() => locationSync(store.getState().routing.locationBeforeTransitions));
 
 /**
- * Listen for actions that provide queries to send to the api
+ * Listen for actions that provide queries to send to the api - mainly
+ * API_REQUEST
  */
 export const fetchQueriesEpic = (action$, store) =>
 	action$.ofType('API_REQUEST')
