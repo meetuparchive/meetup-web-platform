@@ -18,7 +18,7 @@ import { fetchQueries } from '../util/fetchUtils';
  *
  * These queries will then be dispatched in the payload of `apiRequest`
  * @param {Object} routes The application's React Router routes
- * @returns {Function} an Epic function
+ * @returns {Function} an Epic function that emits an API_REQUEST action
  */
 export const getNavEpic = routes => {
 	const activeQueries$ = activeRouteQueries$(routes);
@@ -35,6 +35,8 @@ export const getNavEpic = routes => {
  *
  * The action can have a Boolean `meta` prop to indicate if the action was
  * dispatched on the server. If so, the application will _not_ be reloaded
+ *
+ * emits a LOCATION_SYNC action
  */
 export const resetLocationEpic = (action$, store) =>
 	action$.ofType('CONFIGURE_AUTH')  // auth changes imply privacy changes - reload
@@ -44,6 +46,8 @@ export const resetLocationEpic = (action$, store) =>
 /**
  * Listen for actions that provide queries to send to the api - mainly
  * API_REQUEST
+ *
+ * emits (API_SUCCESS || API_ERROR) then API_COMPLETE
  */
 export const fetchQueriesEpic = (action$, store) =>
 	action$.ofType('API_REQUEST')
