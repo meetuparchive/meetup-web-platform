@@ -31,12 +31,15 @@ describe('SyncMiddleware', () => {
 		expect(syncDispatcher(MOCK_APP_STATE, this.renderAction))
 			.toEqual(this.renderAction);  // end of dispatch chain is the action
 	});
-	it('dispatches locationSync with routing state on CONFIGURE_AUTH', function() {
+	it('dispatches locationSync with routing state on CONFIGURE_AUTH', function(done) {
 		spyOn(syncActionCreators, 'locationSync');
 		syncDispatcher(MOCK_APP_STATE, { type: 'CONFIGURE_AUTH' });
-		jest.runAllTimers();
-		expect(syncActionCreators.locationSync)
-			.toHaveBeenCalledWith(MOCK_APP_STATE.routing.locationBeforeTransitions);
+		// locationSync is called async with a setTimeout (0)
+		setTimeout(() => {
+			expect(syncActionCreators.locationSync)
+				.toHaveBeenCalledWith(MOCK_APP_STATE.routing.locationBeforeTransitions);
+			done();
+		}, 0);
 	});
 });
 

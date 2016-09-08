@@ -15,7 +15,6 @@ import CacheMiddleware, {
 	makeCache,
 	cacheWriter,
 	cacheReader,
-	checkEnable,
 } from './cache' ;
 
 /**
@@ -117,37 +116,11 @@ describe('CacheMiddleware', () => {
 		const dispatch = CacheMiddleware(createFakeStore({}))(() => {});
 		dispatch(cacheSetAction);
 		dispatch(cacheRequestAction);
-		jest.useRealTimers();
 		setTimeout(() => {
 			const expectedResults = { queries: [this.MOCK_QUERY], responses: MOCK_API_RESULT };
 			expect(cacheActionCreators.cacheSuccess).toHaveBeenCalledWith(expectedResults);
 			done();
 		}, 0);
-	});
-	it('does not call cacheSet when disabled', function() {
-		const spyable = {
-			checkEnable,
-		};
-		spyOn(spyable, 'checkEnable').and.callFake(() => false);
-		// set up a fresh dispatcher and apiSuccessAction that will use the faked
-		// checkEnable function
-		const CacheMiddleware = require('./cache').default;
-		const cacheDispatcher = middlewareDispatcher(CacheMiddleware);
-		const apiSuccessAction = syncActionCreators.apiSuccess({
-			queries: [this.MOCK_QUERY],
-			responses: MOCK_API_RESULT
-		});
-
-		// test for cache actions in response to api actions
-		spyOn(cacheActionCreators, 'cacheSet');
-		cacheDispatcher(MOCK_APP_STATE, apiSuccessAction);
-		expect(cacheActionCreators.cacheSet)
-			.not.toHaveBeenCalled();
-
-		const apiRequestAction = syncActionCreators.apiRequest([this.MOCK_QUERY]);
-		spyOn(cacheActionCreators, 'cacheRequest');
-		cacheDispatcher(MOCK_APP_STATE, apiRequestAction);
-		expect(cacheActionCreators.cacheRequest).not.toHaveBeenCalled();
 	});
 	it('calls CACHE_CLEAR for LOGOUT_REQUEST', function() {
 		spyOn(cacheActionCreators, 'cacheClear');
@@ -162,7 +135,6 @@ describe('CacheMiddleware', () => {
 		const cacheClearAction = cacheActionCreators.cacheClear();
 		const cacheRequestAction = cacheActionCreators.cacheRequest([this.MOCK_QUERY]);
 		const dispatch = CacheMiddleware(createFakeStore({}))(() => {});
-		jest.useRealTimers();
 		dispatch(cacheSetAction);
 		setTimeout(() => {
 			dispatch(cacheClearAction);
