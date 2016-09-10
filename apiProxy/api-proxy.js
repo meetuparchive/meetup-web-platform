@@ -101,7 +101,6 @@ export const buildRequestArgs = externalRequestOpts => ({ endpoint, params }) =>
 	externalRequestOptsQuery.url = `/${endpoint}`;
 
 	const dataParams = urlFormatParams(params, externalRequestOptsQuery.method === 'get');
-	console.log(require('chalk').blue(dataParams));
 
 	switch (externalRequestOptsQuery.method) {
 	case 'get':

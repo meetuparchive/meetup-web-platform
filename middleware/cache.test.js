@@ -98,12 +98,6 @@ describe('CacheMiddleware', () => {
 			})
 			.then(done);
 	});
-	it('calls CACHE_SET for API_SUCCESS', function() {
-		spyOn(cacheActionCreators, 'cacheSet');
-		cacheDispatcher(MOCK_APP_STATE, this.apiSuccessAction);
-		expect(cacheActionCreators.cacheSet)
-			.toHaveBeenCalled();
-	});
 	it('calls CACHE_REQUEST for API_REQUEST', function() {
 		spyOn(cacheActionCreators, 'cacheRequest');
 		const apiRequestAction = syncActionCreators.apiRequest([this.MOCK_QUERY]);
@@ -123,6 +117,17 @@ describe('CacheMiddleware', () => {
 			expect(cacheActionCreators.cacheSuccess).toHaveBeenCalledWith(expectedResults);
 			done();
 		}, 0);
+	});
+	it('calls CACHE_SET for API_SUCCESS', function(done) {
+		spyOn(cacheActionCreators, 'cacheSet');
+		jest.useRealTimers();
+		cacheDispatcher(MOCK_APP_STATE, this.apiSuccessAction);
+		setTimeout(() => {
+			expect(cacheActionCreators.cacheSet)
+				.toHaveBeenCalled();
+			done();
+		}, 10);
+		jest.useFakeTimers();
 	});
 	it('does not call cacheSet when disabled', function() {
 		const spyable = {
