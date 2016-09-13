@@ -8,7 +8,6 @@
  * @module AuthMiddleware
  */
 import Cookies from 'js-cookie';
-import Rx from 'rx';
 import { bindActionCreators } from 'redux';
 import {
 	logoutSuccess,
@@ -17,14 +16,6 @@ import {
 } from '../actions/authActionCreators';
 
 export const ANONYMOUS_AUTH_APP_PATH = '/anon';
-
-/**
- * login sub responds to only the most recent login request, and can be disposed
- * by a logout
- * @const
- */
-const loginSub = new Rx.SerialDisposable();
-loginSub.setDisposable(Rx.Disposable.empty);
 
 /**
  * There are 6 login-related actions:

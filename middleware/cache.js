@@ -4,7 +4,7 @@
  *
  * @module CacheMiddleware
  */
-import Rx from 'rx';
+import Rx from 'rxjs';
 import { bindActionCreators } from 'redux';
 import {
 	cacheSuccess,
