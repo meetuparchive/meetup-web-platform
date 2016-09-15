@@ -137,7 +137,7 @@ const makeRenderer = (routes, reducer, middleware=[]) => request => {
 		expires_in,
 		anonymous,
 	};
-	const store = createStore(routes, reducer, null, middleware);
+	const store = createStore(routes, reducer, {}, middleware);
 	const storeIsReady$ = Rx.Observable.create(obs =>
 			store.subscribe(() => obs.next(store.getState()))
 		)
