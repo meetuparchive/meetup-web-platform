@@ -15,7 +15,7 @@ import {
 
 import createStore from '../util/createStore';
 import Dom from '../components/dom';
-import { configureApiUrl } from '../actions/actionCreators';
+import { configureApiUrl } from '../actions/configActionCreators';
 import { polyfillNodeIntl } from '../util/localizationUtils';
 
 // Ensure global Intl for use with FormatJS
