@@ -9,7 +9,7 @@
  * @module SyncMiddleware
  */
 
-import Rx from 'rx';
+import Rx from 'rxjs';
 import { bindActionCreators } from 'redux';
 import { LOCATION_CHANGE } from 'react-router-redux';
 import {
@@ -23,11 +23,27 @@ import { activeRouteQueries$ } from '../util/routeUtils';
 import { fetchQueries } from '../util/fetchUtils';
 
 /**
- * navRenderSub lives for the entire request, but only responds to the most
- * recent routing action, so it's a module-scoped 'SerialDisposable', which
- * will take care of disposing previous subscriptions automatically
+ * Stateful higher-order function to handle a subscription that should not
+ * have parallel instances.
+ *
+ * The next/error/completed handlers initially supplied will be applied to each
+ * subsequent Observable stream passed to the returned function
  */
-const navRenderSub = new Rx.SerialDisposable();
+const makeSerialSubscriber = (next, error, completed) => {
+	let serialSub = new Rx.Subscription();  // empty sub on init
+	return obs$ => {
+		if (!serialSub.isUnsubscribed) {
+			serialSub.unsubscribe();  // kill any open subscriptions
+		}
+		// set up the new subscription
+		serialSub = obs$.subscribe(
+			next,
+			error,
+			completed
+		);
+		return serialSub;
+	};
+};
 
 /**
  * The middleware is exported as a getter because it needs the application's
@@ -36,51 +52,68 @@ const navRenderSub = new Rx.SerialDisposable();
  * The middleware itself - passes the queries to the application server, which
  * will make necessary calls to the API
  */
-const getSyncMiddleware = routes => store => next => action => {
-	if (action.type === LOCATION_CHANGE ||  // client nav
-		action.type === '@@server/RENDER' ||
-		action.type === 'LOCATION_SYNC') {
-		const dispatchApiRequest = bindActionCreators(apiRequest, store.dispatch);
+const getSyncMiddleware = routes => store => {
+	const actions = bindActionCreators(
+		{ apiRequest, apiSuccess, apiError, apiComplete, locationSync },
+		store.dispatch
+	);
 
-		const location = action.payload;
-		const activeQueries$ = activeRouteQueries$(routes, { location })
-			.delay(0)  // needed in order for LOCATION_CHANGE to finish processing
-			.filter(queries => queries);  // only emit value if queries exist
+	/*
+	 * We want to make sure there is always and only one data-fetching subscription
+	 * open at a time, so we create a 'serial subscriber' that can be passed an
+	 * Observable to subscribe to with a particular set of next/error/completed
+	 * handlers. When a new fetch happens, this subscription will get replaced with
+	 * a new subscription.
+	 */
+	const subscribeToFetch = makeSerialSubscriber(
+		actions.apiSuccess,
+		actions.apiError,
+		actions.apiComplete
+	);
 
-		activeQueries$.subscribe(dispatchApiRequest);
-	}
+	// Now, return the curried functions used by all Redux middleware
+	return next => action => {
+		// CASE 1: navigation-related actions - gather reactive query info and
+		// dispatch an API_REQUEST action
+		if (action.type === LOCATION_CHANGE ||  // client nav
+			action.type === '@@server/RENDER' ||
+			action.type === 'LOCATION_SYNC') {
 
-	if (action.type === 'CONFIGURE_AUTH' && !action.meta) {
-		setTimeout(() => {
-			store.dispatch(locationSync(store.getState().routing.locationBeforeTransitions));
-		}, 0);
-	}
+			const location = action.payload;
+			const activeQueries$ = activeRouteQueries$(routes, { location })
+				.delay(0)  // needed in order for LOCATION_CHANGE to finish processing
+				.filter(queries => queries);  // only emit value if queries exist
 
-	if (action.type === 'API_REQUEST') {
-		const actions = bindActionCreators(
-			{ apiSuccess, apiError, apiComplete },
-			store.dispatch
-		);
-		const {
-			auth,
-			config,
-		} = store.getState();
-		// should read auth from cookie if on browser, only read from state if on server
+			// we have our stream of queries, now dispatch an action with them
+			activeQueries$.subscribe(actions.apiRequest);
+		}
 
-		const apiFetch$ = Rx.Observable.just(action.payload)
-			.flatMap(fetchQueries(config.apiUrl, { method: 'GET', auth }));
+		// CASE 2: Any time auth information changes, we need to re-load any app
+		// data related to the current location to reflect what the new auth allows
+		// the client to see
+		if (action.type === 'CONFIGURE_AUTH' && !action.meta) {
+			setTimeout(() => {
+				actions.locationSync(store.getState().routing.locationBeforeTransitions);
+			}, 0);
+		}
 
-		// dispatch the sync action
-		navRenderSub.setDisposable(
-			apiFetch$.subscribe(
-				actions.apiSuccess,
-				actions.apiError,
-				actions.apiComplete
-			)
-		);
-	}
+		// CASE 3: When there's an API_REQEUST, go ahead and make the fetch call
+		// and use subscribeToFetch to manage the subscription
+		if (action.type === 'API_REQUEST') {
+			const {
+				auth,
+				config,
+			} = store.getState();
+			// should read auth from cookie if on browser, only read from state if on server
 
-	return next(action);
+			const apiFetch$ = Rx.Observable.of(action.payload)  // read the queries
+				.flatMap(fetchQueries(config.apiUrl, { method: 'GET', auth }));  // call fetch
+
+			subscribeToFetch(apiFetch$);  // open the subscription
+		}
+
+		return next(action);
+	};
 };
 
 export default getSyncMiddleware;
