@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Router from 'react-router/lib/Router';
 import browserHistory from 'react-router/lib/browserHistory';
-import match from 'react-router/lib/match';
 import { Provider } from 'react-redux';
 import { syncHistoryWithStore } from 'react-router-redux';
 import createStore from '../util/createStore';
@@ -34,14 +33,12 @@ function makeRenderer(routes, reducer, middleware) {
 	const history = syncHistoryWithStore(browserHistory, store);
 
 	return (rootElId='outlet') => {
-		match({ history, routes }, (error, redirectLocation, renderProps) => {
-			ReactDOM.render(
-				<Provider store={store}>
-					<Router {...renderProps } />
-				</Provider>,
-				document.getElementById(rootElId)
-			);
-		});
+		ReactDOM.render(
+			<Provider store={store}>
+				<Router history={history} routes={routes} />
+			</Provider>,
+			document.getElementById(rootElId)
+		);
 	};
 }
 
