@@ -47,7 +47,7 @@ const DOCTYPE = '<!DOCTYPE html>';
  * @return {Object} the statusCode and result used by Hapi's `reply` API
  *   {@link http://hapijs.com/api#replyerr-result}
  */
-function renderAppResult(renderProps, store) {
+function renderAppResult(renderProps, store, clientPath) {
 	// pre-render the app-specific markup, this is the string of markup that will
 	// be managed by React on the client.
 	//
@@ -64,7 +64,7 @@ function renderAppResult(renderProps, store) {
 	// all the data for the full `<html>` element has been initialized by the app
 	// so go ahead and assemble the full response body
 	const htmlMarkup = ReactDOMServer.renderToString(
-		<Dom initialState={initialState} appMarkup={appMarkup} CONFIG={global.CONFIG}/>
+		<Dom clientPath={clientPath} initialState={initialState} appMarkup={appMarkup} />
 	);
 	const result = `${DOCTYPE}${htmlMarkup}`;
 	const statusCode = renderProps.routes.pop().statusCode || 200;
@@ -115,7 +115,7 @@ const dispatchInitActions = (store, { apiUrl, auth }) => ([redirectLocation, ren
  * `oauth_token` in `state`
  * @return {Observable}
  */
-const makeRenderer = (routes, reducer, middleware=[]) => request => {
+const makeRenderer = (routes, reducer, clientPath, middleware=[]) => request => {
 	request.log(['info'], chalk.green(`Rendering ${request.url.href}`));
 	const {
 		url,
@@ -151,7 +151,7 @@ const makeRenderer = (routes, reducer, middleware=[]) => request => {
 		})
 		.do(dispatchInitActions(store, { apiUrl, auth }))
 		.flatMap(args => storeIsReady$.map(() => args))  // `sample` appears not to work - this is equivalent
-		.map(([redirectLocation, renderProps]) => renderAppResult(renderProps, store))
+		.map(([redirectLocation, renderProps]) => renderAppResult(renderProps, store, clientPath))
 		.catch(error => {
 			// render errors result in a rendered stack trace using RedBox
 			const appMarkup = ReactDOMServer.renderToString(<RedBox error={error} />);

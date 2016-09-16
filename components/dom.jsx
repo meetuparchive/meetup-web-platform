@@ -1,7 +1,6 @@
 import React from 'react';
 import Helmet from 'react-helmet';
 import escapeHtml from 'escape-html';
-import { getLocaleCode } from '../util/localizationUtils';
 
 function getInnerHTML(__html) {
 	return {
@@ -20,9 +19,9 @@ function getInnerHTML(__html) {
  */
 const DOM = (props) => {
 	const {
+		clientPath,
 		initialState,
 		appMarkup,
-		CONFIG
 	} = props;
 
 	/**
@@ -46,8 +45,6 @@ const DOM = (props) => {
 	// Extract the `<head>` information from any page-specific `<Helmet>` components
 	const head = Helmet.rewind();
 
-	const localeCode = getLocaleCode(initialState.app.self.value);
-
 	return (
 		<html>
 			<head>
@@ -58,7 +55,7 @@ const DOM = (props) => {
 			<body style={{ margin: 0, fontFamily:'sans-serif' }}>
 				<div id='outlet' dangerouslySetInnerHTML={getInnerHTML(appMarkup)} />
 				<script dangerouslySetInnerHTML={getInnerHTML(`window.INITIAL_STATE=${JSON.stringify(INITIAL_STATE_SAFE_JSONABLE)};`)} />
-				<script src={`//${CONFIG.ASSET_SERVER_HOST}:${CONFIG.ASSET_SERVER_PORT}/${localeCode}/client.js`} />
+				<script src={clientPath} />
 			</body>
 		</html>
 	);
@@ -67,7 +64,6 @@ const DOM = (props) => {
 DOM.propTypes = {
 	initialState: React.PropTypes.object.isRequired,
 	appMarkup: React.PropTypes.string,
-	CONFIG: React.PropTypes.object,
 };
 
 export default DOM;
