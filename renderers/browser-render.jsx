@@ -42,6 +42,7 @@ function makeRenderer(routes, reducer, middleware) {
 				document.getElementById(rootElId)
 			);
 		});
+		return store;
 	};
 }
 
