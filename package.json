@@ -1,9 +1,10 @@
 {
   "name": "meetup-web-platform",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "A collection of Node web application utilities developed for the Meetup web platform",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "preversion": "npm test"
   },
   "repository": {
     "type": "git",
