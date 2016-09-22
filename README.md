@@ -6,6 +6,23 @@ composing applications with React + Redux.
 
 In general, application-specific code will live outside of this package.
 
+# Releases
+
+This package uses semver versioning to tag releases. For now, please use npm's
+built-in [versioning CLI](https://docs.npmjs.com/cli/version) to tag releases
+when they are ready, e.g.
+
+```sh
+> npm version patch
+```
+
+This will
+1. run unit tests
+2. update the package version number in `package.json`
+3. commit the update
+4. create a git tag
+5. push the results to GitHub.
+
 # Modules
 
 ## Server
