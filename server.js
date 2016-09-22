@@ -83,7 +83,6 @@ export default function start(renderRequestMap, options) {
 	return getConfig()
 		.then(configureEnv)
 		.then(config => {
-			config.localeCodes = Object.keys(renderRequestMap);
 			const baseRoutes = getRoutes(renderRequestMap, config);
 			const finalRoutes = [ ...routes, ...baseRoutes ];
 

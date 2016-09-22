@@ -10,7 +10,6 @@ export default function getRoutes(
 	{
 		API_SERVER_ROOT_URL,
 		PHOTO_SCALER_SALT,
-		localeCodes
 	}) {
 
 	console.log(chalk.green(`Supported languages:\n${Object.keys(renderRequestMap).join('\n')}`));
@@ -49,9 +48,9 @@ export default function getRoutes(
 		method: 'GET',
 		path: '/{wild*}',
 		handler: (request, reply) => {
-			const requestLanguage = Accepts(request).language(localeCodes) || 'en-US';
-
+			const requestLanguage = Accepts(request).language(Object.keys(renderRequestMap));
 			request.log(['info'], chalk.green(`Request received for ${request.url.href} (${requestLanguage})`));
+
 			const render$ = request.authorize()  // `authorize()` method is supplied by anonAuthPlugin
 				.flatMap(renderRequestMap[requestLanguage]);
 
