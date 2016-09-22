@@ -15,6 +15,17 @@ function getInnerHTML(__html) {
  * Elements should only be added inside head via Helmet
  * @see {@link https://github.com/nfl/react-helmet}
  *
+ * This component solves some "hard" problems related to wrapping a React
+ * application in the full HTML markup needed to render it on the server.
+ *
+ * 1. Passing server-side app state to the client-side JS application - the
+ * `window.INITIAL_STATE` setting, which has a few subtle gotchas if
+ * implemented differently
+ * 2. `<head>` management through `react-helmet` - there are lots of ways of
+ * doing this wrong or implementing a fragile/inflexible solution
+ * 3. Using an injected variable to write the client JS application bundle path
+ * - there are lots of ways to introduce bugs into alternative implementations.
+ *
  * @module DOM
  */
 const DOM = (props) => {
