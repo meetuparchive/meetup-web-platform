@@ -17,6 +17,7 @@ when they are ready, e.g.
 ```
 
 This will
+
 1. run unit tests
 2. update the package version number in `package.json`
 3. commit the update
