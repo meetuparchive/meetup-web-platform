@@ -74,7 +74,6 @@ export default function start(renderRequestMap, options) {
 	const {
 		routes,
 		plugins,
-		localeCodes,
 	} = options;
 	// source maps make for better stack traces - we might not want this in
 	// production if it makes anything slower, though
@@ -84,7 +83,7 @@ export default function start(renderRequestMap, options) {
 	return getConfig()
 		.then(configureEnv)
 		.then(config => {
-			config.localeCodes = localeCodes || ['en-US'];
+			config.localeCodes = Object.keys(renderRequestMap);
 			const baseRoutes = getRoutes(renderRequestMap, config);
 			const finalRoutes = [ ...routes, ...baseRoutes ];
 
