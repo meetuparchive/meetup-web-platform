@@ -29,18 +29,8 @@ This will
 ## Server
 
 The [server module](./server.js) exports a `startServer` function that consumes
-an array of Hapi `routes`, a `connection` configuration object, and an array of
-Hapi `plugins` to register, all provided by the specific web application.
-
-### Usage
-
-```js
-import startServer from `meetup-web-platform/server';
-
-// ...
-
-startServer(routes, connection, plugins);
-```
+a mapping of locale codes to app-rendering Observables, plus any app-specific
+server routes and plugins. See the code comments for usage details.
 
 ## API Adapter
 
@@ -57,6 +47,13 @@ the `queries` and recieve the `queryResponses` for any data request -
 all the API-specific translations happen on the server.
 
 ## Middleware
+
+The built-in middleware provides core functionality for interacting with
+API data - managing authenticated user sessions, syncing with the current
+URL location, caching data, and POSTing data to the API.
+
+Additional middleware can be passed to the `makeRenderer` function for
+each specific application's client and server entry points.
 
 ### Auth `middleware/auth.js`
 
@@ -151,4 +148,3 @@ their return values will be `dispatch`ed by the middleware in the API success/er
 case.
 
 Use reducers to parse the response and update application state.
-
