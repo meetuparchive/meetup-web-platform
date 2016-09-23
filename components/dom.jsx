@@ -49,13 +49,13 @@ const DOM = (props) => {
 	// escape the string
 	const escapedState = escapeHtml(initialStateJson);
 
-	// create a plain object with the escaped string to write to the DOM with JSON.stringify
-	const INITIAL_STATE_SAFE_JSONABLE = {
-		escapedState
-	};
-
 	// Extract the `<head>` information from any page-specific `<Helmet>` components
 	const head = Helmet.rewind();
+
+	const APP_RUNTIME = {
+		assetPublicPath,
+		escapedState
+	};
 
 	return (
 		<html>
@@ -66,8 +66,7 @@ const DOM = (props) => {
 			</head>
 			<body style={{ margin: 0, fontFamily:'sans-serif' }}>
 				<div id='outlet' dangerouslySetInnerHTML={getInnerHTML(appMarkup)} />
-				<script dangerouslySetInnerHTML={getInnerHTML(`window.ASSET_PUBLIC_PATH='${assetPublicPath}';`)} />
-				<script dangerouslySetInnerHTML={getInnerHTML(`window.INITIAL_STATE=${JSON.stringify(INITIAL_STATE_SAFE_JSONABLE)};`)} />
+				<script dangerouslySetInnerHTML={getInnerHTML(`window.APP_RUNTIME=${JSON.stringify(APP_RUNTIME)};`)} />
 				<script src={`${assetPublicPath}${clientFilename}`} />
 			</body>
 		</html>

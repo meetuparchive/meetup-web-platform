@@ -125,7 +125,7 @@ const makeRenderer = (
 	reducer,
 	clientFilename,
 	assetPublicPath,
-	middleware
+	middleware=[]
 ) => request => {
 
 	middleware = middleware || [];
