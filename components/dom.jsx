@@ -30,7 +30,8 @@ function getInnerHTML(__html) {
  */
 const DOM = (props) => {
 	const {
-		clientPath,
+		clientFilename,
+		assetPublicPath,
 		initialState,
 		appMarkup,
 	} = props;
@@ -65,8 +66,9 @@ const DOM = (props) => {
 			</head>
 			<body style={{ margin: 0, fontFamily:'sans-serif' }}>
 				<div id='outlet' dangerouslySetInnerHTML={getInnerHTML(appMarkup)} />
+				<script dangerouslySetInnerHTML={getInnerHTML(`window.__webpack_public_path__='${assetPublicPath}';`)} />
 				<script dangerouslySetInnerHTML={getInnerHTML(`window.INITIAL_STATE=${JSON.stringify(INITIAL_STATE_SAFE_JSONABLE)};`)} />
-				<script src={clientPath} />
+				<script src={`${assetPublicPath}${clientFilename}`} />
 			</body>
 		</html>
 	);
