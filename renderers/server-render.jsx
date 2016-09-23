@@ -120,13 +120,13 @@ const dispatchInitActions = (store, { apiUrl, auth }) => ([redirectLocation, ren
  * `oauth_token` in `state`
  * @return {Observable}
  */
-const makeRenderer = ({
+const makeRenderer = (
 	routes,
 	reducer,
 	clientFilename,
 	assetPublicPath,
 	middleware
-}) => request => {
+) => request => {
 
 	middleware = middleware || [];
 	request.log(['info'], chalk.green(`Rendering ${request.url.href}`));
