@@ -5,18 +5,22 @@ import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import RouterContext from 'react-router/lib/RouterContext';
 import match from 'react-router/lib/match';
-import { Provider } from 'react-redux';
 import RedBox from 'redbox-react';
+import { Provider } from 'react-redux';
 
+import createStore from '../util/createStore';
+import Dom from '../components/dom';
+import { polyfillNodeIntl } from '../util/localizationUtils';
 import { catchAndReturn$ } from '../util/rxUtils';
+
 import {
 	configureAuth
 } from '../actions/authActionCreators';
 
-import createStore from '../util/createStore';
-import Dom from '../components/dom';
-import { configureApiUrl } from '../actions/configActionCreators';
-import { polyfillNodeIntl } from '../util/localizationUtils';
+import {
+	configureApiUrl,
+	configureTrackingId
+} from '../actions/configActionCreators';
 
 // Ensure global Intl for use with FormatJS
 polyfillNodeIntl();
@@ -85,11 +89,12 @@ function renderAppResult(renderProps, store, clientPath) {
  * @return dispatchMatch functiont that takes the 'match' callback args and
  *   dispatches necessary initialization actions (auth and RENDER)
  */
-const dispatchInitActions = (store, { apiUrl, auth }) => ([redirectLocation, renderProps]) => {
+const dispatchInitActions = (store, { apiUrl, auth, meetupTrack }) => ([redirectLocation, renderProps]) => {
 	console.log(chalk.green(`Dispatching config for ${renderProps.path}`));
 
 	store.dispatch(configureAuth(auth, true));
 	store.dispatch(configureApiUrl(apiUrl));
+	store.dispatch(configureTrackingId(meetupTrack));
 	store.dispatch({
 		type: '@@server/RENDER',
 		payload: renderProps.location
@@ -126,6 +131,7 @@ const makeRenderer = (routes, reducer, clientPath, middleware=[]) => request => 
 			refresh_token,
 			expires_in,
 			anonymous,
+			meetupTrack
 		}
 	} = request;
 
@@ -149,7 +155,7 @@ const makeRenderer = (routes, reducer, clientPath, middleware=[]) => request => 
 				throw Boom.notFound();
 			}
 		})
-		.do(dispatchInitActions(store, { apiUrl, auth }))
+		.do(dispatchInitActions(store, { apiUrl, auth, meetupTrack }))
 		.flatMap(args => storeIsReady$.map(() => args))  // `sample` appears not to work - this is equivalent
 		.map(([redirectLocation, renderProps]) => renderAppResult(renderProps, store, clientPath))
 		.catch(error => {
