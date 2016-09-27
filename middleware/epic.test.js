@@ -8,7 +8,7 @@ import {
 	MOCK_ROUTES,
 } from '../util/mocks/app';
 import * as syncActionCreators from '../actions/syncActionCreators';
-import getSyncMiddleware from './sync';
+import getEpicMiddleware from './epic';
 
 /**
  * The sync middleware needs to respond to particular actions by calling
@@ -20,7 +20,7 @@ import getSyncMiddleware from './sync';
  * @module SyncMiddlewareTest
  */
 describe('SyncMiddleware', () => {
-	const syncDispatcher = middlewareDispatcher(getSyncMiddleware(MOCK_ROUTES));
+	const syncDispatcher = middlewareDispatcher(getEpicMiddleware(MOCK_ROUTES));
 	beforeEach(function() {
 		this.renderAction = {
 			type: 'ARBITRARY',

@@ -1,16 +1,55 @@
 import Accepts from 'accepts';
 import Boom from 'boom';
 import chalk from 'chalk';
+import uuid from 'node-uuid';
 
 import apiProxy$ from './apiProxy/api-proxy';
-import { duotones, getDuotoneUrls } from './util/duotone';
+
+import {
+	duotones,
+	getDuotoneUrls
+} from './util/duotone';
+
+const yearOfMilliseconds = 1000 * 60 * 60 * 24 * 365;
+
+/**
+ * @method initTrackingCookie
+ *
+ * Initialize the tracking session for member or anonymous user.
+ * A cookie is used for the tracking session.
+ * The cookie contains a uuid.
+ *
+ * For an anonymous user:
+ *  - If the user has a tracking cookie already set, do nothing.
+ *  - Otherwise, generate a new uuid and set a tracking cookie.
+ *
+ * TODO: logged in member
+ *
+ * @param {Object} hapi request object
+ * @param {Object} hapi response object
+ */
+const initTrackingCookie = (request, response) => {
+	const trackCookie = request.state.meetupTrack;
+
+	if (!trackCookie) {
+		// Generate a new trackId (uuid) and cookie
+		const trackingId = uuid.v4();
+		response.state(
+			'meetupTrack',
+			trackingId,
+			{
+				ttl: yearOfMilliseconds * 20,
+				encoding: 'none'
+			}
+		);
+	}
+};
 
 export default function getRoutes(
 	renderRequestMap,
 	{
 		API_SERVER_ROOT_URL,
 		PHOTO_SCALER_SALT,
-		localeCodes
 	}) {
 
 	console.log(chalk.green(`Supported languages:\n${Object.keys(renderRequestMap).join('\n')}`));
@@ -49,9 +88,9 @@ export default function getRoutes(
 		method: 'GET',
 		path: '/{wild*}',
 		handler: (request, reply) => {
-			const requestLanguage = Accepts(request).language(localeCodes) || 'en-US';
-
+			const requestLanguage = Accepts(request).language(Object.keys(renderRequestMap));
 			request.log(['info'], chalk.green(`Request received for ${request.url.href} (${requestLanguage})`));
+
 			const render$ = request.authorize()  // `authorize()` method is supplied by anonAuthPlugin
 				.flatMap(renderRequestMap[requestLanguage]);
 
@@ -59,6 +98,7 @@ export default function getRoutes(
 				({ result, statusCode }) => {
 					// response is sent when this function returns (`nextTick`)
 					const response = reply(result).code(statusCode);
+					initTrackingCookie(request, response);
 
 					request.log(['info'], chalk.green('HTML response ready'));
 					if (reply.request.app.setCookies) {
@@ -71,7 +111,6 @@ export default function getRoutes(
 							expires_in,
 							anonymous,
 						} = reply.request.state;
-						const yearOfMilliseconds = 1000 * 60 * 60 * 24 * 365;
 
 						request.log(['info'], chalk.green(`Setting cookies ${Object.keys(reply.request.state)}`));
 						response.state('oauth_token', oauth_token, { ttl: expires_in * 1000 });

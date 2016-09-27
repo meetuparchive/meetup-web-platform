@@ -1,9 +1,11 @@
 {
   "name": "meetup-web-platform",
-  "version": "1.0.0",
+  "version": "0.2.0",
   "description": "A collection of Node web application utilities developed for the Meetup web platform",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "preversion": "npm test",
+    "postversion": "git push && git push --tags"
   },
   "repository": {
     "type": "git",
@@ -42,14 +44,19 @@
     "hapi": "^14.2.0",
     "idb": "^1.1.4",
     "inert": "^4.0.2",
+    "intl": "^1.2.4",
     "jest-cli": "^14.1.0",
     "js-cookie": "^2.1.2",
     "node-fetch": "^1.6.0",
+    "node-uuid": "^1.4.7",
     "react": "^15.3.1",
     "react-addons-test-utils": "^15.3.1",
+    "react-helmet": "^3.1.0",
+    "react-intl": "^2.1.5",
     "react-router": "^2.7.0",
     "react-router-redux": "^4.0.5",
     "redux": "^3.5.2",
+    "redux-observable": "^0.9.1",
     "request": "^2.74.0",
     "rxjs": "^5.0.0-beta.11",
     "source-map-support": "^0.4.2",

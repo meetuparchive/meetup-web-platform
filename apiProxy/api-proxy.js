@@ -74,8 +74,7 @@ export function queryToApiConfig({ type, params }) {
 function urlFormatParams(params, doEncode) {
 	return Object.keys(params || {})
 		.reduce((dataParams, paramKey) => {
-			const paramValue = doEncode ?
-				encodeURIComponent(params[paramKey]) : params[paramKey];
+			const paramValue = encodeURIComponent(params[paramKey]);
 			dataParams.push(`${paramKey}=${paramValue}`);
 			return dataParams;
 		}, []).join('&');

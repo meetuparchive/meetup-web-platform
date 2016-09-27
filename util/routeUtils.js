@@ -25,18 +25,6 @@ function getActiveRouteQueries([ , { routes, location, params }]) {
 		.map(query => query({ location, params }));  // call the query function
 }
 
-function addParamsToMatch(newParams) {
-	return function(match) {
-		const [redirectLocation, renderProps] = match;
-		const params = renderProps.params || {};
-		renderProps.params = { ...params, ...newParams };
-		return [redirectLocation, renderProps];
-	};
-}
-
-export function activeRouteQueries$(routes, { location, auth }) {
-	return match$({ routes, location })
-		.map(addParamsToMatch({ auth }))  // queries may need to know logged-in user
-		.map(getActiveRouteQueries);  // collect queries from active routes
-}
+export const activeRouteQueries$ = routes => location =>
+	match$({ routes, location }).map(getActiveRouteQueries);
 
