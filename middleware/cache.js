@@ -170,10 +170,11 @@ const CacheMiddleware = store => {
 		if (action.type === 'API_SUCCESS') {
 			const dispatchCacheSet = bindActionCreators(cacheSet, store.dispatch);
 			const { queries, responses } = action.payload;
-			queries.forEach((query, i) => {
+			// defer execution so that `API_SUCCESS` completes before `CACHE_SET`
+			setTimeout(() => queries.forEach((query, i) => {
 				const response = responses[i];
 				dispatchCacheSet(query, response);
-			});
+			}), 0);
 		}
 
 		/**
