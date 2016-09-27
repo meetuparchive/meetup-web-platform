@@ -103,7 +103,7 @@ export const setAuthCookies = action$ =>
 		.do(setOauthCookie)
 		.do(setRefreshCookie)
 		.do(setAnonymousCookie)
-		.ignoreElements();
+		.ignoreElements();  // don't need to emit a new action here
 
 export default combineEpics(
 	handleLoginSuccess,
