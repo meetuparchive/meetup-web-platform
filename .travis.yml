@@ -1,0 +1,69 @@
+udo: required
+language: bash
+
+# exclude tags
+branches:
+  except:
+    - /^\d+$/
+    - /^v[\d.]+$/
+
+services:
+  - docker
+
+env:
+  global:
+    # build number used by blt pipeline
+    - CI_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER
+    # disables gcloud installation prompts
+    - CLOUDSDK_CORE_DISABLE_PROMPTS=1
+
+before_install:
+  # Install envtpl for easy templating.
+  - sudo pip install envtpl
+
+  # Login to mup.cr to publish artifacts
+  - docker login --username $DOCKER_LOGIN --password $DOCKER_PASS mup.cr
+
+  # Install gcloud
+  - rm -rf ${HOME}/google-cloud-sdk
+  - curl https://sdk.cloud.google.com | bash;
+  - export PATH=${HOME}/google-cloud-sdk/bin:$PATH
+  - gcloud components install kubectl
+
+  # authenticate gcp requests the gcloud cli tool makes
+  - echo $GCP_SECRET > client-secret.json
+  - gcloud auth activate-service-account --key-file client-secret.json
+  - export GOOGLE_APPLICATION_CREDENTIALS="$TRAVIS_BUILD_DIR/client-secret.json"
+
+script:
+  - make $(if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then echo publish; else echo package; fi)
+  #- if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then make deploy-stage; fi
+  # TODO validate stage deployment
+  - if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then make deploy-prod; fi
+  # TODO validate prod deployment
+
+after_success:
+  - git config --global user.email "builds@travis-ci.com"
+  - git config --global user.name "Travis CI"
+  - export GIT_TAG=$(make version)
+  - echo "GIT_TAG=$GIT_TAG"
+  - >
+    [ "${TRAVIS_PULL_REQUEST}" = "false" ] && [ "${TRAVIS_BRANCH}" = "master" ] &&
+    git tag $GIT_TAG -f -a -m "Version $GIT_TAG built by Travis CI - https://travis-ci.com/$TRAVIS_REPO_SLUG/builds/$TRAVIS_JOB_ID"
+    || true
+  - >
+    [ "${TRAVIS_PULL_REQUEST}" = "false" ] && [ "${TRAVIS_BRANCH}" = "master" ] &&
+    git push -q https://$GITHUB_USER:$GITHUB_TOKEN@github.com/$TRAVIS_REPO_SLUG --tags || true
+
+notifications:
+  # slack integration
+  slack:
+    # encrypted token for the meetuphq slack channel
+    secure: J7M6eSgKWcbMqFs9Z2wSiHemn/IGOj8D/iB6AB2WXPYxr8+HQnzE6L96lmdwwSHNscB0tbg7y7xsMJHh+qeiiFgrMTAP7SbbT0kV9JdFWEJs4mwZtMBeQXbyfIJ/6HSFAsAjOxBgyhNnmx6PYKWKc+HGVcRui4dWJQRO24Nmfup93gJon63U/KsdXyvTpVN/dZ2EneQzhh/Evg0fXRxo9ETeqfeJ7KNTc0FvklVYdMe0d9cPKZ7/22qoYM7KKELE5ER/pDEeU42ttz4axm1l7WQAddDTQElH1oZP46Eq62Adu244bSuQUBIRwSBJOjUMnIzxn+2s3u4BfeSSGm9d8X8PD46fcaIKbIQaYOnlL9IK4s8jUhv1j0/qEHm3X5OJ7nrHM1FEmlY8R/lgCPyFI6Rr1z722n2iCxKrsasqFaF4bNQjp1L1hHmuFS1bAsGYouc6IRYVLntl0KHI5RpLWxCf6s3kaYHRb8sKcrZTXK+lf/Hlk0iWfXK+SU5vdKtjSrIJusWBU5AmcDKJbjTBbi85/zxJ86jYJy0WN2HsyR6K2mm+iGwTcBD52Ut/7J3PcHgJyp9kq+NQIxyuyk1PmGFWwy6N+xpirlFo7ztgSSEa2teD0gb9Feh1XaLiuAXtmMyaO8esAbXqygweLJGSXoTQgvjJ1Bvgb5GJSej0LME=
+
+    # dont notify successful builds
+    on_success: never
+
+    # always notify build failures
+    on_failure: always
+
