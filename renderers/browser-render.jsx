@@ -27,7 +27,7 @@ function makeRenderer(routes, reducer, middleware) {
 	// containing the HTML-escaped JSON string in `window.INITIAL_STATE.escapedState`.
 	// unescape the text using native `textarea.textContent` unescaping
 	const escape = document.createElement('textarea');
-	escape.innerHTML = window.INITIAL_STATE.escapedState;
+	escape.innerHTML = window.APP_RUNTIME.escapedState;
 	const unescapedStateJSON = escape.textContent;
 	const initialState = JSON.parse(unescapedStateJSON);
 	const store = createStore(routes, reducer, initialState, middleware);
