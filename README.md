@@ -6,23 +6,31 @@ composing applications with React + Redux.
 
 In general, application-specific code will live outside of this package.
 
+# Releases
+
+This package uses semver versioning to tag releases. For now, please use npm's
+built-in [versioning CLI](https://docs.npmjs.com/cli/version) to tag releases
+when they are ready, e.g.
+
+```sh
+> npm version patch
+```
+
+This will
+
+1. run unit tests
+2. update the package version number in `package.json`
+3. commit the update
+4. create a git tag
+5. push the results to GitHub.
+
 # Modules
 
 ## Server
 
 The [server module](./server.js) exports a `startServer` function that consumes
-an array of Hapi `routes`, a `connection` configuration object, and an array of
-Hapi `plugins` to register, all provided by the specific web application.
-
-### Usage
-
-```js
-import startServer from `meetup-web-platform/server';
-
-// ...
-
-startServer(routes, connection, plugins);
-```
+a mapping of locale codes to app-rendering Observables, plus any app-specific
+server routes and plugins. See the code comments for usage details.
 
 ## API Adapter
 
@@ -39,6 +47,13 @@ the `queries` and recieve the `queryResponses` for any data request -
 all the API-specific translations happen on the server.
 
 ## Middleware
+
+The built-in middleware provides core functionality for interacting with
+API data - managing authenticated user sessions, syncing with the current
+URL location, caching data, and POSTing data to the API.
+
+Additional middleware can be passed to the `makeRenderer` function for
+each specific application's client and server entry points.
 
 ### Auth `middleware/auth.js`
 
@@ -133,4 +148,3 @@ their return values will be `dispatch`ed by the middleware in the API success/er
 case.
 
 Use reducers to parse the response and update application state.
-
