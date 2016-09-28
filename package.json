@@ -3,9 +3,7 @@
   "version": "0.2.0",
   "description": "A collection of Node web application utilities developed for the Meetup web platform",
   "scripts": {
-    "test": "jest",
-    "preversion": "npm test",
-    "postversion": "git push && git push --tags"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
