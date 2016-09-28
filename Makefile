@@ -3,7 +3,7 @@ CI_BUILD_NUMBER ?= $(USER)-snapshot
 VERSION ?= 0.2.$(CI_BUILD_NUMBER)
 
 test:
-	npm install
+	npm install --silent
 	npm test
 
 package:
