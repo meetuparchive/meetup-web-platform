@@ -23,23 +23,25 @@ addons:
     packages:
       - g++-4.8
 
-before_install:
-  # set up Travis to publish to meetup's npm account
-  # outside contirbutors to this repo will NOT get the token
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
-
 after_success:
   - git config --global user.email "builds@travis-ci.com"
   - git config --global user.name "Travis CI"
   - export GIT_TAG=$(make version)
   - echo "GIT_TAG=$GIT_TAG"
   - >
+    [ "${TRAVIS_PULL_REQUEST}" = "false" ] && [ "${TRAVIS_BRANCH}" = "master" ] &&
     npm version $GIT_TAG -m "Version $GIT_TAG built by Travis CI - https://travis-ci.com/$TRAVIS_REPO_SLUG/builds/$TRAVIS_JOB_ID"
     || true
   - >
-    git push https://$GITHUB_USER:$GITHUB_TOKEN@github.com/$TRAVIS_REPO_SLUG && git push -q https://$GITHUB_USER:$GITHUB_TOKEN@github.com/$TRAVIS_REPO_SLUG --tags || true
-  - >
-    npm publish
+    [ "${TRAVIS_PULL_REQUEST}" = "false" ] && [ "${TRAVIS_BRANCH}" = "master" ] &&
+    git push -q https://$GITHUB_USER:$GITHUB_TOKEN@github.com/$TRAVIS_REPO_SLUG --tags || true
+
+deploy:
+  provider: npm
+  api_key: $NPM_TOKEN
+  on:
+    tags: true
+    branch: master
 
 notifications:
   # slack integration
