@@ -10,8 +10,9 @@ branches:
     - /^v[\d.]+$/
 
 env:
-  - CXX=g++-4.8
   global:
+    # compiler command for Travis
+    - CXX=g++-4.8
     # build number used by blt pipeline
     - CI_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER
     # disables gcloud installation prompts
@@ -34,11 +35,14 @@ after_success:
   - echo "GIT_TAG=$GIT_TAG"
   - >
     [ "${TRAVIS_PULL_REQUEST}" = "false" ] && [ "${TRAVIS_BRANCH}" = "master" ] &&
-    git tag $GIT_TAG -f -a -m "Version $GIT_TAG built by Travis CI - https://travis-ci.com/$TRAVIS_REPO_SLUG/builds/$TRAVIS_JOB_ID"
+    npm version $GIT_TAG -m "Version $GIT_TAG built by Travis CI - https://travis-ci.com/$TRAVIS_REPO_SLUG/builds/$TRAVIS_JOB_ID"
     || true
   - >
     [ "${TRAVIS_PULL_REQUEST}" = "false" ] && [ "${TRAVIS_BRANCH}" = "master" ] &&
     git push -q https://$GITHUB_USER:$GITHUB_TOKEN@github.com/$TRAVIS_REPO_SLUG --tags || true
+  - >
+    [ "${TRAVIS_PULL_REQUEST}" = "false" ] && [ "${TRAVIS_BRANCH}" = "master" ] &&
+    npm publish
 
 notifications:
   # slack integration
