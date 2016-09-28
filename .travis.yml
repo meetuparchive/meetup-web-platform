@@ -15,8 +15,6 @@ env:
     - CXX=g++-4.8
     # build number used by blt pipeline
     - CI_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER
-    # disables gcloud installation prompts
-    - CLOUDSDK_CORE_DISABLE_PROMPTS=1
 
 addons:
   apt:
