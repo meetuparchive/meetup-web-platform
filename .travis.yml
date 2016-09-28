@@ -19,28 +19,24 @@ env:
 
 before_install:
   # Install envtpl for easy templating.
-  - sudo pip install envtpl
+  #- sudo pip install envtpl
 
-  # Login to mup.cr to publish artifacts
-  - docker login --username $DOCKER_LOGIN --password $DOCKER_PASS mup.cr
+  ## Login to mup.cr to publish artifacts
+  #- docker login --username $DOCKER_LOGIN --password $DOCKER_PASS mup.cr
 
-  # Install gcloud
-  - rm -rf ${HOME}/google-cloud-sdk
-  - curl https://sdk.cloud.google.com | bash;
-  - export PATH=${HOME}/google-cloud-sdk/bin:$PATH
-  - gcloud components install kubectl
+  ## Install gcloud
+  #- rm -rf ${HOME}/google-cloud-sdk
+  #- curl https://sdk.cloud.google.com | bash;
+  #- export PATH=${HOME}/google-cloud-sdk/bin:$PATH
+  #- gcloud components install kubectl
 
-  # authenticate gcp requests the gcloud cli tool makes
-  - echo $GCP_SECRET > client-secret.json
-  - gcloud auth activate-service-account --key-file client-secret.json
-  - export GOOGLE_APPLICATION_CREDENTIALS="$TRAVIS_BUILD_DIR/client-secret.json"
+  ## authenticate gcp requests the gcloud cli tool makes
+  #- echo $GCP_SECRET > client-secret.json
+  #- gcloud auth activate-service-account --key-file client-secret.json
+  #- export GOOGLE_APPLICATION_CREDENTIALS="$TRAVIS_BUILD_DIR/client-secret.json"
 
 script:
-  - make $(if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then echo publish; else echo package; fi)
-  #- if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then make deploy-stage; fi
-  # TODO validate stage deployment
-  - if [ "$TRAVIS_PULL_REQUEST" == "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then make deploy-prod; fi
-  # TODO validate prod deployment
+  - make package  # run tests
 
 after_success:
   - git config --global user.email "builds@travis-ci.com"
