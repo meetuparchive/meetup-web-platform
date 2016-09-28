@@ -1,14 +1,12 @@
-udo: required
-language: bash
+language: node_js
+node_js:
+  - "6.1"
 
 # exclude tags
 branches:
   except:
     - /^\d+$/
     - /^v[\d.]+$/
-
-services:
-  - docker
 
 env:
   global:
@@ -18,25 +16,7 @@ env:
     - CLOUDSDK_CORE_DISABLE_PROMPTS=1
 
 before_install:
-  # Install envtpl for easy templating.
-  #- sudo pip install envtpl
-
-  ## Login to mup.cr to publish artifacts
-  #- docker login --username $DOCKER_LOGIN --password $DOCKER_PASS mup.cr
-
-  ## Install gcloud
-  #- rm -rf ${HOME}/google-cloud-sdk
-  #- curl https://sdk.cloud.google.com | bash;
-  #- export PATH=${HOME}/google-cloud-sdk/bin:$PATH
-  #- gcloud components install kubectl
-
-  ## authenticate gcp requests the gcloud cli tool makes
-  #- echo $GCP_SECRET > client-secret.json
-  #- gcloud auth activate-service-account --key-file client-secret.json
-  #- export GOOGLE_APPLICATION_CREDENTIALS="$TRAVIS_BUILD_DIR/client-secret.json"
-
-script:
-  - make package  # run tests
+  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
 
 after_success:
   - git config --global user.email "builds@travis-ci.com"
