@@ -1,3 +1,9 @@
+[![npm
+version](https://badge.fury.io/js/meetup-web-platform.svg)](https://badge.fury.io/js/meetup-web-platform)
+
+[![Build
+Status](https://travis-ci.org/meetup/meetup-web-platform.svg?branch=master)](https://travis-ci.org/meetup/meetup-web-platform)
+
 # Web platform
 
 This is the base platform for serving Meetup web apps including the public
