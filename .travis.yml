@@ -26,14 +26,14 @@ after_success:
   - export GIT_TAG=$(make version)
   - echo "GIT_TAG=$GIT_TAG"
   - >
-    [ "${TRAVIS_BRANCH}" = "master" ] &&
+    [ "${TRAVIS_BRANCH}" = "master" ] && [ "${TRAVIS_PULL_REQUEST}" = "false" ] &&
     npm version $GIT_TAG -m "Version $GIT_TAG built by Travis CI - https://travis-ci.com/$TRAVIS_REPO_SLUG/builds/$TRAVIS_JOB_ID"
     || echo "skipping versioning"
   - >
-    [ "${TRAVIS_BRANCH}" = "master" ] &&
+    [ "${TRAVIS_BRANCH}" = "master" ] && [ "${TRAVIS_PULL_REQUEST}" = "false" ] &&
     git push -q https://$GITHUB_USER:$GITHUB_TOKEN@github.com/$TRAVIS_REPO_SLUG --tags || true
   - >
-    [ "${TRAVIS_BRANCH}" = "master" ] &&
+    [ "${TRAVIS_BRANCH}" = "master" ] && [ "${TRAVIS_PULL_REQUEST}" = "false" ] &&
     npm publish
 
 notifications:
