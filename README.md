@@ -1,3 +1,7 @@
+[![npm
+version](https://badge.fury.io/js/meetup-web-platform.svg)](https://badge.fury.io/js/meetup-web-platform) [![Build
+Status](https://travis-ci.org/meetup/meetup-web-platform.svg?branch=master)](https://travis-ci.org/meetup/meetup-web-platform)
+
 # Web platform
 
 This is the base platform for serving Meetup web apps including the public
@@ -8,21 +12,15 @@ In general, application-specific code will live outside of this package.
 
 # Releases
 
-This package uses semver versioning to tag releases. For now, please use npm's
-built-in [versioning CLI](https://docs.npmjs.com/cli/version) to tag releases
-when they are ready, e.g.
+This package uses semver versioning to tag releases, although the patch version
+is determined exclusively by the Travis build number for non-PR pushed to
+`master`. Major and minor versions are hard-coded into the
+[Makefile](Makefile#L2).
 
-```sh
-> npm version patch
-```
-
-This will
-
-1. run unit tests
-2. update the package version number in `package.json`
-3. commit the update
-4. create a git tag
-5. push the results to GitHub.
+**To publish a release to npm**, you must manually push a commit to `master` -
+PR merges will _not_ be built by Travis, and therefore will not kick off the
+publish routine. The currently-published version of the package is shown on
+the repo homepage on GitHub in a badge at the top of the README.
 
 # Modules
 
