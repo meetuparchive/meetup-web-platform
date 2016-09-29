@@ -29,19 +29,16 @@ after_success:
   - export GIT_TAG=$(make version)
   - echo "GIT_TAG=$GIT_TAG"
   - >
-    [ "${TRAVIS_PULL_REQUEST}" = "false" ] && [ "${TRAVIS_BRANCH}" = "master" ] &&
+    [ "${TRAVIS_BRANCH}" = "master" ] &&
     npm version $GIT_TAG -m "Version $GIT_TAG built by Travis CI - https://travis-ci.com/$TRAVIS_REPO_SLUG/builds/$TRAVIS_JOB_ID"
     || true
   - >
-    [ "${TRAVIS_PULL_REQUEST}" = "false" ] && [ "${TRAVIS_BRANCH}" = "master" ] &&
+    [ "${TRAVIS_BRANCH}" = "master" ] &&
     git push -q https://$GITHUB_USER:$GITHUB_TOKEN@github.com/$TRAVIS_REPO_SLUG --tags || true
-
-deploy:
-  provider: npm
-  api_key: $NPM_TOKEN
-  on:
-    tags: true
-    branch: master
+  - >
+    echo "//registry.npmjs.org/:_authToken=$(NPM_TOKEN)" > ~/.npmrc
+  - >
+    npm publish
 
 notifications:
   # slack integration
