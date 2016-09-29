@@ -1,7 +1,7 @@
-export function cacheSet(query, response) {
+export function cacheSet({ queries, responses }) {
 	return {
 		type: 'CACHE_SET',
-		payload: { query, response },
+		payload: { queries, responses },
 	};
 }
 

@@ -1,3 +1,11 @@
+## [v0.2.x] to [0.3.0]
+
+- **Removed** `SyncMiddleware` and `CacheMiddleware` are now part of
+[`EpicMiddleware`](middleware/epic.js), which exports a
+`getEpicMiddleware(routes)` function that replaces
+`getSyncMiddleware(routes)`. This is a drop-in replacement. Future point-releases
+will incorporate the remaining platform middleware.
+
 ## [v0.1.2] to [v0.2.0]
 
 - **Refactor** [`server-render:makeRenderer`](renderers/server-render.jsx#L123)
