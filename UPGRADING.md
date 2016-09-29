@@ -1,4 +1,4 @@
-## [v0.2.x] to [0.3.0]
+## [0.3.0]
 
 - **Removed** `SyncMiddleware`, `CacheMiddleware`, `AuthMiddleware` are now part of
 [`EpicMiddleware`](middleware/epic.js), which exports a
@@ -6,7 +6,7 @@
 to the previous middleware. If you are using `createStore` from the platform library,
 you can ignore this update, as the middleware loading is done for you.
 
-## [v0.1.2] to [v0.2.0]
+## [v0.2.0]
 
 - **Refactor** [`server-render:makeRenderer`](renderers/server-render.jsx#L123)
 now takes `clientFilename` and `assetPublicPath` as separate arguments rather
