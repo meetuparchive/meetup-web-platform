@@ -3,9 +3,7 @@
  * @module createStore
  */
 import { applyMiddleware, createStore, compose } from 'redux';
-import getSyncMiddleware from '../middleware/sync';
-import AuthMiddleware from '../middleware/auth';
-import CacheMiddleware from '../middleware/cache';
+import getEpicMiddleware from '../middleware/epic';
 import PostMiddleware from '../middleware/post';
 
 const noopMiddleware = store => next => action => next(action);
@@ -28,9 +26,7 @@ function finalCreateStore(routes, reducer, initialState=null, middleware=[]) {
 	 * @const
 	 */
 	const middlewareToApply = [
-		getSyncMiddleware(routes),
-		CacheMiddleware,
-		AuthMiddleware,
+		getEpicMiddleware(routes),
 		PostMiddleware,
 		typeof window !== 'undefined' && window.mupDevTools ? window.mupDevTools() : noopMiddleware,
 		...middleware,
