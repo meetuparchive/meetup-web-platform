@@ -25,16 +25,6 @@ export function checkEnable() {
 	return true;
 }
 
-/**
- * The cache middleware triggers a 'set'/store action when new data is received
- * from the API (API_SUCCESS), and is queried when queries are sent to the API
- * (API_REQUEST). These events trigger cache-specific events, CACHE_SET and
- * CACHE_QUERY, which are then used to update the cache or update the
- * application state (CACHE_SUCCESS)
- *
- * @returns {Function} the curried state => action => next middleware function
- */
-
 // get a cache, any cache (that conforms to the Promise-based API)
 const cache = makeCache();
 
