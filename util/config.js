@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { ANONYMOUS_AUTH_APP_PATH } from '../middleware/auth';
+import { ANONYMOUS_AUTH_APP_PATH } from '../epics/auth';
 /**
  * Start the server with a config
  *
