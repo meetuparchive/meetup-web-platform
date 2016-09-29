@@ -44,7 +44,7 @@ From the client-side application's point of view, it will always send
 the `queries` and recieve the `queryResponses` for any data request -
 all the API-specific translations happen on the server.
 
-## Middleware
+## Middleware/Epics
 
 The built-in middleware provides core functionality for interacting with
 API data - managing authenticated user sessions, syncing with the current
@@ -53,7 +53,12 @@ URL location, caching data, and POSTing data to the API.
 Additional middleware can be passed to the `makeRenderer` function for
 each specific application's client and server entry points.
 
-### Auth `middleware/auth.js`
+### Epic middleware
+
+Based on `redux-observable`, this middleware provides the following
+functionality through "Epics":
+
+#### Auth `epics/auth.js`
 
 _in development - API will provide most auth needs_
 
@@ -72,9 +77,9 @@ regular data API - the current branch implements it as part of the API server, r
 - delete auth cookie (not currently implemented)
 - clearing local state is not a side effect, so it's handled directly by the `auth` reducer in `coreReducers`
 
-### Sync `middleware/sync.js`
+#### Sync `epics/sync.js`
 
-This middleware is currently only responsible for fetching the data from the API server on initial render or client-side
+This epic is currently only responsible for fetching the data from the API server on initial render or client-side
 user navigation.
 
 **on `server/RENDER` or `LOCATION_CHANGE`**, which provide a `location` (URL):
@@ -91,14 +96,14 @@ user navigation.
 
 _Interesting feature_: `navRenderSub` is a `Rx.SerialDisposable`, which means that when a user navigates to a new page,
 any "pending" API requests will *not be processed*. This is a Very Good Thing because it means that we won't be calling
-`API_COMPLETE` for a page load that is no longer applicable. A similar tool is used for the AuthMiddleware so that only
+`API_COMPLETE` for a page load that is no longer applicable. A similar tool is used for the AuthEpic so that only
 one login request can be processed, but it's less likely to be an issue there since it's rare that users would be trying
 to log in repeatedly without waiting for previous login requests to be processed.
 
-### Cache `middleware/cache.js`
+#### Cache `epics/cache.js`
 
-The cache middleware provides optimistic `state` updates for any data specified
-by active route queries, similar to the SyncMiddleware, but using locally
+The cache epic provides optimistic `state` updates for any data specified
+by active route queries, similar to the SyncEpic, but using locally
 cached data rather than an API. It is client-side only, and it *does not suppress*
 data fetched from the server - it simply pre-empts it before the API response
 returns and overwrites everything with the latest server data.
@@ -122,7 +127,7 @@ In dev, be aware that the cache may be masking failed API requests - keep your
 network dev tools open and watch the server logs to make sure you haven't broken
 anything. We will add tooling to make such cases more obvious in the future.
 
-#### Disable cache
+##### Disable cache
 
 By design, the cache masks slow responses from the API and can create a 'flash'
 of stale content before the API responds with the latest data. In development,
