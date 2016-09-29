@@ -3,12 +3,6 @@ language: node_js
 node_js:
   - "6.1"
 
-# exclude tags
-branches:
-  except:
-    - /^\d+$/
-    - /^v[\d.]+$/
-
 env:
   global:
     # compiler command for Travis
@@ -31,7 +25,7 @@ after_success:
   - >
     [ "${TRAVIS_BRANCH}" = "master" ] &&
     npm version $GIT_TAG -m "Version $GIT_TAG built by Travis CI - https://travis-ci.com/$TRAVIS_REPO_SLUG/builds/$TRAVIS_JOB_ID"
-    || true
+    || echo "skipping versioning"
   - >
     [ "${TRAVIS_BRANCH}" = "master" ] &&
     git push -q https://$GITHUB_USER:$GITHUB_TOKEN@github.com/$TRAVIS_REPO_SLUG --tags || true
@@ -40,7 +34,7 @@ after_success:
     echo "//registry.npmjs.org/:_authToken=$(NPM_TOKEN)" > ~/.npmrc || true
   - >
     [ "${TRAVIS_BRANCH}" = "master" ] &&
-    npm publish || true
+    npm publish
 
 notifications:
   # slack integration
