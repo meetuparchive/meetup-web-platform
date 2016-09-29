@@ -22,7 +22,8 @@ after_success:
   - git config --global user.name "Travis CI"
   - export GIT_TAG=$(make version)
   - echo "GIT_TAG=$GIT_TAG"
-  - [ "${TRAVIS_BRANCH}" = "master" ] &&
+  - >
+    [ "${TRAVIS_BRANCH}" = "master" ] &&
     npm version $GIT_TAG -m "Version $GIT_TAG built by Travis CI - https://travis-ci.com/$TRAVIS_REPO_SLUG/builds/$TRAVIS_JOB_ID"
     || echo "skipping versioning"
   - >
@@ -31,7 +32,8 @@ after_success:
   - >
     [ "${TRAVIS_BRANCH}" = "master" ] &&
     echo "//registry.npmjs.org/:_authToken=$(NPM_TOKEN)" > ~/.npmrc || true
-  - [ "${TRAVIS_BRANCH}" = "master" ] &&
+  - >
+    [ "${TRAVIS_BRANCH}" = "master" ] &&
     npm publish
 
 notifications:
