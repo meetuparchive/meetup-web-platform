@@ -57,5 +57,6 @@
     "rxjs": "^5.0.0-beta.11",
     "source-map-support": "^0.4.2",
     "url-search-params": "^0.5.0"
-  }
+  },
+  "version": "0.2.31"
 }
