@@ -37,10 +37,10 @@ after_success:
     git push -q https://$GITHUB_USER:$GITHUB_TOKEN@github.com/$TRAVIS_REPO_SLUG --tags || true
   - >
     [ "${TRAVIS_BRANCH}" = "master" ] &&
-    echo "//registry.npmjs.org/:_authToken=$(NPM_TOKEN)" > ~/.npmrc
+    echo "//registry.npmjs.org/:_authToken=$(NPM_TOKEN)" > ~/.npmrc || true
   - >
     [ "${TRAVIS_BRANCH}" = "master" ] &&
-    npm publish
+    npm publish || true
 
 notifications:
   # slack integration
