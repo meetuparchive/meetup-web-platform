@@ -13,14 +13,14 @@ In general, application-specific code will live outside of this package.
 # Releases
 
 This package uses semver versioning to tag releases, although the patch version
-is determined exclusively by the Travis build number for merges to `master`.
-Major and minor versions are hard-coded into the Makefile, which is used to
-template the version number set and published by Travis when any commit is
-successfully merged to `master`.
+is determined exclusively by the Travis build number for non-PR pushed to
+`master`. Major and minor versions are hard-coded into the
+[Makefile](Makefile#L2).
 
-One result of this setup is that you cannot specify a specific release version
-dependency in your application code until the dependent changes have been
-merged to `master`.
+**To publish a release to npm**, you must manually push a commit to `master` -
+PR merges will _not_ be built by Travis, and therefore will not kick off the
+publish routine. The currently-published version of the package is shown on
+the repo homepage on GitHub in a badge at the top of the README.
 
 # Modules
 
