@@ -3,12 +3,6 @@ language: node_js
 node_js:
   - "6.1"
 
-# exclude tags
-branches:
-  except:
-    - /^\d+$/
-    - /^v[\d.]+$/
-
 env:
   global:
     # compiler command for Travis
