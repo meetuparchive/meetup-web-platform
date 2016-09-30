@@ -47,7 +47,6 @@ describe('SyncMiddleware', () => {
 	it('dispatches locationSync with routing state on CONFIGURE_AUTH', function() {
 		spyOn(syncActionCreators, 'locationSync');
 		syncDispatcher(MOCK_APP_STATE, authActionCreators.configureAuth({}));
-		jest.runAllTimers();
 		expect(syncActionCreators.locationSync)
 			.toHaveBeenCalledWith(MOCK_APP_STATE.routing.locationBeforeTransitions);
 	});
