@@ -1,0 +1,11 @@
+{
+  "coverageDirectory": "<rootDir>/coverage",
+  "setupFiles": [
+    "<rootDir>/util/globals.js"
+  ],
+  "moduleFileExtensions": [
+    "js",
+    "jsx"
+  ],
+  "testRegex": ".*\\.test\\.jsx?$"
+}

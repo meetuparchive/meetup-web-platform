@@ -29,7 +29,6 @@ describe('PostMiddleware', () => {
 		postDispatcher(MOCK_APP_STATE, MOCK_POST_ACTION);
 		// The promises resolve async, but resolution is not accessible to test, so
 		// we use a setTimeout to make sure execution has completed
-		jest.useRealTimers();
 		setTimeout(() => {
 			expect(MOCK_POST_ACTION.payload.onSuccess)
 				.toHaveBeenCalledWith(result);
@@ -43,7 +42,6 @@ describe('PostMiddleware', () => {
 		postDispatcher(MOCK_APP_STATE, MOCK_POST_ACTION);
 		// The promises resolve async, but resolution is not accessible to test, so
 		// we use a setTimeout to make sure execution has completed
-		jest.useRealTimers();
 		setTimeout(() => {
 			expect(MOCK_POST_ACTION.payload.onError)
 				.toHaveBeenCalledWith(result);
