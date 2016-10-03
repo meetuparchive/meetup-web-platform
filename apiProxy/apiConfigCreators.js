@@ -30,6 +30,20 @@ export function group(params) {
 }
 
 /**
+ * profiles
+ *
+ * Note, this is group-specific information, general Meetup user info is 'Members'
+ */
+export function profile(params) {
+	const pathExtension = params.id ? `/${params.id}` : '';
+	return {
+		endpoint: `${params.urlname}/members${pathExtension}`,
+		params
+	};
+}
+
+
+/**
  * all the endpoints that return event objects
  */
 export function event(params) {
