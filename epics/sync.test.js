@@ -14,15 +14,9 @@ import getSyncEpic from '../epics/sync';
 import * as syncActionCreators from '../actions/syncActionCreators';
 import * as authActionCreators from '../actions/authActionCreators';
 /**
- * The sync middleware needs to respond to particular actions by calling
- * an API endpoint and then triggering a syncing action asynchronously
- *
- * Middleware tests require a mock `dispatch` method and a mock `createStore`.
- * @see {@link http://redux.js.org/docs/recipes/WritingTests.html#middleware}
- *
- * @module SyncMiddlewareTest
+ * @module SyncEpicTest
  */
-describe('SyncMiddleware', () => {
+describe('Sync epic', () => {
 	const routes = {};
 	it('does not pass through arbitrary actions', function(done) {
 		const arbitraryAction = {

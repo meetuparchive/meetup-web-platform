@@ -32,7 +32,8 @@ export const MOCK_ROUTES = [
 	{
 		path: '/noQuery',
 		component: () => {},
-	}, {
+	},
+	{
 		path: '/',
 		component: () => {},
 		query: () => {},
@@ -43,7 +44,7 @@ export const MOCK_ROUTES = [
 				query: () => {}
 			}
 		]
-	}
+	},
 ];
 
 export const MOCK_API_PROBLEM = {

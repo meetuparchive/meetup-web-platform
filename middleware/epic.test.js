@@ -24,39 +24,6 @@ import {
 import getEpicMiddleware from './epic';
 
 
-describe('AuthMiddleware', () => {
-	const authDispatcher = middlewareDispatcher(getEpicMiddleware(MOCK_ROUTES));
-	beforeEach(function() {
-		const MOCK_LOGIN_RESPONSE = {
-			value: {
-				member: {},
-				oauth_token: 1234
-			}
-		};
-		this.loginSuccessAction = authActionCreators.loginSuccess(MOCK_LOGIN_RESPONSE);
-		this.logoutAction = authActionCreators.logoutRequest();
-	});
-	it('dispatches', function() {
-		expect(authDispatcher(MOCK_APP_STATE, this.loginSuccessAction))
-			.toEqual(this.loginSuccessAction);  // end of dispatch chain is the action
-	});
-	it('dispatches configureAuth on LOGIN_SUCCESS', function() {
-		spyOn(authActionCreators, 'configureAuth');
-		authDispatcher(MOCK_APP_STATE, this.loginSuccessAction);
-		expect(authActionCreators.configureAuth).toHaveBeenCalled();
-	});
-	it('dispatches configureAuth on LOGIN_SUCCESS', function() {
-		spyOn(authActionCreators, 'configureAuth');
-		authDispatcher(MOCK_APP_STATE, this.loginSuccessAction);
-		expect(authActionCreators.configureAuth).toHaveBeenCalled();
-	});
-	it('dispatches configureAuth on LOGOUT_REQUEST', function() {
-		spyOn(authActionCreators, 'configureAuth');
-		authDispatcher(MOCK_APP_STATE, this.logoutAction);
-		expect(authActionCreators.configureAuth).toHaveBeenCalled();
-	});
-});
-
 describe('CacheMiddleware', () => {
 	const cacheDispatcher = middlewareDispatcher(getEpicMiddleware(MOCK_ROUTES));
 	beforeEach(function() {
