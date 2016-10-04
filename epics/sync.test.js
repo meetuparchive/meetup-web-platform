@@ -38,7 +38,7 @@ describe('Sync epic', () => {
 			}
 		);
 	});
-	it('dispatches apiRequest for nav-related actions with matched query', function(done) {
+	it('emits API_REQUEST for nav-related actions with matched query', function(done) {
 		const locationChange = { type: LOCATION_CHANGE, payload: MOCK_RENDERPROPS.location };
 		const serverRender = { type: '@@server/RENDER', payload: MOCK_RENDERPROPS.location };
 		const locationSync = syncActionCreators.locationSync(MOCK_RENDERPROPS.location);
@@ -51,7 +51,7 @@ describe('Sync epic', () => {
 			done
 		);
 	});
-	it('does not dispatch for nav-related actions without matched query', function(done) {
+	it('does not emit for nav-related actions without matched query', function(done) {
 		const pathname = '/noQuery';
 		const noMatchLocation = { ...MOCK_RENDERPROPS.location, pathname };
 		const locationChange = { type: LOCATION_CHANGE, payload: noMatchLocation };
@@ -73,7 +73,7 @@ describe('Sync epic', () => {
 			}
 		);
 	});
-	it('dispatches API_SUCCESS and API_COMPLETE on successful API_REQUEST', function(done) {
+	it('emits API_SUCCESS and API_COMPLETE on successful API_REQUEST', function(done) {
 		global.fetch = () => {
 			return Promise.resolve({
 				json: () => Promise.resolve({})
@@ -92,7 +92,7 @@ describe('Sync epic', () => {
 			done
 		);
 	});
-	it('dispatches API_ERROR on failed API_REQUEST', function(done) {
+	it('emits API_ERROR on failed API_REQUEST', function(done) {
 		global.fetch = () => Promise.reject(new Error());
 		const queries = [mockQuery({})];
 		const apiRequest = syncActionCreators.apiRequest(queries);
@@ -107,13 +107,16 @@ describe('Sync epic', () => {
 		);
 	});
 
-	it('dispatches locationSync with routing state on CONFIGURE_AUTH', function(done) {
+	it('emits LOCATION_SYNC with routing state on CONFIGURE_AUTH', function(done) {
 		const configureAuth = authActionCreators.configureAuth({});
 		const action$ = ActionsObservable.of(configureAuth);
 		const fakeStore = createFakeStore(MOCK_APP_STATE);
 		const epic$ = getSyncEpic(routes)(action$, fakeStore);
 		epic$.subscribe(
-			action => expect(action.payload).toEqual(MOCK_APP_STATE.routing.locationBeforeTransitions),
+			action => {
+				expect(action.type).toEqual('LOCATION_SYNC');
+				expect(action.payload).toEqual(MOCK_APP_STATE.routing.locationBeforeTransitions);
+			},
 			null,
 			done
 		);
