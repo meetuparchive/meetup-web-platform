@@ -26,5 +26,7 @@ function getActiveRouteQueries([ , { routes, location, params }]) {
 }
 
 export const activeRouteQueries$ = routes => location =>
-	match$({ routes, location }).map(getActiveRouteQueries);
+	match$({ routes, location })
+		.map(getActiveRouteQueries)
+		.filter(queries => queries.length);
 

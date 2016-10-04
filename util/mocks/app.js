@@ -28,11 +28,23 @@ export const MOCK_APP_STATE = {
 	},
 };
 
-export const MOCK_ROUTES = {
-	path: '/',
-	component: {},
-	query: () => {}
-};
+export const MOCK_ROUTES = [
+	{
+		path: '/noQuery',
+		component: () => {},
+	}, {
+		path: '/',
+		component: () => {},
+		query: () => {},
+		childRoutes: [
+			{
+				path: 'foo',
+				component: () => {},
+				query: () => {}
+			}
+		]
+	}
+];
 
 export const MOCK_API_PROBLEM = {
 	problem: 'There was an internal problem in the API'
