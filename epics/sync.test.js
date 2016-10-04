@@ -5,6 +5,7 @@ global.fetch = fetch;
 import { LOCATION_CHANGE } from 'react-router-redux';
 import { createFakeStore } from '../util/testUtils';
 import {
+	mockQuery,
 	MOCK_APP_STATE,
 	MOCK_RENDERPROPS,
 	MOCK_ROUTES,
@@ -76,6 +77,39 @@ describe('SyncMiddleware', () => {
 				expect(spyable.notCalled).not.toHaveBeenCalled();
 				done();
 			}
+		);
+	});
+	it('dispatches API_SUCCESS and API_COMPLETE on successful API_REQUEST', function(done) {
+		global.fetch = () => {
+			return Promise.resolve({
+				json: () => Promise.resolve({})
+			});
+		};
+		const queries = [mockQuery({})];
+		const apiRequest = syncActionCreators.apiRequest(queries);
+		const action$ = ActionsObservable.of(apiRequest);
+		const fakeStore = createFakeStore(MOCK_APP_STATE);
+		const epic$ = getSyncEpic(routes)(action$, fakeStore)
+			.toArray();
+
+		epic$.subscribe(
+			actions => expect(actions.map(({ type }) => type)).toEqual(['API_SUCCESS', 'API_COMPLETE']),
+			null,
+			done
+		);
+	});
+	it('dispatches API_ERROR on failed API_REQUEST', function(done) {
+		global.fetch = () => Promise.reject(new Error());
+		const queries = [mockQuery({})];
+		const apiRequest = syncActionCreators.apiRequest(queries);
+		const action$ = ActionsObservable.of(apiRequest);
+		const fakeStore = createFakeStore(MOCK_APP_STATE);
+		const epic$ = getSyncEpic(routes)(action$, fakeStore);
+
+		epic$.subscribe(
+			action => expect(action.type).toEqual('API_ERROR'),
+			null,
+			done
 		);
 	});
 

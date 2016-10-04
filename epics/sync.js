@@ -58,8 +58,8 @@ export const fetchQueriesEpic = (action$, store) =>
 			return Observable.fromPromise(fetch(queries))  // call fetch
 				.takeUntil(action$.ofType(LOCATION_CHANGE, 'LOCATION_SYNC'))  // cancel this fetch when nav happens
 				.map(apiSuccess)                             // dispatch apiSuccess with server response
-				.catch(err => Observable.of(apiError(err)))  // ... or apiError
-				.flatMap(action => Observable.of(action, apiComplete()));  // dispatch apiComplete after resolution
+				.flatMap(action => Observable.of(action, apiComplete()))  // dispatch apiComplete after resolution
+				.catch(err => Observable.of(apiError(err)));  // ... or apiError
 		});
 
 export default function getSyncEpic(routes) {
