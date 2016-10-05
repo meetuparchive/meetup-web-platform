@@ -1,43 +1,10 @@
-import fetch from 'node-fetch';
-global.fetch = fetch;
-import {
-	middlewareDispatcher,
-} from '../util/testUtils';
-import {
-	mockQuery,
-	MOCK_API_RESULT,
-	MOCK_APP_STATE,
-	MOCK_RENDERPROPS,
-	MOCK_ROUTES,
-} from '../util/mocks/app';
-import * as syncActionCreators from '../actions/syncActionCreators';
-import * as authActionCreators from '../actions/authActionCreators';
-import * as cacheActionCreators from '../actions/cacheActionCreators';
 import {
 	makeCache,
 	cacheWriter,
 	cacheReader,
 } from '../util/cacheUtils';
-import {
-	checkEnable,
-} from '../epics/cache';
-import getEpicMiddleware from './epic';
 
-
-describe('CacheMiddleware', () => {
-	const cacheDispatcher = middlewareDispatcher(getEpicMiddleware(MOCK_ROUTES));
-	beforeEach(function() {
-		this.MOCK_QUERY = mockQuery(MOCK_RENDERPROPS);
-		this.apiSuccessAction = syncActionCreators.apiSuccess({
-			queries: [this.MOCK_QUERY],
-			responses: MOCK_API_RESULT
-		});
-		console.log = () => {};  // suppress expected irrelevant console output
-	});
-	it('dispatches', function() {
-		expect(cacheDispatcher(MOCK_APP_STATE, this.apiSuccessAction))
-			.toEqual(this.apiSuccessAction);  // end of dispatch chain is the action
-	});
+describe('cache utils', () => {
 	it('creates a Promise-based cache', function() {
 		const cache = makeCache();
 		expect(cache.get).toEqual(jasmine.any(Function));
@@ -98,29 +65,4 @@ describe('CacheMiddleware', () => {
 			})
 			.then(done);
 	});
-	it('does not call cacheSet when disabled', function() {
-		const spyable = {
-			checkEnable,
-		};
-		spyOn(spyable, 'checkEnable').and.callFake(() => false);
-		// set up a fresh dispatcher and apiSuccessAction that will use the faked
-		// checkEnable function
-		const cacheDispatcher = getEpicMiddleware({});
-		const apiSuccessAction = syncActionCreators.apiSuccess({
-			queries: [this.MOCK_QUERY],
-			responses: MOCK_API_RESULT
-		});
-
-		// test for cache actions in response to api actions
-		spyOn(cacheActionCreators, 'cacheSet');
-		cacheDispatcher(MOCK_APP_STATE, apiSuccessAction);
-		expect(cacheActionCreators.cacheSet)
-			.not.toHaveBeenCalled();
-
-		const apiRequestAction = syncActionCreators.apiRequest([this.MOCK_QUERY]);
-		spyOn(cacheActionCreators, 'cacheRequest');
-		cacheDispatcher(MOCK_APP_STATE, apiRequestAction);
-		expect(cacheActionCreators.cacheRequest).not.toHaveBeenCalled();
-	});
 });
-

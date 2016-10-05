@@ -29,9 +29,9 @@ export function checkEnable() {
 const cache = makeCache();
 
 // get a function that can read from the cache for a specific query
-const readCache = cacheReader(cache);
+export const readCache = cacheReader(cache);
 // get a function that can write to the cache for a specific query-response
-const writeCache = cacheWriter(cache);
+export const writeCache = cacheWriter(cache);
 
 /**
  * Listen for any action that should clear cached state
@@ -41,7 +41,7 @@ const writeCache = cacheWriter(cache);
 export const cacheClearEpic = action$ =>
 	action$.ofType('LOGOUT_REQUEST', 'CACHE_CLEAR')
 		.flatMap(() => cache.clear())  // wait for cache to clear before continuing
-		.flatMap(() => Rx.Observable.empty());
+		.ignoreElements();
 
 /**
  * Listen for any action that should set cached state with a
@@ -59,7 +59,7 @@ export const cacheSetEpic = action$ =>
 			Rx.Observable.from(queries).zip(Rx.Observable.from(responses))
 		)
 		.flatMap(([ query, response ]) => writeCache(query, response))
-		.flatMap(() => Rx.Observable.empty());
+		.ignoreElements();
 
 /**
  * Listen for any action that should query the cache using a payload of queries
@@ -78,13 +78,14 @@ export const cacheQueryEpic = action$ =>
 			queries: [ ...acc.queries, query ],
 			responses: [ ...acc.responses, response ],
 		}), { queries: [], responses: [] })           // empty response structure
+		.filter(cacheResponse => cacheResponse.responses.length)
 		.map(cacheSuccess);
 
 const cacheEpic = checkEnable() ? combineEpics(
 	cacheClearEpic,
 	cacheSetEpic,
 	cacheQueryEpic
-) : Rx.Observable.empty();
+) : action$ => action$.ignoreElements();
 
 export default cacheEpic;
 
