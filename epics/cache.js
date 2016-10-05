@@ -26,12 +26,12 @@ export function checkEnable() {
 }
 
 // get a cache, any cache (that conforms to the Promise-based API)
-const cache = makeCache();
+export const cache = makeCache();
 
 // get a function that can read from the cache for a specific query
-export const readCache = cacheReader(cache);
+const readCache = cacheReader(cache);
 // get a function that can write to the cache for a specific query-response
-export const writeCache = cacheWriter(cache);
+const writeCache = cacheWriter(cache);
 
 /**
  * Listen for any action that should clear cached state

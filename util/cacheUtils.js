@@ -23,15 +23,16 @@ export function makeCache() {
 			},
 			set(key, val) {
 				_data[key] = val;
-				return Promise.resolve();
+				return Promise.resolve(true);
 			},
 			delete(key) {
 				delete _data[key];
-				return Promise.resolve();
+				return Promise.resolve(true);
 			},
 			clear() {
+				console.log('cleared');
 				Object.keys(_data).forEach(key => delete _data[key]);
-				return Promise.resolve();
+				return Promise.resolve(true);
 			},
 		};
 	}
