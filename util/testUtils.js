@@ -1,11 +1,13 @@
+import { Observable } from 'rxjs/Observable';
+import Hapi from 'hapi';
+import Cookie from 'tough-cookie';
 import TestUtils from 'react-addons-test-utils';
 
-export function findComponentsWithType(tree, typeString) {
-	return TestUtils.findAllInRenderedTree(
+export const findComponentsWithType = (tree, typeString) =>
+	TestUtils.findAllInRenderedTree(
 		tree,
 		(component) => component && component.constructor.name === typeString
 	);
-}
 
 export const createFakeStore = fakeData => ({
 	getState() {
@@ -20,5 +22,31 @@ export const middlewareDispatcher = middleware => (storeData, action) => {
 	const dispatch = middleware(createFakeStore(storeData))(actionAttempt => dispatched = actionAttempt);
 	dispatch(action);
 	return dispatched;
+};
+
+export const parseCookieHeader = cookieHeader => {
+	const cookies = (cookieHeader instanceof Array) ?
+		cookieHeader.map(Cookie.parse) :
+		[Cookie.parse(cookieHeader)];
+
+	return cookies.reduce(
+		(acc, cookie) => ({ ...acc, [cookie.key]: cookie.value }),
+		{}
+	);
+
+};
+
+export const getServer = connection => {
+	const server = new Hapi.Server();
+	server.connection(connection);
+
+	// mock the anonAuthPlugin
+	server.decorate(
+		'request',
+		'authorize',
+		request => () => Observable.of(request),
+		{ apply: true }
+	);
+	return server;
 };
 

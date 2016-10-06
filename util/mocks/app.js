@@ -1,3 +1,4 @@
+import { Observable } from 'rxjs';
 import {
 	MOCK_GROUP,
 	MOCK_EVENT,
@@ -44,6 +45,12 @@ export const MOCK_API_RESULT = [{
 	value: MOCK_APP_STATE.app.group.value
 }];
 
+export const MOCK_OAUTH_COOKIES = {
+	oauth_token: '1234',
+	refresh_token: 'asdf',
+	anonymous: true
+};
+
 export const MOCK_RENDERPROPS = {
 	location: {  // https://github.com/reactjs/history/blob/master/docs/Location.md
 		pathname: '/foo',
@@ -85,3 +92,29 @@ export const MOCK_POST_ACTION = {
 		onError: err => ({ type: 'MOCK_ERROR' }),
 	}
 };
+
+// string 'Cookie:' header from MOCK_OAUTH_COOKIES
+export const MOCK_COOKIE_HEADER = Object.keys(MOCK_OAUTH_COOKIES)
+	.reduce((acc, key) => acc += `${key}=${JSON.stringify(MOCK_OAUTH_COOKIES[key])}; `, '');
+
+// mock the renderRequest$ function provided by the server-locale app bundle
+export const MOCK_RENDER_REQUEST$ = () =>
+	Observable.of({ result: MOCK_RENDER_RESULT, statusCode: 200 });
+
+export const MOCK_renderRequestMap = {
+	'en-US': MOCK_RENDER_REQUEST$,
+};
+
+// Arbitrary string response payload from server render
+export const MOCK_RENDER_RESULT = '<html><body><h1>Hello world</h1></body></html>';
+
+export const MOCK_REQUEST_COOKIES = {
+	url: '/',
+	headers: {
+		cookie: MOCK_COOKIE_HEADER
+	},
+};
+
+// mock the whole apiProxy module so that we don't actually invoke it
+export const MOCK_API_PROXY$ = () => () => Observable.of(MOCK_API_RESULT);
+
