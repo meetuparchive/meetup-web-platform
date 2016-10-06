@@ -3,12 +3,11 @@ import Hapi from 'hapi';
 import Cookie from 'tough-cookie';
 import TestUtils from 'react-addons-test-utils';
 
-export function findComponentsWithType(tree, typeString) {
-	return TestUtils.findAllInRenderedTree(
+export const findComponentsWithType = (tree, typeString) =>
+	TestUtils.findAllInRenderedTree(
 		tree,
 		(component) => component && component.constructor.name === typeString
 	);
-}
 
 export const createFakeStore = fakeData => ({
 	getState() {
@@ -25,7 +24,7 @@ export const middlewareDispatcher = middleware => (storeData, action) => {
 	return dispatched;
 };
 
-export const parseCookieHeader = (cookieHeader) => {
+export const parseCookieHeader = cookieHeader => {
 	const cookies = (cookieHeader instanceof Array) ?
 		cookieHeader.map(Cookie.parse) :
 		[Cookie.parse(cookieHeader)];
@@ -37,9 +36,9 @@ export const parseCookieHeader = (cookieHeader) => {
 
 };
 
-export function getServer() {
+export const getServer = connection => {
 	const server = new Hapi.Server();
-	server.connection();
+	server.connection(connection);
 
 	// mock the anonAuthPlugin
 	server.decorate(
@@ -49,6 +48,5 @@ export function getServer() {
 		{ apply: true }
 	);
 	return server;
-}
-
+};
 
