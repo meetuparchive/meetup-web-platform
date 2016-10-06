@@ -1,3 +1,6 @@
+import { Observable } from 'rxjs/Observable';
+import Hapi from 'hapi';
+import Cookie from 'tough-cookie';
 import TestUtils from 'react-addons-test-utils';
 
 export function findComponentsWithType(tree, typeString) {
@@ -21,4 +24,31 @@ export const middlewareDispatcher = middleware => (storeData, action) => {
 	dispatch(action);
 	return dispatched;
 };
+
+export const parseCookieHeader = (cookieHeader) => {
+	const cookies = (cookieHeader instanceof Array) ?
+		cookieHeader.map(Cookie.parse) :
+		[Cookie.parse(cookieHeader)];
+
+	return cookies.reduce(
+		(acc, cookie) => ({ ...acc, [cookie.key]: cookie.value }),
+		{}
+	);
+
+};
+
+export function getServer() {
+	const server = new Hapi.Server();
+	server.connection();
+
+	// mock the anonAuthPlugin
+	server.decorate(
+		'request',
+		'authorize',
+		request => () => Observable.of(request),
+		{ apply: true }
+	);
+	return server;
+}
+
 
