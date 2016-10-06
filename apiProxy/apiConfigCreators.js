@@ -18,6 +18,29 @@ export function home(params) {
 }
 
 /**
+ * Single category groups, grouped by topic
+ */
+export function category_groups(params) {
+	params.fields = params.fields ? `${params.fields},photo_gradient` : 'photo_gradient';
+	return {
+		endpoint: 'recommended/group_topics/binge',
+		params
+	};
+}
+
+/**
+ * Groups matching a param
+ */
+export function find_groups(params) {
+	params.fields = params.fields ? `${params.fields},photo_gradient` : 'photo_gradient';
+	return {
+		endpoint: 'find/groups',
+		params
+	};
+}
+
+
+/**
  * all the group-related endpoints
  */
 export function group(params) {
