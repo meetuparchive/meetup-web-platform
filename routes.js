@@ -50,10 +50,11 @@ export default function getRoutes(
 	{
 		API_SERVER_ROOT_URL,
 		PHOTO_SCALER_SALT,
-	}) {
+	},
+	apiProxyFn$ = apiProxy$) {
 
 	console.log(chalk.green(`Supported languages:\n${Object.keys(renderRequestMap).join('\n')}`));
-	const proxyApiRequest$ = apiProxy$({
+	const proxyApiRequest$ = apiProxyFn$({
 		baseUrl: API_SERVER_ROOT_URL,
 		duotoneUrls: getDuotoneUrls(duotones, PHOTO_SCALER_SALT),
 	});
