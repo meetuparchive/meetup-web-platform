@@ -3,6 +3,7 @@
   "description": "A collection of Node web application utilities developed for the Meetup web platform",
   "scripts": {
     "coveralls": "cat coverage/lcov.info | coveralls",
+    "lint": "eslint . --ext .js,.jsx --fix",
     "test": "jest --silent --config jest.config.json --coverage"
   },
   "repository": {

@@ -16,6 +16,8 @@ server.decorate(
 	{ apply: true }
 );
 
+const UUID_V4_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 const MOCK_RESULT = 'asdf';
 const MOCK_RENDER_REQUEST = () => Observable.of({ result: MOCK_RESULT, statusCode: 200 });
 
@@ -38,6 +40,31 @@ const serverReady = getConfig()
 	.then(config => getRoutes(MOCK_renderRequestMap, config, () => () => Observable.of(MOCK_API_RESULT)))
 	.then(server.route.bind(server));
 
+const simulateRequestWithCookies = () => {
+	const cookie = Object.keys(MOCK_OAUTH_COOKIES)
+		.reduce((acc, key) => acc += `${key}=${JSON.stringify(MOCK_OAUTH_COOKIES[key])}; `, '');
+
+	return server.inject({
+		url: '/',
+		headers: { cookie },
+		app: {
+			setCookies: true
+		}
+	});
+};
+
+const getCookiesFromResponse = (cookieHeader) => {
+	const cookies = (cookieHeader instanceof Array) ?
+		cookieHeader.map(Cookie.parse) :
+		[Cookie.parse(cookieHeader)];
+
+	return cookies.reduce(
+		(acc, cookie) => ({ ...acc, [cookie.key]: cookie.value }),
+		{}
+	);
+
+};
+
 describe('routes', () => {
 	it('serves the homepage route', () =>
 		serverReady
@@ -55,34 +82,27 @@ describe('routes', () => {
 	);
 	it('sets oauth cookies in response when require.app.setCookies is true', () =>
 		serverReady
-			.then(() => {
-				const cookie = Object.keys(MOCK_OAUTH_COOKIES)
-					.reduce((acc, key) => acc += `${key}=${JSON.stringify(MOCK_OAUTH_COOKIES[key])}; `, '');
-
-				return server.inject({
-					url: '/',
-					headers: { cookie },
-					app: {
-						setCookies: true
-					}
-				});
-			})
+			.then(simulateRequestWithCookies)
 			.then(response => {
 				const cookieHeader = response.headers['set-cookie'];
-				const cookies = (cookieHeader instanceof Array) ?
-					cookieHeader.map(Cookie.parse) :
-					[Cookie.parse(cookieHeader)];
-
 				expect(cookieHeader).not.toBeNull();
 
-				const cookieMap = cookies.reduce(
-					(acc, cookie) => ({ ...acc, [cookie.key]: cookie.value }),
-					{}
-				);
+				const cookies = getCookiesFromResponse(cookieHeader);
+				expect(cookies.oauth_token).toBe(MOCK_OAUTH_COOKIES.oauth_token);
+				expect(cookies.refresh_token).toBe(MOCK_OAUTH_COOKIES.refresh_token);
+				expect(cookies.anonymous).toBe(MOCK_OAUTH_COOKIES.anonymous.toString());
+			})
+	);
+	it('sets tracking cookie in response', () =>
+		serverReady
+			.then(simulateRequestWithCookies)
+			.then(response => {
+				const cookieHeader = response.headers['set-cookie'];
+				expect(cookieHeader).not.toBeNull();
 
-				expect(cookieMap.oauth_token).toBe(MOCK_OAUTH_COOKIES.oauth_token);
-				expect(cookieMap.refresh_token).toBe(MOCK_OAUTH_COOKIES.refresh_token);
-				expect(cookieMap.anonymous).toBe(MOCK_OAUTH_COOKIES.anonymous.toString());
+				const cookies = getCookiesFromResponse(cookieHeader);
+				expect(cookies.meetupTrack).not.toBeNull();
+				expect(UUID_V4_REGEX.test(cookies.meetupTrack)).toBe(true);
 			})
 	);
 });
