@@ -55,19 +55,17 @@ describe('AuthEpic', () => {
 						.toEqual(['CONFIGURE_AUTH', 'LOGOUT_ERROR'])
 			);
 	});
-	it('sets 3 cookies on CONFIGURE_AUTH', function(done) {
+	it('sets 3 cookies on CONFIGURE_AUTH', function() {
 		const cookieNames = ['oauth_token', 'refresh_token', 'anonymous'];
 		spyOn(Cookies, 'set');
 		const configureAuthAction = authActionCreators.configureAuth({});
 		const action$ = ActionsObservable.of(configureAuthAction);
-		const epic$ = AuthEpic(action$)
+		return AuthEpic(action$)
 			.do(null, null, () =>
 				expect(Cookies.set.calls.allArgs().map(args => args[0]).sort())  // first arg is cookie name
 					.toEqual(cookieNames.sort())
-			);
-
-		// no action expected, just 'completed' after cookies are set
-		epic$.subscribe(null, null, done);
+			)
+			.toPromise();
 	});
 });
 
