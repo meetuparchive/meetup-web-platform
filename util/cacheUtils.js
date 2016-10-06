@@ -17,9 +17,7 @@ export function makeCache() {
 		const _data = {};
 		return {
 			get(key) {
-				return key in _data ?
-					Promise.resolve(_data[key]) :
-					Promise.reject(new Error(`${key} not found`));
+				return Promise.resolve(_data[key]);
 			},
 			set(key, val) {
 				_data[key] = val;
@@ -30,7 +28,6 @@ export function makeCache() {
 				return Promise.resolve(true);
 			},
 			clear() {
-				console.log('cleared');
 				Object.keys(_data).forEach(key => delete _data[key]);
 				return Promise.resolve(true);
 			},

@@ -14,45 +14,40 @@ describe('cache utils', () => {
 		expect(cache.delete).toEqual(jasmine.any(Function));
 		expect(cache.delete()).toEqual(jasmine.any(Promise));
 	});
-	it('sets and gets from cache', function(done) {
+	it('sets and gets from cache', function() {
 		const cache = makeCache();
-		cache.set('foo', 'bar');
-		cache.get('foo')
+		return cache.set('foo', 'bar')
+			.then(() => cache.get('foo'))
 			.then(value => expect(value).toEqual('bar'))
-			.then(() => {
-				cache.set('foo', 'baz');
-				cache.get('foo')
-					.then(value => expect(value).toEqual('baz'))
-					.then(done);
-			});
+			.then(() => cache.set('foo', 'baz'))
+			.then(() => cache.get('foo'))
+			.then(value => expect(value).toEqual('baz'));
 	});
-	it('deletes from cache', function(done) {
+	it('deletes from cache', function() {
 		const cache = makeCache();
-		cache.set('foo', 'bar');
-		cache.delete('foo');
-		cache.get('foo')
+		return cache.set('foo', 'bar')
+			.then(() => cache.delete('foo'))
+			.then(() => cache.get('foo'))
 			.then(value => expect(value).toBeUndefined())
-			.catch(err => expect(err).toEqual(jasmine.any(Error)))
-			.then(done);
+			.catch(err => expect(err).toEqual(jasmine.any(Error)));
 	});
 
-	it('cacheWriter writes to cache', function(done) {
+	it('cacheWriter writes to cache', function() {
 		const cache = makeCache();
 		const query = { foo: 'baz' };
 		const response = 'bar';
-		cacheWriter(cache)(query, response)
+		return cacheWriter(cache)(query, response)
 			.then(() => cache.get(JSON.stringify(query)))
-			.then(cachedResponse => expect(cachedResponse).toEqual(response))
-			.then(done);
+			.then(cachedResponse => expect(cachedResponse).toEqual(response));
 	});
 
-	it('cacheReader reads from cache and returns result with query', function(done) {
+	it('cacheReader reads from cache and returns result with query', function() {
 		const cache = makeCache();
 		const requestCache = cacheReader(cache);
 		const query = { foo: 'baz' };
 		const nonCachedQuery = { bing: 'bong' };
 		const response = 'bar';
-		cacheWriter(cache)(query, response)
+		return cacheWriter(cache)(query, response)
 			.then(() => requestCache(query))
 			.then(([ cachedQuery, cachedResponse ]) => {  // expecting two-element array response
 				expect(cachedQuery).toEqual(query);
@@ -61,8 +56,7 @@ describe('cache utils', () => {
 			.then(() => requestCache(nonCachedQuery))  // test with un-cached query
 			.then(([ cachedQuery, cachedResponse ]) => {
 				expect(cachedQuery).toEqual(nonCachedQuery);
-				expect(cachedResponse).toBeNull();
-			})
-			.then(done);
+				expect(cachedResponse).toBeUndefined();
+			});
 	});
 });

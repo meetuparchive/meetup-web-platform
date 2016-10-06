@@ -1,68 +1,31 @@
 import 'rxjs/Observable';
 import { ActionsObservable } from 'redux-observable';
 import Cookies from 'js-cookie';
+import {
+	MOCK_LOGIN_RESPONSE
+} from '../util/mocks/app';
+import {
+	epicIgnoreArbitrary
+} from '../util/testUtils';
 import * as authActionCreators from '../actions/authActionCreators';
 import AuthEpic from './auth';
 
 describe('AuthEpic', () => {
-	it('does not pass through arbitrary actions', function(done) {
-		const arbitraryAction = {
-			type: 'ARBITRARY',
-			payload: '/'  // root location/path will query for member
-		};
-		const action$ = ActionsObservable.of(arbitraryAction);
-		const epic$ = AuthEpic(action$);
-		const spyable = {
-			notCalled: () => {}
-		};
-		spyOn(spyable, 'notCalled');
-		epic$.subscribe(
-			spyable.notCalled,
-			null,
-			() => {
-				expect(spyable.notCalled).not.toHaveBeenCalled();
-				done();
-			}
-		);
+	it('does not pass through arbitrary actions', epicIgnoreArbitrary(AuthEpic));
+	it('emits CONFIGURE_AUTH on LOGIN_SUCCESS', function() {
+		const loginSuccessAction = authActionCreators.loginSuccess(MOCK_LOGIN_RESPONSE);
+		const action$ = ActionsObservable.of(loginSuccessAction);
+		return AuthEpic(action$)
+			.toPromise()
+			.then(action => expect(action.type).toEqual('CONFIGURE_AUTH'));
 	});
-	beforeEach(function() {
-		const MOCK_LOGIN_RESPONSE = {
-			value: {
-				member: {},
-				oauth_token: 1234
-			}
-		};
-		this.loginSuccessAction = authActionCreators.loginSuccess(MOCK_LOGIN_RESPONSE);
-		this.logoutAction = authActionCreators.logoutRequest();
-	});
-	it('emits CONFIGURE_AUTH on LOGIN_SUCCESS', function(done) {
-		const action$ = ActionsObservable.of(this.loginSuccessAction);
-		const epic$ = AuthEpic(action$).take(1);
-		epic$.subscribe(
-			action => expect(action.type).toEqual('CONFIGURE_AUTH'),
-			null,
-			done
-		);
-	});
-	it('emits CONFIGURE_AUTH on LOGOUT_REQUEST', function(done) {
-		const action$ = ActionsObservable.of(this.logoutAction);
-		const epic$ = AuthEpic(action$).take(1);
-		epic$.subscribe(
-			action => expect(action.type).toEqual('CONFIGURE_AUTH'),
-			null,
-			done
-		);
-	});
-	it('emits CONFIGURE_AUTH on LOGOUT_REQUEST', function(done) {
+	it('emits CONFIGURE_AUTH on LOGOUT_SUCCESS', function() {
 		const action$ = ActionsObservable.of(authActionCreators.logoutSuccess({}));
-		const epic$ = AuthEpic(action$).take(1);
-		epic$.subscribe(
-			action => expect(action.type).toEqual('CONFIGURE_AUTH'),
-			null,
-			done
-		);
+		return AuthEpic(action$)
+			.toPromise()
+			.then(action => expect(action.type).toEqual('CONFIGURE_AUTH'));
 	});
-	it('emits CONFIGURE_AUTH then LOGOUT_SUCCESS on successful LOGOUT_REQUEST', function(done) {
+	it('emits CONFIGURE_AUTH then LOGOUT_SUCCESS on successful LOGOUT_REQUEST', function() {
 		global.fetch = () => {
 			return Promise.resolve({
 				json: () => Promise.resolve({})
@@ -70,42 +33,41 @@ describe('AuthEpic', () => {
 		};
 		const logoutRequest = authActionCreators.logoutRequest();
 		const action$ = ActionsObservable.of(logoutRequest);
-		const epic$ = AuthEpic(action$)
-			.toArray();
-
-		epic$.subscribe(
-			actions => expect(actions.map(({ type }) => type)).toEqual(['CONFIGURE_AUTH', 'LOGOUT_SUCCESS']),
-			null,
-			done
-		);
+		return AuthEpic(action$)
+			.toArray()
+			.toPromise()
+			.then(
+				actions =>
+					expect(actions.map(({ type }) => type))
+					.toEqual(['CONFIGURE_AUTH', 'LOGOUT_SUCCESS'])
+			);
 	});
-	it('emits CONFIGURE_AUTH then LOGOUT_ERROR on failed LOGOUT_REQUEST', function(done) {
+	it('emits CONFIGURE_AUTH then LOGOUT_ERROR on failed LOGOUT_REQUEST', function() {
 		global.fetch = () => Promise.reject(new Error());
 		const logoutRequest = authActionCreators.logoutRequest();
 		const action$ = ActionsObservable.of(logoutRequest);
-		const epic$ = AuthEpic(action$)
-			.toArray();
-
-		epic$.subscribe(
-			actions => expect(actions.map(({ type }) => type)).toEqual(['CONFIGURE_AUTH', 'LOGOUT_ERROR']),
-			null,
-			done
-		);
+		return AuthEpic(action$)
+			.toArray()
+			.toPromise()
+			.then(
+				actions =>
+					expect(actions.map(({ type }) => type))
+						.toEqual(['CONFIGURE_AUTH', 'LOGOUT_ERROR'])
+			);
 	});
 	it('sets 3 cookies on CONFIGURE_AUTH', function(done) {
+		const cookieNames = ['oauth_token', 'refresh_token', 'anonymous'];
 		spyOn(Cookies, 'set');
-		const action$ = ActionsObservable.of(authActionCreators.configureAuth({}));
-		const epic$ = AuthEpic(action$);
+		const configureAuthAction = authActionCreators.configureAuth({});
+		const action$ = ActionsObservable.of(configureAuthAction);
+		const epic$ = AuthEpic(action$)
+			.do(null, null, () =>
+				expect(Cookies.set.calls.allArgs().map(args => args[0]).sort())  // first arg is cookie name
+					.toEqual(cookieNames.sort())
+			);
 
-		epic$.subscribe(
-			null,
-			null,
-			() => {
-				expect(Cookies.set.calls.count()).toBe(3);
-				done();
-			}
-		);
-
+		// no action expected, just 'completed' after cookies are set
+		epic$.subscribe(null, null, done);
 	});
 });
 

@@ -1,4 +1,5 @@
 import { Observable } from 'rxjs/Observable';
+import { ActionsObservable } from 'redux-observable';
 import Hapi from 'hapi';
 import Cookie from 'tough-cookie';
 import TestUtils from 'react-addons-test-utils';
@@ -50,3 +51,23 @@ export const getServer = connection => {
 	return server;
 };
 
+export const epicIgnoreArbitrary = epic => done => {
+	const arbitraryAction = {
+		type: 'ARBITRARY',
+		payload: '/'  // root location/path will query for member
+	};
+	const action$ = ActionsObservable.of(arbitraryAction);
+	const epic$ = epic(action$);
+	const spyable = {
+		notCalled: () => {}
+	};
+	spyOn(spyable, 'notCalled');
+	epic$.subscribe(
+		spyable.notCalled,
+		null,
+		() => {
+			expect(spyable.notCalled).not.toHaveBeenCalled();
+			done();
+		}
+	);
+};

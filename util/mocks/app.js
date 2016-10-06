@@ -97,6 +97,13 @@ export const MOCK_CREDENTIALS = {
 	pw: 'whatever'
 };
 
+export const MOCK_LOGIN_RESPONSE = {
+	value: {
+		member: {},
+		oauth_token: 1234,
+	}
+};
+
 export const MOCK_POST_ACTION = {
 	type: 'POST_DUMMY',
 	payload: {
