@@ -144,7 +144,10 @@ const makeRenderer = (
 
 	middleware = middleware || [];
 	if (request.query.skeleton) {
-		return Rx.Observable.of(getHtml(assetPublicPath, clientFilename));
+		return Rx.Observable.of({
+			result: getHtml(assetPublicPath, clientFilename),
+			statusCode: 200
+		});
 	}
 	request.log(['info'], chalk.green(`Rendering ${request.url.href}`));
 	const {
