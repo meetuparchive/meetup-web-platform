@@ -77,6 +77,11 @@ export const MOCK_RENDERPROPS = {
 	}
 };
 
+export const MOCK_MEANINGLESS_ACTION = {
+	type: 'ARBITRARY',
+	payload: '/'
+};
+
 export const mockQuery = ({ location, params }) => {
 	return {
 		type: 'group',

@@ -6,7 +6,7 @@ import {
 	MOCK_API_RESULT,
 } from '../util/mocks/app';
 import {
-	epicIgnoreArbitrary
+	epicIgnoreAction
 } from '../util/testUtils';
 import * as syncActionCreators from '../actions/syncActionCreators';
 import {
@@ -40,17 +40,8 @@ function clearCacheEpic(CacheEpic) {
 		.then(() => CacheEpic);
 }
 
-const testForEmptyCache = (action=apiRequestAction) => CacheEpic => {
-	const spyable = {
-		notCalled: () => {}
-	};
-	spyOn(spyable, 'notCalled');
-	// try to read from the new cache - expect nothing
-	const testAction$ = ActionsObservable.of(action);
-	return CacheEpic(testAction$)
-		.do(spyable.notCalled, null, () => expect(spyable.notCalled).not.toHaveBeenCalled())
-		.toPromise();
-};
+const testForEmptyCache = (action=apiRequestAction) => CacheEpic =>
+	epicIgnoreAction(CacheEpic, action)();
 
 const testForPopulatedCache = (action=apiRequestAction) => CacheEpic => {
 	const testAction$ = ActionsObservable.of(action);
@@ -60,7 +51,7 @@ const testForPopulatedCache = (action=apiRequestAction) => CacheEpic => {
 };
 
 describe('getCacheEpic', () => {
-	it('does not pass through arbitrary actions', epicIgnoreArbitrary(getCacheEpic()));
+	it('does not pass through arbitrary actions', epicIgnoreAction(getCacheEpic()));
 	it('does not emit CACHE_SUCCESS when no cache hit from API_REQUEST', () =>
 		makeCacheEpic().then(testForEmptyCache())
 	);

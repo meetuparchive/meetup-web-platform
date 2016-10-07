@@ -5,13 +5,13 @@ import {
 	MOCK_LOGIN_RESPONSE
 } from '../util/mocks/app';
 import {
-	epicIgnoreArbitrary
+	epicIgnoreAction
 } from '../util/testUtils';
 import * as authActionCreators from '../actions/authActionCreators';
 import AuthEpic from './auth';
 
 describe('AuthEpic', () => {
-	it('does not pass through arbitrary actions', epicIgnoreArbitrary(AuthEpic));
+	it('does not pass through arbitrary actions', epicIgnoreAction(AuthEpic));
 	it('emits CONFIGURE_AUTH on LOGIN_SUCCESS', function() {
 		const loginSuccessAction = authActionCreators.loginSuccess(MOCK_LOGIN_RESPONSE);
 		const action$ = ActionsObservable.of(loginSuccessAction);
