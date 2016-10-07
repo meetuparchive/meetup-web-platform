@@ -39,6 +39,17 @@ export function find_groups(params) {
 	};
 }
 
+/**
+ * Topics
+ */
+export function topic(params) {
+	return {
+		endpoint: 'topics',
+		params
+	};
+}
+
+
 
 /**
  * all the group-related endpoints
