@@ -19,6 +19,23 @@ will kick off the npm publish routine. The currently-published version of the
 package is shown on the repo homepage on GitHub in a badge at the top of the
 README.
 
+# Introductory Resources
+
+Basic knowledge of reactive programming using RxJS 5 is a pre-requisite for being
+able to work in this repository. https://www.learnrxjs.io/ manages a good
+list of starting resources, specifically:
+
+- [RxJS Introduction](http://reactivex.io/rxjs/manual/overview.html#introduction) - Official Docs
+- [The Introduction to Reactive Programming You've Been Missing](https://gist.github.com/staltz/868e7e9bc2a7b8c1f754) - André Staltz
+- [Asynchronous Programming: The End of The Loop](https://egghead.io/courses/mastering-asynchronous-programming-the-end-of-the-loop) - Jafar Husain
+- [Introduction to Reactive Programming](https://egghead.io/courses/introduction-to-reactive-programming) - André Staltz
+- [Functional Programming in Javascript](http://reactivex.io/learnrx/) - Jafar Husain
+
+Suggestions:
+- Reference the api docs regularly while watching videos (http://reactivex.io/rxjs/).
+- Play around with the JSBin in the egghead.io videos (`console.log` to each transformation step, etc).
+
+
 # Modules
 
 ## Server
