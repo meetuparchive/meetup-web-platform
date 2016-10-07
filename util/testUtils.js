@@ -3,7 +3,10 @@ import { ActionsObservable } from 'redux-observable';
 import Hapi from 'hapi';
 import Cookie from 'tough-cookie';
 import TestUtils from 'react-addons-test-utils';
-import { MOCK_MEANINGLESS_ACTION } from './mocks/app';
+import {
+	MOCK_MEANINGLESS_ACTION,
+	MOCK_APP_STATE
+} from './mocks/app';
 
 export const findComponentsWithType = (tree, typeString) =>
 	TestUtils.findAllInRenderedTree(
@@ -52,13 +55,13 @@ export const getServer = connection => {
 	return server;
 };
 
-export const epicIgnoreAction = (epic, action=MOCK_MEANINGLESS_ACTION) => () => {
+export const epicIgnoreAction = (epic, action=MOCK_MEANINGLESS_ACTION, store=createFakeStore(MOCK_APP_STATE)) => () => {
 	const spyable = {
 		notCalled: () => {}
 	};
 	spyOn(spyable, 'notCalled');
 	const action$ = ActionsObservable.of(action);
-	return epic(action$)
+	return epic(action$, store)
 		.do(spyable.notCalled, null, expect(spyable.notCalled).not.toHaveBeenCalled())
 		.toPromise();
 };
