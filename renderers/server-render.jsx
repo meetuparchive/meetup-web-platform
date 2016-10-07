@@ -167,12 +167,12 @@ const makeRenderer = (
 
 	const store = createStore(routes, reducer, {}, middleware);
 	const storeIsReady$ = Rx.Observable.create(obs =>
-			store.subscribe(() => obs.next(store.getState()))
+			store.subscribe(() => {
+				console.log('prerender', store.getState().preRenderChecklist);
+				return obs.next(store.getState());
+			})
 		)
-		.first(state => {
-			console.log(state.preRenderChecklist);
-			return state.preRenderChecklist.every(isReady => isReady);
-		});  // take the first ready state
+		.first(state => state.preRenderChecklist.every(isReady => isReady));  // take the first ready state
 	const match$ = Rx.Observable.bindNodeCallback(match);
 	const render$ = match$({ location, routes })
 		.do(([redirectLocation, renderProps]) => {
