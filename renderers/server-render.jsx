@@ -21,6 +21,9 @@ import {
 	configureApiUrl,
 	configureTrackingId
 } from '../actions/configActionCreators';
+import {
+	apiComplete
+} from '../actions/syncActionCreators';
 
 // Ensure global Intl for use with FormatJS
 polyfillNodeIntl();
@@ -103,16 +106,12 @@ function renderAppResult(renderProps, store, clientFilename, assetPublicPath) {
  * @return dispatchMatch functiont that takes the 'match' callback args and
  *   dispatches necessary initialization actions (auth and RENDER)
  */
-const dispatchInitActions = (store, { apiUrl, auth, meetupTrack }) => ([redirectLocation, renderProps]) => {
-	console.log(chalk.green(`Dispatching config for ${renderProps.path}`));
+const dispatchConfig = (store, { apiUrl, auth, meetupTrack }) => {
+	console.log(chalk.green('Dispatching config'));
 
 	store.dispatch(configureAuth(auth, true));
 	store.dispatch(configureApiUrl(apiUrl));
 	store.dispatch(configureTrackingId(meetupTrack));
-	store.dispatch({
-		type: '@@server/RENDER',
-		payload: renderProps.location
-	});
 };
 
 /**
@@ -143,12 +142,6 @@ const makeRenderer = (
 ) => request => {
 
 	middleware = middleware || [];
-	if (request.query.skeleton) {
-		return Rx.Observable.of({
-			result: getHtml(assetPublicPath, clientFilename),
-			statusCode: 200
-		});
-	}
 	request.log(['info'], chalk.green(`Rendering ${request.url.href}`));
 	const {
 		url,
@@ -184,9 +177,25 @@ const makeRenderer = (
 				throw Boom.notFound();
 			}
 		})
-		.do(dispatchInitActions(store, { apiUrl, auth, meetupTrack }))
+		.do(() => dispatchConfig(store, { apiUrl, auth, meetupTrack }))
+		.do(([redirectLocation, renderProps ]) => {
+			if (request.query.skeleton) {
+				// short circuit API calls
+				store.dispatch(apiComplete());
+			} else {
+				store.dispatch({
+					type: '@@server/RENDER',
+					payload: renderProps.location
+				});
+			}
+		})
 		.flatMap(args => storeIsReady$.map(() => args))  // `sample` appears not to work - this is equivalent
-		.map(([redirectLocation, renderProps]) => renderAppResult(renderProps, store, clientFilename, assetPublicPath))
+		.map(([redirectLocation, renderProps]) => {
+			if (request.query.skeleton) {
+				return getHtml(clientFilename, assetPublicPath, store.getState());
+			}
+			return renderAppResult(renderProps, store, clientFilename, assetPublicPath);
+		})
 		.catch(error => {
 			// render errors result in a rendered stack trace using RedBox
 			const appMarkup = ReactDOMServer.renderToString(<RedBox error={error} />);
