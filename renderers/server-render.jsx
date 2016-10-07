@@ -34,6 +34,18 @@ const DOCTYPE = '<!DOCTYPE html>';
  * @module ServerRender
  */
 
+function getHtml(assetPublicPath, clientFilename, initialState={}, appMarkup='') {
+	const htmlMarkup = ReactDOMServer.renderToString(
+		<Dom
+			assetPublicPath={assetPublicPath}
+			clientFilename={clientFilename}
+			initialState={initialState}
+			appMarkup={appMarkup}
+		/>
+	);
+	return `${DOCTYPE}${htmlMarkup}`;
+}
+
 /**
  * Using the current route information and Redux store, render the app to an
  * HTML string and server response code.
@@ -64,19 +76,16 @@ function renderAppResult(renderProps, store, clientFilename, assetPublicPath) {
 			<RouterContext {...renderProps} />
 		</Provider>
 	);
+	const statusCode = renderProps.routes.pop().statusCode || 200;
 
 	// all the data for the full `<html>` element has been initialized by the app
 	// so go ahead and assemble the full response body
-	const htmlMarkup = ReactDOMServer.renderToString(
-		<Dom
-			assetPublicPath={assetPublicPath}
-			clientFilename={clientFilename}
-			initialState={initialState}
-			appMarkup={appMarkup}
-		/>
+	const result = getHtml(
+		assetPublicPath,
+		clientFilename,
+		initialState,
+		appMarkup
 	);
-	const result = `${DOCTYPE}${htmlMarkup}`;
-	const statusCode = renderProps.routes.pop().statusCode || 200;
 
 	return {
 		statusCode,
@@ -134,6 +143,9 @@ const makeRenderer = (
 ) => request => {
 
 	middleware = middleware || [];
+	if (request.query.skeleton) {
+		return Rx.Observable.of(getHtml(assetPublicPath, clientFilename));
+	}
 	request.log(['info'], chalk.green(`Rendering ${request.url.href}`));
 	const {
 		url,
