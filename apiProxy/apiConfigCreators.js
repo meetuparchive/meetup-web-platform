@@ -90,6 +90,17 @@ export function event(params) {
 }
 
 /**
+ * open events
+ */
+export function open_events(params) {
+	params.fields = ['rsvp_sample'];
+	return {
+		endpoint: '2/open_events',
+		params
+	};
+}
+
+/**
  * member object endpoints
  *
  * Note, this is different than 'Profiles' which are used to represent the
