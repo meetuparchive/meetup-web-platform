@@ -195,7 +195,7 @@ const makeRenderer = (
 			if (request.query.skeleton) {
 				return {
 					result: getHtml(clientFilename, assetPublicPath, store.getState()),
-					statusCode: 200;
+					statusCode: 200
 				};
 			}
 			return renderAppResult(renderProps, store, clientFilename, assetPublicPath);
