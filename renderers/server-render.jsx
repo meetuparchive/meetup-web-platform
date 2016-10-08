@@ -166,13 +166,11 @@ const makeRenderer = (
 	};
 
 	const store = createStore(routes, reducer, {}, middleware);
-	const storeIsReady$ = Rx.Observable.create(obs =>
-			store.subscribe(() => {
-				console.log('prerender', store.getState().preRenderChecklist);
-				return obs.next(store.getState());
-			})
-		)
-		.first(state => state.preRenderChecklist.every(isReady => isReady));  // take the first ready state
+	const storeIsReady$ = Rx.Observable.create(obs => {
+		obs.next(store.getState());
+		return store.subscribe(() => obs.next(store.getState()));
+	})
+	.first(state => state.preRenderChecklist.every(isReady => isReady));  // take the first ready state
 	const match$ = Rx.Observable.bindNodeCallback(match);
 	const render$ = match$({ location, routes })
 		.do(([redirectLocation, renderProps]) => {
@@ -195,7 +193,10 @@ const makeRenderer = (
 		.flatMap(args => storeIsReady$.map(() => args))  // `sample` appears not to work - this is equivalent
 		.map(([redirectLocation, renderProps]) => {
 			if (request.query.skeleton) {
-				return getHtml(clientFilename, assetPublicPath, store.getState());
+				return {
+					result: getHtml(clientFilename, assetPublicPath, store.getState()),
+					statusCode: 200;
+				};
 			}
 			return renderAppResult(renderProps, store, clientFilename, assetPublicPath);
 		})
