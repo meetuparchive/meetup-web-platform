@@ -63,35 +63,36 @@ function getHtml(assetPublicPath, clientFilename, initialState={}, appMarkup='')
  * @return {Object} the statusCode and result used by Hapi's `reply` API
  *   {@link http://hapijs.com/api#replyerr-result}
  */
-function renderAppResult(renderProps, store, clientFilename, assetPublicPath) {
-	// pre-render the app-specific markup, this is the string of markup that will
-	// be managed by React on the client.
-	//
-	// **IMPORTANT**: this string is built separately from `<Dom />` because it
-	// initializes page-specific state that `<Dom />` needs to render, e.g.
-	// `<head>` contents
-	const initialState = store.getState();
-	const appMarkup = ReactDOMServer.renderToString(
-		<Provider store={store}>
-			<RouterContext {...renderProps} />
-		</Provider>
-	);
-	const statusCode = renderProps.routes.pop().statusCode || 200;
+const getRouterRenderer = (store, clientFilename, assetPublicPath) =>
+	([ redirectLocation, renderProps ]) => {
+		// pre-render the app-specific markup, this is the string of markup that will
+		// be managed by React on the client.
+		//
+		// **IMPORTANT**: this string is built separately from `<Dom />` because it
+		// initializes page-specific state that `<Dom />` needs to render, e.g.
+		// `<head>` contents
+		const initialState = store.getState();
+		const appMarkup = ReactDOMServer.renderToString(
+			<Provider store={store}>
+				<RouterContext {...renderProps} />
+			</Provider>
+		);
+		const statusCode = renderProps.routes.pop().statusCode || 200;
 
-	// all the data for the full `<html>` element has been initialized by the app
-	// so go ahead and assemble the full response body
-	const result = getHtml(
-		assetPublicPath,
-		clientFilename,
-		initialState,
-		appMarkup
-	);
+		// all the data for the full `<html>` element has been initialized by the app
+		// so go ahead and assemble the full response body
+		const result = getHtml(
+			assetPublicPath,
+			clientFilename,
+			initialState,
+			appMarkup
+		);
 
-	return {
-		statusCode,
-		result
+		return {
+			statusCode,
+			result
+		};
 	};
-}
 
 /**
  * Curry a Redux store and auth tokens to privde a function that can dispatch
@@ -196,9 +197,7 @@ const makeRenderer = (
 			})
 		)
 		.flatMap(args => storeIsReady$.map(() => args))  // `sample` appears not to work - this is equivalent
-		.map(([redirectLocation, renderProps]) =>
-			renderAppResult(renderProps, store, clientFilename, assetPublicPath)
-		)
+		.map(getRouterRenderer(store, clientFilename, assetPublicPath))
 		.catch(error => {
 			// render errors result in a rendered stack trace using RedBox
 			const appMarkup = ReactDOMServer.renderToString(<RedBox error={error} />);
