@@ -194,7 +194,7 @@ const makeRenderer = (
 		.map(([redirectLocation, renderProps]) => {
 			if (request.query.skeleton) {
 				return {
-					result: getHtml(clientFilename, assetPublicPath, store.getState()),
+					result: getHtml(assetPublicPath, clientFilename, store.getState()),
 					statusCode: 200
 				};
 			}
