@@ -21,9 +21,6 @@ import {
 	configureApiUrl,
 	configureTrackingId
 } from '../actions/configActionCreators';
-import {
-	apiComplete
-} from '../actions/syncActionCreators';
 
 // Ensure global Intl for use with FormatJS
 polyfillNodeIntl();
@@ -165,41 +162,43 @@ const makeRenderer = (
 		anonymous,
 	};
 
+	// create the store
 	const store = createStore(routes, reducer, {}, middleware);
+
+	// load initial config
+	dispatchConfig(store, { apiUrl, auth, meetupTrack });
+
+	// render skeleton if requested - the store is ready
+	if ('skeleton' in request.query) {
+		return Rx.Observable.of({
+			result: getHtml(assetPublicPath, clientFilename, store.getState()),
+			statusCode: 200
+		});
+	}
+
+	// otherwise render using the API and React router
 	const storeIsReady$ = Rx.Observable.create(obs => {
 		obs.next(store.getState());
 		return store.subscribe(() => obs.next(store.getState()));
 	})
 	.first(state => state.preRenderChecklist.every(isReady => isReady));  // take the first ready state
-	const match$ = Rx.Observable.bindNodeCallback(match);
-	const render$ = match$({ location, routes })
+
+	return Rx.Observable.bindNodeCallback(match)({ location, routes })
 		.do(([redirectLocation, renderProps]) => {
 			if (!redirectLocation && !renderProps) {
 				throw Boom.notFound();
 			}
 		})
-		.do(() => dispatchConfig(store, { apiUrl, auth, meetupTrack }))
-		.do(([redirectLocation, renderProps ]) => {
-			if (request.query.skeleton) {
-				// short circuit API calls
-				store.dispatch(apiComplete());
-			} else {
-				store.dispatch({
-					type: '@@server/RENDER',
-					payload: renderProps.location
-				});
-			}
-		})
+		.do(([redirectLocation, renderProps]) =>
+			store.dispatch({
+				type: '@@server/RENDER',
+				payload: renderProps.location
+			})
+		)
 		.flatMap(args => storeIsReady$.map(() => args))  // `sample` appears not to work - this is equivalent
-		.map(([redirectLocation, renderProps]) => {
-			if (request.query.skeleton) {
-				return {
-					result: getHtml(assetPublicPath, clientFilename, store.getState()),
-					statusCode: 200
-				};
-			}
-			return renderAppResult(renderProps, store, clientFilename, assetPublicPath);
-		})
+		.map(([redirectLocation, renderProps]) =>
+			renderAppResult(renderProps, store, clientFilename, assetPublicPath)
+		)
 		.catch(error => {
 			// render errors result in a rendered stack trace using RedBox
 			const appMarkup = ReactDOMServer.renderToString(<RedBox error={error} />);
@@ -212,8 +211,6 @@ const makeRenderer = (
 				statusCode
 			}, request.log)(error);
 		});
-
-	return render$;
 };
 
 export default makeRenderer;
