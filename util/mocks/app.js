@@ -29,11 +29,24 @@ export const MOCK_APP_STATE = {
 	},
 };
 
-export const MOCK_ROUTES = {
-	path: '/',
-	component: {},
-	query: () => {}
-};
+export const MOCK_ROUTES = [
+	{
+		path: '/noQuery',
+		component: () => {},
+	},
+	{
+		path: '/',
+		component: () => {},
+		query: () => {},
+		childRoutes: [
+			{
+				path: 'foo',
+				component: () => {},
+				query: () => {}
+			}
+		]
+	},
+];
 
 export const MOCK_API_PROBLEM = {
 	problem: 'There was an internal problem in the API'
@@ -64,6 +77,11 @@ export const MOCK_RENDERPROPS = {
 	}
 };
 
+export const MOCK_MEANINGLESS_ACTION = {
+	type: 'ARBITRARY',
+	payload: '/'
+};
+
 export const mockQuery = ({ location, params }) => {
 	return {
 		type: 'group',
@@ -82,6 +100,13 @@ export const MOCK_DATETIME = new Date().getTime();
 export const MOCK_CREDENTIALS = {
 	username: 'Michael McGahan',
 	pw: 'whatever'
+};
+
+export const MOCK_LOGIN_RESPONSE = {
+	value: {
+		member: {},
+		oauth_token: 1234,
+	}
 };
 
 export const MOCK_POST_ACTION = {
