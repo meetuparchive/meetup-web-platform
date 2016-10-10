@@ -53,10 +53,9 @@ export const handleLogoutRequest = action$ =>
 				Rx.Observable.fromPromise(
 					fetch(ANONYMOUS_AUTH_APP_PATH)
 						.then(response => response.json())
-						.catch(e => Promise.reject([e]))
 				)
-				.catch(logoutError)
 				.map(logoutSuccess)
+				.catch(err => Rx.Observable.of(logoutError(err)))
 			)
 		);
 

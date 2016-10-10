@@ -69,9 +69,11 @@ export function logoutSuccess(auth) {
 	};
 }
 
-export function logoutError() {
+export function logoutError(err) {
 	return {
-		type: 'LOGOUT_ERROR'
+		type: 'LOGOUT_ERROR',
+		error: true,
+		payload: err
 	};
 }
 

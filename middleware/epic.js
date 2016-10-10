@@ -2,7 +2,7 @@ import { combineEpics, createEpicMiddleware } from 'redux-observable';
 
 import getSyncEpic from '../epics/sync';
 import authEpic from '../epics/auth';
-import cacheEpic from '../epics/cache';
+import getCacheEpic from '../epics/cache';
 
 /**
  * The middleware is exported as a getter because it needs the application's
@@ -13,7 +13,7 @@ const getEpicMiddleware = routes => createEpicMiddleware(
 	combineEpics(
 		getSyncEpic(routes),
 		authEpic,
-		cacheEpic
+		getCacheEpic()
 	)
 );
 
