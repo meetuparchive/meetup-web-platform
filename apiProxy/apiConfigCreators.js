@@ -101,6 +101,16 @@ export function open_events(params) {
 }
 
 /**
+ * attendees (RSVPs)
+ */
+export function rsvps(params) {
+	return {
+		endpoint: '${params.urlname}/events/${params.eventId}/rsvps',
+		params
+	};
+}
+
+/**
  * member object endpoints
  *
  * Note, this is different than 'Profiles' which are used to represent the
