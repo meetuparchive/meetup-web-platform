@@ -1,6 +1,6 @@
 {
   "name": "meetup-web-platform",
-  "version": "0.0.0",
+  "version": "0.3.102",
   "description": "A collection of Node web application utilities developed for the Meetup web platform",
   "scripts": {
     "coveralls": "cat coverage/lcov.info | coveralls",
