@@ -111,6 +111,27 @@ export function rsvps(params) {
 }
 
 /**
+ * albums
+ */
+export function albums(params) {
+	return {
+		endpoint: `${params.urlname}/photo_albums/${params.id}`,
+		params
+	};
+}
+
+/**
+ * album photos
+ */
+export function album_photos(params) {
+	return {
+		endpoint: `${params.urlname}/photo_albums/${params.id}/photos`,
+		params
+	};
+}
+
+
+/**
  * member object endpoints
  *
  * Note, this is different than 'Profiles' which are used to represent the
