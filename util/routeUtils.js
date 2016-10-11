@@ -2,11 +2,11 @@
  * Utilities for interacting with the Router and getting location data
  * @module routeUtils
  */
-import Rx from 'rxjs';
+import { Observable } from 'rxjs/Observable';
 import match from 'react-router/lib/match';
 
 // Create observable from callback-based `match`
-const match$ = Rx.Observable.bindNodeCallback(match);
+const match$ = Observable.bindNodeCallback(match);
 
 /**
  * From the renderProps provided by React Router's `match`, collect the results

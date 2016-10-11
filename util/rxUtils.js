@@ -1,4 +1,4 @@
-import Rx from 'rxjs';
+import { Observable } from 'rxjs/Observable';
 /**
  * Utilities to help with Observable sequences
  *
@@ -18,7 +18,7 @@ export const catchAndReturn$ = (errorResponse, log) => error => {
 	console.warn(`Error: ${error.message}`);
 	log(['error'], error.stack);
 
-	return Rx.Observable.of(errorResponse || { error });
+	return Observable.of(errorResponse || { error });
 };
 
 

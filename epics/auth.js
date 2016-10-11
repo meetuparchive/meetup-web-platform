@@ -7,7 +7,7 @@
  *
  * @module AuthMiddleware
  */
-import Rx from 'rxjs';
+import { Observable } from 'rxjs/Observable';
 import { combineEpics } from 'redux-observable';
 import Cookies from 'js-cookie';
 
@@ -45,17 +45,17 @@ export const handleLoginSuccess = action$ =>
 export const handleLogoutRequest = action$ =>
 	action$.ofType('LOGOUT_REQUEST')
 		.flatMap(action =>
-			Rx.Observable.merge(
+			Observable.merge(
 				// immediately clear auth information so no more private data is accessible
 				// - this will put the app in limbo, unable to request any more data until
 				// a new token is provided by `LOGOUT_SUCESS` or a full refresh
-				Rx.Observable.of(configureAuth({ anonymous: true })),
-				Rx.Observable.fromPromise(
+				Observable.of(configureAuth({ anonymous: true })),
+				Observable.fromPromise(
 					fetch(ANONYMOUS_AUTH_APP_PATH)
 						.then(response => response.json())
 				)
 				.map(logoutSuccess)
-				.catch(err => Rx.Observable.of(logoutError(err)))
+				.catch(err => Observable.of(logoutError(err)))
 			)
 		);
 

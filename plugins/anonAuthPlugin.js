@@ -1,6 +1,6 @@
 import Boom from 'boom';
 import chalk from 'chalk';
-import Rx from 'rxjs';
+import { Observable } from 'rxjs/Observable';
 
 /**
  * @module anonAuthPlugin
@@ -55,12 +55,12 @@ export const requestAuthorizer = auth$ => request => {
 	// always need oauth_token, even if it's an anonymous (pre-reg) token
 	// This is 'deferred' because we don't want to start fetching the token
 	// before we know that it's needed
-	const deferredAuth$ = Rx.Observable.defer(
+	const deferredAuth$ = Observable.defer(
 		() => auth$(request)
 	);
 
-	const request$ = Rx.Observable.of(request);
-	return Rx.Observable.if(
+	const request$ = Observable.of(request);
+	return Observable.if(
 		() => request.state.oauth_token,
 		request$,
 		request$
@@ -97,11 +97,11 @@ export function getAnonymousCode$({ ANONYMOUS_AUTH_URL, oauth }, redirect_uri) {
 
 	return () => {
 		console.log(`Fetching anonymous auth code from ${ANONYMOUS_AUTH_URL}`);
-		return Rx.Observable.fromPromise(fetch(anonymousCodeUrl, requestOpts))
+		return Observable.fromPromise(fetch(anonymousCodeUrl, requestOpts))
 		.flatMap(tryJSON)
 		.catch(error => {
 			console.log(error.stack);
-			return Rx.Observable.of({ code: null });
+			return Observable.of({ code: null });
 		})
 		.map(({ code }) => ({
 			grant_type: 'anonymous_code',
@@ -164,7 +164,7 @@ export const getAnonymousAccessToken$ = ({ ANONYMOUS_ACCESS_URL, oauth }, redire
 			const url = `${ANONYMOUS_ACCESS_URL}?${accessParams}`;
 
 			console.log(`Fetching anonymous access_token from ${ANONYMOUS_ACCESS_URL}`);
-			return Rx.Observable.fromPromise(fetch(url, requestOpts))
+			return Observable.fromPromise(fetch(url, requestOpts))
 				.flatMap(tryJSON);
 		};
 	};
@@ -189,9 +189,9 @@ export const anonAuth$ = config => {
 	const token$ = getAnonymousAccessToken$(config, redirect_uri);
 
 	// if the request has a refresh_token, use it. Otherwise, get a new anonymous code
-	return request => Rx.Observable.if(
+	return request => Observable.if(
 		() => request.state.refresh_token,
-		Rx.Observable.of({
+		Observable.of({
 			grant_type: 'refresh_token',
 			token: request.state.refresh_token
 		}),
@@ -200,7 +200,7 @@ export const anonAuth$ = config => {
 	.flatMap(token$(request.headers))
 	.catch(error => {
 		console.log(error.stack);
-		return Rx.Observable.of({});  // failure results in empty object response - bad time
+		return Observable.of({});  // failure results in empty object response - bad time
 	});
 };
 

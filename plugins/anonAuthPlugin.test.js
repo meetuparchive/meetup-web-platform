@@ -1,4 +1,4 @@
-import Rx from 'rxjs';
+import { Observable } from 'rxjs/Observable';
 import register, {
 	anonAuth$,
 	getAnonymousCode$,
@@ -76,7 +76,7 @@ describe('getAnonymousToken$', () => {
 		getToken$(MOCK_HEADERS)(MOCK_CODE)
 			.catch(err => {
 				expect(err).toEqual(jasmine.any(Error));
-				return Rx.Observable.of(null);
+				return Observable.of(null);
 			})
 			.subscribe(done);
 	});
