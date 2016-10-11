@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { ActionsObservable } from 'redux-observable';
 import Hapi from 'hapi';
 import Cookie from 'tough-cookie';

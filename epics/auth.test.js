@@ -1,4 +1,4 @@
-import 'rxjs/Observable';
+import 'rxjs';
 import { ActionsObservable } from 'redux-observable';
 import Cookies from 'js-cookie';
 import {
