@@ -20,10 +20,7 @@ const noopMiddleware = store => next => action => next(action);
  *   should be applied to the store
  */
 function finalCreateStore(routes, reducer, initialState=null, middleware=[]) {
-	/**
-	 * **All** middleware gets added here
-	 * @const
-	 */
+	// **All** middleware gets added here
 	const middlewareToApply = [
 		getPlatformMiddleware(routes),
 		typeof window !== 'undefined' && window.mupDevTools ? window.mupDevTools() : noopMiddleware,
