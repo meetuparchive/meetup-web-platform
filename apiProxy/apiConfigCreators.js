@@ -114,6 +114,7 @@ export function rsvps(params) {
  * albums
  */
 export function albums(params) {
+	params.fields = ['photo_sample'];
 	return {
 		endpoint: `${params.urlname}/photo_albums`,
 		params
