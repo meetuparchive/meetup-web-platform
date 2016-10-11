@@ -1,6 +1,6 @@
 import externalRequest from 'request';
-import { Observable } from 'rxjs/Observable';
-const externalRequest$ = Observable.bindNodeCallback(externalRequest);
+import Rx from 'rxjs';
+const externalRequest$ = Rx.Observable.bindNodeCallback(externalRequest);
 
 import * as apiConfigCreators from './apiConfigCreators';
 import { catchAndReturn$ } from '../util/rxUtils';
@@ -244,7 +244,7 @@ const apiProxy$ = ({ baseUrl, duotoneUrls }) => {
 		// to build the query-specific API request options object
 		const apiConfigToRequestOptions = buildRequestArgs(externalRequestOpts);
 
-		return Observable.from(queries)    // create stream of query objects - fan-out
+		return Rx.Observable.from(queries)    // create stream of query objects - fan-out
 			.map(queryToApiConfig)              // convert query to API-specific config
 			.map(apiConfigToRequestOptions)     // API-specific args for api request
 			.do(externalRequestOpts => request.log(['api'], JSON.stringify(externalRequestOpts.url)))  // logging
@@ -252,7 +252,7 @@ const apiProxy$ = ({ baseUrl, duotoneUrls }) => {
 			.map(([response, body]) => body)    // ignore Response object, just process body string
 			.map(parseApiResponse)              // parse into plain object
 			.catch(catchAndReturn$())           // return error object instead of response
-			.zip(Observable.from(queries))   // zip the apiResponse with corresponding query
+			.zip(Rx.Observable.from(queries))   // zip the apiResponse with corresponding query
 			.map(apiResponseToQueryResponse)    // convert apiResponse to app-ready queryResponse
 			.map(setApiResponseDuotones)        // special duotone prop
 			.toArray();                         // group all responses into a single array - fan-in

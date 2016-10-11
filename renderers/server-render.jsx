@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs/Observable';
+import Rx from 'rxjs';
 import Boom from 'boom';
 import chalk from 'chalk';
 import React from 'react';
@@ -158,11 +158,11 @@ const makeRenderer = (
 	};
 
 	const store = createStore(routes, reducer, {}, middleware);
-	const storeIsReady$ = Observable.create(obs =>
+	const storeIsReady$ = Rx.Observable.create(obs =>
 			store.subscribe(() => obs.next(store.getState()))
 		)
 		.first(state => state.preRenderChecklist.every(isReady => isReady));  // take the first ready state
-	const match$ = Observable.bindNodeCallback(match);
+	const match$ = Rx.Observable.bindNodeCallback(match);
 	const render$ = match$({ location, routes })
 		.do(([redirectLocation, renderProps]) => {
 			if (!redirectLocation && !renderProps) {

@@ -4,7 +4,7 @@
  *
  * @module CacheMiddleware
  */
-import { Observable } from 'rxjs/Observable';
+import Rx from 'rxjs';
 import { combineEpics } from 'redux-observable';
 import {
 	cacheSuccess,
@@ -48,7 +48,7 @@ export const cacheClearEpic = cache => action$ =>
 export const cacheSetEpic = cache => action$ =>
 	action$.ofType('API_SUCCESS', 'CACHE_SET')
 		.flatMap(({ payload: { queries, responses } }) =>
-			Observable.from(queries).zip(Observable.from(responses))
+			Rx.Observable.from(queries).zip(Rx.Observable.from(responses))
 		)
 		.flatMap(([ query, response ]) => cacheWriter(cache)(query, response))
 		.ignoreElements();
@@ -63,7 +63,7 @@ export const cacheSetEpic = cache => action$ =>
  */
 export const cacheQueryEpic = cache => action$ =>
 	action$.ofType('API_REQUEST')
-		.flatMap(({ payload }) => Observable.from(payload))  // fan out
+		.flatMap(({ payload }) => Rx.Observable.from(payload))  // fan out
 		.flatMap(cacheReader(cache))                          // look for a cache hit
 		.filter(([ query, response ]) => response)   // ignore misses
 		.reduce((acc, [ query, response ]) => ({      // fan-in to create response

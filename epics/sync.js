@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { combineEpics } from 'redux-observable';
 import { LOCATION_CHANGE } from 'react-router-redux';
 import {
