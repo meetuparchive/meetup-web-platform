@@ -105,7 +105,7 @@ export function open_events(params) {
  */
 export function rsvps(params) {
 	return {
-		endpoint: '${params.urlname}/events/${params.eventId}/rsvps',
+		endpoint: `${params.urlname}/events/${params.eventId}/rsvps`,
 		params
 	};
 }
