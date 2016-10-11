@@ -115,7 +115,7 @@ export function rsvps(params) {
  */
 export function albums(params) {
 	return {
-		endpoint: `${params.urlname}/photo_albums/${params.id}`,
+		endpoint: `${params.urlname}/photo_albums`,
 		params
 	};
 }
