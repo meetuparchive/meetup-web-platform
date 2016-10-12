@@ -90,6 +90,16 @@ export function event(params) {
 }
 
 /**
+ * event comments
+ */
+export function event_comments(params) {
+	return {
+		endpoint: `${params.urlname}/events/${params.id}/comments`,
+		params
+	};
+}
+
+/**
  * open events
  */
 export function open_events(params) {
