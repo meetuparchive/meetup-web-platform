@@ -31,7 +31,7 @@
     "good-console": "^6.1.2",
     "good-squeeze": "^4.0.0",
     "hapi": "^14.2.0",
-    "idb": "^1.1.4",
+    "idb-keyval": "2.1.2",
     "inert": "^4.0.2",
     "intl": "1.2.5",
     "jest-cli": "15.1.1",

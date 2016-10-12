@@ -25,23 +25,15 @@ export function checkEnable() {
 	return true;
 }
 
-// get a cache, any cache (that conforms to the Promise-based API)
-const cache = makeCache();
-
-// get a function that can read from the cache for a specific query
-const readCache = cacheReader(cache);
-// get a function that can write to the cache for a specific query-response
-const writeCache = cacheWriter(cache);
-
 /**
  * Listen for any action that should clear cached state
  *
  * Note that this will clear the cache without emitting an action
  */
-export const cacheClearEpic = action$ =>
+export const cacheClearEpic = cache => action$ =>
 	action$.ofType('LOGOUT_REQUEST', 'CACHE_CLEAR')
 		.flatMap(() => cache.clear())  // wait for cache to clear before continuing
-		.flatMap(() => Rx.Observable.empty());
+		.ignoreElements();
 
 /**
  * Listen for any action that should set cached state with a
@@ -53,13 +45,13 @@ export const cacheClearEpic = action$ =>
  *
  * Not that this will set the cache without emitting an action
  */
-export const cacheSetEpic = action$ =>
+export const cacheSetEpic = cache => action$ =>
 	action$.ofType('API_SUCCESS', 'CACHE_SET')
 		.flatMap(({ payload: { queries, responses } }) =>
 			Rx.Observable.from(queries).zip(Rx.Observable.from(responses))
 		)
-		.flatMap(([ query, response ]) => writeCache(query, response))
-		.flatMap(() => Rx.Observable.empty());
+		.flatMap(([ query, response ]) => cacheWriter(cache)(query, response))
+		.ignoreElements();
 
 /**
  * Listen for any action that should query the cache using a payload of queries
@@ -69,22 +61,26 @@ export const cacheSetEpic = action$ =>
  * the results are collated into a single response object containing the cache
  * hits.
  */
-export const cacheQueryEpic = action$ =>
+export const cacheQueryEpic = cache => action$ =>
 	action$.ofType('API_REQUEST')
 		.flatMap(({ payload }) => Rx.Observable.from(payload))  // fan out
-		.flatMap(readCache)                          // look for a cache hit
+		.flatMap(cacheReader(cache))                          // look for a cache hit
 		.filter(([ query, response ]) => response)   // ignore misses
 		.reduce((acc, [ query, response ]) => ({      // fan-in to create response
 			queries: [ ...acc.queries, query ],
 			responses: [ ...acc.responses, response ],
 		}), { queries: [], responses: [] })           // empty response structure
+		.filter(cacheResponse => cacheResponse.responses.length)
 		.map(cacheSuccess);
 
-const cacheEpic = checkEnable() ? combineEpics(
-	cacheClearEpic,
-	cacheSetEpic,
-	cacheQueryEpic
-) : Rx.Observable.empty();
+const getCacheEpic = (cache=makeCache()) =>
+	checkEnable() ?
+		combineEpics(
+			cacheClearEpic(cache),
+			cacheSetEpic(cache),
+			cacheQueryEpic(cache)
+		) :
+		action$ => action$.ignoreElements();
 
-export default cacheEpic;
+export default getCacheEpic;
 

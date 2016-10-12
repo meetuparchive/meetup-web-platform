@@ -17,66 +17,24 @@ export function makeCache() {
 		const _data = {};
 		return {
 			get(key) {
-				return key in _data ?
-					Promise.resolve(_data[key]) :
-					Promise.reject(new Error(`${key} not found`));
+				return Promise.resolve(_data[key]);
 			},
 			set(key, val) {
 				_data[key] = val;
-				return Promise.resolve();
+				return Promise.resolve(true);
 			},
 			delete(key) {
 				delete _data[key];
-				return Promise.resolve();
+				return Promise.resolve(true);
 			},
 			clear() {
 				Object.keys(_data).forEach(key => delete _data[key]);
-				return Promise.resolve();
+				return Promise.resolve(true);
 			},
 		};
 	}
 
-	// tap into/create the mup-web database, with a `cache` store
-	const idb = require('idb');
-	const DB_NAME = 'mup-web';
-	const DB_VERSION = 1;
-	const CACHE_STORE_NAME = 'cache';
-	const dbPromise = idb.open(
-		DB_NAME,
-		DB_VERSION,
-		upgradeDB => {
-			upgradeDB.createObjectStore(CACHE_STORE_NAME);
-		}
-	);
-	return {
-		get(key) {
-			return dbPromise.then(db => {
-				return db.transaction(CACHE_STORE_NAME)
-					.objectStore(CACHE_STORE_NAME).get(key);
-			});
-		},
-		set(key, val) {
-			return dbPromise.then(db => {
-				const tx = db.transaction(CACHE_STORE_NAME, 'readwrite');
-				tx.objectStore(CACHE_STORE_NAME).put(val, key);
-				return tx.complete;
-			});
-		},
-		delete(key) {
-			return dbPromise.then(db => {
-				const tx = db.transaction(CACHE_STORE_NAME, 'readwrite');
-				tx.objectStore(CACHE_STORE_NAME).delete(key);
-				return tx.complete;
-			});
-		},
-		clear() {
-			return dbPromise.then(db => {
-				const tx = db.transaction(CACHE_STORE_NAME, 'readwrite');
-				tx.objectStore(CACHE_STORE_NAME).clear();
-				return tx.complete;
-			});
-		},
-	};
+	return require('idb-keyval');
 }
 
 /**
