@@ -63,14 +63,16 @@ export const cacheSetEpic = cache => action$ =>
  */
 export const cacheQueryEpic = cache => action$ =>
 	action$.ofType('API_REQUEST')
-		.flatMap(({ payload }) => Rx.Observable.from(payload))  // fan out
-		.flatMap(cacheReader(cache))                          // look for a cache hit
-		.filter(([ query, response ]) => response)   // ignore misses
-		.reduce((acc, [ query, response ]) => ({      // fan-in to create response
-			queries: [ ...acc.queries, query ],
-			responses: [ ...acc.responses, response ],
-		}), { queries: [], responses: [] })           // empty response structure
-		.filter(cacheResponse => cacheResponse.responses.length)
+		.flatMap(({ payload }) =>
+			Rx.Observable.from(payload)  // fan out
+				.flatMap(cacheReader(cache))               // look for a cache hit
+				.filter(([ query, response ]) => response) // ignore misses
+				.reduce((acc, [ query, response ]) => ({   // fan-in to create response
+					queries: [ ...acc.queries, query ],
+					responses: [ ...acc.responses, response ],
+				}), { queries: [], responses: [] })        // empty response structure
+				.filter(cacheResponse => cacheResponse.responses.length)
+		)
 		.map(cacheSuccess);
 
 const getCacheEpic = (cache=makeCache()) =>
