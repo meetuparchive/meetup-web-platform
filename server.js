@@ -42,6 +42,15 @@ export function configureEnv(config) {
 	return config;
 }
 
+export function onPreResponse(request, reply) {
+	const response = request.response;
+	if (!response.isBoom) {
+		return reply.continue();
+	}
+	const error = response;
+	return reply(`oh hell no ${error.stack}`);
+}
+
 /**
  * server-starting function
  */
@@ -50,6 +59,7 @@ export function server(routes, connection, plugins=[]) {
 
 	return server.connection(connection)
 		.register(plugins)
+		.then(() => server.ext('onPreResponse', onPreResponse))
 		.then(() => server.log(['start'], `${plugins.length} plugins registered, assigning routes...`))
 		.then(() => server.route(routes))
 		.then(() => server.log(['start'], `${routes.length} routes assigned, starting server...`))

@@ -118,8 +118,7 @@ export default function getRoutes(
 						response.state('refresh_token', refresh_token, { ttl: yearOfMilliseconds * 2 });
 						response.state('anonymous', anonymous.toString(), { ttl: yearOfMilliseconds * 2 });
 					}
-				},
-				(err) => { reply(Boom.badImplementation(err.message)); }
+				}
 			);
 		}
 	};
