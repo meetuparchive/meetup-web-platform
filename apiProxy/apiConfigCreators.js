@@ -145,7 +145,7 @@ export function album_photos(params) {
  * conversations
  */
 export function conversation(params) {
-	const pathExtension = params.id ? `/${params.id}` : '';
+	const pathExtension = params.id ? `/${params.id}/messages` : '';
 	return {
 		endpoint: `self/conversations${pathExtension}`,
 		params
