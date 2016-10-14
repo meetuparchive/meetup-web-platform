@@ -5,13 +5,11 @@ import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import RouterContext from 'react-router/lib/RouterContext';
 import match from 'react-router/lib/match';
-import RedBox from 'redbox-react';
 import { Provider } from 'react-redux';
 
 import createStore from '../util/createStore';
 import Dom from '../components/dom';
 import { polyfillNodeIntl } from '../util/localizationUtils';
-import { catchAndReturn$ } from '../util/rxUtils';
 
 import {
 	configureAuth
@@ -72,21 +70,38 @@ const getRouterRenderer = (store, clientFilename, assetPublicPath) =>
 		// initializes page-specific state that `<Dom />` needs to render, e.g.
 		// `<head>` contents
 		const initialState = store.getState();
-		const appMarkup = ReactDOMServer.renderToString(
-			<Provider store={store}>
-				<RouterContext {...renderProps} />
-			</Provider>
-		);
-		const statusCode = renderProps.routes.pop().statusCode || 200;
+		let appMarkup;
+		let result;
+		let statusCode;
 
-		// all the data for the full `<html>` element has been initialized by the app
-		// so go ahead and assemble the full response body
-		const result = getHtml(
-			assetPublicPath,
-			clientFilename,
-			initialState,
-			appMarkup
-		);
+		try {
+			appMarkup = ReactDOMServer.renderToString(
+				<Provider store={store}>
+					<RouterContext {...renderProps} />
+				</Provider>
+			);
+
+			// all the data for the full `<html>` element has been initialized by the app
+			// so go ahead and assemble the full response body
+			result = getHtml(
+				assetPublicPath,
+				clientFilename,
+				initialState,
+				appMarkup
+			);
+			statusCode = renderProps.routes.pop().statusCode || 200;
+		} catch(e) {
+			// log the error stack here because Observable logs not great
+			console.error(e.stack);
+			if (IS_DEV) {  // eslint-disable-line no-undef
+				const { RedBoxError } = require('redbox-react');
+				appMarkup = ReactDOMServer.renderToString(<RedBoxError error={e} />);
+				result = `${DOCTYPE}<html><body>${appMarkup}</body></html>`;
+				statusCode = 500;
+			} else {
+				throw e;
+			}
+		}
 
 		return {
 			statusCode,
@@ -197,19 +212,9 @@ const makeRenderer = (
 			})
 		)
 		.flatMap(args => storeIsReady$.map(() => args))  // `sample` appears not to work - this is equivalent
-		.map(getRouterRenderer(store, clientFilename, assetPublicPath))
-		.catch(error => {
-			// render errors result in a rendered stack trace using RedBox
-			const appMarkup = ReactDOMServer.renderToString(<RedBox error={error} />);
-			const result = `${DOCTYPE}<html><body>${appMarkup}</body></html>`;
-			const statusCode = 500;
+		.map(getRouterRenderer(store, clientFilename, assetPublicPath));
 
-			// also log to the console with `catchAndReturn`
-			return catchAndReturn$({
-				result,
-				statusCode
-			}, request.log)(error);
-		});
+	return render$;
 };
 
 export default makeRenderer;
