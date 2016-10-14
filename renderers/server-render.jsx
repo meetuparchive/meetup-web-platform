@@ -81,6 +81,8 @@ function renderAppResult(renderProps, store, clientFilename, assetPublicPath) {
 		result = `${DOCTYPE}${htmlMarkup}`;
 		statusCode = renderProps.routes.pop().statusCode || 200;
 	} catch(e) {
+		// log the error stack here because Observable logs not great
+		console.error(e.stack);
 		if (IS_DEV) {  // eslint-disable-line no-undef
 			const { RedBoxError } = require('redbox-react');
 			appMarkup = ReactDOMServer.renderToString(<RedBoxError error={e} />);
