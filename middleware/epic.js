@@ -1,3 +1,4 @@
+import 'rxjs';
 import { combineEpics, createEpicMiddleware } from 'redux-observable';
 
 import getSyncEpic from '../epics/sync';
