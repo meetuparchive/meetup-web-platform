@@ -3,7 +3,6 @@ import Rx from 'rxjs';
 const externalRequest$ = Rx.Observable.bindNodeCallback(externalRequest);
 
 import * as apiConfigCreators from './apiConfigCreators';
-import { catchAndReturn$ } from '../util/rxUtils';
 import { duotoneRef } from '../util/duotone';
 
 /**
@@ -30,16 +29,18 @@ import { duotoneRef } from '../util/duotone';
  */
 export const parseApiResponse = response => {
 	let responseObj;
+	let error;
+
 	try {
 		responseObj = JSON.parse(response);
 	} catch(e) {
-		throw new TypeError(`API response was not JSON: "${response}"`);
+		error = `API response was not JSON: "${response}"`;
 	}
 	if (responseObj && responseObj.problem) {
-		throw new Error(`API problem: ${responseObj.problem}: ${responseObj.details}`);
+		error = `API problem: ${responseObj.problem}: ${responseObj.details}`;
 	}
 
-	return responseObj;
+	return error ? { error } : responseObj;
 };
 
 /**
@@ -206,7 +207,7 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
 					groups.forEach(setGroupDuotone);
 					break;
 				case 'home':
-					value.rows.map(({ items }) => items)
+					(value.rows || []).map(({ items }) => items)
 						.forEach(items => items.filter(({ type }) => type === 'group')
 							.forEach(({ group }) => setGroupDuotone(group))
 						);
@@ -244,14 +245,26 @@ const apiProxy$ = ({ baseUrl, duotoneUrls }) => {
 		// to build the query-specific API request options object
 		const apiConfigToRequestOptions = buildRequestArgs(externalRequestOpts);
 
+		const apiTimeout = 5000;
 		return Rx.Observable.from(queries)    // create stream of query objects - fan-out
 			.map(queryToApiConfig)              // convert query to API-specific config
 			.map(apiConfigToRequestOptions)     // API-specific args for api request
 			.do(externalRequestOpts => request.log(['api'], JSON.stringify(externalRequestOpts.url)))  // logging
-			.concatMap(externalRequestOpts => externalRequest$(externalRequestOpts))  // make the API calls - keep order
+			.concatMap(externalRequestOpts =>  // make the API calls - keep order
+				externalRequest$(externalRequestOpts)
+					.timeout(apiTimeout, new Error('API response timeout'))
+					.catch(error =>
+						Rx.Observable.of(
+							[null, JSON.stringify({ error: error.message})]
+						)
+					)
+			)
 			.map(([response, body]) => body)    // ignore Response object, just process body string
 			.map(parseApiResponse)              // parse into plain object
-			.catch(catchAndReturn$())           // return error object instead of response
+			.catch(error =>  // if there has been an error, all 'responses' need to be the error
+				Rx.Observable.of({ error: error.message })
+					.repeat(queries.length)
+			)
 			.zip(Rx.Observable.from(queries))   // zip the apiResponse with corresponding query
 			.map(apiResponseToQueryResponse)    // convert apiResponse to app-ready queryResponse
 			.map(setApiResponseDuotones)        // special duotone prop

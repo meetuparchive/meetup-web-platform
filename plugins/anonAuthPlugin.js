@@ -2,6 +2,7 @@ import Boom from 'boom';
 import chalk from 'chalk';
 import Rx from 'rxjs';
 
+const AUTH_TIMEOUT = 5000;
 /**
  * @module anonAuthPlugin
  */
@@ -98,15 +99,16 @@ export function getAnonymousCode$({ ANONYMOUS_AUTH_URL, oauth }, redirect_uri) {
 	return () => {
 		console.log(`Fetching anonymous auth code from ${ANONYMOUS_AUTH_URL}`);
 		return Rx.Observable.fromPromise(fetch(anonymousCodeUrl, requestOpts))
-		.flatMap(tryJSON)
-		.catch(error => {
-			console.log(error.stack);
-			return Rx.Observable.of({ code: null });
-		})
-		.map(({ code }) => ({
-			grant_type: 'anonymous_code',
-			token: code
-		}));
+			.timeout(AUTH_TIMEOUT)
+			.flatMap(tryJSON)
+			.catch(error => {
+				console.log(error.stack);
+				return Rx.Observable.of({ code: null });
+			})
+			.map(({ code }) => ({
+				grant_type: 'anonymous_code',
+				token: code
+			}));
 	};
 }
 
@@ -165,6 +167,7 @@ export const getAnonymousAccessToken$ = ({ ANONYMOUS_ACCESS_URL, oauth }, redire
 
 			console.log(`Fetching anonymous access_token from ${ANONYMOUS_ACCESS_URL}`);
 			return Rx.Observable.fromPromise(fetch(url, requestOpts))
+				.timeout(AUTH_TIMEOUT)
 				.flatMap(tryJSON);
 		};
 	};
