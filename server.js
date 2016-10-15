@@ -57,9 +57,9 @@ export function onPreResponse(request, reply) {
 	const errorMarkup = ReactDOMServer.renderToString(
 		React.createElement(RedBoxError, { error })
 	);
-	error.message = `<!DOCTYPE html><html><body>${errorMarkup}</body></html>`;
-	error.reformat();
-	return reply(error).code(500);
+	const errorResponse = reply(`<!DOCTYPE html><html><body>${errorMarkup}</body></html>`);
+	errorResponse.code(error.output.statusCode);
+	return errorResponse;
 }
 
 /**
