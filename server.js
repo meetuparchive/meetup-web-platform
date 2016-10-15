@@ -1,5 +1,7 @@
 import https from 'https';
 import Hapi from 'hapi';
+import React from 'react';
+import ReactDOMServer from 'react-dom/server';
 
 import './util/globals';
 
@@ -42,13 +44,22 @@ export function configureEnv(config) {
 	return config;
 }
 
+/**
+ * This function provides global error handling when there is a 500 error
+ */
 export function onPreResponse(request, reply) {
 	const response = request.response;
 	if (!response.isBoom) {
 		return reply.continue();
 	}
 	const error = response;
-	return reply(`oh hell no ${error.stack}`);
+	const { RedBoxError } = require('redbox-react');
+	const errorMarkup = ReactDOMServer.renderToString(
+		React.createElement(RedBoxError, { error })
+	);
+	error.message = `<!DOCTYPE html><html><body>${errorMarkup}</body></html>`;
+	error.reformat();
+	return reply(error).statusCode(500);
 }
 
 /**

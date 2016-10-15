@@ -26,7 +26,7 @@ export const fetchQueries = (apiUrl, options) => queries => {
 		console.log('No access token provided');
 		if (!auth.refresh_token) {
 			console.log('No refresh_token - cannot fetch');
-			return Promise.reject('No auth info provided');
+			return Promise.reject(new Error('No auth info provided'));
 		}
 	}
 	const isPost = method.toLowerCase() === 'post';
