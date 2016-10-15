@@ -59,7 +59,7 @@ export function onPreResponse(request, reply) {
 	);
 	error.message = `<!DOCTYPE html><html><body>${errorMarkup}</body></html>`;
 	error.reformat();
-	return reply(error).statusCode(500);
+	return reply(error).code(500);
 }
 
 /**
