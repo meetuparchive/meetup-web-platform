@@ -70,10 +70,11 @@ export function group(params) {
  */
 export function profile(params) {
 	const pathExtension = params.id ? `/${params.id}` : '';
+	delete params.id;
+	delete params.urlname;
 	return {
 		endpoint: `${params.urlname}/members${pathExtension}`,
-		{} // profile api doesn't like params, it thinks we're trying to update the record
-	};
+		params
 }
 
 
