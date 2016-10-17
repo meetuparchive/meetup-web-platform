@@ -3,8 +3,7 @@
  * @module createStore
  */
 import { applyMiddleware, createStore, compose } from 'redux';
-import getEpicMiddleware from '../middleware/epic';
-import PostMiddleware from '../middleware/post';
+import getPlatformMiddleware from '../middleware/epic';
 
 const noopMiddleware = store => next => action => next(action);
 
@@ -21,13 +20,9 @@ const noopMiddleware = store => next => action => next(action);
  *   should be applied to the store
  */
 function finalCreateStore(routes, reducer, initialState=null, middleware=[]) {
-	/**
-	 * **All** middleware gets added here
-	 * @const
-	 */
+	// **All** middleware gets added here
 	const middlewareToApply = [
-		getEpicMiddleware(routes),
-		PostMiddleware,
+		getPlatformMiddleware(routes),
 		typeof window !== 'undefined' && window.mupDevTools ? window.mupDevTools() : noopMiddleware,
 		...middleware,
 	];

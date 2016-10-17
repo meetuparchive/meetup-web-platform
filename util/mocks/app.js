@@ -113,8 +113,8 @@ export const MOCK_POST_ACTION = {
 	type: 'POST_DUMMY',
 	payload: {
 		query: {},
-		onSuccess: result => ({ type: 'MOCK_SUCCESS' }),
-		onError: err => ({ type: 'MOCK_ERROR' }),
+		onSuccess: payload => ({ type: 'MOCK_SUCCESS', payload }),
+		onError: err => ({ type: 'MOCK_ERROR', payload: err, error: true }),
 	}
 };
 

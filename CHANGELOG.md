@@ -1,4 +1,12 @@
-## [0.3.0]
+## [0.4]
+
+- **Renamed** - `getEpicMiddleware` is now `getPlatformMiddleware` since all
+platform middleware functionality is provided as a single redux-observable
+epic-based middleware combining multiple epics
+- **Removed** `PostMiddleware` - the equivalent functionality is now provided
+as an epic in `PostEpic`, which is part of `getPlatformMiddleware`
+
+## [0.3]
 
 - **Added** `getEpicMiddleware`
 - **Removed/Added** `SyncMiddleware`, `CacheMiddleware`, `AuthMiddleware` are now
@@ -7,7 +15,7 @@ part of [`EpicMiddleware`](middleware/epic.js)
 	previous middleware. If you are using `createStore` from the platform library,
 	you can ignore this update, as the middleware loading is done for you.
 
-## [v0.2.0]
+## [v0.2]
 
 - **Refactor** [`server-render:makeRenderer`](renderers/server-render.jsx#L123)
 now takes `clientFilename` and `assetPublicPath` as separate arguments
