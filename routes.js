@@ -48,6 +48,7 @@ const initTrackingCookie = (request, response) => {
 export default function getRoutes(
 	renderRequestMap,
 	{
+		API_TIMEOUT,
 		API_SERVER_ROOT_URL,
 		PHOTO_SCALER_SALT,
 	},
@@ -55,6 +56,7 @@ export default function getRoutes(
 
 	console.log(chalk.green(`Supported languages:\n${Object.keys(renderRequestMap).join('\n')}`));
 	const proxyApiRequest$ = apiProxyFn$({
+		API_TIMEOUT,
 		baseUrl: API_SERVER_ROOT_URL,
 		duotoneUrls: getDuotoneUrls(duotones, PHOTO_SCALER_SALT),
 	});

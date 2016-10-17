@@ -46,13 +46,13 @@ describe('parseApiResponse', () => {
 		expect(parseApiResponse(validJSON)).toEqual(jasmine.any(Object));
 		expect(parseApiResponse(validJSON)).toEqual(MOCK_GROUP);
 	});
-	it('throws a TypeError for invalid JSON', () => {
+	it('returns an object with a string "error" value for invalid JSON', () => {
 		const invalidJSON = 'not valid';
-		expect(() => parseApiResponse(invalidJSON)).toThrow(jasmine.any(TypeError));
+		expect(parseApiResponse(invalidJSON).error).toEqual(jasmine.any(String));
 	});
-	it('throws an error when the api response indicates an API problem', () => {
+	it('returns an object with a string "error" value for API response with "problem"', () => {
 		const responeWithProblem = JSON.stringify(MOCK_API_PROBLEM);
-		expect(() => parseApiResponse(responeWithProblem)).toThrow(jasmine.any(Error));
+		expect(parseApiResponse(responeWithProblem).error).toEqual(jasmine.any(String));
 	});
 });
 
@@ -165,3 +165,4 @@ describe('apiResponseDuotoneSetter', () => {
 		expect(group.duotoneUrl.startsWith(expectedUrl)).toBe(true);
 	});
 });
+

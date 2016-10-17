@@ -2,7 +2,6 @@ import Boom from 'boom';
 import chalk from 'chalk';
 import Rx from 'rxjs';
 
-const AUTH_TIMEOUT = 5000;
 /**
  * @module anonAuthPlugin
  */
@@ -79,7 +78,7 @@ export const requestAuthorizer = auth$ => request => {
  * @param {Object} config { ANONYMOUS_AUTH_URL, oauth }
  * @param {String} redirect_uri Return url after anonymous grant
  */
-export function getAnonymousCode$({ ANONYMOUS_AUTH_URL, oauth }, redirect_uri) {
+export function getAnonymousCode$({ API_TIMEOUT=5000, ANONYMOUS_AUTH_URL, oauth }, redirect_uri) {
 	if (!oauth.key) {
 		throw new ReferenceError('OAuth consumer key is required');
 	}
@@ -99,7 +98,7 @@ export function getAnonymousCode$({ ANONYMOUS_AUTH_URL, oauth }, redirect_uri) {
 	return () => {
 		console.log(`Fetching anonymous auth code from ${ANONYMOUS_AUTH_URL}`);
 		return Rx.Observable.fromPromise(fetch(anonymousCodeUrl, requestOpts))
-			.timeout(AUTH_TIMEOUT)
+			.timeout(API_TIMEOUT)
 			.flatMap(tryJSON)
 			.catch(error => {
 				console.log(error.stack);
@@ -121,7 +120,7 @@ export function getAnonymousCode$({ ANONYMOUS_AUTH_URL, oauth }, redirect_uri) {
  * @return {Object} the JSON-parsed response from the authorize endpoint
  *   - contains 'access_token', 'refresh_token'
  */
-export const getAnonymousAccessToken$ = ({ ANONYMOUS_ACCESS_URL, oauth }, redirect_uri) => {
+export const getAnonymousAccessToken$ = ({ API_TIMEOUT=5000, ANONYMOUS_ACCESS_URL, oauth }, redirect_uri) => {
 	if (!oauth.key) {
 		throw new ReferenceError('OAuth consumer key is required');
 	}
@@ -167,7 +166,7 @@ export const getAnonymousAccessToken$ = ({ ANONYMOUS_ACCESS_URL, oauth }, redire
 
 			console.log(`Fetching anonymous access_token from ${ANONYMOUS_ACCESS_URL}`);
 			return Rx.Observable.fromPromise(fetch(url, requestOpts))
-				.timeout(AUTH_TIMEOUT)
+				.timeout(API_TIMEOUT)
 				.flatMap(tryJSON);
 		};
 	};

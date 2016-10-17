@@ -233,7 +233,7 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
  * @param {Object} baseUrl API server base URL for all API requests
  * @return Array$ contains all API responses corresponding to the provided queries
  */
-const apiProxy$ = ({ baseUrl, duotoneUrls }) => {
+const apiProxy$ = ({ API_TIMEOUT=5000, baseUrl, duotoneUrls }) => {
 	const setApiResponseDuotones = apiResponseDuotoneSetter(duotoneUrls);
 
 	return request => {
@@ -245,14 +245,13 @@ const apiProxy$ = ({ baseUrl, duotoneUrls }) => {
 		// to build the query-specific API request options object
 		const apiConfigToRequestOptions = buildRequestArgs(externalRequestOpts);
 
-		const apiTimeout = 5000;
 		return Rx.Observable.from(queries)    // create stream of query objects - fan-out
 			.map(queryToApiConfig)              // convert query to API-specific config
 			.map(apiConfigToRequestOptions)     // API-specific args for api request
 			.do(externalRequestOpts => request.log(['api'], JSON.stringify(externalRequestOpts.url)))  // logging
 			.concatMap(externalRequestOpts =>  // make the API calls - keep order
 				externalRequest$(externalRequestOpts)
-					.timeout(apiTimeout, new Error('API response timeout'))
+					.timeout(API_TIMEOUT, new Error('API response timeout'))
 					.catch(error =>
 						Rx.Observable.of(
 							[null, JSON.stringify({ error: error.message})]

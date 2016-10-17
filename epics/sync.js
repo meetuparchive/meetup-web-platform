@@ -49,12 +49,12 @@ export const resetLocationEpic = (action$, store) =>
  *
  * emits (API_SUCCESS || API_ERROR) then API_COMPLETE
  */
-export const fetchQueriesEpic = (action$, store) =>
+export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 	action$.ofType('API_REQUEST')
 		.map(({ payload }) => payload)  // payload contains the queries array
 		.flatMap(queries => {           // set up the fetch call to the app server
 			const { config, auth } = store.getState();
-			const fetch = fetchQueries(config.apiUrl, { method: 'GET', auth });
+			const fetch = fetchQueriesFn(config.apiUrl, { method: 'GET', auth });
 			return Observable.fromPromise(fetch(queries))  // call fetch
 				.takeUntil(action$.ofType(LOCATION_CHANGE, 'LOCATION_SYNC'))  // cancel this fetch when nav happens
 				.map(apiSuccess)                             // dispatch apiSuccess with server response
@@ -62,11 +62,11 @@ export const fetchQueriesEpic = (action$, store) =>
 				.catch(err => Observable.of(apiError(err)));  // ... or apiError
 		});
 
-export default function getSyncEpic(routes) {
+export default function getSyncEpic(routes, fetchQueriesFn=fetchQueries) {
 	return combineEpics(
 		getNavEpic(routes),
 		resetLocationEpic,
-		fetchQueriesEpic
+		getFetchQueriesEpic(fetchQueriesFn)
 	);
 }
 
