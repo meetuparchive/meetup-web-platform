@@ -72,7 +72,7 @@ export function profile(params) {
 	const pathExtension = params.id ? `/${params.id}` : '';
 	return {
 		endpoint: `${params.urlname}/members${pathExtension}`,
-		params
+		{} // profile api doesn't like params, it thinks we're trying to update the record
 	};
 }
 
