@@ -40,6 +40,7 @@ describe('fetchQueries', () => {
 		spyOn(global, 'fetch');
 
 		return fetchUtils.fetchQueries(API_URL.toString(), { auth: {}, method: 'GET' })(queries)
+			.then(() => expect(true).toBe(false))  // should never be called!
 			.catch(err => {
 				expect(err).toEqual(jasmine.any(Error));
 				expect(global.fetch).not.toHaveBeenCalled();
