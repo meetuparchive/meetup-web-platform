@@ -95,7 +95,7 @@ export const mockQueryBadType = ({ location, params }) => {
 	return { ...mockQuery({ location, params }), type };
 };
 
-export const MOCK_AUTH_HEADER = 'Bearer abcdefg';
+export const MOCK_AUTH_HEADER = `Bearer ${MOCK_OAUTH_COOKIES}.oauth_token`;
 export const MOCK_DATETIME = new Date().getTime();
 export const MOCK_CREDENTIALS = {
 	username: 'Michael McGahan',
