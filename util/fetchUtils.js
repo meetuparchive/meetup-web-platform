@@ -33,7 +33,8 @@ export const fetchQueries = (apiUrl, options) => queries => {
 
 	const params = new URLSearchParams();
 	params.append('queries', JSON.stringify(queries));
-	const fetchUrl = `${apiUrl}?${isPost ? '' : params}`;
+	const searchString = `?${params}`;
+	const fetchUrl = `${apiUrl}${isPost ? '' : searchString}`;
 	const fetchConfig = {
 		method,
 		headers: {
