@@ -1,5 +1,7 @@
 import https from 'https';
 import Hapi from 'hapi';
+import React from 'react';
+import ReactDOMServer from 'react-dom/server';
 
 import './util/globals';
 
@@ -43,6 +45,24 @@ export function configureEnv(config) {
 }
 
 /**
+ * This function provides global error handling when there is a 500 error
+ */
+export function onPreResponse(request, reply) {
+	const response = request.response;
+	if (!response.isBoom) {
+		return reply.continue();
+	}
+	const error = response;
+	const { RedBoxError } = require('redbox-react');
+	const errorMarkup = ReactDOMServer.renderToString(
+		React.createElement(RedBoxError, { error })
+	);
+	const errorResponse = reply(`<!DOCTYPE html><html><body>${errorMarkup}</body></html>`);
+	errorResponse.code(error.output.statusCode);
+	return errorResponse;
+}
+
+/**
  * server-starting function
  */
 export function server(routes, connection, plugins=[]) {
@@ -50,6 +70,7 @@ export function server(routes, connection, plugins=[]) {
 
 	return server.connection(connection)
 		.register(plugins)
+		.then(() => server.ext('onPreResponse', onPreResponse))
 		.then(() => server.log(['start'], `${plugins.length} plugins registered, assigning routes...`))
 		.then(() => server.route(routes))
 		.then(() => server.log(['start'], `${routes.length} routes assigned, starting server...`))

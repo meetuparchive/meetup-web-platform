@@ -40,6 +40,7 @@
     "node-uuid": "^1.4.7",
     "react": "15.3.2",
     "react-addons-test-utils": "15.3.2",
+    "react-dom": "15.3.2",
     "react-helmet": "^3.1.0",
     "react-intl": "^2.1.5",
     "react-router": "^2.7.0",
