@@ -23,13 +23,18 @@ export const fetchQueries = (apiUrl, options) => queries => {
 	} = options;
 
 	if (!auth.oauth_token) {
-		console.log('No access token provided - hope there\'s a refresh token');
+		console.log('No access token provided');
+		if (!auth.refresh_token) {
+			console.log('No refresh_token - cannot fetch');
+			return Promise.reject(new Error('No auth info provided'));
+		}
 	}
 	const isPost = method.toLowerCase() === 'post';
 
 	const params = new URLSearchParams();
 	params.append('queries', JSON.stringify(queries));
-	const fetchUrl = `${apiUrl}?${isPost ? '' : params}`;
+	const searchString = `?${params}`;
+	const fetchUrl = `${apiUrl}${isPost ? '' : searchString}`;
 	const fetchConfig = {
 		method,
 		headers: {

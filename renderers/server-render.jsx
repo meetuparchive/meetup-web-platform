@@ -32,6 +32,18 @@ const DOCTYPE = '<!DOCTYPE html>';
  * @module ServerRender
  */
 
+function getHtml(assetPublicPath, clientFilename, initialState={}, appMarkup='') {
+	const htmlMarkup = ReactDOMServer.renderToString(
+		<Dom
+			assetPublicPath={assetPublicPath}
+			clientFilename={clientFilename}
+			initialState={initialState}
+			appMarkup={appMarkup}
+		/>
+	);
+	return `${DOCTYPE}${htmlMarkup}`;
+}
+
 /**
  * Using the current route information and Redux store, render the app to an
  * HTML string and server response code.
@@ -49,76 +61,66 @@ const DOCTYPE = '<!DOCTYPE html>';
  * @return {Object} the statusCode and result used by Hapi's `reply` API
  *   {@link http://hapijs.com/api#replyerr-result}
  */
-function renderAppResult(renderProps, store, clientFilename, assetPublicPath) {
-	// pre-render the app-specific markup, this is the string of markup that will
-	// be managed by React on the client.
-	//
-	// **IMPORTANT**: this string is built separately from `<Dom />` because it
-	// initializes page-specific state that `<Dom />` needs to render, e.g.
-	// `<head>` contents
-	const initialState = store.getState();
-	let appMarkup;
-	let result;
-	let statusCode;
+const getRouterRenderer = (store, clientFilename, assetPublicPath) =>
+	([ redirectLocation, renderProps ]) => {
+		// pre-render the app-specific markup, this is the string of markup that will
+		// be managed by React on the client.
+		//
+		// **IMPORTANT**: this string is built separately from `<Dom />` because it
+		// initializes page-specific state that `<Dom />` needs to render, e.g.
+		// `<head>` contents
+		const initialState = store.getState();
+		let appMarkup;
+		let result;
+		let statusCode;
 
-	try {
-		appMarkup = ReactDOMServer.renderToString(
-			<Provider store={store}>
-				<RouterContext {...renderProps} />
-			</Provider>
-		);
+		try {
+			appMarkup = ReactDOMServer.renderToString(
+				<Provider store={store}>
+					<RouterContext {...renderProps} />
+				</Provider>
+			);
 
-		// all the data for the full `<html>` element has been initialized by the app
-		// so go ahead and assemble the full response body
-		const htmlMarkup = ReactDOMServer.renderToString(
-			<Dom
-				assetPublicPath={assetPublicPath}
-				clientFilename={clientFilename}
-				initialState={initialState}
-				appMarkup={appMarkup}
-			/>
-		);
-		result = `${DOCTYPE}${htmlMarkup}`;
-		statusCode = renderProps.routes.pop().statusCode || 200;
-	} catch(e) {
-		// log the error stack here because Observable logs not great
-		console.error(e.stack);
-		if (IS_DEV) {  // eslint-disable-line no-undef
-			const { RedBoxError } = require('redbox-react');
-			appMarkup = ReactDOMServer.renderToString(<RedBoxError error={e} />);
-			result = `${DOCTYPE}<html><body>${appMarkup}</body></html>`;
-			statusCode = 500;
-		} else {
-			throw e;
+			// all the data for the full `<html>` element has been initialized by the app
+			// so go ahead and assemble the full response body
+			result = getHtml(
+				assetPublicPath,
+				clientFilename,
+				initialState,
+				appMarkup
+			);
+			statusCode = renderProps.routes.pop().statusCode || 200;
+		} catch(e) {
+			// log the error stack here because Observable logs not great
+			console.error(e.stack);
+			if (IS_DEV) {  // eslint-disable-line no-undef
+				const { RedBoxError } = require('redbox-react');
+				appMarkup = ReactDOMServer.renderToString(<RedBoxError error={e} />);
+				result = `${DOCTYPE}<html><body>${appMarkup}</body></html>`;
+				statusCode = 500;
+			} else {
+				throw e;
+			}
 		}
-	}
 
-	return {
-		statusCode,
-		result
+		return {
+			statusCode,
+			result
+		};
 	};
-}
 
 /**
- * Curry a Redux store and auth tokens to privde a function that can dispatch
- * the actions necessary to set up the initial state of the app when supplied
- * matching route information
+ * dispatch the actions necessary to set up the initial state of the app
  *
  * @param {Store} store Redux store for this request
- * @param {Object} config auth tokens, e.g. oauth_token
- * @return dispatchMatch functiont that takes the 'match' callback args and
- *   dispatches necessary initialization actions (auth and RENDER)
+ * @param {Object} config that initializes app (auth tokens, e.g. oauth_token)
  */
-const dispatchInitActions = (store, { apiUrl, auth, meetupTrack }) => ([redirectLocation, renderProps]) => {
-	console.log(chalk.green(`Dispatching config for ${renderProps.path}`));
+const dispatchConfig = (store, { apiUrl, auth, meetupTrack }) => {
+	console.log(chalk.green('Dispatching config'));
 
 	store.dispatch(configureAuth(auth, true));
 	store.dispatch(configureApiUrl(apiUrl));
 	store.dispatch(configureTrackingId(meetupTrack));
-	store.dispatch({
-		type: '@@server/RENDER',
-		payload: renderProps.location
-	});
 };
 
 /**
@@ -172,21 +174,41 @@ const makeRenderer = (
 		anonymous,
 	};
 
+	// create the store
 	const store = createStore(routes, reducer, {}, middleware);
-	const storeIsReady$ = Rx.Observable.create(obs =>
-			store.subscribe(() => obs.next(store.getState()))
-		)
-		.first(state => state.preRenderChecklist.every(isReady => isReady));  // take the first ready state
-	const match$ = Rx.Observable.bindNodeCallback(match);
-	const render$ = match$({ location, routes })
+
+	// load initial config
+	dispatchConfig(store, { apiUrl, auth, meetupTrack });
+
+	// render skeleton if requested - the store is ready
+	if ('skeleton' in request.query) {
+		return Rx.Observable.of({
+			result: getHtml(assetPublicPath, clientFilename, store.getState()),
+			statusCode: 200
+		});
+	}
+
+	// otherwise render using the API and React router
+	const storeIsReady$ = Rx.Observable.create(obs => {
+		obs.next(store.getState());
+		return store.subscribe(() => obs.next(store.getState()));
+	})
+	.first(state => state.preRenderChecklist.every(isReady => isReady));  // take the first ready state
+
+	return Rx.Observable.bindNodeCallback(match)({ location, routes })
 		.do(([redirectLocation, renderProps]) => {
 			if (!redirectLocation && !renderProps) {
 				throw Boom.notFound();
 			}
 		})
-		.do(dispatchInitActions(store, { apiUrl, auth, meetupTrack }))
+		.do(([redirectLocation, renderProps]) =>
+			store.dispatch({
+				type: '@@server/RENDER',
+				payload: renderProps.location
+			})
+		)
 		.flatMap(args => storeIsReady$.map(() => args))  // `sample` appears not to work - this is equivalent
-		.map(([redirectLocation, renderProps]) => renderAppResult(renderProps, store, clientFilename, assetPublicPath));
+		.map(getRouterRenderer(store, clientFilename, assetPublicPath));
 
 	return render$;
 };
