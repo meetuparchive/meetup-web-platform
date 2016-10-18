@@ -46,5 +46,16 @@ describe('server', () => {
 	it('starts', () =>
 		start({}, {}).then(server => server.stop()).then(() => expect(true).toBe(true))
 	);
+	it('applies passed-in routes', () => {
+		const routes = [
+			{ method: 'GET', path: '/', config: { id: 'root' }, handler: () => {} },
+			{ method: 'GET', path: '/sub', config: { id: 'sub' }, handler: () => {} },
+		];
+		return start({}, { routes }).then(server => {
+			expect(server.lookup('root').path).toBe('/');
+			expect(server.lookup('sub').path).toBe('/sub');
+			server.stop();
+		});
+	});
 });
 
