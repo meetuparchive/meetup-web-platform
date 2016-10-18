@@ -1,5 +1,5 @@
 import https from 'https';
-import {
+import start, {
 	checkForDevUrl,
 	configureEnv,
 } from './server';
@@ -40,5 +40,11 @@ describe('configureEnv', function() {
 		configureEnv({ url: 'www.meetup.com' });
 		expect(https.globalAgent.options.rejectUnauthorized).toBe(true);
 	});
+});
+
+describe('server', () => {
+	it('starts', () =>
+		start({}, {}).then(server => server.stop()).then(() => expect(true).toBe(true))
+	);
 });
 

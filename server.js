@@ -54,7 +54,8 @@ export function server(routes, connection, plugins=[]) {
 		.then(() => server.route(routes))
 		.then(() => server.log(['start'], `${routes.length} routes assigned, starting server...`))
 		.then(() => server.start())
-		.then(() => server.log(['start'], `Dev server is listening at ${server.info.uri}`));
+		.then(() => server.log(['start'], `Dev server is listening at ${server.info.uri}`))
+		.then(() => server);
 }
 
 /**
@@ -70,11 +71,11 @@ export function server(routes, connection, plugins=[]) {
  *   features in the additional routes
  * @return {Promise} the Promise returned by Hapi's `server.connection` method
  */
-export default function start(renderRequestMap, options) {
-	const {
-		routes,
-		plugins,
-	} = options;
+export default function start(
+	renderRequestMap,
+	{ routes=[], plugins=[] },
+	config=getConfig
+) {
 	// source maps make for better stack traces - we might not want this in
 	// production if it makes anything slower, though
 	// (process.env.NODE_ENV === 'production')
