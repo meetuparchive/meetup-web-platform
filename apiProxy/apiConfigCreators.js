@@ -73,6 +73,7 @@ export function profile(params) {
 	return {
 		endpoint: `${params.urlname}/members${pathExtension}`,
 		params
+	};
 }
 
 
