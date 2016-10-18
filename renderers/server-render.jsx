@@ -110,14 +110,10 @@ const getRouterRenderer = (store, clientFilename, assetPublicPath) =>
 	};
 
 /**
- * Curry a Redux store and auth tokens to privde a function that can dispatch
- * the actions necessary to set up the initial state of the app when supplied
- * matching route information
+ * dispatch the actions necessary to set up the initial state of the app
  *
  * @param {Store} store Redux store for this request
- * @param {Object} config auth tokens, e.g. oauth_token
- * @return dispatchMatch functiont that takes the 'match' callback args and
- *   dispatches necessary initialization actions (auth and RENDER)
+ * @param {Object} config that initializes app (auth tokens, e.g. oauth_token)
  */
 const dispatchConfig = (store, { apiUrl, auth, meetupTrack }) => {
 	console.log(chalk.green('Dispatching config'));
