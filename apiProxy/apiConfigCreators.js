@@ -70,6 +70,8 @@ export function group(params) {
  */
 export function profile(params) {
 	const pathExtension = params.id ? `/${params.id}` : '';
+	delete params.id;
+	delete params.urlname;
 	return {
 		endpoint: `${params.urlname}/members${pathExtension}`,
 		params
