@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { withSideEffect } from 'react-side-effect';
+import withSideEffect from 'react-side-effect';
 import { apiRequest } from '../actions/syncActionCreators';
 
 function mapStateToProps(state) {
