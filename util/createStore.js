@@ -30,14 +30,13 @@ function createEnhancedStore(router, routes, reducer, initialState=null, middlew
 		router.routerMiddleware,
 		typeof window !== 'undefined' && window.mupDevTools ? window.mupDevTools() : noopMiddleware,
 	];
-	const appliedMiddleware = applyMiddleware(...middleware);
-	enhancers = [
+	const enhancer = compose(
 		...enhancers,
 		router.routerEnhancer,
-		appliedMiddleware,
+		applyMiddleware(...middleware),
 		typeof window !== 'undefined' && window.devToolsExtension ? window.devToolsExtension() : fn => fn
-	];
-	const store = createStore(reducer, initialState, compose(...enhancers));
+	);
+	const store = createStore(reducer, initialState, enhancer);
 	return store;
 }
 
@@ -45,14 +44,15 @@ export function createBrowserStore(routes, reducer, initialState=null, middlewar
 	const router = routerForBrowser({
 		routes
 	});
-	return createEnhancedStore(router, reducer, initialState, middleware, enhancers);
+	return createEnhancedStore(router, routes, reducer, initialState, middleware, enhancers);
 }
 
 export function createServerStore(request, routes, reducer, initialState=null, middleware=[], enhancers=[]) {
+	console.log(reducer, 'reducer');
 	const router = routerForHapi({
 		request,
 		routes,
 	});
-	return createEnhancedStore(router, reducer, initialState, middleware, enhancers);
+	return createEnhancedStore(router, routes, reducer, initialState, middleware, enhancers);
 }
 
