@@ -193,15 +193,15 @@ const makeRenderer = (
 	}
 
 	// otherwise render using the API and React router
+	/*
 	const storeIsReady$ = Rx.Observable.create(obs => {
 		obs.next(store.getState());
 		return store.subscribe(() => obs.next(store.getState()));
 	})
 	.first(state => state.preRenderChecklist.every(isReady => isReady));  // take the first ready state
+	*/
 
-	return storeIsReady$
-		.map(getRouterRenderer(App, clientFilename, assetPublicPath));
-
+	return Rx.Observable.of(getRouterRenderer(App, clientFilename, assetPublicPath)(store));
 };
 
 export default makeRenderer;
