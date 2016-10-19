@@ -49,9 +49,10 @@ export function createBrowserStore(routes, reducer, initialState=null, middlewar
 	return createEnhancedStore(router, reducer, initialState, middleware, enhancers);
 }
 
-export function createServerStore(routes, reducer, initialState=null, middleware=[], enhancers=[]) {
+export function createServerStore(request, routes, reducer, initialState=null, middleware=[], enhancers=[]) {
 	const router = routerForHapi({
-		routes
+		request,
+		routes,
 	});
 	return createEnhancedStore(router, reducer, initialState, middleware, enhancers);
 }

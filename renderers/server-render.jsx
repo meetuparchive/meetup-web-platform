@@ -174,7 +174,7 @@ const makeRenderer = (
 	};
 
 	// create the store
-	const store = createServerStore(routes, reducer, {}, middleware);
+	const store = createServerStore(request, routes, reducer, {}, middleware);
 
 	// load initial config
 	dispatchConfig(store, { apiUrl, auth, meetupTrack });
