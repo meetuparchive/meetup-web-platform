@@ -6,8 +6,9 @@ import ReactDOMServer from 'react-dom/server';
 import RouterContext from 'react-router/lib/RouterContext';
 import match from 'react-router/lib/match';
 import { Provider } from 'react-redux';
+import { initializeCurrentLocation } from 'redux-little-router';
 
-import createStore from '../util/createStore';
+import { createServerStore } from '../util/createStore';
 import Dom from '../components/dom';
 import { polyfillNodeIntl } from '../util/localizationUtils';
 
@@ -175,10 +176,14 @@ const makeRenderer = (
 	};
 
 	// create the store
-	const store = createStore(routes, reducer, {}, middleware);
+	const store = createServerStore(routes, reducer, {}, middleware);
 
 	// load initial config
 	dispatchConfig(store, { apiUrl, auth, meetupTrack });
+	const initialLocation = store.getState().router;
+	if (initialLocation) {
+		store.dispatch(initializeCurrentLocation(initialLocation));
+	}
 
 	// render skeleton if requested - the store is ready
 	if ('skeleton' in request.query) {
@@ -210,7 +215,6 @@ const makeRenderer = (
 		.flatMap(args => storeIsReady$.map(() => args))  // `sample` appears not to work - this is equivalent
 		.map(getRouterRenderer(store, clientFilename, assetPublicPath));
 
-	return render$;
 };
 
 export default makeRenderer;

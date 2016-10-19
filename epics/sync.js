@@ -8,7 +8,7 @@ import {
 	apiComplete,
 	locationSync,
 } from '../actions/syncActionCreators';
-import { activeRouteQueries$ } from '../util/routeUtils';
+import { getRouteQueries } from '../util/routeUtils';
 import { fetchQueries } from '../util/fetchUtils';
 
 /**
@@ -21,11 +21,10 @@ import { fetchQueries } from '../util/fetchUtils';
  * @returns {Function} an Epic function that emits an API_REQUEST action
  */
 export const getNavEpic = routes => {
-	const activeQueries$ = activeRouteQueries$(routes);
 	return (action$, store) =>
 		action$.ofType(LOCATION_CHANGE, '@@server/RENDER', 'LOCATION_SYNC')
-			.map(({ payload }) => payload)  // extract the `location` from the action payload
-			.flatMap(activeQueries$)        // find the queries for the location
+			.map(({ payload }) => payload.result)  // extract the route from the action payload (location)
+			.map(getRouteQueries)        // find the queries for the location
 			.map(apiRequest);               // dispatch apiRequest with all queries
 };
 
@@ -41,7 +40,7 @@ export const getNavEpic = routes => {
 export const resetLocationEpic = (action$, store) =>
 	action$.ofType('CONFIGURE_AUTH')  // auth changes imply privacy changes - reload
 		.filter(({ meta }) => !meta)  // throw out any server-side actions
-		.map(() => locationSync(store.getState().routing.locationBeforeTransitions));
+		.map(() => locationSync(store.getState().router));
 
 /**
  * Listen for actions that provide queries to send to the api - mainly

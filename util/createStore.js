@@ -3,6 +3,10 @@
  * @module createStore
  */
 import { applyMiddleware, createStore, compose } from 'redux';
+import {
+	routerForBrowser,
+		routerForHapi,
+} from 'redux-little-router';
 import getPlatformMiddleware from '../middleware/epic';
 
 const noopMiddleware = store => next => action => next(action);
@@ -19,22 +23,36 @@ const noopMiddleware = store => next => action => next(action);
  * @param {Function} middleware (optional) any app-specific middleware that
  *   should be applied to the store
  */
-function finalCreateStore(routes, reducer, initialState=null, middleware=[]) {
-	// **All** middleware gets added here
-	const middlewareToApply = [
-		getPlatformMiddleware(routes),
-		typeof window !== 'undefined' && window.mupDevTools ? window.mupDevTools() : noopMiddleware,
+function createEnhancedStore(router, routes, reducer, initialState=null, middleware=[], enhancers=[]) {
+	middleware = [
 		...middleware,
+		getPlatformMiddleware(routes),
+		router.routerMiddleware,
+		window.mupDevTools ? window.mupDevTools() : noopMiddleware,
 	];
-	const appliedMiddleware = applyMiddleware(...middlewareToApply);
-
-	const createStoreWithMiddleware = compose(
+	const appliedMiddleware = applyMiddleware(...middleware);
+	enhancers = [
+		...enhancers,
 		appliedMiddleware,
-		typeof window !== 'undefined' && window.devToolsExtension ? window.devToolsExtension() : fn => fn
-	)(createStore);
-
-	return createStoreWithMiddleware(reducer, initialState);
+		router.routerEnhancer,
+		window.devToolsExtension ? window.devToolsExtension() : fn => fn
+	];
+	const enhancedCreateStore = compose(...enhancers)(createStore);
+	const store = enhancedCreateStore(reducer, initialState);
+	return store;
 }
 
-export default finalCreateStore;
+export function createBrowserStore(routes, reducer, initialState=null, middleware=[], enhancers=[]) {
+	const router = routerForBrowser({
+		routes
+	});
+	return createEnhancedStore(router, reducer, initialState, middleware, enhancers);
+}
+
+export function createServerStore(routes, reducer, initialState=null, middleware=[], enhancers=[]) {
+	const router = routerForHapi({
+		routes
+	});
+	return createEnhancedStore(router, reducer, initialState, middleware, enhancers);
+}
 

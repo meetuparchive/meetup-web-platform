@@ -1,11 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Router from 'react-router/lib/Router';
-import browserHistory from 'react-router/lib/browserHistory';
-import match from 'react-router/lib/match';
 import { Provider } from 'react-redux';
-import { syncHistoryWithStore } from 'react-router-redux';
-import createStore from '../util/createStore';
+import { RouterProvider, initializeCurrentLocation } from 'redux-little-router';
+import { createBrowserStore } from '../util/createStore';
 
 /**
  * This function creates a 'renderer', which is just a function that, when
@@ -22,7 +19,7 @@ import createStore from '../util/createStore';
  * @returns {Function} a function that results in a ReactDOM.render call - can
  *   use a custom root element ID or default to `'outlet'`
  */
-function makeRenderer(routes, reducer, middleware) {
+function makeRenderer(App, routes, reducer, middleware) {
 	// the initial state is delivered in the HTML from the server as a plain object
 	// containing the HTML-escaped JSON string in `window.INITIAL_STATE.escapedState`.
 	// unescape the text using native `textarea.textContent` unescaping
@@ -30,18 +27,21 @@ function makeRenderer(routes, reducer, middleware) {
 	escape.innerHTML = window.APP_RUNTIME.escapedState;
 	const unescapedStateJSON = escape.textContent;
 	const initialState = JSON.parse(unescapedStateJSON);
-	const store = createStore(routes, reducer, initialState, middleware);
-	const history = syncHistoryWithStore(browserHistory, store);
+	const store = createBrowserStore(routes, reducer, initialState, middleware);
+	const initialLocation = store.getState().router;
+	if (initialLocation) {
+		store.dispatch(initializeCurrentLocation(initialLocation));
+	}
 
 	return (rootElId='outlet') => {
-		match({ history, routes }, (error, redirectLocation, renderProps) => {
-			ReactDOM.render(
-				<Provider store={store}>
-					<Router {...renderProps } />
-				</Provider>,
-				document.getElementById(rootElId)
-			);
-		});
+		ReactDOM.render(
+			<Provider store={store}>
+				<RouterProvider store={store}>
+					<App />
+				</RouterProvider>
+			</Provider>,
+			document.getElementById(rootElId)
+		);
 		return store;
 	};
 }
