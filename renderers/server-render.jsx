@@ -4,7 +4,7 @@ import chalk from 'chalk';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import { Provider } from 'react-redux';
-import { initializeCurrentLocation } from 'redux-little-router';
+import { initializeCurrentLocation, RouterProvider } from 'redux-little-router';
 
 import { createServerStore } from '../util/createStore';
 import Dom from '../components/dom';
@@ -89,7 +89,7 @@ const getRouterRenderer = (App, clientFilename, assetPublicPath) => store => {
 			initialState,
 			appMarkup
 		);
-		statusCode = initialState.router.result.statusCode || 200;
+		statusCode = (initialState.router.result || {}).statusCode || 200;
 	} catch(e) {
 		// log the error stack here because Observable logs not great
 		console.error(e.stack);
