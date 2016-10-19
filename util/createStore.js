@@ -33,12 +33,11 @@ function createEnhancedStore(router, routes, reducer, initialState=null, middlew
 	const appliedMiddleware = applyMiddleware(...middleware);
 	enhancers = [
 		...enhancers,
-		appliedMiddleware,
 		router.routerEnhancer,
+		appliedMiddleware,
 		typeof window !== 'undefined' && window.devToolsExtension ? window.devToolsExtension() : fn => fn
 	];
-	const enhancedCreateStore = compose(...enhancers)(createStore);
-	const store = enhancedCreateStore(reducer, initialState);
+	const store = createStore(reducer, initialState, compose(...enhancers));
 	return store;
 }
 
