@@ -28,14 +28,14 @@ function createEnhancedStore(router, routes, reducer, initialState=null, middlew
 		...middleware,
 		getPlatformMiddleware(routes),
 		router.routerMiddleware,
-		window.mupDevTools ? window.mupDevTools() : noopMiddleware,
+		typeof window !== 'undefined' && window.mupDevTools ? window.mupDevTools() : noopMiddleware,
 	];
 	const appliedMiddleware = applyMiddleware(...middleware);
 	enhancers = [
 		...enhancers,
 		appliedMiddleware,
 		router.routerEnhancer,
-		window.devToolsExtension ? window.devToolsExtension() : fn => fn
+		typeof window !== 'undefined' && window.devToolsExtension ? window.devToolsExtension() : fn => fn
 	];
 	const enhancedCreateStore = compose(...enhancers)(createStore);
 	const store = enhancedCreateStore(reducer, initialState);
