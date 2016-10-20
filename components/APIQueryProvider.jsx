@@ -30,7 +30,7 @@ class APIQueryProvider extends React.Component {
 		};
 	}
 	componentDidUpdate(prevProps) {
-		if (prevProps.location.key !== this.props.location.key) {
+		if (prevProps.location.key !== this.props.location.key && this.queries.length) {
 			this.props.apiRequest(this.queries.map(query => query(this.props.location)));
 			this.queries = [];
 		}
