@@ -11,7 +11,7 @@ import postEpic from '../epics/post';
  * routes in order to set up the nav-related epic(s) that are part of the
  * final middleware
  */
-const getPlatformMiddleware = createEpicMiddleware(
+const getPlatformMiddleware = () => createEpicMiddleware(
 	combineEpics(
 		getSyncEpic(),
 		authEpic,
