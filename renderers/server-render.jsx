@@ -8,6 +8,8 @@ import { initializeCurrentLocation, RouterProvider } from 'redux-little-router';
 
 import { createServerStore } from '../util/createStore';
 import Dom from '../components/dom';
+import APIQueryProvider from '../components/APIQueryProvider';
+import { apiRequest } from '../actions/syncActionCreators';
 import { polyfillNodeIntl } from '../util/localizationUtils';
 
 import {
@@ -18,6 +20,7 @@ import {
 	configureApiUrl,
 	configureTrackingId
 } from '../actions/configActionCreators';
+
 
 // Ensure global Intl for use with FormatJS
 polyfillNodeIntl();
@@ -67,7 +70,6 @@ const getRouterRenderer = (App, clientFilename, assetPublicPath) => store => {
 	// **IMPORTANT**: this string is built separately from `<Dom />` because it
 	// initializes page-specific state that `<Dom />` needs to render, e.g.
 	// `<head>` contents
-	const initialState = store.getState();
 	let appMarkup;
 	let result;
 	let statusCode;
@@ -80,6 +82,10 @@ const getRouterRenderer = (App, clientFilename, assetPublicPath) => store => {
 				</RouterProvider>
 			</Provider>
 		);
+
+		const queries = APIQueryProvider.rewind();
+		store.dispatch(apiRequest(queries));
+		const initialState = store.getState();
 
 		// all the data for the full `<html>` element has been initialized by the app
 		// so go ahead and assemble the full response body

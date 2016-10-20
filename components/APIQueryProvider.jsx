@@ -13,26 +13,30 @@ function mapDispatchToProps(dispatch) {
 	return bindActionCreators({ apiRequest }, dispatch);
 }
 
+let queries = [];
+
 /**
  * @module APIQueryProvider
  */
 class APIQueryProvider extends React.Component {
-	constructor(props) {
-		super(props);
-		this.queries = [];
+	static rewind() {
+		const recordedQueries = queries;
+		queries = [];
+		return recordedQueries;
 	}
 	getChildContext() {
 		return {
 			addQuery: query => {
 				const newQueries = query instanceof Array ? query : [query];
-				this.queries = [...this.queries, ...newQueries];
+				queries = [...queries, ...newQueries];
 			}
 		};
 	}
 	componentDidUpdate(prevProps) {
-		if (prevProps.location.key !== this.props.location.key && this.queries.length) {
-			this.props.apiRequest(this.queries.map(query => query(this.props.location)));
-			this.queries = [];
+		// all components ready, so dispatch the collected queries
+		if (prevProps.location.key !== this.props.location.key && queries.length) {
+			this.props.apiRequest(queries.map(query => query(this.props.location)));
+			queries = [];
 		}
 	}
 	render() {
