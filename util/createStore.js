@@ -48,7 +48,6 @@ export function createBrowserStore(routes, reducer, initialState=null, middlewar
 }
 
 export function createServerStore(request, routes, reducer, initialState=null, middleware=[], enhancers=[]) {
-	console.log(reducer, 'reducer');
 	const router = routerForHapi({
 		request,
 		routes,

@@ -3,7 +3,7 @@
  * @module routeUtils
  */
 
-export function getRouteQueries(route) {
+function getRouteQueries(route) {
 	if (!route) {
 		return [];
 	}

@@ -2,31 +2,12 @@ import { Observable } from 'rxjs';
 import { combineEpics } from 'redux-observable';
 import { LOCATION_CHANGE } from 'react-router-redux';
 import {
-	apiRequest,
 	apiSuccess,
 	apiError,
 	apiComplete,
 	locationSync,
 } from '../actions/syncActionCreators';
-import { getRouteQueries } from '../util/routeUtils';
 import { fetchQueries } from '../util/fetchUtils';
-
-/**
- * Navigation actions will provide the `location` as the payload, which this
- * epic will use to collect the current Reactive Queries associated with the
- * active routes.
- *
- * These queries will then be dispatched in the payload of `apiRequest`
- * @param {Object} routes The application's React Router routes
- * @returns {Function} an Epic function that emits an API_REQUEST action
- */
-export const getNavEpic = routes => {
-	return (action$, store) =>
-		action$.ofType(LOCATION_CHANGE, '@@server/RENDER', 'LOCATION_SYNC')
-			.map(({ payload }) => payload.result)  // extract the route from the action payload (location)
-			.map(getRouteQueries)        // find the queries for the location
-			.map(apiRequest);               // dispatch apiRequest with all queries
-};
 
 /**
  * Listen for actions that should cause the application state to reload based
