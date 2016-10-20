@@ -13,7 +13,7 @@ class APIQuery extends React.Component {
 	 * }
 	 */
 	render() {
-		return null;
+		return React.Children.only(this.props.children);
 	}
 }
 
