@@ -41,7 +41,7 @@ class APIQueryProvider extends React.Component {
 }
 
 APIQueryProvider.childContextTypes = {
-	addQuery: React.PropTypes.function
+	addQuery: React.PropTypes.func
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(APIQueryProvider);
