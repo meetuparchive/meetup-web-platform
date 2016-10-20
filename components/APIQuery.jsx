@@ -17,5 +17,9 @@ class APIQuery extends React.Component {
 	}
 }
 
+APIQuery.contextTypes = {
+	addQuery: React.PropTypes.function
+};
+
 export default APIQuery;
 
