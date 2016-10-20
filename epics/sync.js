@@ -9,6 +9,16 @@ import {
 } from '../actions/syncActionCreators';
 import { fetchQueries } from '../util/fetchUtils';
 
+//
+// on location_sync, we can read query from
+// routes[location.route].query
+// routes[location.result.parent.route].query
+// routes[location.result.parent.parent.route].query
+// ...
+// .map(q => q(location))
+//
+// and dispatch apiRequest with that list
+//
 /**
  * Listen for actions that should cause the application state to reload based
  * on the current routing location

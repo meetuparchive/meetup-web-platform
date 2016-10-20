@@ -4,7 +4,7 @@ import React from 'react';
  * @module APIQuery
  */
 class APIQuery extends React.Component {
-	componentDidMount() {
+	componentWillMount() {
 		this.context.addQuery(this.props.query);
 	}
 	/*

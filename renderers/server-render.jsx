@@ -84,7 +84,7 @@ const getRouterRenderer = (App, clientFilename, assetPublicPath) => store => {
 		);
 
 		const queries = APIQueryProvider.rewind();
-		store.dispatch(apiRequest(queries));
+		store.dispatch(apiRequest(queries.map(q => q(store.getState().router))));
 		const initialState = store.getState();
 
 		// all the data for the full `<html>` element has been initialized by the app
