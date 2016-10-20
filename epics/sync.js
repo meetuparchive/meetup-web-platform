@@ -44,7 +44,6 @@ export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 
 export default function getSyncEpic(routes, fetchQueriesFn=fetchQueries) {
 	return combineEpics(
-		getNavEpic(routes),
 		resetLocationEpic,
 		getFetchQueriesEpic(fetchQueriesFn)
 	);
