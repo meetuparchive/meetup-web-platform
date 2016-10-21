@@ -24,9 +24,7 @@ export const MOCK_APP_STATE = {
 	},
 	auth: {},
 	config: {},
-	routing: {
-		locationBeforeTransitions: {}
-	},
+	router: MOCK_LOCATION,
 };
 
 export const MOCK_ROUTES = {
