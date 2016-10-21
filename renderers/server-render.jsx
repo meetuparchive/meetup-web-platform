@@ -196,7 +196,7 @@ const makeRenderer = (
 	}
 
 	// otherwise render using the API and React router
-	Rx.Observable.create(obs => {
+	return Rx.Observable.create(obs => {
 		obs.next(store);
 		return store.subscribe(() => obs.next(store));
 	})

@@ -23,10 +23,10 @@ const noopMiddleware = store => next => action => next(action);
  * @param {Function} middleware (optional) any app-specific middleware that
  *   should be applied to the store
  */
-function createEnhancedStore(router, reducer, initialState=null, middleware=[], enhancers=[]) {
+function createEnhancedStore(router, routes, reducer, initialState=null, middleware=[], enhancers=[]) {
 	middleware = [
 		...middleware,
-		getPlatformMiddleware(),
+		getPlatformMiddleware(routes),
 		router.routerMiddleware,
 		typeof window !== 'undefined' && window.mupDevTools ? window.mupDevTools() : noopMiddleware,
 	];
@@ -44,7 +44,7 @@ export function createBrowserStore(routes, reducer, initialState=null, middlewar
 	const router = routerForBrowser({
 		routes
 	});
-	return createEnhancedStore(router, reducer, initialState, middleware, enhancers);
+	return createEnhancedStore(router, routes, reducer, initialState, middleware, enhancers);
 }
 
 export function createServerStore(request, routes, reducer, initialState=null, middleware=[], enhancers=[]) {
@@ -52,6 +52,6 @@ export function createServerStore(request, routes, reducer, initialState=null, m
 		request,
 		routes,
 	});
-	return createEnhancedStore(router, reducer, initialState, middleware, enhancers);
+	return createEnhancedStore(router, routes, reducer, initialState, middleware, enhancers);
 }
 
