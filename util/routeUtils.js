@@ -3,23 +3,23 @@
  * @module routeUtils
  */
 
-function getParentRoutes(routeResult) {
+function getParentQueries(routeResult) {
 	if (!routeResult) {
 		return [];
 	}
+	console.log(routeResult);
 	return [
-		routeResult.route,
-		...getParentRoutes(routeResult.parent)
+		routeResult.query,
+		...getParentQueries(routeResult.parent)
 	];
 }
 
 
 export const activeRouteQueries = routes => location =>
 	[
-		location.route,
-		...getParentRoutes(location.result.parent)
+		location.result.query,
+		...getParentQueries(location.result.parent)
 	]
-	.map(path => routes[path].query)
 	.filter(q => q)
 	.map(q => q instanceof Array ? q : [q])
 	.reduce((queries, query) => ([ ...queries, ...query ]), [])
