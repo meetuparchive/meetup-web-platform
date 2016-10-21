@@ -6,10 +6,9 @@ import ReactDOMServer from 'react-dom/server';
 import { Provider } from 'react-redux';
 import { initializeCurrentLocation, RouterProvider } from 'redux-little-router';
 
-import { createServerStore } from '../util/createStore';
 import Dom from '../components/dom';
-import APIQueryProvider from '../components/APIQueryProvider';
-import { apiRequest } from '../actions/syncActionCreators';
+
+import { createServerStore } from '../util/createStore';
 import { polyfillNodeIntl } from '../util/localizationUtils';
 
 import {
@@ -83,8 +82,6 @@ const getRouterRenderer = (App, clientFilename, assetPublicPath) => store => {
 			</Provider>
 		);
 
-		const queries = APIQueryProvider.rewind();
-		store.dispatch(apiRequest(queries.map(q => q(store.getState().router))));
 		const initialState = store.getState();
 
 		// all the data for the full `<html>` element has been initialized by the app
@@ -199,15 +196,12 @@ const makeRenderer = (
 	}
 
 	// otherwise render using the API and React router
-	/*
-	const storeIsReady$ = Rx.Observable.create(obs => {
-		obs.next(store.getState());
-		return store.subscribe(() => obs.next(store.getState()));
+	Rx.Observable.create(obs => {
+		obs.next(store);
+		return store.subscribe(() => obs.next(store));
 	})
-	.first(state => state.preRenderChecklist.every(isReady => isReady));  // take the first ready state
-	*/
-
-	return Rx.Observable.of(getRouterRenderer(App, clientFilename, assetPublicPath)(store));
+	.first(store => store.getState().preRenderChecklist.every(isReady => isReady))
+	.map(getRouterRenderer(App, clientFilename, assetPublicPath));
 };
 
 export default makeRenderer;

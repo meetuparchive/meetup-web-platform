@@ -29,6 +29,7 @@ function makeRenderer(App, routes, reducer, middleware) {
 	const initialState = JSON.parse(unescapedStateJSON);
 	const store = createBrowserStore(routes, reducer, initialState, middleware);
 	const initialLocation = store.getState().router;
+	// might not need this since the initial state is 'correct'
 	if (initialLocation) {
 		store.dispatch(initializeCurrentLocation(initialLocation));
 	}
