@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 import { combineEpics } from 'redux-observable';
-import { LOCATION_CHANGE } from 'redux-little-router';
+import { LOCATION_CHANGED } from 'redux-little-router';
 import {
 	apiRequest,
 	apiSuccess,
@@ -21,7 +21,7 @@ import { fetchQueries } from '../util/fetchUtils';
  * @returns {Function} an Epic function that emits an API_REQUEST action
  */
 export const getNavEpic = routes => (action$, store) =>
-	action$.ofType(LOCATION_CHANGE, 'LOCATION_SYNC')
+	action$.ofType(LOCATION_CHANGED, 'LOCATION_SYNC')
 		.map(({ payload }) => payload)  // extract the `location` from the action payload
 		.map(activeRouteQueries(routes))        // find the queries for the location
 		.map(apiRequest);               // dispatch apiRequest with all queries
@@ -53,7 +53,7 @@ export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 			const { config, auth } = store.getState();
 			const fetch = fetchQueriesFn(config.apiUrl, { method: 'GET', auth });
 			return Observable.fromPromise(fetch(queries))  // call fetch
-				.takeUntil(action$.ofType(LOCATION_CHANGE, 'LOCATION_SYNC'))  // cancel this fetch when nav happens
+				.takeUntil(action$.ofType(LOCATION_CHANGED, 'LOCATION_SYNC'))  // cancel this fetch when nav happens
 				.map(apiSuccess)                             // dispatch apiSuccess with server response
 				.flatMap(action => Observable.of(action, apiComplete()))  // dispatch apiComplete after resolution
 				.catch(err => Observable.of(apiError(err)));  // ... or apiError
