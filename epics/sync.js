@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 import { combineEpics } from 'redux-observable';
-import { LOCATION_CHANGE } from 'react-router-redux';
+import { LOCATION_CHANGE } from 'redux-little-router';
 import {
 	apiRequest,
 	apiSuccess,
