@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { RouterProvider, initializeCurrentLocation } from 'redux-little-router';
+import { RouterProvider } from 'redux-little-router';
 import { createBrowserStore } from '../util/createStore';
 
 /**
@@ -28,11 +28,6 @@ function makeRenderer(App, routes, reducer, middleware) {
 	const unescapedStateJSON = escape.textContent;
 	const initialState = JSON.parse(unescapedStateJSON);
 	const store = createBrowserStore(routes, reducer, initialState, middleware);
-	const initialLocation = store.getState().router;
-	// might not need this since the initial state is 'correct'
-	if (initialLocation) {
-		store.dispatch(initializeCurrentLocation(initialLocation));
-	}
 
 	return (rootElId='outlet') => {
 		ReactDOM.render(
