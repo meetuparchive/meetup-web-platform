@@ -13,17 +13,14 @@ import { fetchQueries } from '../util/fetchUtils';
 
 /**
  * Navigation actions will provide the `location` as the payload, which this
- * epic will use to collect the current Reactive Queries associated with the
- * active routes.
+ * epic will use to collect the current Reactive Queries  *
  *
  * These queries will then be dispatched in the payload of `apiRequest`
- * @param {Object} routes The application's React Router routes
- * @returns {Function} an Epic function that emits an API_REQUEST action
  */
-export const getNavEpic = routes => (action$, store) =>
+export const navEpic = (action$, store) =>
 	action$.ofType(LOCATION_CHANGED, 'LOCATION_SYNC')
 		.map(({ payload }) => payload)  // extract the `location` from the action payload
-		.map(activeRouteQueries(routes))        // find the queries for the location
+		.map(activeRouteQueries)        // find the queries for the location
 		.map(apiRequest);               // dispatch apiRequest with all queries
 
 /**
@@ -59,9 +56,9 @@ export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 				.catch(err => Observable.of(apiError(err)));  // ... or apiError
 		});
 
-export default function getSyncEpic(routes, fetchQueriesFn=fetchQueries) {
+export default function getSyncEpic(fetchQueriesFn=fetchQueries) {
 	return combineEpics(
-		getNavEpic(routes),
+		navEpic,
 		resetLocationEpic,
 		getFetchQueriesEpic(fetchQueriesFn)
 	);

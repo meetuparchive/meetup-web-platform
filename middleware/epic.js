@@ -7,13 +7,12 @@ import getCacheEpic from '../epics/cache';
 import postEpic from '../epics/post';
 
 /**
- * The middleware is exported as a getter because it needs the application's
- * routes in order to set up the nav-related epic(s) that are part of the
- * final middleware
+ * The middleware is exported as a getter because some of the epics have
+ * runtime-configurable dependencies (defaults are used here)
  */
-const getPlatformMiddleware = routes => createEpicMiddleware(
+const getPlatformMiddleware = () => createEpicMiddleware(
 	combineEpics(
-		getSyncEpic(routes),
+		getSyncEpic(),
 		authEpic,
 		getCacheEpic(),
 		postEpic
