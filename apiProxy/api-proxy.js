@@ -146,6 +146,7 @@ export function parseRequest(request, baseUrl) {
 		method,
 		headers: { ...headers },  // make a copy to be immutable
 		mode: 'no-cors',
+		time: true,
 		agentOptions: {
 			rejectUnauthorized: baseUrl.indexOf('.dev') === -1
 		}
@@ -258,6 +259,7 @@ const apiProxy$ = ({ API_TIMEOUT=5000, baseUrl, duotoneUrls }) => {
 						)
 					)
 			)
+			.do(([response]) => request.log(['api'], `${response.elapsedTime}ms - ${response.request.uri.path}`)) // log api response time
 			.map(([response, body]) => body)    // ignore Response object, just process body string
 			.map(parseApiResponse)              // parse into plain object
 			.catch(error =>  // if there has been an error, all 'responses' need to be the error
