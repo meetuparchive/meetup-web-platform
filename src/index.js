@@ -1,12 +1,12 @@
-import makeServerRender from './renderers/server-render';
-import makeBrowserRender from './renderers/browser-render';
+// IMPORTANT: only export server-side modules here - browser
+// should only import modules individually
+import makeServerRenderer from './renderers/server-render';
 import startServer from './renderers/browser-render';
 import * as apiMocks from './util/mocks/api';
 import * as appMocks from './util/mocks/app';
 
 module.exports = {
-	makeServerRender,
-	makeBrowserRender,
+	makeServerRenderer,
 	startServer,
 	mocks: {
 		app: appMocks,
