@@ -7,7 +7,7 @@ import { fetchQueries } from '../util/fetchUtils';
  *
  * ```
  * {
- *   type: 'POST_<SOMETHING>' (or 'SOMETHING_POST'),
+ *   type: 'POST_<SOMETHING>' (or '<SOMETHING>_POST'),
  *   payload: {
  *     query: a 'reactive query' object that maps to an API call,
  *     onSuccess: a callback that takes the API response as an argument, and
