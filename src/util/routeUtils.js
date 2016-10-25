@@ -15,7 +15,7 @@ function getParentQueries(routeResult) {
 }
 
 
-export const activeRouteQueries = () => location =>
+export const activeRouteQueries = location =>
 	[
 		location.result.query,
 		...getParentQueries(location.result.parent)
