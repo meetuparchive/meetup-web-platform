@@ -40,7 +40,7 @@ Suggestions:
 
 ## Server
 
-The [server module](./server.js) exports a `startServer` function that consumes
+The [server module](./src/server.js) exports a `startServer` function that consumes
 a mapping of locale codes to app-rendering Observables, plus any app-specific
 server routes and plugins. See the code comments for usage details.
 

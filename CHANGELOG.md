@@ -1,3 +1,19 @@
+## [0.5]
+
+- **Refactor** - all modules are now transpiled to CommonJS ES5 modules in
+`lib/`, so your import paths should change:
+
+```js
+// v0.4
+import <module> from 'meetup-web-platform/<moduleName>';
+
+// v0.5
+import <module> from 'meetup-web-platform/lib/<moduleName>';
+```
+
+If you want to use the ES6 source files directly, import them with
+`'meetup-web-platform/src/<moduleName>';`
+
 ## [0.4]
 
 - **Renamed** - `getEpicMiddleware` is now `getPlatformMiddleware` since all
