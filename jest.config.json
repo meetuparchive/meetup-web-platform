@@ -11,5 +11,5 @@
     "js",
     "jsx"
   ],
-  "testRegex": ".*\\.test\\.jsx?$"
+  "testRegex": "src\/.*\\.test\\.jsx?$"
 }
