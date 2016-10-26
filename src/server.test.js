@@ -42,7 +42,7 @@ describe('configureEnv', function() {
 	});
 });
 
-describe('server', () => {
+xdescribe('server', () => {
 	it('starts', () =>
 		start({}, {}).then(server => server.stop()).then(() => expect(true).toBe(true))
 	);
