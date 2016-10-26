@@ -4,7 +4,7 @@ import start, {
 	configureEnv,
 } from './server';
 
-xdescribe('checkForDevUrl', () => {
+describe('checkForDevUrl', () => {
 	it('returns true for dev URLs', () => {
 		expect(checkForDevUrl('www.dev.meetup.com')).toBe(true);
 		expect(checkForDevUrl('secure.dev.meetup.com')).toBe(true);
@@ -23,7 +23,7 @@ xdescribe('checkForDevUrl', () => {
 	});
 });
 
-xdescribe('configureEnv', function() {
+describe('configureEnv', function() {
 	beforeEach(() => {
 		// cache the 'default' setting for rejectUnauthorized
 		this.defaultRejectUnauthorized = https.globalAgent.options.rejectUnauthorized;
