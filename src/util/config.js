@@ -41,7 +41,7 @@ function validateConfig(config) {
 		API_HOST: Joi.string().hostname().required(),
 		ANONYMOUS_AUTH_URL: Joi.string().uri().required(),
 		ANONYMOUS_ACCESS_URL: Joi.string().uri().required(),
-		PHOTO_SCALER_SALT: Joi.string().required().error(
+		PHOTO_SCALER_SALT: Joi.string().min(1).required().error(
 			new Error('get PHOTO_SCALER_SALT from web platform team')
 		),
 		ANONYMOUS_AUTH_APP_PATH: Joi.string().uri({ allowRelative: true }).required(),
