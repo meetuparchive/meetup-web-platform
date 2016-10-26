@@ -157,6 +157,16 @@ export function conversation(params) {
 
 
 /**
+ * notifications
+ */
+export function notifications(params) {
+	return {
+		endpoint: 'notifications',
+		params
+	};
+}
+
+/**
  * member object endpoints
  *
  * Note, this is different than 'Profiles' which are used to represent the
