@@ -28,11 +28,12 @@ export default function getConfig(overrideConfig) {
 	config.API_SERVER_ROOT_URL = `${config.API_PROTOCOL}://${config.API_HOST}`;
 
 	// currently all config is available syncronously, so resolve immediately
-	return Promise.resolve(overrideConfig || config)
+	return Promise.resolve({ ...config, ...overrideConfig })
 		.then(validateConfig);
 }
 
 function validateConfig(config) {
+	console.log(config.API_PROTOCOL, 'protocol');
 	const oauthError = new Error('get oauth secrets from web platform team');
 	const configSchema = Joi.object().keys({
 		DEV_SERVER_PORT: Joi.number().integer().max(65535),
