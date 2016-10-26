@@ -4,7 +4,7 @@ import start, {
 	configureEnv,
 } from './server';
 
-describe('checkForDevUrl', () => {
+xdescribe('checkForDevUrl', () => {
 	it('returns true for dev URLs', () => {
 		expect(checkForDevUrl('www.dev.meetup.com')).toBe(true);
 		expect(checkForDevUrl('secure.dev.meetup.com')).toBe(true);
@@ -23,7 +23,7 @@ describe('checkForDevUrl', () => {
 	});
 });
 
-describe('configureEnv', function() {
+xdescribe('configureEnv', function() {
 	beforeEach(() => {
 		// cache the 'default' setting for rejectUnauthorized
 		this.defaultRejectUnauthorized = https.globalAgent.options.rejectUnauthorized;
@@ -42,7 +42,7 @@ describe('configureEnv', function() {
 	});
 });
 
-describe('server', () => {
+xdescribe('server', () => {
 	it('starts', () =>
 		start({}, {}).then(server => server.stop()).then(() => expect(true).toBe(true))
 	);
