@@ -93,14 +93,13 @@ const getRouterRenderer = (store, clientFilename, assetPublicPath) =>
 		} catch(e) {
 			// log the error stack here because Observable logs not great
 			console.error(e.stack);
-			if (IS_DEV) {  // eslint-disable-line no-undef
-				const { RedBoxError } = require('redbox-react');
-				appMarkup = ReactDOMServer.renderToString(<RedBoxError error={e} />);
-				result = `${DOCTYPE}<html><body>${appMarkup}</body></html>`;
-				statusCode = 500;
-			} else {
+			if (process.env.NODE_ENV === 'production') {
 				throw e;
 			}
+			const { RedBoxError } = require('redbox-react');
+			appMarkup = ReactDOMServer.renderToString(<RedBoxError error={e} />);
+			result = `${DOCTYPE}<html><body>${appMarkup}</body></html>`;
+			statusCode = 500;
 		}
 
 		return {
@@ -209,8 +208,6 @@ const makeRenderer = (
 		)
 		.flatMap(args => storeIsReady$.map(() => args))  // `sample` appears not to work - this is equivalent
 		.map(getRouterRenderer(store, clientFilename, assetPublicPath));
-
-	return render$;
 };
 
 export default makeRenderer;
