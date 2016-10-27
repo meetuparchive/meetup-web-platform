@@ -7,7 +7,6 @@ function getParentQueries(routeResult) {
 	if (!routeResult) {
 		return [];
 	}
-	console.log(routeResult);
 	return [
 		routeResult.query,
 		...getParentQueries(routeResult.parent)
