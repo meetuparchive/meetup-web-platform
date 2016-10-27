@@ -30,9 +30,11 @@ after_success:
   - git config --global user.name "Travis CI"
   - >
     [ "${TRAVIS_BRANCH}" = "master" ] && [ "${TRAVIS_PULL_REQUEST}" = "false" ] &&
-    export GIT_TAG=$(make version) &&
+    export GIT_TAG=$(make version) ||
+    export GIT_TAG=$(make version)-beta
+  - >
+    [ "${TRAVIS_BRANCH}" = "master" ] && [ "${TRAVIS_PULL_REQUEST}" = "false" ] &&
     export NPM_TAG=latest ||
-    export GIT_TAG=$(make version)-beta &&
     export NPM_TAG=beta
   - echo "GIT_TAG=$GIT_TAG"
   - echo "NPM_TAG=$NPM_TAG"
