@@ -143,3 +143,20 @@ export const MOCK_REQUEST_COOKIES = {
 // mock the whole apiProxy module so that we don't actually invoke it
 export const MOCK_API_PROXY$ = () => () => Observable.of(MOCK_API_RESULT);
 
+const mock_valid_config = {
+	DEV_SERVER_PORT: 8000,
+	API_PROTOCOL: 'https',
+	API_HOST: 'api.dev.meetup.com',
+	ANONYMOUS_AUTH_URL: 'https://secure.dev.meetup.com/oauth2/authorize',
+	ANONYMOUS_ACCESS_URL: 'https://secure.dev.meetup.com/oauth2/access',
+	PHOTO_SCALER_SALT: 'abcdefg',
+	ANONYMOUS_AUTH_APP_PATH: '/anon',
+	oauth: {
+		secret: process.env.MUPWEB_OAUTH_SECRET,
+		key: process.env.MUPWEB_OAUTH_KEY,
+	},
+};
+mock_valid_config.API_SERVER_ROOT_URL = `${mock_valid_config.API_PROTOCOL}://${mock_valid_config.API_HOST}`;
+export const MOCK_VALID_CONFIG = mock_valid_config;
+
+
