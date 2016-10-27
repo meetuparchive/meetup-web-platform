@@ -41,7 +41,7 @@ after_success:
   - >
     [ "${TRAVIS_BRANCH}" = "master" ] &&
     npm version $GIT_TAG -m "Version $GIT_TAG built by Travis CI - https://travis-ci.com/$TRAVIS_REPO_SLUG/builds/$TRAVIS_JOB_ID" &&
-    git push -q https://$GITHUB_USER:$GITHUB_TOKEN@github.com/$TRAVIS_REPO_SLUG --tags
+    git push -q https://$GITHUB_USER:$GITHUB_TOKEN@github.com/$TRAVIS_REPO_SLUG --tags &&
     npm publish --tag $NPM_TAG ||
     echo "skipping versioning"
 
