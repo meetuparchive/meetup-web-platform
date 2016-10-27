@@ -2,7 +2,7 @@ import 'rxjs/Observable';
 import { ActionsObservable } from 'redux-observable';
 import fetch from 'node-fetch';
 global.fetch = fetch;
-import { LOCATION_CHANGED } from 'react-router-redux';
+import { LOCATION_CHANGED } from 'redux-little-router';
 import { createFakeStore } from '../util/testUtils';
 import {
 	mockQuery,
