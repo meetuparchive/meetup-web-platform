@@ -1,4 +1,4 @@
-import chalk from 'chalk';
+import Joi from 'joi';
 import { ANONYMOUS_AUTH_APP_PATH } from '../epics/auth';
 /**
  * Start the server with a config
@@ -28,26 +28,34 @@ export default function getConfig(overrideConfig) {
 	config.API_SERVER_ROOT_URL = `${config.API_PROTOCOL}://${config.API_HOST}`;
 
 	// currently all config is available syncronously, so resolve immediately
-	return Promise.resolve(overrideConfig || config)
+	return Promise.resolve({ ...config, ...overrideConfig })
 		.then(validateConfig);
 }
 
 function validateConfig(config) {
-	if (!config) {
-		console.log(chalk.red('No config loaded'));
-		return false;
-	}
-	if (!config.oauth || !config.oauth.secret || !config.oauth.key) {
-		console.log(chalk.red(`MUPWEB_OAUTH_SECRET and MUPWEB_OAUTH_KEY must be set as environment variables
-- get the values from an admin in #web-platform on Slack`));
-		return false;
-	}
-	if (!config.PHOTO_SCALER_SALT) {
-		console.log(chalk.red(`PHOTO_SCALER_SALT must be set as an environment variable
-- get the value from an admin in #web-platform on Slack`));
-		return false;
-	}
-	return config;
-}
+	console.log(config.API_PROTOCOL, 'protocol');
+	const oauthError = new Error('get oauth secrets from web platform team');
+	const configSchema = Joi.object().keys({
+		DEV_SERVER_PORT: Joi.number().integer().max(65535),
+		API_PROTOCOL: Joi.any().only(['https', 'http']).required(),
+		API_HOST: Joi.string().hostname().required(),
+		ANONYMOUS_AUTH_URL: Joi.string().uri().required(),
+		ANONYMOUS_ACCESS_URL: Joi.string().uri().required(),
+		PHOTO_SCALER_SALT: Joi.string().min(1).required().error(
+			new Error('get PHOTO_SCALER_SALT from web platform team')
+		),
+		ANONYMOUS_AUTH_APP_PATH: Joi.string().uri({ allowRelative: true }).required(),
+		oauth: Joi.object().keys({
+			secret: Joi.string().min(1).required().error(oauthError),
+			key: Joi.string().min(1).required().error(oauthError),
+		}).required(),
+		API_SERVER_ROOT_URL: Joi.string().uri()
+	}).required();
 
+	const result = Joi.validate(config, configSchema);
+	if (result.error) {
+		throw result.error;
+	}
+	return result.value;
+}
 

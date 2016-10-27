@@ -83,7 +83,6 @@ const getRouterRenderer = (App, clientFilename, assetPublicPath) => store => {
 		);
 
 		const initialState = store.getState();
-
 		// all the data for the full `<html>` element has been initialized by the app
 		// so go ahead and assemble the full response body
 		result = getHtml(
@@ -96,14 +95,12 @@ const getRouterRenderer = (App, clientFilename, assetPublicPath) => store => {
 	} catch(e) {
 		// log the error stack here because Observable logs not great
 		console.error(e.stack);
-		if (IS_DEV) {  // eslint-disable-line no-undef
-			const { RedBoxError } = require('redbox-react');
-			appMarkup = ReactDOMServer.renderToString(<RedBoxError error={e} />);
-			result = `${DOCTYPE}<html><body>${appMarkup}</body></html>`;
-			statusCode = 500;
-		} else {
+		if (process.env.NODE_ENV === 'production') {
 			throw e;
 		}
+		appMarkup = ReactDOMServer.renderToString(<RedBoxError error={e} />);
+		result = `${DOCTYPE}<html><body>${appMarkup}</body></html>`;
+		statusCode = 500;
 	}
 
 	return {

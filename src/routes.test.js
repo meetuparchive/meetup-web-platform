@@ -1,5 +1,4 @@
 import getRoutes from './routes';
-import getConfig from './util/config';
 import {
 	MOCK_API_RESULT,
 	MOCK_OAUTH_COOKIES,
@@ -7,6 +6,7 @@ import {
 	MOCK_API_PROXY$,
 	MOCK_RENDER_RESULT,
 	MOCK_REQUEST_COOKIES,
+	MOCK_VALID_CONFIG,
 } from './util/mocks/app';
 import {
 	parseCookieHeader,
@@ -19,14 +19,13 @@ const UUID_V4_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{
 function getResponse(injectRequest, server=getServer()) {
 	// a Promise that returns the server instance after it has been
 	// configured with the routes being tested
-	return getConfig()
-		.then(config => getRoutes(
-			MOCK_renderRequestMap,
-			config,
-			MOCK_API_PROXY$)
-		)
-		.then(server.route.bind(server))
-		.then(() => server.inject(injectRequest));
+	const routes = getRoutes(
+		MOCK_renderRequestMap,
+		MOCK_VALID_CONFIG,
+		MOCK_API_PROXY$
+	);
+	server.route(routes);
+	return server.inject(injectRequest);
 }
 
 describe('routes', () => {

@@ -18,33 +18,15 @@ describe('getConfig', function() {
 });
 
 describe('getConfig - invalid', function() {
-	console.log = () => {};
-	it(
-		'empty config returns false',
-		() => getConfig({})
-		.then(config => {
-			expect(config).toBe(false);
-		})
-	);
-
-	const noOauth = { ...validConfig };
-	noOauth.oauth = {};
-	it(
-		'missing oauth returns false',
-		() => getConfig(noOauth)
-		.then(config => {
-			expect(config).toBe(false);
-		})
-	);
-
-	const noPhotoScaler = { ...validConfig };
-	noPhotoScaler.PHOTO_SCALER_SALT = null;
 	it(
 		'missing PHOTO_SCALER_SALT returns false',
-		() => getConfig(noPhotoScaler)
-		.then(config => {
-			expect(config).toBe(false);
-		})
+		() => getConfig({ PHOTO_SCALER_SALT: null })
+			.then(config => {
+				expect(true).toBe(false);  // should not be called
+			})
+			.catch(err => {
+				expect(err).toEqual(jasmine.any(Error));
+			})
 	);
 });
 
