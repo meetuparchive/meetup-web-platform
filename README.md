@@ -19,6 +19,26 @@ will kick off the npm publish routine. The currently-published version of the
 package is shown on the repo homepage on GitHub in a badge at the top of the
 README.
 
+## Development/Beta releases
+
+When developing a consumer application that requires changes to the platform
+code, you can release a beta version of the platform on npm by opening a PR in
+the meetup-web-platform repo. When it builds successfully, a new beta version
+will be added to the list of available npm versions, which you can see with
+
+```sh
+> npm show meetup-web-platform versions
+```
+
+You can then install this beta version into your consumer application with
+
+```sh
+> npm i meetup-web-platform@<version tag>
+```
+
+Each time you push a change to your `meetup-web-platform` PR, you'll need to
+re-install it with the new tag in your consumer application code.
+
 # Introductory Resources
 
 Basic knowledge of reactive programming using RxJS 5 is a pre-requisite for being
