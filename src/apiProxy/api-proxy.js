@@ -219,6 +219,10 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
 	};
 };
 
+const makeMockRequest = (requestOpts, mockResponse) =>
+	Rx.Observable.of(mockResponse)
+		.do(() => console.log(`MOCKING response to ${requestOpts.url}`));
+
 export const makeApiRequest = (request, API_TIMEOUT, duotoneUrls) => {
 	const setApiResponseDuotones = apiResponseDuotoneSetter(duotoneUrls);
 	const makeExternalApiRequest$ = requestOpts =>
@@ -229,7 +233,7 @@ export const makeApiRequest = (request, API_TIMEOUT, duotoneUrls) => {
 
 	return ([requestOpts, query]) => {
 		const request$ = query.mockResponse ?
-			Rx.Observable.of(query.mockResponse) :
+			makeMockRequest(requestOpts, query.mockResponse) :
 			makeExternalApiRequest$(requestOpts);
 
 		return request$
