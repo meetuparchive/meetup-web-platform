@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 import { combineEpics } from 'redux-observable';
-import { LOCATION_CHANGE } from 'react-router-redux';
+import { LOCATION_CHANGED } from 'redux-little-router';
 import {
 	apiRequest,
 	apiSuccess,
@@ -8,26 +8,20 @@ import {
 	apiComplete,
 	locationSync,
 } from '../actions/syncActionCreators';
-import { activeRouteQueries$ } from '../util/routeUtils';
+import { activeRouteQueries } from '../util/routeUtils';
 import { fetchQueries } from '../util/fetchUtils';
 
 /**
  * Navigation actions will provide the `location` as the payload, which this
- * epic will use to collect the current Reactive Queries associated with the
- * active routes.
+ * epic will use to collect the current Reactive Queries  *
  *
  * These queries will then be dispatched in the payload of `apiRequest`
- * @param {Object} routes The application's React Router routes
- * @returns {Function} an Epic function that emits an API_REQUEST action
  */
-export const getNavEpic = routes => {
-	const activeQueries$ = activeRouteQueries$(routes);
-	return (action$, store) =>
-		action$.ofType(LOCATION_CHANGE, '@@server/RENDER', 'LOCATION_SYNC')
-			.map(({ payload }) => payload)  // extract the `location` from the action payload
-			.flatMap(activeQueries$)        // find the queries for the location
-			.map(apiRequest);               // dispatch apiRequest with all queries
-};
+export const navEpic = (action$, store) =>
+	action$.ofType(LOCATION_CHANGED, 'LOCATION_SYNC')
+		.map(({ payload }) => payload)  // extract the `location` from the action payload
+		.map(activeRouteQueries)        // find the queries for the location
+		.map(apiRequest);               // dispatch apiRequest with all queries
 
 /**
  * Listen for actions that should cause the application state to reload based
@@ -41,7 +35,7 @@ export const getNavEpic = routes => {
 export const resetLocationEpic = (action$, store) =>
 	action$.ofType('CONFIGURE_AUTH')  // auth changes imply privacy changes - reload
 		.filter(({ meta }) => !meta)  // throw out any server-side actions
-		.map(() => locationSync(store.getState().routing.locationBeforeTransitions));
+		.map(() => locationSync(store.getState().router));
 
 /**
  * Listen for actions that provide queries to send to the api - mainly
@@ -56,15 +50,15 @@ export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 			const { config, auth } = store.getState();
 			const fetch = fetchQueriesFn(config.apiUrl, { method: 'GET', auth });
 			return Observable.fromPromise(fetch(queries))  // call fetch
-				.takeUntil(action$.ofType(LOCATION_CHANGE, 'LOCATION_SYNC'))  // cancel this fetch when nav happens
+				.takeUntil(action$.ofType(LOCATION_CHANGED, 'LOCATION_SYNC'))  // cancel this fetch when nav happens
 				.map(apiSuccess)                             // dispatch apiSuccess with server response
 				.flatMap(action => Observable.of(action, apiComplete()))  // dispatch apiComplete after resolution
 				.catch(err => Observable.of(apiError(err)));  // ... or apiError
 		});
 
-export default function getSyncEpic(routes, fetchQueriesFn=fetchQueries) {
+export default function getSyncEpic(fetchQueriesFn=fetchQueries) {
 	return combineEpics(
-		getNavEpic(routes),
+		navEpic,
 		resetLocationEpic,
 		getFetchQueriesEpic(fetchQueriesFn)
 	);
