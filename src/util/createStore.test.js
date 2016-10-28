@@ -1,17 +1,22 @@
-import createStore from './createStore';
+import {
+	createServerStore,
+} from './createStore';
 
 const MOCK_ROUTES = {};
 const IDENTITY_REDUCER = state => state;
-describe('createStore', () => {
+describe('createServerStore', () => {
+	const mockRequest = {};
 	it('creates a store with store functions', () => {
-		const basicStore = createStore(MOCK_ROUTES, IDENTITY_REDUCER);
+		const basicStore = createServerStore(mockRequest, MOCK_ROUTES, IDENTITY_REDUCER);
 		expect(basicStore.getState).toEqual(jasmine.any(Function));
 		expect(basicStore.dispatch).toEqual(jasmine.any(Function));
 	});
 	it('creates a store with supplied initialState', (done) => {
 		const initialState = { foo: 'bar' };
-		const basicStore = createStore(MOCK_ROUTES, IDENTITY_REDUCER, initialState);
+		const basicStore = createServerStore(mockRequest, MOCK_ROUTES, IDENTITY_REDUCER, initialState);
 		basicStore.subscribe(() => {
+			const noRouterState = basicStore.getState();
+			delete noRouterState.router;
 			expect(basicStore.getState()).toEqual(initialState);
 			done();
 		});
@@ -26,7 +31,8 @@ describe('createStore', () => {
 			middleware: store => next => action => next(action)
 		};
 		spyOn(spyable, 'middleware').and.callThrough();
-		createStore(
+		createServerStore(
+			mockRequest,
 			MOCK_ROUTES,
 			IDENTITY_REDUCER,
 			null,  // initialState doesn't matter
