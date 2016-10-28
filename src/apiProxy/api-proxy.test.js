@@ -107,7 +107,7 @@ describe('apiResponseToQueryResponse', () => {
 
 	it('transforms an API response object to an object for State consumption', function() {
 		this.MOCK_API_RESPONSES
-			.map((apiResponse, i) => apiResponseToQueryResponse([apiResponse, this.queries[i]]))
+			.map((apiResponse, i) => apiResponseToQueryResponse(this.queries[i])(apiResponse))
 			.forEach((queryResponse, i)=> {
 				expect(queryResponse).toEqual(jasmine.any(Object));
 				expect(queryResponse[this.refs[i]]).toEqual(jasmine.any(Object));
