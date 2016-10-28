@@ -33,11 +33,20 @@ will be added to the list of available npm versions, which you can see with
 You can then install this beta version into your consumer application with
 
 ```sh
-> npm i meetup-web-platform@<version tag>
+> npm install meetup-web-platform@<version tag>
 ```
 
 Each time you push a change to your `meetup-web-platform` PR, you'll need to
 re-install it with the new tag in your consumer application code.
+
+The overall workflow is:
+
+1. Open a PR for your `meetup-web-platform` branch
+2. Wait for Travis to successfully build your branch (this can take 5+ minutes)
+3. run `npm show meetup-web-platform versions` on your locale machine
+4. install the latest `-beta` version listed
+5. (if needed) Push changes to your `meetup-web-platform` branch
+6. Repeat steps 2-4
 
 # Introductory Resources
 
