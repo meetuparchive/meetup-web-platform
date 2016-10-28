@@ -50,7 +50,6 @@ export function topic(params) {
 }
 
 
-
 /**
  * all the group-related endpoints
  */
