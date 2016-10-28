@@ -4,29 +4,6 @@ import {
 	MOCK_EVENT,
 } from './api';
 
-export const MOCK_APP_STATE = {
-	app: {
-		self: {
-			type: 'member',
-			value: { id: 1234 }
-		},
-		group: {
-			type: 'group',
-			value: MOCK_GROUP
-		},
-		events: {
-			type: 'event',
-			value: [
-				{ ...MOCK_EVENT, ...({ id: 3456 }) },
-				{ ...MOCK_EVENT, ...({ id: 4567 }) }
-			]
-		}
-	},
-	auth: {},
-	config: {},
-	router: MOCK_LOCATION,
-};
-
 export const MOCK_ROUTES = {
 	'/noQuery': {
 		title: 'noQuery',
@@ -72,6 +49,29 @@ export const MOCK_LOCATION = {  // redux-little-router LOCATION_CHANGED
 			// result recursively
 		}
 	}
+};
+
+export const MOCK_APP_STATE = {
+	app: {
+		self: {
+			type: 'member',
+			value: { id: 1234 }
+		},
+		group: {
+			type: 'group',
+			value: MOCK_GROUP
+		},
+		events: {
+			type: 'event',
+			value: [
+				{ ...MOCK_EVENT, ...({ id: 3456 }) },
+				{ ...MOCK_EVENT, ...({ id: 4567 }) }
+			]
+		}
+	},
+	auth: {},
+	config: {},
+	router: MOCK_LOCATION,
 };
 
 export const MOCK_RENDERPROPS = {
