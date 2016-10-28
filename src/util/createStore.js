@@ -3,6 +3,10 @@
  * @module createStore
  */
 import { applyMiddleware, createStore, compose } from 'redux';
+import {
+	routerForBrowser,
+		routerForHapi,
+} from 'redux-little-router';
 import getPlatformMiddleware from '../middleware/epic';
 
 const noopMiddleware = store => next => action => next(action);
@@ -19,22 +23,35 @@ const noopMiddleware = store => next => action => next(action);
  * @param {Function} middleware (optional) any app-specific middleware that
  *   should be applied to the store
  */
-function finalCreateStore(routes, reducer, initialState=null, middleware=[]) {
-	// **All** middleware gets added here
-	const middlewareToApply = [
-		getPlatformMiddleware(routes),
-		typeof window !== 'undefined' && window.mupDevTools ? window.mupDevTools() : noopMiddleware,
+function createEnhancedStore(router, reducer, initialState=null, middleware=[], enhancers=[]) {
+	middleware = [
 		...middleware,
+		getPlatformMiddleware(),
+		router.routerMiddleware,
+		typeof window !== 'undefined' && window.mupDevTools ? window.mupDevTools() : noopMiddleware,
 	];
-	const appliedMiddleware = applyMiddleware(...middlewareToApply);
-
-	const createStoreWithMiddleware = compose(
-		appliedMiddleware,
+	const enhancer = compose(
+		...enhancers,
+		router.routerEnhancer,
+		applyMiddleware(...middleware),
 		typeof window !== 'undefined' && window.devToolsExtension ? window.devToolsExtension() : fn => fn
-	)(createStore);
-
-	return createStoreWithMiddleware(reducer, initialState);
+	);
+	const store = createStore(reducer, initialState, enhancer);
+	return store;
 }
 
-export default finalCreateStore;
+export function createBrowserStore(routes, reducer, initialState=null, middleware=[], enhancers=[]) {
+	const router = routerForBrowser({
+		routes
+	});
+	return createEnhancedStore(router, reducer, initialState, middleware, enhancers);
+}
+
+export function createServerStore(request, routes, reducer, initialState=null, middleware=[], enhancers=[]) {
+	const router = routerForHapi({
+		request,
+		routes,
+	});
+	return createEnhancedStore(router, reducer, initialState, middleware, enhancers);
+}
 
