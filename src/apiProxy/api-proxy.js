@@ -122,7 +122,7 @@ export const buildRequestArgs = externalRequestOpts => ({ endpoint, params }) =>
  *
  * @param {Object} apiResponse JSON-parsed api response data
  */
-export const apiResponseToQueryResponse = ([response, query]) => ({
+export const apiResponseToQueryResponse = query => response => ({
 	[query.ref]: {
 		type: query.type,
 		value: response,
@@ -219,6 +219,36 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
 	};
 };
 
+const makeMockRequest = (requestOpts, mockResponse) =>
+	Rx.Observable.of(mockResponse)
+		.do(() => console.log(`MOCKING response to ${requestOpts.url}`));
+
+export const makeApiRequest = (request, API_TIMEOUT, duotoneUrls) => {
+	const setApiResponseDuotones = apiResponseDuotoneSetter(duotoneUrls);
+	const makeExternalApiRequest$ = requestOpts =>
+		externalRequest$(requestOpts)
+			.timeout(API_TIMEOUT, new Error('API response timeout'))
+			.do(([response]) => request.log(['api'], `${response.elapsedTime}ms - ${response.request.uri.path}`)) // log api response time
+			.map(([response, body]) => body);    // ignore Response object, just process body string
+
+	return ([requestOpts, query]) => {
+		const request$ = query.mockResponse ?
+			makeMockRequest(requestOpts, query.mockResponse) :
+			makeExternalApiRequest$(requestOpts);
+
+		return request$
+			.map(parseApiResponse)             // parse into plain object
+			.catch(error =>
+				Rx.Observable.of({ error: error.message })
+			)
+			.map(apiResponseToQueryResponse(query))    // convert apiResponse to app-ready queryResponse
+			.map(setApiResponseDuotones);        // special duotone prop
+	};
+};
+
+const sortResponsesByQueryOrder = queries => responses =>
+	queries.map(({ ref }) => responses.find(response => response[ref]));
+
 /**
  * This function transforms a single request to the application server into a
  * parallel array of requests to the API server, and then re-assembles the
@@ -235,7 +265,6 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
  * @return Array$ contains all API responses corresponding to the provided queries
  */
 const apiProxy$ = ({ API_TIMEOUT=5000, baseUrl, duotoneUrls }) => {
-	const setApiResponseDuotones = apiResponseDuotoneSetter(duotoneUrls);
 
 	return request => {
 
@@ -249,27 +278,11 @@ const apiProxy$ = ({ API_TIMEOUT=5000, baseUrl, duotoneUrls }) => {
 		return Rx.Observable.from(queries)    // create stream of query objects - fan-out
 			.map(queryToApiConfig)              // convert query to API-specific config
 			.map(apiConfigToRequestOptions)     // API-specific args for api request
-			.do(externalRequestOpts => request.log(['api'], JSON.stringify(externalRequestOpts.url)))  // logging
-			.concatMap(externalRequestOpts =>  // make the API calls - keep order
-				externalRequest$(externalRequestOpts)
-					.timeout(API_TIMEOUT, new Error('API response timeout'))
-					.catch(error =>
-						Rx.Observable.of(
-							[null, JSON.stringify({ error: error.message})]
-						)
-					)
-			)
-			.do(([response]) => request.log(['api'], `${response.elapsedTime}ms - ${response.request.uri.path}`)) // log api response time
-			.map(([response, body]) => body)    // ignore Response object, just process body string
-			.map(parseApiResponse)              // parse into plain object
-			.catch(error =>  // if there has been an error, all 'responses' need to be the error
-				Rx.Observable.of({ error: error.message })
-					.repeat(queries.length)
-			)
+			.do(({ url }) => request.log(['api'], JSON.stringify(url)))  // logging
 			.zip(Rx.Observable.from(queries))   // zip the apiResponse with corresponding query
-			.map(apiResponseToQueryResponse)    // convert apiResponse to app-ready queryResponse
-			.map(setApiResponseDuotones)        // special duotone prop
-			.toArray();                         // group all responses into a single array - fan-in
+			.flatMap(makeApiRequest(request, API_TIMEOUT, duotoneUrls))  // parallel requests
+			.toArray()                         // group all responses into a single array - fan-in
+			.map(sortResponsesByQueryOrder(queries));
 	};
 };
 
