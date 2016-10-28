@@ -221,18 +221,25 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
 
 export const makeApiRequest = (request, API_TIMEOUT, duotoneUrls) => {
 	const setApiResponseDuotones = apiResponseDuotoneSetter(duotoneUrls);
-
-	return ([requestOpts, query]) =>
+	const makeExternalApiRequest$ = requestOpts =>
 		externalRequest$(requestOpts)
 			.timeout(API_TIMEOUT, new Error('API response timeout'))
 			.do(([response]) => request.log(['api'], `${response.elapsedTime}ms - ${response.request.uri.path}`)) // log api response time
-			.map(([response, body]) => body)    // ignore Response object, just process body string
+			.map(([response, body]) => body);    // ignore Response object, just process body string
+
+	return ([requestOpts, query]) => {
+		const request$ = query.mockResponse ?
+			Rx.Observable.of(query.mockResponse) :
+			makeExternalApiRequest$(requestOpts);
+
+		return request$
 			.map(parseApiResponse)             // parse into plain object
 			.catch(error =>
 				Rx.Observable.of({ error: error.message })
 			)
 			.map(apiResponseToQueryResponse(query))    // convert apiResponse to app-ready queryResponse
 			.map(setApiResponseDuotones);        // special duotone prop
+	};
 };
 
 const sortResponsesByQueryOrder = queries => responses =>
