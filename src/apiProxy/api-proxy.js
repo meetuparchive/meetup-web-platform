@@ -220,10 +220,10 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
 };
 
 const makeMockRequest = (requestOpts, mockResponse) =>
-	Rx.Observable.of(mockResponse)
+	Rx.Observable.of(JSON.stringify(mockResponse))
 		.do(() => console.log(`MOCKING response to ${requestOpts.url}`));
 
-export const makeApiRequest = (request, API_TIMEOUT, duotoneUrls) => {
+export const makeApiRequest$ = (request, API_TIMEOUT, duotoneUrls) => {
 	const setApiResponseDuotones = apiResponseDuotoneSetter(duotoneUrls);
 	const makeExternalApiRequest$ = requestOpts =>
 		externalRequest$(requestOpts)
@@ -280,7 +280,7 @@ const apiProxy$ = ({ API_TIMEOUT=5000, baseUrl, duotoneUrls }) => {
 			.map(apiConfigToRequestOptions)     // API-specific args for api request
 			.do(({ url }) => request.log(['api'], JSON.stringify(url)))  // logging
 			.zip(Rx.Observable.from(queries))   // zip the apiResponse with corresponding query
-			.flatMap(makeApiRequest(request, API_TIMEOUT, duotoneUrls))  // parallel requests
+			.flatMap(makeApiRequest$(request, API_TIMEOUT, duotoneUrls))  // parallel requests
 			.toArray()                         // group all responses into a single array - fan-in
 			.map(sortResponsesByQueryOrder(queries));
 	};
