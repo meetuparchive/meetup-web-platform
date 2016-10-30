@@ -235,9 +235,6 @@ export const makeApiRequest = (request, API_TIMEOUT, duotoneUrls) => {
 			.map(setApiResponseDuotones);        // special duotone prop
 };
 
-const sortResponsesByQueryOrder = queries => responses =>
-	queries.map(({ ref }) => responses.find(response => response[ref]));
-
 /**
  * This function transforms a single request to the application server into a
  * parallel array of requests to the API server, and then re-assembles the
@@ -264,14 +261,12 @@ const apiProxy$ = ({ API_TIMEOUT=5000, baseUrl, duotoneUrls }) => {
 		// to build the query-specific API request options object
 		const apiConfigToRequestOptions = buildRequestArgs(externalRequestOpts);
 
-		return Rx.Observable.from(queries)    // create stream of query objects - fan-out
-			.map(queryToApiConfig)              // convert query to API-specific config
-			.map(apiConfigToRequestOptions)     // API-specific args for api request
-			.do(({ url }) => request.log(['api'], JSON.stringify(url)))  // logging
-			.zip(Rx.Observable.from(queries))   // zip the apiResponse with corresponding query
-			.flatMap(makeApiRequest(request, API_TIMEOUT, duotoneUrls))  // parallel requests
-			.toArray()                         // group all responses into a single array - fan-in
-			.map(sortResponsesByQueryOrder(queries));
+		return Rx.Observable.zip(
+			...queries
+				.map(queryToApiConfig)
+				.map(apiConfigToRequestOptions)
+				.map((opts, i) => makeApiRequest(request, API_TIMEOUT, duotoneUrls)([opts, queries[i]]))
+		);
 	};
 };
 
