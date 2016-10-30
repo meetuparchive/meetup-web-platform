@@ -238,9 +238,7 @@ export const makeApiRequest$ = (request, API_TIMEOUT, duotoneUrls) => {
 
 		return request$
 			.map(parseApiResponse)             // parse into plain object
-			.catch(error =>
-				Rx.Observable.of({ error: error.message })
-			)
+			.catch(error => Rx.Observable.of({ error: error.message }))
 			.map(apiResponseToQueryResponse(query))    // convert apiResponse to app-ready queryResponse
 			.map(setApiResponseDuotones);        // special duotone prop
 	};
