@@ -222,8 +222,9 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
 export const makeApiRequest = (request, API_TIMEOUT, duotoneUrls) => {
 	const setApiResponseDuotones = apiResponseDuotoneSetter(duotoneUrls);
 
-	return ([requestOpts, query]) =>
-		externalRequest$(requestOpts)
+	return ([requestOpts, query]) => {
+		request.log(['api'], JSON.stringify(requestOpts.url));
+		return externalRequest$(requestOpts)
 			.timeout(API_TIMEOUT, new Error('API response timeout'))
 			.do(([response]) => request.log(['api'], `${response.elapsedTime}ms - ${response.request.uri.path}`)) // log api response time
 			.map(([response, body]) => body)    // ignore Response object, just process body string
@@ -233,6 +234,7 @@ export const makeApiRequest = (request, API_TIMEOUT, duotoneUrls) => {
 			)
 			.map(apiResponseToQueryResponse(query))    // convert apiResponse to app-ready queryResponse
 			.map(setApiResponseDuotones);        // special duotone prop
+	};
 };
 
 /**
