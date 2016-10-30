@@ -219,20 +219,29 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
 	};
 };
 
-export const makeApiRequest = (request, API_TIMEOUT, duotoneUrls) => {
-	const setApiResponseDuotones = apiResponseDuotoneSetter(duotoneUrls);
+const makeMockRequest = (requestOpts, mockResponse) =>
+	Rx.Observable.of(JSON.stringify(mockResponse))
+		.do(() => console.log(`MOCKING response to ${requestOpts.url}`));
 
-	return ([requestOpts, query]) =>
+export const makeApiRequest$ = (request, API_TIMEOUT, duotoneUrls) => {
+	const setApiResponseDuotones = apiResponseDuotoneSetter(duotoneUrls);
+	const makeExternalApiRequest$ = requestOpts =>
 		externalRequest$(requestOpts)
 			.timeout(API_TIMEOUT, new Error('API response timeout'))
 			.do(([response]) => request.log(['api'], `${response.elapsedTime}ms - ${response.request.uri.path}`)) // log api response time
-			.map(([response, body]) => body)    // ignore Response object, just process body string
+			.map(([response, body]) => body);    // ignore Response object, just process body string
+
+	return ([requestOpts, query]) => {
+		const request$ = query.mockResponse ?
+			makeMockRequest(requestOpts, query.mockResponse) :
+			makeExternalApiRequest$(requestOpts);
+
+		return request$
 			.map(parseApiResponse)             // parse into plain object
-			.catch(error =>
-				Rx.Observable.of({ error: error.message })
-			)
+			.catch(error => Rx.Observable.of({ error: error.message }))
 			.map(apiResponseToQueryResponse(query))    // convert apiResponse to app-ready queryResponse
 			.map(setApiResponseDuotones);        // special duotone prop
+	};
 };
 
 const sortResponsesByQueryOrder = queries => responses =>
@@ -269,7 +278,7 @@ const apiProxy$ = ({ API_TIMEOUT=5000, baseUrl, duotoneUrls }) => {
 			.map(apiConfigToRequestOptions)     // API-specific args for api request
 			.do(({ url }) => request.log(['api'], JSON.stringify(url)))  // logging
 			.zip(Rx.Observable.from(queries))   // zip the apiResponse with corresponding query
-			.flatMap(makeApiRequest(request, API_TIMEOUT, duotoneUrls))  // parallel requests
+			.mergeMap(makeApiRequest$(request, API_TIMEOUT, duotoneUrls))  // parallel requests
 			.toArray()                         // group all responses into a single array - fan-in
 			.map(sortResponsesByQueryOrder(queries));
 	};
