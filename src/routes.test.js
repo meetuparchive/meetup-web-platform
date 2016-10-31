@@ -56,8 +56,8 @@ describe('routes', () => {
 				expect(cookieHeader).not.toBeNull();
 
 				const cookies = parseCookieHeader(cookieHeader);
-				expect(cookies.sessionId).not.toBeNull();
-				expect(UUID_V4_REGEX.test(cookies.sessionId)).toBe(true);
+				expect(cookies.track_id).not.toBeNull();
+				expect(UUID_V4_REGEX.test(cookies.track_id)).toBe(true);
 			})
 	);
 });
