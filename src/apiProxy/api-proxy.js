@@ -236,6 +236,7 @@ export const makeApiRequest$ = (request, API_TIMEOUT, duotoneUrls) => {
 			makeMockRequest(requestOpts, query.mockResponse) :
 			makeExternalApiRequest$(requestOpts);
 
+		request.log(['api'], JSON.stringify(requestOpts.url));
 		return request$
 			.map(parseApiResponse)             // parse into plain object
 			.catch(error => Rx.Observable.of({ error: error.message }))
@@ -243,9 +244,6 @@ export const makeApiRequest$ = (request, API_TIMEOUT, duotoneUrls) => {
 			.map(setApiResponseDuotones);        // special duotone prop
 	};
 };
-
-const sortResponsesByQueryOrder = queries => responses =>
-	queries.map(({ ref }) => responses.find(response => response[ref]));
 
 /**
  * This function transforms a single request to the application server into a
@@ -273,14 +271,15 @@ const apiProxy$ = ({ API_TIMEOUT=5000, baseUrl, duotoneUrls }) => {
 		// to build the query-specific API request options object
 		const apiConfigToRequestOptions = buildRequestArgs(externalRequestOpts);
 
-		return Rx.Observable.from(queries)    // create stream of query objects - fan-out
-			.map(queryToApiConfig)              // convert query to API-specific config
-			.map(apiConfigToRequestOptions)     // API-specific args for api request
-			.do(({ url }) => request.log(['api'], JSON.stringify(url)))  // logging
-			.zip(Rx.Observable.from(queries))   // zip the apiResponse with corresponding query
-			.mergeMap(makeApiRequest$(request, API_TIMEOUT, duotoneUrls))  // parallel requests
-			.toArray()                         // group all responses into a single array - fan-in
-			.map(sortResponsesByQueryOrder(queries));
+		// 3. map the queries onto an array of api request observables
+		const apiRequests$ = queries
+			.map(queryToApiConfig)
+			.map(apiConfigToRequestOptions)
+			.map((opts, i) => ([opts, queries[i]]))  // zip the query back into the opts
+			.map(makeApiRequest$(request, API_TIMEOUT, duotoneUrls));
+
+		// 4. zip them together to send them parallel and receive them in order
+		return Rx.Observable.zip(...apiRequests$);
 	};
 };
 
