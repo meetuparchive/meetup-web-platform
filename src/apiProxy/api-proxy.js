@@ -219,25 +219,38 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
 	};
 };
 
-const makeMockRequest = (requestOpts, mockResponse) =>
+/**
+ * Fake an API request and directly return the stringified mockResponse
+ */
+const makeMockRequest = mockResponse => requestOpts =>
 	Rx.Observable.of(JSON.stringify(mockResponse))
 		.do(() => console.log(`MOCKING response to ${requestOpts.url}`));
 
+const logResponseTime = log => ([response, body]) =>
+	log(['api'], `${response.elapsedTime}ms - ${response.request.uri.path}`);
+
+/**
+ * Make a real external API request, return response body string
+ */
+const makeExternalApiRequest = (request, API_TIMEOUT) => requestOpts =>
+	externalRequest$(requestOpts)
+		.timeout(API_TIMEOUT, new Error('API response timeout'))
+		.do(logResponseTime(request.log.bind(request)))
+		.map(([response, body]) => body);    // ignore Response object, just process body string
+
+/**
+ * Make an API request and parse the response into the expected `response`
+ * object shape
+ */
 export const makeApiRequest$ = (request, API_TIMEOUT, duotoneUrls) => {
 	const setApiResponseDuotones = apiResponseDuotoneSetter(duotoneUrls);
-	const makeExternalApiRequest$ = requestOpts =>
-		externalRequest$(requestOpts)
-			.timeout(API_TIMEOUT, new Error('API response timeout'))
-			.do(([response]) => request.log(['api'], `${response.elapsedTime}ms - ${response.request.uri.path}`)) // log api response time
-			.map(([response, body]) => body);    // ignore Response object, just process body string
-
 	return ([requestOpts, query]) => {
 		const request$ = query.mockResponse ?
-			makeMockRequest(requestOpts, query.mockResponse) :
-			makeExternalApiRequest$(requestOpts);
+			makeMockRequest(query.mockResponse) :
+			makeExternalApiRequest(request, API_TIMEOUT);
 
 		request.log(['api'], JSON.stringify(requestOpts.url));
-		return request$
+		return request$(requestOpts)
 			.map(parseApiResponse)             // parse into plain object
 			.catch(error => Rx.Observable.of({ error: error.message }))
 			.map(apiResponseToQueryResponse(query))    // convert apiResponse to app-ready queryResponse
@@ -260,7 +273,7 @@ export const makeApiRequest$ = (request, API_TIMEOUT, duotoneUrls) => {
  * @param {Object} baseUrl API server base URL for all API requests
  * @return Array$ contains all API responses corresponding to the provided queries
  */
-const apiProxy$ = ({ API_TIMEOUT=5000, baseUrl, duotoneUrls }) => {
+const apiProxy$ = ({ API_TIMEOUT=5000, baseUrl='', duotoneUrls={} }) => {
 
 	return request => {
 
