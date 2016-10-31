@@ -30,6 +30,34 @@ export function group(params) {
 }
 
 /**
+ * group communication endpoints
+ *
+ * accepts an `method` property in params
+ */
+export function mugcomm(params) {
+	const path = 'communications';
+	const { urlname, conversationId } = params;
+
+	let endpoint;
+	switch (params.method) {
+		case 'getAll':
+			endpoint = `${urlname}/${path}`;
+		case 'getId':
+			endpoint = `${urlname}/${path}/${conversationId}`;
+		case 'followers':
+			endpoint = `${urlname}/${path}/${conversationId}/followers`;
+		case 'suggestedMembers':
+			endpoint = `${urlname}/${path}/${conversationId}/suggested_members`;
+		default:
+			endpoint = `${urlname}/${path}/`;
+	}
+	return {
+		endpoint,
+		params
+	}
+}
+
+/**
  * all the endpoints that return event objects
  */
 export function event(params) {
