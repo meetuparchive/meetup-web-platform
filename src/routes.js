@@ -3,10 +3,7 @@ import Boom from 'boom';
 import chalk from 'chalk';
 
 import apiProxy$ from './apiProxy/api-proxy';
-import {
-	setSessionId,
-	updateTrackId,
-} from './util/tracking';
+import tracking from './util/tracking';
 
 import {
 	duotones,
@@ -65,25 +62,16 @@ export default function getRoutes(
 			request.log(['info'], chalk.green(`Request received for ${request.url.href} (${requestLanguage})`));
 
 			const render$ = request.authorize()  // `authorize()` method is supplied by anonAuthPlugin
-				.flatMap(renderRequestMap[requestLanguage]);
+				.flatMap(renderRequestMap[requestLanguage])
+				.do(() => request.log(['info'], chalk.green('HTML response ready')));
 
 			render$.subscribe(
 				({ result, statusCode }) => {
 					// response is sent when this function returns (`nextTick`)
 					const response = reply(result).code(statusCode);
 
-					// TRACKING
-					const sessionId = setSessionId(request, response);
-					const trackId = updateTrackId(request, response);
-					const trackInfo = {
-						description: 'new session',
-						sessionId,
-						trackId,
-					};
-					request.log(['tracking'], JSON.stringify(trackInfo, null, 2));
-					// \TRACKING
+					tracking(response);
 
-					request.log(['info'], chalk.green('HTML response ready'));
 					if (reply.request.app.setCookies) {
 						// when auth cookies are generated on the server rather than the
 						// original browser request, we need to send the new cookies

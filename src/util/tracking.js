@@ -7,15 +7,18 @@ const YEAR_IN_MS = 1000 * 60 * 60 * 24 * 365;
  *
  * simple tracking id for the browser session
  *
- * @param {Object} hapi request object
  * @param {Object} hapi response object
  */
-export const setSessionId = (request, response) => {
+export const setSessionId = response => {
 	const sessionId = uuid.v4();
 	response.state(
 		'session_id',
 		sessionId,
-		{ encoding: 'none' }
+		{
+			ttl: null,  // this explicitly a browser session cookie
+			encoding: 'none',
+			isHttpOnly: true,  // client doesn't need to access this one
+		}
 	);
 	return sessionId;
 };
@@ -30,11 +33,10 @@ export const setSessionId = (request, response) => {
  *  - If the user has a tracking cookie already set, do nothing.
  *  - Otherwise, generate a new uuid and set a tracking cookie.
  *
- * @param {Object} hapi request object
  * @param {Object} hapi response object
  */
-export const updateTrackId = (request, response) => {
-	let trackId = request.state.track_id;
+export const updateTrackId = response => {
+	let trackId = response.request.state.track_id;
 
 	if (!trackId) {
 		// Generate a new track_id cookie
@@ -44,10 +46,20 @@ export const updateTrackId = (request, response) => {
 			trackId,
 			{
 				ttl: YEAR_IN_MS * 20,
-				encoding: 'none'
+				encoding: 'none',
 			}
 		);
 	}
 	return trackId;
 };
+
+export default function trackingManager(response) {
+	const trackInfo = {
+		description: 'new session',
+		trackId: updateTrackId(response),
+		sessionId: setSessionId(response),
+	};
+	response.request.log(['tracking'], JSON.stringify(trackInfo, null, 2));
+	return trackInfo;
+}
 
