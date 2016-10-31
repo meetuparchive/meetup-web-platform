@@ -17,6 +17,7 @@ export const setSessionId = (request, response) => {
 		sessionId,
 		{ encoding: 'none' }
 	);
+	return sessionId;
 };
 
 /**
