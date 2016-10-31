@@ -263,12 +263,15 @@ const apiProxy$ = ({ API_TIMEOUT=5000, baseUrl, duotoneUrls }) => {
 		// to build the query-specific API request options object
 		const apiConfigToRequestOptions = buildRequestArgs(externalRequestOpts);
 
-		return Rx.Observable.zip(
-			...queries
-				.map(queryToApiConfig)
-				.map(apiConfigToRequestOptions)
-				.map((opts, i) => makeApiRequest(request, API_TIMEOUT, duotoneUrls)([opts, queries[i]]))
-		);
+		// 3. map the queries onto an array of api request observables
+		const apiRequests$ = queries
+			.map(queryToApiConfig)
+			.map(apiConfigToRequestOptions)
+			.map((opts, i) => ([opts, queries[i]]))  // zip the query back into the opts
+			.map(makeApiRequest(request, API_TIMEOUT, duotoneUrls));
+
+		// 4. zip them together to send them parallel and receive them in order
+		return Rx.Observable.zip(...apiRequests$);
 	};
 };
 
