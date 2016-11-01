@@ -51,7 +51,7 @@ export const handleLogoutRequest = action$ =>
 				// a new token is provided by `LOGOUT_SUCESS` or a full refresh
 				Rx.Observable.of(configureAuth({ anonymous: true })),
 				Rx.Observable.fromPromise(
-					fetch(ANONYMOUS_AUTH_APP_PATH, { credentials: 'same-origin' })
+					fetch(ANONYMOUS_AUTH_APP_PATH, { credentials: 'same-origin' })  // response will set cookies
 						.then(response => response.json())
 				)
 				.map(logoutSuccess)

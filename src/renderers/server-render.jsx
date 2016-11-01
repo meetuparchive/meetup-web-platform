@@ -17,7 +17,6 @@ import {
 
 import {
 	configureApiUrl,
-	configureTrackingId
 } from '../actions/configActionCreators';
 
 // Ensure global Intl for use with FormatJS
@@ -114,12 +113,11 @@ const getRouterRenderer = (store, clientFilename, assetPublicPath) =>
  * @param {Store} store Redux store for this request
  * @param {Object} config that initializes app (auth tokens, e.g. oauth_token)
  */
-const dispatchConfig = (store, { apiUrl, auth, sessionId }) => {
+const dispatchConfig = (store, { apiUrl, auth }) => {
 	console.log(chalk.green('Dispatching config'));
 
 	store.dispatch(configureAuth(auth, true));
 	store.dispatch(configureApiUrl(apiUrl));
-	store.dispatch(configureTrackingId(sessionId));
 };
 
 /**
@@ -160,7 +158,6 @@ const makeRenderer = (
 			refresh_token,
 			expires_in,
 			anonymous,
-			sessionId
 		}
 	} = request;
 
@@ -177,7 +174,7 @@ const makeRenderer = (
 	const store = createStore(routes, reducer, {}, middleware);
 
 	// load initial config
-	dispatchConfig(store, { apiUrl, auth, sessionId });
+	dispatchConfig(store, { apiUrl, auth });
 
 	// render skeleton if requested - the store is ready
 	if ('skeleton' in request.query) {

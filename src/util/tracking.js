@@ -1,6 +1,12 @@
 import uuid from 'node-uuid';
 
 const YEAR_IN_MS = 1000 * 60 * 60 * 24 * 365;
+const COOKIE_OPTS = {
+	encoding: 'none',
+	path: '/',
+	isHttpOnly: true,
+};
+
 
 /**
  * @method updateSessionId
@@ -10,30 +16,45 @@ const YEAR_IN_MS = 1000 * 60 * 60 * 24 * 365;
  * @param {Object} hapi response object
  */
 export const updateSessionId = response => {
-	let sessionId = response.request.state.session_id;
+	let session_id = response.request.state.session_id;
 
-	if (!sessionId) {
-		sessionId = uuid.v4();
+	if (!session_id) {
+		session_id = uuid.v4();
 		response.state(
 			'session_id',
-			sessionId,
-			{
-				ttl: null,  // this explicitly a browser session cookie
-				encoding: 'none',
-				isHttpOnly: true,  // client doesn't need to access this one
-				path: '/',
-			}
+			session_id,
+			COOKIE_OPTS
 		);
 	}
-	return sessionId;
+	return session_id;
+};
+
+/**
+ * getter/setter for member_id cookie: if member_id is not passed, the cookie
+ * will be unset
+ */
+export const updateMemberId = (response, member_id) => {
+	if (!member_id) {
+		response.unstate('member_id');
+		return response.request.state.member_id;
+	}
+	response.state(
+		'member_id',
+		member_id,
+		{
+			...COOKIE_OPTS,
+			ttl: YEAR_IN_MS * 20,
+		}
+	);
+	return member_id;
 };
 
 /**
  * @method updateTrackId
  *
- * Initialize the trackId for member or anonymous user - the longest-living id
+ * Initialize the track_id for member or anonymous user - the longest-living id
  * we can assigned to a user. Stays in place until login or logout, when it is
- * exchanged for a new trackId
+ * exchanged for a new track_id
  *
  *  - If the user has a tracking cookie already set, do nothing.
  *  - Otherwise, generate a new uuid and set a tracking cookie.
@@ -41,41 +62,44 @@ export const updateSessionId = response => {
  * @param {Object} hapi response object
  */
 export const updateTrackId = (response, doRefresh) => {
-	let trackId = response.request.state.track_id;
+	let track_id = response.request.state.track_id;
 
-	if (!trackId || doRefresh) {
+	if (!track_id || doRefresh) {
 		// Generate a new track_id cookie
-		trackId = uuid.v4();
+		track_id = uuid.v4();
 		response.state(
 			'track_id',
-			trackId,
+			track_id,
 			{
+				...COOKIE_OPTS,
 				ttl: YEAR_IN_MS * 20,
-				encoding: 'none',
-				path: '/',
 			}
 		);
 	}
-	return trackId;
+	return track_id;
 };
 
 export const trackLogout = response =>
 	logTrack(
 		response,
 		{
-			description: 'new anonymous user',
-			trackId: updateTrackId(response, true),
-			sessionId: response.request.state.session_id,
+			description: 'logout',
+			member_id: updateMemberId(response),
+			track_id_from: response.request.state.track_id,
+			track_id: updateTrackId(response, true),
+			session_id: response.request.state.session_id,
 		}
 	);
 
-export const trackLogin = response =>
+export const trackLogin = (response, member_id) =>
 	logTrack(
 		response,
 		{
-			description: 'new session',
-			trackId: updateTrackId(response, true),
-			sessionId: response.request.state.session_id,
+			description: 'login',
+			member_id: updateMemberId(response, member_id),
+			track_id_from: response.request.state.track_id,
+			track_id: updateTrackId(response, true),
+			session_id: response.request.state.session_id,
 		}
 	);
 
@@ -84,13 +108,25 @@ export const trackSession = response =>
 		response,
 		{
 			description: 'new session',
-			trackId: updateTrackId(response),
-			sessionId: updateSessionId(response),
+			member_id: response.request.state.member_id,
+			track_id: updateTrackId(response),
+			session_id: updateSessionId(response),
 		}
 	);
 
 export function logTrack(response, trackInfo) {
-	response.request.log(['tracking'], JSON.stringify(trackInfo, null, 2));
+	const trackLog = {
+		...trackInfo,
+		request_id: uuid.v4(),
+		url: '',
+		referrer: '',
+		ip: response.request.headers['remote_addr'],
+		agent: response.request.headers['user-agent'],
+		platform: 'something something',
+		platform_agent: 'something something',
+	};
+	// response.request.log will provide timestaemp
+	response.request.log(['tracking'], JSON.stringify(trackLog, null, 2));
 	return trackInfo;
 }
 
