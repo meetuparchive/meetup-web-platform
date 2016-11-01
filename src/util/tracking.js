@@ -21,6 +21,7 @@ export const updateSessionId = response => {
 				ttl: null,  // this explicitly a browser session cookie
 				encoding: 'none',
 				isHttpOnly: true,  // client doesn't need to access this one
+				path: '/',
 			}
 		);
 	}
@@ -51,6 +52,7 @@ export const updateTrackId = response => {
 			{
 				ttl: YEAR_IN_MS * 20,
 				encoding: 'none',
+				path: '/',
 			}
 		);
 	}
