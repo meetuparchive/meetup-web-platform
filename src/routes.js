@@ -47,7 +47,7 @@ export default function getRoutes(
 					// special case - login requests need to be tracked
 					const loginResponse = queryResponses.find(r => r.login);
 					if (loginResponse) {
-						trackLogin(response, loginResponse.value.member.id);
+						trackLogin(response, loginResponse.login.value.member.id);
 					}
 				},
 				(err) => { reply(Boom.badImplementation(err.message)); }
