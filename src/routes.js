@@ -44,7 +44,7 @@ export default function getRoutes(
 			queryResponses$.subscribe(
 				queryResponses => {
 					const response = reply(JSON.stringify(queryResponses)).type('application/json');
-					if (queryResponses.find(r => r.type === 'login').length) {
+					if (queryResponses.find(r => r.type === 'login')) {
 						trackLogin(response);
 					}
 				},
