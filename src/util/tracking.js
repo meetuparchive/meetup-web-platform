@@ -3,23 +3,27 @@ import uuid from 'node-uuid';
 const YEAR_IN_MS = 1000 * 60 * 60 * 24 * 365;
 
 /**
- * @method setSessionId
+ * @method updateSessionId
  *
  * simple tracking id for the browser session
  *
  * @param {Object} hapi response object
  */
-export const setSessionId = response => {
-	const sessionId = uuid.v4();
-	response.state(
-		'session_id',
-		sessionId,
-		{
-			ttl: null,  // this explicitly a browser session cookie
-			encoding: 'none',
-			isHttpOnly: true,  // client doesn't need to access this one
-		}
-	);
+export const updateSessionId = response => {
+	let sessionId = response.request.state.session_id;
+
+	if (!sessionId) {
+		sessionId = uuid.v4();
+		response.state(
+			'session_id',
+			sessionId,
+			{
+				ttl: null,  // this explicitly a browser session cookie
+				encoding: 'none',
+				isHttpOnly: true,  // client doesn't need to access this one
+			}
+		);
+	}
 	return sessionId;
 };
 
@@ -53,11 +57,11 @@ export const updateTrackId = response => {
 	return trackId;
 };
 
-export default function trackingManager(response) {
+export default function trackingManager(description, response) {
 	const trackInfo = {
-		description: 'new session',
+		description,
 		trackId: updateTrackId(response),
-		sessionId: setSessionId(response),
+		sessionId: updateSessionId(response),
 	};
 	response.request.log(['tracking'], JSON.stringify(trackInfo, null, 2));
 	return trackInfo;

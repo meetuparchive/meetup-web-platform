@@ -70,7 +70,7 @@ export default function getRoutes(
 					// response is sent when this function returns (`nextTick`)
 					const response = reply(result).code(statusCode);
 
-					tracking(response);
+					tracking('new session', response);
 
 					if (reply.request.app.setCookies) {
 						// when auth cookies are generated on the server rather than the
