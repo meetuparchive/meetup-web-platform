@@ -120,7 +120,7 @@ export function logTrack(response, trackInfo) {
 		request_id: uuid.v4(),
 		url: '',
 		referrer: '',
-		ip: response.request.headers['remote_addr'],
+		ip: response.request.headers['remote-addr'],
 		agent: response.request.headers['user-agent'],
 		platform: 'something something',
 		platform_agent: 'something something',
