@@ -44,7 +44,7 @@ export default function getRoutes(
 			queryResponses$.subscribe(
 				queryResponses => {
 					const response = reply(JSON.stringify(queryResponses)).type('application/json');
-					if (queryResponses.find(r => r.type === 'login')) {
+					if (queryResponses.find(r => r.login)) {
 						trackLogin(response);
 					}
 				},
@@ -85,10 +85,11 @@ export default function getRoutes(
 							anonymous,
 						} = reply.request.state;
 
+						const path = '/';
 						request.log(['info'], chalk.green(`Setting cookies ${Object.keys(reply.request.state)}`));
-						response.state('oauth_token', oauth_token, { ttl: expires_in * 1000 });
-						response.state('refresh_token', refresh_token, { ttl: YEAR_IN_MS * 2 });
-						response.state('anonymous', anonymous.toString(), { ttl: YEAR_IN_MS * 2 });
+						response.state('oauth_token', oauth_token, { path, ttl: expires_in * 1000 });
+						response.state('refresh_token', refresh_token, { path, ttl: YEAR_IN_MS * 2 });
+						response.state('anonymous', anonymous.toString(), { path, ttl: YEAR_IN_MS * 2 });
 					}
 				}
 			);
