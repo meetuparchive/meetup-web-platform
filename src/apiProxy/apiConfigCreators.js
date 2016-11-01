@@ -83,7 +83,7 @@ export function profile(params) {
  * all the endpoints that return event objects
  */
 export function event(params) {
-	params.fields = ['rsvp_sample'];
+	params.fields = params.fields ? `${params.fields},rsvp_sample` : 'rsvp_sample';
 	const pathExtension = params.id ? `/${params.id}` : '';
 	return {
 		endpoint: `${params.urlname}/events${pathExtension}`,
@@ -105,7 +105,7 @@ export function event_comments(params) {
  * open events
  */
 export function open_events(params) {
-	params.fields = ['rsvp_sample'];
+	params.fields = params.fields ? `${params.fields},rsvp_sample` : 'rsvp_sample';
 	return {
 		endpoint: '2/open_events',
 		params
@@ -126,7 +126,7 @@ export function rsvps(params) {
  * albums
  */
 export function albums(params) {
-	params.fields = ['photo_sample'];
+	params.fields = params.fields ? `${params.fields},photo_sample` : 'photo_sample';
 	return {
 		endpoint: `${params.urlname}/photo_albums`,
 		params
