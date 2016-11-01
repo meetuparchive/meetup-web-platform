@@ -114,12 +114,12 @@ const getRouterRenderer = (store, clientFilename, assetPublicPath) =>
  * @param {Store} store Redux store for this request
  * @param {Object} config that initializes app (auth tokens, e.g. oauth_token)
  */
-const dispatchConfig = (store, { apiUrl, auth, meetupTrack }) => {
+const dispatchConfig = (store, { apiUrl, auth, sessionId }) => {
 	console.log(chalk.green('Dispatching config'));
 
 	store.dispatch(configureAuth(auth, true));
 	store.dispatch(configureApiUrl(apiUrl));
-	store.dispatch(configureTrackingId(meetupTrack));
+	store.dispatch(configureTrackingId(sessionId));
 };
 
 /**
@@ -160,7 +160,7 @@ const makeRenderer = (
 			refresh_token,
 			expires_in,
 			anonymous,
-			meetupTrack
+			sessionId
 		}
 	} = request;
 
@@ -177,7 +177,7 @@ const makeRenderer = (
 	const store = createStore(routes, reducer, {}, middleware);
 
 	// load initial config
-	dispatchConfig(store, { apiUrl, auth, meetupTrack });
+	dispatchConfig(store, { apiUrl, auth, sessionId });
 
 	// render skeleton if requested - the store is ready
 	if ('skeleton' in request.query) {
