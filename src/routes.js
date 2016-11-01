@@ -3,7 +3,7 @@ import Boom from 'boom';
 import chalk from 'chalk';
 
 import apiProxy$ from './apiProxy/api-proxy';
-import tracking, { trackLogin } from './util/tracking';
+import { trackSession, trackLogin } from './util/tracking';
 
 import {
 	duotones,
@@ -44,7 +44,9 @@ export default function getRoutes(
 			queryResponses$.subscribe(
 				queryResponses => {
 					const response = reply(JSON.stringify(queryResponses)).type('application/json');
-					trackLogin(queryResponses, response);
+					if (queryResponses.find(r => r.type === 'login').length) {
+						trackLogin(response);
+					}
 				},
 				(err) => { reply(Boom.badImplementation(err.message)); }
 			);
@@ -70,8 +72,7 @@ export default function getRoutes(
 				({ result, statusCode }) => {
 					// response is sent when this function returns (`nextTick`)
 					const response = reply(result).code(statusCode);
-
-					tracking('new session', response);
+					trackSession(response);
 
 					if (reply.request.app.setCookies) {
 						// when auth cookies are generated on the server rather than the

@@ -2,7 +2,7 @@ import Boom from 'boom';
 import chalk from 'chalk';
 import Rx from 'rxjs';
 
-import tracking from '../util/tracking';
+import { trackLogout } from '../util/tracking';
 
 /**
  * @module anonAuthPlugin
@@ -239,9 +239,7 @@ export default function register(server, options, next) {
 			auth$(request).subscribe(
 				auth => {
 					const response = reply(JSON.stringify(auth)).type('application/json');
-					tracking('new anonymous user', response, {
-						newTrackId: true,
-					});
+					trackLogout(response);
 				},
 				(err) => { reply(Boom.badImplementation(err.message)); }
 			);

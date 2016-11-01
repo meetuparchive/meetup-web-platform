@@ -40,10 +40,10 @@ export const updateSessionId = response => {
  *
  * @param {Object} hapi response object
  */
-export const updateTrackId = (response, doUpdate) => {
+export const updateTrackId = (response, doRefresh) => {
 	let trackId = response.request.state.track_id;
 
-	if (!trackId || doUpdate) {
+	if (!trackId || doRefresh) {
 		// Generate a new track_id cookie
 		trackId = uuid.v4();
 		response.state(
@@ -59,20 +59,23 @@ export const updateTrackId = (response, doUpdate) => {
 	return trackId;
 };
 
-export const trackLogin = (queryResponses, response) => {
-	const loginResponse = queryResponses.find(r => r.type === 'login');
-	if (!loginResponse.length) {
-		return {};
-	}
-	return trackingManager('new login', response, {
-		newTrackId: true
+export const trackLogout = response =>
+	trackingManager('new anonymous user', response, {
+		refreshTrackId: true,
 	});
-};
+
+export const trackLogin = response =>
+	trackingManager('new login', response, {
+		refreshTrackId: true
+	});
+
+export const trackSession = response =>
+	trackingManager('new session', response);
 
 export default function trackingManager(description, response, options={}) {
 	const trackInfo = {
 		description,
-		trackId: updateTrackId(response, options.newTrackId),
+		trackId: updateTrackId(response, options.refreshTrackId),
 		sessionId: updateSessionId(response),
 	};
 	response.request.log(['tracking'], JSON.stringify(trackInfo, null, 2));
