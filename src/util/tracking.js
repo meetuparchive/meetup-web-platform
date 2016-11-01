@@ -60,24 +60,36 @@ export const updateTrackId = (response, doRefresh) => {
 };
 
 export const trackLogout = response =>
-	trackingManager('new anonymous user', response, {
-		refreshTrackId: true,
-	});
+	logTrack(
+		response,
+		{
+			description: 'new anonymous user',
+			trackId: updateTrackId(response, true),
+			sessionId: response.request.state.session_id,
+		}
+	);
 
 export const trackLogin = response =>
-	trackingManager('new login', response, {
-		refreshTrackId: true
-	});
+	logTrack(
+		response,
+		{
+			description: 'new session',
+			trackId: updateTrackId(response, true),
+			sessionId: response.request.state.session_id,
+		}
+	);
 
 export const trackSession = response =>
-	trackingManager('new session', response);
+	logTrack(
+		response,
+		{
+			description: 'new session',
+			trackId: updateTrackId(response),
+			sessionId: updateSessionId(response),
+		}
+	);
 
-export default function trackingManager(description, response, options={}) {
-	const trackInfo = {
-		description,
-		trackId: updateTrackId(response, options.refreshTrackId),
-		sessionId: updateSessionId(response),
-	};
+export function logTrack(response, trackInfo) {
 	response.request.log(['tracking'], JSON.stringify(trackInfo, null, 2));
 	return trackInfo;
 }
