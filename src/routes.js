@@ -3,7 +3,7 @@ import Boom from 'boom';
 import chalk from 'chalk';
 
 import apiProxy$ from './apiProxy/api-proxy';
-import tracking from './util/tracking';
+import tracking, { trackLogin } from './util/tracking';
 
 import {
 	duotones,
@@ -43,7 +43,8 @@ export default function getRoutes(
 			const queryResponses$ = proxyApiRequest$(request);
 			queryResponses$.subscribe(
 				queryResponses => {
-					reply(JSON.stringify(queryResponses)).type('application/json');
+					const response = reply(JSON.stringify(queryResponses)).type('application/json');
+					trackLogin(queryResponses, response);
 				},
 				(err) => { reply(Boom.badImplementation(err.message)); }
 			);

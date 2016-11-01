@@ -239,7 +239,9 @@ export default function register(server, options, next) {
 			auth$(request).subscribe(
 				auth => {
 					const response = reply(JSON.stringify(auth)).type('application/json');
-					tracking('new anonymous user', response);
+					tracking('new anonymous user', response, {
+						newTrackId: true,
+					});
 				},
 				(err) => { reply(Boom.badImplementation(err.message)); }
 			);
