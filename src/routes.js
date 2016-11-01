@@ -43,11 +43,15 @@ export default function getRoutes(
 			const queryResponses$ = proxyApiRequest$(request);
 			queryResponses$.subscribe(
 				queryResponses => {
-					const response = reply(JSON.stringify(queryResponses)).type('application/json');
+					const response = reply(JSON.stringify(queryResponses))
+						.type('application/json');
 					// special case - login requests need to be tracked
 					const loginResponse = queryResponses.find(r => r.login);
 					if (loginResponse) {
-						trackLogin(response, loginResponse.login.value.member.id);
+						trackLogin(
+							response,
+							JSON.stringify(loginResponse.login.value.member.id)
+						);
 					}
 				},
 				(err) => { reply(Boom.badImplementation(err.message)); }
