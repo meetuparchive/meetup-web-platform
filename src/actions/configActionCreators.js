@@ -5,9 +5,3 @@ export function configureApiUrl(url) {
 	};
 }
 
-export function configureTrackingId(id) {
-	return {
-		type: 'CONFIGURE_TRACKING_ID',
-		payload: id
-	};
-}

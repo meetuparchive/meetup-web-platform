@@ -6,6 +6,7 @@ import ReactDOMServer from 'react-dom/server';
 import './util/globals';
 
 import getConfig from './util/config';
+import track from './util/tracking';
 import getPlugins from './plugins';
 import getRoutes from './routes';
 
@@ -67,6 +68,8 @@ export function onPreResponse(request, reply) {
  */
 export function server(routes, connection, plugins=[]) {
 	const server = new Hapi.Server();
+
+	server.decorate('reply', 'track', track);
 
 	return server.connection(connection)
 		.register(plugins)
