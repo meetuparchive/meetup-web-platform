@@ -84,10 +84,10 @@ export const trackLogout = log => response =>
 		response,
 		{
 			description: 'logout',
-			member_id: updateMemberId(this.response),
-			track_id_from: this.response.request.state.track_id,
-			track_id: updateTrackId(this.response, true),
-			session_id: this.response.request.state.session_id,
+			member_id: updateMemberId(response),
+			track_id_from: response.request.state.track_id,
+			track_id: updateTrackId(response, true),
+			session_id: response.request.state.session_id,
 		}
 	);
 
@@ -96,10 +96,10 @@ export const trackLogin = log => (response, member_id) =>
 		response,
 		{
 			description: 'login',
-			member_id: updateMemberId(this.response, member_id),
-			track_id_from: this.response.request.state.track_id,
-			track_id: updateTrackId(this.response, true),
-			session_id: this.response.request.state.session_id,
+			member_id: updateMemberId(response, member_id),
+			track_id_from: response.request.state.track_id,
+			track_id: updateTrackId(response, true),
+			session_id: response.request.state.session_id,
 		}
 	);
 
@@ -108,9 +108,9 @@ export const trackSession = log => response =>
 		response,
 		{
 			description: 'new session',
-			member_id: this.response.request.state.member_id,
-			track_id: updateTrackId(this.response),
-			session_id: updateSessionId(this.response),
+			member_id: response.request.state.member_id,
+			track_id: updateTrackId(response),
+			session_id: updateSessionId(response),
 		}
 	);
 
