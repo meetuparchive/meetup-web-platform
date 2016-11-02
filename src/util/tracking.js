@@ -115,13 +115,14 @@ export const trackSession = response =>
 	);
 
 export function logTrack(response, trackInfo) {
+	const requestHeaders = response.request.headers;
 	const trackLog = {
 		...trackInfo,
 		request_id: uuid.v4(),
-		url: '',
-		referrer: '',
-		ip: response.request.headers['remote-addr'],
-		agent: response.request.headers['user-agent'],
+		url: requestHeaders.referer,
+		referrer: 'this will be handled in a special way for navigation actions',
+		ip: requestHeaders['remote-addr'],
+		agent: requestHeaders['user-agent'],
 		platform: 'something something',
 		platform_agent: 'something something',
 	};
