@@ -66,10 +66,10 @@ export function onPreResponse(request, reply) {
 /**
  * server-starting function
  */
-export function server(routes, connection, plugins=[]) {
+export function server(routes, connection, plugins=[], platform_agent) {
 	const server = new Hapi.Server();
 
-	server.decorate('reply', 'track', track);
+	server.decorate('reply', 'track', track(platform_agent));
 
 	return server.connection(connection)
 		.register(plugins)
@@ -97,7 +97,7 @@ export function server(routes, connection, plugins=[]) {
  */
 export default function start(
 	renderRequestMap,
-	{ routes=[], plugins=[] },
+	{ routes=[], plugins=[], platform_agent='consumer_name' },
 	config=getConfig
 ) {
 	// source maps make for better stack traces - we might not want this in
@@ -118,7 +118,7 @@ export default function start(
 
 			const finalPlugins = [ ...plugins, ...getPlugins(config) ];
 
-			return server(finalRoutes, connection, finalPlugins);
+			return server(finalRoutes, connection, finalPlugins, platform_agent);
 		});
 }
 
