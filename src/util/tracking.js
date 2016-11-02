@@ -79,40 +79,49 @@ export const updateTrackId = (response, doRefresh) => {
 	return track_id;
 };
 
-export const trackLogout = response =>
+export function trackLogout(platform_agent) {
 	logTrack(
-		response,
+		this.response,
 		{
+			platform_agent,
 			description: 'logout',
-			member_id: updateMemberId(response),
-			track_id_from: response.request.state.track_id,
-			track_id: updateTrackId(response, true),
-			session_id: response.request.state.session_id,
+			member_id: updateMemberId(this.response),
+			track_id_from: this.response.request.state.track_id,
+			track_id: updateTrackId(this.response, true),
+			session_id: this.response.request.state.session_id,
 		}
 	);
+	return this;
+}
 
-export const trackLogin = (response, member_id) =>
+export function trackLogin(platform_agent, member_id) {
 	logTrack(
-		response,
+		this.response,
 		{
+			platform_agent,
 			description: 'login',
-			member_id: updateMemberId(response, member_id),
-			track_id_from: response.request.state.track_id,
-			track_id: updateTrackId(response, true),
-			session_id: response.request.state.session_id,
+			member_id: updateMemberId(this.response, member_id),
+			track_id_from: this.response.request.state.track_id,
+			track_id: updateTrackId(this.response, true),
+			session_id: this.response.request.state.session_id,
 		}
 	);
+	return this;
+}
 
-export const trackSession = response =>
+export function trackSession(platform_agent) {
 	logTrack(
-		response,
+		this.response,
 		{
+			platform_agent,
 			description: 'new session',
-			member_id: response.request.state.member_id,
-			track_id: updateTrackId(response),
-			session_id: updateSessionId(response),
+			member_id: this.response.request.state.member_id,
+			track_id: updateTrackId(this.response),
+			session_id: updateSessionId(this.response),
 		}
 	);
+	return this;
+}
 
 export function logTrack(response, trackInfo) {
 	const requestHeaders = response.request.headers;
@@ -123,7 +132,7 @@ export function logTrack(response, trackInfo) {
 		referrer: 'this will be handled in a special way for navigation actions',
 		ip: requestHeaders['remote-addr'],
 		agent: requestHeaders['user-agent'],
-		platform: 'something something',
+		platform: 'meetup-web-platform',
 		platform_agent: 'something something',
 	};
 	// response.request.log will provide timestaemp
