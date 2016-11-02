@@ -131,7 +131,7 @@ export const logTrack = platform_agent => (response, trackInfo) => {
 	return trackLog;
 };
 
-export default function track(platform_agent) {
+export default function decorateTrack(platform_agent) {
 	const log = logTrack(platform_agent);
 	const login = trackLogin(log);
 	const logout = trackLogout(log);
@@ -142,7 +142,7 @@ export default function track(platform_agent) {
 		session,
 	};
 	return function(type, ...args) {
-		return trackers[type](this.response, ...args);
+		return trackers[type](this.request.response, ...args);
 	};
 }
 
