@@ -6,11 +6,7 @@ import ReactDOMServer from 'react-dom/server';
 import './util/globals';
 
 import getConfig from './util/config';
-import {
-	trackLogin,
-	trackLogout,
-	trackSession,
-} from './util/tracking';
+import track from './util/tracking';
 import getPlugins from './plugins';
 import getRoutes from './routes';
 
@@ -73,9 +69,7 @@ export function onPreResponse(request, reply) {
 export function server(routes, connection, plugins=[]) {
 	const server = new Hapi.Server();
 
-	server.decorate('reply', 'trackLogin', trackLogin);
-	server.decorate('reply', 'trackLogout', trackLogout);
-	server.decorate('reply', 'trackSession', trackSession);
+	server.decorate('reply', 'track', track);
 
 	return server.connection(connection)
 		.register(plugins)
