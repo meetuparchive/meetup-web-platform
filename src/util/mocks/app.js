@@ -4,6 +4,53 @@ import {
 	MOCK_EVENT,
 } from './api';
 
+export const MOCK_ROUTES = {
+	'/noQuery': {
+		title: 'noQuery',
+	},
+	'/': {
+		query: () => {},
+		'/foo': {
+			query: () => {}
+		}
+	}
+};
+
+export const MOCK_API_PROBLEM = {
+	problem: 'There was an internal problem in the API'
+};
+
+export const MOCK_API_RESULT = [{
+	ref: 'group',
+	type: 'group',
+	value: MOCK_APP_STATE.app.group.value
+}];
+
+export const MOCK_OAUTH_COOKIES = {
+	oauth_token: '1234',
+	refresh_token: 'asdf',
+	anonymous: true
+};
+
+export const MOCK_LOCATION = {  // redux-little-router LOCATION_CHANGED
+	pathname: '/messages/a-user-has-no-name',
+	route: '/messages/:user',
+	params: {
+		user: 'a-user-has-no-name'
+	},
+	query: { // if your `history` instance uses `useQueries`
+		some: 'thing'
+	},
+	result: {
+		query: mockQuery,
+		parent: { // for nested routes only
+			// contains the result of the parent route,
+			// which contains each other parent route's
+			// result recursively
+		}
+	}
+};
+
 export const MOCK_APP_STATE = {
 	app: {
 		self: {
@@ -24,44 +71,7 @@ export const MOCK_APP_STATE = {
 	},
 	auth: {},
 	config: {},
-	routing: {
-		locationBeforeTransitions: {}
-	},
-};
-
-export const MOCK_ROUTES = [
-	{
-		path: '/noQuery',
-		component: () => {},
-	},
-	{
-		path: '/',
-		component: () => {},
-		query: () => {},
-		childRoutes: [
-			{
-				path: 'foo',
-				component: () => {},
-				query: () => {}
-			}
-		]
-	},
-];
-
-export const MOCK_API_PROBLEM = {
-	problem: 'There was an internal problem in the API'
-};
-
-export const MOCK_API_RESULT = [{
-	ref: 'group',
-	type: 'group',
-	value: MOCK_APP_STATE.app.group.value
-}];
-
-export const MOCK_OAUTH_COOKIES = {
-	oauth_token: '1234',
-	refresh_token: 'asdf',
-	anonymous: true
+	router: MOCK_LOCATION,
 };
 
 export const MOCK_RENDERPROPS = {
