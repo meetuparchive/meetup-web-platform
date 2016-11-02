@@ -32,25 +32,22 @@ export function group(params) {
 /**
  * group communication endpoints
  *
- * accepts an `method` property in params
+ * accepts an `apiMethod` property in params:
+ * 	`apiMethod: 'followers' - return followers for a given conversation id
+ * 	`apiMethod: 'suggested_members' - return suggested_members for a given conversation id
  */
 export function mugcomm(params) {
-	const path = 'communications';
-	const { urlname, conversationId } = params;
+	const { urlname, conversationId, apiMethod } = params;
 
-	let endpoint;
-	switch (params.method) {
-		case 'getAll':
-			endpoint = `${urlname}/${path}`;
-		case 'getId':
-			endpoint = `${urlname}/${path}/${conversationId}`;
-		case 'followers':
-			endpoint = `${urlname}/${path}/${conversationId}/followers`;
-		case 'suggestedMembers':
-			endpoint = `${urlname}/${path}/${conversationId}/suggested_members`;
-		default:
-			endpoint = `${urlname}/${path}/`;
-	}
+	const endpoint = [
+		urlname,
+		'conversations',
+		conversationId,
+		apiMethod
+	]
+		.filter(urlFragment => urlFragment) // only inlcude populated fragments
+		.join('/');
+
 	return {
 		endpoint,
 		params
