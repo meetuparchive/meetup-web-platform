@@ -88,6 +88,7 @@ export const trackLogout = log => response =>
 			track_id_from: response.request.state.track_id,
 			track_id: updateTrackId(response, true),
 			session_id: response.request.state.session_id,
+			url: response.request.info.referrer,
 		}
 	);
 
@@ -100,6 +101,7 @@ export const trackLogin = log => (response, member_id) =>
 			track_id_from: response.request.state.track_id,
 			track_id: updateTrackId(response, true),
 			session_id: response.request.state.session_id,
+			url: response.request.info.referrer,
 		}
 	);
 
@@ -111,20 +113,20 @@ export const trackSession = log => response =>
 			member_id: response.request.state.member_id,
 			track_id: updateTrackId(response),
 			session_id: updateSessionId(response),
+			url: response.request.url.path,
 		}
 	);
 
 export const logTrack = platform_agent => (response, trackInfo) => {
 	const requestHeaders = response.request.headers;
 	const trackLog = {
-		...trackInfo,
 		request_id: uuid.v4(),
-		url: requestHeaders.referer,
 		referrer: 'this will be handled in a special way for navigation actions',
 		ip: requestHeaders['remote-addr'],
 		agent: requestHeaders['user-agent'],
 		platform: 'meetup-web-platform',
 		platform_agent,
+		...trackInfo,
 	};
 	// response.request.log will provide timestaemp
 	response.request.log(['tracking'], JSON.stringify(trackLog, null, 2));
