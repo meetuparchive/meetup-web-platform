@@ -128,6 +128,7 @@ export const logTrack = platform_agent => (response, trackInfo) => {
 	};
 	// response.request.log will provide timestaemp
 	response.request.log(['tracking'], JSON.stringify(trackLog, null, 2));
+	return trackLog;
 };
 
 export default function track(platform_agent) {
@@ -141,8 +142,7 @@ export default function track(platform_agent) {
 		session,
 	};
 	return function(type, ...args) {
-		trackers[type](this.response, ...args);
-		return this;
+		return trackers[type](this.response, ...args);
 	};
 }
 
