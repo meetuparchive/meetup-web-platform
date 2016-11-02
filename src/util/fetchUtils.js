@@ -40,7 +40,8 @@ export const fetchQueries = (apiUrl, options) => queries => {
 		headers: {
 			Authorization: `Bearer ${auth.oauth_token}`,
 			'content-type': isPost ? 'application/x-www-form-urlencoded' : 'text/plain',
-		}
+		},
+		credentials: 'same-origin'  // allow response to set-cookies
 	};
 	if (isPost) {
 		fetchConfig.body = params;
