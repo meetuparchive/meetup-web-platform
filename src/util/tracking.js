@@ -141,8 +141,8 @@ export default function decorateTrack(platform_agent) {
 		logout,
 		session,
 	};
-	return function(type, ...args) {
-		return trackers[type](this.request.response, ...args);
+	return function(response, trackType, ...args) {
+		return trackers[trackType](response, ...args);
 	};
 }
 
