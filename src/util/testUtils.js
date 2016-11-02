@@ -52,6 +52,7 @@ export const getServer = connection => {
 		request => () => Observable.of(request),
 		{ apply: true }
 	);
+	server.decorate('reply', 'track', function() { return this; });
 	return server;
 };
 

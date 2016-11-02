@@ -49,7 +49,7 @@ export default function getRoutes(
 					const loginResponse = queryResponses.find(r => r.login);
 					if (loginResponse) {
 						const member_id = JSON.stringify(loginResponse.login.value.member.id);
-						reply.trackLogin(member_id);
+						reply.track('login', member_id);
 					}
 				},
 				(err) => { reply(Boom.badImplementation(err.message)); }
@@ -76,8 +76,8 @@ export default function getRoutes(
 				({ result, statusCode }) => {
 					// response is sent when this function returns (`nextTick`)
 					const response = reply(result)
-						.code(statusCode)
-						.trackSession();
+						.code(statusCode);
+					reply.track('session');
 
 					if (reply.request.app.setCookies) {
 						// when auth cookies are generated on the server rather than the

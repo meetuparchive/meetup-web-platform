@@ -79,11 +79,10 @@ export const updateTrackId = (response, doRefresh) => {
 	return track_id;
 };
 
-export function trackLogout(platform_agent) {
-	logTrack(
-		this.response,
+export const trackLogout = log => response =>
+	log(
+		response,
 		{
-			platform_agent,
 			description: 'logout',
 			member_id: updateMemberId(this.response),
 			track_id_from: this.response.request.state.track_id,
@@ -91,14 +90,11 @@ export function trackLogout(platform_agent) {
 			session_id: this.response.request.state.session_id,
 		}
 	);
-	return this;
-}
 
-export function trackLogin(platform_agent, member_id) {
-	logTrack(
-		this.response,
+export const trackLogin = log => (response, member_id) =>
+	log(
+		response,
 		{
-			platform_agent,
 			description: 'login',
 			member_id: updateMemberId(this.response, member_id),
 			track_id_from: this.response.request.state.track_id,
@@ -106,24 +102,19 @@ export function trackLogin(platform_agent, member_id) {
 			session_id: this.response.request.state.session_id,
 		}
 	);
-	return this;
-}
 
-export function trackSession(platform_agent) {
-	logTrack(
-		this.response,
+export const trackSession = log => response =>
+	log(
+		response,
 		{
-			platform_agent,
 			description: 'new session',
 			member_id: this.response.request.state.member_id,
 			track_id: updateTrackId(this.response),
 			session_id: updateSessionId(this.response),
 		}
 	);
-	return this;
-}
 
-export function logTrack(response, trackInfo) {
+export const logTrack = platform_agent => (response, trackInfo) => {
 	const requestHeaders = response.request.headers;
 	const trackLog = {
 		...trackInfo,
@@ -133,10 +124,25 @@ export function logTrack(response, trackInfo) {
 		ip: requestHeaders['remote-addr'],
 		agent: requestHeaders['user-agent'],
 		platform: 'meetup-web-platform',
-		platform_agent: 'something something',
+		platform_agent,
 	};
 	// response.request.log will provide timestaemp
 	response.request.log(['tracking'], JSON.stringify(trackLog, null, 2));
-	return trackInfo;
+};
+
+export default function track(platform_agent) {
+	const log = logTrack(platform_agent);
+	const login = trackLogin(log);
+	const logout = trackLogout(log);
+	const session = trackSession(log);
+	const trackers = {
+		login,
+		logout,
+		session,
+	};
+	return function(type, ...args) {
+		trackers[type](this.response, ...args);
+		return this;
+	};
 }
 

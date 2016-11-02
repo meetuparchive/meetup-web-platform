@@ -237,8 +237,8 @@ export default function register(server, options, next) {
 			auth$(request).subscribe(
 				auth => {
 					reply(JSON.stringify(auth))
-						.type('application/json')
-						.trackLogout();
+						.type('application/json');
+					reply.track('logout');
 				},
 				(err) => { reply(Boom.badImplementation(err.message)); }
 			);
