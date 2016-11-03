@@ -68,6 +68,14 @@ describe('parseApiResponse', () => {
 		const nonOkReponse = { ...MOCK_RESPONSE, ...badStatus };
 		expect(parseApiResponse([nonOkReponse, '{}']).value.error).toEqual(badStatus.statusText);
 	});
+	it('returns the flags set in the X-Meetup-Flags header', () => {
+		const headers = {
+			'X-Meetup-Flags': 'foo=true,bar=false',
+		};
+		const flaggedResponse = { ...MOCK_RESPONSE, headers };
+		expect(parseApiResponse([flaggedResponse, '{}']).flags.foo).toBe(true);
+		expect(parseApiResponse([flaggedResponse, '{}']).flags.bar).toBe(false);
+	});
 });
 
 describe('queryToApiConfig', () => {
