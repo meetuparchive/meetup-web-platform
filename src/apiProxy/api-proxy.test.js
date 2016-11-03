@@ -70,7 +70,7 @@ describe('parseApiResponse', () => {
 	});
 	it('returns the flags set in the X-Meetup-Flags header', () => {
 		const headers = {
-			'X-Meetup-Flags': 'foo=true,bar=false',
+			'x-meetup-flags': 'foo=true,bar=false',
 		};
 		const flaggedResponse = { ...MOCK_RESPONSE, headers };
 		expect(parseApiResponse([flaggedResponse, '{}']).flags.foo).toBe(true);

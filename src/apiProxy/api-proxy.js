@@ -6,7 +6,7 @@ import * as apiConfigCreators from './apiConfigCreators';
 import { duotoneRef } from '../util/duotone';
 
 const parseResponseFlags = ({ headers }) =>
-	(headers['X-Meetup-Flags'] || '')
+	(headers['x-meetup-flags'] || '')
 		.split(',')
 		.filter(pair => pair)
 		.map(pair => pair.split('='))
