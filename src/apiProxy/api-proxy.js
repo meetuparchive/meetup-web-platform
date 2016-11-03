@@ -11,7 +11,7 @@ const parseResponseFlags = ({ headers }) =>
 		.filter(pair => pair)
 		.map(pair => pair.split('='))
 		.reduce((flags, [key, val]) => {
-			flags[key] = val === '1';
+			flags[key] = val === 'true';
 			return flags;
 		}, {});
 
