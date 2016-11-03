@@ -85,6 +85,24 @@ server routes and plugins. See the code comments for usage details.
 
 ## API Adapter
 
+### Query
+
+The app server expects API requests to be provided in the form of `query`
+objects in the payload of a single request to the app server at the `/api`
+endpoint. A query takes the following shape:
+
+```js
+{
+	type: <string>,
+	params: {
+		<string>: <string>,
+		...
+	},
+	ref: <string>,
+	flags: [<string>, ...],
+}
+```
+
 When the application server receives the JSON-encoded array of queries,
 it uses an API adapter module to translate those into the configuration
 needed to fetch data from an external API. The application server is
@@ -96,6 +114,15 @@ This adapter is used to proxy all requests to `/api`.
 From the client-side application's point of view, it will always send
 the `queries` and recieve the `queryResponses` for any data request -
 all the API-specific translations happen on the server.
+
+### Feature flags
+
+The API adapter provides an interface into feature flag values - just pass
+an array of feature flag names in the `flags` array of your query, and the
+response from the API adapter will return an object mapping the flag names to
+their true/false valuse in the `flags` property of the response. Your
+application will probably add these flag values directly to the Redux `state`,
+where they can be consumed by components to affect the UI.
 
 ## Middleware/Epics
 
