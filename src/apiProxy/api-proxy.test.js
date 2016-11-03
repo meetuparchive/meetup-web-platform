@@ -44,7 +44,7 @@ describe('parseApiResponse', () => {
 	const MOCK_RESPONSE = {
 		headers: {},
 		ok: true,
-		status: 200
+		statusCode: 200
 	};
 	it('converts valid JSON into an equivalent object', () => {
 		const validJSON = JSON.stringify(MOCK_GROUP);

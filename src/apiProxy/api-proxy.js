@@ -41,7 +41,7 @@ export const parseApiResponse = ([response, body]) => {
 	let value;
 	const flags = parseResponseFlags(response);
 
-	if (response.statusCode > 299) {
+	if ((response.status || response.statusCode) > 299) {
 		return {
 			value: { error: response.statusText },
 			flags,
