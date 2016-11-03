@@ -82,21 +82,18 @@ export const epicIgnoreAction = (epic, action=MOCK_MEANINGLESS_ACTION, store=cre
  * renderLocation('/foo').then(app => ...);
  * ```
  */
-export const routeRenderer = routes => {
-	return (location, state=MOCK_APP_STATE) => {
-		const FAKE_STORE = createFakeStore(state);
-		return new Promise((resolve, reject) => {
-			match({ location, routes }, (err, redirectLocation, renderProps) => {
-				const app = TestUtils.renderIntoDocument(
-					<IntlProvider locale='en'>
-						<Provider store={FAKE_STORE}>
-							<RouterContext {...renderProps} />
-						</Provider>
-					</IntlProvider>
-				);
-				resolve(app);
-			});
-		});
-	};
-};
+export const routeRenderer = routes => (location, state=MOCK_APP_STATE) =>
+	new Promise((resolve, reject) =>
+		match({ location, routes }, (err, redirectLocation, renderProps) => {
+			const FAKE_STORE = createFakeStore(state);
+			const app = TestUtils.renderIntoDocument(
+				<IntlProvider locale='en'>
+					<Provider store={FAKE_STORE}>
+						<RouterContext {...renderProps} />
+					</Provider>
+				</IntlProvider>
+			);
+			resolve(app);
+		})
+	);
 
