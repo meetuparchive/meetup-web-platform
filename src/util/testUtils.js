@@ -1,8 +1,13 @@
+import React from 'react';
 import { Observable } from 'rxjs';
 import { ActionsObservable } from 'redux-observable';
 import Hapi from 'hapi';
 import Cookie from 'tough-cookie';
 import TestUtils from 'react-addons-test-utils';
+import RouterContext from 'react-router/lib/RouterContext';
+import match from 'react-router/lib/match';
+import { IntlProvider } from 'react-intl';
+import { Provider } from 'react-redux';
 import {
 	MOCK_MEANINGLESS_ACTION,
 	MOCK_APP_STATE
@@ -65,3 +70,33 @@ export const epicIgnoreAction = (epic, action=MOCK_MEANINGLESS_ACTION, store=cre
 		.do(spyable.notCalled, null, expect(spyable.notCalled).not.toHaveBeenCalled())
 		.toPromise();
 };
+
+/**
+ * Curry a function that takes a set of React Router routes and a location to
+ * render, and return a Promise that resolves with the rendered React app
+ *
+ * @example
+ * ```
+ * const renderLocation = routeRenderer(routes);
+ * renderLocation('/').then(app => ...);
+ * renderLocation('/foo').then(app => ...);
+ * ```
+ */
+export const routeRenderer = routes => {
+	return (location, state=MOCK_APP_STATE) => {
+		const FAKE_STORE = createFakeStore(state);
+		return new Promise((resolve, reject) => {
+			match({ location, routes }, (err, redirectLocation, renderProps) => {
+				const app = TestUtils.renderIntoDocument(
+					<IntlProvider locale='en'>
+						<Provider store={FAKE_STORE}>
+							<RouterContext {...renderProps} />
+						</Provider>
+					</IntlProvider>
+				);
+				resolve(app);
+			});
+		});
+	};
+};
+
