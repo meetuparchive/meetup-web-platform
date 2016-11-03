@@ -41,18 +41,32 @@ describe('parseRequest', () => {
 });
 
 describe('parseApiResponse', () => {
+	const MOCK_RESPONSE = {
+		headers: {},
+		ok: true,
+		status: 200
+	};
 	it('converts valid JSON into an equivalent object', () => {
 		const validJSON = JSON.stringify(MOCK_GROUP);
-		expect(parseApiResponse(validJSON)).toEqual(jasmine.any(Object));
-		expect(parseApiResponse(validJSON)).toEqual(MOCK_GROUP);
+		expect(parseApiResponse([MOCK_RESPONSE, validJSON]).value).toEqual(jasmine.any(Object));
+		expect(parseApiResponse([MOCK_RESPONSE, validJSON]).value).toEqual(MOCK_GROUP);
 	});
 	it('returns an object with a string "error" value for invalid JSON', () => {
 		const invalidJSON = 'not valid';
-		expect(parseApiResponse(invalidJSON).error).toEqual(jasmine.any(String));
+		expect(parseApiResponse([MOCK_RESPONSE, invalidJSON]).value.error).toEqual(jasmine.any(String));
 	});
 	it('returns an object with a string "error" value for API response with "problem"', () => {
 		const responeWithProblem = JSON.stringify(MOCK_API_PROBLEM);
-		expect(parseApiResponse(responeWithProblem).error).toEqual(jasmine.any(String));
+		expect(parseApiResponse([MOCK_RESPONSE, responeWithProblem]).value.error).toEqual(jasmine.any(String));
+	});
+	it('returns an object with a string "error" value for a not-ok response', () => {
+		const badStatus = {
+			ok: false,
+			status: 500,
+			statusText: 'Problems',
+		};
+		const nonOkReponse = { ...MOCK_RESPONSE, ...badStatus };
+		expect(parseApiResponse([nonOkReponse, '{}']).value.error).toEqual(badStatus.statusText);
 	});
 });
 
