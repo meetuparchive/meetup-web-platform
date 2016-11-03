@@ -8,9 +8,10 @@ import { duotoneRef } from '../util/duotone';
 const parseResponseFlags = ({ headers }) =>
 	(headers['X-Meetup-Flags'] || '')
 		.split(',')
+		.filter(pair => pair)
 		.map(pair => pair.split('='))
 		.reduce((flags, [key, val]) => {
-			flags[key] = val === 'true';
+			flags[key] = val === '1';
 			return flags;
 		}, {});
 
@@ -78,7 +79,10 @@ export function queryToApiConfig({ type, params, flags }) {
 	if (!configCreator) {
 		throw new ReferenceError(`No API specified for query type ${type}`);
 	}
-	return configCreator(params);
+	return {
+		...configCreator(params),  // endpoint, params
+		flags,
+	};
 }
 
 /**
@@ -145,7 +149,7 @@ export const buildRequestArgs = externalRequestOpts =>
  *
  * @param {Object} apiResponse JSON-parsed api response data
  */
-export const apiResponseToQueryResponse = query => ({ flags, value }) => ({
+export const apiResponseToQueryResponse = query => ({ value, flags }) => ({
 	[query.ref]: {
 		type: query.type,
 		value,
