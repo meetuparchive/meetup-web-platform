@@ -37,21 +37,27 @@ const parseResponseFlags = ({ headers }) =>
  * @return responseObj the JSON-parsed text, possibly with error info
  */
 export const parseApiResponse = ([response, body]) => {
-	let responseObj;
-	let error;
-
-	try {
-		responseObj = JSON.parse(body);
-	} catch(e) {
-		error = `API response body was not JSON: "${body}"`;
-	}
-	if (responseObj && responseObj.problem) {
-		error = `API problem: ${responseObj.problem}: ${responseObj.details}`;
-	}
-
+	let value;
 	const flags = parseResponseFlags(response);
 
-	return error ? { error } : { ...responseObj, flags };
+	if (!response.ok) {
+		return {
+			value: { error: response.statusText },
+			flags,
+		};
+	}
+	try {
+		value = JSON.parse(body);
+		if (value && value.problem) {
+			value = { error: `API problem: ${value.problem}: ${value.details}` };
+		}
+		return { value, flags };
+	} catch(err) {
+		return {
+			value: { error: err.message },
+			flags
+		};
+	}
 };
 
 /**
@@ -139,10 +145,11 @@ export const buildRequestArgs = externalRequestOpts =>
  *
  * @param {Object} apiResponse JSON-parsed api response data
  */
-export const apiResponseToQueryResponse = query => response => ({
+export const apiResponseToQueryResponse = query => ({ flags, value }) => ({
 	[query.ref]: {
 		type: query.type,
-		value: response,
+		value,
+		flags
 	}
 });
 
@@ -246,7 +253,7 @@ export const makeApiRequest = (request, API_TIMEOUT, duotoneUrls) => {
 			.do(([response]) => request.log(['api'], `${response.elapsedTime}ms - ${response.request.uri.path}`)) // log api response time
 			.map(parseApiResponse)             // parse into plain object
 			.catch(error =>
-				Rx.Observable.of({ error: error.message })
+				Rx.Observable.of({ value: { error: error.message } })
 			)
 			.map(apiResponseToQueryResponse(query))    // convert apiResponse to app-ready queryResponse
 			.map(setApiResponseDuotones);        // special duotone prop
