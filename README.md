@@ -99,7 +99,7 @@ endpoint. A query takes the following shape:
 		...
 	},
 	ref: <string>,
-	flags: [<string>, ...],
+	flags?: [<string>, ...],
 }
 ```
 
@@ -114,6 +114,21 @@ This adapter is used to proxy all requests to `/api`.
 From the client-side application's point of view, it will always send
 the `queries` and recieve the `queryResponses` for any data request -
 all the API-specific translations happen on the server.
+
+A `queryResponse` takes the following shape:
+
+```js
+{
+	<string (ref)>: {
+		value?: <parsed API response JSON>
+		flags?: {
+			<string>: <Boolean>
+			...
+		},
+		error?: <string>
+	}
+}
+```
 
 ### Feature flags
 
