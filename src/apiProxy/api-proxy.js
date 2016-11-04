@@ -121,7 +121,8 @@ function urlFormatParams(params, doEncode) {
 export const buildRequestArgs = externalRequestOpts =>
 	({ endpoint, params, flags }) => {
 
-		const opts = { ...externalRequestOpts };
+		// cheap, brute-force object clone, acceptable for serializable object
+		const opts = JSON.parse(JSON.stringify(externalRequestOpts));
 		opts.url = `/${endpoint}`;
 
 		const formattedParams = urlFormatParams(params, opts.method === 'get');
