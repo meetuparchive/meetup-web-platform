@@ -40,6 +40,17 @@ export function find_groups(params) {
 }
 
 /**
+ * V2 Groups (only current way to get sponsors)
+ */
+export function groups2(params) {
+	params.fields = params.fields ? `${params.fields},sponsors` : 'sponsors';
+	return {
+		endpoint: '2/groups',
+		params
+	};
+}
+
+/**
  * Topics
  */
 export function topic(params) {
