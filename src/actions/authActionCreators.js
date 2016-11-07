@@ -34,11 +34,11 @@ export function loginPost(params) {
 	};
 }
 
-export function configureAuth(auth, isServer) {
+export function configureAuth(auth, suppressSync) {
 	return {
 		type: 'CONFIGURE_AUTH',
 		payload: auth,
-		meta: isServer
+		meta: suppressSync
 	};
 }
 
