@@ -89,6 +89,31 @@ export function profile(params) {
 	};
 }
 
+/**
+ * group communication endpoints
+ *
+ * accepts an `apiMethod` property in params:
+ * 	`apiMethod: 'followers' - return followers for a given conversation id
+ * 	`apiMethod: 'suggested_members' - return suggested_members for a given conversation id
+ */
+export function mugcomm(params) {
+	const { urlname, conversationId, apiMethod } = params;
+
+	const endpoint = [
+		urlname,
+		'conversations',
+		conversationId,
+		apiMethod
+	]
+		.filter(urlFragment => urlFragment) // only inlcude populated fragments
+		.join('/');
+
+	return {
+		endpoint,
+		params
+	}
+}
+
 
 /**
  * all the endpoints that return event objects

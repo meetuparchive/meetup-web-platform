@@ -123,7 +123,7 @@ export const buildRequestArgs = externalRequestOpts => ({ endpoint, params }) =>
  *
  * @param {Object} apiResponse JSON-parsed api response data
  */
-export const apiResponseToQueryResponse = ([response, query]) => ({
+export const apiResponseToQueryResponse = query => response => ({
 	[query.ref]: {
 		type: query.type,
 		value: response,
@@ -221,6 +221,45 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
 };
 
 /**
+ * Fake an API request and directly return the stringified mockResponse
+ */
+const makeMockRequest = mockResponse => requestOpts =>
+	Rx.Observable.of(JSON.stringify(mockResponse))
+		.do(() => console.log(`MOCKING response to ${requestOpts.url}`));
+
+const logResponseTime = log => ([response, body]) =>
+	log(['api'], `${response.elapsedTime}ms - ${response.request.uri.path}`);
+
+/**
+ * Make a real external API request, return response body string
+ */
+const makeExternalApiRequest = (request, API_TIMEOUT) => requestOpts =>
+	externalRequest$(requestOpts)
+		.timeout(API_TIMEOUT, new Error('API response timeout'))
+		.do(logResponseTime(request.log.bind(request)))
+		.map(([response, body]) => body);    // ignore Response object, just process body string
+
+/**
+ * Make an API request and parse the response into the expected `response`
+ * object shape
+ */
+export const makeApiRequest$ = (request, API_TIMEOUT, duotoneUrls) => {
+	const setApiResponseDuotones = apiResponseDuotoneSetter(duotoneUrls);
+	return ([requestOpts, query]) => {
+		const request$ = query.mockResponse ?
+			makeMockRequest(query.mockResponse) :
+			makeExternalApiRequest(request, API_TIMEOUT);
+
+		request.log(['api'], JSON.stringify(requestOpts.url));
+		return request$(requestOpts)
+			.map(parseApiResponse)             // parse into plain object
+			.catch(error => Rx.Observable.of({ error: error.message }))
+			.map(apiResponseToQueryResponse(query))    // convert apiResponse to app-ready queryResponse
+			.map(setApiResponseDuotones);        // special duotone prop
+	};
+};
+
+/**
  * This function transforms a single request to the application server into a
  * parallel array of requests to the API server, and then re-assembles the
  * API responses into an array of 'query responses' - i.e. API responses that
@@ -235,8 +274,7 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
  * @param {Object} baseUrl API server base URL for all API requests
  * @return Array$ contains all API responses corresponding to the provided queries
  */
-const apiProxy$ = ({ API_TIMEOUT=5000, baseUrl, duotoneUrls }) => {
-	const setApiResponseDuotones = apiResponseDuotoneSetter(duotoneUrls);
+const apiProxy$ = ({ API_TIMEOUT=5000, baseUrl='', duotoneUrls={} }) => {
 
 	return request => {
 
@@ -247,30 +285,15 @@ const apiProxy$ = ({ API_TIMEOUT=5000, baseUrl, duotoneUrls }) => {
 		// to build the query-specific API request options object
 		const apiConfigToRequestOptions = buildRequestArgs(externalRequestOpts);
 
-		return Rx.Observable.from(queries)    // create stream of query objects - fan-out
-			.map(queryToApiConfig)              // convert query to API-specific config
-			.map(apiConfigToRequestOptions)     // API-specific args for api request
-			.do(externalRequestOpts => request.log(['api'], JSON.stringify(externalRequestOpts.url)))  // logging
-			.concatMap(externalRequestOpts =>  // make the API calls - keep order
-				externalRequest$(externalRequestOpts)
-					.timeout(API_TIMEOUT, new Error('API response timeout'))
-					.catch(error =>
-						Rx.Observable.of(
-							[null, JSON.stringify({ error: error.message})]
-						)
-					)
-			)
-			.do(([response]) => request.log(['api'], `${response.elapsedTime}ms - ${response.request.uri.path}`)) // log api response time
-			.map(([response, body]) => body)    // ignore Response object, just process body string
-			.map(parseApiResponse)              // parse into plain object
-			.catch(error =>  // if there has been an error, all 'responses' need to be the error
-				Rx.Observable.of({ error: error.message })
-					.repeat(queries.length)
-			)
-			.zip(Rx.Observable.from(queries))   // zip the apiResponse with corresponding query
-			.map(apiResponseToQueryResponse)    // convert apiResponse to app-ready queryResponse
-			.map(setApiResponseDuotones)        // special duotone prop
-			.toArray();                         // group all responses into a single array - fan-in
+		// 3. map the queries onto an array of api request observables
+		const apiRequests$ = queries
+			.map(queryToApiConfig)
+			.map(apiConfigToRequestOptions)
+			.map((opts, i) => ([opts, queries[i]]))  // zip the query back into the opts
+			.map(makeApiRequest$(request, API_TIMEOUT, duotoneUrls));
+
+		// 4. zip them together to send them parallel and receive them in order
+		return Rx.Observable.zip(...apiRequests$);
 	};
 };
 

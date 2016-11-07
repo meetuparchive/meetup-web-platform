@@ -24,20 +24,39 @@ README.
 When developing a consumer application that requires changes to the platform
 code, you can release a beta version of the platform on npm by opening a PR in
 the meetup-web-platform repo. When it builds successfully, a new beta version
-will be added to the list of available npm versions, which you can see with
+will be added to the list of available npm versions. The generated version number
+is in the Travis build logs, which you can navigate to by clicking on 'Show all
+checks' in the box that says 'All checks have passed', and then getting the
+'Details' of the Travis build.
 
-```sh
-> npm show meetup-web-platform versions
-```
+<img width="797" alt="screen shot 2016-10-29 at 10 25 20 am" src="https://cloud.githubusercontent.com/assets/1885153/19822867/26d007dc-9dc2-11e6-8059-96d368411e78.png">
+
+<img width="685" alt="screen shot 2016-10-29 at 10 25 29 am" src="https://cloud.githubusercontent.com/assets/1885153/19822869/28d1f432-9dc2-11e6-8157-3d381746f315.png">
+
+At the bottom of the build log, there is a line that `echo`s the `GIT_TAG`.
+If you click the disclosure arrow, the version number will be displayed, e.g.
+`0.5.177-beta`.
+
+<img width="343" alt="screen shot 2016-10-29 at 10 25 59 am" src="https://cloud.githubusercontent.com/assets/1885153/19822874/312a9792-9dc2-11e6-97bc-62f61d252d4e.png">
+
+<img width="418" alt="screen shot 2016-10-29 at 10 26 06 am" src="https://cloud.githubusercontent.com/assets/1885153/19822876/34182e9c-9dc2-11e6-9901-c8e68591dc12.png">
 
 You can then install this beta version into your consumer application with
 
 ```sh
-> npm i meetup-web-platform@<version tag>
+> npm install meetup-web-platform@<version tag>
 ```
 
 Each time you push a change to your `meetup-web-platform` PR, you'll need to
 re-install it with the new tag in your consumer application code.
+
+The overall workflow is:
+
+1. Open a PR for your `meetup-web-platform` branch
+2. Wait for Travis to successfully build your branch (this can take 5+ minutes)
+3. Get the version string from the build logs under `GIT_TAG`
+4. (if needed) Push changes to your `meetup-web-platform` branch
+5. Repeat steps 2-3
 
 # Introductory Resources
 
@@ -77,6 +96,51 @@ This adapter is used to proxy all requests to `/api`.
 From the client-side application's point of view, it will always send
 the `queries` and recieve the `queryResponses` for any data request -
 all the API-specific translations happen on the server.
+
+### Faking an API response
+
+Sometimes, during development, you might want to set up your consumer app to
+query data from an API endpoint that is not yet set up. In this case, you can
+add a `mockResponse` property to your `query` object that will be used as the
+return value for the API call (you _have_ defined the API return values,
+right?). When the API endpoint is ready, simply remove the `mockResponse` from
+the query and the platform will call the API as configured in
+`src/apiProxy/apiConfigCreators.js`.
+
+**Example**
+
+A new feature will use a new API `/:urlname/candy` endpoint - it returns a new
+`type` of data called `candy` with an `id` and `flavor` property.
+
+The query function in the consumer app would look like this:
+
+``` js
+function candyQuery({ params, location }) {
+  const urlname = params.urlname;
+  return {
+    type: 'candy',
+    params: { urlname },
+    ref: 'candystate',
+    mockResponse: {
+      id: 1234,
+      flavor: 'kiwi'
+  };
+}
+```
+
+the `apiConfigCreator` would need to be defined like this:
+
+``` js
+function candy(params) {
+  return {
+    endpoint: `${params.urlname}/candy`,
+    params
+  };
+}
+```
+
+Then, even if the API server isn't handling `/:urlname/candy` yet, the app will
+load the `mockResponse` into Redux state at `state.app.candystate.value`.
 
 ## Middleware/Epics
 

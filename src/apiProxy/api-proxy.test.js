@@ -17,6 +17,7 @@ import {
 	apiResponseToQueryResponse,
 	apiResponseDuotoneSetter,
 	groupDuotoneSetter,
+	makeApiRequest$,
 } from './api-proxy';
 
 describe('parseRequest', () => {
@@ -107,7 +108,7 @@ describe('apiResponseToQueryResponse', () => {
 
 	it('transforms an API response object to an object for State consumption', function() {
 		this.MOCK_API_RESPONSES
-			.map((apiResponse, i) => apiResponseToQueryResponse([apiResponse, this.queries[i]]))
+			.map((apiResponse, i) => apiResponseToQueryResponse(this.queries[i])(apiResponse))
 			.forEach((queryResponse, i)=> {
 				expect(queryResponse).toEqual(jasmine.any(Object));
 				expect(queryResponse[this.refs[i]]).toEqual(jasmine.any(Object));
@@ -166,3 +167,18 @@ describe('apiResponseDuotoneSetter', () => {
 	});
 });
 
+describe('makeApiRequest$', () => {
+	it('responds with query.mockResponse when set', () => {
+		const mockResponse = { foo: 'bar' };
+		const query = { ...mockQuery(MOCK_RENDERPROPS), mockResponse };
+		const expectedResponse = {
+			[query.ref]: {
+				type: query.type,
+				value: mockResponse,
+			}
+		};
+		return makeApiRequest$({ log: () => {} }, 5000, {})([{ url: '/foo' }, query])
+			.toPromise()
+			.then(response => expect(response).toEqual(expectedResponse));
+	});
+});
