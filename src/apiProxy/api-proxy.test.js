@@ -17,6 +17,7 @@ import {
 	apiResponseToQueryResponse,
 	apiResponseDuotoneSetter,
 	groupDuotoneSetter,
+	makeApiRequest$,
 } from './api-proxy';
 
 describe('parseRequest', () => {
@@ -188,3 +189,18 @@ describe('apiResponseDuotoneSetter', () => {
 	});
 });
 
+describe('makeApiRequest$', () => {
+	it('responds with query.mockResponse when set', () => {
+		const mockResponse = { foo: 'bar' };
+		const query = { ...mockQuery(MOCK_RENDERPROPS), mockResponse };
+		const expectedResponse = {
+			[query.ref]: {
+				type: query.type,
+				value: mockResponse,
+			}
+		};
+		return makeApiRequest$({ log: () => {} }, 5000, {})([{ url: '/foo' }, query])
+			.toPromise()
+			.then(response => expect(response).toEqual(expectedResponse));
+	});
+});
