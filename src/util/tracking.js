@@ -109,7 +109,7 @@ export const trackSession = log => response =>
 	log(
 		response,
 		{
-			description: 'new session',
+			description: 'session',
 			member_id: response.request.state.member_id,
 			track_id: updateTrackId(response),
 			session_id: updateSessionId(response),
