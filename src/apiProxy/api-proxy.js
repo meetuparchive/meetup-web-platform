@@ -5,6 +5,16 @@ const externalRequest$ = Rx.Observable.bindNodeCallback(externalRequest);
 import * as apiConfigCreators from './apiConfigCreators';
 import { duotoneRef } from '../util/duotone';
 
+const parseResponseFlags = ({ headers }) =>
+	(headers['x-meetup-flags'] || '')
+		.split(',')
+		.filter(pair => pair)
+		.map(pair => pair.split('='))
+		.reduce((flags, [key, val]) => {
+			flags[key] = val === 'true';
+			return flags;
+		}, {});
+
 /**
  * Given the current request and API server host, proxy the request to the API
  * and return the responses corresponding to the provided queries.
@@ -27,20 +37,28 @@ import { duotoneRef } from '../util/duotone';
  * @param response {String} the raw response body text from an API call
  * @return responseObj the JSON-parsed text, possibly with error info
  */
-export const parseApiResponse = response => {
-	let responseObj;
-	let error;
+export const parseApiResponse = ([response, body]) => {
+	let value;
+	const flags = parseResponseFlags(response);
 
+	if (response.statusCode > 299) {
+		return {
+			value: { error: response.statusMessage },
+			flags,
+		};
+	}
 	try {
-		responseObj = JSON.parse(response);
-	} catch(e) {
-		error = `API response was not JSON: "${response}"`;
+		value = JSON.parse(body);
+		if (value && value.problem) {
+			value = { error: `API problem: ${value.problem}: ${value.details}` };
+		}
+		return { value, flags };
+	} catch(err) {
+		return {
+			value: { error: err.message },
+			flags
+		};
 	}
-	if (responseObj && responseObj.problem) {
-		error = `API problem: ${responseObj.problem}: ${responseObj.details}`;
-	}
-
-	return error ? { error } : responseObj;
 };
 
 /**
@@ -56,12 +74,15 @@ export const parseApiResponse = response => {
  * @param {Object} query a query object from the application
  * @return {Object} the arguments for api request, including endpoint
  */
-export function queryToApiConfig({ type, params }) {
+export function queryToApiConfig({ type, params, flags }) {
 	const configCreator = apiConfigCreators[type];
 	if (!configCreator) {
 		throw new ReferenceError(`No API specified for query type ${type}`);
 	}
-	return configCreator(params);
+	return {
+		...configCreator(params),  // endpoint, params
+		flags,
+	};
 }
 
 /**
@@ -92,40 +113,48 @@ function urlFormatParams(params, doEncode) {
  *
  * @param {Object} externalRequestOpts request options that will be applied to
  *   every query request
- * @param {Object} apiConfig { endpoint, params }
+ * @param {Object} apiConfig { endpoint, params, flags }
  *   call)
  * @return {Object} externalRequestOptsQuery argument for the call to
  *   `externalRequest` for the query
  */
-export const buildRequestArgs = externalRequestOpts => ({ endpoint, params }) => {
-	const externalRequestOptsQuery = { ...externalRequestOpts };
-	externalRequestOptsQuery.url = `/${endpoint}`;
+export const buildRequestArgs = externalRequestOpts =>
+	({ endpoint, params, flags }) => {
 
-	const dataParams = urlFormatParams(params, externalRequestOptsQuery.method === 'get');
+		// cheap, brute-force object clone, acceptable for serializable object
+		const opts = JSON.parse(JSON.stringify(externalRequestOpts));
+		opts.url = `/${endpoint}`;
 
-	switch (externalRequestOptsQuery.method) {
-	case 'get':
-		externalRequestOptsQuery.url += `?${dataParams}`;
-		externalRequestOptsQuery.headers['X-Meta-Photo-Host'] = 'secure';
-		break;
-	case 'post':
-		externalRequestOptsQuery.body = dataParams;
-		externalRequestOptsQuery.headers['content-type'] = 'application/x-www-form-urlencoded';
-		break;
-	}
+		const formattedParams = urlFormatParams(params, opts.method === 'get');
 
-	return externalRequestOptsQuery;
-};
+		if (flags) {
+			opts.headers['X-Meetup-Request-Flags'] = flags.join(',');
+		}
+
+		switch (opts.method) {
+		case 'get':
+			opts.url += `?${formattedParams}`;
+			opts.headers['X-Meta-Photo-Host'] = 'secure';
+			break;
+		case 'post':
+			opts.body = formattedParams;
+			opts.headers['content-type'] = 'application/x-www-form-urlencoded';
+			break;
+		}
+
+		return opts;
+	};
 
 /**
  * Format apiResponse to match expected state structure
  *
  * @param {Object} apiResponse JSON-parsed api response data
  */
-export const apiResponseToQueryResponse = query => response => ({
+export const apiResponseToQueryResponse = query => ({ value, flags }) => ({
 	[query.ref]: {
 		type: query.type,
-		value: response,
+		value,
+		flags
 	}
 });
 
@@ -219,11 +248,16 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
 	};
 };
 
+const MOCK_RESPONSE_OK = {  // minimal representation of http.IncomingMessage
+	statusCode: 200,
+	statusMessage: 'OK',
+	headers: {},
+};
 /**
  * Fake an API request and directly return the stringified mockResponse
  */
 const makeMockRequest = mockResponse => requestOpts =>
-	Rx.Observable.of(JSON.stringify(mockResponse))
+	Rx.Observable.of([MOCK_RESPONSE_OK, JSON.stringify(mockResponse)])
 		.do(() => console.log(`MOCKING response to ${requestOpts.url}`));
 
 const logResponseTime = log => ([response, body]) =>
@@ -235,8 +269,7 @@ const logResponseTime = log => ([response, body]) =>
 const makeExternalApiRequest = (request, API_TIMEOUT) => requestOpts =>
 	externalRequest$(requestOpts)
 		.timeout(API_TIMEOUT, new Error('API response timeout'))
-		.do(logResponseTime(request.log.bind(request)))
-		.map(([response, body]) => body);    // ignore Response object, just process body string
+		.do(logResponseTime(request.log.bind(request)));
 
 /**
  * Make an API request and parse the response into the expected `response`
