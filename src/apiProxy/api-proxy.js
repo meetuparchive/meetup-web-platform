@@ -248,11 +248,16 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
 	};
 };
 
+const MOCK_RESPONSE_OK = {
+	ok: true,
+	status: 200,
+	headers: {},
+};
 /**
  * Fake an API request and directly return the stringified mockResponse
  */
 const makeMockRequest = mockResponse => requestOpts =>
-	Rx.Observable.of(JSON.stringify(mockResponse))
+	Rx.Observable.of([MOCK_RESPONSE_OK, JSON.stringify(mockResponse)])
 		.do(() => console.log(`MOCKING response to ${requestOpts.url}`));
 
 const logResponseTime = log => ([response, body]) =>
@@ -264,8 +269,7 @@ const logResponseTime = log => ([response, body]) =>
 const makeExternalApiRequest = (request, API_TIMEOUT) => requestOpts =>
 	externalRequest$(requestOpts)
 		.timeout(API_TIMEOUT, new Error('API response timeout'))
-		.do(logResponseTime(request.log.bind(request)))
-		.map(([response, body]) => body);    // ignore Response object, just process body string
+		.do(logResponseTime(request.log.bind(request)));
 
 /**
  * Make an API request and parse the response into the expected `response`

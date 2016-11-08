@@ -195,6 +195,7 @@ describe('makeApiRequest$', () => {
 		const query = { ...mockQuery(MOCK_RENDERPROPS), mockResponse };
 		const expectedResponse = {
 			[query.ref]: {
+				flags: {},
 				type: query.type,
 				value: mockResponse,
 			}
