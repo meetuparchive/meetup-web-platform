@@ -44,7 +44,6 @@ describe('parseRequest', () => {
 describe('parseApiResponse', () => {
 	const MOCK_RESPONSE = {
 		headers: {},
-		ok: true,
 		statusCode: 200
 	};
 	it('converts valid JSON into an equivalent object', () => {
@@ -63,11 +62,11 @@ describe('parseApiResponse', () => {
 	it('returns an object with a string "error" value for a not-ok response', () => {
 		const badStatus = {
 			ok: false,
-			status: 500,
-			statusText: 'Problems',
+			statusCode: 500,
+			statusMessage: 'Problems',
 		};
 		const nonOkReponse = { ...MOCK_RESPONSE, ...badStatus };
-		expect(parseApiResponse([nonOkReponse, '{}']).value.error).toEqual(badStatus.statusText);
+		expect(parseApiResponse([nonOkReponse, '{}']).value.error).toEqual(badStatus.statusMessage);
 	});
 	it('returns the flags set in the X-Meetup-Flags header', () => {
 		const headers = {

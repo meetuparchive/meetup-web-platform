@@ -41,9 +41,9 @@ export const parseApiResponse = ([response, body]) => {
 	let value;
 	const flags = parseResponseFlags(response);
 
-	if ((response.status || response.statusCode) > 299) {
+	if (response.statusCode > 299) {
 		return {
-			value: { error: response.statusText },
+			value: { error: response.statusMessage },
 			flags,
 		};
 	}
@@ -248,9 +248,9 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
 	};
 };
 
-const MOCK_RESPONSE_OK = {
-	ok: true,
-	status: 200,
+const MOCK_RESPONSE_OK = {  // minimal representation of http.IncomingMessage
+	statusCode: 200,
+	statusMessage: 'OK',
 	headers: {},
 };
 /**
