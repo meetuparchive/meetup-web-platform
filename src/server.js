@@ -28,8 +28,7 @@ import {
  */
 export default function start(
 	renderRequestMap,
-	{ routes=[], plugins=[] },
-	config=getConfig
+	{ routes=[], plugins=[] }
 ) {
 	// source maps make for better stack traces - we might not want this in
 	// production if it makes anything slower, though
