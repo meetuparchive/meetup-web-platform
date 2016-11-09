@@ -89,5 +89,18 @@ describe('Sync epic', () => {
 				}
 			);
 	});
+	it('does not emit LOCATION_SYNC on CONFIGURE_AUTH when no oauth token in state', function() {
+		const auth = {};
+		const configureAuth = authActionCreators.configureAuth({});
+		const action$ = ActionsObservable.of(configureAuth);
+		const fakeStore = createFakeStore({ ...MOCK_APP_STATE, auth });
+		return getSyncEpic(routes)(action$, fakeStore)
+			.toPromise()
+			.then(
+				action => {
+					expect(action).toBeUndefined();
+				}
+			);
+	});
 });
 
