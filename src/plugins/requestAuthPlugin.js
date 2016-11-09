@@ -48,7 +48,7 @@ function injectAuthIntoRequest([request, auth]) {
  *
  * If the Request already has a valid oauth token, it is returned unchanged
  *
- * @param {Observable} auth$ a configured anonymous auth stream from `anonAuth$(config)`
+ * @param {Observable} auth$ a configured anonymous auth stream from `provideAuth$(config)`
  * @param {Request} request Hapi request to modify with auth token (if necessary)
  */
 export const requestAuthorizer = auth$ => request => {
@@ -62,9 +62,9 @@ export const requestAuthorizer = auth$ => request => {
 	const request$ = Rx.Observable.of(request);
 	return Rx.Observable.if(
 		() => request.state.oauth_token,
-		request$,
+		request$,  // no problem, request is authorized
 		request$
-			.zip(deferredAuth$)
+			.zip(deferredAuth$)  // need to get a new token
 			.do(verifyAuth)
 			.do(injectAuthIntoRequest)
 			.map(([request, auth]) => request)  // throw away auth info
@@ -172,10 +172,16 @@ export const getAccessToken$ = ({ API_TIMEOUT=5000, ANONYMOUS_ACCESS_URL, oauth 
 	};
 };
 
+const refreshToken$ = (refresh_token) => Rx.Observable.of({
+	grant_type: 'refresh_token',
+	token: refresh_token
+});
+
 /**
- * Curry a function that will get an anonymous auth token for a passed-in request
+ * Curry a function that will get a new auth token for a passed-in request
  * The request header information is used to determine the location and language of the
- * expected anonymous member
+ * expected anonymous member. The new auth token may be for an anonymous or
+ * logged-in member if a refresh_token is present.
  *
  * @param {Object} config { ANONYMOUS_AUTH_URL, ANONYMOUS_ACCESS_URL, oauth }
  * @param {String} redirect_uri this will be ignored since we get the code async,
@@ -185,21 +191,19 @@ export const getAccessToken$ = ({ API_TIMEOUT=5000, ANONYMOUS_ACCESS_URL, oauth 
  * language setting of the browser so that the anonymous token will access
  * translated API content
  */
-export const anonAuth$ = config => {
+export const provideAuth$ = config => {
 	const redirect_uri = 'http://www.meetup.com/';  // required param set in oauth consumer config
-	const code$ = getAnonymousCode$(config, redirect_uri);
-	const token$ = getAccessToken$(config, redirect_uri);
+	const anonymousCode$ = getAnonymousCode$(config, redirect_uri);
+	const accessToken$ = getAccessToken$(config, redirect_uri);
 
 	// if the request has a refresh_token, use it. Otherwise, get a new anonymous code
-	return request => Rx.Observable.if(
-		() => request.state.refresh_token,
-		Rx.Observable.of({
-			grant_type: 'refresh_token',
-			token: request.state.refresh_token
-		}),
-		code$()
+	return ({ headers, state: { refresh_token} }) => Rx.Observable.if(
+		() => refresh_token,
+		refreshToken$(refresh_token),
+		anonymousCode$()
 	)
-	.flatMap(token$(request.headers))
+	.flatMap(accessToken$(headers))
+	.retry(2)  // might be a temporary problem
 	.catch(error => {
 		console.log(error.stack);
 		return Rx.Observable.of({});  // failure results in empty object response - bad time
@@ -218,8 +222,8 @@ export const anonAuth$ = config => {
  * {@link http://hapijs.com/tutorials/plugins}
  */
 export default function register(server, options, next) {
-	// create a single anonAuth$ stream that can be used by any route
-	const auth$ = anonAuth$(options);
+	// create a single provideAuth$ stream that can be used by any route
+	const auth$ = provideAuth$(options);
 	// create a single stream for modifying an arbitrary request with anonymous auth
 	const authorizeRequest$ = requestAuthorizer(auth$);
 

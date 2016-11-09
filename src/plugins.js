@@ -1,5 +1,5 @@
 import Good from 'good';
-import anonAuthPlugin from './plugins/anonAuthPlugin';
+import anonAuthPlugin from './plugins/requestAuthPlugin';
 
 /**
  * Hapi plugins for the dev server

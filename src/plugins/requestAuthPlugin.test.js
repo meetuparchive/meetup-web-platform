@@ -1,10 +1,10 @@
 import Rx from 'rxjs';
 import register, {
-	anonAuth$,
+	provideAuth$,
 	getAnonymousCode$,
 	getAccessToken$,
 	requestAuthorizer,
-} from './anonAuthPlugin';
+} from './requestAuthPlugin';
 
 // silence expected console logging output
 console.log = () => {};
@@ -82,7 +82,7 @@ describe('getAnonymousToken$', () => {
 	});
 });
 
-describe('anonAuth$', () => {
+describe('provideAuth$', () => {
 	it('returns token when provided URLs and oauth info', function(done) {
 		spyOn(global, 'fetch').and.callFake((url, opts) => {
 			if (url.startsWith(ANONYMOUS_AUTH_URL)) {
@@ -96,7 +96,7 @@ describe('anonAuth$', () => {
 				});
 			}
 		});
-		const auth$ = anonAuth$({ oauth, ANONYMOUS_AUTH_URL, ANONYMOUS_ACCESS_URL }, null);
+		const auth$ = provideAuth$({ oauth, ANONYMOUS_AUTH_URL, ANONYMOUS_ACCESS_URL }, null);
 		const MOCK_REQUEST = { headers: MOCK_HEADERS, state: {}, app: {}, log: () => {} };
 
 		auth$(MOCK_REQUEST).subscribe(auth => {
@@ -106,7 +106,7 @@ describe('anonAuth$', () => {
 	});
 });
 describe('requestAuthorizer', () => {
-	const auth$ = anonAuth$({ oauth, ANONYMOUS_AUTH_URL, ANONYMOUS_ACCESS_URL }, null);
+	const auth$ = provideAuth$({ oauth, ANONYMOUS_AUTH_URL, ANONYMOUS_ACCESS_URL }, null);
 	const authorizeRequest$ = requestAuthorizer(auth$);
 	it('does not try to fetch when provided a request with an oauth token in state', function(done) {
 		spyOn(global, 'fetch').and.callFake((url, opts) => {
