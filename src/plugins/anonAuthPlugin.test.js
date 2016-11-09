@@ -2,7 +2,7 @@ import Rx from 'rxjs';
 import register, {
 	anonAuth$,
 	getAnonymousCode$,
-	getAnonymousAccessToken$,
+	getAccessToken$,
 	requestAuthorizer,
 } from './anonAuthPlugin';
 
@@ -50,29 +50,29 @@ describe('getAnonymousToken$', () => {
 			expect(url.startsWith(ANONYMOUS_ACCESS_URL)).toBe(true);
 			return GOOD_MOCK_FETCH_RESULT;
 		});
-		const getToken$ = getAnonymousAccessToken$({ oauth, ANONYMOUS_ACCESS_URL }, null);
+		const getToken$ = getAccessToken$({ oauth, ANONYMOUS_ACCESS_URL }, null);
 		getToken$(MOCK_HEADERS)(MOCK_CODE).subscribe(done);
 	});
 	it('throws an error when no oauth.key is supplied', function() {
 		const oauthNoKey = { ...oauth };
 		delete oauthNoKey.key;
-		expect(() => getAnonymousAccessToken$({ oauth: oauthNoKey, ANONYMOUS_ACCESS_URL }, null))
+		expect(() => getAccessToken$({ oauth: oauthNoKey, ANONYMOUS_ACCESS_URL }, null))
 			.toThrowError(ReferenceError);
 	});
 	it('throws an error when no oauth.secret is supplied', function() {
 		const oauthNoSecret = { ...oauth };
 		delete oauthNoSecret.secret;
-		expect(() => getAnonymousAccessToken$({ oauth: oauthNoSecret, ANONYMOUS_ACCESS_URL }, null))
+		expect(() => getAccessToken$({ oauth: oauthNoSecret, ANONYMOUS_ACCESS_URL }, null))
 			.toThrowError(ReferenceError);
 	});
 	it('throws an error when no access code is supplied to the final curried function', function() {
 		const token = null;
-		const getToken$ = getAnonymousAccessToken$({ oauth, ANONYMOUS_ACCESS_URL }, null);
+		const getToken$ = getAccessToken$({ oauth, ANONYMOUS_ACCESS_URL }, null);
 		expect(() => getToken$(MOCK_HEADERS)({ ...MOCK_CODE, token })).toThrowError(ReferenceError);
 	});
 	it('throws an error when response cannot be JSON parsed', function(done) {
 		spyOn(global, 'fetch').and.callFake((url, opts) => BAD_MOCK_FETCH_RESULT);
-		const getToken$ = getAnonymousAccessToken$({ oauth, ANONYMOUS_ACCESS_URL }, null);
+		const getToken$ = getAccessToken$({ oauth, ANONYMOUS_ACCESS_URL }, null);
 		getToken$(MOCK_HEADERS)(MOCK_CODE)
 			.catch(err => {
 				expect(err).toEqual(jasmine.any(Error));

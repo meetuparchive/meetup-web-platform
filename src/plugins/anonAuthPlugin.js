@@ -120,7 +120,7 @@ export function getAnonymousCode$({ API_TIMEOUT=5000, ANONYMOUS_AUTH_URL, oauth 
  * @return {Object} the JSON-parsed response from the authorize endpoint
  *   - contains 'access_token', 'refresh_token'
  */
-export const getAnonymousAccessToken$ = ({ API_TIMEOUT=5000, ANONYMOUS_ACCESS_URL, oauth }, redirect_uri) => {
+export const getAccessToken$ = ({ API_TIMEOUT=5000, ANONYMOUS_ACCESS_URL, oauth }, redirect_uri) => {
 	if (!oauth.key) {
 		throw new ReferenceError('OAuth consumer key is required');
 	}
@@ -188,7 +188,7 @@ export const getAnonymousAccessToken$ = ({ API_TIMEOUT=5000, ANONYMOUS_ACCESS_UR
 export const anonAuth$ = config => {
 	const redirect_uri = 'http://www.meetup.com/';  // required param set in oauth consumer config
 	const code$ = getAnonymousCode$(config, redirect_uri);
-	const token$ = getAnonymousAccessToken$(config, redirect_uri);
+	const token$ = getAccessToken$(config, redirect_uri);
 
 	// if the request has a refresh_token, use it. Otherwise, get a new anonymous code
 	return request => Rx.Observable.if(

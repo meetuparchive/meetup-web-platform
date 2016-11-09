@@ -73,7 +73,8 @@ export default function getRoutes(
 		method: ['GET', 'POST', 'DELETE', 'PATCH'],
 		path: '/api',
 		handler: (request, reply) => {
-			const queryResponses$ = proxyApiRequest$(request);
+			const queryResponses$ = request.authorize()  // ensures that a valid oauth_token is present in the request
+				.flatMap(proxyApiRequest$);
 			queryResponses$.subscribe(
 				queryResponses => {
 					reply(JSON.stringify(queryResponses)).type('application/json');
