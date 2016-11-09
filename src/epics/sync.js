@@ -41,7 +41,7 @@ export const getNavEpic = routes => {
 export const resetLocationEpic = (action$, store) =>
 	action$.ofType('CONFIGURE_AUTH')  // auth changes imply privacy changes - reload
 		.filter(({ meta }) => !meta)  // throw out any cases where sync is specifically suppressed
-		.filter(() => !store.getState().auth.oauth_token)  // ignore cases where auth tokens are not set
+		.filter(() => store.getState().auth.oauth_token)  // only continue if oauth_token is set
 		.map(() => locationSync(store.getState().routing.locationBeforeTransitions));
 
 /**
