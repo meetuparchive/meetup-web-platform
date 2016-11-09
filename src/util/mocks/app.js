@@ -22,7 +22,9 @@ export const MOCK_APP_STATE = {
 			]
 		}
 	},
-	auth: {},
+	auth: {
+		oauth_token: 'foo'
+	},
 	config: {},
 	routing: {
 		locationBeforeTransitions: {}
