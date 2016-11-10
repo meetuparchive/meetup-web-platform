@@ -6,6 +6,8 @@ import Rx from 'rxjs';
  * @module anonAuthPlugin
  */
 
+const YEAR_IN_MS = 1000 * 60 * 60 * 24 * 365;
+
 function tryJSON(response) {
 	const { status } = response;
 	if (status >= 400) {  // status always 200: bugzilla #52128
@@ -95,7 +97,7 @@ export function getAnonymousCode$({ API_TIMEOUT=5000, ANONYMOUS_AUTH_URL, oauth 
 		},
 	};
 
-	return () => {
+	return Rx.Observable.defer(() => {
 		console.log(`Fetching anonymous auth code from ${ANONYMOUS_AUTH_URL}`);
 		return Rx.Observable.fromPromise(fetch(anonymousCodeUrl, requestOpts))
 			.timeout(API_TIMEOUT)
@@ -108,7 +110,7 @@ export function getAnonymousCode$({ API_TIMEOUT=5000, ANONYMOUS_AUTH_URL, oauth 
 				grant_type: 'anonymous_code',
 				token: code
 			}));
-	};
+	});
 }
 
 /**
@@ -156,15 +158,16 @@ export const getAccessToken$ = ({ API_TIMEOUT=5000, ANONYMOUS_ACCESS_URL, oauth 
 
 			accessParams.append('grant_type', grant_type);
 			if (grant_type === 'anonymous_code') {
+				console.log(`Fetching anonymous access_token from ${ANONYMOUS_ACCESS_URL}`);
 				accessParams.append('code', token);
 			}
 			if (grant_type === 'refresh_token') {
+				console.log(`Refreshing access_token from ${ANONYMOUS_ACCESS_URL}`);
 				accessParams.append('refresh_token', token);
 			}
 
 			const url = `${ANONYMOUS_ACCESS_URL}?${accessParams}`;
 
-			console.log(`Fetching anonymous access_token from ${ANONYMOUS_ACCESS_URL}`);
 			return Rx.Observable.fromPromise(fetch(url, requestOpts))
 				.timeout(API_TIMEOUT)
 				.flatMap(tryJSON);
@@ -200,7 +203,7 @@ export const provideAuth$ = config => {
 	return ({ headers, state: { refresh_token} }) => Rx.Observable.if(
 		() => refresh_token,
 		refreshToken$(refresh_token),
-		anonymousCode$()
+		anonymousCode$
 	)
 	.flatMap(accessToken$(headers))
 	.retry(2)  // might be a temporary problem
@@ -232,6 +235,28 @@ export default function register(server, options, next) {
 		'authorize',
 		request => () => authorizeRequest$(request),
 		{ apply: true }
+	);
+
+	server.handler('auth', (route, options) => (request, reply) =>
+		request.authorize()
+			.flatMap(request => options.response$(request, reply))
+			.do(response => {
+				if (request.app.setCookies) {
+					const {
+						oauth_token,
+						refresh_token,
+						expires_in,
+						anonymous,
+					} = request.state;
+
+					const path = '/';
+					request.log(['info'], chalk.green(`Setting cookies ${Object.keys(request.state)}`));
+					response.state('oauth_token', oauth_token, { path, ttl: expires_in * 1000 });
+					response.state('refresh_token', refresh_token, { path, ttl: YEAR_IN_MS * 2 });
+					response.state('anonymous', anonymous.toString(), { path, ttl: YEAR_IN_MS * 2 });
+				}
+			})
+			.subscribe(() => {}, err => { reply(Boom.badImplementation(err.message)); })
 	);
 
 	server.route({
