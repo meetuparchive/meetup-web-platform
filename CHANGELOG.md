@@ -1,3 +1,14 @@
+## [0.6]
+
+- **Removed** - `CONFIGURE_AUTH` action will no longer contain a key named
+`anonymous`. The app can determine whether the current user is logged in from
+the `app.self` value, which should be a memeber object with a `status`
+indicating whether the user is logged in.
+- **Deprecated** - the `ANONYMOUS_ACCESS_URL` and `ANONYMOUS_AUTH_URL` env
+variable names have been changed to `OAUTH_ACCESS_URL` and `OAUTH_AUTH_URL`,
+respectively. The only names will still be read, but will be removed entirely
+in a future version.
+
 ## [0.5]
 
 - **Refactor** - all modules are now transpiled to CommonJS ES5 modules in
