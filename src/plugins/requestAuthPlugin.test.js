@@ -4,7 +4,7 @@ import register, {
 	getAnonymousCode$,
 	getAnonymousAccessToken$,
 	requestAuthorizer,
-} from './anonAuthPlugin';
+} from './requestAuthPlugin';
 
 // silence expected console logging output
 console.log = () => {};
