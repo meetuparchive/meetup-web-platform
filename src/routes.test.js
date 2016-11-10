@@ -46,7 +46,6 @@ describe('routes', () => {
 				const cookies = parseCookieHeader(cookieHeader);
 				expect(cookies.oauth_token).toBe(MOCK_OAUTH_COOKIES.oauth_token);
 				expect(cookies.refresh_token).toBe(MOCK_OAUTH_COOKIES.refresh_token);
-				expect(cookies.anonymous).toBe(MOCK_OAUTH_COOKIES.anonymous.toString());
 			})
 	);
 	it('sets tracking cookie in response', () =>

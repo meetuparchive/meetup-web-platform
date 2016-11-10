@@ -30,12 +30,12 @@ describe('getAnonymousCode$', () => {
 			expect(url.startsWith(ANONYMOUS_AUTH_URL)).toBe(true);
 			return GOOD_MOCK_FETCH_RESULT;
 		});
-		getAnonymousCode$({ oauth, ANONYMOUS_AUTH_URL })().subscribe(done);
+		getAnonymousCode$({ oauth, ANONYMOUS_AUTH_URL }).subscribe(done);
 	});
 	it('returns null code when response cannot be JSON parsed', function(done) {
 		spyOn(global, 'fetch').and.callFake((url, opts) => BAD_MOCK_FETCH_RESULT);
 
-		const getCode$ = getAnonymousCode$({ oauth, ANONYMOUS_AUTH_URL })();
+		const getCode$ = getAnonymousCode$({ oauth, ANONYMOUS_AUTH_URL });
 		getCode$.subscribe(({ grant_type, token }) => {
 			expect(token).toBeNull();
 			done();
