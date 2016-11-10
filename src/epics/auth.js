@@ -48,7 +48,7 @@ export const handleLogoutRequest = action$ =>
 				// immediately clear auth information so no more private data is accessible
 				// - this will put the app in limbo, unable to request any more data until
 				// a new token is provided by `LOGOUT_SUCESS` or a full refresh
-				Rx.Observable.of(configureAuth({})),
+				Rx.Observable.of(configureAuth({})),  // clear all auth info
 				Rx.Observable.fromPromise(
 					fetch(ANONYMOUS_AUTH_APP_PATH)
 						.then(response => response.json())
