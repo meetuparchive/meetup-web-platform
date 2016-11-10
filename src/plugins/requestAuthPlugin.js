@@ -182,8 +182,8 @@ export const getAccessToken$ = ({ API_TIMEOUT=5000, OAUTH_ACCESS_URL, oauth }, r
  */
 export const requestAuth$ = config => {
 	const redirect_uri = 'http://www.meetup.com/';  // required param set in oauth consumer config
-	const code$ = getAnonymousCode$(config, redirect_uri);
-	const token$ = getAccessToken$(config, redirect_uri);
+	const anonymousCode$ = getAnonymousCode$(config, redirect_uri);
+	const accessToken$ = getAccessToken$(config, redirect_uri);
 
 	// if the request has a refresh_token, use it. Otherwise, get a new anonymous access token
 	return request => Rx.Observable.if(
@@ -192,9 +192,9 @@ export const requestAuth$ = config => {
 			grant_type: 'refresh_token',
 			token: request.state.refresh_token
 		}),
-		code$
+		anonymousCode$
 	)
-	.flatMap(token$(request.headers))
+	.flatMap(accessToken$(request.headers))
 	.catch(error => {
 		console.log(error.stack);
 		return Rx.Observable.of({});  // failure results in empty object response - bad time
