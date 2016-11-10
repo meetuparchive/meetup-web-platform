@@ -250,3 +250,14 @@ case.
 
 Use reducers to parse the response and update application state.
 
+## Tracking
+
+When starting the server, applications provide a `platform_agent` identifier,
+e.g. `'mup-web'` that is used to tag all of the automatically-generated
+tracking data produced by platform-related activity, including data requests,
+browser sessions and login/logout actions. Over time, this system will expand
+to include click tracking and other types of tracking defined by the Data team
+and implemented through platform-provided unique IDs.
+
+More info in Confluence [here](https://meetup.atlassian.net/wiki/display/WP/Tracking+data+needs)
+
