@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import Rx from 'rxjs';
 
 /**
- * @module anonAuthPlugin
+ * @module requestAuthPlugin
  */
 
 function tryJSON(response) {
@@ -34,7 +34,6 @@ function injectAuthIntoRequest([request, auth]) {
 	request.state.oauth_token = auth.access_token;  // this endpoint provides 'access_token' instead of 'oauth_token'
 	request.state.refresh_token = auth.refresh_token;  // use to get new oauth upon expiration
 	request.state.expires_in = auth.expires_in;  // TTL for oauth token (in seconds)
-	request.state.anonymous = true;
 
 	// special prop in `request.app` to indicate that this is a new,
 	// server-provided token, not from the original request, so the cookies
@@ -95,7 +94,7 @@ export function getAnonymousCode$({ API_TIMEOUT=5000, ANONYMOUS_AUTH_URL, oauth 
 		},
 	};
 
-	return () => {
+	return Rx.Observable.defer(() => {
 		console.log(`Fetching anonymous auth code from ${ANONYMOUS_AUTH_URL}`);
 		return Rx.Observable.fromPromise(fetch(anonymousCodeUrl, requestOpts))
 			.timeout(API_TIMEOUT)
@@ -108,7 +107,7 @@ export function getAnonymousCode$({ API_TIMEOUT=5000, ANONYMOUS_AUTH_URL, oauth 
 				grant_type: 'anonymous_code',
 				token: code
 			}));
-	};
+	});
 }
 
 /**
@@ -197,7 +196,7 @@ export const anonAuth$ = config => {
 			grant_type: 'refresh_token',
 			token: request.state.refresh_token
 		}),
-		code$()
+		code$
 	)
 	.flatMap(token$(request.headers))
 	.catch(error => {

@@ -8,7 +8,10 @@ export const MOCK_APP_STATE = {
 	app: {
 		self: {
 			type: 'member',
-			value: { id: 1234 }
+			value: {
+				id: 1234,
+				status: 'prereg',
+			}
 		},
 		group: {
 			type: 'group',
