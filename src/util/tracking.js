@@ -92,6 +92,15 @@ export const trackLogout = log => response =>
 		}
 	);
 
+export const trackApi = log => (response, queryResponses) => {
+	// special case - login requests need to be tracked
+	const loginResponse = queryResponses.find(r => r.login);
+	if (loginResponse) {
+		const member_id = JSON.stringify(loginResponse.login.value.member.id);
+		return trackLogin(log)(response, member_id);
+	}
+};
+
 export const trackLogin = log => (response, member_id) =>
 	log(
 		response,
@@ -135,10 +144,12 @@ export const logTrack = platform_agent => (response, trackInfo) => {
 
 export default function decorateTrack(platform_agent) {
 	const log = logTrack(platform_agent);
+	const api = trackApi(log);
 	const login = trackLogin(log);
 	const logout = trackLogout(log);
 	const session = trackSession(log);
 	const trackers = {
+		api,
 		login,
 		logout,
 		session,

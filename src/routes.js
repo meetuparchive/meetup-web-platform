@@ -44,13 +44,7 @@ export default function getRoutes(
 				queryResponses => {
 					const response = reply(JSON.stringify(queryResponses))
 						.type('application/json');
-
-					// special case - login requests need to be tracked
-					const loginResponse = queryResponses.find(r => r.login);
-					if (loginResponse) {
-						const member_id = JSON.stringify(loginResponse.login.value.member.id);
-						reply.track(response, 'login', member_id);
-					}
+					reply.track(response, 'api', queryResponses);
 				},
 				(err) => { reply(Boom.badImplementation(err.message)); }
 			);
