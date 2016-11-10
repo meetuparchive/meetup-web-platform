@@ -56,7 +56,7 @@ describe('AuthEpic', () => {
 			);
 	});
 	it('sets 3 cookies on CONFIGURE_AUTH', function() {
-		const cookieNames = ['oauth_token', 'refresh_token', 'anonymous'];
+		const cookieNames = ['oauth_token', 'refresh_token'];
 		spyOn(Cookies, 'set');
 		const configureAuthAction = authActionCreators.configureAuth({});
 		const action$ = ActionsObservable.of(configureAuthAction);

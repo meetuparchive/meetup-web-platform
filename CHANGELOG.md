@@ -1,3 +1,10 @@
+## [0.6]
+
+- **Removed** - `CONFIGURE_AUTH` action will no longer contain a key named
+`anonymous`. The app can determine whether the current user is logged in from
+the `app.self` value, which should be a memeber object with a `status`
+indicating whether the user is logged in.
+
 ## [0.5]
 
 - **Refactor** - all modules are now transpiled to CommonJS ES5 modules in
