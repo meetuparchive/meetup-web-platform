@@ -81,14 +81,12 @@ export default function getRoutes(
 							oauth_token,
 							refresh_token,
 							expires_in,
-							anonymous,
 						} = reply.request.state;
 
 						const path = '/';
 						request.log(['info'], chalk.green(`Setting cookies ${Object.keys(reply.request.state)}`));
 						response.state('oauth_token', oauth_token, { path, ttl: expires_in * 1000 });
 						response.state('refresh_token', refresh_token, { path, ttl: YEAR_IN_MS * 2 });
-						response.state('anonymous', anonymous.toString(), { path, ttl: YEAR_IN_MS * 2 });
 					}
 				}
 			);
