@@ -42,13 +42,8 @@ export default function getRoutes(
 						.map(queryResponses => {
 							const response = reply(JSON.stringify(queryResponses))
 								.type('application/json');
+							reply.track(response, 'api', queryResponses);
 
-							// special case - login requests need to be tracked
-							const loginResponse = queryResponses.find(r => r.login);
-							if (loginResponse) {
-								const member_id = JSON.stringify(loginResponse.login.value.member.id);
-								reply.track(response, 'login', member_id);
-							}
 							return response;
 						})
 			}

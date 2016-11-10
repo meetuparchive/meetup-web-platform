@@ -2,6 +2,7 @@ import {
 	updateSessionId,
 	updateTrackId,
 	updateMemberId,
+	trackApi,
 	trackLogout,
 	trackLogin,
 	trackSession,
@@ -177,6 +178,26 @@ describe('tracking loggers', () => {
 		expect(trackInfo.track_id_from).toBeDefined();
 		expect(trackInfo.track_id_from).toEqual(request.state.track_id);
 		expect(trackInfo.session_id).toEqual(request.state.session_id);
+	});
+	it('trackApi: calls logger with "login" when login in queryResponses', () => {
+		spyOn(spyable, 'log').and.callThrough();
+		const request = {
+			state: {
+				track_id: 'foo',
+				session_id: 'bar',
+			},
+			info: { referrer: 'baz' }
+		};
+		const loginResponse = {
+			...MOCK_HAPI_RESPONSE,
+			request
+		};
+		const trackInfo = trackApi(spyable.log)(
+			loginResponse,
+			[{ login: { type: 'login', value: { member: { id: 1234 } } } }]
+		);
+		expect(spyable.log).toHaveBeenCalled();
+		expect(trackInfo.description).toEqual('login');  // this may change, but need to ensure tag is always correct
 	});
 	it('trackSession: calls logger with "session", new session_id, old track_id & member_id', () => {
 		spyOn(spyable, 'log').and.callThrough();
