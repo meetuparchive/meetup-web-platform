@@ -17,7 +17,7 @@ import {
 	configureAuth,
 } from '../actions/authActionCreators';
 
-export const ANONYMOUS_AUTH_APP_PATH = '/anon';
+export const AUTH_ENDPOINT = '/auth';
 
 /**
  * There are 6 login-related actions:
@@ -50,7 +50,7 @@ export const handleLogoutRequest = action$ =>
 				// a new token is provided by `LOGOUT_SUCESS` or a full refresh
 				Rx.Observable.of(configureAuth({})),  // clear all auth info
 				Rx.Observable.fromPromise(
-					fetch(ANONYMOUS_AUTH_APP_PATH)
+					fetch(AUTH_ENDPOINT)
 						.then(response => response.json())
 				)
 				.map(logoutSuccess)
