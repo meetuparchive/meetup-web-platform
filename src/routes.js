@@ -37,7 +37,7 @@ export default function getRoutes(
 		path: '/api',
 		handler: {
 			auth: {
-				response$: (request, reply) =>
+				handler: (request, reply) =>
 					proxyApiRequest$(request)
 						.map(queryResponses => {
 							const response = reply(JSON.stringify(queryResponses))
@@ -64,7 +64,7 @@ export default function getRoutes(
 		path: '/{wild*}',
 		handler: {
 			auth: {
-				response$: (request, reply) => {
+				handler: (request, reply) => {
 					const requestLanguage = Accepts(request).language(Object.keys(renderRequestMap));
 					request.log(['info'], chalk.green(`Request received for ${request.url.href} (${requestLanguage})`));
 

@@ -31,18 +31,23 @@ function verifyAuth([request, auth]) {
 	request.log(['auth'], `Authorizing with keys: ${JSON.stringify(keys)}`);
 }
 
-function injectAuthIntoRequest([request, auth]) {
-	// update request with auth info
-	request.state.oauth_token = auth.access_token;  // this endpoint provides 'access_token' instead of 'oauth_token'
-	request.state.refresh_token = auth.refresh_token;  // use to get new oauth upon expiration
-	request.state.expires_in = auth.expires_in;  // TTL for oauth token (in seconds)
-	request.state.anonymous = true;
-
-	// special prop in `request.app` to indicate that this is a new,
-	// server-provided token, not from the original request, so the cookies
-	// will need to be set in the response
-	request.app.setCookies = true;
-}
+const injectAuthIntoRequest = ([request, auth]) => {
+	const path = '/';
+	request.plugins.requestAuth = {
+		oauth_token: {
+			value: auth.oauth_token || auth.access_token,
+			opts: { path, ttl: auth.expires_in * 1000 },
+		},
+		refresh_token: {
+			value: auth.refresh_token,
+			opts: { path, ttl: YEAR_IN_MS * 2 },
+		},
+		anonymous: {
+			value: auth.anonymous.toString(),
+			opts: { path, ttl: YEAR_IN_MS * 2 }
+		},
+	};
+};
 
 /**
  * Curry a function that uses a pre-configured anonymous auth stream to ensure
@@ -170,7 +175,11 @@ export const getAccessToken$ = ({ API_TIMEOUT=5000, ANONYMOUS_ACCESS_URL, oauth 
 
 			return Rx.Observable.fromPromise(fetch(url, requestOpts))
 				.timeout(API_TIMEOUT)
-				.flatMap(tryJSON);
+				.flatMap(tryJSON)
+				.map(auth => ({
+					...auth,
+					anonymous: grant_type === 'grant_type',
+				}));
 		};
 	};
 };
@@ -239,24 +248,19 @@ export default function register(server, options, next) {
 
 	server.handler('auth', (route, options) => (request, reply) =>
 		request.authorize()
-			.flatMap(request => options.response$(request, reply))
-			.do(response => {
-				if (request.app.setCookies) {
-					const {
-						oauth_token,
-						refresh_token,
-						expires_in,
-						anonymous,
-					} = request.state;
-
-					const path = '/';
-					request.log(['info'], chalk.green(`Setting cookies ${Object.keys(request.state)}`));
-					response.state('oauth_token', oauth_token, { path, ttl: expires_in * 1000 });
-					response.state('refresh_token', refresh_token, { path, ttl: YEAR_IN_MS * 2 });
-					response.state('anonymous', anonymous.toString(), { path, ttl: YEAR_IN_MS * 2 });
+			.flatMap(request => options.handler(request, reply))
+			.do(() => {
+				const { requestAuth } = request.plugins;
+				for (const cookie in requestAuth) {
+					request.log(['info'], chalk.green(`Setting cookie ${cookie}`));
+					reply.state(
+						cookie,
+						requestAuth[cookie].value,
+						requestAuth[cookie].opts
+					);
 				}
 			})
-			.subscribe(() => {}, err => { reply(Boom.badImplementation(err.message)); })
+			.subscribe(() => {}, err => { console.error(err.message); })
 	);
 
 	server.route({
@@ -277,7 +281,7 @@ export default function register(server, options, next) {
 	next();
 }
 register.attributes = {
-	name: 'anonAuth',
+	name: 'requestAuth',
 	version: '1.0.0',
 };
 
