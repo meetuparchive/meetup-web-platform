@@ -175,11 +175,7 @@ export const getAccessToken$ = ({ API_TIMEOUT=5000, ANONYMOUS_ACCESS_URL, oauth 
 
 			return Rx.Observable.fromPromise(fetch(url, requestOpts))
 				.timeout(API_TIMEOUT)
-				.flatMap(tryJSON)
-				.map(auth => ({
-					...auth,
-					anonymous: grant_type === 'grant_type',
-				}));
+				.flatMap(tryJSON);
 		};
 	};
 };
@@ -265,7 +261,7 @@ export default function register(server, options, next) {
 
 	server.route({
 		method: 'GET',
-		path: options.ANONYMOUS_AUTH_APP_PATH,
+		path: options.AUTH_ENDPOINT,
 		handler: (request, reply) => {
 			auth$(request).subscribe(
 				auth => {
