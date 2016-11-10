@@ -172,6 +172,11 @@ export const getAccessToken$ = ({ API_TIMEOUT=5000, OAUTH_ACCESS_URL, oauth }, r
 	};
 };
 
+const refreshToken$ = refresh_token => Rx.Observable.of({
+	grant_type: 'refresh_token',
+	token: refresh_token
+});
+
 /**
  * Curry a function that will get a new auth token for a passed-in request.
  * For an anonymous auth, the request header information is used to determine
@@ -186,15 +191,12 @@ export const requestAuth$ = config => {
 	const accessToken$ = getAccessToken$(config, redirect_uri);
 
 	// if the request has a refresh_token, use it. Otherwise, get a new anonymous access token
-	return request => Rx.Observable.if(
-		() => request.state.refresh_token,
-		Rx.Observable.of({
-			grant_type: 'refresh_token',
-			token: request.state.refresh_token
-		}),
+	return ({ headers, state: { refresh_token} }) => Rx.Observable.if(
+		() => refresh_token,
+		refreshToken$(refresh_token),
 		anonymousCode$
 	)
-	.flatMap(accessToken$(request.headers))
+	.flatMap(accessToken$(headers))
 	.catch(error => {
 		console.log(error.stack);
 		return Rx.Observable.of({});  // failure results in empty object response - bad time
