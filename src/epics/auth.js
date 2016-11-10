@@ -17,7 +17,7 @@ import {
 	configureAuth,
 } from '../actions/authActionCreators';
 
-export const ANONYMOUS_AUTH_APP_PATH = '/anon';
+export const AUTH_ENDPOINT = '/auth';
 
 /**
  * There are 6 login-related actions:
@@ -38,7 +38,6 @@ export const handleLoginSuccess = action$ =>
 				oauth_token: payload.value.oauth_token,  // currently does not expire
 				expires_in: payload.value.expires_in || 60 * 60,  // seconds
 				refresh_token: payload.value.refresh_token,
-				anonymous: false,
 			})
 		);
 
@@ -49,9 +48,9 @@ export const handleLogoutRequest = action$ =>
 				// immediately clear auth information so no more private data is accessible
 				// - this will put the app in limbo, unable to request any more data until
 				// a new token is provided by `LOGOUT_SUCESS` or a full refresh
-				Rx.Observable.of(configureAuth({ anonymous: true })),
+				Rx.Observable.of(configureAuth({})),  // clear all auth info
 				Rx.Observable.fromPromise(
-					fetch(ANONYMOUS_AUTH_APP_PATH, { credentials: 'same-origin' })  // response will set cookies
+					fetch(AUTH_ENDPOINT, { credentials: 'same-origin' })  // response will set cookies
 						.then(response => response.json())
 				)
 				.map(logoutSuccess)
@@ -63,7 +62,6 @@ export const handleLogoutSuccess = action$ =>
 	action$.ofType('LOGOUT_SUCCESS')
 		.map(({ payload }) =>
 			configureAuth({
-				anonymous: true,
 				oauth_token: payload.access_token,
 				refresh_token: payload.refresh_token,
 				expires_in: payload.expires_in,
@@ -87,21 +85,12 @@ function setRefreshCookie({ refresh_token }) {
 	);
 }
 
-function setAnonymousCookie({ anonymous }) {
-	Cookies.set(
-		'anonymous',
-		anonymous || '',
-		{ expires: 5 * 365 }  // 'permanent', but refreshes with every login/logout
-	);
-}
-
 export const setAuthCookies = action$ =>
 	action$.ofType('CONFIGURE_AUTH')
 		.filter(({ meta }) => !meta)
 		.map(({ payload }) => payload)
 		.do(setOauthCookie)
 		.do(setRefreshCookie)
-		.do(setAnonymousCookie)
 		.ignoreElements();  // don't need to emit a new action here
 
 export default combineEpics(
