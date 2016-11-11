@@ -1,5 +1,6 @@
 import Rx from 'rxjs';
 import register, {
+	oauthScheme,
 	requestAuth$,
 	getAnonymousCode$,
 	getAccessToken$,
@@ -12,6 +13,14 @@ console.log = () => {};
 const oauth = {
 	key: '1234',
 	secret: 'asdf',
+};
+const MOCK_SERVER = {
+	decorate() {},
+	route() {},
+	auth: {
+		scheme: () => {},
+	},
+	ext: () => {},
 };
 const MOCK_HEADERS = {};
 const GOOD_MOCK_FETCH_RESULT = Promise.resolve({
@@ -108,7 +117,7 @@ describe('requestAuth$', () => {
 describe('requestAuthorizer', () => {
 	const auth$ = requestAuth$({ oauth, OAUTH_AUTH_URL, OAUTH_ACCESS_URL }, null);
 	const authorizeRequest$ = requestAuthorizer(auth$);
-	it('does not try to fetch when provided a request with an oauth token in state', function(done) {
+	it('does not try to fetch when provided a request with an oauth token in state', () => {
 		spyOn(global, 'fetch').and.callFake((url, opts) => {
 			if (url.startsWith(OAUTH_AUTH_URL)) {
 				return Promise.resolve({
@@ -128,14 +137,20 @@ describe('requestAuthorizer', () => {
 			},
 			app: {},
 			log: () => {},
+			authorize: {
+				reply: {
+					state: () => {},
+				},
+			},
 		};
 
-		authorizeRequest$(MOCK_REQUEST).subscribe(request => {
-			expect(global.fetch).not.toHaveBeenCalled();
-			done();
-		});
+		return authorizeRequest$(MOCK_REQUEST)
+			.toPromise()
+			.then(request => {
+				expect(global.fetch).not.toHaveBeenCalled();
+			});
 	});
-	it('calls fetch when provided a request without an oauth token in state', function(done) {
+	it('calls fetch when provided a request without an oauth token in state', () => {
 		spyOn(global, 'fetch').and.callFake((url, opts) => {
 			if (url.startsWith(OAUTH_AUTH_URL)) {
 				return Promise.resolve({
@@ -153,19 +168,21 @@ describe('requestAuthorizer', () => {
 			state: {},
 			app: {},
 			log: () => {},
+			authorize: {
+				reply: {
+					state: () => {},
+				},
+			},
 		};
 
-		authorizeRequest$(MOCK_REQUEST).subscribe(request => {
-			expect(global.fetch).toHaveBeenCalled();
-			done();
-		});
+		return authorizeRequest$(MOCK_REQUEST)
+			.toPromise()
+			.then(request => {
+				expect(global.fetch).toHaveBeenCalled();
+			});
 	});
 });
 describe('register', () => {
-	const MOCK_SERVER = {
-		decorate() {},
-		route() {},
-	};
 	const spyable = {
 		next() {}
 	};
@@ -182,14 +199,30 @@ describe('register', () => {
 		register(MOCK_SERVER, options, spyable.next);
 		expect(spyable.next).toHaveBeenCalled();
 	});
+});
+
+describe('oauthScheme', () => {
+	const options = {
+		OAUTH_AUTH_URL: '',
+		OAUTH_ACCESS_URL: '',
+		oauth: {
+			key: '1234',
+			secret: 'abcd',
+		},
+	};
 	it('calls server.route with an object', () => {
 		spyOn(MOCK_SERVER, 'route');
-		register(MOCK_SERVER, options, spyable.next);
+		oauthScheme(MOCK_SERVER, options);
 		expect(MOCK_SERVER.route).toHaveBeenCalledWith(jasmine.any(Object));
+	});
+	it('calls server.ext with an \'onPreAuth\' function', () => {
+		spyOn(MOCK_SERVER, 'ext');
+		oauthScheme(MOCK_SERVER, options);
+		expect(MOCK_SERVER.ext).toHaveBeenCalledWith('onPreAuth', jasmine.any(Function));
 	});
 	it('calls server.decorate to add a method to `request`', () => {
 		spyOn(MOCK_SERVER, 'decorate');
-		register(MOCK_SERVER, options, spyable.next);
+		oauthScheme(MOCK_SERVER, options);
 		expect(MOCK_SERVER.decorate)
 			.toHaveBeenCalledWith('request', jasmine.any(String), jasmine.any(Function), { apply: true });
 	});

@@ -2,24 +2,17 @@ import Boom from 'boom';
 import chalk from 'chalk';
 import Rx from 'rxjs';
 
+import { tryJSON } from '../util/fetchUtils';
 /**
  * @module requestAuthPlugin
  */
 
 const YEAR_IN_MS = 1000 * 60 * 60 * 24 * 365;
 
-const tryJSON = reqUrl => response => {
-	const { status, statusText } = response;
-	if (status >= 400) {  // status always 200: bugzilla #52128
-		throw new Error(`Request to ${reqUrl} responded with error code ${status}: ${statusText}`);
-	}
-	return response.text().then(text => JSON.parse(text));
-};
-
 function verifyAuth([request, auth]) {
 	const keys = Object.keys(auth);
 	if (!keys.length) {
-		const errorMessage = 'No auth info provided';
+		const errorMessage = 'No auth token(s) provided';
 		console.error(
 			chalk.red(errorMessage),
 			': application can not fetch data.',
@@ -36,7 +29,7 @@ function verifyAuth([request, auth]) {
  * 'authorized' state in order for the app to render correctly with data from
  * the API, so this function modifies the request and the reply
  */
-const injectAuthIntoRequest = ([request, auth]) => {
+const applyAuth = ([request, auth]) => {
 	const path = '/';
 	const authState = {
 		oauth_token: {
@@ -50,8 +43,10 @@ const injectAuthIntoRequest = ([request, auth]) => {
 	};
 	Object.keys(authState).forEach(name => {
 		const cookieVal = authState[name];
-		request.state[name] = cookieVal.value;  // apply to request
-		request.authorize.reply.state(name, cookieVal.value, cookieVal.opts);  // apply to response
+		// apply to request
+		request.state[name] = cookieVal.value;
+		// apply to response - note this special `reply` prop assigned onPreAuth
+		request.authorize.reply.state(name, cookieVal.value, cookieVal.opts);
 	});
 };
 
@@ -85,7 +80,7 @@ export const requestAuthorizer = auth$ => request => {
 			.do(() => request.log(['info', 'auth'], 'Request does not contain auth token'))
 			.zip(deferredAuth$)  // need to get a new token
 			.do(verifyAuth)
-			.do(injectAuthIntoRequest)
+			.do(applyAuth)
 			.map(([request, auth]) => request)  // throw away auth info
 	);
 };
@@ -223,31 +218,10 @@ export const requestAuth$ = config => {
 	});
 };
 
-const oauthScheme = (server, options) => ({
-	authenticate: (request, reply) => {
-		request.log(['info', 'auth'], 'Authenticating request');
-		request.authorize()
-			.do(request => {
-				request.log(['info', 'auth'], 'Request authenticated');
-			})
-			.subscribe(({ state: { oauth_token }, headers: { authorization } }) => {
-				const credentials = oauth_token || authorization.replace('Bearer ', '');
-				reply.continue({ credentials, artifacts: credentials });
-			});
-	},
-});
 /**
- * This plugin does two things.
- *
- * 1. Adds an 'authorize' interface on the Hapi `request`, which ensures that
- * the request has an oauth_token cookie - it provides an anonymous token when
- * none is provided in the request, and refreshes a token that has expired
- * 2. Adds a new route that returns the auth JSON containing the new oauth_token
- * (configurable, defaults to '/auth')
- *
- * {@link http://hapijs.com/tutorials/plugins}
+ * Request authorizing scheme
  */
-export default function register(server, options, next) {
+export const oauthScheme = (server, options) => {
 	// create a single requestAuth$ stream that can be used by any route
 	const auth$ = requestAuth$(options);
 	// create a single stream for modifying an arbitrary request with anonymous auth
@@ -260,14 +234,10 @@ export default function register(server, options, next) {
 		{ apply: true }
 	);
 
-	server.ext('onPreAuth', (request, reply) => {
-		// Used for setting and unsetting state, not for replying to request
-		request.authorize.reply = reply;
-
-		return reply.continue();
-	});
-	server.auth.scheme('oauth', oauthScheme);
-
+	// Assign a new route that can deliver new anonymous credentials on logout.
+	// This route will not be necessary when auth is handled entirely by cookies
+	// that are set with any request to any app endpoint (no auth header, no auth
+	// info in app state)
 	server.route({
 		method: 'GET',
 		path: options.AUTH_ENDPOINT,
@@ -285,6 +255,40 @@ export default function register(server, options, next) {
 		}
 	});
 
+	server.ext('onPreAuth', (request, reply) => {
+		// Used for setting and unsetting state, not for replying to request
+		request.authorize.reply = reply;
+
+		return reply.continue();
+	});
+
+	return {
+		authenticate: (request, reply) => {
+			request.log(['info', 'auth'], 'Authenticating request');
+			request.authorize()
+				.do(request => {
+					request.log(['info', 'auth'], 'Request authenticated');
+				})
+				.subscribe(({ state: { oauth_token }, headers: { authorization } }) => {
+					const credentials = oauth_token || authorization.replace('Bearer ', '');
+					reply.continue({ credentials, artifacts: credentials });
+				});
+		},
+	};
+};
+/**
+ * This plugin does two things.
+ *
+ * 1. Adds an 'authorize' interface on the Hapi `request`, which ensures that
+ * the request has an oauth_token cookie - it provides an anonymous token when
+ * none is provided in the request, and refreshes a token that has expired
+ * 2. Adds a new route that returns the auth JSON containing the new oauth_token
+ * (configurable, defaults to '/auth')
+ *
+ * {@link http://hapijs.com/tutorials/plugins}
+ */
+export default function register(server, options, next) {
+	server.auth.scheme('oauth', oauthScheme);
 	next();
 }
 register.attributes = {
