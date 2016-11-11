@@ -1,5 +1,6 @@
 import Rx from 'rxjs';
 import register, {
+	authenticate,
 	oauthScheme,
 	requestAuth$,
 	getAnonymousCode$,
@@ -23,6 +24,18 @@ const MOCK_SERVER = {
 	ext: () => {},
 };
 const MOCK_HEADERS = {};
+const MOCK_REPLY_FN = () => {};
+MOCK_REPLY_FN.state = () => {};
+MOCK_REPLY_FN.continue = () => {};
+const MOCK_REQUEST = {
+	headers: MOCK_HEADERS,
+	state: {},
+	app: {},
+	log: () => {},
+	authorize: () => Rx.Observable.of(MOCK_REQUEST),
+};
+MOCK_REQUEST.authorize.reply = MOCK_REPLY_FN;
+
 const GOOD_MOCK_FETCH_RESULT = Promise.resolve({
 	text: () => Promise.resolve('{}')
 });
@@ -106,9 +119,8 @@ describe('requestAuth$', () => {
 			}
 		});
 		const auth$ = requestAuth$({ oauth, OAUTH_AUTH_URL, OAUTH_ACCESS_URL }, null);
-		const MOCK_REQUEST = { headers: MOCK_HEADERS, state: {}, app: {}, log: () => {} };
 
-		auth$(MOCK_REQUEST).subscribe(auth => {
+		auth$({ ...MOCK_REQUEST }).subscribe(auth => {
 			expect(auth.oauth_token).toBe('good_token');
 			done();
 		});
@@ -130,21 +142,8 @@ describe('requestAuthorizer', () => {
 				});
 			}
 		});
-		const MOCK_REQUEST = {
-			headers: MOCK_HEADERS,
-			state: {
-				oauth_token: 'good_token'
-			},
-			app: {},
-			log: () => {},
-			authorize: {
-				reply: {
-					state: () => {},
-				},
-			},
-		};
 
-		return authorizeRequest$(MOCK_REQUEST)
+		return authorizeRequest$({ ...MOCK_REQUEST, state: { oauth_token: 'good_token' } })
 			.toPromise()
 			.then(request => {
 				expect(global.fetch).not.toHaveBeenCalled();
@@ -163,19 +162,7 @@ describe('requestAuthorizer', () => {
 				});
 			}
 		});
-		const MOCK_REQUEST = {
-			headers: MOCK_HEADERS,
-			state: {},
-			app: {},
-			log: () => {},
-			authorize: {
-				reply: {
-					state: () => {},
-				},
-			},
-		};
-
-		return authorizeRequest$(MOCK_REQUEST)
+		return authorizeRequest$({ ...MOCK_REQUEST })
 			.toPromise()
 			.then(request => {
 				expect(global.fetch).toHaveBeenCalled();
@@ -228,3 +215,24 @@ describe('oauthScheme', () => {
 	});
 });
 
+describe('authenticate', () => {
+	it('calls request.authorize', () => {
+		spyOn(MOCK_REQUEST, 'authorize').and.callThrough();
+		return new Promise((resolve, reject) =>
+			authenticate(MOCK_REQUEST, MOCK_REPLY_FN).add(() => {
+				expect(MOCK_REQUEST.authorize).toHaveBeenCalled();
+				resolve();
+			})
+		);
+	});
+	it('calls reply.continue with credentials and artifacts', () => {
+		spyOn(MOCK_REPLY_FN, 'continue');
+		return new Promise((resolve, reject) =>
+			authenticate(MOCK_REQUEST, MOCK_REPLY_FN).add(() => {
+				expect(MOCK_REPLY_FN.continue)
+					.toHaveBeenCalledWith({ credentials: jasmine.any(String), artifacts: jasmine.any(String) });
+				resolve();
+			})
+		);
+	});
+});

@@ -218,8 +218,26 @@ export const requestAuth$ = config => {
 	});
 };
 
+export const authenticate = (request, reply) => {
+	request.log(['info', 'auth'], 'Authenticating request');
+	return request.authorize()
+		.do(request => {
+			request.log(['info', 'auth'], 'Request authenticated');
+		})
+		.subscribe(({ state: { oauth_token }, headers: { authorization } }) => {
+			const credentials = oauth_token || authorization.replace('Bearer ', '');
+			reply.continue({ credentials, artifacts: credentials });
+		});
+};
+
 /**
  * Request authorizing scheme
+ *
+ * 1. add a `.authorize` method to the request
+ * 2. assign a reference to the reply interface on request.authorize
+ * 3. add an anonymous-user-JSON-generating route (for app logout)
+ * 4. return the authentication function, which ensures that all requests have
+ * valid auth credentials (anonymous or logged in)
  */
 export const oauthScheme = (server, options) => {
 	// create a single requestAuth$ stream that can be used by any route
@@ -233,6 +251,13 @@ export const oauthScheme = (server, options) => {
 		request => () => authorizeRequest$(request),
 		{ apply: true }
 	);
+
+	server.ext('onPreAuth', (request, reply) => {
+		// Used for setting and unsetting state, not for replying to request
+		request.authorize.reply = reply;
+
+		return reply.continue();
+	});
 
 	// Assign a new route that can deliver new anonymous credentials on logout.
 	// This route will not be necessary when auth is handled entirely by cookies
@@ -255,26 +280,7 @@ export const oauthScheme = (server, options) => {
 		}
 	});
 
-	server.ext('onPreAuth', (request, reply) => {
-		// Used for setting and unsetting state, not for replying to request
-		request.authorize.reply = reply;
-
-		return reply.continue();
-	});
-
-	return {
-		authenticate: (request, reply) => {
-			request.log(['info', 'auth'], 'Authenticating request');
-			request.authorize()
-				.do(request => {
-					request.log(['info', 'auth'], 'Request authenticated');
-				})
-				.subscribe(({ state: { oauth_token }, headers: { authorization } }) => {
-					const credentials = oauth_token || authorization.replace('Bearer ', '');
-					reply.continue({ credentials, artifacts: credentials });
-				});
-		},
-	};
+	return { authenticate };
 };
 /**
  * This plugin does two things.
