@@ -45,8 +45,8 @@ const injectAuthIntoRequest = ([request, auth]) => {
 	};
 	Object.keys(authState).forEach(name => {
 		const cookieVal = authState[name];
-		request.state[name] = cookieVal.value;
-		request.authorize.reply.state(name, cookieVal.value, cookieVal.opts);
+		request.state[name] = cookieVal.value;  // apply to request
+		request.authorize.reply.state(name, cookieVal.value, cookieVal.opts);  // apply to response
 	});
 };
 
