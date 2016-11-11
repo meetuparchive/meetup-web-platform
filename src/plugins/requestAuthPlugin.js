@@ -28,12 +28,12 @@ function verifyAuth([request, auth]) {
 		throw new Error(errorMessage);
 	}
 	// there are secret tokens in `auth`, be careful with logging
-	request.log(['auth'], `Authorizing with keys: ${JSON.stringify(keys)}`);
+	request.log(['info', 'auth'], `Authorizing with keys: ${JSON.stringify(keys)}`);
 }
 
 const injectAuthIntoRequest = ([request, auth]) => {
 	const path = '/';
-	request.plugins.requestAuth = {
+	const authState = {
 		oauth_token: {
 			value: auth.oauth_token || auth.access_token,
 			opts: { path, ttl: auth.expires_in * 1000 },
@@ -41,8 +41,13 @@ const injectAuthIntoRequest = ([request, auth]) => {
 		refresh_token: {
 			value: auth.refresh_token,
 			opts: { path, ttl: YEAR_IN_MS * 2 },
-		},
+		}
 	};
+	Object.keys(authState).forEach(name => {
+		const cookieVal = authState[name];
+		request.state[name] = cookieVal.value;
+		request.authorize.reply.state(name, cookieVal.value, cookieVal.opts);
+	});
 };
 
 /**
@@ -57,16 +62,20 @@ const injectAuthIntoRequest = ([request, auth]) => {
  * @return {Observable} Observable that emits the request with auth applied
  */
 export const requestAuthorizer = auth$ => request => {
+	request.log(['info', 'auth'], 'Checking for oauth_token in request');
 	// always need oauth_token, even if it's an anonymous (pre-reg) token
 	// This is 'deferred' because we don't want to start fetching the token
 	// before we know that it's needed
 	const deferredAuth$ = Rx.Observable.defer(() => auth$(request));
 
 	const request$ = Rx.Observable.of(request);
+
 	return Rx.Observable.if(
 		() => request.state.oauth_token,
-		request$,  // no problem, request is authorized
 		request$
+			.do(() => request.log(['info', 'auth'], 'Request is authorized')),
+		request$
+			.do(() => request.log(['info', 'auth'], 'Request is not authorized'))
 			.zip(deferredAuth$)  // need to get a new token
 			.do(verifyAuth)
 			.do(injectAuthIntoRequest)
@@ -201,13 +210,24 @@ export const requestAuth$ = config => {
 		anonymousCode$
 	)
 	.flatMap(accessToken$(headers))
-	.retry(2)  // might be a temporary problem
 	.catch(error => {
 		console.log(error.stack);
 		return Rx.Observable.of({});  // failure results in empty object response - bad time
 	});
 };
 
+const oauthScheme = (server, options) => ({
+	authenticate: (request, reply) => {
+		request.log(['info', 'auth'], 'Authenticating request');
+		request.authorize()
+			.do(request => {
+				request.log(['info', 'auth'], 'Request authenticated');
+			})
+			.subscribe(({ state: { oauth_token } }) =>
+				reply.continue({ credentials: oauth_token, artifacts: oauth_token })
+			);
+	},
+});
 /**
  * This plugin does two things.
  *
@@ -232,27 +252,20 @@ export default function register(server, options, next) {
 		{ apply: true }
 	);
 
-	server.handler('auth', (route, options) => (request, reply) =>
-		request.authorize()
-			.flatMap(request => options.handler(request, reply))
-			.do(() => {
-				const { requestAuth } = request.plugins;
-				for (const cookie in requestAuth) {
-					request.log(['info'], chalk.green(`Setting cookie ${cookie}`));
-					reply.state(
-						cookie,
-						requestAuth[cookie].value,
-						requestAuth[cookie].opts
-					);
-				}
-			})
-			.subscribe(() => {}, err => { console.error(err.message); })
-	);
+	server.ext('onPreAuth', (request, reply) => {
+		// Used for setting and unsetting state, not for replying to request
+		request.authorize.reply = reply;
+
+		return reply.continue();
+	});
+	server.auth.scheme('oauth', oauthScheme);
 
 	server.route({
 		method: 'GET',
 		path: options.AUTH_ENDPOINT,
+		config: { auth: false },
 		handler: (request, reply) => {
+			request.log(['info', 'auth'], 'Handling an auth endpoint request');
 			auth$(request).subscribe(
 				auth => {
 					const response = reply(JSON.stringify(auth))

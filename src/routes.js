@@ -35,19 +35,16 @@ export default function getRoutes(
 	const apiProxyRoute = {
 		method: ['GET', 'POST', 'DELETE', 'PATCH'],
 		path: '/api',
-		handler: {
-			auth: {
-				handler: (request, reply) =>
-					proxyApiRequest$(request)
-						.map(queryResponses => {
-							const response = reply(JSON.stringify(queryResponses))
-								.type('application/json');
-							reply.track(response, 'api', queryResponses);
+		handler: (request, reply) =>
+			proxyApiRequest$(request)
+				.map(queryResponses => {
+					const response = reply(JSON.stringify(queryResponses))
+						.type('application/json');
+					reply.track(response, 'api', queryResponses);
 
-							return response;
-						})
-			}
-		}
+					return response;
+				})
+				.subscribe()
 	};
 
 	/**
@@ -57,25 +54,21 @@ export default function getRoutes(
 	const applicationRoute = {
 		method: 'GET',
 		path: '/{wild*}',
-		handler: {
-			auth: {
-				handler: (request, reply) => {
-					const requestLanguage = Accepts(request).language(Object.keys(renderRequestMap));
-					request.log(['info'], chalk.green(`Request received for ${request.url.href} (${requestLanguage})`));
+		handler: (request, reply) => {
+			const requestLanguage = Accepts(request).language(Object.keys(renderRequestMap));
+			request.log(['info'], chalk.green(`Request received for ${request.url.href} (${requestLanguage})`));
 
-					return renderRequestMap[requestLanguage](request)
-						.do(() => request.log(['info'], chalk.green('HTML response ready')))
-						.map(({ result, statusCode }) => {
-							// response is sent when this function returns (`nextTick`)
-							const response = reply(result)
-								.code(statusCode);
+			return renderRequestMap[requestLanguage](request)
+				.do(() => request.log(['info'], chalk.green('HTML response ready')))
+				.map(({ result, statusCode }) => {
+					// response is sent when this function returns (`nextTick`)
+					const response = reply(result)
+						.code(statusCode);
 
-							reply.track(response, 'session');
-							return response;
-						}
-					);
-				}
-			}
+					reply.track(response, 'session');
+					return response;
+				})
+				.subscribe();
 		}
 	};
 

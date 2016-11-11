@@ -74,6 +74,7 @@ export function server(routes, connection, plugins=[], platform_agent) {
 	return server.connection(connection)
 		.register(plugins)
 		.then(() => server.ext('onPreResponse', onPreResponse))
+		.then(() => server.auth.strategy('default', 'oauth', true))
 		.then(() => server.log(['start'], `${plugins.length} plugins registered, assigning routes...`))
 		.then(() => server.route(routes))
 		.then(() => server.log(['start'], `${routes.length} routes assigned, starting server...`))
