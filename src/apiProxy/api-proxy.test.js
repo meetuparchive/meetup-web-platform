@@ -94,7 +94,24 @@ describe('buildRequestArgs', () => {
 		expect(postArgs.body).toEqual(jasmine.any(String));  // post requests will add body string
 		// post requests will add body string
 		expect(postArgs.headers['content-type']).toEqual('application/x-www-form-urlencoded');
+
 	});
+
+	const encoded_uri = 'http://example.com/%E3%82%BA%E3%83%B3%E3%83%90-%E6%9D%B1%E4%BA%AC/'
+	const options_utf8 = {
+		url: 'http://example.com/ズンバ-東京/',
+		headers: {
+			authorization: 'Bearer testtoken'
+		},
+		mode: 'no-cors'
+
+	};
+
+	it('Properly encodes the URL'), () => {
+		const method = 'get';
+		const getArgs = buildRequestArgs({ ...options_utf8, method })(apiConfig);
+		expect(getArgs.url).toBe(encoded_uri);
+	}
 
 });
 
