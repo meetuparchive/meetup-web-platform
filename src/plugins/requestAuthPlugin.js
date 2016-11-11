@@ -187,7 +187,7 @@ export const getAccessToken$ = ({ API_TIMEOUT=5000, OAUTH_ACCESS_URL, oauth }, r
 	};
 };
 
-const refreshToken$ = (refresh_token) => Rx.Observable.of({
+const refreshToken$ = refresh_token => Rx.Observable.of({
 	grant_type: 'refresh_token',
 	token: refresh_token
 });

@@ -1,4 +1,5 @@
 import Accepts from 'accepts';
+import Boom from 'boom';
 import chalk from 'chalk';
 
 import apiProxy$ from './apiProxy/api-proxy';
@@ -37,11 +38,14 @@ export default function getRoutes(
 		path: '/api',
 		handler: (request, reply) =>
 			proxyApiRequest$(request)
-				.subscribe(queryResponses => {
-					const response = reply(JSON.stringify(queryResponses))
-						.type('application/json');
-					reply.track(response, 'api', queryResponses);
-				})
+				.subscribe(
+					queryResponses => {
+						const response = reply(JSON.stringify(queryResponses))
+							.type('application/json');
+						reply.track(response, 'api', queryResponses);
+					},
+					(err) => { reply(Boom.badImplementation(err.message)); }
+				)
 	};
 
 	/**

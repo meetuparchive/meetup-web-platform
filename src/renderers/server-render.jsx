@@ -176,7 +176,7 @@ const makeRenderer = (
 	const store = createStore(routes, reducer, {}, middleware);
 	const originalDispatch = store.dispatch.bind(store);
 	store.dispatch = (action) => {
-		request.log(['app', 'action'], action.type);
+		request.log(['app', 'info'], action.type);
 		return originalDispatch(action);
 	};
 
