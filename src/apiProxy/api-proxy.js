@@ -1,3 +1,4 @@
+import querystring from 'querystring';
 import externalRequest from 'request';
 import Rx from 'rxjs';
 const externalRequest$ = Rx.Observable.bindNodeCallback(externalRequest);
@@ -65,23 +66,6 @@ export function queryToApiConfig({ type, params }) {
 }
 
 /**
- * Join the key-value params object into a querystring-like
- * string. use `encodeURIComponent` _only_ if `doEncode` is provided,
- * otherwise the caller is responsible for encoding
- *
- * @param {Object} params plain object of keys and values to format
- * @return {String}
- */
-function urlFormatParams(params, doEncode) {
-	return Object.keys(params || {})
-		.reduce((dataParams, paramKey) => {
-			const paramValue = encodeURIComponent(params[paramKey]);
-			dataParams.push(`${paramKey}=${paramValue}`);
-			return dataParams;
-		}, []).join('&');
-}
-
-/**
  * Transform each query into the arguments needed for a `request` call.
  *
  * Some request options are constant for all queries, and these are curried into
@@ -101,7 +85,7 @@ export const buildRequestArgs = externalRequestOpts => ({ endpoint, params }) =>
 	const externalRequestOptsQuery = { ...externalRequestOpts };
 	externalRequestOptsQuery.url = `/${endpoint}`;
 
-	const dataParams = urlFormatParams(params, externalRequestOptsQuery.method === 'get');
+	const dataParams = querystring.stringify(params);
 
 	switch (externalRequestOptsQuery.method) {
 	case 'get':
