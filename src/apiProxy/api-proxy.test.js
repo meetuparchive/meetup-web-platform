@@ -4,6 +4,7 @@ import {
 	MOCK_API_PROBLEM,
 	MOCK_AUTH_HEADER,
 	MOCK_RENDERPROPS,
+	MOCK_RENDERPROPS_UTF8,
 } from '../util/mocks/app';
 import {
 	MOCK_DUOTONE_URLS,
@@ -97,21 +98,15 @@ describe('buildRequestArgs', () => {
 
 	});
 
-	const encoded_uri = 'http://example.com/%E3%82%BA%E3%83%B3%E3%83%90-%E6%9D%B1%E4%BA%AC/'
-	const options_utf8 = {
-		url: 'http://example.com/ズンバ-東京/',
-		headers: {
-			authorization: 'Bearer testtoken'
-		},
-		mode: 'no-cors'
+	const testQueryResults_utf8 = mockQuery(MOCK_RENDERPROPS_UTF8);
+	const apiConfig_utf8 = queryToApiConfig(testQueryResults_utf8);
+	const encoded_url = '/%E3%83%90-%E4%BA%AC';
 
-	};
-
-	it('Properly encodes the URL'), () => {
+	it('Properly encodes the URL', () => {
 		const method = 'get';
-		const getArgs = buildRequestArgs({ ...options_utf8, method })(apiConfig);
-		expect(getArgs.url).toBe(encoded_uri);
-	}
+		const getArgs = buildRequestArgs({ ...options, method })(apiConfig_utf8);
+		expect(getArgs.url.split('?')[0]).toEqual(encoded_url);
+	});
 
 });
 
