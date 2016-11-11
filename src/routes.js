@@ -37,14 +37,11 @@ export default function getRoutes(
 		path: '/api',
 		handler: (request, reply) =>
 			proxyApiRequest$(request)
-				.map(queryResponses => {
+				.subscribe(queryResponses => {
 					const response = reply(JSON.stringify(queryResponses))
 						.type('application/json');
 					reply.track(response, 'api', queryResponses);
-
-					return response;
 				})
-				.subscribe()
 	};
 
 	/**
@@ -60,15 +57,13 @@ export default function getRoutes(
 
 			return renderRequestMap[requestLanguage](request)
 				.do(() => request.log(['info'], chalk.green('HTML response ready')))
-				.map(({ result, statusCode }) => {
+				.subscribe(({ result, statusCode }) => {
 					// response is sent when this function returns (`nextTick`)
 					const response = reply(result)
 						.code(statusCode);
 
 					reply.track(response, 'session');
-					return response;
-				})
-				.subscribe();
+				});
 		}
 	};
 
