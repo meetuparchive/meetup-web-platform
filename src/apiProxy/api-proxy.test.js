@@ -4,6 +4,7 @@ import {
 	MOCK_API_PROBLEM,
 	MOCK_AUTH_HEADER,
 	MOCK_RENDERPROPS,
+	MOCK_RENDERPROPS_UTF8,
 } from '../util/mocks/app';
 import {
 	MOCK_DUOTONE_URLS,
@@ -94,6 +95,17 @@ describe('buildRequestArgs', () => {
 		expect(postArgs.body).toEqual(jasmine.any(String));  // post requests will add body string
 		// post requests will add body string
 		expect(postArgs.headers['content-type']).toEqual('application/x-www-form-urlencoded');
+
+	});
+
+	const testQueryResults_utf8 = mockQuery(MOCK_RENDERPROPS_UTF8);
+	const apiConfig_utf8 = queryToApiConfig(testQueryResults_utf8);
+	const encoded_url = '/%E3%83%90-%E4%BA%AC';
+
+	it('Properly encodes the URL', () => {
+		const method = 'get';
+		const getArgs = buildRequestArgs({ ...options, method })(apiConfig_utf8);
+		expect(getArgs.url.split('?')[0]).toEqual(encoded_url);
 	});
 
 });
