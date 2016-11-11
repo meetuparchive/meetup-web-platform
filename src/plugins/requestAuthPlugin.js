@@ -8,13 +8,13 @@ import Rx from 'rxjs';
 
 const YEAR_IN_MS = 1000 * 60 * 60 * 24 * 365;
 
-function tryJSON(response) {
-	const { status } = response;
+const tryJSON = reqUrl => response => {
+	const { status, statusText } = response;
 	if (status >= 400) {  // status always 200: bugzilla #52128
-		throw new Error(`API responded with error code ${status}`);
+		throw new Error(`Request to ${reqUrl} responded with error code ${status}: ${statusText}`);
 	}
 	return response.text().then(text => JSON.parse(text));
-}
+};
 
 function verifyAuth([request, auth]) {
 	const keys = Object.keys(auth);
@@ -31,6 +31,11 @@ function verifyAuth([request, auth]) {
 	request.log(['info', 'auth'], `Authorizing with keys: ${JSON.stringify(keys)}`);
 }
 
+/**
+ * Both the incoming request and the outgoing response need to have an
+ * 'authorized' state in order for the app to render correctly with data from
+ * the API, so this function modifies the request and the reply
+ */
 const injectAuthIntoRequest = ([request, auth]) => {
 	const path = '/';
 	const authState = {
@@ -62,20 +67,22 @@ const injectAuthIntoRequest = ([request, auth]) => {
  * @return {Observable} Observable that emits the request with auth applied
  */
 export const requestAuthorizer = auth$ => request => {
-	request.log(['info', 'auth'], 'Checking for oauth_token in request');
 	// always need oauth_token, even if it's an anonymous (pre-reg) token
 	// This is 'deferred' because we don't want to start fetching the token
 	// before we know that it's needed
 	const deferredAuth$ = Rx.Observable.defer(() => auth$(request));
-
 	const request$ = Rx.Observable.of(request);
+	const authType = request.state.oauth_token && 'cookie' ||
+		request.headers.authorization && 'header' ||
+		false;
 
+	request.log(['info', 'auth'], 'Checking for oauth_token in request');
 	return Rx.Observable.if(
-		() => request.state.oauth_token,
+		() => authType,
 		request$
-			.do(() => request.log(['info', 'auth'], 'Request is authorized')),
+			.do(() => request.log(['info', 'auth'], `Request contains auth token (${authType})`)),
 		request$
-			.do(() => request.log(['info', 'auth'], 'Request is not authorized'))
+			.do(() => request.log(['info', 'auth'], 'Request does not contain auth token'))
 			.zip(deferredAuth$)  // need to get a new token
 			.do(verifyAuth)
 			.do(injectAuthIntoRequest)
@@ -111,7 +118,7 @@ export function getAnonymousCode$({ API_TIMEOUT=5000, OAUTH_AUTH_URL, oauth }, r
 		console.log(`Fetching anonymous auth code from ${OAUTH_AUTH_URL}`);
 		return Rx.Observable.fromPromise(fetch(authURL, requestOpts))
 			.timeout(API_TIMEOUT)
-			.flatMap(tryJSON)
+			.flatMap(tryJSON(OAUTH_AUTH_URL))
 			.catch(error => {
 				console.log(error.stack);
 				return Rx.Observable.of({ code: null });
@@ -180,7 +187,7 @@ export const getAccessToken$ = ({ API_TIMEOUT=5000, OAUTH_ACCESS_URL, oauth }, r
 
 			return Rx.Observable.fromPromise(fetch(url, requestOpts))
 				.timeout(API_TIMEOUT)
-				.flatMap(tryJSON);
+				.flatMap(tryJSON(OAUTH_ACCESS_URL));
 		};
 	};
 };
@@ -223,9 +230,10 @@ const oauthScheme = (server, options) => ({
 			.do(request => {
 				request.log(['info', 'auth'], 'Request authenticated');
 			})
-			.subscribe(({ state: { oauth_token } }) =>
-				reply.continue({ credentials: oauth_token, artifacts: oauth_token })
-			);
+			.subscribe(({ state: { oauth_token }, headers: { authorization } }) => {
+				const credentials = oauth_token || authorization.replace('Bearer ', '');
+				reply.continue({ credentials, artifacts: credentials });
+			});
 	},
 });
 /**
