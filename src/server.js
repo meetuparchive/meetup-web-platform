@@ -66,7 +66,7 @@ export function onPreResponse(request, reply) {
 /**
  * server-starting function
  */
-export function server(routes, connection, plugins=[], platform_agent) {
+export function server(routes, connection, plugins, platform_agent, config) {
 	const server = new Hapi.Server();
 
 	server.decorate('reply', 'track', track(platform_agent));
@@ -74,7 +74,7 @@ export function server(routes, connection, plugins=[], platform_agent) {
 	return server.connection(connection)
 		.register(plugins)
 		.then(() => server.ext('onPreResponse', onPreResponse))
-		.then(() => server.auth.strategy('default', 'oauth', true))
+		.then(() => server.auth.strategy('default', 'oauth', true, config))
 		.then(() => server.log(['start'], `${plugins.length} plugins registered, assigning routes...`))
 		.then(() => server.route(routes))
 		.then(() => server.log(['start'], `${routes.length} routes assigned, starting server...`))
@@ -119,7 +119,7 @@ export default function start(
 
 			const finalPlugins = [ ...plugins, ...getPlugins(config) ];
 
-			return server(finalRoutes, connection, finalPlugins, platform_agent);
+			return server(finalRoutes, connection, finalPlugins, platform_agent, config);
 		});
 }
 
