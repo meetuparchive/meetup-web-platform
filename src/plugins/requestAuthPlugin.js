@@ -35,11 +35,19 @@ const applyAuth = ([request, auth]) => {
 	const authState = {
 		oauth_token: {
 			value: auth.oauth_token || auth.access_token,
-			opts: { path, ttl: auth.expires_in * 1000 },
+			opts: {
+				path,
+				ttl: auth.expires_in * 1000,
+				isHttpOnly: true,
+			},
 		},
 		refresh_token: {
 			value: auth.refresh_token,
-			opts: { path, ttl: YEAR_IN_MS * 2 },
+			opts: {
+				path,
+				ttl: YEAR_IN_MS * 2,
+				isHttpOnly: true,
+			},
 		}
 	};
 	Object.keys(authState).forEach(name => {
