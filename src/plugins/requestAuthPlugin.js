@@ -1,5 +1,6 @@
 import Boom from 'boom';
 import chalk from 'chalk';
+import nodeFetch from 'node-fetch';
 import Rx from 'rxjs';
 
 import { tryJSON } from '../util/fetchUtils';
@@ -67,9 +68,7 @@ export const requestAuthorizer = auth$ => request => {
 	// before we know that it's needed
 	const deferredAuth$ = Rx.Observable.defer(() => auth$(request));
 	const request$ = Rx.Observable.of(request);
-	const authType = request.state.oauth_token && 'cookie' ||
-		request.headers.authorization && 'header' ||
-		false;
+	const authType = request.state.oauth_token && 'cookie';
 
 	request.log(['info', 'auth'], 'Checking for oauth_token in request');
 	return Rx.Observable.if(
@@ -224,12 +223,25 @@ export const authenticate = (request, reply) => {
 		.do(request => {
 			request.log(['info', 'auth'], 'Request authenticated');
 		})
-		.subscribe(({ state: { oauth_token }, headers: { authorization } }) => {
-			const credentials = oauth_token || authorization.replace('Bearer ', '');
+		.subscribe(({ state: { oauth_token } }) => {
+			const credentials = oauth_token;
 			reply.continue({ credentials, artifacts: credentials });
 		});
 };
 
+/**
+ * create a `fetch` function that contains the cookies passed in
+ */
+const cookieFetch = cookie => (url, options={}) => {
+	options = {
+		...options,
+		headers: {
+			...(options.headers || {}),
+			cookie,
+		},
+	};
+	return nodeFetch(url, options);
+};
 /**
  * Request authorizing scheme
  *
@@ -253,6 +265,9 @@ export const oauthScheme = (server, options) => {
 	);
 
 	server.ext('onPreAuth', (request, reply) => {
+		// overwrite fetch to inject _this_ request's cookies
+		global.fetch = cookieFetch(request.headers.cookie);
+
 		// Used for setting and unsetting state, not for replying to request
 		request.authorize.reply = reply;
 
@@ -269,6 +284,8 @@ export const oauthScheme = (server, options) => {
 		config: { auth: false },
 		handler: (request, reply) => {
 			request.log(['info', 'auth'], 'Handling an auth endpoint request');
+			// this is a logout endpoint - we need to invalidate any oauth cookies in
+			// the request
 			auth$(request).subscribe(
 				auth => {
 					const response = reply(JSON.stringify(auth))

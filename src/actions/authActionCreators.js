@@ -34,9 +34,9 @@ export function loginPost(params) {
 	};
 }
 
-export function configureAuth(auth, suppressSync) {
+export function clearAuth(auth, suppressSync) {
 	return {
-		type: 'CONFIGURE_AUTH',
+		type: 'CLEAR_AUTH',
 		payload: auth,
 		meta: suppressSync
 	};
