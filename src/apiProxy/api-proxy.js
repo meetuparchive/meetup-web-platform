@@ -9,7 +9,7 @@ import { duotoneRef } from '../util/duotone';
 const parseResponseFlags = ({ headers }) =>
 	(headers['x-meetup-flags'] || '')
 		.split(',')
-		.filter(pair => pair)
+		.filter(pair => pair)  // ignore empty elements in the array
 		.map(pair => pair.split('='))
 		.reduce((flags, [key, val]) => {
 			flags[key] = val === 'true';
@@ -30,6 +30,16 @@ const parseResponseFlags = ({ headers }) =>
  */
 
 /**
+ * Accept an Error and return an object that will be used in place of the
+ * expected API return value
+ */
+function formatApiError(err) {
+	return {
+		error: err.message
+	};
+}
+
+/**
  * mostly error handling - any case where the API does not satisfy the
  * "api response" formatting requirement: plain object containing the requested
  * values
@@ -42,21 +52,22 @@ export const parseApiResponse = ([response, body]) => {
 	let value;
 	const flags = parseResponseFlags(response);
 
-	if (response.statusCode > 299) {
+	// treat non-success HTTP code as an error
+	if (response.statusCode < 200 || response.statusCode > 299) {
 		return {
-			value: { error: response.statusMessage },
+			value: formatApiError(new Error(response.statusMessage)),
 			flags,
 		};
 	}
 	try {
 		value = JSON.parse(body);
 		if (value && value.problem) {
-			value = { error: `API problem: ${value.problem}: ${value.details}` };
+			value = formatApiError(new Error(`API problem: ${value.problem}: ${value.details}`));
 		}
 		return { value, flags };
 	} catch(err) {
 		return {
-			value: { error: err.message },
+			value: formatApiError(err),
 			flags
 		};
 	}
