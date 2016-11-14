@@ -1,3 +1,4 @@
+import querystring from 'querystring';
 import externalRequest from 'request';
 import Rx from 'rxjs';
 const externalRequest$ = Rx.Observable.bindNodeCallback(externalRequest);
@@ -86,23 +87,6 @@ export function queryToApiConfig({ type, params, flags }) {
 }
 
 /**
- * Join the key-value params object into a querystring-like
- * string. use `encodeURIComponent` _only_ if `doEncode` is provided,
- * otherwise the caller is responsible for encoding
- *
- * @param {Object} params plain object of keys and values to format
- * @return {String}
- */
-function urlFormatParams(params, doEncode) {
-	return Object.keys(params || {})
-		.reduce((dataParams, paramKey) => {
-			const paramValue = encodeURIComponent(params[paramKey]);
-			dataParams.push(`${paramKey}=${paramValue}`);
-			return dataParams;
-		}, []).join('&');
-}
-
-/**
  * Transform each query into the arguments needed for a `request` call.
  *
  * Some request options are constant for all queries, and these are curried into
@@ -122,27 +106,27 @@ export const buildRequestArgs = externalRequestOpts =>
 	({ endpoint, params, flags }) => {
 
 		// cheap, brute-force object clone, acceptable for serializable object
-		const opts = JSON.parse(JSON.stringify(externalRequestOpts));
-		opts.url = `/${endpoint}`;
-
-		const formattedParams = urlFormatParams(params, opts.method === 'get');
+		const externalRequestOptsQuery = JSON.parse(JSON.stringify(externalRequestOpts));
+		externalRequestOptsQuery.url = encodeURI(`/${endpoint}`);
 
 		if (flags) {
-			opts.headers['X-Meetup-Request-Flags'] = flags.join(',');
+			externalRequestOptsQuery.headers['X-Meetup-Request-Flags'] = flags.join(',');
 		}
 
-		switch (opts.method) {
+		const dataParams = querystring.stringify(params);
+
+		switch (externalRequestOptsQuery.method) {
 		case 'get':
-			opts.url += `?${formattedParams}`;
-			opts.headers['X-Meta-Photo-Host'] = 'secure';
+			externalRequestOptsQuery.url += `?${dataParams}`;
+			externalRequestOptsQuery.headers['X-Meta-Photo-Host'] = 'secure';
 			break;
 		case 'post':
-			opts.body = formattedParams;
-			opts.headers['content-type'] = 'application/x-www-form-urlencoded';
+			externalRequestOptsQuery.body = dataParams;
+			externalRequestOptsQuery.headers['content-type'] = 'application/x-www-form-urlencoded';
 			break;
 		}
 
-		return opts;
+		return externalRequestOptsQuery;
 	};
 
 /**

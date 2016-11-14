@@ -1,5 +1,5 @@
 import Good from 'good';
-import anonAuthPlugin from './plugins/anonAuthPlugin';
+import requestAuthPlugin from './plugins/requestAuthPlugin';
 
 /**
  * Hapi plugins for the dev server
@@ -45,9 +45,9 @@ export function getConsoleLogPlugin() {
  * configure and return the plugin that will allow requests to get anonymous
  * oauth tokens to communicate with the API
  */
-export function getAnonAuthPlugin(options) {
+export function getRequestAuthPlugin(options) {
 	return {
-		register: anonAuthPlugin,
+		register: requestAuthPlugin,
 		options,
 	};
 }
@@ -55,7 +55,7 @@ export function getAnonAuthPlugin(options) {
 export default function getPlugins(config) {
 	return [
 		getConsoleLogPlugin(),
-		getAnonAuthPlugin(config),
+		getRequestAuthPlugin(config),
 	];
 }
 

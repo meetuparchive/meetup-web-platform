@@ -13,9 +13,6 @@ import {
 	getServer,
 } from './util/testUtils';
 
-// RegEx to verify UUID
-const UUID_V4_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-
 function getResponse(injectRequest, server=getServer()) {
 	// a Promise that returns the server instance after it has been
 	// configured with the routes being tested
@@ -46,18 +43,6 @@ describe('routes', () => {
 				const cookies = parseCookieHeader(cookieHeader);
 				expect(cookies.oauth_token).toBe(MOCK_OAUTH_COOKIES.oauth_token);
 				expect(cookies.refresh_token).toBe(MOCK_OAUTH_COOKIES.refresh_token);
-				expect(cookies.anonymous).toBe(MOCK_OAUTH_COOKIES.anonymous.toString());
-			})
-	);
-	it('sets tracking cookie in response', () =>
-		getResponse({ url: '/' })
-			.then(response => {
-				const cookieHeader = response.headers['set-cookie'];
-				expect(cookieHeader).not.toBeNull();
-
-				const cookies = parseCookieHeader(cookieHeader);
-				expect(cookies.meetupTrack).not.toBeNull();
-				expect(UUID_V4_REGEX.test(cookies.meetupTrack)).toBe(true);
 			})
 	);
 });
