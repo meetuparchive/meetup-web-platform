@@ -100,12 +100,12 @@ describe('buildRequestArgs', () => {
 
 	const testQueryResults_utf8 = mockQuery(MOCK_RENDERPROPS_UTF8);
 	const apiConfig_utf8 = queryToApiConfig(testQueryResults_utf8);
-	const encoded_url = '/%E3%83%90-%E4%BA%AC';
 
 	it('Properly encodes the URL', () => {
 		const method = 'get';
 		const getArgs = buildRequestArgs({ ...options, method })(apiConfig_utf8);
-		expect(getArgs.url.split('?')[0]).toEqual(encoded_url);
+		const { pathname } = require('url').parse(getArgs.url);
+		expect(/^[\x00-\xFF]*$/.test(pathname)).toBe(true);
 	});
 
 });
