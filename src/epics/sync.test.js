@@ -15,7 +15,6 @@ import {
 } from '../util/testUtils';
 import getSyncEpic from '../epics/sync';
 import * as syncActionCreators from '../actions/syncActionCreators';
-import * as authActionCreators from '../actions/authActionCreators';
 /**
  * @module SyncEpicTest
  */
@@ -76,18 +75,5 @@ describe('Sync epic', () => {
 			.then(action => expect(action.type).toEqual('API_ERROR'));
 	});
 
-	it('emits LOCATION_SYNC with routing state on CONFIGURE_AUTH', function() {
-		const configureAuth = authActionCreators.configureAuth({});
-		const action$ = ActionsObservable.of(configureAuth);
-		const fakeStore = createFakeStore(MOCK_APP_STATE);
-		return getSyncEpic(routes)(action$, fakeStore)
-			.toPromise()
-			.then(
-				action => {
-					expect(action.type).toEqual('LOCATION_SYNC');
-					expect(action.payload).toEqual(MOCK_APP_STATE.routing.locationBeforeTransitions);
-				}
-			);
-	});
 });
 
