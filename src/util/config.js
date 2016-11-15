@@ -1,5 +1,4 @@
 import Joi from 'joi';
-import { AUTH_ENDPOINT } from '../epics/auth';
 /**
  * Start the server with a config
  *
@@ -29,7 +28,6 @@ export default function getConfig(overrideConfig) {
 			process.env.ANONYMOUS_ACCESS_URL ||
 			'https://secure.dev.meetup.com/oauth2/access',
 		PHOTO_SCALER_SALT: process.env.PHOTO_SCALER_SALT,
-		AUTH_ENDPOINT,
 		oauth: {
 			secret: process.env.MUPWEB_OAUTH_SECRET,
 			key: process.env.MUPWEB_OAUTH_KEY,
@@ -53,7 +51,6 @@ function validateConfig(config) {
 		PHOTO_SCALER_SALT: Joi.string().min(1).required().error(
 			new Error('get PHOTO_SCALER_SALT from web platform team')
 		),
-		AUTH_ENDPOINT: Joi.string().uri({ allowRelative: true }).required(),
 		oauth: Joi.object().keys({
 			secret: Joi.string().min(1).required().error(oauthError),
 			key: Joi.string().min(1).required().error(oauthError),
