@@ -155,12 +155,6 @@ const makeRenderer = (
 
 	// create the store
 	const store = createStore(routes, reducer, {}, middleware);
-	const originalDispatch = store.dispatch.bind(store);
-	store.dispatch = (action) => {
-		request.log(['app', 'info'], action.type);
-		return originalDispatch(action);
-	};
-
 	// load initial config
 	dispatchConfig(store, { apiUrl, log: log.bind(request) });
 
@@ -181,10 +175,6 @@ const makeRenderer = (
 
 	request.log(['app', 'info'], `Finding route for path: '${location}'`);
 	return Rx.Observable.bindNodeCallback(match)({ location, routes })
-		.catch(err => {
-			request.log(['app', 'error'], err.message);
-			return Rx.Observable.of([]);
-		})
 		.do(([redirectLocation, renderProps]) => {
 			if (!redirectLocation && !renderProps) {
 				throw Boom.notFound();
