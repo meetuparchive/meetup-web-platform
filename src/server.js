@@ -54,6 +54,7 @@ export function onPreResponse(request, reply) {
 		return reply.continue();
 	}
 	const error = response;
+	console.error(error.stack);
 	const { RedBoxError } = require('redbox-react');
 	const errorMarkup = ReactDOMServer.renderToString(
 		React.createElement(RedBoxError, { error })

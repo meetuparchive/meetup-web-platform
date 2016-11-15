@@ -109,7 +109,7 @@ export const requestAuthorizer = auth$ => request => {
 			.do(() => request.log(['info', 'auth'], `Request contains auth token (${authType})`)),
 		request$
 			.do(() => request.log(['info', 'auth'], 'Request does not contain auth token'))
-			.flatMap(request => auth$(request).do(applyAuthState(request)))
+			.flatMap(request => auth$(request).do(applyAuthState(request)).map(() => request))
 	);
 };
 
@@ -142,10 +142,6 @@ export function getAnonymousCode$({ API_TIMEOUT=5000, OAUTH_AUTH_URL, oauth }, r
 		return Rx.Observable.fromPromise(fetch(authURL, requestOpts))
 			.timeout(API_TIMEOUT)
 			.flatMap(tryJSON(OAUTH_AUTH_URL))
-			.catch(error => {
-				console.log(error.stack);
-				return Rx.Observable.of({ code: null });
-			})
 			.map(({ code }) => ({
 				grant_type: 'anonymous_code',
 				token: code
@@ -242,11 +238,7 @@ export const requestAuth$ = config => {
 			anonymousCode$
 		)
 		.flatMap(accessToken$(headers))
-		.do(verifyAuth)
-		.catch(error => {
-			console.log(error.stack);
-			return Rx.Observable.of({});  // operational error results in empty auth response
-		});
+		.do(verifyAuth);
 };
 
 export const authenticate = (request, reply) => {
