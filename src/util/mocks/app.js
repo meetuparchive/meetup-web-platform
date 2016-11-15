@@ -82,6 +82,19 @@ export const MOCK_RENDERPROPS = {
 	}
 };
 
+export const MOCK_RENDERPROPS_UTF8 = {
+	location: {  // https://github.com/reactjs/history/blob/master/docs/Location.md
+		pathname: '/バ-京',
+		search: '',
+		state: {},
+		action: 'PUSH',
+		key: '1234'
+	},
+	params: {
+		urlname: 'バ-京'
+	}
+};
+
 export const MOCK_MEANINGLESS_ACTION = {
 	type: 'ARBITRARY',
 	payload: '/'

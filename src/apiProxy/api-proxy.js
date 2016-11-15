@@ -83,7 +83,7 @@ export function queryToApiConfig({ type, params }) {
  */
 export const buildRequestArgs = externalRequestOpts => ({ endpoint, params }) => {
 	const externalRequestOptsQuery = { ...externalRequestOpts };
-	externalRequestOptsQuery.url = `/${endpoint}`;
+	externalRequestOptsQuery.url = encodeURI(`/${endpoint}`);
 
 	const dataParams = querystring.stringify(params);
 
