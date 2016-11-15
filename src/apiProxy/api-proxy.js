@@ -211,7 +211,7 @@ const makeMockRequest = mockResponse => requestOpts =>
 		.do(() => console.log(`MOCKING response to ${requestOpts.url}`));
 
 const logResponseTime = log => ([response, body]) =>
-	log(['api'], `${response.elapsedTime}ms - ${response.request.uri.path}`);
+	log(['api'], `REST API response: ${response.elapsedTime}ms - ${response.request.uri.path}`);
 
 /**
  * Make a real external API request, return response body string
@@ -233,7 +233,7 @@ export const makeApiRequest$ = (request, API_TIMEOUT, duotoneUrls) => {
 			makeMockRequest(query.mockResponse) :
 			makeExternalApiRequest(request, API_TIMEOUT);
 
-		request.log(['api'], JSON.stringify(requestOpts.url));
+		request.log(['api'], `REST API request: ${requestOpts.url}`);
 		return request$(requestOpts)
 			.map(parseApiResponse)             // parse into plain object
 			.catch(error => Rx.Observable.of({ error: error.message }))
