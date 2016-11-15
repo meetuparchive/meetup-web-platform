@@ -123,12 +123,25 @@ export function parseRequest(request, baseUrl) {
 		method,
 		query,
 		payload,
+		state,
 	} = request;
+
+	// Forward the Hapi request headers from the client query
+	// except for `host` and `accept-encoding`
+	// which should be provided by the external api request
+	const externalRequestHeaders = {
+		...headers,
+		authorization: `Bearer ${state.oauth_token}`,
+	};
+
+	delete externalRequestHeaders['host'];
+	delete externalRequestHeaders['accept-encoding'];
+	delete externalRequestHeaders['content-length'];  // original request content-length is irrelevant
 
 	const externalRequestOpts = {
 		baseUrl,
 		method,
-		headers: { ...headers },  // make a copy to be immutable
+		headers: externalRequestHeaders,  // make a copy to be immutable
 		mode: 'no-cors',
 		time: true,
 		agentOptions: {
@@ -136,12 +149,6 @@ export function parseRequest(request, baseUrl) {
 		}
 	};
 
-	// Forward the Hapi request headers from the client query
-	// except for `host` and `accept-encoding`
-	// which should be provided by the external api request
-	delete externalRequestOpts.headers['host'];
-	delete externalRequestOpts.headers['accept-encoding'];
-	delete externalRequestOpts.headers['content-length'];  // original request content-length is irrelevant
 
 	const queriesJSON = request.method === 'get' ? query.queries : payload.queries;
 	const queries = JSON.parse(queriesJSON);
@@ -211,7 +218,7 @@ const makeMockRequest = mockResponse => requestOpts =>
 		.do(() => console.log(`MOCKING response to ${requestOpts.url}`));
 
 const logResponseTime = log => ([response, body]) =>
-	log(['api'], `${response.elapsedTime}ms - ${response.request.uri.path}`);
+	log(['api', 'info'], `REST API response: ${response.elapsedTime}ms - ${response.request.uri.path}`);
 
 /**
  * Make a real external API request, return response body string
@@ -233,7 +240,7 @@ export const makeApiRequest$ = (request, API_TIMEOUT, duotoneUrls) => {
 			makeMockRequest(query.mockResponse) :
 			makeExternalApiRequest(request, API_TIMEOUT);
 
-		request.log(['api'], JSON.stringify(requestOpts.url));
+		request.log(['api', 'info'], `REST API request: ${requestOpts.url}`);
 		return request$(requestOpts)
 			.map(parseApiResponse)             // parse into plain object
 			.catch(error => Rx.Observable.of({ error: error.message }))
@@ -260,6 +267,9 @@ export const makeApiRequest$ = (request, API_TIMEOUT, duotoneUrls) => {
 const apiProxy$ = ({ API_TIMEOUT=5000, baseUrl='', duotoneUrls={} }) => {
 
 	return request => {
+		if (!request.state.oauth_token) {
+			throw new Error('Request does not contain oauth cookie, cannot call API');
+		}
 
 		// 1. get the queries and the 'universal' `externalRequestOpts` from the request
 		const { queries, externalRequestOpts } = parseRequest(request, baseUrl);

@@ -1,19 +1,47 @@
 import Rx from 'rxjs';
 import register, {
+	authenticate,
+	oauthScheme,
 	requestAuth$,
 	getAnonymousCode$,
 	getAccessToken$,
 	requestAuthorizer,
 } from './requestAuthPlugin';
 
-// silence expected console logging output
-console.log = () => {};
-
 const oauth = {
 	key: '1234',
 	secret: 'asdf',
 };
+const MOCK_SERVER = {
+	decorate() {},
+	route() {},
+	auth: {
+		scheme: () => {},
+	},
+	ext: () => {},
+};
 const MOCK_HEADERS = {};
+const MOCK_REPLY_FN = () => {};
+MOCK_REPLY_FN.state = () => {};
+MOCK_REPLY_FN.continue = () => {};
+const MOCK_REQUEST = {
+	headers: MOCK_HEADERS,
+	state: {},
+	app: {},
+	log: (tags, data) => { console.log(data); },
+	authorize: () => Rx.Observable.of(MOCK_REQUEST),
+	query: {},
+};
+const MOCK_AUTHED_REQUEST = {
+	headers: MOCK_HEADERS,
+	state: { oauth_token: 'good_token' },
+	app: {},
+	log: (tags, data) => { console.log(data); },
+	authorize: () => Rx.Observable.of(MOCK_AUTHED_REQUEST),
+	query: {},
+};
+MOCK_REQUEST.authorize.reply = MOCK_REPLY_FN;
+
 const GOOD_MOCK_FETCH_RESULT = Promise.resolve({
 	text: () => Promise.resolve('{}')
 });
@@ -97,9 +125,8 @@ describe('requestAuth$', () => {
 			}
 		});
 		const auth$ = requestAuth$({ oauth, OAUTH_AUTH_URL, OAUTH_ACCESS_URL }, null);
-		const MOCK_REQUEST = { headers: MOCK_HEADERS, state: {}, app: {}, log: () => {} };
 
-		auth$(MOCK_REQUEST).subscribe(auth => {
+		auth$({ ...MOCK_REQUEST }).subscribe(auth => {
 			expect(auth.oauth_token).toBe('good_token');
 			done();
 		});
@@ -108,7 +135,7 @@ describe('requestAuth$', () => {
 describe('requestAuthorizer', () => {
 	const auth$ = requestAuth$({ oauth, OAUTH_AUTH_URL, OAUTH_ACCESS_URL }, null);
 	const authorizeRequest$ = requestAuthorizer(auth$);
-	it('does not try to fetch when provided a request with an oauth token in state', function(done) {
+	it('does not try to fetch when provided a request with an oauth token in state', () => {
 		spyOn(global, 'fetch').and.callFake((url, opts) => {
 			if (url.startsWith(OAUTH_AUTH_URL)) {
 				return Promise.resolve({
@@ -121,21 +148,14 @@ describe('requestAuthorizer', () => {
 				});
 			}
 		});
-		const MOCK_REQUEST = {
-			headers: MOCK_HEADERS,
-			state: {
-				oauth_token: 'good_token'
-			},
-			app: {},
-			log: () => {},
-		};
 
-		authorizeRequest$(MOCK_REQUEST).subscribe(request => {
-			expect(global.fetch).not.toHaveBeenCalled();
-			done();
-		});
+		return authorizeRequest$({ ...MOCK_AUTHED_REQUEST })
+			.toPromise()
+			.then(request => {
+				expect(global.fetch).not.toHaveBeenCalled();
+			});
 	});
-	it('calls fetch when provided a request without an oauth token in state', function(done) {
+	it('calls fetch when provided a request without an oauth token in state', () => {
 		spyOn(global, 'fetch').and.callFake((url, opts) => {
 			if (url.startsWith(OAUTH_AUTH_URL)) {
 				return Promise.resolve({
@@ -148,24 +168,14 @@ describe('requestAuthorizer', () => {
 				});
 			}
 		});
-		const MOCK_REQUEST = {
-			headers: MOCK_HEADERS,
-			state: {},
-			app: {},
-			log: () => {},
-		};
-
-		authorizeRequest$(MOCK_REQUEST).subscribe(request => {
-			expect(global.fetch).toHaveBeenCalled();
-			done();
-		});
+		return authorizeRequest$({ ...MOCK_REQUEST })
+			.toPromise()
+			.then(request => {
+				expect(global.fetch).toHaveBeenCalled();
+			});
 	});
 });
 describe('register', () => {
-	const MOCK_SERVER = {
-		decorate() {},
-		route() {},
-	};
 	const spyable = {
 		next() {}
 	};
@@ -182,16 +192,48 @@ describe('register', () => {
 		register(MOCK_SERVER, options, spyable.next);
 		expect(spyable.next).toHaveBeenCalled();
 	});
-	it('calls server.route with an object', () => {
-		spyOn(MOCK_SERVER, 'route');
-		register(MOCK_SERVER, options, spyable.next);
-		expect(MOCK_SERVER.route).toHaveBeenCalledWith(jasmine.any(Object));
+});
+
+describe('oauthScheme', () => {
+	const options = {
+		OAUTH_AUTH_URL: '',
+		OAUTH_ACCESS_URL: '',
+		oauth: {
+			key: '1234',
+			secret: 'abcd',
+		},
+	};
+	it('calls server.ext with an \'onPreAuth\' function', () => {
+		spyOn(MOCK_SERVER, 'ext');
+		oauthScheme(MOCK_SERVER, options);
+		expect(MOCK_SERVER.ext).toHaveBeenCalledWith('onPreAuth', jasmine.any(Function));
 	});
 	it('calls server.decorate to add a method to `request`', () => {
 		spyOn(MOCK_SERVER, 'decorate');
-		register(MOCK_SERVER, options, spyable.next);
+		oauthScheme(MOCK_SERVER, options);
 		expect(MOCK_SERVER.decorate)
 			.toHaveBeenCalledWith('request', jasmine.any(String), jasmine.any(Function), { apply: true });
 	});
 });
 
+describe('authenticate', () => {
+	it('calls request.authorize', () => {
+		spyOn(MOCK_REQUEST, 'authorize').and.callThrough();
+		return new Promise((resolve, reject) =>
+			authenticate(MOCK_REQUEST, MOCK_REPLY_FN).add(() => {
+				expect(MOCK_REQUEST.authorize).toHaveBeenCalled();
+				resolve();
+			})
+		);
+	});
+	it('calls reply.continue with credentials and artifacts', () => {
+		spyOn(MOCK_REPLY_FN, 'continue');
+		return new Promise((resolve, reject) =>
+			authenticate({ ...MOCK_AUTHED_REQUEST }, MOCK_REPLY_FN).add(() => {
+				expect(MOCK_REPLY_FN.continue)
+					.toHaveBeenCalledWith({ credentials: jasmine.any(String), artifacts: jasmine.any(String) });
+				resolve();
+			})
+		);
+	});
+});

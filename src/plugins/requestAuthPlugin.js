@@ -1,23 +1,19 @@
-import Boom from 'boom';
 import chalk from 'chalk';
+import nodeFetch from 'node-fetch';
 import Rx from 'rxjs';
+
+import { tryJSON } from '../util/fetchUtils';
 
 /**
  * @module requestAuthPlugin
  */
 
-function tryJSON(response) {
-	const { status } = response;
-	if (status >= 400) {  // status always 200: bugzilla #52128
-		throw new Error(`API responded with error code ${status}`);
-	}
-	return response.text().then(text => JSON.parse(text));
-}
+const YEAR_IN_MS = 1000 * 60 * 60 * 24 * 365;
 
-function verifyAuth([request, auth]) {
+function verifyAuth(auth) {
 	const keys = Object.keys(auth);
 	if (!keys.length) {
-		const errorMessage = 'No auth info provided';
+		const errorMessage = 'No auth token(s) provided';
 		console.error(
 			chalk.red(errorMessage),
 			': application can not fetch data.',
@@ -25,21 +21,68 @@ function verifyAuth([request, auth]) {
 		);
 		throw new Error(errorMessage);
 	}
+	return auth;
+}
+
+/**
+ * Transform auth info from the API into a configuration for the corresponding
+ * cookies to write into the Hapi request/response
+ *
+ * @param {Object} auth { oauth_token || access_token, refresh_token, expires_in }
+ * object from API/Auth endpoint
+ */
+const configureAuthState = auth => {
+	const path = '/';
+	return {
+		oauth_token: {
+			value: auth.oauth_token || auth.access_token,
+			opts: {
+				path,
+				ttl: auth.expires_in * 1000,
+				isHttpOnly: true,
+			},
+		},
+		refresh_token: {
+			value: auth.refresh_token,
+			opts: {
+				path,
+				ttl: YEAR_IN_MS * 2,
+				isHttpOnly: true,
+			},
+		}
+	};
+};
+
+/**
+ * Both the incoming request and the outgoing response need to have an
+ * 'authorized' state in order for the app to render correctly with data from
+ * the API, so this function modifies the request and the reply
+ *
+ * @param request Hapi request
+ * @param auth { oauth_token || access_token, expires_in (seconds), refresh_token }
+ */
+const applyAuthState = request => auth => {
 	// there are secret tokens in `auth`, be careful with logging
-	request.log(['auth'], `Authorizing with keys: ${JSON.stringify(keys)}`);
-}
+	const authState = configureAuthState(auth);
+	const authCookies = Object.keys(authState);
 
-function injectAuthIntoRequest([request, auth]) {
-	// update request with auth info
-	request.state.oauth_token = auth.access_token;  // this endpoint provides 'access_token' instead of 'oauth_token'
-	request.state.refresh_token = auth.refresh_token;  // use to get new oauth upon expiration
-	request.state.expires_in = auth.expires_in;  // TTL for oauth token (in seconds)
+	request.log(['auth', 'info'], `Setting auth cookies: ${JSON.stringify(authCookies)}`);
+	Object.keys(authState).forEach(name => {
+		const cookieVal = authState[name];
+		// apply to request
+		request.state[name] = cookieVal.value;
+		// apply to response - note this special `request.authorize.reply` prop assigned onPreAuth
+		request.authorize.reply.state(name, cookieVal.value, cookieVal.opts);
+	});
+	return request;
+};
 
-	// special prop in `request.app` to indicate that this is a new,
-	// server-provided token, not from the original request, so the cookies
-	// will need to be set in the response
-	request.app.setCookies = true;
-}
+const removeAuthState = (names, request) => {
+	names.forEach(name => {
+		request.state[name] = null;
+		request.authorize.reply.unstate(name);
+	});
+};
 
 /**
  * Ensure that the passed-in Request contains a valid Oauth token
@@ -56,17 +99,17 @@ export const requestAuthorizer = auth$ => request => {
 	// always need oauth_token, even if it's an anonymous (pre-reg) token
 	// This is 'deferred' because we don't want to start fetching the token
 	// before we know that it's needed
-	const deferredAuth$ = Rx.Observable.defer(() => auth$(request));
-
 	const request$ = Rx.Observable.of(request);
+	const authType = request.state.oauth_token && 'cookie';
+
+	request.log(['info', 'auth'], 'Checking for oauth_token in request');
 	return Rx.Observable.if(
-		() => request.state.oauth_token,
-		request$,
+		() => authType,
 		request$
-			.zip(deferredAuth$)
-			.do(verifyAuth)
-			.do(injectAuthIntoRequest)
-			.map(([request, auth]) => request)  // throw away auth info
+			.do(() => request.log(['info', 'auth'], `Request contains auth token (${authType})`)),
+		request$
+			.do(() => request.log(['info', 'auth'], 'Request does not contain auth token'))
+			.flatMap(request => auth$(request).do(applyAuthState(request)))
 	);
 };
 
@@ -98,7 +141,7 @@ export function getAnonymousCode$({ API_TIMEOUT=5000, OAUTH_AUTH_URL, oauth }, r
 		console.log(`Fetching anonymous auth code from ${OAUTH_AUTH_URL}`);
 		return Rx.Observable.fromPromise(fetch(authURL, requestOpts))
 			.timeout(API_TIMEOUT)
-			.flatMap(tryJSON)
+			.flatMap(tryJSON(OAUTH_AUTH_URL))
 			.catch(error => {
 				console.log(error.stack);
 				return Rx.Observable.of({ code: null });
@@ -135,8 +178,8 @@ export const getAccessToken$ = ({ API_TIMEOUT=5000, OAUTH_ACCESS_URL, oauth }, r
 		const requestOpts = {
 			method: 'POST',
 			headers: {
-				Cookie: headers['cookie'],
-				Accept: headers['accept'],
+				Cookie: headers.cookie,
+				Accept: headers.accept,
 				'Accept-Language': headers['accept-language'],
 				'Cache-Control': headers['cache-control']
 			},
@@ -150,6 +193,7 @@ export const getAccessToken$ = ({ API_TIMEOUT=5000, OAUTH_ACCESS_URL, oauth }, r
 		return ({ grant_type, token }) => {
 
 			if (!token) {
+				// programmer error or catastrophic auth failure - throw exception
 				throw new ReferenceError('No grant token provided - cannot obtain access token');
 			}
 
@@ -167,7 +211,7 @@ export const getAccessToken$ = ({ API_TIMEOUT=5000, OAUTH_ACCESS_URL, oauth }, r
 
 			return Rx.Observable.fromPromise(fetch(url, requestOpts))
 				.timeout(API_TIMEOUT)
-				.flatMap(tryJSON);
+				.flatMap(tryJSON(OAUTH_ACCESS_URL));
 		};
 	};
 };
@@ -191,30 +235,55 @@ export const requestAuth$ = config => {
 	const accessToken$ = getAccessToken$(config, redirect_uri);
 
 	// if the request has a refresh_token, use it. Otherwise, get a new anonymous access token
-	return ({ headers, state: { refresh_token} }) => Rx.Observable.if(
-		() => refresh_token,
-		refreshToken$(refresh_token),
-		anonymousCode$
-	)
-	.flatMap(accessToken$(headers))
-	.catch(error => {
-		console.log(error.stack);
-		return Rx.Observable.of({});  // failure results in empty object response - bad time
-	});
+	return ({ headers, state: { refresh_token} }) =>
+		Rx.Observable.if(
+			() => refresh_token,
+			refreshToken$(refresh_token),
+			anonymousCode$
+		)
+		.flatMap(accessToken$(headers))
+		.do(verifyAuth)
+		.catch(error => {
+			console.log(error.stack);
+			return Rx.Observable.of({});  // operational error results in empty auth response
+		});
+};
+
+export const authenticate = (request, reply) => {
+	// logout is accomplished exclusively through a `logout` querystring value
+	if ('logout' in request.query) {
+		request.log(['info', 'auth'], 'Logout received, clearing cookies to re-authenticate');
+		return removeAuthState(['oauth_token', 'refresh_token'], request);
+	}
+
+	request.log(['info', 'auth'], 'Authenticating request');
+	return request.authorize()
+		.do(request => {
+			request.log(['info', 'auth'], 'Request authenticated');
+		})
+		.subscribe(({ state: { oauth_token } }) => {
+			const credentials = oauth_token;
+			reply.continue({ credentials, artifacts: credentials });
+		});
 };
 
 /**
- * This plugin does two things.
- *
- * 1. Adds an 'authorize' interface on the Hapi `request`, which ensures that
- * the request has an oauth_token cookie - it provides an anonymous token when
- * none is provided in the request, and refreshes a token that has expired
- * 2. Adds a new route that returns the auth JSON containing the new oauth_token
- * (configurable, defaults to '/auth')
- *
- * {@link http://hapijs.com/tutorials/plugins}
+ * create a `fetch` function that contains the cookie header passed in
  */
-export default function register(server, options, next) {
+const cookieFetch = cookie => (url, options={}) => {
+	const headers = { ...(options.headers || {}), cookie };
+	return nodeFetch(url, { ...options, headers });
+};
+/**
+ * Request authorizing scheme
+ *
+ * 1. add a `.authorize` method to the request
+ * 2. assign a reference to the reply interface on request.authorize
+ * 3. add an anonymous-user-JSON-generating route (for app logout)
+ * 4. return the authentication function, which ensures that all requests have
+ * valid auth credentials (anonymous or logged in)
+ */
+export const oauthScheme = (server, options) => {
 	// create a single requestAuth$ stream that can be used by any route
 	const auth$ = requestAuth$(options);
 	// create a single stream for modifying an arbitrary request with anonymous auth
@@ -227,21 +296,31 @@ export default function register(server, options, next) {
 		{ apply: true }
 	);
 
-	server.route({
-		method: 'GET',
-		path: options.AUTH_ENDPOINT,
-		handler: (request, reply) => {
-			auth$(request).subscribe(
-				auth => {
-					const response = reply(JSON.stringify(auth))
-						.type('application/json');
-					reply.track(response, 'logout');
-				},
-				(err) => { reply(Boom.badImplementation(err.message)); }
-			);
-		}
+	server.ext('onPreAuth', (request, reply) => {
+		// overwrite fetch to inject _this_ request's cookies
+		global.fetch = cookieFetch(request.headers.cookie);
+
+		// Used for setting and unsetting state, not for replying to request
+		request.authorize.reply = reply;
+
+		return reply.continue();
 	});
 
+	return { authenticate };
+};
+/**
+ * This plugin does two things.
+ *
+ * 1. Adds an 'authorize' interface on the Hapi `request`, which ensures that
+ * the request has an oauth_token cookie - it provides an anonymous token when
+ * none is provided in the request, and refreshes a token that has expired
+ * 2. Adds a new route that returns the auth JSON containing the new oauth_token
+ * (configurable, defaults to '/auth')
+ *
+ * {@link http://hapijs.com/tutorials/plugins}
+ */
+export default function register(server, options, next) {
+	server.auth.scheme('oauth', oauthScheme);
 	next();
 }
 register.attributes = {
