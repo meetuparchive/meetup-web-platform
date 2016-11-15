@@ -43,7 +43,6 @@ export default function getConfig(overrideConfig) {
 }
 
 function validateConfig(config) {
-	console.log(config.API_PROTOCOL, 'protocol');
 	const oauthError = new Error('get oauth secrets from web platform team');
 	const configSchema = Joi.object().keys({
 		DEV_SERVER_PORT: Joi.number().integer().max(65535),
