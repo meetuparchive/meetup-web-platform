@@ -2,7 +2,6 @@ import 'rxjs';  // required to enable all Observable operators
 import { combineEpics, createEpicMiddleware } from 'redux-observable';
 
 import getSyncEpic from '../epics/sync';
-import authEpic from '../epics/auth';
 import getCacheEpic from '../epics/cache';
 import postEpic from '../epics/post';
 
@@ -14,7 +13,6 @@ import postEpic from '../epics/post';
 const getPlatformMiddleware = routes => createEpicMiddleware(
 	combineEpics(
 		getSyncEpic(routes),
-		authEpic,
 		getCacheEpic(),
 		postEpic
 	)
