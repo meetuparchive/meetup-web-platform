@@ -24,16 +24,6 @@ describe('fetchQueries', () => {
 				expect(response.responses).toEqual(jasmine.any(Array));
 			});
 	});
-	it('rejects with an Error without calling fetch when no oauth', () => {
-		spyOn(global, 'fetch');
-
-		return fetchUtils.fetchQueries(API_URL.toString(), { method: 'GET' })(queries)
-			.then(() => expect(true).toBe(false))  // should never be called!
-			.catch(err => {
-				expect(err).toEqual(jasmine.any(Error));
-				expect(global.fetch).not.toHaveBeenCalled();
-			});
-	});
 	describe('GET', () => {
 		it('calls fetch with API url with GET and querystring', () => {
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);

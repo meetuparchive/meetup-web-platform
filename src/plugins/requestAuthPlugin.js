@@ -1,4 +1,3 @@
-import Boom from 'boom';
 import chalk from 'chalk';
 import nodeFetch from 'node-fetch';
 import Rx from 'rxjs';
@@ -10,7 +9,7 @@ import { tryJSON } from '../util/fetchUtils';
 
 const YEAR_IN_MS = 1000 * 60 * 60 * 24 * 365;
 
-function verifyAuth([request, auth]) {
+function verifyAuth(auth) {
 	const keys = Object.keys(auth);
 	if (!keys.length) {
 		const errorMessage = 'No auth token(s) provided';
@@ -21,18 +20,18 @@ function verifyAuth([request, auth]) {
 		);
 		throw new Error(errorMessage);
 	}
-	// there are secret tokens in `auth`, be careful with logging
-	request.log(['info', 'auth'], `Authorizing with keys: ${JSON.stringify(keys)}`);
+	return auth;
 }
 
 /**
- * Both the incoming request and the outgoing response need to have an
- * 'authorized' state in order for the app to render correctly with data from
- * the API, so this function modifies the request and the reply
+ * Transform auth info from the API into a configuration for the corresponding
+ * cookies to write into the Hapi request/response
+ *
+ * @param {Object} auth { oauth_token || access_token, refresh_token, expires_in }
  */
-const applyAuth = ([request, auth]) => {
+const configureAuthState = auth => {
 	const path = '/';
-	const authState = {
+	return {
 		oauth_token: {
 			value: auth.oauth_token || auth.access_token,
 			opts: {
@@ -50,12 +49,36 @@ const applyAuth = ([request, auth]) => {
 			},
 		}
 	};
+};
+
+/**
+ * Both the incoming request and the outgoing response need to have an
+ * 'authorized' state in order for the app to render correctly with data from
+ * the API, so this function modifies the request and the reply
+ *
+ * @param request Hapi request
+ * @param auth { oauth_token || access_token, expires_in (seconds), refresh_token }
+ */
+const applyAuthState = request => auth => {
+	// there are secret tokens in `auth`, be careful with logging
+	const authState = configureAuthState(auth);
+	const authCookies = Object.keys(authState);
+
+	request.log(['auth', 'info'], `Authorizing with keys: ${JSON.stringify(authCookies)}`);
 	Object.keys(authState).forEach(name => {
 		const cookieVal = authState[name];
 		// apply to request
 		request.state[name] = cookieVal.value;
 		// apply to response - note this special `reply` prop assigned onPreAuth
 		request.authorize.reply.state(name, cookieVal.value, cookieVal.opts);
+	});
+	return request;
+};
+
+const removeAuthState = (names, request) => {
+	names.forEach(name => {
+		request.state[name] = null;
+		request.authorize.reply.unstate(name);
 	});
 };
 
@@ -74,7 +97,6 @@ export const requestAuthorizer = auth$ => request => {
 	// always need oauth_token, even if it's an anonymous (pre-reg) token
 	// This is 'deferred' because we don't want to start fetching the token
 	// before we know that it's needed
-	const deferredAuth$ = Rx.Observable.defer(() => auth$(request));
 	const request$ = Rx.Observable.of(request);
 	const authType = request.state.oauth_token && 'cookie';
 
@@ -85,10 +107,9 @@ export const requestAuthorizer = auth$ => request => {
 			.do(() => request.log(['info', 'auth'], `Request contains auth token (${authType})`)),
 		request$
 			.do(() => request.log(['info', 'auth'], 'Request does not contain auth token'))
-			.zip(deferredAuth$)  // need to get a new token
-			.do(verifyAuth)
-			.do(applyAuth)
-			.map(([request, auth]) => request)  // throw away auth info
+			.flatMap(request => auth$(request)
+				.do(applyAuthState(request))
+			)
 	);
 };
 
@@ -219,6 +240,7 @@ export const requestAuth$ = config => {
 		anonymousCode$
 	)
 	.flatMap(accessToken$(headers))
+	.do(verifyAuth)
 	.catch(error => {
 		console.log(error.stack);
 		return Rx.Observable.of({});  // failure results in empty object response - bad time
@@ -226,6 +248,11 @@ export const requestAuth$ = config => {
 };
 
 export const authenticate = (request, reply) => {
+	if (request.query.logout) {
+		request.log(['info', 'auth'], 'Logout received, clearing cookies to re-authenticate');
+		return removeAuthState(['oauth_token', 'refresh_token'], request);
+	}
+
 	request.log(['info', 'auth'], 'Authenticating request');
 	return request.authorize()
 		.do(request => {
@@ -280,29 +307,6 @@ export const oauthScheme = (server, options) => {
 		request.authorize.reply = reply;
 
 		return reply.continue();
-	});
-
-	// Assign a new route that can deliver new anonymous credentials on logout.
-	// This route will not be necessary when auth is handled entirely by cookies
-	// that are set with any request to any app endpoint (no auth header, no auth
-	// info in app state)
-	server.route({
-		method: 'GET',
-		path: options.AUTH_ENDPOINT,
-		config: { auth: false },
-		handler: (request, reply) => {
-			request.log(['info', 'auth'], 'Handling an auth endpoint request');
-			// this is a logout endpoint - we need to invalidate any oauth cookies in
-			// the request
-			auth$(request).subscribe(
-				auth => {
-					const response = reply(JSON.stringify(auth))
-						.type('application/json');
-					reply.track(response, 'logout');
-				},
-				(err) => { reply(Boom.badImplementation(err.message)); }
-			);
-		}
 	});
 
 	return { authenticate };

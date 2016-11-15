@@ -34,14 +34,6 @@ export function loginPost(params) {
 	};
 }
 
-export function clearAuth(auth, suppressSync) {
-	return {
-		type: 'CLEAR_AUTH',
-		payload: auth,
-		meta: suppressSync
-	};
-}
-
 export function loginSuccess(response) {
 	return {
 		type: 'LOGIN_SUCCESS',
@@ -53,27 +45,6 @@ export function loginError(response) {
 	return {
 		type: 'LOGIN_ERROR',
 		payload: response,
-	};
-}
-
-export function logoutRequest() {
-	return {
-		type: 'LOGOUT_REQUEST'
-	};
-}
-
-export function logoutSuccess(auth) {
-	return {
-		type: 'LOGOUT_SUCCESS',
-		payload: auth,
-	};
-}
-
-export function logoutError(err) {
-	return {
-		type: 'LOGOUT_ERROR',
-		error: true,
-		payload: err
 	};
 }
 

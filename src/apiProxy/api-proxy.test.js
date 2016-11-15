@@ -29,11 +29,17 @@ describe('parseRequest', () => {
 			headers,
 			method: 'get',
 			query: data,
+			state: {
+				oauth_token: 'foo',
+			},
 		};
 		const postRequest = {
 			headers,
 			method: 'post',
 			payload: data,
+			state: {
+				oauth_token: 'foo',
+			},
 		};
 
 		expect(parseRequest(getRequest, 'http://dummy.api.meetup.com').queries).toEqual(queries);
