@@ -311,10 +311,6 @@ export const makeApiRequest$ = (request, API_TIMEOUT, duotoneUrls) => {
 const apiProxy$ = ({ API_TIMEOUT=5000, baseUrl='', duotoneUrls={} }) => {
 
 	return request => {
-		if (!request.state.oauth_token) {
-			throw new Error('Request does not contain oauth cookie, cannot call API');
-		}
-
 		// 1. get the queries and the 'universal' `externalRequestOpts` from the request
 		const { queries, externalRequestOpts } = parseRequest(request, baseUrl);
 
