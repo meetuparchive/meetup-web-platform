@@ -3,6 +3,7 @@ import nodeFetch from 'node-fetch';
 import Rx from 'rxjs';
 
 import { tryJSON } from '../util/fetchUtils';
+
 /**
  * @module requestAuthPlugin
  */
@@ -28,6 +29,7 @@ function verifyAuth(auth) {
  * cookies to write into the Hapi request/response
  *
  * @param {Object} auth { oauth_token || access_token, refresh_token, expires_in }
+ * object from API/Auth endpoint
  */
 const configureAuthState = auth => {
 	const path = '/';
@@ -64,12 +66,12 @@ const applyAuthState = request => auth => {
 	const authState = configureAuthState(auth);
 	const authCookies = Object.keys(authState);
 
-	request.log(['auth', 'info'], `Authorizing with keys: ${JSON.stringify(authCookies)}`);
+	request.log(['auth', 'info'], `Setting auth cookies: ${JSON.stringify(authCookies)}`);
 	Object.keys(authState).forEach(name => {
 		const cookieVal = authState[name];
 		// apply to request
 		request.state[name] = cookieVal.value;
-		// apply to response - note this special `reply` prop assigned onPreAuth
+		// apply to response - note this special `request.authorize.reply` prop assigned onPreAuth
 		request.authorize.reply.state(name, cookieVal.value, cookieVal.opts);
 	});
 	return request;
@@ -107,9 +109,7 @@ export const requestAuthorizer = auth$ => request => {
 			.do(() => request.log(['info', 'auth'], `Request contains auth token (${authType})`)),
 		request$
 			.do(() => request.log(['info', 'auth'], 'Request does not contain auth token'))
-			.flatMap(request => auth$(request)
-				.do(applyAuthState(request))
-			)
+			.flatMap(request => auth$(request).do(applyAuthState(request)))
 	);
 };
 
@@ -178,8 +178,8 @@ export const getAccessToken$ = ({ API_TIMEOUT=5000, OAUTH_ACCESS_URL, oauth }, r
 		const requestOpts = {
 			method: 'POST',
 			headers: {
-				Cookie: headers['cookie'],
-				Accept: headers['accept'],
+				Cookie: headers.cookie,
+				Accept: headers.accept,
 				'Accept-Language': headers['accept-language'],
 				'Cache-Control': headers['cache-control']
 			},
@@ -193,6 +193,7 @@ export const getAccessToken$ = ({ API_TIMEOUT=5000, OAUTH_ACCESS_URL, oauth }, r
 		return ({ grant_type, token }) => {
 
 			if (!token) {
+				// programmer error or catastrophic auth failure - throw exception
 				throw new ReferenceError('No grant token provided - cannot obtain access token');
 			}
 
@@ -234,21 +235,23 @@ export const requestAuth$ = config => {
 	const accessToken$ = getAccessToken$(config, redirect_uri);
 
 	// if the request has a refresh_token, use it. Otherwise, get a new anonymous access token
-	return ({ headers, state: { refresh_token} }) => Rx.Observable.if(
-		() => refresh_token,
-		refreshToken$(refresh_token),
-		anonymousCode$
-	)
-	.flatMap(accessToken$(headers))
-	.do(verifyAuth)
-	.catch(error => {
-		console.log(error.stack);
-		return Rx.Observable.of({});  // failure results in empty object response - bad time
-	});
+	return ({ headers, state: { refresh_token} }) =>
+		Rx.Observable.if(
+			() => refresh_token,
+			refreshToken$(refresh_token),
+			anonymousCode$
+		)
+		.flatMap(accessToken$(headers))
+		.do(verifyAuth)
+		.catch(error => {
+			console.log(error.stack);
+			return Rx.Observable.of({});  // operational error results in empty auth response
+		});
 };
 
 export const authenticate = (request, reply) => {
-	if (request.query.logout) {
+	// logout is accomplished exclusively through a `logout` querystring value
+	if ('logout' in request.query) {
 		request.log(['info', 'auth'], 'Logout received, clearing cookies to re-authenticate');
 		return removeAuthState(['oauth_token', 'refresh_token'], request);
 	}
@@ -265,17 +268,11 @@ export const authenticate = (request, reply) => {
 };
 
 /**
- * create a `fetch` function that contains the cookies passed in
+ * create a `fetch` function that contains the cookie header passed in
  */
 const cookieFetch = cookie => (url, options={}) => {
-	options = {
-		...options,
-		headers: {
-			...(options.headers || {}),
-			cookie,
-		},
-	};
-	return nodeFetch(url, options);
+	const headers = { ...(options.headers || {}), cookie };
+	return nodeFetch(url, { ...options, headers });
 };
 /**
  * Request authorizing scheme
