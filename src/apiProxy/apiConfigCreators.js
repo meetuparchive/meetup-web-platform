@@ -40,12 +40,11 @@ export function group(params) {
  * 	`apiMethod: 'unfollow' - POST unfollow
  */
 export function groupCommunication(params) {
-	const { urlname, conversationId, apiMethod } = params;
+	const { urlname, apiMethod } = params;
 
 	const endpoint = [
 		urlname,
 		'communications',
-		conversationId,
 		apiMethod
 	]
 		.filter(urlFragment => urlFragment) // only inlcude populated fragments
