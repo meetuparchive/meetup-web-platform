@@ -40,11 +40,12 @@ export function group(params) {
  * 	`apiMethod: 'unfollow' - POST unfollow
  */
 export function groupCommunication(params) {
-	const { chapterUrlName, apiMethod } = params;
+	const { urlname, conversationId, apiMethod } = params;
 
 	const endpoint = [
-		chapterUrlName, // group communication uses an inconsistent param for chapter urlname
+		urlname,
 		'communications',
+		conversationId,
 		apiMethod
 	]
 		.filter(urlFragment => urlFragment) // only inlcude populated fragments
