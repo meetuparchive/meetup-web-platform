@@ -60,14 +60,14 @@ describe('getAnonymousCode$', () => {
 		});
 		getAnonymousCode$({ oauth, OAUTH_AUTH_URL }).subscribe(done);
 	});
-	it('returns null code when response cannot be JSON parsed', function(done) {
+	it('throws error when response cannot be JSON parsed', function() {
 		spyOn(global, 'fetch').and.callFake((url, opts) => BAD_MOCK_FETCH_RESULT);
 
-		const getCode$ = getAnonymousCode$({ oauth, OAUTH_AUTH_URL });
-		getCode$.subscribe(({ grant_type, token }) => {
-			expect(token).toBeNull();
-			done();
-		});
+		return getAnonymousCode$({ oauth, OAUTH_AUTH_URL })
+			.toPromise()
+			.catch(err => {
+				expect(err).toEqual(jasmine.any(Error));
+			});
 	});
 
 });
