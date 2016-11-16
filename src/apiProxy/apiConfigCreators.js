@@ -44,7 +44,7 @@ export function groupCommunication(params) {
 
 	const endpoint = [
 		urlname,
-		'conversations',
+		'communications',
 		conversationId,
 		apiMethod
 	]
