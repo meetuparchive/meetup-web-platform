@@ -12,9 +12,15 @@ describe('fetchQueries', () => {
 	const auth = MOCK_OAUTH_COOKIES;
 	const queries = [mockQuery({})];
 	const responses = [MOCK_GROUP];
+	const csrfJwt = 'encodedstuff';
 	const fakeSuccess = () =>
 		Promise.resolve({
-			json: () => Promise.resolve(responses)
+			json: () => Promise.resolve(responses),
+			headers: {
+				get: key => ({
+					'x-csrf-jwt': csrfJwt,
+				}[key]),
+			},
 		});
 
 	it('calls fetch with authorization header', () => {
@@ -35,6 +41,12 @@ describe('fetchQueries', () => {
 				expect(response.queries).toEqual(jasmine.any(Array));
 				expect(response.responses).toEqual(jasmine.any(Array));
 			});
+	});
+	it('returns an object with csrf prop read from response headers', () => {
+		spyOn(global, 'fetch').and.callFake(fakeSuccess);
+
+		return fetchUtils.fetchQueries(API_URL.toString(), { auth, method: 'GET' })(queries)
+			.then(response => expect(response.csrf).toEqual(csrfJwt));
 	});
 	it('rejects with an Error without calling fetch when no oauth', () => {
 		spyOn(global, 'fetch');
