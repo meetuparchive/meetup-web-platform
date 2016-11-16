@@ -1,3 +1,27 @@
+## [0.8]
+
+- **Change** - `API_SUCCESS` now returns a `meta` prop that contains the `csrf`
+token returned by the server that will be used to validate all POSTs. Your
+Redux reducer must include a `config` reducer that will assign `config.csrf`
+on `API_SUCCESS`, e.g.
+
+```js
+function config(state={}, action) {
+	let csrf;
+	switch(action.type) {
+	case 'API_SUCCESS':
+		csrf = action.meta.csrf;
+		return { ...state, csrf };
+	//...
+  }
+}
+```
+
+## [0.7]
+
+- **Rmoved/Refactor** - there are no more `LOGOUT_X` actions. Logout is instead
+a navigation action to any URL with `?logout` in the URL.
+
 ## [0.6]
 
 - **Removed** - `CONFIGURE_AUTH` action will no longer contain a key named

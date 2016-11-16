@@ -11,24 +11,15 @@
  *   application server
  * @param {Object} options {
  *     method: "get", "post", "delete", or "patch",
- *     auth: { oauth_token },
  *   }
  * @return {Promise} resolves with a `{queries, responses}` object
  */
 export const fetchQueries = (apiUrl, options) => queries => {
 	options.method = options.method || 'GET';
 	const {
-		auth,
 		method,
 	} = options;
 
-	if (!auth.oauth_token) {
-		console.log('No access token provided');
-		if (!auth.refresh_token) {
-			console.log('No refresh_token - cannot fetch');
-			return Promise.reject(new Error('No auth info provided'));
-		}
-	}
 	const isPost = method.toLowerCase() === 'post';
 
 	const params = new URLSearchParams();
@@ -38,20 +29,28 @@ export const fetchQueries = (apiUrl, options) => queries => {
 	const fetchConfig = {
 		method,
 		headers: {
-			Authorization: `Bearer ${auth.oauth_token}`,
 			'content-type': isPost ? 'application/x-www-form-urlencoded' : 'text/plain',
+			'x-csrf-jwt': isPost ? options.csrf : '',
 		},
 		credentials: 'same-origin'  // allow response to set-cookies
 	};
 	if (isPost) {
+		// assume client side
 		fetchConfig.body = params;
 	}
 	return fetch(
 		fetchUrl,
 		fetchConfig
 	)
-	.then(queryResponse => queryResponse.json())
-	.then(responses => ({ queries, responses }));
+	.then(queryResponse =>
+		queryResponse.json().then(responses =>
+			({
+				queries,
+				responses,
+				csrf: queryResponse.headers.get('x-csrf-jwt'),
+			})
+		)
+	);
 };
 
 export const tryJSON = reqUrl => response => {

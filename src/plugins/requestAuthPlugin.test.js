@@ -8,9 +8,6 @@ import register, {
 	requestAuthorizer,
 } from './requestAuthPlugin';
 
-// silence expected console logging output
-console.log = () => {};
-
 const oauth = {
 	key: '1234',
 	secret: 'asdf',
@@ -31,8 +28,17 @@ const MOCK_REQUEST = {
 	headers: MOCK_HEADERS,
 	state: {},
 	app: {},
-	log: () => {},
+	log: (tags, data) => { console.log(data); },
 	authorize: () => Rx.Observable.of(MOCK_REQUEST),
+	query: {},
+};
+const MOCK_AUTHED_REQUEST = {
+	headers: MOCK_HEADERS,
+	state: { oauth_token: 'good_token' },
+	app: {},
+	log: (tags, data) => { console.log(data); },
+	authorize: () => Rx.Observable.of(MOCK_AUTHED_REQUEST),
+	query: {},
 };
 MOCK_REQUEST.authorize.reply = MOCK_REPLY_FN;
 
@@ -54,14 +60,14 @@ describe('getAnonymousCode$', () => {
 		});
 		getAnonymousCode$({ oauth, OAUTH_AUTH_URL }).subscribe(done);
 	});
-	it('returns null code when response cannot be JSON parsed', function(done) {
+	it('throws error when response cannot be JSON parsed', function() {
 		spyOn(global, 'fetch').and.callFake((url, opts) => BAD_MOCK_FETCH_RESULT);
 
-		const getCode$ = getAnonymousCode$({ oauth, OAUTH_AUTH_URL });
-		getCode$.subscribe(({ grant_type, token }) => {
-			expect(token).toBeNull();
-			done();
-		});
+		return getAnonymousCode$({ oauth, OAUTH_AUTH_URL })
+			.toPromise()
+			.catch(err => {
+				expect(err).toEqual(jasmine.any(Error));
+			});
 	});
 
 });
@@ -143,7 +149,7 @@ describe('requestAuthorizer', () => {
 			}
 		});
 
-		return authorizeRequest$({ ...MOCK_REQUEST, state: { oauth_token: 'good_token' } })
+		return authorizeRequest$({ ...MOCK_AUTHED_REQUEST })
 			.toPromise()
 			.then(request => {
 				expect(global.fetch).not.toHaveBeenCalled();
@@ -197,11 +203,6 @@ describe('oauthScheme', () => {
 			secret: 'abcd',
 		},
 	};
-	it('calls server.route with an object', () => {
-		spyOn(MOCK_SERVER, 'route');
-		oauthScheme(MOCK_SERVER, options);
-		expect(MOCK_SERVER.route).toHaveBeenCalledWith(jasmine.any(Object));
-	});
 	it('calls server.ext with an \'onPreAuth\' function', () => {
 		spyOn(MOCK_SERVER, 'ext');
 		oauthScheme(MOCK_SERVER, options);
@@ -228,7 +229,7 @@ describe('authenticate', () => {
 	it('calls reply.continue with credentials and artifacts', () => {
 		spyOn(MOCK_REPLY_FN, 'continue');
 		return new Promise((resolve, reject) =>
-			authenticate(MOCK_REQUEST, MOCK_REPLY_FN).add(() => {
+			authenticate({ ...MOCK_AUTHED_REQUEST }, MOCK_REPLY_FN).add(() => {
 				expect(MOCK_REPLY_FN.continue)
 					.toHaveBeenCalledWith({ credentials: jasmine.any(String), artifacts: jasmine.any(String) });
 				resolve();
