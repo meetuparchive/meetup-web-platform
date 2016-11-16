@@ -40,10 +40,10 @@ export function group(params) {
  * 	`apiMethod: 'unfollow' - POST unfollow
  */
 export function groupCommunication(params) {
-	const { urlname, apiMethod } = params;
+	const { chapterUrlName, apiMethod } = params;
 
 	const endpoint = [
-		urlname,
+		chapterUrlName, // group communication uses an inconsistent param for chapter urlname
 		'communications',
 		apiMethod
 	]
