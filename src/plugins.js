@@ -1,5 +1,6 @@
 import CsrfPlugin from 'electrode-csrf-jwt';
 import Good from 'good';
+import Joi from 'joi';
 import requestAuthPlugin from './plugins/requestAuthPlugin';
 
 /**
@@ -9,11 +10,12 @@ import requestAuthPlugin from './plugins/requestAuthPlugin';
  */
 
 export function getCsrfPlugin() {
+	const secret = process.env.CSRF_SECRET;
+	Joi.validate(secret, Joi.string().min(32).required());
 	return {
 		register: CsrfPlugin.register,
 		options: {
-			secret: 'shhhhh',
-			expiresIn: 60 * 60,  // seconds
+			secret,
 		}
 	};
 }
