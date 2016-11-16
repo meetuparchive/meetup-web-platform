@@ -1,3 +1,4 @@
+import CsrfPlugin from 'electrode-csrf-jwt';
 import Good from 'good';
 import requestAuthPlugin from './plugins/requestAuthPlugin';
 
@@ -6,6 +7,16 @@ import requestAuthPlugin from './plugins/requestAuthPlugin';
  *
  * @module ServerPlugins
  */
+
+export function getCsrfPlugin() {
+	return {
+		register: CsrfPlugin.register,
+		options: {
+			secret: 'shhhhh',
+			expiresIn: 60 * 60,  // seconds
+		}
+	};
+}
 
 /**
  * Provides Hapi process monitoring and console logging
@@ -54,6 +65,7 @@ export function getRequestAuthPlugin(options) {
 
 export default function getPlugins(config) {
 	return [
+		getCsrfPlugin(),
 		getConsoleLogPlugin(),
 		getRequestAuthPlugin(config),
 	];
