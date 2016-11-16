@@ -113,10 +113,11 @@ const getRouterRenderer = (store, clientFilename, assetPublicPath) =>
  * @param {Store} store Redux store for this request
  * @param {Object} config that initializes app (auth tokens, e.g. oauth_token)
  */
-const dispatchConfig = (store, { apiUrl, auth }) => {
-	console.log(chalk.green('Dispatching config'));
-
+const dispatchConfig = (store, { apiUrl, auth, log=console.log }) => {
+	log(['app', 'info'], chalk.green(`Configuring auth: ${Object.keys(auth)}`));
 	store.dispatch(configureAuth(auth, true));
+
+	log(['app', 'info'], chalk.green(`Configuring apiUrl: ${apiUrl}`));
 	store.dispatch(configureApiUrl(apiUrl));
 };
 
@@ -153,6 +154,7 @@ const makeRenderer = (
 		url,
 		info,
 		server,
+		log,
 		state: {
 			oauth_token,
 			refresh_token,
@@ -172,9 +174,14 @@ const makeRenderer = (
 
 	// create the store
 	const store = createStore(routes, reducer, {}, middleware);
+	const originalDispatch = store.dispatch.bind(store);
+	store.dispatch = (action) => {
+		request.log(['app', 'info'], action.type);
+		return originalDispatch(action);
+	};
 
 	// load initial config
-	dispatchConfig(store, { apiUrl, auth });
+	dispatchConfig(store, { apiUrl, auth, log: log.bind(request) });
 
 	// render skeleton if requested - the store is ready
 	if ('skeleton' in request.query) {
@@ -191,11 +198,19 @@ const makeRenderer = (
 	})
 	.first(state => state.preRenderChecklist.every(isReady => isReady));  // take the first ready state
 
+	request.log(['app', 'info'], `Finding route for path: '${location}'`);
 	return Rx.Observable.bindNodeCallback(match)({ location, routes })
+		.catch(err => {
+			request.log(['app', 'error'], err.message);
+			return Rx.Observable.of([]);
+		})
 		.do(([redirectLocation, renderProps]) => {
 			if (!redirectLocation && !renderProps) {
 				throw Boom.notFound();
 			}
+		})
+		.do(() => {
+			request.log(['app', 'info'], 'Found app route, dispatching RENDER');
 		})
 		.do(([redirectLocation, renderProps]) =>
 			store.dispatch({

@@ -4,6 +4,7 @@ import {
 	MOCK_API_PROBLEM,
 	MOCK_AUTH_HEADER,
 	MOCK_RENDERPROPS,
+	MOCK_RENDERPROPS_UTF8,
 } from '../util/mocks/app';
 import {
 	MOCK_DUOTONE_URLS,
@@ -42,18 +43,39 @@ describe('parseRequest', () => {
 });
 
 describe('parseApiResponse', () => {
+	const MOCK_RESPONSE = {
+		headers: {},
+		statusCode: 200
+	};
 	it('converts valid JSON into an equivalent object', () => {
 		const validJSON = JSON.stringify(MOCK_GROUP);
-		expect(parseApiResponse(validJSON)).toEqual(jasmine.any(Object));
-		expect(parseApiResponse(validJSON)).toEqual(MOCK_GROUP);
+		expect(parseApiResponse([MOCK_RESPONSE, validJSON]).value).toEqual(jasmine.any(Object));
+		expect(parseApiResponse([MOCK_RESPONSE, validJSON]).value).toEqual(MOCK_GROUP);
 	});
 	it('returns an object with a string "error" value for invalid JSON', () => {
 		const invalidJSON = 'not valid';
-		expect(parseApiResponse(invalidJSON).error).toEqual(jasmine.any(String));
+		expect(parseApiResponse([MOCK_RESPONSE, invalidJSON]).value.error).toEqual(jasmine.any(String));
 	});
 	it('returns an object with a string "error" value for API response with "problem"', () => {
 		const responeWithProblem = JSON.stringify(MOCK_API_PROBLEM);
-		expect(parseApiResponse(responeWithProblem).error).toEqual(jasmine.any(String));
+		expect(parseApiResponse([MOCK_RESPONSE, responeWithProblem]).value.error).toEqual(jasmine.any(String));
+	});
+	it('returns an object with a string "error" value for a not-ok response', () => {
+		const badStatus = {
+			ok: false,
+			statusCode: 500,
+			statusMessage: 'Problems',
+		};
+		const nonOkReponse = { ...MOCK_RESPONSE, ...badStatus };
+		expect(parseApiResponse([nonOkReponse, '{}']).value.error).toEqual(badStatus.statusMessage);
+	});
+	it('returns the flags set in the X-Meetup-Flags header', () => {
+		const headers = {
+			'x-meetup-flags': 'foo=true,bar=false',
+		};
+		const flaggedResponse = { ...MOCK_RESPONSE, headers };
+		expect(parseApiResponse([flaggedResponse, '{}']).flags.foo).toBe(true);
+		expect(parseApiResponse([flaggedResponse, '{}']).flags.bar).toBe(false);
 	});
 });
 
@@ -94,6 +116,17 @@ describe('buildRequestArgs', () => {
 		expect(postArgs.body).toEqual(jasmine.any(String));  // post requests will add body string
 		// post requests will add body string
 		expect(postArgs.headers['content-type']).toEqual('application/x-www-form-urlencoded');
+
+	});
+
+	const testQueryResults_utf8 = mockQuery(MOCK_RENDERPROPS_UTF8);
+	const apiConfig_utf8 = queryToApiConfig(testQueryResults_utf8);
+
+	it('Properly encodes the URL', () => {
+		const method = 'get';
+		const getArgs = buildRequestArgs({ ...options, method })(apiConfig_utf8);
+		const { pathname } = require('url').parse(getArgs.url);
+		expect(/^[\x00-\xFF]*$/.test(pathname)).toBe(true);
 	});
 
 });
@@ -173,6 +206,7 @@ describe('makeApiRequest$', () => {
 		const query = { ...mockQuery(MOCK_RENDERPROPS), mockResponse };
 		const expectedResponse = {
 			[query.ref]: {
+				flags: {},
 				type: query.type,
 				value: mockResponse,
 			}

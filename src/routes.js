@@ -9,8 +9,6 @@ import {
 	getDuotoneUrls
 } from './util/duotone';
 
-const YEAR_IN_MS = 1000 * 60 * 60 * 24 * 365;
-
 export default function getRoutes(
 	renderRequestMap,
 	{
@@ -38,17 +36,16 @@ export default function getRoutes(
 	const apiProxyRoute = {
 		method: ['GET', 'POST', 'DELETE', 'PATCH'],
 		path: '/api',
-		handler: (request, reply) => {
-			const queryResponses$ = proxyApiRequest$(request);
-			queryResponses$.subscribe(
-				queryResponses => {
-					const response = reply(JSON.stringify(queryResponses))
-						.type('application/json');
-					reply.track(response, 'api', queryResponses);
-				},
-				(err) => { reply(Boom.badImplementation(err.message)); }
-			);
-		}
+		handler: (request, reply) =>
+			proxyApiRequest$(request)
+				.subscribe(
+					queryResponses => {
+						const response = reply(JSON.stringify(queryResponses))
+							.type('application/json');
+						reply.track(response, 'api', queryResponses);
+					},
+					(err) => { reply(Boom.badImplementation(err.message)); }
+				)
 	};
 
 	/**
@@ -62,36 +59,15 @@ export default function getRoutes(
 			const requestLanguage = Accepts(request).language(Object.keys(renderRequestMap));
 			request.log(['info'], chalk.green(`Request received for ${request.url.href} (${requestLanguage})`));
 
-			const render$ = request.authorize()  // `authorize()` method is supplied by anonAuthPlugin
-				.flatMap(renderRequestMap[requestLanguage])
-				.do(() => request.log(['info'], chalk.green('HTML response ready')));
-
-			render$.subscribe(
-				({ result, statusCode }) => {
+			return renderRequestMap[requestLanguage](request)
+				.do(() => request.log(['info'], chalk.green('HTML response ready')))
+				.subscribe(({ result, statusCode }) => {
 					// response is sent when this function returns (`nextTick`)
 					const response = reply(result)
 						.code(statusCode);
+
 					reply.track(response, 'session');
-
-					if (reply.request.app.setCookies) {
-						// when auth cookies are generated on the server rather than the
-						// original browser request, we need to send the new cookies
-						// back to the browser in the response
-						const {
-							oauth_token,
-							refresh_token,
-							expires_in,
-							anonymous,
-						} = reply.request.state;
-
-						const path = '/';
-						request.log(['info'], chalk.green(`Setting cookies ${Object.keys(reply.request.state)}`));
-						response.state('oauth_token', oauth_token, { path, ttl: expires_in * 1000 });
-						response.state('refresh_token', refresh_token, { path, ttl: YEAR_IN_MS * 2 });
-						response.state('anonymous', anonymous.toString(), { path, ttl: YEAR_IN_MS * 2 });
-					}
-				}
-			);
+				});
 		}
 	};
 

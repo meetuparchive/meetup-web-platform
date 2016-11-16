@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { ANONYMOUS_AUTH_APP_PATH } from '../epics/auth';
+import { AUTH_ENDPOINT } from '../epics/auth';
 /**
  * Start the server with a config
  *
@@ -12,14 +12,24 @@ export default function getConfig(overrideConfig) {
 	/**
 	 * Read all config from environment variables here once on startup
 	 */
+	if (!process.env.OAUTH_ACCESS_URL && process.env.ANONYMOUS_ACCESS_URL) {
+		console.warn('The ANONYMOUS_ACCESS_URL env variable is deprecated - please rename to OAUTH_ACCESS_URL');
+	}
+	if (!process.env.OAUTH_AUTH_URL && process.env.ANONYMOUS_AUTH_URL) {
+		console.warn('The ANONYMOUS_AUTH_URL env variable is deprecated - please rename to OAUTH_AUTH_URL');
+	}
 	const config = {
 		DEV_SERVER_PORT: process.env.DEV_SERVER_PORT || 8000,
 		API_PROTOCOL: process.env.API_PROTOCOL || 'https',
 		API_HOST: process.env.API_HOST || 'api.dev.meetup.com',
-		ANONYMOUS_AUTH_URL: process.env.ANONYMOUS_AUTH_URL || 'https://secure.dev.meetup.com/oauth2/authorize',
-		ANONYMOUS_ACCESS_URL: process.env.ANONYMOUS_ACCESS_URL || 'https://secure.dev.meetup.com/oauth2/access',
+		OAUTH_AUTH_URL: process.env.OAUTH_AUTH_URL ||
+			process.env.ANONYMOUS_AUTH_URL ||
+			'https://secure.dev.meetup.com/oauth2/authorize',
+		OAUTH_ACCESS_URL: process.env.OAUTH_ACCESS_URL ||
+			process.env.ANONYMOUS_ACCESS_URL ||
+			'https://secure.dev.meetup.com/oauth2/access',
 		PHOTO_SCALER_SALT: process.env.PHOTO_SCALER_SALT,
-		ANONYMOUS_AUTH_APP_PATH,
+		AUTH_ENDPOINT,
 		oauth: {
 			secret: process.env.MUPWEB_OAUTH_SECRET,
 			key: process.env.MUPWEB_OAUTH_KEY,
@@ -33,18 +43,17 @@ export default function getConfig(overrideConfig) {
 }
 
 function validateConfig(config) {
-	console.log(config.API_PROTOCOL, 'protocol');
 	const oauthError = new Error('get oauth secrets from web platform team');
 	const configSchema = Joi.object().keys({
 		DEV_SERVER_PORT: Joi.number().integer().max(65535),
 		API_PROTOCOL: Joi.any().only(['https', 'http']).required(),
 		API_HOST: Joi.string().hostname().required(),
-		ANONYMOUS_AUTH_URL: Joi.string().uri().required(),
-		ANONYMOUS_ACCESS_URL: Joi.string().uri().required(),
+		OAUTH_AUTH_URL: Joi.string().uri().required(),
+		OAUTH_ACCESS_URL: Joi.string().uri().required(),
 		PHOTO_SCALER_SALT: Joi.string().min(1).required().error(
 			new Error('get PHOTO_SCALER_SALT from web platform team')
 		),
-		ANONYMOUS_AUTH_APP_PATH: Joi.string().uri({ allowRelative: true }).required(),
+		AUTH_ENDPOINT: Joi.string().uri({ allowRelative: true }).required(),
 		oauth: Joi.object().keys({
 			secret: Joi.string().min(1).required().error(oauthError),
 			key: Joi.string().min(1).required().error(oauthError),
