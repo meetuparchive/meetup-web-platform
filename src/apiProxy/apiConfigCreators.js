@@ -39,7 +39,7 @@ export function group(params) {
  * 	`apiMethod: 'follow' - POST follow
  * 	`apiMethod: 'unfollow' - POST unfollow
  */
-export function mugcomm(params) {
+export function groupCommunication(params) {
 	const { urlname, conversationId, apiMethod } = params;
 
 	const endpoint = [
