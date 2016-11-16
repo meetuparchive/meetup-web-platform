@@ -1,4 +1,4 @@
-## [0.7]
+## [0.8]
 
 - **Change** - `API_SUCCESS` now returns a `meta` prop that contains the `csrf`
 token returned by the server that will be used to validate all POSTs. Your
@@ -16,6 +16,11 @@ function config(state={}, action) {
   }
 }
 ```
+
+## [0.7]
+
+- **Rmoved/Refactor** - there are no more `LOGOUT_X` actions. Logout is instead
+a navigation action to any URL with `?logout` in the URL.
 
 ## [0.6]
 
