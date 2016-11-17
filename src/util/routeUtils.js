@@ -24,6 +24,7 @@ function getActiveRouteQueries([ , { routes, location, params }]) {
 		}, [])
 		.map(query => query({ location, params }));  // call the query function
 
+	// any location with logout will send a 'logout' query automatically
 	if ('logout' in location.query) {
 		queries.unshift({ type: 'logout' });
 	}
