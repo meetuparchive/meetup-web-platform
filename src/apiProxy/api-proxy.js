@@ -5,7 +5,7 @@ const externalRequest$ = Rx.Observable.bindNodeCallback(externalRequest);
 
 import * as apiConfigCreators from './apiConfigCreators';
 import { duotoneRef } from '../util/duotone';
-import { applyAuth } from '../util/authUtils';
+import { applyAuthState } from '../util/authUtils';
 
 const parseResponseFlags = ({ headers }) =>
 	(headers['x-meetup-flags'] || '')
@@ -259,13 +259,15 @@ const parseLoginAuth = (request, query) => response => {
 			expires_in,
 			member,
 		} = response.value;
-		applyAuth(request, request.authorize.reply)({
+		applyAuthState(request, request.authorize.reply)({
 			oauth_token,
 			refresh_token,
 			expires_in
 		});
 		return {
-			member
+			value: {
+				member,
+			},
 		};
 	}
 	return response;
