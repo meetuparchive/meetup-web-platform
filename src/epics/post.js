@@ -41,8 +41,9 @@ const getPostActionFetch = ({ getState }) =>
 		const {
 			config,
 		} = getState();
+		const fetchOpts = { method: 'POST', csrf: config.csrf };
 
-		return fetchQueries(config.apiUrl, { method: 'POST' })([query])
+		return fetchQueries(config.apiUrl, fetchOpts)([query])
 			.then(onSuccess)
 			.catch(onError);
 	};
