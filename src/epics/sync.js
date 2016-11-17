@@ -6,6 +6,7 @@ import {
 	apiSuccess,
 	apiError,
 	apiComplete,
+	locationSync,
 } from '../actions/syncActionCreators';
 import { activeRouteQueries$ } from '../util/routeUtils';
 import { fetchQueries } from '../util/fetchUtils';
@@ -22,11 +23,22 @@ import { fetchQueries } from '../util/fetchUtils';
 export const getNavEpic = routes => {
 	const activeQueries$ = activeRouteQueries$(routes);
 	return (action$, store) =>
-		action$.ofType(LOCATION_CHANGE, '@@server/RENDER')
+		action$.ofType(LOCATION_CHANGE, '@@server/RENDER', 'LOCATION_SYNC')
 			.map(({ payload }) => payload)  // extract the `location` from the action payload
 			.flatMap(activeQueries$)        // find the queries for the location
 			.map(apiRequest);               // dispatch apiRequest with all queries
 };
+
+/**
+ * Any action that should reload the API data should be handled here, e.g.
+ * LOGIN_SUCCESS, which should force the app to reload in an 'authorized'
+ * state
+ */
+export const locationSyncEpic = (action$, store) =>
+	action$.ofType('LOGIN_SUCCESS')
+		.map(() => locationSync(
+			store.getState().routing.locationBeforeTransitions)
+		);
 
 /**
  * Listen for actions that provide queries to send to the api - mainly
@@ -50,6 +62,7 @@ export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 export default function getSyncEpic(routes, fetchQueriesFn=fetchQueries) {
 	return combineEpics(
 		getNavEpic(routes),
+		locationSyncEpic,
 		getFetchQueriesEpic(fetchQueriesFn)
 	);
 }
