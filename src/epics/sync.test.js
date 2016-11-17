@@ -15,6 +15,7 @@ import {
 } from '../util/testUtils';
 import getSyncEpic from '../epics/sync';
 import * as syncActionCreators from '../actions/syncActionCreators';
+import * as authActionCreators from '../actions/authActionCreators';
 /**
  * @module SyncEpicTest
  */
@@ -46,6 +47,20 @@ describe('Sync epic', () => {
 		return epicIgnoreAction(SyncEpic, locationChange)()
 			.then(epicIgnoreAction(SyncEpic, serverRender))
 			.then(epicIgnoreAction(SyncEpic, locationSync));
+	});
+
+	it('emits LOCATION_SYNC on LOGIN_SUCCESS', function() {
+		const mockFetchQueries = () => () => Promise.resolve({});
+
+		const loginSuccess = authActionCreators.loginSuccess();
+		const action$ = ActionsObservable.of(loginSuccess);
+		const fakeStore = createFakeStore(MOCK_APP_STATE);
+		return getSyncEpic(routes, mockFetchQueries)(action$, fakeStore)
+			.toPromise()
+			.then(action => {
+				expect(action.type).toEqual('LOCATION_SYNC');
+				expect(action.payload).toEqual(MOCK_APP_STATE.routing.locationBeforeTransitions);
+			});
 	});
 
 	it('emits API_SUCCESS and API_COMPLETE on successful API_REQUEST', function() {
