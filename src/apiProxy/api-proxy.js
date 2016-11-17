@@ -5,7 +5,10 @@ const externalRequest$ = Rx.Observable.bindNodeCallback(externalRequest);
 
 import * as apiConfigCreators from './apiConfigCreators';
 import { duotoneRef } from '../util/duotone';
-import { applyAuthState } from '../util/authUtils';
+import {
+	applyAuthState,
+	removeAuthState,
+} from '../util/authUtils';
 
 const parseResponseFlags = ({ headers }) =>
 	(headers['x-meetup-flags'] || '')
@@ -72,6 +75,17 @@ export const parseApiResponse = ([response, body]) => {
 			flags
 		};
 	}
+};
+
+export const applyLogout$ = (request, queries) => {
+	const logoutQuery = queries.find(q => q.type === 'logout');
+	const nonLogoutQueries$ = Rx.Observable.from(queries.filter(q => q.type !== 'logout'));
+
+	if (logoutQuery && request.authorize) {
+		removeAuthState(['oauth_token', 'refresh_token'], request, request.authorize.reply);
+		return request.authorize().flatMap(() => nonLogoutQueries$);
+	}
+	return nonLogoutQueries$;
 };
 
 /**
@@ -345,7 +359,7 @@ const apiProxy$ = ({ API_TIMEOUT=5000, baseUrl='', duotoneUrls={} }) => {
 		const apiConfigToRequestOptions = buildRequestArgs(externalRequestOpts);
 
 		// 3. map the queries onto an array of api request observables
-		const apiRequests$ = queries
+		const apiRequests$ = applyLogout$(request, queries)
 			.map(queryToApiConfig)
 			.map(apiConfigToRequestOptions)
 			.map((opts, i) => ([opts, queries[i]]))  // zip the query back into the opts
