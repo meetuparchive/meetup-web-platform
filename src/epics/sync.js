@@ -6,7 +6,6 @@ import {
 	apiSuccess,
 	apiError,
 	apiComplete,
-	locationSync,
 } from '../actions/syncActionCreators';
 import { activeRouteQueries$ } from '../util/routeUtils';
 import { fetchQueries } from '../util/fetchUtils';
@@ -23,7 +22,7 @@ import { fetchQueries } from '../util/fetchUtils';
 export const getNavEpic = routes => {
 	const activeQueries$ = activeRouteQueries$(routes);
 	return (action$, store) =>
-		action$.ofType(LOCATION_CHANGE, '@@server/RENDER', 'LOCATION_SYNC')
+		action$.ofType(LOCATION_CHANGE, '@@server/RENDER')
 			.map(({ payload }) => payload)  // extract the `location` from the action payload
 			.flatMap(activeQueries$)        // find the queries for the location
 			.map(apiRequest);               // dispatch apiRequest with all queries
@@ -35,10 +34,11 @@ export const getNavEpic = routes => {
  * state
  */
 export const locationSyncEpic = (action$, store) =>
-	action$.ofType('LOGIN_SUCCESS')
-		.map(() => locationSync(
-			store.getState().routing.locationBeforeTransitions)
-		);
+	action$.ofType('LOCATION_SYNC')
+		.map(() => ({
+			type: LOCATION_CHANGE,
+			payload: store.getState().routing.locationBeforeTransitions,
+		}));
 
 /**
  * Listen for actions that provide queries to send to the api - mainly
