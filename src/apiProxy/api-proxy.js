@@ -7,7 +7,6 @@ import * as apiConfigCreators from './apiConfigCreators';
 import { duotoneRef } from '../util/duotone';
 import {
 	applyAuthState,
-	removeAuthState,
 } from '../util/authUtils';
 
 const parseResponseFlags = ({ headers }) =>
@@ -77,12 +76,14 @@ export const parseApiResponse = ([response, body]) => {
 	}
 };
 
-export const applyLogout$ = (request, queries) => {
+export const parseLogout$ = (request, queries) => {
+	request.log(['auth', 'info'], 'Checking for logout query');
 	const logoutQuery = queries.find(q => q.type === 'logout');
-	const nonLogoutQueries$ = Rx.Observable.from(queries.filter(q => q.type !== 'logout'));
+	request.log(['auth', 'info'], `Logout ${logoutQuery ? 'found' : 'not found'}`);
+	const nonLogoutQueries$ = Rx.Observable.of(queries.filter(q => q.type !== 'logout'));
 
 	if (logoutQuery && request.authorize) {
-		removeAuthState(['oauth_token', 'refresh_token'], request, request.authorize.reply);
+		request.query.logout = true;  // force logout
 		return request.authorize().flatMap(() => nonLogoutQueries$);
 	}
 	return nonLogoutQueries$;
@@ -351,6 +352,7 @@ export const makeApiRequest$ = (request, API_TIMEOUT, duotoneUrls) => {
 const apiProxy$ = ({ API_TIMEOUT=5000, baseUrl='', duotoneUrls={} }) => {
 
 	return request => {
+		request.log(['api', 'info'], 'Parsing api endpoint request');
 		// 1. get the queries and the 'universal' `externalRequestOpts` from the request
 		const { queries, externalRequestOpts } = parseRequest(request, baseUrl);
 
@@ -358,15 +360,21 @@ const apiProxy$ = ({ API_TIMEOUT=5000, baseUrl='', duotoneUrls={} }) => {
 		// to build the query-specific API request options object
 		const apiConfigToRequestOptions = buildRequestArgs(externalRequestOpts);
 
-		// 3. map the queries onto an array of api request observables
-		const apiRequests$ = applyLogout$(request, queries)
-			.map(queryToApiConfig)
-			.map(apiConfigToRequestOptions)
-			.map((opts, i) => ([opts, queries[i]]))  // zip the query back into the opts
-			.map(makeApiRequest$(request, API_TIMEOUT, duotoneUrls));
+		// 3. handle logout queries that might be in the request and make the
+		// appropriate auth updates before calling the API
+		return parseLogout$(request, queries)
+			.flatMap(queries => {
+				request.log(['api', 'info'], JSON.stringify(queries));
+				// 4. map the queries onto an array of api request observables
+				const apiRequests$ = queries
+					.map(queryToApiConfig)
+					.map(apiConfigToRequestOptions)
+					.map((opts, i) => ([opts, queries[i]]))  // zip the query back into the opts
+					.map(makeApiRequest$(request, API_TIMEOUT, duotoneUrls));
 
-		// 4. zip them together to send them parallel and receive them in order
-		return Rx.Observable.zip(...apiRequests$);
+				// 5. zip them together to send them parallel and receive them in order
+				return Rx.Observable.zip(...apiRequests$);
+			});
 	};
 };
 

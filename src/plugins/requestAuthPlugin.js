@@ -23,6 +23,11 @@ function verifyAuth(auth) {
 	return auth;
 }
 
+const handleLogout = request => {
+	request.log(['info', 'auth'], 'Logout received, clearing cookies to re-authenticate');
+	return removeAuthState(['oauth_token', 'refresh_token'], request, request.authorize.reply);
+};
+
 /**
  * Ensure that the passed-in Request contains a valid Oauth token
  *
@@ -35,6 +40,11 @@ function verifyAuth(auth) {
  * @return {Observable} Observable that emits the request with auth applied
  */
 export const requestAuthorizer = auth$ => request => {
+	// logout is accomplished exclusively through a `logout` querystring value
+	if ('logout' in request.query) {
+		handleLogout(request);
+	}
+
 	// always need oauth_token, even if it's an anonymous (pre-reg) token
 	// This is 'deferred' because we don't want to start fetching the token
 	// before we know that it's needed
@@ -181,12 +191,6 @@ export const requestAuth$ = config => {
 };
 
 export const authenticate = (request, reply) => {
-	// logout is accomplished exclusively through a `logout` querystring value
-	if ('logout' in request.query) {
-		request.log(['info', 'auth'], 'Logout received, clearing cookies to re-authenticate');
-		return removeAuthState(['oauth_token', 'refresh_token'], request, reply);
-	}
-
 	request.log(['info', 'auth'], 'Authenticating request');
 	return request.authorize()
 		.do(request => {
