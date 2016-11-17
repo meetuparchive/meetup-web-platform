@@ -40,10 +40,9 @@ const getPostActionFetch = ({ getState }) =>
 	({ type, payload: { query, onSuccess, onError }}) => {
 		const {
 			config,
-			auth,
 		} = getState();
 
-		return fetchQueries(config.apiUrl, { method: 'POST', auth })([query])
+		return fetchQueries(config.apiUrl, { method: 'POST' })([query])
 			.then(onSuccess)
 			.catch(onError);
 	};

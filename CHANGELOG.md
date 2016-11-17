@@ -1,3 +1,8 @@
+## [0.7]
+
+- **Rmoved/Refactor** - there are no more `LOGOUT_X` actions. Logout is instead
+a navigation action to any URL with `?logout` in the URL.
+
 ## [0.6]
 
 - **Removed** - `CONFIGURE_AUTH` action will no longer contain a key named
