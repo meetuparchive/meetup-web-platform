@@ -251,6 +251,12 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
 	};
 };
 
+/**
+ * Login responses contain oauth info that should be applied to the response.
+ * If `request.authorize.reply` exists (supplied by the requestAuthPlugin),
+ * the application is able to set cookies on the response. Otherwise, return
+ * the login response unchanged
+ */
 const parseLoginAuth = (request, query) => response => {
 	if (query.type === 'login' && request.authorize) {
 		const {
@@ -264,11 +270,7 @@ const parseLoginAuth = (request, query) => response => {
 			refresh_token,
 			expires_in
 		});
-		return {
-			value: {
-				member,
-			},
-		};
+		return { value: { member } };
 	}
 	return response;
 };
