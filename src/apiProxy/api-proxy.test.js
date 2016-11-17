@@ -10,6 +10,7 @@ import {
 	MOCK_DUOTONE_URLS,
 	MOCK_GROUP,
 } from '../util/mocks/api';
+import * as authUtils from '../util/authUtils';
 import {
 	parseRequest,
 	parseApiResponse,
@@ -19,6 +20,7 @@ import {
 	apiResponseDuotoneSetter,
 	groupDuotoneSetter,
 	makeApiRequest$,
+	parseLoginAuth,
 } from './api-proxy';
 
 describe('parseRequest', () => {
@@ -132,7 +134,7 @@ describe('buildRequestArgs', () => {
 		const method = 'get';
 		const getArgs = buildRequestArgs({ ...options, method })(apiConfig_utf8);
 		const { pathname } = require('url').parse(getArgs.url);
-		expect(/^[\x00-\xFF]*$/.test(pathname)).toBe(true);
+		expect(/^[\x00-\xFF]*$/.test(pathname)).toBe(true);  // eslint-disable-line no-control-regex
 	});
 
 });
@@ -220,5 +222,34 @@ describe('makeApiRequest$', () => {
 		return makeApiRequest$({ log: () => {} }, 5000, {})([{ url: '/foo' }, query])
 			.toPromise()
 			.then(response => expect(response).toEqual(expectedResponse));
+	});
+});
+
+describe('parseLoginAuth', () => {
+	it('calls applyAuthState for login responses', () => {
+		spyOn(authUtils, 'applyAuthState').and.returnValue(() => {});
+		const request = { authorize: {} };
+		const query = { type: 'login' };
+		const loginResponse = { type: 'login', value: {} };
+		parseLoginAuth(request, query)(loginResponse);
+		expect(authUtils.applyAuthState).toHaveBeenCalled();
+	});
+	it('does not call applyAuthState for non-login responses', () => {
+		spyOn(authUtils, 'applyAuthState').and.returnValue(() => {});
+		const request = { authorize: {} };
+		const query = { type: 'member' };
+		const apiResponse = { type: 'member', value: {} };
+		const returnVal = parseLoginAuth(request, query)(apiResponse);
+		expect(authUtils.applyAuthState).not.toHaveBeenCalled();
+		expect(returnVal).toBe(apiResponse);
+	});
+	it('does not call applyAuthState when request.authorize does not exist', () => {
+		spyOn(authUtils, 'applyAuthState').and.returnValue(() => {});
+		const request = {};
+		const query = { type: 'login' };
+		const loginResponse = { type: 'login', value: {} };
+		const returnVal = parseLoginAuth(request, query)(loginResponse);
+		expect(authUtils.applyAuthState).not.toHaveBeenCalled();
+		expect(returnVal).toBe(loginResponse);
 	});
 });

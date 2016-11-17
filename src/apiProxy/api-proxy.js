@@ -257,7 +257,7 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
  * the application is able to set cookies on the response. Otherwise, return
  * the login response unchanged
  */
-const parseLoginAuth = (request, query) => response => {
+export const parseLoginAuth = (request, query) => response => {
 	if (query.type === 'login' && request.authorize) {
 		const {
 			oauth_token,
