@@ -24,7 +24,7 @@ export const getNavEpic = routes => (action$, store) =>
 		.map(({ payload }) => payload)  // extract the `location` from the action payload
 		.flatMap(location =>
 			activeRouteQueries$(routes)  // find the queries for the location
-				.map(queries => apiRequest(queries, browserHistory && browserHistory.previous))
+				.map(queries => apiRequest(queries, browserHistory && browserHistory.previous || null))
 		);
 /**
  * Any action that should reload the API data should be handled here, e.g.
