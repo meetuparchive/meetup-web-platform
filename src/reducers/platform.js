@@ -78,8 +78,8 @@ const platformReducers = {
  * A function that builds a reducer combining platform-standard reducers and
  * app-specific reducers
  */
-export default function makeRootReducer(appReducers) {
-	Object.keys(platformReducers).forEach(reducer => {
+export default function makeRootReducer(appReducers={}) {
+	Object.keys(appReducers).forEach(reducer => {
 		if (reducer in platformReducers) {
 			throw new Error(`'${reducer}' is a reserved platform reducer name`);
 		}
