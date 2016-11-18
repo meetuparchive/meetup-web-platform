@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 import { combineEpics } from 'redux-observable';
-import { LOCATION_CHANGE } from 'react-router-redux';
+import { LOCATION_CHANGE, browserHistory } from 'react-router-redux';
 import {
 	apiRequest,
 	apiSuccess,
@@ -19,15 +19,13 @@ import { fetchQueries } from '../util/fetchUtils';
  * @param {Object} routes The application's React Router routes
  * @returns {Function} an Epic function that emits an API_REQUEST action
  */
-export const getNavEpic = routes => {
-	const activeQueries$ = activeRouteQueries$(routes);
-	return (action$, store) =>
-		action$.ofType(LOCATION_CHANGE, '@@server/RENDER')
-			.map(({ payload }) => payload)  // extract the `location` from the action payload
-			.flatMap(activeQueries$)        // find the queries for the location
-			.map(apiRequest);               // dispatch apiRequest with all queries
-};
-
+export const getNavEpic = routes => (action$, store) =>
+	action$.ofType(LOCATION_CHANGE, '@@server/RENDER')
+		.map(({ payload }) => payload)  // extract the `location` from the action payload
+		.flatMap(location =>
+			activeRouteQueries$(routes)  // find the queries for the location
+				.map(queries => apiRequest(queries, browserHistory && browserHistory.previous))
+		);
 /**
  * Any action that should reload the API data should be handled here, e.g.
  * LOGIN_SUCCESS, which should force the app to reload in an 'authorized'
@@ -48,11 +46,10 @@ export const locationSyncEpic = (action$, store) =>
  */
 export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 	action$.ofType('API_REQUEST')
-		.map(({ payload }) => payload)  // payload contains the queries array
-		.flatMap(queries => {           // set up the fetch call to the app server
+		.flatMap(({ payload, meta }) => {           // set up the fetch call to the app server
 			const { config } = store.getState();
 			const fetch = fetchQueriesFn(config.apiUrl, { method: 'GET' });
-			return Observable.fromPromise(fetch(queries))  // call fetch
+			return Observable.fromPromise(fetch(payload, meta))  // call fetch
 				.takeUntil(action$.ofType(LOCATION_CHANGE))  // cancel this fetch when nav happens
 				.map(apiSuccess)                             // dispatch apiSuccess with server response
 				.flatMap(action => Observable.of(action, apiComplete()))  // dispatch apiComplete after resolution

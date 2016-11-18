@@ -42,7 +42,13 @@ export default function getRoutes(
 					queryResponses => {
 						const response = reply(JSON.stringify(queryResponses))
 							.type('application/json');
-						reply.track(response, 'api', queryResponses);
+						reply.track(
+							response,
+							'api',
+							queryResponses,
+							response.request.info.referrer,
+							response.request.query.referrer
+						);
 					},
 					(err) => { reply(Boom.badImplementation(err.message)); }
 				)

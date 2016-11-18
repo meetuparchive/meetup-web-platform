@@ -92,12 +92,29 @@ export const trackLogout = log => response =>
 		}
 	);
 
-export const trackApi = log => (response, queryResponses) => {
+export const trackNav = log => (response, queryResponses, url, referrer) => {
+	const queries = queryResponses.map(qr => [Object.keys(qr)[0]]);
+	log(
+		response,
+		{
+			description: 'nav',
+			member_id: response.request.state.member_id,
+			track_id: response.request.state.track_id,
+			session_id: response.request.state.session_id,
+			url,
+			referrer,
+			queries,
+		}
+	);
+};
+
+export const trackApi = log => (response, queryResponses, url, referrer) => {
+	trackNav(log)(response, queryResponses, url, referrer);
 	// special case - login requests need to be tracked
 	const loginResponse = queryResponses.find(r => r.login);
 	if (loginResponse) {
 		const member_id = JSON.stringify(loginResponse.login.value.member.id);
-		return trackLogin(log)(response, member_id);
+		trackLogin(log)(response, member_id);
 	}
 };
 
