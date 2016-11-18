@@ -8,6 +8,15 @@ composing applications with React + Redux.
 
 In general, application-specific code will live outside of this package.
 
+# Usage
+
+## Environment
+
+All platform applications must provide certain environment variables.
+
+1. `CSRF_SECRET` - any long string (> 32 characters). Essentially this is a
+unique string that is used to salt/validate CSRF tokens.
+
 # Releases
 
 This package uses semver versioning to tag releases, although the patch version
