@@ -26,11 +26,8 @@ export function apiComplete() {
 	};
 }
 
-export function locationSync(location) {
-	return {
-		type: 'LOCATION_SYNC',
-		payload: location,
-	};
+export function locationSync() {
+	return { type: 'LOCATION_SYNC' };
 }
 
 
