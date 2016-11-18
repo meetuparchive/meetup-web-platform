@@ -43,6 +43,10 @@ export default function getRoutes(
 						const response = reply(JSON.stringify(queryResponses))
 							.type('application/json');
 						reply.track(response, 'api', queryResponses);
+						// if login, gotta re-authorize with response
+						// if (request.query.queries ... contains login)
+						// remove oauth info from response, apply to reply.state
+						// should this happen in API proxy? probably
 					},
 					(err) => { reply(Boom.badImplementation(err.message)); }
 				)
