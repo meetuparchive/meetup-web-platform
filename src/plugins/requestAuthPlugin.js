@@ -3,12 +3,11 @@ import nodeFetch from 'node-fetch';
 import Rx from 'rxjs';
 
 import { tryJSON } from '../util/fetchUtils';
+import { applyAuthState, removeAuthState } from '../util/authUtils';
 
 /**
  * @module requestAuthPlugin
  */
-
-const YEAR_IN_MS = 1000 * 60 * 60 * 24 * 365;
 
 function verifyAuth(auth) {
 	const keys = Object.keys(auth);
@@ -24,64 +23,9 @@ function verifyAuth(auth) {
 	return auth;
 }
 
-/**
- * Transform auth info from the API into a configuration for the corresponding
- * cookies to write into the Hapi request/response
- *
- * @param {Object} auth { oauth_token || access_token, refresh_token, expires_in }
- * object from API/Auth endpoint
- */
-const configureAuthState = auth => {
-	const path = '/';
-	return {
-		oauth_token: {
-			value: auth.oauth_token || auth.access_token,
-			opts: {
-				path,
-				ttl: auth.expires_in * 1000,
-				isHttpOnly: true,
-			},
-		},
-		refresh_token: {
-			value: auth.refresh_token,
-			opts: {
-				path,
-				ttl: YEAR_IN_MS * 2,
-				isHttpOnly: true,
-			},
-		}
-	};
-};
-
-/**
- * Both the incoming request and the outgoing response need to have an
- * 'authorized' state in order for the app to render correctly with data from
- * the API, so this function modifies the request and the reply
- *
- * @param request Hapi request
- * @param auth { oauth_token || access_token, expires_in (seconds), refresh_token }
- */
-const applyAuthState = request => auth => {
-	// there are secret tokens in `auth`, be careful with logging
-	const authState = configureAuthState(auth);
-	const authCookies = Object.keys(authState);
-
-	request.log(['auth', 'info'], `Setting auth cookies: ${JSON.stringify(authCookies)}`);
-	Object.keys(authState).forEach(name => {
-		const cookieVal = authState[name];
-		// apply to request
-		request.state[name] = cookieVal.value;
-		// apply to response - note this special `request.authorize.reply` prop assigned onPreAuth
-		request.authorize.reply.state(name, cookieVal.value, cookieVal.opts);
-	});
-	return request;
-};
-
-const removeAuthState = (names, request) => {
-	names.forEach(name => {
-		request.state[name] = null;
-		request.authorize.reply.unstate(name);
-	});
+const handleLogout = request => {
+	request.log(['info', 'auth'], 'Logout received, clearing cookies to re-authenticate');
+	return removeAuthState(['oauth_token', 'refresh_token'], request, request.authorize.reply);
 };
 
 /**
@@ -96,6 +40,11 @@ const removeAuthState = (names, request) => {
  * @return {Observable} Observable that emits the request with auth applied
  */
 export const requestAuthorizer = auth$ => request => {
+	// logout is accomplished exclusively through a `logout` querystring value
+	if ('logout' in request.query) {
+		handleLogout(request);
+	}
+
 	// always need oauth_token, even if it's an anonymous (pre-reg) token
 	// This is 'deferred' because we don't want to start fetching the token
 	// before we know that it's needed
@@ -109,7 +58,7 @@ export const requestAuthorizer = auth$ => request => {
 			.do(() => request.log(['info', 'auth'], `Request contains auth token (${authType})`)),
 		request$
 			.do(() => request.log(['info', 'auth'], 'Request does not contain auth token'))
-			.flatMap(request => auth$(request).do(applyAuthState(request)).map(() => request))
+			.flatMap(request => auth$(request).do(applyAuthState(request, request.authorize.reply)).map(() => request))
 	);
 };
 
@@ -242,12 +191,6 @@ export const requestAuth$ = config => {
 };
 
 export const authenticate = (request, reply) => {
-	// logout is accomplished exclusively through a `logout` querystring value
-	if ('logout' in request.query) {
-		request.log(['info', 'auth'], 'Logout received, clearing cookies to re-authenticate');
-		return removeAuthState(['oauth_token', 'refresh_token'], request);
-	}
-
 	request.log(['info', 'auth'], 'Authenticating request');
 	return request.authorize()
 		.do(request => {
