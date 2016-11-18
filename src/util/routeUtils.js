@@ -16,13 +16,20 @@ const match$ = Rx.Observable.bindNodeCallback(match);
  * @return {Array} The return values of each active route's query function
  */
 function getActiveRouteQueries([ , { routes, location, params }]) {
-	return routes
+	const queries = routes
 		.filter(({ query }) => query)  // only get routes with queries
 		.reduce((queries, { query }) => {  // assemble into one array of queries
 			const routeQueries = query instanceof Array ? query : [query];
 			return queries.concat(routeQueries);
 		}, [])
 		.map(query => query({ location, params }));  // call the query function
+
+	// any location with logout will send a 'logout' query automatically
+	if ('logout' in location.query) {
+		queries.unshift({ type: 'logout' });
+	}
+
+	return queries;
 }
 
 export const activeRouteQueries$ = routes => location =>

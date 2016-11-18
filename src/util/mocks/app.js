@@ -30,7 +30,9 @@ export const MOCK_APP_STATE = {
 	},
 	config: {},
 	routing: {
-		locationBeforeTransitions: {}
+		locationBeforeTransitions: {
+			pathname: '/foo',
+		}
 	},
 };
 
