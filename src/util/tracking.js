@@ -109,13 +109,12 @@ export const trackNav = log => (response, queryResponses, url, referrer) => {
 };
 
 export const trackApi = log => (response, queryResponses, url, referrer) => {
-
 	trackNav(log)(response, queryResponses, url, referrer);
 	// special case - login requests need to be tracked
 	const loginResponse = queryResponses.find(r => r.login);
 	if (loginResponse) {
 		const member_id = JSON.stringify(loginResponse.login.value.member.id);
-		trackLogin(log)(response, member_id);
+		return trackLogin(log)(response, member_id);
 	}
 };
 
