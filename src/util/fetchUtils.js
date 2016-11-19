@@ -25,7 +25,7 @@ export const fetchQueries = (apiUrl, options) => (queries, referrer) => {
 	const params = new URLSearchParams();
 	params.append('queries', JSON.stringify(queries));
 	if (referrer) {
-		params.append('referrer', JSON.stringify(referrer));
+		params.append('referrer', referrer);
 	}
 	const searchString = `?${params}`;
 	const fetchUrl = `${apiUrl}${isPost ? '' : searchString}`;

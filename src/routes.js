@@ -1,3 +1,5 @@
+import url from 'url';
+
 import Accepts from 'accepts';
 import Boom from 'boom';
 import chalk from 'chalk';
@@ -42,11 +44,12 @@ export default function getRoutes(
 					queryResponses => {
 						const response = reply(JSON.stringify(queryResponses))
 							.type('application/json');
+
 						reply.track(
 							response,
 							'api',
 							queryResponses,
-							response.request.info.referrer,
+							url.parse(response.request.info.referrer).pathname,
 							response.request.query.referrer
 						);
 					},

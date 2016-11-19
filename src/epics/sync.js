@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 import { combineEpics } from 'redux-observable';
-import { LOCATION_CHANGE, browserHistory } from 'react-router-redux';
+import { LOCATION_CHANGE } from 'react-router-redux';
 import {
 	apiRequest,
 	apiSuccess,
@@ -19,13 +19,20 @@ import { fetchQueries } from '../util/fetchUtils';
  * @param {Object} routes The application's React Router routes
  * @returns {Function} an Epic function that emits an API_REQUEST action
  */
-export const getNavEpic = routes => (action$, store) =>
-	action$.ofType(LOCATION_CHANGE, '@@server/RENDER')
-		.map(({ payload }) => payload)  // extract the `location` from the action payload
-		.flatMap(location =>
-			activeRouteQueries$(routes)  // find the queries for the location
-				.map(queries => apiRequest(queries, browserHistory && browserHistory.previous || null))
-		);
+export const getNavEpic = routes => {
+	const activeQueries$ = activeRouteQueries$(routes);
+	let currentRoute = {};  // keep track of current route so that apiRequest can get 'referrer'
+	return (action$, store) =>
+		action$.ofType(LOCATION_CHANGE, '@@server/RENDER')
+			.flatMap(({ payload }) =>
+				activeQueries$(payload)  // find the queries for the location
+					.map(queries =>
+						apiRequest(queries, currentRoute.pathname)
+					)
+					.do(() => currentRoute = payload)
+			);
+};
+
 /**
  * Any action that should reload the API data should be handled here, e.g.
  * LOGIN_SUCCESS, which should force the app to reload in an 'authorized'

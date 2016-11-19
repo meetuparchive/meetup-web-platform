@@ -93,8 +93,8 @@ export const trackLogout = log => response =>
 	);
 
 export const trackNav = log => (response, queryResponses, url, referrer) => {
-	const queries = queryResponses.map(qr => [Object.keys(qr)[0]]);
-	log(
+	const queries = queryResponses.map(qr => Object.keys(qr)[0]);
+	return log(
 		response,
 		{
 			description: 'nav',
@@ -109,6 +109,7 @@ export const trackNav = log => (response, queryResponses, url, referrer) => {
 };
 
 export const trackApi = log => (response, queryResponses, url, referrer) => {
+
 	trackNav(log)(response, queryResponses, url, referrer);
 	// special case - login requests need to be tracked
 	const loginResponse = queryResponses.find(r => r.login);
@@ -147,7 +148,6 @@ export const logTrack = platform_agent => (response, trackInfo) => {
 	const requestHeaders = response.request.headers;
 	const trackLog = {
 		request_id: uuid.v4(),
-		referrer: 'this will be handled in a special way for navigation actions',
 		ip: requestHeaders['remote-addr'],
 		agent: requestHeaders['user-agent'],
 		platform: 'meetup-web-platform',
