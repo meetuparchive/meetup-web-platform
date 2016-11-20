@@ -45,14 +45,14 @@ export default function getRoutes(
 						const response = reply(JSON.stringify(queryResponses))
 							.type('application/json');
 
+						const metadata = JSON.parse(response.request.query.metadata);
+						metadata.url = url.parse(response.request.info.referrer).pathname;
+
 						reply.track(
 							response,
 							'api',
 							queryResponses,
-							{
-								referrer: url.parse(response.request.info.referrer).pathname,
-								url: response.request.query.referrer,
-							}
+							metadata
 						);
 					},
 					(err) => { reply(Boom.badImplementation(err.message)); }

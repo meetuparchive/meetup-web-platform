@@ -24,9 +24,7 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 
 	const params = new URLSearchParams();
 	params.append('queries', JSON.stringify(queries));
-	for (const key in meta) {
-		params.append(key, meta[key]);
-	}
+	paranms.append('metadata', JSON.stringify(meta));
 	const searchString = `?${params}`;
 	const fetchUrl = `${apiUrl}${isPost ? '' : searchString}`;
 	const fetchConfig = {
