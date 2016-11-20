@@ -34,7 +34,7 @@ export const getNavEpic = routes => {
  * state
  */
 export const locationSyncEpic = (action$, store) =>
-	action$.ofType('LOCATION_SYNC')
+	action$.ofType('LOCATION_SYNC', 'LOGIN_SUCCESS')
 		.map(() => ({
 			type: LOCATION_CHANGE,
 			payload: store.getState().routing.locationBeforeTransitions,
