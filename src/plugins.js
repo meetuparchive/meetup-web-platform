@@ -1,4 +1,6 @@
+import CsrfPlugin from 'electrode-csrf-jwt';
 import Good from 'good';
+import Joi from 'joi';
 import requestAuthPlugin from './plugins/requestAuthPlugin';
 
 /**
@@ -6,6 +8,17 @@ import requestAuthPlugin from './plugins/requestAuthPlugin';
  *
  * @module ServerPlugins
  */
+
+export function getCsrfPlugin() {
+	const secret = process.env.CSRF_SECRET;
+	Joi.validate(secret, Joi.string().min(32).required());
+	return {
+		register: CsrfPlugin.register,
+		options: {
+			secret,
+		}
+	};
+}
 
 /**
  * Provides Hapi process monitoring and console logging
@@ -54,6 +67,7 @@ export function getRequestAuthPlugin(options) {
 
 export default function getPlugins(config) {
 	return [
+		getCsrfPlugin(),
 		getConsoleLogPlugin(),
 		getRequestAuthPlugin(config),
 	];

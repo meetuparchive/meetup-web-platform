@@ -30,18 +30,27 @@ export const fetchQueries = (apiUrl, options) => queries => {
 		method,
 		headers: {
 			'content-type': isPost ? 'application/x-www-form-urlencoded' : 'text/plain',
+			'x-csrf-jwt': isPost ? options.csrf : '',
 		},
 		credentials: 'same-origin'  // allow response to set-cookies
 	};
 	if (isPost) {
+		// assume client side
 		fetchConfig.body = params;
 	}
 	return fetch(
 		fetchUrl,
 		fetchConfig
 	)
-	.then(queryResponse => queryResponse.json())
-	.then(responses => ({ queries, responses }));
+	.then(queryResponse =>
+		queryResponse.json().then(responses =>
+			({
+				queries,
+				responses,
+				csrf: queryResponse.headers.get('x-csrf-jwt'),
+			})
+		)
+	);
 };
 
 export const tryJSON = reqUrl => response => {
