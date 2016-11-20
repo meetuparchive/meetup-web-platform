@@ -49,8 +49,10 @@ export default function getRoutes(
 							response,
 							'api',
 							queryResponses,
-							url.parse(response.request.info.referrer).pathname,
-							response.request.query.referrer
+							{
+								referrer: url.parse(response.request.info.referrer).pathname,
+								url: response.request.query.referrer,
+							}
 						);
 					},
 					(err) => { reply(Boom.badImplementation(err.message)); }

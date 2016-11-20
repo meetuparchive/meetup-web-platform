@@ -108,7 +108,11 @@ export const trackNav = log => (response, queryResponses, url, referrer) => {
 	);
 };
 
-export const trackApi = log => (response, queryResponses, url, referrer) => {
+export const trackApi = log => (response, queryResponses, metadata={}) => {
+	const {
+		url,
+		referrer,
+	} = metadata;
 	trackNav(log)(response, queryResponses, url, referrer);
 	// special case - login requests need to be tracked
 	const loginResponse = queryResponses.find(r => r.login);

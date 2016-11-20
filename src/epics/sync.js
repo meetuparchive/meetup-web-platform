@@ -21,16 +21,17 @@ import { fetchQueries } from '../util/fetchUtils';
  */
 export const getNavEpic = routes => {
 	const activeQueries$ = activeRouteQueries$(routes);
-	let currentRoute = {};  // keep track of current route so that apiRequest can get 'referrer'
+	let currentLocation = {};  // keep track of current route so that apiRequest can get 'referrer'
 	return (action$, store) =>
 		action$.ofType(LOCATION_CHANGE, '@@server/RENDER')
-			.flatMap(({ payload }) =>
-				activeQueries$(payload)  // find the queries for the location
-					.map(queries =>
-						apiRequest(queries, currentRoute.pathname)
-					)
-					.do(() => currentRoute = payload)
-			);
+			.flatMap(({ payload }) => {
+				const requestMetadata = {
+					referrer: currentLocation.pathname,
+				};
+				return activeQueries$(payload)  // find the queries for the location
+					.map(queries => apiRequest(queries, requestMetadata))
+					.do(() => currentLocation = payload);  // update to new location
+			});
 };
 
 /**

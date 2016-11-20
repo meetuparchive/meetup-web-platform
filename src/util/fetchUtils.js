@@ -14,7 +14,7 @@
  *   }
  * @return {Promise} resolves with a `{queries, responses}` object
  */
-export const fetchQueries = (apiUrl, options) => (queries, referrer) => {
+export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 	options.method = options.method || 'GET';
 	const {
 		method,
@@ -24,8 +24,8 @@ export const fetchQueries = (apiUrl, options) => (queries, referrer) => {
 
 	const params = new URLSearchParams();
 	params.append('queries', JSON.stringify(queries));
-	if (referrer) {
-		params.append('referrer', referrer);
+	for (const key in meta) {
+		params.append(key, meta[key]);
 	}
 	const searchString = `?${params}`;
 	const fetchUrl = `${apiUrl}${isPost ? '' : searchString}`;

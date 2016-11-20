@@ -1,8 +1,8 @@
-export function apiRequest(queries, referrer) {
+export function apiRequest(queries, meta) {
 	return {
 		type: 'API_REQUEST',
 		payload: queries,
-		meta: referrer,
+		meta,
 	};
 }
 
