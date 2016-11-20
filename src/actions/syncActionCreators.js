@@ -27,8 +27,11 @@ export function apiComplete() {
 	};
 }
 
+/**
+ * A simple signal to indicate that the app should re-sync data with the
+ * current router location. Usually used for authorization changes
+ */
 export function locationSync() {
 	return { type: 'LOCATION_SYNC' };
 }
-
 

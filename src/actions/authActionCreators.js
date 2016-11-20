@@ -1,4 +1,3 @@
-import { locationSync } from './syncActionCreators';
 /**
  * @module authActionCreators
  */
@@ -27,7 +26,8 @@ export function loginPost(params) {
 				if (response.value.errors) {
 					return loginError(response.value.errors);
 				}
-				return locationSync();
+				// otherwise return the action
+				return loginSuccess();
 			},
 			onError: loginError
 		}
