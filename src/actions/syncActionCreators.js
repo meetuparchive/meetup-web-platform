@@ -6,10 +6,13 @@ export function apiRequest(queries, meta) {
 	};
 }
 
-export function apiSuccess({ queries, responses }) {
+export function apiSuccess({ queries, responses, csrf }) {
 	return {
 		type: 'API_SUCCESS',
 		payload: { queries, responses },
+		meta: {
+			csrf,
+		},
 	};
 }
 

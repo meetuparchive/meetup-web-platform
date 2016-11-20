@@ -54,7 +54,7 @@ const DOM = (props) => {
 
 	const APP_RUNTIME = {
 		assetPublicPath,
-		escapedState
+		escapedState,
 	};
 
 	return (
