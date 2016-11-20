@@ -18,6 +18,7 @@ export const fetchQueries = (apiUrl, options) => queries => {
 	options.method = options.method || 'GET';
 	const {
 		method,
+		headers,
 	} = options;
 
 	const isPost = method.toLowerCase() === 'post';
@@ -29,6 +30,7 @@ export const fetchQueries = (apiUrl, options) => queries => {
 	const fetchConfig = {
 		method,
 		headers: {
+			...(headers || {}),
 			'content-type': isPost ? 'application/x-www-form-urlencoded' : 'text/plain',
 		},
 		credentials: 'same-origin'  // allow response to set-cookies
@@ -51,4 +53,9 @@ export const tryJSON = reqUrl => response => {
 	}
 	return response.text().then(text => JSON.parse(text));
 };
+
+export const makeCookieHeader = cookieObj =>
+	Object.keys(cookieObj)
+		.map(name => `${name}=${cookieObj[name]}`)
+		.join('; ');
 

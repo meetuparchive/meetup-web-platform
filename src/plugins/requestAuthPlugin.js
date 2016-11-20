@@ -1,5 +1,4 @@
 import chalk from 'chalk';
-import nodeFetch from 'node-fetch';
 import Rx from 'rxjs';
 
 import { tryJSON } from '../util/fetchUtils';
@@ -67,7 +66,7 @@ const applyAuthState = request => auth => {
 	const authCookies = Object.keys(authState);
 
 	request.log(['auth', 'info'], `Setting auth cookies: ${JSON.stringify(authCookies)}`);
-	Object.keys(authState).forEach(name => {
+	authCookies.forEach(name => {
 		const cookieVal = authState[name];
 		// apply to request
 		request.state[name] = cookieVal.value;
@@ -249,6 +248,7 @@ export const authenticate = (request, reply) => {
 	}
 
 	request.log(['info', 'auth'], 'Authenticating request');
+	console.log(`\nreceived headers:\n${JSON.stringify(request.headers, null, 2)}\n`);
 	return request.authorize()
 		.do(request => {
 			request.log(['info', 'auth'], 'Request authenticated');
@@ -259,13 +259,6 @@ export const authenticate = (request, reply) => {
 		});
 };
 
-/**
- * create a `fetch` function that contains the cookie header passed in
- */
-const cookieFetch = cookie => (url, options={}) => {
-	const headers = { ...(options.headers || {}), cookie };
-	return nodeFetch(url, { ...options, headers });
-};
 /**
  * Request authorizing scheme
  *
@@ -289,9 +282,6 @@ export const oauthScheme = (server, options) => {
 	);
 
 	server.ext('onPreAuth', (request, reply) => {
-		// overwrite fetch to inject _this_ request's cookies
-		global.fetch = cookieFetch(request.headers.cookie);
-
 		// Used for setting and unsetting state, not for replying to request
 		request.authorize.reply = reply;
 
