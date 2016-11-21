@@ -28,7 +28,8 @@ import {
  */
 export default function start(
 	renderRequestMap,
-	{ routes=[], plugins=[] }
+	{ routes=[], plugins=[], platform_agent='consumer_name' },
+	config=getConfig
 ) {
 	// source maps make for better stack traces - we might not want this in
 	// production if it makes anything slower, though
@@ -48,7 +49,7 @@ export default function start(
 
 			const finalPlugins = [ ...plugins, ...getPlugins(config) ];
 
-			return server(finalRoutes, connection, finalPlugins);
+			return server(finalRoutes, connection, finalPlugins, platform_agent, config);
 		});
 }
 

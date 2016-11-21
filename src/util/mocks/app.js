@@ -8,7 +8,10 @@ export const MOCK_APP_STATE = {
 	app: {
 		self: {
 			type: 'member',
-			value: { id: 1234 }
+			value: {
+				id: 1234,
+				status: 'prereg',
+			}
 		},
 		group: {
 			type: 'group',
@@ -27,7 +30,9 @@ export const MOCK_APP_STATE = {
 	},
 	config: {},
 	routing: {
-		locationBeforeTransitions: {}
+		locationBeforeTransitions: {
+			pathname: '/foo',
+		}
 	},
 };
 
@@ -76,6 +81,19 @@ export const MOCK_RENDERPROPS = {
 	},
 	params: {
 		urlname: 'foo'
+	}
+};
+
+export const MOCK_RENDERPROPS_UTF8 = {
+	location: {  // https://github.com/reactjs/history/blob/master/docs/Location.md
+		pathname: '/バ-京',
+		search: '',
+		state: {},
+		action: 'PUSH',
+		key: '1234'
+	},
+	params: {
+		urlname: 'バ-京'
 	}
 };
 
@@ -149,10 +167,10 @@ const mock_valid_config = {
 	DEV_SERVER_PORT: 8000,
 	API_PROTOCOL: 'https',
 	API_HOST: 'api.dev.meetup.com',
-	ANONYMOUS_AUTH_URL: 'https://secure.dev.meetup.com/oauth2/authorize',
-	ANONYMOUS_ACCESS_URL: 'https://secure.dev.meetup.com/oauth2/access',
+	OAUTH_AUTH_URL: 'https://secure.dev.meetup.com/oauth2/authorize',
+	OAUTH_ACCESS_URL: 'https://secure.dev.meetup.com/oauth2/access',
 	PHOTO_SCALER_SALT: 'abcdefg',
-	ANONYMOUS_AUTH_APP_PATH: '/anon',
+	AUTH_ENDPOINT: '/auth',
 	oauth: {
 		secret: process.env.MUPWEB_OAUTH_SECRET,
 		key: process.env.MUPWEB_OAUTH_KEY,

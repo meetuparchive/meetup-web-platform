@@ -11,45 +11,61 @@
  *   application server
  * @param {Object} options {
  *     method: "get", "post", "delete", or "patch",
- *     auth: { oauth_token },
  *   }
  * @return {Promise} resolves with a `{queries, responses}` object
  */
-export const fetchQueries = (apiUrl, options) => queries => {
+export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 	options.method = options.method || 'GET';
 	const {
-		auth,
 		method,
+		headers,
 	} = options;
 
-	if (!auth.oauth_token) {
-		console.log('No access token provided');
-		if (!auth.refresh_token) {
-			console.log('No refresh_token - cannot fetch');
-			return Promise.reject(new Error('No auth info provided'));
-		}
-	}
 	const isPost = method.toLowerCase() === 'post';
 
 	const params = new URLSearchParams();
 	params.append('queries', JSON.stringify(queries));
+	params.append('metadata', JSON.stringify(meta));
 	const searchString = `?${params}`;
 	const fetchUrl = `${apiUrl}${isPost ? '' : searchString}`;
 	const fetchConfig = {
 		method,
 		headers: {
-			Authorization: `Bearer ${auth.oauth_token}`,
+			...(headers || {}),
 			'content-type': isPost ? 'application/x-www-form-urlencoded' : 'text/plain',
-		}
+			'x-csrf-jwt': isPost ? options.csrf : '',
+		},
+		credentials: 'same-origin'  // allow response to set-cookies
 	};
 	if (isPost) {
+		// assume client side
 		fetchConfig.body = params;
 	}
 	return fetch(
 		fetchUrl,
 		fetchConfig
 	)
-	.then(queryResponse => queryResponse.json())
-	.then(responses => ({ queries, responses }));
+	.then(queryResponse =>
+		queryResponse.json().then(responses =>
+			({
+				queries,
+				responses,
+				csrf: queryResponse.headers.get('x-csrf-jwt'),
+			})
+		)
+	);
 };
+
+export const tryJSON = reqUrl => response => {
+	const { status, statusText } = response;
+	if (status >= 400) {  // status always 200: bugzilla #52128
+		throw new Error(`Request to ${reqUrl} responded with error code ${status}: ${statusText}`);
+	}
+	return response.text().then(text => JSON.parse(text));
+};
+
+export const makeCookieHeader = cookieObj =>
+	Object.keys(cookieObj)
+		.map(name => `${name}=${cookieObj[name]}`)
+		.join('; ');
 

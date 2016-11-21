@@ -3,6 +3,8 @@ import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import Hapi from 'hapi';
 
+import track from './tracking';
+
 /**
  * determine whether a nested object of values contains a string that contains
  * `.dev.meetup.`
@@ -55,12 +57,15 @@ export function onPreResponse(request, reply) {
 /**
  * server-starting function
  */
-export function server(routes, connection, plugins=[]) {
+export function server(routes, connection, plugins, platform_agent, config) {
 	const server = new Hapi.Server();
+
+	server.decorate('reply', 'track', track(platform_agent));
 
 	return server.connection(connection)
 		.register(plugins)
 		.then(() => server.ext('onPreResponse', onPreResponse))
+		.then(() => server.auth.strategy('default', 'oauth', true, config))
 		.then(() => server.log(['start'], `${plugins.length} plugins registered, assigning routes...`))
 		.then(() => server.route(routes))
 		.then(() => server.log(['start'], `${routes.length} routes assigned, starting server...`))

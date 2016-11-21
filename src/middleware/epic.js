@@ -2,21 +2,23 @@ import 'rxjs';  // required to enable all Observable operators
 import { combineEpics, createEpicMiddleware } from 'redux-observable';
 
 import getSyncEpic from '../epics/sync';
-import authEpic from '../epics/auth';
 import getCacheEpic from '../epics/cache';
-import postEpic from '../epics/post';
+import getPostEpic from '../epics/post';
 
 /**
  * The middleware is exported as a getter because it needs the application's
  * routes in order to set up the nav-related epic(s) that are part of the
  * final middleware
+ *
+ * **Note** it's unlikely that the server needs any epics other than `sync` in
+ * order to render the application. We may want to write a server-specific
+ * middleware that doesn't include the other epics if performance is an issue
  */
-const getPlatformMiddleware = routes => createEpicMiddleware(
+const getPlatformMiddleware = (routes, fetchQueries) => createEpicMiddleware(
 	combineEpics(
-		getSyncEpic(routes),
-		authEpic,
+		getSyncEpic(routes, fetchQueries),
 		getCacheEpic(),
-		postEpic
+		getPostEpic(fetchQueries)
 	)
 );
 

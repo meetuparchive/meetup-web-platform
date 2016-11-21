@@ -1,11 +1,24 @@
+import CsrfPlugin from 'electrode-csrf-jwt';
 import Good from 'good';
-import anonAuthPlugin from './plugins/anonAuthPlugin';
+import Joi from 'joi';
+import requestAuthPlugin from './plugins/requestAuthPlugin';
 
 /**
  * Hapi plugins for the dev server
  *
  * @module ServerPlugins
  */
+
+export function getCsrfPlugin() {
+	const secret = process.env.CSRF_SECRET;
+	Joi.validate(secret, Joi.string().min(32).required());
+	return {
+		register: CsrfPlugin.register,
+		options: {
+			secret,
+		}
+	};
+}
 
 /**
  * Provides Hapi process monitoring and console logging
@@ -45,17 +58,18 @@ export function getConsoleLogPlugin() {
  * configure and return the plugin that will allow requests to get anonymous
  * oauth tokens to communicate with the API
  */
-export function getAnonAuthPlugin(options) {
+export function getRequestAuthPlugin(options) {
 	return {
-		register: anonAuthPlugin,
+		register: requestAuthPlugin,
 		options,
 	};
 }
 
 export default function getPlugins(config) {
 	return [
+		getCsrfPlugin(),
 		getConsoleLogPlugin(),
-		getAnonAuthPlugin(config),
+		getRequestAuthPlugin(config),
 	];
 }
 

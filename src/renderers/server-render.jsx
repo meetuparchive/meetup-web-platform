@@ -7,17 +7,12 @@ import RouterContext from 'react-router/lib/RouterContext';
 import match from 'react-router/lib/match';
 import { Provider } from 'react-redux';
 
-import createStore from '../util/createStore';
+import { createServerStore } from '../util/createStore';
 import Dom from '../components/dom';
 import { polyfillNodeIntl } from '../util/localizationUtils';
 
 import {
-	configureAuth
-} from '../actions/authActionCreators';
-
-import {
 	configureApiUrl,
-	configureTrackingId
 } from '../actions/configActionCreators';
 
 // Ensure global Intl for use with FormatJS
@@ -114,12 +109,9 @@ const getRouterRenderer = (store, clientFilename, assetPublicPath) =>
  * @param {Store} store Redux store for this request
  * @param {Object} config that initializes app (auth tokens, e.g. oauth_token)
  */
-const dispatchConfig = (store, { apiUrl, auth, meetupTrack }) => {
-	console.log(chalk.green('Dispatching config'));
-
-	store.dispatch(configureAuth(auth, true));
+const dispatchConfig = (store, { apiUrl, log=console.log }) => {
+	log(['app', 'info'], chalk.green(`Configuring apiUrl: ${apiUrl}`));
 	store.dispatch(configureApiUrl(apiUrl));
-	store.dispatch(configureTrackingId(meetupTrack));
 };
 
 /**
@@ -155,29 +147,16 @@ const makeRenderer = (
 		url,
 		info,
 		server,
-		state: {
-			oauth_token,
-			refresh_token,
-			expires_in,
-			anonymous,
-			meetupTrack
-		}
+		log,
 	} = request;
 
 	const location = url.path;
 	const apiUrl = `${server.info.protocol}://${info.host}/api`;
-	const auth = {
-		oauth_token,
-		refresh_token,
-		expires_in,
-		anonymous,
-	};
 
 	// create the store
-	const store = createStore(routes, reducer, {}, middleware);
-
+	const store = createServerStore(routes, reducer, {}, middleware, request);
 	// load initial config
-	dispatchConfig(store, { apiUrl, auth, meetupTrack });
+	dispatchConfig(store, { apiUrl, log: log.bind(request) });
 
 	// render skeleton if requested - the store is ready
 	if ('skeleton' in request.query) {
@@ -194,11 +173,15 @@ const makeRenderer = (
 	})
 	.first(state => state.preRenderChecklist.every(isReady => isReady));  // take the first ready state
 
+	request.log(['app', 'info'], `Finding route for path: '${location}'`);
 	return Rx.Observable.bindNodeCallback(match)({ location, routes })
 		.do(([redirectLocation, renderProps]) => {
 			if (!redirectLocation && !renderProps) {
 				throw Boom.notFound();
 			}
+		})
+		.do(() => {
+			request.log(['app', 'info'], 'Found app route, dispatching RENDER');
 		})
 		.do(([redirectLocation, renderProps]) =>
 			store.dispatch({
