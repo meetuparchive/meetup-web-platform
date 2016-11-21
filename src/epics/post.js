@@ -1,5 +1,3 @@
-import { fetchQueries } from '../util/fetchUtils';
-
 /**
  * PostEpic provides a generic interface for triggering POST requests and
  * dispatching particular actions with the API response. The POST action must
@@ -36,7 +34,7 @@ import { fetchQueries } from '../util/fetchUtils';
  * @param {Object} postAction, providing query, onSuccess, and onError
  * @return {Promise} results of the fetch, either onSuccess or onError
  */
-const getPostActionFetch = ({ getState }) =>
+const getPostActionFetch = ({ getState }, fetchQueries) =>
 	({ type, payload: { query, onSuccess, onError }}) => {
 		const {
 			config,
@@ -48,8 +46,8 @@ const getPostActionFetch = ({ getState }) =>
 			.catch(onError);
 	};
 
-const PostEpic = (action$, store) =>
+const getPostEpic = fetchQueries => (action$, store) =>
 	action$.filter(({ type })=> type.endsWith('_POST') || type.startsWith('POST_'))
-		.flatMap(getPostActionFetch(store));
+		.flatMap(getPostActionFetch(store, fetchQueries));
 
-export default PostEpic;
+export default getPostEpic;
