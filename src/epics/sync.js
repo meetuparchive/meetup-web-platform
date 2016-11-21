@@ -14,7 +14,10 @@ import { activeRouteQueries$ } from '../util/routeUtils';
  * epic will use to collect the current Reactive Queries associated with the
  * active routes.
  *
- * These queries will then be dispatched in the payload of `apiRequest`
+ * These queries will then be dispatched in the payload of `apiRequest`. Any
+ * metadata about the navigation action can also be sent to the `apiRequest`
+ * here.
+ *
  * @param {Object} routes The application's React Router routes
  * @returns {Function} an Epic function that emits an API_REQUEST action
  */
@@ -24,6 +27,7 @@ export const getNavEpic = routes => {
 	return (action$, store) =>
 		action$.ofType(LOCATION_CHANGE, '@@server/RENDER')
 			.flatMap(({ payload }) => {
+				// inject request metadata from context, including `store.getState()`
 				const requestMetadata = {
 					referrer: currentLocation.pathname,
 				};
