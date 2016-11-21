@@ -248,6 +248,9 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
 		Object.keys(queryResponse)
 			.forEach(key => {
 				const { type, value } = queryResponse[key];
+				if (!value || value.error) {
+					return;
+				}
 				let groups;
 				switch (type) {
 				case 'group':
@@ -255,7 +258,7 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
 					groups.forEach(setGroupDuotone);
 					break;
 				case 'home':
-					(value && value.rows || []).map(({ items }) => items)
+					(value.rows || []).map(({ items }) => items)
 						.forEach(items => items.filter(({ type }) => type === 'group')
 							.forEach(({ group }) => setGroupDuotone(group))
 						);
