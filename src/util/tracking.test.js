@@ -1,5 +1,5 @@
 import {
-	updateSessionId,
+	newSessionId,
 	updateTrackId,
 	updateMemberId,
 	trackApi,
@@ -19,25 +19,13 @@ const MOCK_HAPI_RESPONSE = {
 };
 
 describe('tracking state setters', () => {
-	it('sets session id if not set', () => {
+	it('sets session id', () => {
 		const responseWithoutSessionId = MOCK_HAPI_RESPONSE;
 		spyOn(responseWithoutSessionId, 'state');
-		const session_id = updateSessionId(responseWithoutSessionId);
+		const session_id = newSessionId(responseWithoutSessionId);
 		expect(UUID_V4_REGEX.test(session_id)).toBe(true);
 		expect(responseWithoutSessionId.state)
 			.toHaveBeenCalledWith('session_id', session_id, jasmine.any(Object));
-	});
-	it('does not set session id if already set', () => {
-		const session_id = 'foo';
-		const request = { state: { session_id } };
-		const responseWithSessionId = {
-			...MOCK_HAPI_RESPONSE,
-			request,
-		};
-		spyOn(responseWithSessionId, 'state');
-		const new_session_id = updateSessionId(responseWithSessionId);
-		expect(new_session_id).toBe(session_id);
-		expect(responseWithSessionId.state).not.toHaveBeenCalled();
 	});
 	it('sets track id if not set', () => {
 		const responseWithoutTrackId = MOCK_HAPI_RESPONSE;
@@ -207,7 +195,7 @@ describe('tracking loggers', () => {
 				track_id: 'foo',
 			},
 			info: { referrer: 'baz' },
-			url: { path: 'afogato' },
+			url: { path: 'affogato' },
 		};
 		const loginResponse = {
 			...MOCK_HAPI_RESPONSE,
@@ -223,5 +211,24 @@ describe('tracking loggers', () => {
 		expect(trackInfo.track_id).toBeDefined();
 		expect(trackInfo.track_id).toEqual(request.state.track_id);
 		expect(trackInfo.member_id).toEqual(request.state.member_id);
+	});
+	it('trackSession: does not call logger when session_id exists', () => {
+		spyOn(spyable, 'log').and.callThrough();
+		const request = {
+			state: {
+				member_id: 1234,
+				track_id: 'foo',
+				session_id: 'all set',
+			},
+			info: { referrer: 'baz' },
+			url: { path: 'afogato' },
+		};
+		const loginResponse = {
+			...MOCK_HAPI_RESPONSE,
+			request
+		};
+		const trackInfo = trackSession(spyable.log)(loginResponse);
+		expect(spyable.log).not.toHaveBeenCalled();
+		expect(trackInfo).toBeNull();  // null return value when no tracking is logged
 	});
 });
