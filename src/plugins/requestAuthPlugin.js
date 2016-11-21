@@ -24,7 +24,7 @@ function verifyAuth(auth) {
 
 const handleLogout = request => {
 	request.log(['info', 'auth'], 'Logout received, clearing cookies to re-authenticate');
-	return removeAuthState(['oauth_token', 'refresh_token'], request, request.authorize.reply);
+	return removeAuthState(['oauth_token', 'refresh_token'], request, request.plugins.requestAuth.reply);
 };
 
 /**
@@ -57,7 +57,7 @@ export const requestAuthorizer = auth$ => request => {
 			.do(() => request.log(['info', 'auth'], `Request contains auth token (${authType})`)),
 		request$
 			.do(() => request.log(['info', 'auth'], 'Request does not contain auth token'))
-			.flatMap(request => auth$(request).do(applyAuthState(request, request.authorize.reply)).map(() => request))
+			.flatMap(request => auth$(request).do(applyAuthState(request, request.plugins.requestAuth.reply)).map(() => request))
 	);
 };
 
@@ -205,7 +205,7 @@ export const authenticate = (request, reply) => {
  * Request authorizing scheme
  *
  * 1. add a `.authorize` method to the request
- * 2. assign a reference to the reply interface on request.authorize
+ * 2. assign a reference to the reply interface on request.plugins.requestAuth
  * 3. add an anonymous-user-JSON-generating route (for app logout)
  * 4. return the authentication function, which ensures that all requests have
  * valid auth credentials (anonymous or logged in)
@@ -225,7 +225,9 @@ export const oauthScheme = (server, options) => {
 
 	server.ext('onPreAuth', (request, reply) => {
 		// Used for setting and unsetting state, not for replying to request
-		request.authorize.reply = reply;
+		request.plugins.requestAuth = {
+			reply,
+		};
 
 		return reply.continue();
 	});
