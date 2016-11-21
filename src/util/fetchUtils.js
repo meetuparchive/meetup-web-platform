@@ -14,21 +14,24 @@
  *   }
  * @return {Promise} resolves with a `{queries, responses}` object
  */
-export const fetchQueries = (apiUrl, options) => queries => {
+export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 	options.method = options.method || 'GET';
 	const {
 		method,
+		headers,
 	} = options;
 
 	const isPost = method.toLowerCase() === 'post';
 
 	const params = new URLSearchParams();
 	params.append('queries', JSON.stringify(queries));
+	params.append('metadata', JSON.stringify(meta));
 	const searchString = `?${params}`;
 	const fetchUrl = `${apiUrl}${isPost ? '' : searchString}`;
 	const fetchConfig = {
 		method,
 		headers: {
+			...(headers || {}),
 			'content-type': isPost ? 'application/x-www-form-urlencoded' : 'text/plain',
 			'x-csrf-jwt': isPost ? options.csrf : '',
 		},
@@ -60,4 +63,9 @@ export const tryJSON = reqUrl => response => {
 	}
 	return response.text().then(text => JSON.parse(text));
 };
+
+export const makeCookieHeader = cookieObj =>
+	Object.keys(cookieObj)
+		.map(name => `${name}=${cookieObj[name]}`)
+		.join('; ');
 

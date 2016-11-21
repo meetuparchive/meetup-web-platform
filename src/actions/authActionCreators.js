@@ -27,7 +27,7 @@ export function loginPost(params) {
 					return loginError(response.value.errors);
 				}
 				// otherwise return the action
-				return loginSuccess(response);
+				return loginSuccess();
 			},
 			onError: loginError
 		}

@@ -9,23 +9,19 @@ const COOKIE_OPTS = {
 
 
 /**
- * @method updateSessionId
+ * @method newSessionId
  *
  * simple tracking id for the browser session
  *
  * @param {Object} hapi response object
  */
-export const updateSessionId = response => {
-	let session_id = response.request.state.session_id;
-
-	if (!session_id) {
-		session_id = uuid.v4();
-		response.state(
-			'session_id',
-			session_id,
-			COOKIE_OPTS
-		);
-	}
+export const newSessionId = response => {
+	const session_id = uuid.v4();
+	response.state(
+		'session_id',
+		session_id,
+		COOKIE_OPTS
+	);
 	return session_id;
 };
 
@@ -92,7 +88,28 @@ export const trackLogout = log => response =>
 		}
 	);
 
-export const trackApi = log => (response, queryResponses) => {
+export const trackNav = log => (response, queryResponses, url, referrer) => {
+	const queries = queryResponses.map(qr => Object.keys(qr)[0]);
+	return log(
+		response,
+		{
+			description: 'nav',
+			member_id: response.request.state.member_id,
+			track_id: response.request.state.track_id,
+			session_id: response.request.state.session_id,
+			url,
+			referrer,
+			queries,
+		}
+	);
+};
+
+export const trackApi = log => (response, queryResponses, metadata={}) => {
+	const {
+		url,
+		referrer,
+	} = metadata;
+	trackNav(log)(response, queryResponses, url, referrer);
 	// special case - login requests need to be tracked
 	const loginResponse = queryResponses.find(r => r.login);
 	if (loginResponse) {
@@ -114,23 +131,27 @@ export const trackLogin = log => (response, member_id) =>
 		}
 	);
 
-export const trackSession = log => response =>
-	log(
+export const trackSession = log => response => {
+	if (response.request.state.session_id) {
+		// if there's already a session id, there's nothing to track
+		return null;
+	}
+	return log(
 		response,
 		{
 			description: 'session',
 			member_id: response.request.state.member_id,
 			track_id: updateTrackId(response),
-			session_id: updateSessionId(response),
+			session_id: newSessionId(response),
 			url: response.request.url.path,
 		}
 	);
+};
 
 export const logTrack = platform_agent => (response, trackInfo) => {
 	const requestHeaders = response.request.headers;
 	const trackLog = {
 		request_id: uuid.v4(),
-		referrer: 'this will be handled in a special way for navigation actions',
 		ip: requestHeaders['remote-addr'],
 		agent: requestHeaders['user-agent'],
 		platform: 'meetup-web-platform',

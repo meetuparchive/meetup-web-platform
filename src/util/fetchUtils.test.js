@@ -67,3 +67,11 @@ describe('fetchQueries', () => {
 		});
 	});
 });
+
+describe('makeCookieHeader', () => {
+	it('makes a cookie header string from a { key<string> : value<string> } object', () => {
+		expect(fetchUtils.makeCookieHeader({ foo: 'foo', bar: 'bar' }))
+			.toEqual('foo=foo; bar=bar');
+	});
+});
+
