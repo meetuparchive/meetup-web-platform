@@ -8,7 +8,6 @@ import {
 	apiComplete,
 } from '../actions/syncActionCreators';
 import { activeRouteQueries$ } from '../util/routeUtils';
-import { fetchQueries } from '../util/fetchUtils';
 
 /**
  * Navigation actions will provide the `location` as the payload, which this
@@ -47,10 +46,10 @@ export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 				.catch(err => Observable.of(apiError(err)));  // ... or apiError
 		});
 
-export default function getSyncEpic(routes, fetchQueriesFn=fetchQueries) {
+export default function getSyncEpic(routes, fetchQueries) {
 	return combineEpics(
 		getNavEpic(routes),
-		getFetchQueriesEpic(fetchQueriesFn)
+		getFetchQueriesEpic(fetchQueries)
 	);
 }
 
