@@ -9,19 +9,19 @@ import {
 	createFakeStore,
 } from '../util/testUtils';
 import * as fetchUtils from '../util/fetchUtils';  // used for mocking
-import PostEpic from './post';
+import getPostEpic from './post';
 
 /**
  * @module PostEpicTest
  */
 const store = createFakeStore(MOCK_APP_STATE);
-describe('PostEpic', () => {
-	it('does not pass through arbitrary actions', epicIgnoreAction(PostEpic));
+describe('getPostEpic', () => {
+	it('does not pass through arbitrary actions', epicIgnoreAction(getPostEpic(fetchUtils.fetchQueries)));
 	it('calls fetchQueries with `method: "POST"`', function() {
 		const response = 'success';
 		spyOn(fetchUtils, 'fetchQueries').and.callFake(() => () => Promise.resolve(response));
 		const action$ = ActionsObservable.of(MOCK_POST_ACTION);
-		return PostEpic(action$, store)
+		return getPostEpic(fetchUtils.fetchQueries)(action$, store)
 			.do(() => {
 				expect(fetchUtils.fetchQueries.calls.count()).toBe(1);
 				const methodArg = fetchUtils.fetchQueries.calls.argsFor(0)[1].method;
@@ -34,7 +34,7 @@ describe('PostEpic', () => {
 		fetchUtils.fetchQueries = jest.fn(() => () => Promise.resolve(response));
 		spyOn(MOCK_POST_ACTION.payload, 'onSuccess');
 		const action$ = ActionsObservable.of(MOCK_POST_ACTION);
-		return PostEpic(action$, store)
+		return getPostEpic(fetchUtils.fetchQueries)(action$, store)
 			.do(() => expect(MOCK_POST_ACTION.payload.onSuccess).toHaveBeenCalledWith(response))
 			.toPromise();
 	});
@@ -45,7 +45,7 @@ describe('PostEpic', () => {
 		// The promises resolve async, but resolution is not accessible to test, so
 		// we use a setTimeout to make sure execution has completed
 		const action$ = ActionsObservable.of(MOCK_POST_ACTION);
-		return PostEpic(action$, store)
+		return getPostEpic(fetchUtils.fetchQueries)(action$, store)
 			.do(() => expect(MOCK_POST_ACTION.payload.onError).toHaveBeenCalledWith(err))
 			.toPromise();
 	});
