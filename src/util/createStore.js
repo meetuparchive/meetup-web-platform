@@ -37,7 +37,15 @@ function finalCreateStore(routes, reducer, initialState=null, middleware=[], fet
 	return createStoreWithMiddleware(reducer, initialState);
 }
 
-const serverFetchQueries = cookie => (api, options) => {
+/**
+ * wrap the `fetchQueries` function with a function that injects cookies into
+ * the request
+ *
+ * @param {Object} cookieState { name: value } object of cookies to inject
+ * @return {Function} a fetchQueries function
+ */
+const serverFetchQueries = cookieState => (api, options) => {
+	const cookie = makeCookieHeader(cookieState);
 	options.headers = options.headers || {};
 	options.headers.cookie = options.headers.cookie ?
 		`${options.headers.cookie}; ${cookie}` :
@@ -45,9 +53,28 @@ const serverFetchQueries = cookie => (api, options) => {
 	return fetchQueries(api, options);
 };
 
-export function createServerStore(routes, reducer, initialState, middleware, request) {
-	const cookie = makeCookieHeader(request.state);
-	return finalCreateStore(routes, reducer, initialState, middleware, serverFetchQueries(cookie));
+/**
+ * the server needs a slightly different store than the browser because the
+ * server does not know which cookies to pass along to the `fetch` function
+ * inside the sync middleware.
+ *
+ * This createServerStore function will therefore return a store that is
+ * specifically tailored to making API requests that correspond to the incoming
+ * request from the browser
+ */
+export function createServerStore(
+	routes,
+	reducer,
+	initialState,
+	middleware,
+	request) {
+	return finalCreateStore(
+		routes,
+		reducer,
+		initialState,
+		middleware,
+		serverFetchQueries(request.state)
+	);
 }
 
 export default finalCreateStore;
