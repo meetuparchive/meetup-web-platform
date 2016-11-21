@@ -1,3 +1,5 @@
+import url from 'url';
+
 import Accepts from 'accepts';
 import Boom from 'boom';
 import chalk from 'chalk';
@@ -42,7 +44,17 @@ export default function getRoutes(
 					queryResponses => {
 						const response = reply(JSON.stringify(queryResponses))
 							.type('application/json');
-						reply.track(response, 'api', queryResponses);
+
+						const metadata = JSON.parse(response.request.query.metadata || '{}');
+						const originUrl = response.request.info.referrer;
+						metadata.url = url.parse(originUrl).pathname;
+
+						reply.track(
+							response,
+							'api',
+							queryResponses,
+							metadata
+						);
 					},
 					(err) => { reply(Boom.badImplementation(err.message)); }
 				)
