@@ -69,6 +69,16 @@ export function event(params) {
 	};
 }
 
+/***
+ * photo admin endpoints
+ */
+export function photoAdmin(params) {
+	return {
+		endpoint: `${params.urlname}/photos`,
+		params
+	};
+}
+
 /**
  * member object endpoints
  *
