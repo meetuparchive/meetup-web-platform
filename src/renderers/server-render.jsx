@@ -7,7 +7,7 @@ import RouterContext from 'react-router/lib/RouterContext';
 import match from 'react-router/lib/match';
 import { Provider } from 'react-redux';
 
-import createStore from '../util/createStore';
+import { createServerStore } from '../util/createStore';
 import Dom from '../components/dom';
 import { polyfillNodeIntl } from '../util/localizationUtils';
 
@@ -154,7 +154,7 @@ const makeRenderer = (
 	const apiUrl = `${server.info.protocol}://${info.host}/api`;
 
 	// create the store
-	const store = createStore(routes, reducer, {}, middleware);
+	const store = createServerStore(routes, reducer, {}, middleware, request);
 	// load initial config
 	dispatchConfig(store, { apiUrl, log: log.bind(request) });
 
