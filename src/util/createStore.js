@@ -4,6 +4,7 @@
  */
 import { applyMiddleware, createStore, compose } from 'redux';
 import getPlatformMiddleware from '../middleware/epic';
+import { fetchQueries, makeCookieHeader } from '../util/fetchUtils';
 
 const noopMiddleware = store => next => action => next(action);
 
@@ -19,10 +20,10 @@ const noopMiddleware = store => next => action => next(action);
  * @param {Function} middleware (optional) any app-specific middleware that
  *   should be applied to the store
  */
-function finalCreateStore(routes, reducer, initialState=null, middleware=[]) {
+function finalCreateStore(routes, reducer, initialState=null, middleware=[], fetchQueriesFn=fetchQueries) {
 	// **All** middleware gets added here
 	const middlewareToApply = [
-		getPlatformMiddleware(routes),
+		getPlatformMiddleware(routes, fetchQueriesFn),
 		typeof window !== 'undefined' && window.mupDevTools ? window.mupDevTools() : noopMiddleware,
 		...middleware,
 	];
@@ -34,6 +35,19 @@ function finalCreateStore(routes, reducer, initialState=null, middleware=[]) {
 	)(createStore);
 
 	return createStoreWithMiddleware(reducer, initialState);
+}
+
+const serverFetchQueries = cookie => (api, options) => {
+	options.headers = options.headers || {};
+	options.headers.cookie = options.headers.cookie ?
+		`${options.headers.cookie}; ${cookie}` :
+		cookie;
+	return fetchQueries(api, options);
+};
+
+export function createServerStore(routes, reducer, initialState, middleware, request) {
+	const cookie = makeCookieHeader(request.state);
+	return finalCreateStore(routes, reducer, initialState, middleware, serverFetchQueries(cookie));
 }
 
 export default finalCreateStore;
