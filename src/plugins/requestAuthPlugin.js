@@ -191,7 +191,6 @@ export const requestAuth$ = config => {
 
 export const authenticate = (request, reply) => {
 	request.log(['info', 'auth'], 'Authenticating request');
-	console.log(`\nreceived headers:\n${JSON.stringify(request.headers, null, 2)}\n`);
 	return request.authorize()
 		.do(request => {
 			request.log(['info', 'auth'], 'Request authenticated');
