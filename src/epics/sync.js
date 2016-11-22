@@ -14,17 +14,28 @@ import { activeRouteQueries$ } from '../util/routeUtils';
  * epic will use to collect the current Reactive Queries associated with the
  * active routes.
  *
- * These queries will then be dispatched in the payload of `apiRequest`
+ * These queries will then be dispatched in the payload of `apiRequest`. Any
+ * metadata about the navigation action can also be sent to the `apiRequest`
+ * here.
+ *
  * @param {Object} routes The application's React Router routes
  * @returns {Function} an Epic function that emits an API_REQUEST action
  */
 export const getNavEpic = routes => {
 	const activeQueries$ = activeRouteQueries$(routes);
+	let currentLocation = {};  // keep track of current route so that apiRequest can get 'referrer'
 	return (action$, store) =>
 		action$.ofType(LOCATION_CHANGE, '@@server/RENDER')
-			.map(({ payload }) => payload)  // extract the `location` from the action payload
-			.flatMap(activeQueries$)        // find the queries for the location
-			.map(apiRequest);               // dispatch apiRequest with all queries
+			.flatMap(({ payload }) => {
+				// inject request metadata from context, including `store.getState()`
+				const requestMetadata = {
+					referrer: currentLocation.pathname,
+					logout: 'logout' in payload.query,
+				};
+				return activeQueries$(payload)  // find the queries for the location
+					.map(queries => apiRequest(queries, requestMetadata))
+					.do(() => currentLocation = payload);  // update to new location
+			});
 };
 
 /**
@@ -47,11 +58,10 @@ export const locationSyncEpic = (action$, store) =>
  */
 export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 	action$.ofType('API_REQUEST')
-		.map(({ payload }) => payload)  // payload contains the queries array
-		.flatMap(queries => {           // set up the fetch call to the app server
+		.flatMap(({ payload, meta }) => {           // set up the fetch call to the app server
 			const { config } = store.getState();
 			const fetch = fetchQueriesFn(config.apiUrl, { method: 'GET' });
-			return Observable.fromPromise(fetch(queries))  // call fetch
+			return Observable.fromPromise(fetch(payload, meta))  // call fetch
 				.takeUntil(action$.ofType(LOCATION_CHANGE))  // cancel this fetch when nav happens
 				.map(apiSuccess)                             // dispatch apiSuccess with server response
 				.flatMap(action => Observable.of(action, apiComplete()))  // dispatch apiComplete after resolution

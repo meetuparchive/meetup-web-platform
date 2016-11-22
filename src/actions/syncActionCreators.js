@@ -1,7 +1,8 @@
-export function apiRequest(queries) {
+export function apiRequest(queries, meta) {
 	return {
 		type: 'API_REQUEST',
 		payload: queries,
+		meta,
 	};
 }
 
