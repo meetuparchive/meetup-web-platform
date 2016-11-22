@@ -5,12 +5,15 @@ import {
 	MOCK_AUTH_HEADER,
 	MOCK_RENDERPROPS,
 	MOCK_RENDERPROPS_UTF8,
-} from '../util/mocks/app';
+} from 'meetup-web-mocks/lib/app';
+
 import {
 	MOCK_DUOTONE_URLS,
 	MOCK_GROUP,
-} from '../util/mocks/api';
+} from 'meetup-web-mocks/lib/api';
+
 import * as authUtils from '../util/authUtils';
+
 import {
 	parseRequest,
 	parseApiResponse,

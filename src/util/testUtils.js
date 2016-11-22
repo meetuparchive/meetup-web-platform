@@ -11,7 +11,7 @@ import { Provider } from 'react-redux';
 import {
 	MOCK_MEANINGLESS_ACTION,
 	MOCK_APP_STATE
-} from './mocks/app';
+} from 'meetup-web-mocks/lib/app';
 
 export const findComponentsWithType = (tree, typeString) =>
 	TestUtils.findAllInRenderedTree(
