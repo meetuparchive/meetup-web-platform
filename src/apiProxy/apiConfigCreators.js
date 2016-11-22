@@ -54,7 +54,7 @@ export function groupCommunication(params) {
 	return {
 		endpoint,
 		params
-	}
+	};
 }
 
 /**
@@ -69,7 +69,7 @@ export function event(params) {
 	};
 }
 
-/***
+/**
  * photo admin endpoints
  */
 export function photoAdmin(params) {
