@@ -2,8 +2,8 @@
 // should only import modules individually
 import makeServerRenderer from './renderers/server-render';
 import startServer from './server';
-import * as apiMocks from './util/mocks/api';
-import * as appMocks from './util/mocks/app';
+import * as apiMocks from 'meetup-web-mocks/lib/api';
+import * as appMocks from 'meetup-web-mocks/lib/app';
 
 module.exports = {
 	makeServerRenderer,

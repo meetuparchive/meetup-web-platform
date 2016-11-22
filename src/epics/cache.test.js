@@ -1,17 +1,21 @@
 import { ActionsObservable } from 'redux-observable';
+
 import {
 	mockQuery,
 	MOCK_RENDERPROPS,
 	MOCK_API_RESULT,
-} from '../util/mocks/app';
+} from 'meetup-web-mocks/lib/app';
+
 import {
 	epicIgnoreAction
 } from '../util/testUtils';
-import * as syncActionCreators from '../actions/syncActionCreators';
+
 import {
 	makeCache,
 } from '../util/cacheUtils';
+
 import getCacheEpic from './cache';
+import * as syncActionCreators from '../actions/syncActionCreators';
 
 const MOCK_QUERY = mockQuery(MOCK_RENDERPROPS);
 const MOCK_SUCCESS_ACTION = syncActionCreators.apiSuccess({
