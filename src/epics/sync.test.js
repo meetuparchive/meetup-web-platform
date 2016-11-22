@@ -1,20 +1,25 @@
 import 'rxjs/Observable';
 import { ActionsObservable } from 'redux-observable';
+import { LOCATION_CHANGE } from 'react-router-redux';
+
 import fetch from 'node-fetch';
 global.fetch = fetch;
-import { LOCATION_CHANGE } from 'react-router-redux';
-import { createFakeStore } from '../util/testUtils';
+
 import {
 	mockQuery,
 	MOCK_APP_STATE,
 	MOCK_RENDERPROPS,
 	MOCK_ROUTES,
-} from '../util/mocks/app';
+} from 'meetup-web-mocks/lib/app';
+
 import {
+	createFakeStore,
 	epicIgnoreAction
 } from '../util/testUtils';
+
 import getSyncEpic from '../epics/sync';
 import * as syncActionCreators from '../actions/syncActionCreators';
+
 /**
  * @module SyncEpicTest
  */

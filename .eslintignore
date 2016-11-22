@@ -1,8 +1,4 @@
-build/
-infrastructure/
+lib/
 coverage/
 node_modules/
-src/assets/
-svg/
-training/
 *.log

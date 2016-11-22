@@ -54,7 +54,7 @@ export function groupCommunication(params) {
 	return {
 		endpoint,
 		params
-	}
+	};
 }
 
 /**
