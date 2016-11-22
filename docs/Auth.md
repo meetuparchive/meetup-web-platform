@@ -77,7 +77,7 @@ its API requests, it looks for login-related data in the API response:
 
 Logging out is handled by `requestAuthPlugin` as described above. However, since logout
 is querystring-based when navigating the _app_ URLs, and SPA navigation doesn't _directly_
-hit the app server, the [`fetchUtils.js:fetchQueries`] function is responsible for
+hit the app server, the [`fetchUtils.js:fetchQueries`](../util/fetchUtils.js) function is responsible for
 injecting the `logout` querystring property when creating a navigation-based API request
 to the `/api` endpoint - it does this by checking whether the current _app_ location
 contains the querystring value, and adds it to the `/api` request querystring if so.
