@@ -52,10 +52,13 @@ which happens _before_ the route handler is invoked, the `requestAuthPlugin`
 3. If the Meetup API is being called (which is basically for all requests), the
 `oauth_token` in the request cookie will be converted to an `Authorization` header
 in each request to the Meetup API - this happens in [`api-proxy.js:parseRequest`](../apiProxy/api-proxy.js)
-4. **Special case - Login**: Logging in is a special kind of API request that needs
-to set new `reply` cookies from the `api-proxy` module - it is independent of the
-`requestAuthPlugin` but must set cookies with the same format so that they can be
-used by `requestAuthPlugin` for future requests. When the `api-proxy` makes
+
+## Login
+
+Logging in is a special kind of API request that needs to set new `reply` cookies
+from the `api-proxy` module - it is independent of the `requestAuthPlugin` but
+must set cookies with the same format so that they can be used by
+`requestAuthPlugin` for future requests. When the `api-proxy` makes
 its API requests, it looks for login-related data in the API response:
   - Assume that the request was made by a POST from the browser (the app server never
     generates a login request on its own), which allows response cookies to be set
@@ -69,3 +72,15 @@ its API requests, it looks for login-related data in the API response:
       - Create and apply new oauth cookies to the `reply` to set the new cookies
         in the browser
       - return _only_ the `member` data, not the auth data, as the API response
+
+## Logout
+
+Logging out is handled by `requestAuthPlugin` as described above. However, since logout
+is querystring-based when navigating the _app_ URLs, and SPA navigation doesn't _directly_
+hit the app server, the [`fetchUtils.js:fetchQueries`](../util/fetchUtils.js) function is responsible for
+injecting the `logout` querystring property when creating a navigation-based API request
+to the `/api` endpoint - it does this by checking whether the current _app_ location
+contains the querystring value, and adds it to the `/api` request querystring if so.
+
+The response to this `/api` request will provide logged-out data and new 'anonymous user'
+oauth tokens in the `Set-Cookie` header.
