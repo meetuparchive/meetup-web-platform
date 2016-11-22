@@ -57,7 +57,11 @@ export const requestAuthorizer = auth$ => request => {
 			.do(() => request.log(['info', 'auth'], `Request contains auth token (${authType})`)),
 		request$
 			.do(() => request.log(['info', 'auth'], 'Request does not contain auth token'))
-			.flatMap(request => auth$(request).do(applyAuthState(request, request.plugins.requestAuth.reply)).map(() => request))
+			.flatMap(request =>
+				auth$(request)
+					.do(applyAuthState(request, request.plugins.requestAuth.reply))
+					.map(() => request)
+			)
 	);
 };
 
@@ -189,9 +193,9 @@ export const requestAuth$ = config => {
 		.do(verifyAuth);
 };
 
-export const authenticate = (request, reply) => {
+export const getAuthenticate = authorizeRequest$ => (request, reply) => {
 	request.log(['info', 'auth'], 'Authenticating request');
-	return request.authorize()
+	return authorizeRequest$(request)
 		.do(request => {
 			request.log(['info', 'auth'], 'Request authenticated');
 		})
@@ -216,13 +220,6 @@ export const oauthScheme = (server, options) => {
 	// create a single stream for modifying an arbitrary request with anonymous auth
 	const authorizeRequest$ = requestAuthorizer(auth$);
 
-	server.decorate(
-		'request',
-		'authorize',
-		request => () => authorizeRequest$(request),
-		{ apply: true }
-	);
-
 	server.ext('onPreAuth', (request, reply) => {
 		// Used for setting and unsetting state, not for replying to request
 		request.plugins.requestAuth = {
@@ -232,7 +229,7 @@ export const oauthScheme = (server, options) => {
 		return reply.continue();
 	});
 
-	return { authenticate };
+	return { authenticate: getAuthenticate(authorizeRequest$) };
 };
 /**
  * This plugin does two things.
