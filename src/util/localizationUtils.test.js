@@ -2,15 +2,14 @@ import IntlMessageFormat from 'intl-messageformat';
 import IntlRelativeFormat from 'intl-relativeformat';
 
 import {
+	MOCK_SELF,
+	MOCK_SELF_FR
+} from 'meetup-web-mocks/lib/api';
+
+import {
 	getLocaleCode,
 	loadLocale
 } from './localizationUtils';
-
-import {
-	MOCK_SELF,
-	MOCK_SELF_FR
-} from '../util/mocks/api';
-
 
 describe('localizationUtils', () => {
 

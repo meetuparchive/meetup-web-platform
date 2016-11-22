@@ -1,6 +1,6 @@
 import Rx from 'rxjs';
 import register, {
-	authenticate,
+	getAuthenticate,
 	oauthScheme,
 	requestAuth$,
 	getAnonymousCode$,
@@ -31,6 +31,7 @@ const MOCK_REQUEST = {
 	log: (tags, data) => { console.log(data); },
 	authorize: () => Rx.Observable.of(MOCK_REQUEST),
 	query: {},
+	plugins: {},
 };
 const MOCK_AUTHED_REQUEST = {
 	headers: MOCK_HEADERS,
@@ -40,7 +41,9 @@ const MOCK_AUTHED_REQUEST = {
 	authorize: () => Rx.Observable.of(MOCK_AUTHED_REQUEST),
 	query: {},
 };
-MOCK_REQUEST.authorize.reply = MOCK_REPLY_FN;
+MOCK_REQUEST.plugins.requestAuth = {
+	reply: MOCK_REPLY_FN
+};
 
 const GOOD_MOCK_FETCH_RESULT = Promise.resolve({
 	text: () => Promise.resolve('{}')
@@ -208,20 +211,17 @@ describe('oauthScheme', () => {
 		oauthScheme(MOCK_SERVER, options);
 		expect(MOCK_SERVER.ext).toHaveBeenCalledWith('onPreAuth', jasmine.any(Function));
 	});
-	it('calls server.decorate to add a method to `request`', () => {
-		spyOn(MOCK_SERVER, 'decorate');
-		oauthScheme(MOCK_SERVER, options);
-		expect(MOCK_SERVER.decorate)
-			.toHaveBeenCalledWith('request', jasmine.any(String), jasmine.any(Function), { apply: true });
-	});
 });
 
-describe('authenticate', () => {
+describe('getAuthenticate', () => {
 	it('calls request.authorize', () => {
-		spyOn(MOCK_REQUEST, 'authorize').and.callThrough();
+		const spyable = {
+			authenticateRequest$: x => Rx.Observable.of(x),
+		};
+		spyOn(spyable, 'authenticateRequest$').and.callThrough();
 		return new Promise((resolve, reject) =>
-			authenticate(MOCK_REQUEST, MOCK_REPLY_FN).add(() => {
-				expect(MOCK_REQUEST.authorize).toHaveBeenCalled();
+			getAuthenticate(spyable.authenticateRequest$)(MOCK_REQUEST, MOCK_REPLY_FN).add(() => {
+				expect(spyable.authenticateRequest$).toHaveBeenCalled();
 				resolve();
 			})
 		);
@@ -229,7 +229,7 @@ describe('authenticate', () => {
 	it('calls reply.continue with credentials and artifacts', () => {
 		spyOn(MOCK_REPLY_FN, 'continue');
 		return new Promise((resolve, reject) =>
-			authenticate({ ...MOCK_AUTHED_REQUEST }, MOCK_REPLY_FN).add(() => {
+			getAuthenticate(x => Rx.Observable.of(x))({ ...MOCK_AUTHED_REQUEST }, MOCK_REPLY_FN).add(() => {
 				expect(MOCK_REPLY_FN.continue)
 					.toHaveBeenCalledWith({ credentials: jasmine.any(String), artifacts: jasmine.any(String) });
 				resolve();
