@@ -9,8 +9,8 @@ import {
 	applyAuthState,
 } from '../util/authUtils';
 
-const parseResponseFlags = ({ headers }) =>
-	(headers['x-meetup-flags'] || '')
+const parseResponseFlags = flagHeader =>
+	(flagHeader || '')
 		.split(',')
 		.filter(pair => pair)  // ignore empty elements in the array
 		.map(pair => pair.split('='))
@@ -18,6 +18,15 @@ const parseResponseFlags = ({ headers }) =>
 			flags[key] = val === 'true';
 			return flags;
 		}, {});
+
+const parseHeaders = headers => {
+	const flags = parseResponseFlags(headers['x-meetup-flags']);
+	const requestId = headers['x-meetup-request-id'];
+	return {
+		flags,
+		requestId,
+	};
+};
 
 /**
  * Given the current request and API server host, proxy the request to the API
@@ -53,13 +62,17 @@ function formatApiError(err) {
  */
 export const parseApiResponse = ([response, body]) => {
 	let value;
-	const flags = parseResponseFlags(response);
+	const {
+		flags,
+		requestId
+	} = parseHeaders(response.headers);
 
 	// treat non-success HTTP code as an error
 	if (response.statusCode < 200 || response.statusCode > 299) {
 		return {
 			value: formatApiError(new Error(response.statusMessage)),
 			flags,
+			requestId,
 		};
 	}
 	try {
@@ -67,11 +80,16 @@ export const parseApiResponse = ([response, body]) => {
 		if (value && value.problem) {
 			value = formatApiError(new Error(`API problem: ${value.problem}: ${value.details}`));
 		}
-		return { value, flags };
+		return {
+			value,
+			flags,
+			requestId
+		};
 	} catch(err) {
 		return {
 			value: formatApiError(err),
-			flags
+			flags,
+			requestId
 		};
 	}
 };
