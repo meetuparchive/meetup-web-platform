@@ -9,23 +9,19 @@ const COOKIE_OPTS = {
 
 
 /**
- * @method updateSessionId
+ * @method newSessionId
  *
  * simple tracking id for the browser session
  *
  * @param {Object} hapi response object
  */
-export const updateSessionId = response => {
-	let session_id = response.request.state.session_id;
-
-	if (!session_id) {
-		session_id = uuid.v4();
-		response.state(
-			'session_id',
-			session_id,
-			COOKIE_OPTS
-		);
-	}
+export const newSessionId = response => {
+	const session_id = uuid.v4();
+	response.state(
+		'session_id',
+		session_id,
+		COOKIE_OPTS
+	);
 	return session_id;
 };
 
@@ -114,17 +110,22 @@ export const trackLogin = log => (response, member_id) =>
 		}
 	);
 
-export const trackSession = log => response =>
-	log(
+export const trackSession = log => response => {
+	if (response.request.state.session_id) {
+		// if there's already a session id, there's nothing to track
+		return null;
+	}
+	return log(
 		response,
 		{
 			description: 'session',
 			member_id: response.request.state.member_id,
 			track_id: updateTrackId(response),
-			session_id: updateSessionId(response),
+			session_id: newSessionId(response),
 			url: response.request.url.path,
 		}
 	);
+};
 
 export const logTrack = platform_agent => (response, trackInfo) => {
 	const requestHeaders = response.request.headers;
