@@ -30,7 +30,9 @@ export const MOCK_APP_STATE = {
 	},
 	config: {},
 	routing: {
-		locationBeforeTransitions: {}
+		locationBeforeTransitions: {
+			pathname: '/foo',
+		}
 	},
 };
 
@@ -72,10 +74,13 @@ export const MOCK_OAUTH_COOKIES = {
 export const MOCK_RENDERPROPS = {
 	location: {  // https://github.com/reactjs/history/blob/master/docs/Location.md
 		pathname: '/foo',
-		search: '',
+		search: '?foo',
 		state: {},
 		action: 'PUSH',
-		key: '1234'
+		key: '1234',
+		query: {
+			foo: null,
+		},
 	},
 	params: {
 		urlname: 'foo'
