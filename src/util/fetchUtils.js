@@ -14,7 +14,7 @@
  *   }
  * @return {Promise} resolves with a `{queries, responses}` object
  */
-export const fetchQueries = (apiUrl, options) => queries => {
+export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 	options.method = options.method || 'GET';
 	const {
 		method,
@@ -25,6 +25,10 @@ export const fetchQueries = (apiUrl, options) => queries => {
 
 	const params = new URLSearchParams();
 	params.append('queries', JSON.stringify(queries));
+	params.append('metadata', JSON.stringify(meta));
+	if (meta && meta.logout) {
+		params.append('logout', true);
+	}
 	const searchString = `?${params}`;
 	const fetchUrl = `${apiUrl}${isPost ? '' : searchString}`;
 	const fetchConfig = {
