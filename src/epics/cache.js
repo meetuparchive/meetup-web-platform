@@ -31,7 +31,7 @@ export function checkEnable() {
  * Note that this will clear the cache without emitting an action
  */
 export const cacheClearEpic = cache => action$ =>
-	action$.ofType('LOGOUT_REQUEST', 'CACHE_CLEAR')
+	action$.ofType('CACHE_CLEAR')
 		.flatMap(() => cache.clear())  // wait for cache to clear before continuing
 		.ignoreElements();
 

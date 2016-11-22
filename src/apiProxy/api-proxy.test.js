@@ -228,7 +228,7 @@ describe('makeApiRequest$', () => {
 describe('parseLoginAuth', () => {
 	it('calls applyAuthState for login responses', () => {
 		spyOn(authUtils, 'applyAuthState').and.returnValue(() => {});
-		const request = { authorize: {} };
+		const request = { plugins: { requestAuth: {} } };
 		const query = { type: 'login' };
 		const loginResponse = { type: 'login', value: {} };
 		parseLoginAuth(request, query)(loginResponse);
@@ -236,16 +236,16 @@ describe('parseLoginAuth', () => {
 	});
 	it('does not call applyAuthState for non-login responses', () => {
 		spyOn(authUtils, 'applyAuthState').and.returnValue(() => {});
-		const request = { authorize: {} };
+		const request = { plugins: { requestAuth: {} } };
 		const query = { type: 'member' };
 		const apiResponse = { type: 'member', value: {} };
 		const returnVal = parseLoginAuth(request, query)(apiResponse);
 		expect(authUtils.applyAuthState).not.toHaveBeenCalled();
 		expect(returnVal).toBe(apiResponse);
 	});
-	it('does not call applyAuthState when request.authorize does not exist', () => {
+	it('does not call applyAuthState when request.plugins does not exist', () => {
 		spyOn(authUtils, 'applyAuthState').and.returnValue(() => {});
-		const request = {};
+		const request = { plugins: {} };
 		const query = { type: 'login' };
 		const loginResponse = { type: 'login', value: {} };
 		const returnVal = parseLoginAuth(request, query)(loginResponse);

@@ -30,6 +30,7 @@ export const getNavEpic = routes => {
 				// inject request metadata from context, including `store.getState()`
 				const requestMetadata = {
 					referrer: currentLocation.pathname,
+					logout: payload.query.logout,
 				};
 				return activeQueries$(payload)  // find the queries for the location
 					.map(queries => apiRequest(queries, requestMetadata))
