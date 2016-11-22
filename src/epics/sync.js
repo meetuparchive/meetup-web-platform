@@ -28,6 +28,18 @@ export const getNavEpic = routes => {
 };
 
 /**
+ * Any action that should reload the API data should be handled here, e.g.
+ * LOGIN_SUCCESS, which should force the app to reload in an 'authorized'
+ * state
+ */
+export const locationSyncEpic = (action$, store) =>
+	action$.ofType('LOCATION_SYNC', 'LOGIN_SUCCESS')
+		.map(() => ({
+			type: LOCATION_CHANGE,
+			payload: store.getState().routing.locationBeforeTransitions,
+		}));
+
+/**
  * Listen for actions that provide queries to send to the api - mainly
  * API_REQUEST
  *
@@ -49,6 +61,7 @@ export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 export default function getSyncEpic(routes, fetchQueries) {
 	return combineEpics(
 		getNavEpic(routes),
+		locationSyncEpic,
 		getFetchQueriesEpic(fetchQueries)
 	);
 }
