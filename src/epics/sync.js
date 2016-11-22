@@ -8,7 +8,6 @@ import {
 	apiComplete,
 } from '../actions/syncActionCreators';
 import { activeRouteQueries$ } from '../util/routeUtils';
-import { fetchQueries } from '../util/fetchUtils';
 
 /**
  * Navigation actions will provide the `location` as the payload, which this
@@ -34,7 +33,7 @@ export const getNavEpic = routes => {
  * state
  */
 export const locationSyncEpic = (action$, store) =>
-	action$.ofType('LOCATION_SYNC')
+	action$.ofType('LOCATION_SYNC', 'LOGIN_SUCCESS')
 		.map(() => ({
 			type: LOCATION_CHANGE,
 			payload: store.getState().routing.locationBeforeTransitions,
@@ -59,11 +58,11 @@ export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 				.catch(err => Observable.of(apiError(err)));  // ... or apiError
 		});
 
-export default function getSyncEpic(routes, fetchQueriesFn=fetchQueries) {
+export default function getSyncEpic(routes, fetchQueries) {
 	return combineEpics(
 		getNavEpic(routes),
 		locationSyncEpic,
-		getFetchQueriesEpic(fetchQueriesFn)
+		getFetchQueriesEpic(fetchQueries)
 	);
 }
 
