@@ -44,12 +44,13 @@ function finalCreateStore(routes, reducer, initialState=null, middleware=[], fet
  * @param {Object} cookieState { name: value } object of cookies to inject
  * @return {Function} a fetchQueries function
  */
-const serverFetchQueries = cookieState => (api, options) => {
-	const cookie = makeCookieHeader(cookieState);
+const serverFetchQueries = request => (api, options) => {
+	const cookie = makeCookieHeader(request.state);
 	options.headers = options.headers || {};
 	options.headers.cookie = options.headers.cookie ?
 		`${options.headers.cookie}; ${cookie}` :
 		cookie;
+	options.headers.referer = options.headers.referer || request.url.pathname;
 	return fetchQueries(api, options);
 };
 
@@ -73,7 +74,7 @@ export function createServerStore(
 		reducer,
 		initialState,
 		middleware,
-		serverFetchQueries(request.state)
+		serverFetchQueries(request)
 	);
 }
 
