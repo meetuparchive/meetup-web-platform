@@ -334,7 +334,7 @@ export const logApiResponse = appRequest => ([response, body]) => {
 		},
 		response: {
 			elapsedTime: response.elapsedTime,
-			body: process.env.DEBUG && body || 'set DEBUG=true to view full response',
+			body: body.length > 256 ? `${body.substr(0, 256)}...`: body,
 		},
 	};
 	appRequest.log(['api', 'info'], JSON.stringify(responseLog, null, 2));

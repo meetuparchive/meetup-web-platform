@@ -285,12 +285,6 @@ describe('logApiResponse', () => {
 			method: 'get',
 		},
 	};
-	beforeEach(function() {
-		this.origEnv = process.env;
-	});
-	afterEach(function() {
-		process.env = this.origEnv;
-	});
 	it('emits parsed request and response data', () => {
 		spyOn(MOCK_HAPI_REQUEST, 'log');
 		logApiResponse(MOCK_HAPI_REQUEST)([MOCK_INCOMINGMESSAGE, 'foo']);
@@ -345,22 +339,21 @@ describe('logApiResponse', () => {
 			baz: 'boodle',
 		});
 	});
-	it('does not return body when process.env.DEBUG is not set', () => {
-		process.env.DEBUG = '';
-		const body = 'foo';
-		spyOn(MOCK_HAPI_REQUEST, 'log');
-		logApiResponse(MOCK_HAPI_REQUEST)([MOCK_INCOMINGMESSAGE, body]);
-		expect(MOCK_HAPI_REQUEST.log).toHaveBeenCalled();
-		const loggedObject = JSON.parse(MOCK_HAPI_REQUEST.log.calls.mostRecent().args[1]);
-		expect(loggedObject.response.body).not.toEqual(body);
-	});
-	it('does return body when process.env.DEBUG is set', () => {
-		process.env.DEBUG = 'true';
+	it('returns the full body of the response if less than 256 characters', () => {
 		const body = 'foo';
 		spyOn(MOCK_HAPI_REQUEST, 'log');
 		logApiResponse(MOCK_HAPI_REQUEST)([MOCK_INCOMINGMESSAGE, body]);
 		expect(MOCK_HAPI_REQUEST.log).toHaveBeenCalled();
 		const loggedObject = JSON.parse(MOCK_HAPI_REQUEST.log.calls.mostRecent().args[1]);
 		expect(loggedObject.response.body).toEqual(body);
+	});
+	it('returns a truncated response body if more than 256 characters', () => {
+		const body300 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean egestas viverra sem vel congue. Cras vitae malesuada justo. Fusce ut finibus felis, at sagittis leo. Morbi nec velit dignissim, viverra tellus at, pretium nisi. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla turpis duis.';
+		spyOn(MOCK_HAPI_REQUEST, 'log');
+		logApiResponse(MOCK_HAPI_REQUEST)([MOCK_INCOMINGMESSAGE, body300]);
+		expect(MOCK_HAPI_REQUEST.log).toHaveBeenCalled();
+		const loggedObject = JSON.parse(MOCK_HAPI_REQUEST.log.calls.mostRecent().args[1]);
+		expect(loggedObject.response.body.startsWith(body300.substr(0, 256))).toBe(true);
+		expect(loggedObject.response.body.startsWith(body300)).toBe(false);
 	});
 });
