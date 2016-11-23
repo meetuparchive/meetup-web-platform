@@ -294,7 +294,7 @@ export const parseLoginAuth = (request, query) => response => {
 			refresh_token,
 			expires_in
 		});
-		return { value: { member } };
+		response.value = { member };
 	}
 	return response;
 };

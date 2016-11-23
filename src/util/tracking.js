@@ -115,8 +115,11 @@ export const trackApi = log => (response, queryResponses, metadata={}) => {
 	const {
 		url,
 		referrer,
+		method,
 	} = metadata;
-	trackNav(log)(response, queryResponses, url, referrer);
+	if (method === 'get') {
+		return trackNav(log)(response, queryResponses, url, referrer);
+	}
 	// special case - login requests need to be tracked
 	const loginResponse = queryResponses.find(r => r.login);
 	if (loginResponse) {
