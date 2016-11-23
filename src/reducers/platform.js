@@ -36,10 +36,14 @@ export function app(state=DEFAULT_APP_STATE, action={}) {
 }
 
 export function config(state={}, action) {
-	let apiUrl,
+	let csrf,
+		apiUrl,
 		trackId;
 
 	switch(action.type) {
+	case 'API_SUCCESS':
+		csrf = action.meta.csrf;
+		return { ...state, csrf };
 	case 'CONFIGURE_API_URL':
 		apiUrl = action.payload;
 		return { ...state, apiUrl };
