@@ -89,7 +89,14 @@ export const trackLogout = log => response =>
 	);
 
 export const trackNav = log => (response, queryResponses, url, referrer) => {
-	const queries = queryResponses.map(qr => Object.keys(qr)[0]);
+	const apiRequests = queryResponses.map(qr => {
+		const ref = Object.keys(qr)[0];
+		const { meta } = { ...qr[ref] };
+		return {
+			requestId: meta.requestId,
+			endpoint: meta.endpoint,
+		};
+	});
 	return log(
 		response,
 		{
@@ -99,7 +106,7 @@ export const trackNav = log => (response, queryResponses, url, referrer) => {
 			session_id: response.request.state.session_id,
 			url,
 			referrer,
-			queries,
+			apiRequests,
 		}
 	);
 };
@@ -108,8 +115,11 @@ export const trackApi = log => (response, queryResponses, metadata={}) => {
 	const {
 		url,
 		referrer,
+		method,
 	} = metadata;
-	trackNav(log)(response, queryResponses, url, referrer);
+	if (method === 'get') {
+		return trackNav(log)(response, queryResponses, url, referrer);
+	}
 	// special case - login requests need to be tracked
 	const loginResponse = queryResponses.find(r => r.login);
 	if (loginResponse) {
