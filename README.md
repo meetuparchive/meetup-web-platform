@@ -8,6 +8,10 @@ composing applications with React + Redux.
 
 In general, application-specific code will live outside of this package.
 
+# Docs
+
+- [Auth flow from `requestAuthPlugin`](docs/auth.md)
+
 # Usage
 
 ## Environment
