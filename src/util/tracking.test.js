@@ -182,7 +182,7 @@ describe('tracking loggers', () => {
 		};
 		const trackInfo = trackApi(spyable.log)(
 			loginResponse,
-			[{ login: { type: 'login', value: { member: { id: 1234 } } } }]
+			[{ login: { type: 'login', value: { member: { id: 1234 } }, meta: {} } }]
 		);
 		expect(spyable.log).toHaveBeenCalled();
 		expect(trackInfo.description).toEqual('login');  // this may change, but need to ensure tag is always correct
