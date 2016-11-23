@@ -26,6 +26,7 @@ export function getCsrfPlugin() {
  * @see {@link https://github.com/hapijs/good}
  */
 export function getConsoleLogPlugin() {
+	const logFilter = process.env.LOG_FILTER || '*';
 	return {
 		register: Good,
 		options: {
@@ -36,10 +37,10 @@ export function getConsoleLogPlugin() {
 						module: 'good-squeeze',
 						name: 'Squeeze',
 						args: [{
-							error: '*',
-							response: '*',
-							request: '*',
-							log: '*',
+							error: logFilter,
+							response: logFilter,
+							request: logFilter,
+							log: logFilter,
 						}]
 					}, {  // format with good-console
 						module: 'good-console',

@@ -1,14 +1,13 @@
-import getRoutes from './routes';
 import {
 	MOCK_API_RESULT,
 	MOCK_renderRequestMap,
 	MOCK_API_PROXY$,
 	MOCK_RENDER_RESULT,
 	MOCK_VALID_CONFIG,
-} from './util/mocks/app';
-import {
-	getServer,
-} from './util/testUtils';
+} from 'meetup-web-mocks/lib/app';
+
+import getRoutes from './routes';
+import { getServer } from './util/testUtils';
 
 function getResponse(injectRequest, server=getServer()) {
 	// a Promise that returns the server instance after it has been

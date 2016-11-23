@@ -76,19 +76,6 @@ export const parseApiResponse = ([response, body]) => {
 	}
 };
 
-export const parseLogout$ = (request, queries) => {
-	request.log(['auth', 'info'], 'Checking for logout query');
-	const logoutQuery = queries.find(q => q.type === 'logout');
-	request.log(['auth', 'info'], `Logout ${logoutQuery ? 'found' : 'not found'}`);
-	const nonLogoutQueries$ = Rx.Observable.of(queries.filter(q => q.type !== 'logout'));
-
-	if (logoutQuery && request.authorize) {
-		request.query.logout = true;  // force logout
-		return request.authorize().flatMap(() => nonLogoutQueries$);
-	}
-	return nonLogoutQueries$;
-};
-
 /**
  * Translate a query into an API `endpoint` + `params`. The translation is based
  * on the Meetup REST API.
@@ -248,6 +235,9 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
 		Object.keys(queryResponse)
 			.forEach(key => {
 				const { type, value } = queryResponse[key];
+				if (!value || value.error) {
+					return;
+				}
 				let groups;
 				switch (type) {
 				case 'group':
@@ -268,19 +258,19 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
 
 /**
  * Login responses contain oauth info that should be applied to the response.
- * If `request.authorize.reply` exists (supplied by the requestAuthPlugin),
+ * If `request.plugins.requestAuth.reply` exists (supplied by the requestAuthPlugin),
  * the application is able to set cookies on the response. Otherwise, return
  * the login response unchanged
  */
 export const parseLoginAuth = (request, query) => response => {
-	if (query.type === 'login' && request.authorize) {
+	if (query.type === 'login' && request.plugins.requestAuth) {
 		const {
 			oauth_token,
 			refresh_token,
 			expires_in,
 			member,
 		} = response.value;
-		applyAuthState(request, request.authorize.reply)({
+		applyAuthState(request, request.plugins.requestAuth.reply)({
 			oauth_token,
 			refresh_token,
 			expires_in
@@ -360,21 +350,16 @@ const apiProxy$ = ({ API_TIMEOUT=5000, baseUrl='', duotoneUrls={} }) => {
 		// to build the query-specific API request options object
 		const apiConfigToRequestOptions = buildRequestArgs(externalRequestOpts);
 
-		// 3. handle logout queries that might be in the request and make the
-		// appropriate auth updates before calling the API
-		return parseLogout$(request, queries)
-			.flatMap(queries => {
-				request.log(['api', 'info'], JSON.stringify(queries));
-				// 4. map the queries onto an array of api request observables
-				const apiRequests$ = queries
-					.map(queryToApiConfig)
-					.map(apiConfigToRequestOptions)
-					.map((opts, i) => ([opts, queries[i]]))  // zip the query back into the opts
-					.map(makeApiRequest$(request, API_TIMEOUT, duotoneUrls));
+		request.log(['api', 'info'], JSON.stringify(queries));
+		// 3. map the queries onto an array of api request observables
+		const apiRequests$ = queries
+			.map(queryToApiConfig)
+			.map(apiConfigToRequestOptions)
+			.map((opts, i) => ([opts, queries[i]]))  // zip the query back into the opts
+			.map(makeApiRequest$(request, API_TIMEOUT, duotoneUrls));
 
-				// 5. zip them together to send them parallel and receive them in order
-				return Rx.Observable.zip(...apiRequests$);
-			});
+		// 4. zip them together to send them parallel and return responses in order
+		return Rx.Observable.zip(...apiRequests$);
 	};
 };
 

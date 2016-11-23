@@ -5,12 +5,15 @@ import {
 	MOCK_AUTH_HEADER,
 	MOCK_RENDERPROPS,
 	MOCK_RENDERPROPS_UTF8,
-} from '../util/mocks/app';
+} from 'meetup-web-mocks/lib/app';
+
 import {
 	MOCK_DUOTONE_URLS,
 	MOCK_GROUP,
-} from '../util/mocks/api';
+} from 'meetup-web-mocks/lib/api';
+
 import * as authUtils from '../util/authUtils';
+
 import {
 	parseRequest,
 	parseApiResponse,
@@ -228,7 +231,7 @@ describe('makeApiRequest$', () => {
 describe('parseLoginAuth', () => {
 	it('calls applyAuthState for login responses', () => {
 		spyOn(authUtils, 'applyAuthState').and.returnValue(() => {});
-		const request = { authorize: {} };
+		const request = { plugins: { requestAuth: {} } };
 		const query = { type: 'login' };
 		const loginResponse = { type: 'login', value: {} };
 		parseLoginAuth(request, query)(loginResponse);
@@ -236,16 +239,16 @@ describe('parseLoginAuth', () => {
 	});
 	it('does not call applyAuthState for non-login responses', () => {
 		spyOn(authUtils, 'applyAuthState').and.returnValue(() => {});
-		const request = { authorize: {} };
+		const request = { plugins: { requestAuth: {} } };
 		const query = { type: 'member' };
 		const apiResponse = { type: 'member', value: {} };
 		const returnVal = parseLoginAuth(request, query)(apiResponse);
 		expect(authUtils.applyAuthState).not.toHaveBeenCalled();
 		expect(returnVal).toBe(apiResponse);
 	});
-	it('does not call applyAuthState when request.authorize does not exist', () => {
+	it('does not call applyAuthState when request.plugins does not exist', () => {
 		spyOn(authUtils, 'applyAuthState').and.returnValue(() => {});
-		const request = {};
+		const request = { plugins: {} };
 		const query = { type: 'login' };
 		const loginResponse = { type: 'login', value: {} };
 		const returnVal = parseLoginAuth(request, query)(loginResponse);

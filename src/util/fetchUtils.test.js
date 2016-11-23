@@ -1,10 +1,10 @@
-import * as fetchUtils from './fetchUtils';
 import {
 	mockQuery,
-} from './mocks/app';
+} from 'meetup-web-mocks/lib/app';
 import {
 	MOCK_GROUP,
-} from './mocks/api';
+} from 'meetup-web-mocks/lib/api';
+import * as fetchUtils from './fetchUtils';
 
 describe('fetchQueries', () => {
 	const API_URL = new URL('http://api.example.com/');
@@ -67,3 +67,11 @@ describe('fetchQueries', () => {
 		});
 	});
 });
+
+describe('makeCookieHeader', () => {
+	it('makes a cookie header string from a { key<string> : value<string> } object', () => {
+		expect(fetchUtils.makeCookieHeader({ foo: 'foo', bar: 'bar' }))
+			.toEqual('foo=foo; bar=bar');
+	});
+});
+
