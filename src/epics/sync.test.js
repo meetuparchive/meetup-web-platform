@@ -43,7 +43,6 @@ describe('Sync epic', () => {
 
 		const pathname = '/noQuery';
 		const noMatchLocation = { ...MOCK_RENDERPROPS.location, pathname };
-		console.log(noMatchLocation.query, 'asdfasdf');
 		const locationChange = { type: LOCATION_CHANGE, payload: noMatchLocation };
 		const serverRender = { type: '@@server/RENDER', payload: noMatchLocation };
 
