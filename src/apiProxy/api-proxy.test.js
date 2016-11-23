@@ -22,6 +22,7 @@ import {
 	apiResponseToQueryResponse,
 	apiResponseDuotoneSetter,
 	groupDuotoneSetter,
+	logApiResponse,
 	makeApiRequest$,
 	parseLoginAuth,
 } from './api-proxy';
@@ -267,5 +268,99 @@ describe('parseLoginAuth', () => {
 		const returnVal = parseLoginAuth(request, query)(loginResponse);
 		expect(authUtils.applyAuthState).not.toHaveBeenCalled();
 		expect(returnVal).toBe(loginResponse);
+	});
+});
+
+describe('logApiResponse', () => {
+	const MOCK_HAPI_REQUEST = {
+		log: () => {},
+	};
+	const MOCK_INCOMINGMESSAGE = {
+		elapsedTime: 1234,
+		request: {
+			uri: {
+				query: 'foo=bar',
+				pathname: '/foo',
+			},
+			method: 'get',
+		},
+	};
+	beforeEach(function() {
+		this.origEnv = process.env;
+	});
+	afterEach(function() {
+		process.env = this.origEnv;
+	});
+	it('emits parsed request and response data', () => {
+		spyOn(MOCK_HAPI_REQUEST, 'log');
+		logApiResponse(MOCK_HAPI_REQUEST)([MOCK_INCOMINGMESSAGE, 'foo']);
+		expect(MOCK_HAPI_REQUEST.log).toHaveBeenCalled();
+		const loggedObject = JSON.parse(MOCK_HAPI_REQUEST.log.calls.mostRecent().args[1]);
+		expect(loggedObject).toEqual({
+			request: {
+				query: { foo: 'bar' },
+				pathname: MOCK_INCOMINGMESSAGE.request.uri.pathname,
+				method: MOCK_INCOMINGMESSAGE.request.method,
+			},
+			response: {
+				elapsedTime: MOCK_INCOMINGMESSAGE.elapsedTime,
+				body: jasmine.any(String),
+			},
+		});
+	});
+	it('handles empty querystring', () => {
+		spyOn(MOCK_HAPI_REQUEST, 'log');
+		const response = {
+			...MOCK_INCOMINGMESSAGE,
+			request: {
+				...MOCK_INCOMINGMESSAGE.request,
+				uri: {
+					query: '',
+					pathname: '/foo',
+				},
+			},
+		};
+		logApiResponse(MOCK_HAPI_REQUEST)([response, 'foo']);
+		expect(MOCK_HAPI_REQUEST.log).toHaveBeenCalled();
+		const loggedObject = JSON.parse(MOCK_HAPI_REQUEST.log.calls.mostRecent().args[1]);
+		expect(loggedObject.request.query).toEqual({});
+	});
+	it('handles empty multiple querystring vals', () => {
+		spyOn(MOCK_HAPI_REQUEST, 'log');
+		const response = {
+			...MOCK_INCOMINGMESSAGE,
+			request: {
+				...MOCK_INCOMINGMESSAGE.request,
+				uri: {
+					query: 'foo=bar&baz=boodle',
+					pathname: '/foo',
+				},
+			},
+		};
+		logApiResponse(MOCK_HAPI_REQUEST)([response, 'foo']);
+		expect(MOCK_HAPI_REQUEST.log).toHaveBeenCalled();
+		const loggedObject = JSON.parse(MOCK_HAPI_REQUEST.log.calls.mostRecent().args[1]);
+		expect(loggedObject.request.query).toEqual({
+			foo: 'bar',
+			baz: 'boodle',
+		});
+	});
+	it('does not return body when process.env.DEBUG is not set', () => {
+		process.env.DEBUG = '';
+		const body = 'foo';
+		spyOn(MOCK_HAPI_REQUEST, 'log');
+		logApiResponse(MOCK_HAPI_REQUEST)([MOCK_INCOMINGMESSAGE, body]);
+		expect(MOCK_HAPI_REQUEST.log).toHaveBeenCalled();
+		const loggedObject = JSON.parse(MOCK_HAPI_REQUEST.log.calls.mostRecent().args[1]);
+		expect(loggedObject.response.body).not.toEqual(body);
+	});
+	it('does return body when process.env.DEBUG is set', () => {
+		process.env.DEBUG = 'true';
+		const body = 'foo';
+		spyOn(MOCK_HAPI_REQUEST, 'log');
+		logApiResponse(MOCK_HAPI_REQUEST)([MOCK_INCOMINGMESSAGE, body]);
+		expect(MOCK_HAPI_REQUEST.log).toHaveBeenCalled();
+		const loggedObject = JSON.parse(MOCK_HAPI_REQUEST.log.calls.mostRecent().args[1]);
+		expect(loggedObject.response.body).toEqual(body);
 	});
 });

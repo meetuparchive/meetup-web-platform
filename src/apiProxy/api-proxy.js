@@ -313,11 +313,29 @@ const makeMockRequest = mockResponse => requestOpts =>
 	Rx.Observable.of([MOCK_RESPONSE_OK, JSON.stringify(mockResponse)])
 		.do(() => console.log(`MOCKING response to ${requestOpts.url}`));
 
-const logApiResponse = appRequest => ([response, body]) => {
+export const logApiResponse = appRequest => ([response, body]) => {
+	const {
+		uri: {
+			query,
+			pathname,
+		},
+		method,
+	} = response.request;
+
 	const responseLog = {
-		endpoint: response.request.uri.path,
-		time: response.elapsedTime,
-		body: process.env.DEBUG ? body : 'set DEBUG=true to see response body',
+		request: {
+			query: query.split('&').reduce((acc, keyval) => {
+				const [key, val] = keyval.split('=');
+				acc[key] = val;
+				return acc;
+			}, {}),
+			pathname,
+			method,
+		},
+		response: {
+			elapsedTime: response.elapsedTime,
+			body: process.env.DEBUG && body || 'set DEBUG=true to view full response',
+		},
 	};
 	appRequest.log(['api', 'info'], JSON.stringify(responseLog, null, 2));
 };
