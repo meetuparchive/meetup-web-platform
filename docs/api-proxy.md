@@ -102,8 +102,9 @@ load the `mockResponse` into Redux state at `state.app.candystate.value`.
 ### Debugging API requests/responses
 
 The server log will show data about the Meetup API requests it generates in
-response to incoming queries, although it hides the full API response 'body'
-by default:
+response to incoming queries, although it will truncate the `body` of the
+response to 256 characters, which should be sufficient to see the cause of
+API errors:
 
 ```
 2016-11-23 22:56:41.901, [request,api,info] data: {
@@ -116,18 +117,11 @@ by default:
   },
   "response": {
     "elapsedTime": 722,
-    "body": "set DEBUG=true to view full response"
+    "body": "{\"service_status\":{\"status\":\"ok\"},\"org_badge\":false,\"categories\":[{\"id\":242,\"shortname\":\"outdoors-adventure\",\"name\":\"???chapter_meta_cat.outdoors-adventure.name???\",\"sort_name\":\"???chapter_meta_cat.outdoors-adventure.name???\",\"photo\":{\"id\":450131943,\"highr..."
   }
 }
 ```
 
-In order to log the full API response, set `DEBUG=true` when starting the
-server:
-
-```
-$ DEBUG=true npm start && npm run tail
-```
-
-Be aware that the server logs will become _very_ noisy with this setting
-because some API requests return a large amount of data.
+To see the full body of the response, you might be able to inspect network
+traffic using something like Charles proxy.
 
