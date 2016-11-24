@@ -14,8 +14,11 @@ const MOCK_HAPI_RESPONSE = {
 	state: (name, value, opts) => {},
 	unstate: name => {},
 	request: {
-		state: {}
-	}
+		state: {},
+		info: { referrer: 'baz' },
+		url: { path: 'affogato' },
+		query: {},
+	},
 };
 
 describe('tracking state setters', () => {
@@ -37,7 +40,10 @@ describe('tracking state setters', () => {
 	});
 	it('does not set track id if already set', () => {
 		const track_id = 'foo';
-		const request = { state: { track_id } };
+		const request = {
+			...MOCK_HAPI_RESPONSE.request,
+			state: { track_id },
+		};
 		const responseWithTrackId = {
 			...MOCK_HAPI_RESPONSE,
 			request,
@@ -48,7 +54,10 @@ describe('tracking state setters', () => {
 	it('sets new track id if doRefresh is true', () => {
 		const track_id = 'foo';
 		const doRefresh = true;
-		const request = { state: { track_id } };
+		const request = {
+			...MOCK_HAPI_RESPONSE.request,
+			state: { track_id },
+		};
 		const responseWithTrackId = {
 			...MOCK_HAPI_RESPONSE,
 			request,
@@ -70,7 +79,10 @@ describe('tracking state setters', () => {
 	});
 	it('overrides request\'s member_id', () => {
 		const member_id = 'foo';
-		const request = { state: { member_id } };
+		const request = {
+			...MOCK_HAPI_RESPONSE.request,
+			state: { member_id },
+		};
 		const responseWithMemberIdRequest = {
 			...MOCK_HAPI_RESPONSE,
 			request
@@ -91,7 +103,10 @@ describe('tracking state setters', () => {
 	});
 	it('returns request\'s member_id, if present, when un-setting', () => {
 		const member_id = 'foo';
-		const request = { state: { member_id } };
+		const request = {
+			...MOCK_HAPI_RESPONSE.request,
+			state: { member_id },
+		};
 		const responseWithMemberIdRequest = {
 			...MOCK_HAPI_RESPONSE,
 			request
@@ -107,29 +122,23 @@ describe('tracking loggers', () => {
 	const spyable = {
 		log: (response, info) => info,
 	};
-	/*
-		description: 'login',
-		member_id: updateMemberId(response, member_id),
-		track_id_from: response.request.state.track_id,
-		track_id: updateTrackId(response, true),
-		session_id: response.request.state.session_id,
-		url: response.request.info.referrer,
-	*/
 	it('trackLogout: calls logger with "logout", new track_id, old session_id, member_id, track_id_from', () => {
 		spyOn(spyable, 'log').and.callThrough();
 		const request = {
+			...MOCK_HAPI_RESPONSE.request,
 			state: {
-				member_id: 'dr moose',
-				track_id: 'foo',
-				session_id: 'bar',
+				member_id: 1234,
+				session_id: 2345,
+				track_id: 3456,
 			},
-			info: { referrer: 'baz' }
 		};
-		const loginResponse = {
+		const reponseWithState = {
 			...MOCK_HAPI_RESPONSE,
 			request
 		};
-		const trackInfo = trackLogout(spyable.log)(loginResponse);
+		trackLogout(spyable.log)(reponseWithState);
+		expect(spyable.log).toHaveBeenCalled();
+		const trackInfo = spyable.log.calls.mostRecent().args[1];
 		expect(spyable.log).toHaveBeenCalled();
 		expect(trackInfo.description).toEqual('logout');  // this may change, but need to ensure tag is always correct
 		// new
@@ -144,18 +153,21 @@ describe('tracking loggers', () => {
 	it('trackLogin: calls logger with "login", new member_id & track_id, old session_id', () => {
 		spyOn(spyable, 'log').and.callThrough();
 		const request = {
+			...MOCK_HAPI_RESPONSE.request,
 			state: {
-				track_id: 'foo',
-				session_id: 'bar',
+				session_id: 2345,
+				track_id: 3456,
 			},
-			info: { referrer: 'baz' }
 		};
-		const loginResponse = {
+		const reponseWithState = {
 			...MOCK_HAPI_RESPONSE,
 			request
 		};
 		const member_id = 1234;
-		const trackInfo = trackLogin(spyable.log)(loginResponse, member_id);
+
+		trackLogin(spyable.log)(reponseWithState, member_id);
+		expect(spyable.log).toHaveBeenCalled();
+		const trackInfo = spyable.log.calls.mostRecent().args[1];
 		expect(spyable.log).toHaveBeenCalled();
 		expect(trackInfo.description).toEqual('login');  // this may change, but need to ensure tag is always correct
 		// new
@@ -169,40 +181,49 @@ describe('tracking loggers', () => {
 	});
 	it('trackApi: calls logger with "login" when login in queryResponses', () => {
 		spyOn(spyable, 'log').and.callThrough();
-		const request = {
-			state: {
-				track_id: 'foo',
-				session_id: 'bar',
-			},
-			info: { referrer: 'baz' }
-		};
-		const loginResponse = {
-			...MOCK_HAPI_RESPONSE,
-			request
-		};
-		const trackInfo = trackApi(spyable.log)(
-			loginResponse,
+		trackApi(spyable.log)(
+			MOCK_HAPI_RESPONSE,
 			[{ login: { type: 'login', value: { member: { id: 1234 } } } }]
 		);
 		expect(spyable.log).toHaveBeenCalled();
-		expect(trackInfo.description).toEqual('login');  // this may change, but need to ensure tag is always correct
+		const trackInfo = spyable.log.calls.mostRecent().args[1];
+		expect(trackInfo.description).toEqual('login');
+	});
+	it('trackApi: calls logger with "logout" when "logout" in request.query', () => {
+		spyOn(spyable, 'log').and.callThrough();
+		const request = {
+			...MOCK_HAPI_RESPONSE.request,
+			query: { logout: null },
+		};
+		const reponseWithState = {
+			...MOCK_HAPI_RESPONSE,
+			request
+		};
+		trackApi(spyable.log)(
+			reponseWithState,
+			[{}]
+		);
+		expect(spyable.log).toHaveBeenCalled();
+		const trackInfo = spyable.log.calls.mostRecent().args[1];
+		expect(trackInfo.description).toEqual('logout');
 	});
 	it('trackSession: calls logger with "session", new session_id, old track_id & member_id', () => {
 		spyOn(spyable, 'log').and.callThrough();
 		const request = {
+			...MOCK_HAPI_RESPONSE.request,
 			state: {
 				member_id: 1234,
-				track_id: 'foo',
+				track_id: 3456,
 			},
-			info: { referrer: 'baz' },
-			url: { path: 'affogato' },
 		};
-		const loginResponse = {
+		const reponseWithState = {
 			...MOCK_HAPI_RESPONSE,
 			request
 		};
-		const trackInfo = trackSession(spyable.log)(loginResponse);
+
+		trackSession(spyable.log)(reponseWithState);
 		expect(spyable.log).toHaveBeenCalled();
+		const trackInfo = spyable.log.calls.mostRecent().args[1];
 		expect(trackInfo.description).toEqual('session');  // this may change, but need to ensure tag is always correct
 		// new
 		expect(trackInfo.session_id).toBeDefined();
@@ -215,20 +236,19 @@ describe('tracking loggers', () => {
 	it('trackSession: does not call logger when session_id exists', () => {
 		spyOn(spyable, 'log').and.callThrough();
 		const request = {
+			...MOCK_HAPI_RESPONSE.request,
 			state: {
 				member_id: 1234,
-				track_id: 'foo',
-				session_id: 'all set',
+				session_id: 2345,
+				track_id: 3456,
 			},
-			info: { referrer: 'baz' },
-			url: { path: 'afogato' },
 		};
-		const loginResponse = {
+		const reponseWithState = {
 			...MOCK_HAPI_RESPONSE,
 			request
 		};
-		const trackInfo = trackSession(spyable.log)(loginResponse);
+		trackSession(spyable.log)(reponseWithState);
 		expect(spyable.log).not.toHaveBeenCalled();
-		expect(trackInfo).toBeNull();  // null return value when no tracking is logged
 	});
 });
+
