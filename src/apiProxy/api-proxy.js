@@ -116,6 +116,7 @@ export function queryToApiConfig({ type, params, flags }) {
  * @return {Object} externalRequestOptsQuery argument for the call to
  *   `externalRequest` for the query
  */
+
 export const buildRequestArgs = externalRequestOpts =>
 	({ endpoint, params, flags }) => {
 
@@ -133,6 +134,7 @@ export const buildRequestArgs = externalRequestOpts =>
 		case 'get':
 			externalRequestOptsQuery.url += `?${dataParams}`;
 			externalRequestOptsQuery.headers['X-Meta-Photo-Host'] = 'secure';
+			externalRequestOptsQuery.headers['X-Meta-Stringify-Ids'] = true;
 			break;
 		case 'post':
 			externalRequestOptsQuery.body = dataParams;
