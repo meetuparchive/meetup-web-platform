@@ -1,3 +1,8 @@
+## [0.10]
+
+- **New env variable** - `COOKIE_ENCRYPT_SECRET` must be in your env vars. It
+must be a 32+ character random string.
+
 ## [0.9]
 
 - **Removed** - Many of the shared methods in `src/util/testUtils`
