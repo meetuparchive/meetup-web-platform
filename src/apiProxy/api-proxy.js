@@ -1,3 +1,4 @@
+import url from 'url';
 import querystring from 'querystring';
 import externalRequest from 'request';
 import Rx from 'rxjs';
@@ -9,8 +10,8 @@ import {
 	applyAuthState,
 } from '../util/authUtils';
 
-const parseResponseFlags = ({ headers }) =>
-	(headers['x-meetup-flags'] || '')
+const parseResponseFlags = flagHeader =>
+	(flagHeader || '')
 		.split(',')
 		.filter(pair => pair)  // ignore empty elements in the array
 		.map(pair => pair.split('='))
@@ -18,6 +19,15 @@ const parseResponseFlags = ({ headers }) =>
 			flags[key] = val === 'true';
 			return flags;
 		}, {});
+
+const parseMetaHeaders = headers => {
+	const flags = parseResponseFlags(headers['x-meetup-flags']);
+	const requestId = headers['x-meetup-request-id'];
+	return {
+		flags,
+		requestId,
+	};
+};
 
 /**
  * Given the current request and API server host, proxy the request to the API
@@ -43,23 +53,29 @@ function formatApiError(err) {
 }
 
 /**
+ *
  * mostly error handling - any case where the API does not satisfy the
  * "api response" formatting requirement: plain object containing the requested
  * values
  *
  * This utility is specific to the response format of the API being consumed
- * @param response {String} the raw response body text from an API call
+ * @param {Array} the callback args for npm request - [response, body], where
+ * `response` is an `Http.IncomingMessage` and `body` is the body text of the
+ * response.
  * @return responseObj the JSON-parsed text, possibly with error info
  */
-export const parseApiResponse = ([response, body]) => {
+export const parseApiResponse = requestUrl => ([response, body]) => {
 	let value;
-	const flags = parseResponseFlags(response);
+	const meta = {
+		...parseMetaHeaders(response.headers),
+		endpoint: url.parse(requestUrl).pathname,
+	};
 
 	// treat non-success HTTP code as an error
 	if (response.statusCode < 200 || response.statusCode > 299) {
 		return {
 			value: formatApiError(new Error(response.statusMessage)),
-			flags,
+			meta,
 		};
 	}
 	try {
@@ -67,11 +83,14 @@ export const parseApiResponse = ([response, body]) => {
 		if (value && value.problem) {
 			value = formatApiError(new Error(`API problem: ${value.problem}: ${value.details}`));
 		}
-		return { value, flags };
+		return {
+			value,
+			meta,
+		};
 	} catch(err) {
 		return {
 			value: formatApiError(err),
-			flags
+			meta,
 		};
 	}
 };
@@ -148,11 +167,11 @@ export const buildRequestArgs = externalRequestOpts =>
  *
  * @param {Object} apiResponse JSON-parsed api response data
  */
-export const apiResponseToQueryResponse = query => ({ value, flags }) => ({
+export const apiResponseToQueryResponse = query => ({ value, meta }) => ({
 	[query.ref]: {
 		type: query.type,
 		value,
-		flags
+		meta
 	}
 });
 
@@ -275,7 +294,7 @@ export const parseLoginAuth = (request, query) => response => {
 			refresh_token,
 			expires_in
 		});
-		return { value: { member } };
+		response.value = { member };
 	}
 	return response;
 };
@@ -283,7 +302,9 @@ export const parseLoginAuth = (request, query) => response => {
 const MOCK_RESPONSE_OK = {  // minimal representation of http.IncomingMessage
 	statusCode: 200,
 	statusMessage: 'OK',
-	headers: {},
+	headers: {
+		'x-meetup-request-id': 'mock request'
+	},
 };
 /**
  * Fake an API request and directly return the stringified mockResponse
@@ -317,7 +338,7 @@ export const makeApiRequest$ = (request, API_TIMEOUT, duotoneUrls) => {
 
 		request.log(['api', 'info'], `REST API request: ${requestOpts.url}`);
 		return request$(requestOpts)
-			.map(parseApiResponse)                   // parse into plain object
+			.map(parseApiResponse(requestOpts.url))                   // parse into plain object
 			.map(parseLoginAuth(request, query))     // login has oauth secrets - special case
 			.map(apiResponseToQueryResponse(query))  // convert apiResponse to app-ready queryResponse
 			.map(setApiResponseDuotones);            // special duotone prop
