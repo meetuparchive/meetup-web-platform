@@ -61,8 +61,8 @@ export const removeAuthState = (names, request, reply) => {
 	});
 };
 
-function validateSecret(secret) {
-	const { value, error } = Joi.validate(secret, Joi.string().min(32));
+export function validateSecret(secret) {
+	const { value, error } = Joi.validate(secret, Joi.string().min(32).required());
 	if (error) {
 		throw error;
 	}
