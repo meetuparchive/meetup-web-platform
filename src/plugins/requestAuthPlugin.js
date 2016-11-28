@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import Rx from 'rxjs';
 
 import { tryJSON } from '../util/fetchUtils';
-import { applyAuthState, removeAuthState } from '../util/authUtils';
+import { applyAuthState, applyServerState, removeAuthState } from '../util/authUtils';
 
 /**
  * @module requestAuthPlugin
@@ -220,6 +220,7 @@ export const oauthScheme = (server, options) => {
 	// create a single stream for modifying an arbitrary request with anonymous auth
 	const authorizeRequest$ = requestAuthorizer(auth$);
 
+	applyServerState(server, options);
 	server.ext('onPreAuth', (request, reply) => {
 		// Used for setting and unsetting state, not for replying to request
 		request.plugins.requestAuth = {
