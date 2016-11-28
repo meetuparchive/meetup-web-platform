@@ -2,6 +2,8 @@
 
 - **New env variable** - `COOKIE_ENCRYPT_SECRET` must be in your env vars. It
 must be a 32+ character random string.
+- **Refactored** - auth cookies are now encrypted, so existing cookies must be
+cleared in the browser.
 
 ## [0.9]
 
