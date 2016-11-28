@@ -2,13 +2,16 @@ import 'rxjs/Observable';
 import { ActionsObservable } from 'redux-observable';
 
 import {
+	createFakeStore,
+} from 'meetup-web-mocks/lib/testUtils';
+
+import {
 	MOCK_POST_ACTION,
-	MOCK_APP_STATE
+	MOCK_APP_STATE,
 } from 'meetup-web-mocks/lib/app';
 
 import {
 	epicIgnoreAction,
-	createFakeStore,
 } from '../util/testUtils';
 
 import getPostEpic from './post';
