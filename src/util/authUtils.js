@@ -61,11 +61,8 @@ export const removeAuthState = (names, request, reply) => {
 	});
 };
 
-function validateOptions(options) {
-	const optionsSchema = Joi.object({
-		password: Joi.string().min(32),
-	});
-	const { value, error } = Joi.validate(options, optionsSchema);
+function validateSecret(secret) {
+	const { value, error } = Joi.validate(secret, Joi.string().min(32));
 	if (error) {
 		throw error;
 	}
@@ -73,10 +70,10 @@ function validateOptions(options) {
 }
 
 export const applyServerState = (server, options) => {
-	options = validateOptions(options);
+	const password = validateSecret(options.COOKIE_ENCRYPT_SECRET);
 	const authCookieOptions = {
 		encoding: 'iron',
-		password: options.COOKIE_ENCRYPT_SECRET,
+		password,
 		// isSecure: process.env.NODE_ENV === 'production',   // enable when SSL is active
 		path: '/',
 		isHttpOnly: true,
