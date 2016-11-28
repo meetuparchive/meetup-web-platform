@@ -1,9 +1,23 @@
+import querystring from 'querystring';
 import externalRequest from 'request';
 import Rx from 'rxjs';
 const externalRequest$ = Rx.Observable.bindNodeCallback(externalRequest);
 
 import * as apiConfigCreators from './apiConfigCreators';
 import { duotoneRef } from '../util/duotone';
+import {
+	applyAuthState,
+} from '../util/authUtils';
+
+const parseResponseFlags = ({ headers }) =>
+	(headers['x-meetup-flags'] || '')
+		.split(',')
+		.filter(pair => pair)  // ignore empty elements in the array
+		.map(pair => pair.split('='))
+		.reduce((flags, [key, val]) => {
+			flags[key] = val === 'true';
+			return flags;
+		}, {});
 
 /**
  * Given the current request and API server host, proxy the request to the API
@@ -19,6 +33,16 @@ import { duotoneRef } from '../util/duotone';
  */
 
 /**
+ * Accept an Error and return an object that will be used in place of the
+ * expected API return value
+ */
+function formatApiError(err) {
+	return {
+		error: err.message
+	};
+}
+
+/**
  * mostly error handling - any case where the API does not satisfy the
  * "api response" formatting requirement: plain object containing the requested
  * values
@@ -27,20 +51,29 @@ import { duotoneRef } from '../util/duotone';
  * @param response {String} the raw response body text from an API call
  * @return responseObj the JSON-parsed text, possibly with error info
  */
-export const parseApiResponse = response => {
-	let responseObj;
-	let error;
+export const parseApiResponse = ([response, body]) => {
+	let value;
+	const flags = parseResponseFlags(response);
 
+	// treat non-success HTTP code as an error
+	if (response.statusCode < 200 || response.statusCode > 299) {
+		return {
+			value: formatApiError(new Error(response.statusMessage)),
+			flags,
+		};
+	}
 	try {
-		responseObj = JSON.parse(response);
-	} catch(e) {
-		error = `API response was not JSON: "${response}"`;
+		value = JSON.parse(body);
+		if (value && value.problem) {
+			value = formatApiError(new Error(`API problem: ${value.problem}: ${value.details}`));
+		}
+		return { value, flags };
+	} catch(err) {
+		return {
+			value: formatApiError(err),
+			flags
+		};
 	}
-	if (responseObj && responseObj.problem) {
-		error = `API problem: ${responseObj.problem}: ${responseObj.details}`;
-	}
-
-	return error ? { error } : responseObj;
 };
 
 /**
@@ -56,29 +89,15 @@ export const parseApiResponse = response => {
  * @param {Object} query a query object from the application
  * @return {Object} the arguments for api request, including endpoint
  */
-export function queryToApiConfig({ type, params }) {
+export function queryToApiConfig({ type, params, flags }) {
 	const configCreator = apiConfigCreators[type];
 	if (!configCreator) {
 		throw new ReferenceError(`No API specified for query type ${type}`);
 	}
-	return configCreator(params);
-}
-
-/**
- * Join the key-value params object into a querystring-like
- * string. use `encodeURIComponent` _only_ if `doEncode` is provided,
- * otherwise the caller is responsible for encoding
- *
- * @param {Object} params plain object of keys and values to format
- * @return {String}
- */
-function urlFormatParams(params, doEncode) {
-	return Object.keys(params || {})
-		.reduce((dataParams, paramKey) => {
-			const paramValue = encodeURIComponent(params[paramKey]);
-			dataParams.push(`${paramKey}=${paramValue}`);
-			return dataParams;
-		}, []).join('&');
+	return {
+		...configCreator(params),  // endpoint, params
+		flags,
+	};
 }
 
 /**
@@ -92,41 +111,50 @@ function urlFormatParams(params, doEncode) {
  *
  * @param {Object} externalRequestOpts request options that will be applied to
  *   every query request
- * @param {Object} apiConfig { endpoint, params }
+ * @param {Object} apiConfig { endpoint, params, flags }
  *   call)
  * @return {Object} externalRequestOptsQuery argument for the call to
  *   `externalRequest` for the query
  */
-export const buildRequestArgs = externalRequestOpts => ({ endpoint, params }) => {
-	const externalRequestOptsQuery = { ...externalRequestOpts };
-	externalRequestOptsQuery.url = `/${endpoint}`;
 
-	const dataParams = urlFormatParams(params, externalRequestOptsQuery.method === 'get');
+export const buildRequestArgs = externalRequestOpts =>
+	({ endpoint, params, flags }) => {
 
-	switch (externalRequestOptsQuery.method) {
-	case 'get':
-		externalRequestOptsQuery.url += `?${dataParams}`;
-		externalRequestOptsQuery.headers['X-Meta-Photo-Host'] = 'secure';
-		externalRequestOptsQuery.headers['X-Meta-Stringify-Ids'] = true;
-		break;
-	case 'post':
-		externalRequestOptsQuery.body = dataParams;
-		externalRequestOptsQuery.headers['content-type'] = 'application/x-www-form-urlencoded';
-		break;
-	}
+		// cheap, brute-force object clone, acceptable for serializable object
+		const externalRequestOptsQuery = JSON.parse(JSON.stringify(externalRequestOpts));
+		externalRequestOptsQuery.url = encodeURI(`/${endpoint}`);
 
-	return externalRequestOptsQuery;
-};
+		if (flags) {
+			externalRequestOptsQuery.headers['X-Meetup-Request-Flags'] = flags.join(',');
+		}
+
+		const dataParams = querystring.stringify(params);
+
+		switch (externalRequestOptsQuery.method) {
+		case 'get':
+			externalRequestOptsQuery.url += `?${dataParams}`;
+			externalRequestOptsQuery.headers['X-Meta-Photo-Host'] = 'secure';
+			externalRequestOptsQuery.headers['X-Meta-Stringify-Ids'] = true;
+			break;
+		case 'post':
+			externalRequestOptsQuery.body = dataParams;
+			externalRequestOptsQuery.headers['content-type'] = 'application/x-www-form-urlencoded';
+			break;
+		}
+
+		return externalRequestOptsQuery;
+	};
 
 /**
  * Format apiResponse to match expected state structure
  *
  * @param {Object} apiResponse JSON-parsed api response data
  */
-export const apiResponseToQueryResponse = query => response => ({
+export const apiResponseToQueryResponse = query => ({ value, flags }) => ({
 	[query.ref]: {
 		type: query.type,
-		value: response,
+		value,
+		flags
 	}
 });
 
@@ -140,12 +168,25 @@ export function parseRequest(request, baseUrl) {
 		method,
 		query,
 		payload,
+		state,
 	} = request;
+
+	// Forward the Hapi request headers from the client query
+	// except for `host` and `accept-encoding`
+	// which should be provided by the external api request
+	const externalRequestHeaders = {
+		...headers,
+		authorization: `Bearer ${state.oauth_token}`,
+	};
+
+	delete externalRequestHeaders['host'];
+	delete externalRequestHeaders['accept-encoding'];
+	delete externalRequestHeaders['content-length'];  // original request content-length is irrelevant
 
 	const externalRequestOpts = {
 		baseUrl,
 		method,
-		headers: { ...headers },  // make a copy to be immutable
+		headers: externalRequestHeaders,  // make a copy to be immutable
 		mode: 'no-cors',
 		time: true,
 		agentOptions: {
@@ -153,12 +194,6 @@ export function parseRequest(request, baseUrl) {
 		}
 	};
 
-	// Forward the Hapi request headers from the client query
-	// except for `host` and `accept-encoding`
-	// which should be provided by the external api request
-	delete externalRequestOpts.headers['host'];
-	delete externalRequestOpts.headers['accept-encoding'];
-	delete externalRequestOpts.headers['content-length'];  // original request content-length is irrelevant
 
 	const queriesJSON = request.method === 'get' ? query.queries : payload.queries;
 	const queries = JSON.parse(queriesJSON);
@@ -202,6 +237,9 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
 		Object.keys(queryResponse)
 			.forEach(key => {
 				const { type, value } = queryResponse[key];
+				if (!value || value.error) {
+					return;
+				}
 				let groups;
 				switch (type) {
 				case 'group':
@@ -221,14 +259,43 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
 };
 
 /**
+ * Login responses contain oauth info that should be applied to the response.
+ * If `request.plugins.requestAuth.reply` exists (supplied by the requestAuthPlugin),
+ * the application is able to set cookies on the response. Otherwise, return
+ * the login response unchanged
+ */
+export const parseLoginAuth = (request, query) => response => {
+	if (query.type === 'login' && request.plugins.requestAuth) {
+		const {
+			oauth_token,
+			refresh_token,
+			expires_in,
+			member,
+		} = response.value;
+		applyAuthState(request, request.plugins.requestAuth.reply)({
+			oauth_token,
+			refresh_token,
+			expires_in
+		});
+		return { value: { member } };
+	}
+	return response;
+};
+
+const MOCK_RESPONSE_OK = {  // minimal representation of http.IncomingMessage
+	statusCode: 200,
+	statusMessage: 'OK',
+	headers: {},
+};
+/**
  * Fake an API request and directly return the stringified mockResponse
  */
 const makeMockRequest = mockResponse => requestOpts =>
-	Rx.Observable.of(JSON.stringify(mockResponse))
+	Rx.Observable.of([MOCK_RESPONSE_OK, JSON.stringify(mockResponse)])
 		.do(() => console.log(`MOCKING response to ${requestOpts.url}`));
 
 const logResponseTime = log => ([response, body]) =>
-	log(['api'], `${response.elapsedTime}ms - ${response.request.uri.path}`);
+	log(['api', 'info'], `REST API response: ${response.elapsedTime}ms - ${response.request.uri.path}`);
 
 /**
  * Make a real external API request, return response body string
@@ -236,8 +303,7 @@ const logResponseTime = log => ([response, body]) =>
 const makeExternalApiRequest = (request, API_TIMEOUT) => requestOpts =>
 	externalRequest$(requestOpts)
 		.timeout(API_TIMEOUT, new Error('API response timeout'))
-		.do(logResponseTime(request.log.bind(request)))
-		.map(([response, body]) => body);    // ignore Response object, just process body string
+		.do(logResponseTime(request.log.bind(request)));
 
 /**
  * Make an API request and parse the response into the expected `response`
@@ -250,12 +316,13 @@ export const makeApiRequest$ = (request, API_TIMEOUT, duotoneUrls) => {
 			makeMockRequest(query.mockResponse) :
 			makeExternalApiRequest(request, API_TIMEOUT);
 
-		request.log(['api'], JSON.stringify(requestOpts.url));
+
+		request.log(['api', 'info'], `REST API request: ${requestOpts.url}`);
 		return request$(requestOpts)
-			.map(parseApiResponse)             // parse into plain object
-			.catch(error => Rx.Observable.of({ error: error.message }))
-			.map(apiResponseToQueryResponse(query))    // convert apiResponse to app-ready queryResponse
-			.map(setApiResponseDuotones);        // special duotone prop
+			.map(parseApiResponse)                   // parse into plain object
+			.map(parseLoginAuth(request, query))     // login has oauth secrets - special case
+			.map(apiResponseToQueryResponse(query))  // convert apiResponse to app-ready queryResponse
+			.map(setApiResponseDuotones);            // special duotone prop
 	};
 };
 
@@ -274,10 +341,10 @@ export const makeApiRequest$ = (request, API_TIMEOUT, duotoneUrls) => {
  * @param {Object} baseUrl API server base URL for all API requests
  * @return Array$ contains all API responses corresponding to the provided queries
  */
-const apiProxy$ = ({ API_TIMEOUT=5000, baseUrl='', duotoneUrls={} }) => {
+const apiProxy$ = ({ API_TIMEOUT=8000, baseUrl='', duotoneUrls={} }) => {
 
 	return request => {
-
+		request.log(['api', 'info'], 'Parsing api endpoint request');
 		// 1. get the queries and the 'universal' `externalRequestOpts` from the request
 		const { queries, externalRequestOpts } = parseRequest(request, baseUrl);
 
@@ -285,6 +352,7 @@ const apiProxy$ = ({ API_TIMEOUT=5000, baseUrl='', duotoneUrls={} }) => {
 		// to build the query-specific API request options object
 		const apiConfigToRequestOptions = buildRequestArgs(externalRequestOpts);
 
+		request.log(['api', 'info'], JSON.stringify(queries));
 		// 3. map the queries onto an array of api request observables
 		const apiRequests$ = queries
 			.map(queryToApiConfig)
@@ -292,7 +360,7 @@ const apiProxy$ = ({ API_TIMEOUT=5000, baseUrl='', duotoneUrls={} }) => {
 			.map((opts, i) => ([opts, queries[i]]))  // zip the query back into the opts
 			.map(makeApiRequest$(request, API_TIMEOUT, duotoneUrls));
 
-		// 4. zip them together to send them parallel and receive them in order
+		// 4. zip them together to send them parallel and return responses in order
 		return Rx.Observable.zip(...apiRequests$);
 	};
 };

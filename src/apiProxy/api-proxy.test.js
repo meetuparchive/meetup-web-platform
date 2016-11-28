@@ -4,11 +4,16 @@ import {
 	MOCK_API_PROBLEM,
 	MOCK_AUTH_HEADER,
 	MOCK_RENDERPROPS,
-} from '../util/mocks/app';
+	MOCK_RENDERPROPS_UTF8,
+} from 'meetup-web-mocks/lib/app';
+
 import {
 	MOCK_DUOTONE_URLS,
 	MOCK_GROUP,
-} from '../util/mocks/api';
+} from 'meetup-web-mocks/lib/api';
+
+import * as authUtils from '../util/authUtils';
+
 import {
 	parseRequest,
 	parseApiResponse,
@@ -18,6 +23,7 @@ import {
 	apiResponseDuotoneSetter,
 	groupDuotoneSetter,
 	makeApiRequest$,
+	parseLoginAuth,
 } from './api-proxy';
 
 describe('parseRequest', () => {
@@ -29,11 +35,17 @@ describe('parseRequest', () => {
 			headers,
 			method: 'get',
 			query: data,
+			state: {
+				oauth_token: 'foo',
+			},
 		};
 		const postRequest = {
 			headers,
 			method: 'post',
 			payload: data,
+			state: {
+				oauth_token: 'foo',
+			},
 		};
 
 		expect(parseRequest(getRequest, 'http://dummy.api.meetup.com').queries).toEqual(queries);
@@ -42,18 +54,39 @@ describe('parseRequest', () => {
 });
 
 describe('parseApiResponse', () => {
+	const MOCK_RESPONSE = {
+		headers: {},
+		statusCode: 200
+	};
 	it('converts valid JSON into an equivalent object', () => {
 		const validJSON = JSON.stringify(MOCK_GROUP);
-		expect(parseApiResponse(validJSON)).toEqual(jasmine.any(Object));
-		expect(parseApiResponse(validJSON)).toEqual(MOCK_GROUP);
+		expect(parseApiResponse([MOCK_RESPONSE, validJSON]).value).toEqual(jasmine.any(Object));
+		expect(parseApiResponse([MOCK_RESPONSE, validJSON]).value).toEqual(MOCK_GROUP);
 	});
 	it('returns an object with a string "error" value for invalid JSON', () => {
 		const invalidJSON = 'not valid';
-		expect(parseApiResponse(invalidJSON).error).toEqual(jasmine.any(String));
+		expect(parseApiResponse([MOCK_RESPONSE, invalidJSON]).value.error).toEqual(jasmine.any(String));
 	});
 	it('returns an object with a string "error" value for API response with "problem"', () => {
 		const responeWithProblem = JSON.stringify(MOCK_API_PROBLEM);
-		expect(parseApiResponse(responeWithProblem).error).toEqual(jasmine.any(String));
+		expect(parseApiResponse([MOCK_RESPONSE, responeWithProblem]).value.error).toEqual(jasmine.any(String));
+	});
+	it('returns an object with a string "error" value for a not-ok response', () => {
+		const badStatus = {
+			ok: false,
+			statusCode: 500,
+			statusMessage: 'Problems',
+		};
+		const nonOkReponse = { ...MOCK_RESPONSE, ...badStatus };
+		expect(parseApiResponse([nonOkReponse, '{}']).value.error).toEqual(badStatus.statusMessage);
+	});
+	it('returns the flags set in the X-Meetup-Flags header', () => {
+		const headers = {
+			'x-meetup-flags': 'foo=true,bar=false',
+		};
+		const flaggedResponse = { ...MOCK_RESPONSE, headers };
+		expect(parseApiResponse([flaggedResponse, '{}']).flags.foo).toBe(true);
+		expect(parseApiResponse([flaggedResponse, '{}']).flags.bar).toBe(false);
 	});
 });
 
@@ -94,6 +127,17 @@ describe('buildRequestArgs', () => {
 		expect(postArgs.body).toEqual(jasmine.any(String));  // post requests will add body string
 		// post requests will add body string
 		expect(postArgs.headers['content-type']).toEqual('application/x-www-form-urlencoded');
+
+	});
+
+	const testQueryResults_utf8 = mockQuery(MOCK_RENDERPROPS_UTF8);
+	const apiConfig_utf8 = queryToApiConfig(testQueryResults_utf8);
+
+	it('Properly encodes the URL', () => {
+		const method = 'get';
+		const getArgs = buildRequestArgs({ ...options, method })(apiConfig_utf8);
+		const { pathname } = require('url').parse(getArgs.url);
+		expect(/^[\x00-\xFF]*$/.test(pathname)).toBe(true);  // eslint-disable-line no-control-regex
 	});
 
 });
@@ -173,6 +217,7 @@ describe('makeApiRequest$', () => {
 		const query = { ...mockQuery(MOCK_RENDERPROPS), mockResponse };
 		const expectedResponse = {
 			[query.ref]: {
+				flags: {},
 				type: query.type,
 				value: mockResponse,
 			}
@@ -180,5 +225,34 @@ describe('makeApiRequest$', () => {
 		return makeApiRequest$({ log: () => {} }, 5000, {})([{ url: '/foo' }, query])
 			.toPromise()
 			.then(response => expect(response).toEqual(expectedResponse));
+	});
+});
+
+describe('parseLoginAuth', () => {
+	it('calls applyAuthState for login responses', () => {
+		spyOn(authUtils, 'applyAuthState').and.returnValue(() => {});
+		const request = { plugins: { requestAuth: {} } };
+		const query = { type: 'login' };
+		const loginResponse = { type: 'login', value: {} };
+		parseLoginAuth(request, query)(loginResponse);
+		expect(authUtils.applyAuthState).toHaveBeenCalled();
+	});
+	it('does not call applyAuthState for non-login responses', () => {
+		spyOn(authUtils, 'applyAuthState').and.returnValue(() => {});
+		const request = { plugins: { requestAuth: {} } };
+		const query = { type: 'member' };
+		const apiResponse = { type: 'member', value: {} };
+		const returnVal = parseLoginAuth(request, query)(apiResponse);
+		expect(authUtils.applyAuthState).not.toHaveBeenCalled();
+		expect(returnVal).toBe(apiResponse);
+	});
+	it('does not call applyAuthState when request.plugins does not exist', () => {
+		spyOn(authUtils, 'applyAuthState').and.returnValue(() => {});
+		const request = { plugins: {} };
+		const query = { type: 'login' };
+		const loginResponse = { type: 'login', value: {} };
+		const returnVal = parseLoginAuth(request, query)(loginResponse);
+		expect(authUtils.applyAuthState).not.toHaveBeenCalled();
+		expect(returnVal).toBe(loginResponse);
 	});
 });

@@ -1,5 +1,7 @@
+import CsrfPlugin from 'electrode-csrf-jwt';
 import Good from 'good';
-import anonAuthPlugin from './plugins/anonAuthPlugin';
+import Joi from 'joi';
+import requestAuthPlugin from './plugins/requestAuthPlugin';
 
 /**
  * Hapi plugins for the dev server
@@ -7,12 +9,24 @@ import anonAuthPlugin from './plugins/anonAuthPlugin';
  * @module ServerPlugins
  */
 
+export function getCsrfPlugin() {
+	const secret = process.env.CSRF_SECRET;
+	Joi.validate(secret, Joi.string().min(32).required());
+	return {
+		register: CsrfPlugin.register,
+		options: {
+			secret,
+		}
+	};
+}
+
 /**
  * Provides Hapi process monitoring and console logging
  *
  * @see {@link https://github.com/hapijs/good}
  */
 export function getConsoleLogPlugin() {
+	const logFilter = process.env.LOG_FILTER || '*';
 	return {
 		register: Good,
 		options: {
@@ -23,10 +37,10 @@ export function getConsoleLogPlugin() {
 						module: 'good-squeeze',
 						name: 'Squeeze',
 						args: [{
-							error: '*',
-							response: '*',
-							request: '*',
-							log: '*',
+							error: logFilter,
+							response: logFilter,
+							request: logFilter,
+							log: logFilter,
 						}]
 					}, {  // format with good-console
 						module: 'good-console',
@@ -45,17 +59,18 @@ export function getConsoleLogPlugin() {
  * configure and return the plugin that will allow requests to get anonymous
  * oauth tokens to communicate with the API
  */
-export function getAnonAuthPlugin(options) {
+export function getRequestAuthPlugin(options) {
 	return {
-		register: anonAuthPlugin,
+		register: requestAuthPlugin,
 		options,
 	};
 }
 
 export default function getPlugins(config) {
 	return [
+		getCsrfPlugin(),
 		getConsoleLogPlugin(),
-		getAnonAuthPlugin(config),
+		getRequestAuthPlugin(config),
 	];
 }
 

@@ -1,3 +1,51 @@
+## [0.9]
+
+- **Removed** - Many of the shared methods in `src/util/testUtils`
+now are in the `meetup-web-mocks` repo
+- **Change** - Use the `meetup-web-mocks` repo for testUtil methods,
+e.g.,
+
+```js
+import {
+  createFakeStore,
+} from 'meetup-web-mocks/lib/testUtils';
+```
+
+## [0.8]
+
+- **Change** - `API_SUCCESS` now returns a `meta` prop that contains the `csrf`
+token returned by the server that will be used to validate all POSTs. Your
+Redux reducer must include a `config` reducer that will assign `config.csrf`
+on `API_SUCCESS`, e.g.
+
+```js
+function config(state={}, action) {
+	let csrf;
+	switch(action.type) {
+	case 'API_SUCCESS':
+		csrf = action.meta.csrf;
+		return { ...state, csrf };
+	//...
+  }
+}
+```
+
+## [0.7]
+
+- **Removed/Refactor** - there are no more `LOGOUT_X` actions. Logout is instead
+a navigation action to any URL with `?logout` in the URL.
+
+## [0.6]
+
+- **Removed** - `CONFIGURE_AUTH` action will no longer contain a key named
+`anonymous`. The app can determine whether the current user is logged in from
+the `app.self` value, which should be a memeber object with a `status`
+indicating whether the user is logged in.
+- **Deprecated** - the `ANONYMOUS_ACCESS_URL` and `ANONYMOUS_AUTH_URL` env
+variable names have been changed to `OAUTH_ACCESS_URL` and `OAUTH_AUTH_URL`,
+respectively. The only names will still be read, but will be removed entirely
+in a future version.
+
 ## [0.5]
 
 - **Refactor** - all modules are now transpiled to CommonJS ES5 modules in
@@ -41,7 +89,7 @@ in your server entry point.
 - In order to correctly apply the `assetPublicPath` to your server and client
 builds, you must set `__webpack_public_path__` _before_ importing your
 application code, e.g.
-  
+
 	```js
 	// your client entry point
 	__webpack_public_path__ = window.APP_RUNTIME.assetPublicPath;

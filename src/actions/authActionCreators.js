@@ -27,18 +27,10 @@ export function loginPost(params) {
 					return loginError(response.value.errors);
 				}
 				// otherwise return the action
-				return loginSuccess(response);
+				return loginSuccess();
 			},
 			onError: loginError
 		}
-	};
-}
-
-export function configureAuth(auth, suppressSync) {
-	return {
-		type: 'CONFIGURE_AUTH',
-		payload: auth,
-		meta: suppressSync
 	};
 }
 
@@ -53,27 +45,6 @@ export function loginError(response) {
 	return {
 		type: 'LOGIN_ERROR',
 		payload: response,
-	};
-}
-
-export function logoutRequest() {
-	return {
-		type: 'LOGOUT_REQUEST'
-	};
-}
-
-export function logoutSuccess(auth) {
-	return {
-		type: 'LOGOUT_SUCCESS',
-		payload: auth,
-	};
-}
-
-export function logoutError(err) {
-	return {
-		type: 'LOGOUT_ERROR',
-		error: true,
-		payload: err
 	};
 }
 
