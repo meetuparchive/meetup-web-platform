@@ -124,7 +124,10 @@ export const trackApi = log => (response, queryResponses, metadata={}) => {
 	const loginResponse = queryResponses.find(r => r.login);
 	if (loginResponse) {
 		const member_id = JSON.stringify(loginResponse.login.value.member.id);
-		return trackLogin(log)(response, member_id);
+		trackLogin(log)(response, member_id);
+	}
+	if ('logout' in response.request.query) {
+		trackLogout(log)(response);
 	}
 };
 

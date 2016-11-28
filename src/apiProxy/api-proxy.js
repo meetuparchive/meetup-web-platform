@@ -360,7 +360,7 @@ export const makeApiRequest$ = (request, API_TIMEOUT, duotoneUrls) => {
  * @param {Object} baseUrl API server base URL for all API requests
  * @return Array$ contains all API responses corresponding to the provided queries
  */
-const apiProxy$ = ({ API_TIMEOUT=5000, baseUrl='', duotoneUrls={} }) => {
+const apiProxy$ = ({ API_TIMEOUT=8000, baseUrl='', duotoneUrls={} }) => {
 
 	return request => {
 		request.log(['api', 'info'], 'Parsing api endpoint request');
