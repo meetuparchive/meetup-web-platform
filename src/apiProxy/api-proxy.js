@@ -1,5 +1,6 @@
 import querystring from 'querystring';
 import externalRequest from 'request';
+import Joi from 'joi';
 import Rx from 'rxjs';
 const externalRequest$ = Rx.Observable.bindNodeCallback(externalRequest);
 
@@ -194,7 +195,11 @@ export function parseRequest(request, baseUrl) {
 
 
 	const queriesJSON = request.method === 'get' ? query.queries : payload.queries;
-	const queries = JSON.parse(queriesJSON);
+	const validatedQueries = Joi.validate(JSON.parse(queriesJSON), Joi.array(Joi.object({ type: Joi.string(), ref: Joi.string(), params: Joi.object(), })));
+	if (validatedQueries.error) {
+		throw validatedQueries.error;
+	}
+	const queries = validatedQueries.value;
 	return { queries, externalRequestOpts };
 }
 
