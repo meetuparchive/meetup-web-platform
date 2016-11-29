@@ -28,11 +28,15 @@ export default function getRoutes(
 		duotoneUrls: getDuotoneUrls(duotones, PHOTO_SCALER_SALT),
 	});
 
-	const handleQueryResponses = reply => queryResponses => {
+	const handleQueryResponses = (request, reply) => queryResponses => {
 		const response = reply(JSON.stringify(queryResponses))
 			.type('application/json');
 
-		const metadata = JSON.parse(response.request.query.metadata || '{}');
+		const payload = request.method === 'post' ?
+			request.payload :
+			request.query;
+
+		const metadata = JSON.parse(payload.metadata || '{}');
 		const originUrl = response.request.info.referrer;
 		metadata.url = url.parse(originUrl).pathname;
 
@@ -43,6 +47,12 @@ export default function getRoutes(
 			metadata
 		);
 	};
+
+	const validApiPayloadSchema = Joi.object({
+		queries: Joi.string().required(),
+		metadata: Joi.string(),
+		logout: Joi.any(),
+	});
 
 	/**
 	 * This handler converts the application-supplied queries into external API
@@ -57,7 +67,7 @@ export default function getRoutes(
 		handler: (request, reply) => {
 			proxyApiRequest$(request)
 				.subscribe(
-					handleQueryResponses(reply),
+					handleQueryResponses(request, reply),
 					(err) => { reply(Boom.badImplementation(err.message)); }
 				);
 		}
@@ -67,17 +77,18 @@ export default function getRoutes(
 		method: ['GET', 'DELETE', 'PATCH'],
 		config: {
 			validate: {
-				query: Joi.object({
-					queries: Joi.string().required(),
-					metadata: Joi.string(),
-					logout: Joi.any(),
-				})
+				query: validApiPayloadSchema
 			},
 		},
 	};
 	const apiPostRoute = {
 		...apiProxyRoute,
 		method: 'POST',
+		config: {
+			validate: {
+				payload: validApiPayloadSchema
+			},
+		},
 	};
 
 
