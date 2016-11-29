@@ -91,6 +91,10 @@ export const parseApiResponse = ([response, body]) => {
  */
 export function queryToApiConfig({ endpoint, type, params, flags }) {
 	if (!endpoint) {
+		console.warn(
+			'Queries without an explicit `endpoint` key are deprecated.',
+			'Please specify the endpoint and params in the query function directly.'
+		);
 		if (!(type in apiConfigCreators)) {
 			throw new ReferenceError(`No API specified for query type ${type} and no endpoint provided`);
 		}
