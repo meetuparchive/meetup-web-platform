@@ -9,6 +9,9 @@ import { duotoneRef } from '../util/duotone';
 import {
 	applyAuthState,
 } from '../util/authUtils';
+import {
+	querySchema
+} from '../util/validation';
 
 const parseResponseFlags = ({ headers }) =>
 	(headers['x-meetup-flags'] || '')
@@ -195,7 +198,10 @@ export function parseRequest(request, baseUrl) {
 
 
 	const queriesJSON = request.method === 'get' ? query.queries : payload.queries;
-	const validatedQueries = Joi.validate(JSON.parse(queriesJSON), Joi.array(Joi.object({ type: Joi.string(), ref: Joi.string(), params: Joi.object(), })));
+	const validatedQueries = Joi.validate(
+		JSON.parse(queriesJSON),
+		Joi.array(querySchema)
+	);
 	if (validatedQueries.error) {
 		throw validatedQueries.error;
 	}
