@@ -91,6 +91,22 @@ describe('parseApiResponse', () => {
 });
 
 describe('queryToApiConfig', () => {
+	it('returns endpoint, params, flags unchanged when endpoint is present', () => {
+		const query = {
+			endpoint: 'foo',
+			type: 'bar',
+			params: {
+				foo: 'bar',
+			},
+			flags: ['asdf'],
+		};
+		const expectedApiConfig = {
+			endpoint: query.endpoint,
+			params: query.params,
+			flags: query.flags,
+		};
+		expect(queryToApiConfig(query)).toEqual(expectedApiConfig);
+	});
 	it('transforms a query of known type to an object for API consumption', () => {
 		const testQueryResults = mockQuery(MOCK_RENDERPROPS);
 		expect(queryToApiConfig(testQueryResults)).toEqual(jasmine.any(Object));

@@ -132,12 +132,13 @@ endpoint. A query takes the following shape:
 
 ```js
 {
+	ref: <string>,
 	type: <string>,
 	params: {
 		<string>: <string>,
 		...
 	},
-	ref: <string>,
+	endpoint?: <string>,  // specify api endpoint string directly, e.g. '/members/self',
 	flags?: [<string>, ...],
 }
 ```
