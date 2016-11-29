@@ -91,15 +91,12 @@ export const parseApiResponse = ([response, body]) => {
  */
 export function queryToApiConfig({ endpoint, type, params, flags }) {
 	if (!endpoint) {
-		const configCreator = apiConfigCreators[type];
-		if (type in configCreator) {
+		if (!(type in apiConfigCreators)) {
 			throw new ReferenceError(`No API specified for query type ${type} and no endpoint provided`);
 		}
-
-		return {
-			...configCreator(params),  // endpoint, params
-			flags,
-		};
+		const baseConfig = apiConfigCreators[type](params);
+		endpoint = baseConfig.endpoint;
+		params = baseConfig.params;
 	}
 	return {
 		endpoint,
