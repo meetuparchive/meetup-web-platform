@@ -1,3 +1,5 @@
+import Joi from 'joi';
+
 /**
  * @module authUtils
  */
@@ -12,22 +14,17 @@ const YEAR_IN_MS = 1000 * 60 * 60 * 24 * 365;
  * object from API/Auth endpoint
  */
 export const configureAuthState = auth => {
-	const path = '/';
 	return {
 		oauth_token: {
 			value: auth.oauth_token || auth.access_token,
 			opts: {
-				path,
 				ttl: auth.expires_in * 1000,
-				isHttpOnly: true,
 			},
 		},
 		refresh_token: {
 			value: auth.refresh_token,
 			opts: {
-				path,
 				ttl: YEAR_IN_MS * 2,
-				isHttpOnly: true,
 			},
 		}
 	};
@@ -64,4 +61,25 @@ export const removeAuthState = (names, request, reply) => {
 	});
 };
 
+export function validateSecret(secret) {
+	const { value, error } = Joi.validate(secret, Joi.string().min(32).required());
+	if (error) {
+		throw error;
+	}
+	return value;
+}
+
+export const applyServerState = (server, options) => {
+	const password = validateSecret(options.COOKIE_ENCRYPT_SECRET);
+	const authCookieOptions = {
+		encoding: 'iron',
+		password,
+		// isSecure: process.env.NODE_ENV === 'production',   // enable when SSL is active
+		path: '/',
+		isHttpOnly: true,
+		clearInvalid: true,
+	};
+	server.state('oauth_token', authCookieOptions);
+	server.state('refresh_token', authCookieOptions);
+};
 

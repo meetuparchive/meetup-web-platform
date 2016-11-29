@@ -1,6 +1,5 @@
 import CsrfPlugin from 'electrode-csrf-jwt';
 import Good from 'good';
-import Joi from 'joi';
 import requestAuthPlugin from './plugins/requestAuthPlugin';
 
 /**
@@ -9,9 +8,7 @@ import requestAuthPlugin from './plugins/requestAuthPlugin';
  * @module ServerPlugins
  */
 
-export function getCsrfPlugin() {
-	const secret = process.env.CSRF_SECRET;
-	Joi.validate(secret, Joi.string().min(32).required());
+export function getCsrfPlugin(secret) {
 	return {
 		register: CsrfPlugin.register,
 		options: {
@@ -68,7 +65,7 @@ export function getRequestAuthPlugin(options) {
 
 export default function getPlugins(config) {
 	return [
-		getCsrfPlugin(),
+		getCsrfPlugin(config.CSRF_SECRET),
 		getConsoleLogPlugin(),
 		getRequestAuthPlugin(config),
 	];
