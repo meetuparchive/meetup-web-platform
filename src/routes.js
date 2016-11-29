@@ -3,6 +3,7 @@ import url from 'url';
 import Accepts from 'accepts';
 import Boom from 'boom';
 import chalk from 'chalk';
+import Joi from 'joi';
 
 import apiProxy$ from './apiProxy/api-proxy';
 
@@ -27,6 +28,22 @@ export default function getRoutes(
 		duotoneUrls: getDuotoneUrls(duotones, PHOTO_SCALER_SALT),
 	});
 
+	const handleQueryResponses = reply => queryResponses => {
+		const response = reply(JSON.stringify(queryResponses))
+			.type('application/json');
+
+		const metadata = JSON.parse(response.request.query.metadata || '{}');
+		const originUrl = response.request.info.referrer;
+		metadata.url = url.parse(originUrl).pathname;
+
+		reply.track(
+			response,
+			'api',
+			queryResponses,
+			metadata
+		);
+	};
+
 	/**
 	 * This handler converts the application-supplied queries into external API
 	 * calls, and converts the API call responses into a standard format that
@@ -36,29 +53,33 @@ export default function getRoutes(
 	 *   by `apiAdapter.apiResponseToQueryResponse`
 	 */
 	const apiProxyRoute = {
-		method: ['GET', 'POST', 'DELETE', 'PATCH'],
 		path: '/api',
-		handler: (request, reply) =>
+		handler: (request, reply) => {
 			proxyApiRequest$(request)
 				.subscribe(
-					queryResponses => {
-						const response = reply(JSON.stringify(queryResponses))
-							.type('application/json');
-
-						const metadata = JSON.parse(response.request.query.metadata || '{}');
-						const originUrl = response.request.info.referrer;
-						metadata.url = url.parse(originUrl).pathname;
-
-						reply.track(
-							response,
-							'api',
-							queryResponses,
-							metadata
-						);
-					},
+					handleQueryResponses(reply),
 					(err) => { reply(Boom.badImplementation(err.message)); }
-				)
+				);
+		}
 	};
+	const apiGetRoute = {
+		...apiProxyRoute,
+		method: ['GET', 'DELETE', 'PATCH'],
+		config: {
+			validate: {
+				query: Joi.object({
+					queries: Joi.string().required(),
+					metadata: Joi.string(),
+					logout: Joi.any(),
+				})
+			},
+		},
+	};
+	const apiPostRoute = {
+		...apiProxyRoute,
+		method: 'POST',
+	};
+
 
 	/**
 	 * Only one wildcard route for all application GET requests - exceptions are
@@ -80,11 +101,12 @@ export default function getRoutes(
 
 					reply.track(response, 'session');
 				});
-		}
+		},
 	};
 
 	return [
-		apiProxyRoute,
+		apiGetRoute,
+		apiPostRoute,
 		applicationRoute,
 	];
 }
