@@ -89,13 +89,21 @@ export const parseApiResponse = ([response, body]) => {
  * @param {Object} query a query object from the application
  * @return {Object} the arguments for api request, including endpoint
  */
-export function queryToApiConfig({ type, params, flags }) {
-	const configCreator = apiConfigCreators[type];
-	if (!configCreator) {
-		throw new ReferenceError(`No API specified for query type ${type}`);
+export function queryToApiConfig({ endpoint, type, params, flags }) {
+	if (!endpoint) {
+		const configCreator = apiConfigCreators[type];
+		if (type in configCreator) {
+			throw new ReferenceError(`No API specified for query type ${type} and no endpoint provided`);
+		}
+
+		return {
+			...configCreator(params),  // endpoint, params
+			flags,
+		};
 	}
 	return {
-		...configCreator(params),  // endpoint, params
+		endpoint,
+		params,
 		flags,
 	};
 }
