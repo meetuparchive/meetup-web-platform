@@ -199,10 +199,13 @@ export const getAuthenticate = authorizeRequest$ => (request, reply) => {
 		.do(request => {
 			request.log(['info', 'auth'], 'Request authenticated');
 		})
-		.subscribe(({ state: { oauth_token } }) => {
-			const credentials = oauth_token;
-			reply.continue({ credentials, artifacts: credentials });
-		});
+		.subscribe(
+			({ state: { oauth_token } }) => {
+				const credentials = oauth_token;
+				reply.continue({ credentials, artifacts: credentials });
+			},
+			err => reply(err, null, { credentials: null })
+		);
 };
 
 /**
