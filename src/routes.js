@@ -39,6 +39,7 @@ export default function getRoutes(
 		const metadata = JSON.parse(payload.metadata || '{}');
 		const originUrl = response.request.info.referrer;
 		metadata.url = url.parse(originUrl).pathname;
+		metadata.method = response.request.method;
 
 		reply.track(
 			response,
