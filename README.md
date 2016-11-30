@@ -123,68 +123,6 @@ The [server module](./src/server.js) exports a `startServer` function that consu
 a mapping of locale codes to app-rendering Observables, plus any app-specific
 server routes and plugins. See the code comments for usage details.
 
-## API Adapter
-
-### Query
-
-The API adapter reads [Query](docs/Queries.md) objects from the incoming request and makes API
-calls based on them.
-
-### Feature flags
-
-The API adapter provides an interface into feature flag values - just pass
-an array of feature flag names in the `flags` array of your query, and the
-response from the API adapter will return an object mapping the flag names to
-their true/false valuse in the `flags` property of the response. Your
-application will probably add these flag values directly to the Redux `state`,
-where they can be consumed by components to affect the UI.
-
-### Faking an API response
-
-Sometimes, during development, you might want to set up your consumer app to
-query data from an API endpoint that is not yet set up. In this case, you can
-add a `mockResponse` property to your `query` object that will be used as the
-return value for the API call (you _have_ defined the API return values,
-right?). When the API endpoint is ready, simply remove the `mockResponse` from
-the query and the platform will call the API as configured in
-`src/apiProxy/apiConfigCreators.js`.
-
-**Example**
-
-A new feature will use a new API `/:urlname/candy` endpoint - it returns a new
-`type` of data called `candy` with an `id` and `flavor` property.
-
-The query function in the consumer app would look like this:
-
-``` js
-function candyQuery({ params, location }) {
-  const urlname = params.urlname;
-  return {
-    type: 'candy',
-    params: { urlname },
-    ref: 'candystate',
-    mockResponse: {
-      id: 1234,
-      flavor: 'kiwi'
-  };
-}
-```
-
-the `apiConfigCreator` would need to be defined like this:
-
-``` js
-function candy(params) {
-  return {
-    endpoint: `${params.urlname}/candy`,
-    params
-  };
-}
-```
-
-Then, even if the API server isn't handling `/:urlname/candy` yet, the app will
-load the `mockResponse` into Redux state at `state.app.candystate.value`.
-
->>>>>>> 6fe768eea1e30844ee86d8977f47feb7815e4a5b
 ## Middleware/Epics
 
 The built-in middleware provides core functionality for interacting with
