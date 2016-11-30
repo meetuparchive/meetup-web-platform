@@ -60,16 +60,16 @@ describe('parseApiResponse', () => {
 	};
 	it('converts valid JSON into an equivalent object', () => {
 		const validJSON = JSON.stringify(MOCK_GROUP);
-		expect(parseApiResponse([MOCK_RESPONSE, validJSON]).value).toEqual(jasmine.any(Object));
-		expect(parseApiResponse([MOCK_RESPONSE, validJSON]).value).toEqual(MOCK_GROUP);
+		expect(parseApiResponse('http://example.com')([MOCK_RESPONSE, validJSON]).value).toEqual(jasmine.any(Object));
+		expect(parseApiResponse('http://example.com')([MOCK_RESPONSE, validJSON]).value).toEqual(MOCK_GROUP);
 	});
 	it('returns an object with a string "error" value for invalid JSON', () => {
 		const invalidJSON = 'not valid';
-		expect(parseApiResponse([MOCK_RESPONSE, invalidJSON]).value.error).toEqual(jasmine.any(String));
+		expect(parseApiResponse('http://example.com')([MOCK_RESPONSE, invalidJSON]).value.error).toEqual(jasmine.any(String));
 	});
 	it('returns an object with a string "error" value for API response with "problem"', () => {
 		const responeWithProblem = JSON.stringify(MOCK_API_PROBLEM);
-		expect(parseApiResponse([MOCK_RESPONSE, responeWithProblem]).value.error).toEqual(jasmine.any(String));
+		expect(parseApiResponse('http://example.com')([MOCK_RESPONSE, responeWithProblem]).value.error).toEqual(jasmine.any(String));
 	});
 	it('returns an object with a string "error" value for a not-ok response', () => {
 		const badStatus = {
@@ -78,15 +78,23 @@ describe('parseApiResponse', () => {
 			statusMessage: 'Problems',
 		};
 		const nonOkReponse = { ...MOCK_RESPONSE, ...badStatus };
-		expect(parseApiResponse([nonOkReponse, '{}']).value.error).toEqual(badStatus.statusMessage);
+		expect(parseApiResponse('http://example.com')([nonOkReponse, '{}']).value.error).toEqual(badStatus.statusMessage);
 	});
 	it('returns the flags set in the X-Meetup-Flags header', () => {
 		const headers = {
 			'x-meetup-flags': 'foo=true,bar=false',
 		};
 		const flaggedResponse = { ...MOCK_RESPONSE, headers };
-		expect(parseApiResponse([flaggedResponse, '{}']).flags.foo).toBe(true);
-		expect(parseApiResponse([flaggedResponse, '{}']).flags.bar).toBe(false);
+		expect(parseApiResponse('http://example.com')([flaggedResponse, '{}']).meta.flags.foo).toBe(true);
+		expect(parseApiResponse('http://example.com')([flaggedResponse, '{}']).meta.flags.bar).toBe(false);
+	});
+	it('returns the requestId set in the X-Meetup-Request-Id header', () => {
+		const requestId = '1234';
+		const headers = {
+			'x-meetup-request-id': requestId,
+		};
+		const flaggedResponse = { ...MOCK_RESPONSE, headers };
+		expect(parseApiResponse('http://example.com')([flaggedResponse, '{}']).meta.requestId).toEqual(requestId);
 	});
 });
 
@@ -229,16 +237,21 @@ describe('apiResponseDuotoneSetter', () => {
 
 describe('makeApiRequest$', () => {
 	it('responds with query.mockResponse when set', () => {
+		const endpoint = 'foo';
 		const mockResponse = { foo: 'bar' };
 		const query = { ...mockQuery(MOCK_RENDERPROPS), mockResponse };
 		const expectedResponse = {
 			[query.ref]: {
-				flags: {},
+				meta: {
+					flags: {},
+					requestId: 'mock request',
+					endpoint
+				},
 				type: query.type,
 				value: mockResponse,
 			}
 		};
-		return makeApiRequest$({ log: () => {} }, 5000, {})([{ url: '/foo' }, query])
+		return makeApiRequest$({ log: () => {} }, 5000, {})([{ url: endpoint }, query])
 			.toPromise()
 			.then(response => expect(response).toEqual(expectedResponse));
 	});
