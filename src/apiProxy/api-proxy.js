@@ -108,13 +108,22 @@ export const parseApiResponse = requestUrl => ([response, body]) => {
  * @param {Object} query a query object from the application
  * @return {Object} the arguments for api request, including endpoint
  */
-export function queryToApiConfig({ type, params, flags }) {
-	const configCreator = apiConfigCreators[type];
-	if (!configCreator) {
-		throw new ReferenceError(`No API specified for query type ${type}`);
+export function queryToApiConfig({ endpoint, type, params, flags }) {
+	if (!endpoint) {
+		console.warn(
+			'Queries without an explicit `endpoint` key are deprecated.',
+			'Please specify the endpoint and params in the query function directly.'
+		);
+		if (!(type in apiConfigCreators)) {
+			throw new ReferenceError(`No API specified for query type ${type} and no endpoint provided`);
+		}
+		const baseConfig = apiConfigCreators[type](params);
+		endpoint = baseConfig.endpoint;
+		params = baseConfig.params;
 	}
 	return {
-		...configCreator(params),  // endpoint, params
+		endpoint,
+		params,
 		flags,
 	};
 }

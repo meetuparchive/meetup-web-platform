@@ -17,10 +17,36 @@ In general, application-specific code will live outside of this package.
 
 ## Environment
 
-All platform applications must provide certain environment variables.
+Platform configuration is read from environment variables, which must be
+declared in `.mupweb.config` in your home directory (i.e.
+`$HOME/.mupweb.config`) in the following format:
 
-1. `CSRF_SECRET` - any long string (> 32 characters). Essentially this is a
-unique string that is used to salt/validate CSRF tokens.
+```
+API_HOST=api.meetup.com
+API_PROTOCOL=https
+DEV_SERVER_PORT=8000
+ASSET_SERVER_HOST=0.0.0.0
+ASSET_SERVER_PORT=8001
+OAUTH_AUTH_URL=https://secure.meetup.com/oauth2/authorize
+OAUTH_ACCESS_URL=https://secure.meetup.com/oauth2/access
+MUPWEB_OAUTH_KEY=<check with an admin>
+MUPWEB_OAUTH_SECRET=<check with an admin>
+PHOTO_SCALER_SALT='<check with admin>'  # single quotes are required
+CSRF_SECRET='<any random string over 32 characters long>'
+```
+
+**Note**: you _can_ use `dev.meetup.com` URLs for `API_HOST`, `OAUTH_AUTH_URL`,
+and `OAUTH_ACCESS_URL`, but you will need to ensure that your devbox is up and
+running with a recent build of Meetup classic.
+
+To automatically add these env variables into your terminal session,
+`source` the config file in your `.bashrc` or `.zshrc`:
+
+```
+set -a  # auto-export all subequent env variable assignments
+source $HOME/.mupweb.config
+set +a  # turn off auto-export of env variables
+```
 
 # Releases
 
@@ -97,6 +123,68 @@ The [server module](./src/server.js) exports a `startServer` function that consu
 a mapping of locale codes to app-rendering Observables, plus any app-specific
 server routes and plugins. See the code comments for usage details.
 
+## API Adapter
+
+### Query
+
+The API adapter reads [Query](docs/Queries.md) objects from the incoming request and makes API
+calls based on them.
+
+### Feature flags
+
+The API adapter provides an interface into feature flag values - just pass
+an array of feature flag names in the `flags` array of your query, and the
+response from the API adapter will return an object mapping the flag names to
+their true/false valuse in the `flags` property of the response. Your
+application will probably add these flag values directly to the Redux `state`,
+where they can be consumed by components to affect the UI.
+
+### Faking an API response
+
+Sometimes, during development, you might want to set up your consumer app to
+query data from an API endpoint that is not yet set up. In this case, you can
+add a `mockResponse` property to your `query` object that will be used as the
+return value for the API call (you _have_ defined the API return values,
+right?). When the API endpoint is ready, simply remove the `mockResponse` from
+the query and the platform will call the API as configured in
+`src/apiProxy/apiConfigCreators.js`.
+
+**Example**
+
+A new feature will use a new API `/:urlname/candy` endpoint - it returns a new
+`type` of data called `candy` with an `id` and `flavor` property.
+
+The query function in the consumer app would look like this:
+
+``` js
+function candyQuery({ params, location }) {
+  const urlname = params.urlname;
+  return {
+    type: 'candy',
+    params: { urlname },
+    ref: 'candystate',
+    mockResponse: {
+      id: 1234,
+      flavor: 'kiwi'
+  };
+}
+```
+
+the `apiConfigCreator` would need to be defined like this:
+
+``` js
+function candy(params) {
+  return {
+    endpoint: `${params.urlname}/candy`,
+    params
+  };
+}
+```
+
+Then, even if the API server isn't handling `/:urlname/candy` yet, the app will
+load the `mockResponse` into Redux state at `state.app.candystate.value`.
+
+>>>>>>> 6fe768eea1e30844ee86d8977f47feb7815e4a5b
 ## Middleware/Epics
 
 The built-in middleware provides core functionality for interacting with
@@ -215,4 +303,44 @@ to include click tracking and other types of tracking defined by the Data team
 and implemented through platform-provided unique IDs.
 
 More info in Confluence [here](https://meetup.atlassian.net/wiki/display/WP/Tracking+data+needs)
+
+# Dev patterns
+
+## Async
+
+Use Promises or Observables to handle async processing - the latter
+tends to provide more powerful async tools than the former, particularly
+for long processing chains or anything involving sequences of values,
+but Promises are good for single async operations. _Do not write
+functions that fire callbacks_.
+
+When using Observables, you can always `throw` an Error and expect the
+subscriber to provide an `onError` handler. When using Promises, call
+`Promise.reject(new Error(<message>))` and expect that the caller will
+provide a `.catch()` or `onRejected` handler.
+
+## Error Handling
+
+Guidelines:
+
+1. Use `Error` objects liberally - they are totally safe until they are
+	 paired with a `throw`, and even then they can be usefully
+	 processed without crashing the application with a `try/catch`.
+2. Use `throw` when there is no clear way for the application to recover from
+   the error. Uncaught errors are allowed to crash the application and
+	 are valuable both in dev and in integration tests.
+3. Populate state with the actual `Error` object rather than just a
+	 Boolean or error message String. Error objects provide better
+	 introspection data. For example, a validation process might return
+	 `null` (for no validation errors) or `new Error('Value is required')`
+	 rather than `true` (for "is valid") or `false`.
+4. Many errors will have an associated Redux action, such as
+	 `LOGIN_ERROR` - keep the corresponding state updates
+	 as narrow as possible. For example, `LOGIN_ERROR` should only affect
+	 `state.app.login` - all affected UI components should read from that
+	 property rather than independently responding to `LOGIN_ERROR` in a
+	 reducer. _Do not create a high-level `error` properties state_
+5. When using Promises or Observables, _always_ provide an error
+	 handling function (`catch` for Promises, `error` for
+	 Observables)
 
