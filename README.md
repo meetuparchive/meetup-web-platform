@@ -11,6 +11,7 @@ In general, application-specific code will live outside of this package.
 # Docs
 
 - [Auth flow from `requestAuthPlugin`](docs/auth.md)
+- [API requests through api-proxy](docs/api-proxy.md)
 
 # Usage
 
@@ -126,49 +127,8 @@ server routes and plugins. See the code comments for usage details.
 
 ### Query
 
-The app server expects API requests to be provided in the form of `query`
-objects in the payload of a single request to the app server at the `/api`
-endpoint. A query takes the following shape:
-
-```js
-{
-	ref: <string>,
-	type: <string>,
-	params: {
-		<string>: <string>,
-		...
-	},
-	endpoint?: <string>,  // specify api endpoint string directly, e.g. '/members/self',
-	flags?: [<string>, ...],
-}
-```
-
-When the application server receives the JSON-encoded array of queries,
-it uses an API adapter module to translate those into the configuration
-needed to fetch data from an external API. The application server is
-therefore the only part of the system that needs to know how to
-communicate with the API.
-
-This adapter is used to proxy all requests to `/api`.
-
-From the client-side application's point of view, it will always send
-the `queries` and recieve the `queryResponses` for any data request -
-all the API-specific translations happen on the server.
-
-A `queryResponse` takes the following shape:
-
-```js
-{
-	<string (ref)>: {
-		value?: <parsed API response JSON>
-		flags?: {
-			<string>: <Boolean>
-			...
-		},
-		error?: <string>
-	}
-}
-```
+The API adapter reads [Query](docs/Queries.md) objects from the incoming request and makes API
+calls based on them.
 
 ### Feature flags
 
@@ -224,6 +184,7 @@ function candy(params) {
 Then, even if the API server isn't handling `/:urlname/candy` yet, the app will
 load the `mockResponse` into Redux state at `state.app.candystate.value`.
 
+>>>>>>> 6fe768eea1e30844ee86d8977f47feb7815e4a5b
 ## Middleware/Epics
 
 The built-in middleware provides core functionality for interacting with
