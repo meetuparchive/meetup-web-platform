@@ -1,3 +1,5 @@
+import Rx from 'rxjs';
+
 import {
 	mockQueryBadType,
 	mockQuery,
@@ -14,15 +16,48 @@ import {
 } from 'meetup-web-mocks/lib/api';
 
 import {
+	apiResponseToQueryResponse,
+	apiResponseDuotoneSetter,
+	buildRequestArgs,
+	logApiResponse,
+	makeExternalApiRequest,
 	parseRequest,
 	parseApiResponse,
 	queryToApiConfig,
-	buildRequestArgs,
-	apiResponseToQueryResponse,
-	apiResponseDuotoneSetter,
 	groupDuotoneSetter,
-	logApiResponse,
 } from './apiUtils';
+
+describe('makeExternalApiRequest', () => {
+	it('calls externalRequest with requestOpts', () => {
+		const spyable = {
+			externalRequest$: () => Rx.Observable.of(1),
+		};
+		spyOn(spyable, 'externalRequest$').and.callThrough();
+		const requestOpts = {
+			foo: 'bar',
+		};
+		return makeExternalApiRequest({}, 5000, spyable.externalRequest$)(requestOpts)
+			.toPromise()
+			.then(() => spyable.externalRequest$.calls.mostRecent().args[0])
+			.then(arg => expect(arg).toBe(requestOpts));
+	});
+	it('throws an error when the API times out', () => {
+		const timeout = 100;
+		const spyable = {
+			externalRequest$: () => Rx.Observable.of(1).delay(timeout + 100),
+		};
+		spyOn(spyable, 'externalRequest$').and.callThrough();
+		const requestOpts = {
+			foo: 'bar',
+		};
+		return makeExternalApiRequest({}, timeout, spyable.externalRequest$)(requestOpts)
+			.toPromise()
+			.then(
+				() => expect(true).toBe(false),  // should not be called
+				err => expect(err).toEqual(jasmine.any(Error))
+			);
+	});
+});
 
 describe('parseApiResponse', () => {
 	const MOCK_RESPONSE = {
@@ -230,6 +265,19 @@ describe('apiResponseDuotoneSetter', () => {
 		};
 		apiResponseDuotoneSetter(MOCK_DUOTONE_URLS)(memberResponse);
 		expect(member).toEqual(MOCK_MEMBER);
+	});
+	it('returns object unmodified when it contains errors', () => {
+		const errorResponse = {
+			self: {
+				type: 'member',
+				value: {
+					error: new Error(),
+				},
+			}
+		};
+		const errorExpectedResponse = { ...errorResponse };
+		apiResponseDuotoneSetter(MOCK_DUOTONE_URLS)(errorResponse);
+		expect(errorResponse).toEqual(errorExpectedResponse);
 	});
 });
 

@@ -5,7 +5,6 @@ import externalRequest from 'request';
 import Joi from 'joi';
 import Rx from 'rxjs';
 
-const externalRequest$ = Rx.Observable.bindNodeCallback(externalRequest);
 
 import {
 	querySchema
@@ -300,6 +299,18 @@ export const makeMockRequest = mockResponse => requestOpts =>
 	Rx.Observable.of([MOCK_RESPONSE_OK, JSON.stringify(mockResponse)])
 		.do(() => console.log(`MOCKING response to ${requestOpts.url}`));
 
+const externalRequest$ = Rx.Observable.bindNodeCallback(externalRequest);
+/**
+ * Make a real external API request, return response body string
+ */
+export const makeExternalApiRequest = (
+	request,
+	API_TIMEOUT,
+	externalRequestFn$=externalRequest$
+) => requestOpts =>
+	externalRequestFn$(requestOpts)
+		.timeout(API_TIMEOUT, new Error('API response timeout'));
+
 export const logApiResponse = appRequest => ([response, body]) => {
 	const {
 		uri: {
@@ -326,12 +337,5 @@ export const logApiResponse = appRequest => ([response, body]) => {
 	};
 	appRequest.log(['api', 'info'], JSON.stringify(responseLog, null, 2));
 };
-
-/**
- * Make a real external API request, return response body string
- */
-export const makeExternalApiRequest = (request, API_TIMEOUT) => requestOpts =>
-	externalRequest$(requestOpts)
-		.timeout(API_TIMEOUT, new Error('API response timeout'));
 
 
