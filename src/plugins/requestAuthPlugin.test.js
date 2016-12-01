@@ -19,6 +19,7 @@ const MOCK_SERVER = {
 		scheme: () => {},
 	},
 	ext: () => {},
+	state: () => {},
 };
 const MOCK_HEADERS = {};
 const MOCK_REPLY_FN = () => {};
@@ -205,6 +206,7 @@ describe('oauthScheme', () => {
 			key: '1234',
 			secret: 'abcd',
 		},
+		COOKIE_ENCRYPT_SECRET: 'asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf',
 	};
 	it('calls server.ext with an \'onPreAuth\' function', () => {
 		spyOn(MOCK_SERVER, 'ext');

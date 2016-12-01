@@ -18,9 +18,11 @@ export default function getConfig(overrideConfig) {
 		console.warn('The ANONYMOUS_AUTH_URL env variable is deprecated - please rename to OAUTH_AUTH_URL');
 	}
 	const config = {
-		DEV_SERVER_PORT: process.env.DEV_SERVER_PORT || 8000,
 		API_PROTOCOL: process.env.API_PROTOCOL || 'https',
 		API_HOST: process.env.API_HOST || 'api.dev.meetup.com',
+		COOKIE_ENCRYPT_SECRET: process.env.COOKIE_ENCRYPT_SECRET,
+		CSRF_SECRET: process.env.CSRF_SECRET,
+		DEV_SERVER_PORT: process.env.DEV_SERVER_PORT || 8000,
 		OAUTH_AUTH_URL: process.env.OAUTH_AUTH_URL ||
 			process.env.ANONYMOUS_AUTH_URL ||
 			'https://secure.dev.meetup.com/oauth2/authorize',
@@ -43,9 +45,16 @@ export default function getConfig(overrideConfig) {
 function validateConfig(config) {
 	const oauthError = new Error('get oauth secrets from web platform team');
 	const configSchema = Joi.object().keys({
-		DEV_SERVER_PORT: Joi.number().integer().max(65535),
 		API_PROTOCOL: Joi.any().only(['https', 'http']).required(),
 		API_HOST: Joi.string().hostname().required(),
+		API_SERVER_ROOT_URL: Joi.string().uri(),
+		COOKIE_ENCRYPT_SECRET: Joi.string().min(32).required().error(
+			new Error('set COOKIE_ENCRYPT_SECRET env variable to a random 32+ character string')
+		),
+		CSRF_SECRET: Joi.string().min(32).required().error(
+			new Error('set CSRF_SECRET env variable to a random 32+ character string')
+		),
+		DEV_SERVER_PORT: Joi.number().integer().max(65535),
 		OAUTH_AUTH_URL: Joi.string().uri().required(),
 		OAUTH_ACCESS_URL: Joi.string().uri().required(),
 		PHOTO_SCALER_SALT: Joi.string().min(1).required().error(
@@ -55,7 +64,6 @@ function validateConfig(config) {
 			secret: Joi.string().min(1).required().error(oauthError),
 			key: Joi.string().min(1).required().error(oauthError),
 		}).required(),
-		API_SERVER_ROOT_URL: Joi.string().uri()
 	}).required();
 
 	const result = Joi.validate(config, configSchema);
