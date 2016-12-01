@@ -10,6 +10,7 @@ import {
 import {
 	MOCK_DUOTONE_URLS,
 	MOCK_GROUP,
+	MOCK_MEMBER,
 } from 'meetup-web-mocks/lib/api';
 
 import {
@@ -124,6 +125,22 @@ describe('buildRequestArgs', () => {
 
 	});
 
+	it('Sets X-Meetup-Request-Flags header when query has flags', () => {
+		const query = {
+			endpoint: 'foo',
+			type: 'bar',
+			params: {
+				foo: 'bar',
+			},
+			flags: ['asdf'],
+		};
+		const apiConfig = queryToApiConfig(query);
+		const getArgs = buildRequestArgs({ ...options, method: 'get' })(apiConfig);
+		expect(getArgs.headers['X-Meetup-Request-Flags']).not.toBeUndefined();
+		const postArgs = buildRequestArgs({ ...options, method: 'post' })(apiConfig);
+		expect(postArgs.headers['X-Meetup-Request-Flags']).not.toBeUndefined();
+	});
+
 	const testQueryResults_utf8 = mockQuery(MOCK_RENDERPROPS_UTF8);
 	const apiConfig_utf8 = queryToApiConfig(testQueryResults_utf8);
 
@@ -203,15 +220,24 @@ describe('apiResponseDuotoneSetter', () => {
 		const expectedUrl = MOCK_DUOTONE_URLS.dtaxb;
 		expect(group.duotoneUrl.startsWith(expectedUrl)).toBe(true);
 	});
+	it('returns object unmodified when it doesn\'t need duotones', () => {
+		const member = { ...MOCK_MEMBER };
+		const memberResponse = {
+			self: {
+				type: 'member',
+				value: member,
+			}
+		};
+		apiResponseDuotoneSetter(MOCK_DUOTONE_URLS)(memberResponse);
+		expect(member).toEqual(MOCK_MEMBER);
+	});
 });
-
-
 
 describe('logApiResponse', () => {
 	const MOCK_HAPI_REQUEST = {
 		log: () => {},
 	};
-	const MOCK_INCOMINGMESSAGE = {
+	const MOCK_INCOMINGMESSAGE_GET = {
 		elapsedTime: 1234,
 		request: {
 			uri: {
@@ -221,46 +247,55 @@ describe('logApiResponse', () => {
 			method: 'get',
 		},
 	};
-	it('emits parsed request and response data', () => {
+	const MOCK_INCOMINGMESSAGE_POST = {
+		elapsedTime: 2345,
+		request: {
+			uri: {
+				pathname: '/foo',
+			},
+			method: 'post'
+		},
+	};
+	it('emits parsed request and response data for GET request', () => {
 		spyOn(MOCK_HAPI_REQUEST, 'log');
-		logApiResponse(MOCK_HAPI_REQUEST)([MOCK_INCOMINGMESSAGE, 'foo']);
+		logApiResponse(MOCK_HAPI_REQUEST)([MOCK_INCOMINGMESSAGE_GET, 'foo']);
 		expect(MOCK_HAPI_REQUEST.log).toHaveBeenCalled();
 		const loggedObject = JSON.parse(MOCK_HAPI_REQUEST.log.calls.mostRecent().args[1]);
 		expect(loggedObject).toEqual({
 			request: {
 				query: { foo: 'bar' },
-				pathname: MOCK_INCOMINGMESSAGE.request.uri.pathname,
-				method: MOCK_INCOMINGMESSAGE.request.method,
+				pathname: MOCK_INCOMINGMESSAGE_GET.request.uri.pathname,
+				method: MOCK_INCOMINGMESSAGE_GET.request.method,
 			},
 			response: {
-				elapsedTime: MOCK_INCOMINGMESSAGE.elapsedTime,
+				elapsedTime: MOCK_INCOMINGMESSAGE_GET.elapsedTime,
 				body: jasmine.any(String),
 			},
 		});
 	});
-	it('handles empty querystring', () => {
+	it('emits parsed request and response data for POST request', () => {
 		spyOn(MOCK_HAPI_REQUEST, 'log');
-		const response = {
-			...MOCK_INCOMINGMESSAGE,
-			request: {
-				...MOCK_INCOMINGMESSAGE.request,
-				uri: {
-					query: '',
-					pathname: '/foo',
-				},
-			},
-		};
-		logApiResponse(MOCK_HAPI_REQUEST)([response, 'foo']);
+		logApiResponse(MOCK_HAPI_REQUEST)([MOCK_INCOMINGMESSAGE_POST, 'foo']);
 		expect(MOCK_HAPI_REQUEST.log).toHaveBeenCalled();
 		const loggedObject = JSON.parse(MOCK_HAPI_REQUEST.log.calls.mostRecent().args[1]);
-		expect(loggedObject.request.query).toEqual({});
+		expect(loggedObject).toEqual({
+			request: {
+				query: {},
+				pathname: MOCK_INCOMINGMESSAGE_POST.request.uri.pathname,
+				method: MOCK_INCOMINGMESSAGE_POST.request.method,
+			},
+			response: {
+				elapsedTime: MOCK_INCOMINGMESSAGE_POST.elapsedTime,
+				body: jasmine.any(String),
+			},
+		});
 	});
-	it('handles empty multiple querystring vals', () => {
+	it('handles multiple querystring vals for GET request', () => {
 		spyOn(MOCK_HAPI_REQUEST, 'log');
 		const response = {
-			...MOCK_INCOMINGMESSAGE,
+			...MOCK_INCOMINGMESSAGE_GET,
 			request: {
-				...MOCK_INCOMINGMESSAGE.request,
+				...MOCK_INCOMINGMESSAGE_GET.request,
 				uri: {
 					query: 'foo=bar&baz=boodle',
 					pathname: '/foo',
@@ -278,7 +313,7 @@ describe('logApiResponse', () => {
 	it('returns the full body of the response if less than 256 characters', () => {
 		const body = 'foo';
 		spyOn(MOCK_HAPI_REQUEST, 'log');
-		logApiResponse(MOCK_HAPI_REQUEST)([MOCK_INCOMINGMESSAGE, body]);
+		logApiResponse(MOCK_HAPI_REQUEST)([MOCK_INCOMINGMESSAGE_GET, body]);
 		expect(MOCK_HAPI_REQUEST.log).toHaveBeenCalled();
 		const loggedObject = JSON.parse(MOCK_HAPI_REQUEST.log.calls.mostRecent().args[1]);
 		expect(loggedObject.response.body).toEqual(body);
@@ -286,7 +321,7 @@ describe('logApiResponse', () => {
 	it('returns a truncated response body if more than 256 characters', () => {
 		const body300 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean egestas viverra sem vel congue. Cras vitae malesuada justo. Fusce ut finibus felis, at sagittis leo. Morbi nec velit dignissim, viverra tellus at, pretium nisi. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla turpis duis.';
 		spyOn(MOCK_HAPI_REQUEST, 'log');
-		logApiResponse(MOCK_HAPI_REQUEST)([MOCK_INCOMINGMESSAGE, body300]);
+		logApiResponse(MOCK_HAPI_REQUEST)([MOCK_INCOMINGMESSAGE_GET, body300]);
 		expect(MOCK_HAPI_REQUEST.log).toHaveBeenCalled();
 		const loggedObject = JSON.parse(MOCK_HAPI_REQUEST.log.calls.mostRecent().args[1]);
 		expect(loggedObject.response.body.startsWith(body300.substr(0, 256))).toBe(true);
@@ -295,9 +330,9 @@ describe('logApiResponse', () => {
 });
 
 describe('parseRequest', () => {
-	it('extracts the queries provided in GET and POST requests', () => {
-		const headers = { authorization: MOCK_AUTH_HEADER };
-		const queries = [mockQuery(MOCK_RENDERPROPS)];
+	const headers = { authorization: MOCK_AUTH_HEADER };
+	const queries = [mockQuery(MOCK_RENDERPROPS)];
+	it('extracts the queries provided in GET requests', () => {
 		const data = { queries: JSON.stringify(queries) };
 		const getRequest = {
 			headers,
@@ -307,6 +342,10 @@ describe('parseRequest', () => {
 				oauth_token: 'foo',
 			},
 		};
+		expect(parseRequest(getRequest, 'http://dummy.api.meetup.com').queries).toEqual(queries);
+	});
+	it('extracts the queries provided in POST requests', () => {
+		const data = { queries: JSON.stringify(queries) };
 		const postRequest = {
 			headers,
 			method: 'post',
@@ -315,10 +354,20 @@ describe('parseRequest', () => {
 				oauth_token: 'foo',
 			},
 		};
-
-		expect(parseRequest(getRequest, 'http://dummy.api.meetup.com').queries).toEqual(queries);
 		expect(parseRequest(postRequest, 'http://dummy.api.meetup.com').queries).toEqual(queries);
 	});
+	it('throws an error for mal-formed queries', () => {
+		const notAQuery = { foo: 'bar' };
+		const data = { queries: JSON.stringify([notAQuery]) };
+		const getRequest = {
+			headers,
+			method: 'get',
+			query: data,
+			state: {
+				oauth_token: 'foo',
+			},
+		};
+		expect(() => parseRequest(getRequest, 'http://dummy.api.meetup.com')).toThrow();
+	});
 });
-
 
