@@ -334,8 +334,32 @@ const makeMockRequest = mockResponse => requestOpts =>
 	Rx.Observable.of([MOCK_RESPONSE_OK, JSON.stringify(mockResponse)])
 		.do(() => console.log(`MOCKING response to ${requestOpts.url}`));
 
-const logResponseTime = log => ([response, body]) =>
-	log(['api', 'info'], `REST API response: ${response.elapsedTime}ms - ${response.request.uri.path}`);
+export const logApiResponse = appRequest => ([response, body]) => {
+	const {
+		uri: {
+			query,
+			pathname,
+		},
+		method,
+	} = response.request;
+
+	const responseLog = {
+		request: {
+			query: query.split('&').reduce((acc, keyval) => {
+				const [key, val] = keyval.split('=');
+				acc[key] = val;
+				return acc;
+			}, {}),
+			pathname,
+			method,
+		},
+		response: {
+			elapsedTime: response.elapsedTime,
+			body: body.length > 256 ? `${body.substr(0, 256)}...`: body,
+		},
+	};
+	appRequest.log(['api', 'info'], JSON.stringify(responseLog, null, 2));
+};
 
 /**
  * Make a real external API request, return response body string
@@ -343,7 +367,7 @@ const logResponseTime = log => ([response, body]) =>
 const makeExternalApiRequest = (request, API_TIMEOUT) => requestOpts =>
 	externalRequest$(requestOpts)
 		.timeout(API_TIMEOUT, new Error('API response timeout'))
-		.do(logResponseTime(request.log.bind(request)));
+		.do(logApiResponse(request));
 
 /**
  * Make an API request and parse the response into the expected `response`
@@ -356,13 +380,14 @@ export const makeApiRequest$ = (request, API_TIMEOUT, duotoneUrls) => {
 			makeMockRequest(query.mockResponse) :
 			makeExternalApiRequest(request, API_TIMEOUT);
 
-
-		request.log(['api', 'info'], `REST API request: ${requestOpts.url}`);
-		return request$(requestOpts)
-			.map(parseApiResponse(requestOpts.url))                   // parse into plain object
-			.map(parseLoginAuth(request, query))     // login has oauth secrets - special case
-			.map(apiResponseToQueryResponse(query))  // convert apiResponse to app-ready queryResponse
-			.map(setApiResponseDuotones);            // special duotone prop
+		return Rx.Observable.defer(() => {
+			request.log(['api', 'info'], `REST API request: ${requestOpts.url}`);
+			return request$(requestOpts)
+				.map(parseApiResponse(requestOpts.url))  // parse into plain object
+				.map(parseLoginAuth(request, query))     // login has oauth secrets - special case
+				.map(apiResponseToQueryResponse(query))  // convert apiResponse to app-ready queryResponse
+				.map(setApiResponseDuotones);            // special duotone prop
+		});
 	};
 };
 
