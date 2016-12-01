@@ -1,6 +1,7 @@
 import url from 'url';
 import querystring from 'querystring';
 import externalRequest from 'request';
+import Joi from 'joi';
 import Rx from 'rxjs';
 const externalRequest$ = Rx.Observable.bindNodeCallback(externalRequest);
 
@@ -9,6 +10,9 @@ import { duotoneRef } from '../util/duotone';
 import {
 	applyAuthState,
 } from '../util/authUtils';
+import {
+	querySchema
+} from '../util/validation';
 
 const parseResponseFlags = flagHeader =>
 	(flagHeader || '')
@@ -223,7 +227,14 @@ export function parseRequest(request, baseUrl) {
 
 
 	const queriesJSON = request.method === 'get' ? query.queries : payload.queries;
-	const queries = JSON.parse(queriesJSON);
+	const validatedQueries = Joi.validate(
+		JSON.parse(queriesJSON),
+		Joi.array(querySchema)
+	);
+	if (validatedQueries.error) {
+		throw validatedQueries.error;
+	}
+	const queries = validatedQueries.value;
 	return { queries, externalRequestOpts };
 }
 
