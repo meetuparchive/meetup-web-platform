@@ -326,6 +326,9 @@ const MOCK_RESPONSE_OK = {  // minimal representation of http.IncomingMessage
 	headers: {
 		'x-meetup-request-id': 'mock request'
 	},
+	request: {
+		uri: {},
+	},
 };
 /**
  * Fake an API request and directly return the stringified mockResponse
