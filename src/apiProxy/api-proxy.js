@@ -345,7 +345,7 @@ export const logApiResponse = appRequest => ([response, body]) => {
 
 	const responseLog = {
 		request: {
-			query: query.split('&').reduce((acc, keyval) => {
+			query: (query || '').split('&').reduce((acc, keyval) => {
 				const [key, val] = keyval.split('=');
 				acc[key] = val;
 				return acc;
@@ -366,8 +366,7 @@ export const logApiResponse = appRequest => ([response, body]) => {
  */
 const makeExternalApiRequest = (request, API_TIMEOUT) => requestOpts =>
 	externalRequest$(requestOpts)
-		.timeout(API_TIMEOUT, new Error('API response timeout'))
-		.do(logApiResponse(request));
+		.timeout(API_TIMEOUT, new Error('API response timeout'));
 
 /**
  * Make an API request and parse the response into the expected `response`
@@ -383,6 +382,7 @@ export const makeApiRequest$ = (request, API_TIMEOUT, duotoneUrls) => {
 		return Rx.Observable.defer(() => {
 			request.log(['api', 'info'], `REST API request: ${requestOpts.url}`);
 			return request$(requestOpts)
+				.do(logApiResponse(request))             // this will leak private info in API response
 				.map(parseApiResponse(requestOpts.url))  // parse into plain object
 				.map(parseLoginAuth(request, query))     // login has oauth secrets - special case
 				.map(apiResponseToQueryResponse(query))  // convert apiResponse to app-ready queryResponse

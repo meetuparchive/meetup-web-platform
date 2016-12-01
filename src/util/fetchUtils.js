@@ -25,9 +25,11 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 
 	const params = new URLSearchParams();
 	params.append('queries', JSON.stringify(queries));
-	params.append('metadata', JSON.stringify(meta));
-	if (meta && meta.logout) {
-		params.append('logout', true);
+	if (meta) {
+		params.append('metadata', JSON.stringify(meta));
+		if (meta.logout) {
+			params.append('logout', true);
+		}
 	}
 	const searchString = `?${params}`;
 	const fetchUrl = `${apiUrl}${isPost ? '' : searchString}`;
