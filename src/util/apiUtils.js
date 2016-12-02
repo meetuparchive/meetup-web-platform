@@ -7,6 +7,10 @@ import Rx from 'rxjs';
 
 
 import {
+	applyAuthState,
+} from '../util/authUtils';
+
+import {
 	querySchema
 } from './validation';
 import { duotoneRef } from './duotone';
@@ -338,4 +342,50 @@ export const logApiResponse = appRequest => ([response, body]) => {
 	appRequest.log(['api', 'info'], JSON.stringify(responseLog, null, 2));
 };
 
+/**
+ * Login responses contain oauth info that should be applied to the response.
+ * If `request.plugins.requestAuth.reply` exists (supplied by the requestAuthPlugin),
+ * the application is able to set cookies on the response. Otherwise, return
+ * the login response unchanged
+ */
+export const parseLoginAuth = (request, query) => response => {
+	if (query.type === 'login' && request.plugins.requestAuth) {
+		const {
+			oauth_token,
+			refresh_token,
+			expires_in,
+			member,
+		} = response.value;
+		applyAuthState(request, request.plugins.requestAuth.reply)({
+			oauth_token,
+			refresh_token,
+			expires_in
+		});
+		response.value = { member };
+	}
+	return response;
+};
+
+/**
+ * Make an API request and parse the response into the expected `response`
+ * object shape
+ */
+export const makeApiRequest$ = (request, API_TIMEOUT, duotoneUrls) => {
+	const setApiResponseDuotones = apiResponseDuotoneSetter(duotoneUrls);
+	return ([requestOpts, query]) => {
+		const request$ = query.mockResponse ?
+			makeMockRequest(query.mockResponse) :
+			makeExternalApiRequest(request, API_TIMEOUT);
+
+		return Rx.Observable.defer(() => {
+			request.log(['api', 'info'], `REST API request: ${requestOpts.url}`);
+			return request$(requestOpts)
+				.do(logApiResponse(request))             // this will leak private info in API response
+				.map(parseApiResponse(requestOpts.url))  // parse into plain object
+				.map(parseLoginAuth(request, query))     // login has oauth secrets - special case
+				.map(apiResponseToQueryResponse(query))  // convert apiResponse to app-ready queryResponse
+				.map(setApiResponseDuotones);            // special duotone prop
+		});
+	};
+};
 

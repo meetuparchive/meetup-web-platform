@@ -1,68 +1,41 @@
+import Rx from 'rxjs';
+import * as apiUtils from '../util/apiUtils';
 import {
 	mockQuery,
 	MOCK_RENDERPROPS,
 } from 'meetup-web-mocks/lib/app';
+import apiProxy$ from './api-proxy';
 
-import * as authUtils from '../util/authUtils';
-
-import {
-	makeApiRequest$,
-	parseLoginAuth,
-} from './api-proxy';
-
-describe('makeApiRequest$', () => {
-	const endpoint = 'foo';
-	it('makes a GET request', () => {
-
-	});
-	it('makes a POST request', () => {
-	});
-	it('responds with query.mockResponse when set', () => {
-		const mockResponse = { foo: 'bar' };
-		const query = { ...mockQuery(MOCK_RENDERPROPS), mockResponse };
-		const expectedResponse = {
-			[query.ref]: {
-				meta: {
-					flags: {},
-					requestId: 'mock request',
-					endpoint
-				},
-				type: query.type,
-				value: mockResponse,
-			}
+describe('apiProxy$', () => {
+	const queries = [
+		mockQuery(MOCK_RENDERPROPS),
+		mockQuery(MOCK_RENDERPROPS),
+	];
+	it('returns an observable that emits an array of results', () => {
+		const data = { queries: JSON.stringify(queries) };
+		const getRequest = {
+			headers: {},
+			method: 'get',
+			query: data,
+			state: {
+				oauth_token: 'foo',
+			},
+			log: () => {},
 		};
-		return makeApiRequest$({ log: () => {} }, 5000, {})([{ url: endpoint }, query])
+		const requestResult = {
+			type: 'fake',
+			value: { foo: 'bar' },
+		};
+		spyOn(apiUtils, 'makeApiRequest$').and.returnValue(
+			() => Rx.Observable.of(requestResult)
+		);
+		const expectedResults = [
+			requestResult,
+			requestResult,
+		];
+		return apiProxy$({})(getRequest)
 			.toPromise()
-			.then(response => expect(response).toEqual(expectedResponse));
-	});
-});
-
-describe('parseLoginAuth', () => {
-	it('calls applyAuthState for login responses', () => {
-		spyOn(authUtils, 'applyAuthState').and.returnValue(() => {});
-		const request = { plugins: { requestAuth: {} } };
-		const query = { type: 'login' };
-		const loginResponse = { type: 'login', value: {} };
-		parseLoginAuth(request, query)(loginResponse);
-		expect(authUtils.applyAuthState).toHaveBeenCalled();
-	});
-	it('does not call applyAuthState for non-login responses', () => {
-		spyOn(authUtils, 'applyAuthState').and.returnValue(() => {});
-		const request = { plugins: { requestAuth: {} } };
-		const query = { type: 'member' };
-		const apiResponse = { type: 'member', value: {} };
-		const returnVal = parseLoginAuth(request, query)(apiResponse);
-		expect(authUtils.applyAuthState).not.toHaveBeenCalled();
-		expect(returnVal).toBe(apiResponse);
-	});
-	it('does not call applyAuthState when request.plugins does not exist', () => {
-		spyOn(authUtils, 'applyAuthState').and.returnValue(() => {});
-		const request = { plugins: {} };
-		const query = { type: 'login' };
-		const loginResponse = { type: 'login', value: {} };
-		const returnVal = parseLoginAuth(request, query)(loginResponse);
-		expect(authUtils.applyAuthState).not.toHaveBeenCalled();
-		expect(returnVal).toBe(loginResponse);
+			.then(results => expect(results).toEqual(expectedResults));
 	});
 });
 
