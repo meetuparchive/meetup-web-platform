@@ -5,7 +5,6 @@ import externalRequest from 'request';
 import Joi from 'joi';
 import Rx from 'rxjs';
 
-
 import {
 	applyAuthState,
 } from '../util/authUtils';
@@ -225,7 +224,6 @@ export function parseRequest(request, baseUrl) {
 		}
 	};
 
-
 	const queriesJSON = request.method === 'get' ? query.queries : payload.queries;
 	const validatedQueries = Joi.validate(
 		JSON.parse(queriesJSON),
@@ -307,12 +305,8 @@ const externalRequest$ = Rx.Observable.bindNodeCallback(externalRequest);
 /**
  * Make a real external API request, return response body string
  */
-export const makeExternalApiRequest = (
-	request,
-	API_TIMEOUT,
-	externalRequestFn$=externalRequest$
-) => requestOpts =>
-	externalRequestFn$(requestOpts)
+export const makeExternalApiRequest = (request, API_TIMEOUT) => requestOpts =>
+	externalRequest$(requestOpts)
 		.timeout(API_TIMEOUT, new Error('API response timeout'));
 
 export const logApiResponse = appRequest => ([response, body]) => {
