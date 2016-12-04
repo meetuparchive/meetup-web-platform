@@ -43,7 +43,7 @@ export function find_groups(params) {
  * V2 Groups (only current way to get sponsors)
  */
 export function groups2(params) {
-	params.fields = params.fields ? `${params.fields},sponsors` : 'sponsors';
+	params.fields = params.fields ? `${params.fields},sponsors,photo_gradient` : 'sponsors,photo_gradient';
 	return {
 		endpoint: '2/groups',
 		params
@@ -122,7 +122,7 @@ export function groupCommunication(params) {
  * all the endpoints that return event objects
  */
 export function event(params) {
-	params.fields = params.fields ? `${params.fields},rsvp_sample` : 'rsvp_sample';
+	params.fields = params.fields ? `${params.fields},rsvp_sample,photo_gradient` : 'rsvp_sample,photo_gradient';
 	const pathExtension = params.id ? `/${params.id}` : '';
 	return {
 		endpoint: `${params.urlname}/events${pathExtension}`,
@@ -144,7 +144,7 @@ export function event_comments(params) {
  * open events
  */
 export function open_events(params) {
-	params.fields = params.fields ? `${params.fields},rsvp_sample` : 'rsvp_sample';
+	params.fields = params.fields ? `${params.fields},rsvp_sample,photo_gradient` : 'rsvp_sample,photo_gradient';
 	return {
 		endpoint: '2/open_events',
 		params
