@@ -82,14 +82,24 @@ export const parseApiResponse = requestUrl => ([response, body]) => {
 		};
 	}
 	try {
-		value = JSON.parse(body);
-		if (value && value.problem) {
-			value = formatApiError(new Error(`API problem: ${value.problem}: ${value.details}`));
+		if (response.statusCode === 204) { //NoContent response type
+			value = {
+				success: true
+			};
+			return {
+				value,
+				meta,
+			};
+		} else {
+			value = JSON.parse(body);
+			if (value && value.problem) {
+				value = formatApiError(new Error(`API problem: ${value.problem}: ${value.details}`));
+			}
+			return {
+				value,
+				meta,
+			};
 		}
-		return {
-			value,
-			meta,
-		};
 	} catch(err) {
 		return {
 			value: formatApiError(err),
