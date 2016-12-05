@@ -97,11 +97,65 @@ function groupQuery({ location, params }) {
 }
 ```
 
-Query lifecycle.
+## Query lifecycle.
 
-| Query                                                      | Action                         | Request              | Response                                   | State                                   |
-|------------------------------------------------------------|--------------------------------|----------------------|--------------------------------------------|-----------------------------------------|
-| {   ref,    type,   endpoint,   params: {},   flags: [], } | {   type,   payload: [query] } | /api?queries=[query] | [{ ref: { type, value: {}, flags, meta } ] | { ref: { type, value: {}, flags, meta } |
-|                                                            |                                |                      |                                            |                                         |
-|                                                            |                                |                      |                                            |                                         |
+**Query**
+
+```
+{
+	ref,
+	type,
+	endpoint,
+	params: {...},
+	flags: [...]
+}
+```
+
+**API request action**
+
+```js
+{
+  type: 'API_REQUEST',  // or 'POST_...' or '..._POST'
+	payload: [query]
+}
+```
+
+**GET request**
+
+```
+/api?queries=[query, ...]
+```
+
+**API response array**
+
+The app server API endpoint will respond with an array of API responses
+structured as individual objects with a single key corresponding to the query
+`ref`.
+
+```js
+[
+  {
+    [ref]: {
+      type,
+      value: {},
+      flags,
+      meta  // data returned from API separate from `value`
+    }
+  },
+  ...
+]
+```
+
+**Redux state**
+```js
+{
+	[ref]: {
+		type,
+		value: {},
+		flags,
+		meta
+  },
+  ...
+}
+```
 
