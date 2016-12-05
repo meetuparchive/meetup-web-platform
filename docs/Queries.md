@@ -103,11 +103,11 @@ function groupQuery({ location, params }) {
 
 ```js
 {
-	ref,
-	type,
-	endpoint,
-	params: {...},
-	flags: [...]
+  ref,
+  type,
+  endpoint,
+  params: {...},
+  flags: [...]
 }
 ```
 
@@ -116,7 +116,7 @@ function groupQuery({ location, params }) {
 ```js
 {
   type: 'API_REQUEST',  // or 'POST_...' or '..._POST'
-	payload: [query]
+  payload: [query]
 }
 ```
 
@@ -149,11 +149,11 @@ structured as individual objects with a single key corresponding to the query
 **Redux state**
 ```js
 {
-	[ref]: {
-		type,
-		value: {},
-		flags,
-		meta
+  [ref]: {
+    type,
+    value: {},
+    flags,
+    meta
   },
   ...
 }
