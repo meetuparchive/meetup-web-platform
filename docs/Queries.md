@@ -81,7 +81,7 @@ extracted from the URL), and deliver a query object for the associated route.
 
 #### Example
 
-```
+```js
 export const GROUP_REF = 'group';
 function groupQuery({ location, params }) {
 	const { urlname } = params;
@@ -101,7 +101,7 @@ function groupQuery({ location, params }) {
 
 **Query**
 
-```
+```js
 {
 	ref,
 	type,
