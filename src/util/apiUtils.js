@@ -83,12 +83,15 @@ export const parseApiResponse = requestUrl => ([response, body]) => {
 	}
 	try {
 		if (response.statusCode === 204) { //NoContent response type
-			value = {
-				success: true
+			value = {};
+			const successMeta = {
+				success: true,
+				...meta
 			};
+
 			return {
 				value,
-				meta,
+				meta: successMeta,
 			};
 		} else {
 			value = JSON.parse(body);
