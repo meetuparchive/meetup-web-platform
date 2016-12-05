@@ -5,5 +5,6 @@ export const querySchema = Joi.object({
 	ref: Joi.string().required(),
 	params: Joi.object().required(),
 	flags: Joi.array(),
+	endpoint: Joi.string(),
 });
 
