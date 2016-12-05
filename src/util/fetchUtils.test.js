@@ -9,6 +9,7 @@ import * as fetchUtils from './fetchUtils';
 describe('fetchQueries', () => {
 	const API_URL = new URL('http://api.example.com/');
 	const queries = [mockQuery({})];
+	const meta = { foo: 'bar' };
 	const responses = [MOCK_GROUP];
 	const csrfJwt = 'encodedstuff';
 	const fakeSuccess = () =>
@@ -37,24 +38,47 @@ describe('fetchQueries', () => {
 			.then(response => expect(response.csrf).toEqual(csrfJwt));
 	});
 	describe('GET', () => {
-		it('calls fetch with API url with GET and querystring', () => {
+		it('GET calls fetch with API url and queries, metadata, logout querystring params', () => {
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
-			return fetchUtils.fetchQueries(API_URL.toString(), { method: 'GET' })(queries)
+			return fetchUtils.fetchQueries(
+				API_URL.toString(),
+				{ method: 'GET' }
+			)(queries, { ...meta, logout: true })
 				.then(() => {
 					const calledWith = global.fetch.calls.mostRecent().args;
 					const url = new URL(calledWith[0]);
 					expect(url.origin).toBe(API_URL.origin);
 					expect(new URLSearchParams(url.search).has('queries')).toBe(true);
+					expect(new URLSearchParams(url.search).has('metadata')).toBe(true);
+					expect(new URLSearchParams(url.search).get('logout')).toBe('true');
 					expect(calledWith[1].method).toEqual('GET');
 				});
 		});
-	});
-	describe('POST', () => {
-		it('calls fetch API url with POST method, csrf header, and body params', () => {
+		it('GET without meta calls fetch without metadata querystring params', () => {
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
-			return fetchUtils.fetchQueries(API_URL.toString(), { method: 'POST', csrf: csrfJwt })(queries)
+			return fetchUtils.fetchQueries(
+				API_URL.toString(),
+				{ method: 'GET' }
+			)(queries).then(() => {
+				const calledWith = global.fetch.calls.mostRecent().args;
+				const url = new URL(calledWith[0]);
+				expect(url.origin).toBe(API_URL.origin);
+				expect(new URLSearchParams(url.search).has('queries')).toBe(true);
+				expect(new URLSearchParams(url.search).has('metadata')).toBe(false);
+				expect(calledWith[1].method).toEqual('GET');
+			});
+		});
+	});
+	describe('POST', () => {
+		it('POST calls fetch with API url; csrf header; queries and metadata body params', () => {
+			spyOn(global, 'fetch').and.callFake(fakeSuccess);
+
+			return fetchUtils.fetchQueries(
+				API_URL.toString(),
+				{ method: 'POST', csrf: csrfJwt }
+			)(queries, meta)
 				.then(() => {
 					const calledWith = global.fetch.calls.mostRecent().args;
 					const url = new URL(calledWith[0]);
@@ -62,9 +86,67 @@ describe('fetchQueries', () => {
 					expect(url.toString()).toBe(API_URL.toString());
 					expect(options.method).toEqual('POST');
 					expect(options.body.has('queries')).toBe(true);
+					expect(options.body.has('metadata')).toBe(true);
 					expect(options.headers['x-csrf-jwt']).toEqual(csrfJwt);
 				});
 		});
+		it('POST without meta calls fetch without metadata body params', () => {
+			spyOn(global, 'fetch').and.callFake(fakeSuccess);
+
+			return fetchUtils.fetchQueries(
+				API_URL.toString(),
+				{ method: 'POST', csrf: csrfJwt }
+			)(queries)
+				.then(() => {
+					const calledWith = global.fetch.calls.mostRecent().args;
+					const url = new URL(calledWith[0]);
+					const options = calledWith[1];
+					expect(url.toString()).toBe(API_URL.toString());
+					expect(options.method).toEqual('POST');
+					expect(options.body.has('queries')).toBe(true);
+					expect(options.body.has('metadata')).toBe(false);
+					expect(options.headers['x-csrf-jwt']).toEqual(csrfJwt);
+				});
+		});
+	});
+});
+
+describe('tryJSON', () => {
+	const reqUrl = 'http://example.com';
+	const goodResponse = { foo: 'bar' };
+	const goodFetchResponse = {
+		text: () => Promise.resolve(JSON.stringify(goodResponse)),
+	};
+	const errorResponse = {
+		status: 400,
+		statusText: '400 Bad Request',
+		text: () => Promise.resolve('There was a problem'),
+	};
+	const badJSON = 'totally not JSON';
+	const badJSONResponse = {
+		text: () => Promise.resolve(badJSON),
+	};
+	it('returns a Promise that resolves to the parsed fetch response JSON', () => {
+		const theFetch = fetchUtils.tryJSON(reqUrl)(goodFetchResponse);
+		expect(theFetch).toEqual(jasmine.any(Promise));
+
+		return theFetch.then(response => expect(response).toEqual(goodResponse));
+	});
+	it('returns a rejected Promise with Error when response has 400+ status', () => {
+		const theFetch = fetchUtils.tryJSON(reqUrl)(errorResponse);
+		expect(theFetch).toEqual(jasmine.any(Promise));
+		return theFetch.then(
+			response => expect(true).toBe(false),  // should not run - promise should be rejected
+			err => expect(err).toEqual(jasmine.any(Error))
+		);
+	});
+	it('returns a rejected Promise with Error when response fails JSON parsing', () => {
+		const theFetch = fetchUtils.tryJSON(reqUrl)(badJSONResponse);
+		expect(theFetch).toEqual(jasmine.any(Promise));
+		return theFetch.then(
+			response => expect(true).toBe(false),  // should not run - promise should be rejected
+			err => expect(err).toEqual(jasmine.any(Error))
+		);
 	});
 });
 
