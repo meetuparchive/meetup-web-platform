@@ -65,39 +65,7 @@ alongside the main request.
 
 ## Usage
 
-### Route query functions
-
-One of the primary uses for queries is to load route-specific data from the
-API. The application will automatically generate these queries by calling
-particular 'query creator' functions that are assigned to application routes,
-producing a fully-qualified 'query' object from the routing state input.
-
-Route query creator functions have two requirements:
-
-1. They are assigned as _props_ of React Router `Route`s .The `query` prop can
-be either a single query creator function or an array of functions
-2. They are pure functions that take the Router's `location` and `params`
-extracted from the URL), and deliver a query object for the associated route.
-
-#### Example
-
-```js
-export const GROUP_REF = 'group';
-function groupQuery({ location, params }) {
-	const { urlname } = params;
-
-	return {
-		ref: GROUP_REF,
-		type: 'group',
-		endpoint: `/${urlname}`,
-		params: {
-			fields: ['event_sample']
-		},
-	};
-}
-```
-
-## Query lifecycle.
+### Query lifecycle.
 
 **Query**
 
@@ -142,11 +110,12 @@ structured as individual objects with a single key corresponding to the query
       meta  // data returned from API separate from `value`
     }
   },
-  ...
+  // ...
 ]
 ```
 
 **Redux state**
+
 ```js
 {
   [ref]: {
@@ -155,7 +124,51 @@ structured as individual objects with a single key corresponding to the query
     flags,
     meta
   },
-  ...
+  // ...
 }
 ```
+
+### Route query functions
+
+One of the primary uses for queries is to load route-specific data from the
+API. The application will automatically generate these queries by calling
+particular 'query creator' functions that are assigned to application routes,
+producing a fully-qualified 'query' object from the routing state input.
+
+Route query creator functions have two requirements:
+
+1. They are assigned as _props_ of React Router `Route`s .The `query` prop can
+be either a single query creator function or an array of functions
+2. They are pure functions that take the Router's `location` and `params`
+extracted from the URL), and deliver a query object for the associated route.
+
+#### Example
+
+```js
+export const GROUP_REF = 'group';
+function groupQuery({ location, params }) {
+	const { urlname } = params;
+
+	return {
+		ref: GROUP_REF,
+		type: 'group',
+		endpoint: `/${urlname}`,
+		params: {
+			fields: ['event_sample']
+		},
+	};
+}
+```
+
+### Accessing data returned by a query
+
+The API endpoint will respond with an array of data, as shown in the
+[query lifecycle](#query-lifecycle) section. For navigation and most POST
+requests, this response will be passed to an `API_SUCCESS` action, which will
+be 'reduced'/injected into the Redux app state at `state.app`, where it can be
+accessed with `state.app[ref].value`.
+
+If the response does _not_ trigger an `API_SUCCESS` action, you will have to
+write a custom reducer to parse the response data and apply the results to a
+different part of `state`. Otherwise, they will be ignored.
 
