@@ -158,6 +158,14 @@ function groupQuery({ location, params }) {
 		},
 	};
 }
+
+// applied to a route:
+
+const groupRoute = {
+	path: '/:urlname',
+	query: groupQuery,
+	component: GroupContainer,
+};
 ```
 
 ### Accessing data returned by a query
