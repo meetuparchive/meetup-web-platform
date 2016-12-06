@@ -1,3 +1,4 @@
+import querystring from 'querystring';
 import {
 	MOCK_API_RESULT,
 	MOCK_renderRequestMap,
@@ -26,9 +27,11 @@ describe('routes', () => {
 		getResponse({ url: '/' })
 			.then(response => expect(response.payload).toEqual(MOCK_RENDER_RESULT))
 	);
-	it('serves the api route', () =>
-		getResponse({ url: '/api' })
-			.then(response => expect(JSON.parse(response.payload)).toEqual(MOCK_API_RESULT))
-	);
+	it('serves the api route', () => {
+		const validQuery = { type: 'a', ref: 'b', params: {} };
+		const qs = querystring.stringify({ queries: JSON.stringify([validQuery]) });
+		return getResponse({ url: `/api?${qs}` })
+			.then(response => expect(JSON.parse(response.payload)).toEqual(MOCK_API_RESULT));
+	});
 });
 

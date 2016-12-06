@@ -25,9 +25,11 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 
 	const params = new URLSearchParams();
 	params.append('queries', JSON.stringify(queries));
-	params.append('metadata', JSON.stringify(meta));
-	if (meta && meta.logout) {
-		params.append('logout', true);
+	if (meta) {
+		params.append('metadata', JSON.stringify(meta));
+		if (meta.logout) {
+			params.append('logout', true);
+		}
 	}
 	const searchString = `?${params}`;
 	const fetchUrl = `${apiUrl}${isPost ? '' : searchString}`;
@@ -62,7 +64,9 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 export const tryJSON = reqUrl => response => {
 	const { status, statusText } = response;
 	if (status >= 400) {  // status always 200: bugzilla #52128
-		throw new Error(`Request to ${reqUrl} responded with error code ${status}: ${statusText}`);
+		return Promise.reject(
+			new Error(`Request to ${reqUrl} responded with error code ${status}: ${statusText}`)
+		);
 	}
 	return response.text().then(text => JSON.parse(text));
 };

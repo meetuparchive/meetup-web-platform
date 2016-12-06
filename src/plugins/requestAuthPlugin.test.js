@@ -19,6 +19,7 @@ const MOCK_SERVER = {
 		scheme: () => {},
 	},
 	ext: () => {},
+	state: () => {},
 };
 const MOCK_HEADERS = {};
 const MOCK_REPLY_FN = () => {};
@@ -205,6 +206,7 @@ describe('oauthScheme', () => {
 			key: '1234',
 			secret: 'abcd',
 		},
+		COOKIE_ENCRYPT_SECRET: 'asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf',
 	};
 	it('calls server.ext with an \'onPreAuth\' function', () => {
 		spyOn(MOCK_SERVER, 'ext');
@@ -216,22 +218,43 @@ describe('oauthScheme', () => {
 describe('getAuthenticate', () => {
 	it('calls request.authorize', () => {
 		const spyable = {
-			authenticateRequest$: x => Rx.Observable.of(x),
+			authorizeRequest$: x => Rx.Observable.of(x),
 		};
-		spyOn(spyable, 'authenticateRequest$').and.callThrough();
+		spyOn(spyable, 'authorizeRequest$').and.callThrough();
 		return new Promise((resolve, reject) =>
-			getAuthenticate(spyable.authenticateRequest$)(MOCK_REQUEST, MOCK_REPLY_FN).add(() => {
-				expect(spyable.authenticateRequest$).toHaveBeenCalled();
-				resolve();
-			})
+			getAuthenticate(spyable.authorizeRequest$)(MOCK_REQUEST, MOCK_REPLY_FN)
+				.add(() => {
+					expect(spyable.authorizeRequest$).toHaveBeenCalled();
+					resolve();
+				})
 		);
 	});
 	it('calls reply.continue with credentials and artifacts', () => {
 		spyOn(MOCK_REPLY_FN, 'continue');
 		return new Promise((resolve, reject) =>
-			getAuthenticate(x => Rx.Observable.of(x))({ ...MOCK_AUTHED_REQUEST }, MOCK_REPLY_FN).add(() => {
-				expect(MOCK_REPLY_FN.continue)
-					.toHaveBeenCalledWith({ credentials: jasmine.any(String), artifacts: jasmine.any(String) });
+			getAuthenticate(x => Rx.Observable.of(x))({ ...MOCK_AUTHED_REQUEST }, MOCK_REPLY_FN)
+				.add(() => {
+					expect(MOCK_REPLY_FN.continue)
+						.toHaveBeenCalledWith({
+							credentials: jasmine.any(String),
+							artifacts: jasmine.any(String)
+						});
+					resolve();
+				})
+		);
+	});
+	it('calls reply(err...) when auth throws an error', () => {
+		const theError = new Error('badness');
+		const authorizeRequest$ = x => Rx.Observable.throw(theError);
+		const spyable = { MOCK_REPLY_FN };
+		spyOn(spyable, 'MOCK_REPLY_FN');
+		return new Promise((resolve, reject) =>
+			getAuthenticate(authorizeRequest$)(
+				{ ...MOCK_AUTHED_REQUEST },
+				spyable.MOCK_REPLY_FN
+			).add(() => {
+				expect(spyable.MOCK_REPLY_FN)
+					.toHaveBeenCalledWith(theError, null, jasmine.any(Object));
 				resolve();
 			})
 		);
