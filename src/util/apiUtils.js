@@ -165,6 +165,7 @@ export const buildRequestArgs = externalRequestOpts =>
 		case 'get':
 			externalRequestOptsQuery.url += `?${dataParams}`;
 			externalRequestOptsQuery.headers['X-Meta-Photo-Host'] = 'secure';
+			externalRequestOptsQuery.headers['X-Meta-Stringify-Ids'] = true;
 			break;
 		case 'post':
 			externalRequestOptsQuery.body = dataParams;
