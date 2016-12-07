@@ -1,4 +1,4 @@
-import uuid from 'node-uuid';
+import uuid from 'uuid';
 
 const YEAR_IN_MS = 1000 * 60 * 60 * 24 * 365;
 const COOKIE_OPTS = {
@@ -89,7 +89,14 @@ export const trackLogout = log => response =>
 	);
 
 export const trackNav = log => (response, queryResponses, url, referrer) => {
-	const queries = queryResponses.map(qr => Object.keys(qr)[0]);
+	const apiRequests = queryResponses.map(qr => {
+		const ref = Object.keys(qr)[0];
+		const { meta } = { ...qr[ref] };
+		return {
+			requestId: meta.requestId,
+			endpoint: meta.endpoint,
+		};
+	});
 	return log(
 		response,
 		{
@@ -99,7 +106,7 @@ export const trackNav = log => (response, queryResponses, url, referrer) => {
 			session_id: response.request.state.session_id,
 			url,
 			referrer,
-			queries,
+			apiRequests,
 		}
 	);
 };
@@ -108,13 +115,19 @@ export const trackApi = log => (response, queryResponses, metadata={}) => {
 	const {
 		url,
 		referrer,
+		method,
 	} = metadata;
-	trackNav(log)(response, queryResponses, url, referrer);
+	if (method === 'get') {
+		return trackNav(log)(response, queryResponses, url, referrer);
+	}
 	// special case - login requests need to be tracked
 	const loginResponse = queryResponses.find(r => r.login);
 	if (loginResponse) {
 		const member_id = JSON.stringify(loginResponse.login.value.member.id);
-		return trackLogin(log)(response, member_id);
+		trackLogin(log)(response, member_id);
+	}
+	if ('logout' in response.request.query) {
+		trackLogout(log)(response);
 	}
 };
 

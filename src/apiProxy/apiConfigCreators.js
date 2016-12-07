@@ -4,6 +4,7 @@
  * API
  *
  * @module apiConfigCreators
+ * @deprecated
  */
 
 /**

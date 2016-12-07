@@ -1,3 +1,23 @@
+## [0.10]
+
+- **New env variable** - `COOKIE_ENCRYPT_SECRET` must be in your env vars. It
+must be a 32+ character random string.
+- **Refactored** - auth cookies are now encrypted, so existing cookies must be
+cleared in the browser.
+
+## [0.9]
+
+- **Removed** - Many of the shared methods in `src/util/testUtils`
+now are in the `meetup-web-mocks` repo
+- **Change** - Use the `meetup-web-mocks` repo for testUtil methods,
+e.g.,
+
+```js
+import {
+  createFakeStore,
+} from 'meetup-web-mocks/lib/testUtils';
+```
+
 ## [0.8]
 
 - **Change** - `API_SUCCESS` now returns a `meta` prop that contains the `csrf`
@@ -19,7 +39,7 @@ function config(state={}, action) {
 
 ## [0.7]
 
-- **Rmoved/Refactor** - there are no more `LOGOUT_X` actions. Logout is instead
+- **Removed/Refactor** - there are no more `LOGOUT_X` actions. Logout is instead
 a navigation action to any URL with `?logout` in the URL.
 
 ## [0.6]
@@ -76,7 +96,7 @@ in your server entry point.
 - In order to correctly apply the `assetPublicPath` to your server and client
 builds, you must set `__webpack_public_path__` _before_ importing your
 application code, e.g.
-  
+
 	```js
 	// your client entry point
 	__webpack_public_path__ = window.APP_RUNTIME.assetPublicPath;
