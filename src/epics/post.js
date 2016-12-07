@@ -38,8 +38,11 @@ import {
  * @param {Object} postAction, providing query, onSuccess, and onError
  * @return {Promise} results of the fetch, either onSuccess or onError
  */
-const getPostQueryFetch = (fetchQueries, { apiUrl, csrf }) =>
-	query => fetchQueries(apiUrl, { method: 'POST', csrf })([query]);
+const getPostQueryFetch = (fetchQueries, store) =>
+	query => {
+		const { config: { apiUrl, csrf } } = store.getState();
+		return fetchQueries(apiUrl, { method: 'POST', csrf })([query]);
+	};
 
 /**
  * Make the POST call to the API and send the responses to the appropriate
@@ -66,7 +69,7 @@ const getPostEpic = fetchQueries => (action$, store) =>
 		.map(({ payload }) => payload)
 		.flatMap(
 			doPost$(
-				getPostQueryFetch(fetchQueries, store.getState().config)
+				getPostQueryFetch(fetchQueries, store)
 			)
 		);
 
