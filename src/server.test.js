@@ -28,6 +28,15 @@ describe('server', () => {
 		});
 	});
 	describe('Component tests', () => {
+		const random32 = 'asdfasdfasdfasdfasdfasdfasdfasdf';
+		const mockConfig = () => Promise.resolve({
+			CSRF_SECRET: random32,
+			COOKIE_ENCRYPT_SECRET: random32,
+			oauth: {
+				key: random32,
+				secret: random32,
+			}
+		});
 		it('starts the server', () => {
 			const fooRoute = {
 				method: 'get',
@@ -36,7 +45,7 @@ describe('server', () => {
 			};
 			const routes = [fooRoute];
 			// spyOn(config, 'default').and.returnValue(Promise.resolve({}));
-			return start({}, { routes })
+			return start({}, { routes }, mockConfig)
 				.then(returnedServer => returnedServer.stop());
 		});
 		it('calls the handler for an unauthenticated route', () => {
@@ -51,7 +60,7 @@ describe('server', () => {
 			};
 			const routes = [fooRoute];
 			// spyOn(config, 'default').and.returnValue(Promise.resolve({}));
-			return start({}, { routes })
+			return start({}, { routes }, mockConfig)
 				.then(server => {
 					const requestFooRoute = {
 						method: 'get',
@@ -72,7 +81,7 @@ describe('server', () => {
 			};
 			const routes = [fooRoute];
 			// spyOn(config, 'default').and.returnValue(Promise.resolve({}));
-			return start({}, { routes })
+			return start({}, { routes }, mockConfig)
 				.then(server => {
 					const authedRequestFooRoute = {
 						method: 'get',
