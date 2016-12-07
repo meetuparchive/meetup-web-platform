@@ -27,5 +27,64 @@ describe('server', () => {
 			expect(returnedServer).toBe(expectedServer);
 		});
 	});
+	describe('Component tests', () => {
+		it('starts the server', () => {
+			const fooRoute = {
+				method: 'get',
+				path: '/foo',
+				handler: (request, reply) => reply('okay')
+			};
+			const routes = [fooRoute];
+			// spyOn(config, 'default').and.returnValue(Promise.resolve({}));
+			return start({}, { routes })
+				.then(returnedServer => returnedServer.stop());
+		});
+		it('calls the handler for an unauthenticated route', () => {
+			const expectedResponse = 'okay';
+			const fooRoute = {
+				method: 'get',
+				path: '/foo',
+				config: {
+					auth: false,
+				},
+				handler: (request, reply) => reply(expectedResponse)
+			};
+			const routes = [fooRoute];
+			// spyOn(config, 'default').and.returnValue(Promise.resolve({}));
+			return start({}, { routes })
+				.then(server => {
+					const requestFooRoute = {
+						method: 'get',
+						url: '/foo',
+					};
+					return server.inject(requestFooRoute).then(
+						response => expect(response.payload).toEqual(expectedResponse)
+					)
+					.then(() => server.stop());
+				});
+		});
+		it('calls the handler for an authenticated route', () => {
+			const expectedResponse = 'okay';
+			const fooRoute = {
+				method: 'get',
+				path: '/foo',
+				handler: (request, reply) => reply(expectedResponse)
+			};
+			const routes = [fooRoute];
+			// spyOn(config, 'default').and.returnValue(Promise.resolve({}));
+			return start({}, { routes })
+				.then(server => {
+					const authedRequestFooRoute = {
+						method: 'get',
+						url: '/foo',
+						credentials: 'whatever',
+					};
+					return server.inject(authedRequestFooRoute).then(
+						response => expect(response.payload).toEqual(expectedResponse)
+					)
+					.then(() => server.stop());
+				});
+		});
+	});
 });
 
