@@ -307,7 +307,7 @@ const externalRequest$ = Rx.Observable.bindNodeCallback(externalRequest);
  */
 export const makeExternalApiRequest = (request, API_TIMEOUT) => requestOpts =>
 	externalRequest$(requestOpts)
-		.timeout(API_TIMEOUT, new Error('API response timeout'));
+		.timeout(API_TIMEOUT);
 
 export const logApiResponse = appRequest => ([response, body]) => {
 	const {
