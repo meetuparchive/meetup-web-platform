@@ -27,7 +27,7 @@ describe('server', () => {
 			expect(returnedServer).toBe(expectedServer);
 		});
 	});
-	describe('Component tests', () => {
+	describe('Integration tests', () => {
 		const random32 = 'asdfasdfasdfasdfasdfasdfasdfasdf';
 		const mockConfig = () => Promise.resolve({
 			CSRF_SECRET: random32,
