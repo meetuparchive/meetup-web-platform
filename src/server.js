@@ -36,7 +36,7 @@ export default function start(
 	// (process.env.NODE_ENV === 'production')
 	require('source-map-support').install();
 
-	return getConfig()
+	return config()
 		.then(configureEnv)
 		.then(config => {
 			const baseRoutes = getRoutes(renderRequestMap, config);
