@@ -75,7 +75,7 @@ export function event(params) {
  */
 export function photoAdmin(params) {
 	return {
-		endpoint: `${params.urlname}/photos`,
+		endpoint: `admin/${params.urlname}/photos`,
 		params
 	};
 }
