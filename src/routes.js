@@ -73,10 +73,16 @@ export default function getRoutes(
 				);
 		}
 	};
+	const plugins = {
+		'electrode-csrf-jwt': {
+			enabled: true,
+		}
+	};
 	const apiGetRoute = {
 		...apiProxyRoute,
 		method: ['GET', 'DELETE', 'PATCH'],
 		config: {
+			plugins,
 			validate: {
 				query: validApiPayloadSchema
 			},
@@ -86,6 +92,7 @@ export default function getRoutes(
 		...apiProxyRoute,
 		method: 'POST',
 		config: {
+			plugins,
 			validate: {
 				payload: validApiPayloadSchema
 			},
