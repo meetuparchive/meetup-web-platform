@@ -2,6 +2,7 @@ import start from './server';
 import * as serverUtils from './util/serverUtils';
 import * as config from './util/config';
 import * as apiProxyHandler from './apiProxy/apiProxyHandler';
+import * as appRouteHandler from './routes/appRouteHandler';
 
 jest.mock('source-map-support');
 
@@ -115,24 +116,22 @@ describe('server', () => {
 					.then(() => server.stop());
 				});
 		});
-		xit('calls the handler for /{wild*}', () => {
-			const expectedResponse = 'okay';
-			const fooRoute = {
-				method: 'get',
-				path: '/foo',
-				handler: (request, reply) => reply(expectedResponse)
+		it('calls the handler for /api', () => {
+			const spyable = {
+				handler: (request, reply) => reply('okay'),
 			};
-			const routes = [fooRoute];
-			// spyOn(config, 'default').and.returnValue(Promise.resolve({}));
-			return start({}, { routes }, mockConfig)
+			spyOn(spyable, 'handler').and.callThrough();
+			spyOn(appRouteHandler, 'getAppRouteHandler')
+				.and.callFake(() => spyable.handler);
+			return start({}, {}, mockConfig)
 				.then(server => {
-					const authedRequestFooRoute = {
+					const request = {
 						method: 'get',
-						url: '/foo',
+						url: '/ny-tech',
 						credentials: 'whatever',
 					};
-					return server.inject(authedRequestFooRoute).then(
-						response => expect(response.payload).toEqual(expectedResponse)
+					return server.inject(request).then(
+						response => expect(spyable.handler).toHaveBeenCalled()
 					)
 					.then(() => server.stop());
 				});
