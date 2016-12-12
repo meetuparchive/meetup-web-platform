@@ -1,8 +1,8 @@
-import 'rxjs';  // required to enable all Observable operators
+require('rxjs');  // required to enable all Observable operators in subsequent imports
 
-import getSyncEpic from '../epics/sync';
-import getCacheEpic from '../epics/cache';
-import getPostEpic from '../epics/post';
+const getSyncEpic = require('../epics/sync').default;
+const getCacheEpic = require('../epics/cache').default;
+const getPostEpic = require('../epics/post').default;
 
 const {
 	combineEpics,
