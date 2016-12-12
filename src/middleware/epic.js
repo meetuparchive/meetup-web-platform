@@ -1,9 +1,13 @@
 import 'rxjs';  // required to enable all Observable operators
-import { combineEpics, createEpicMiddleware } from 'redux-observable';
 
 import getSyncEpic from '../epics/sync';
 import getCacheEpic from '../epics/cache';
 import getPostEpic from '../epics/post';
+
+const {
+	combineEpics,
+	createEpicMiddleware,
+} = require('redux-observable');
 
 /**
  * The middleware is exported as a getter because it needs the application's
