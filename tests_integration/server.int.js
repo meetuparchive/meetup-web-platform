@@ -89,7 +89,7 @@ describe('Integration tests', () => {
 				.then(() => server.stop());
 			});
 	});
-	it('calls the handler for /api', () => {
+	it('calls the handler for /{*wild}', () => {
 		const spyable = {
 			handler: (request, reply) => reply('okay'),
 		};
