@@ -45,6 +45,13 @@ export default function start(
 			const connection = {
 				host: '0.0.0.0',
 				port: config.DEV_SERVER_PORT,
+				routes: {
+					plugins: {
+						'electrode-csrf-jwt': {
+							enabled: false,
+						}
+					}
+				}
 			};
 
 			const finalPlugins = [ ...plugins, ...getPlugins(config) ];

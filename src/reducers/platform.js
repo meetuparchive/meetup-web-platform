@@ -40,10 +40,13 @@ export function config(state={}, action) {
 		apiUrl,
 		trackId;
 
-	switch(action.type) {
-	case 'API_SUCCESS':
+	if ((action.meta || {}).csrf) {
+		// any CSRF-bearing action should update state
 		csrf = action.meta.csrf;
-		return { ...state, csrf };
+		// create a copy of state with updated csrf
+		state = { ...state, csrf };
+	}
+	switch(action.type) {
 	case 'CONFIGURE_API_URL':
 		apiUrl = action.payload;
 		return { ...state, apiUrl };
