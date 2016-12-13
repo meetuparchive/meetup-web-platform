@@ -6,6 +6,6 @@
     "js",
     "jsx"
   ],
-  "testRegex": "integration_tests\/.*\\.int\\.jsx?$"
+  "testRegex": "tests_integration\/.*\\.int\\.jsx?$"
 }
 
