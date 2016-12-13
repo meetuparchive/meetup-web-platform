@@ -8,7 +8,9 @@
     "coveralls": "cat coverage/lcov.info | coveralls",
     "lint": "eslint . --ext .js,.jsx --fix",
     "prepublish": "npm run build",
-    "test": "jest --silent --config jest.config.json --coverage"
+    "test": "npm run test:unit && npm run test:integration",
+    "test:unit": "jest --silent --config jest.config.json --coverage",
+    "test:integration": "jest --silent --config jest.int.config.json"
   },
   "repository": {
     "type": "git",
