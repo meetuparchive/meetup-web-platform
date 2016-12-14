@@ -144,14 +144,18 @@ const makeRenderer = (
 	middleware = middleware || [];
 	request.log(['info'], chalk.green(`Rendering ${request.url.href}`));
 	const {
-		url,
+		connection,
+		headers,
 		info,
-		server,
 		log,
+		url,
 	} = request;
 
 	const location = url.path;
-	const apiUrl = `${server.info.protocol}://${info.host}/api`;
+	// request protocol might be different from original request that hit proxy
+	// we want to use the proxy's protocol
+	const requestProtocol = headers['x-forwarded-proto'] || connection.info.protocol;
+	const apiUrl = `${requestProtocol}://${info.host}/api`;
 
 	// create the store
 	const store = createServerStore(routes, reducer, {}, middleware, request);
