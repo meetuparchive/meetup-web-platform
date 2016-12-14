@@ -15,6 +15,7 @@ export function getCsrfPlugin(secret) {
 		});
 		return CsrfPlugin.register(server, options, next);
 	};
+	register.attributes = CsrfPlugin.register.attributes;
 	return {
 		register,
 		options: {
