@@ -74,7 +74,7 @@ export const applyServerState = (server, options) => {
 	const authCookieOptions = {
 		encoding: 'iron',
 		password,
-		// isSecure: process.env.NODE_ENV === 'production',   // enable when SSL is active
+		isSecure: process.env.NODE_ENV === 'production',
 		path: '/',
 		isHttpOnly: true,
 		clearInvalid: true,

@@ -74,4 +74,3 @@ export function server(routes, connection, plugins, platform_agent, config) {
 		.then(() => server);
 }
 
-
