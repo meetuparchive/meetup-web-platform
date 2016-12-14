@@ -5,6 +5,7 @@ const COOKIE_OPTS = {
 	encoding: 'none',
 	path: '/',
 	isHttpOnly: true,
+	isSecure: process.env.NODE_ENV === 'production',
 };
 
 
