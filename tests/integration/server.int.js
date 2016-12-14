@@ -1,6 +1,6 @@
-import start from '../src/server';
-import * as apiProxyHandler from '../src/apiProxy/apiProxyHandler';
-import * as appRouteHandler from '../src/routes/appRouteHandler';
+import start from '../../src/server';
+import * as apiProxyHandler from '../../src/apiProxy/apiProxyHandler';
+import * as appRouteHandler from '../../src/routes/appRouteHandler';
 
 describe('Integration tests', () => {
 	const random32 = 'asdfasdfasdfasdfasdfasdfasdfasdf';

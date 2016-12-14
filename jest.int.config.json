@@ -6,6 +6,7 @@
     "js",
     "jsx"
   ],
-  "testRegex": "tests_integration\/.*\\.int\\.jsx?$"
+  "testEnvironment": "node",
+  "testRegex": "tests\/integration\/.*\\.int\\.jsx?$"
 }
 
