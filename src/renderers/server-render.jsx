@@ -146,12 +146,14 @@ const makeRenderer = (
 	const {
 		url,
 		info,
-		server,
 		log,
 	} = request;
 
 	const location = url.path;
-	const apiUrl = `${server.info.protocol}://${info.host}/api`;
+	// request protocol might be different from original request that hit proxy
+	// we want to use the proxy's protocol
+	const requestProtocol = request.headers['x-forwarded-proto'] || request.connection.info.protocol;
+	const apiUrl = `${requestProtocol}://${info.host}/api`;
 
 	// create the store
 	const store = createServerStore(routes, reducer, {}, middleware, request);
