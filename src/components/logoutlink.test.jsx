@@ -1,24 +1,28 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import Link from 'react-router/lib/Link';
 import TestUtils from 'react-addons-test-utils';
 import LogoutLink from './LogoutLink';
 
-describe('NavItem', function() {
+const renderer = TestUtils.createRenderer();
+const MOCK_LOGOUT_TO_QUERY = {
+	logout: true
+};
+
+describe('LogoutLink', function() {
+	let tree;
+
 	beforeEach(function() {
-		this.logoutLink = TestUtils.renderIntoDocument(<LogoutLink to='/' />);
-		this.linkEl = ReactDOM.findDOMNode(this.logoutLink);
+		renderer.render(<LogoutLink to='/' />);
+		tree = renderer.getRenderOutput();
 	});
 
 	it('exists', function() {
-		expect(this.linkEl).not.toBeNull();
+		expect(tree).not.toBeNull();
 	});
 
-	it('creates an HTML a element', function() {
-		expect(this.linkEl.nodeName).toBe('A');
+	it('creates a Link element with a logout to prop', function() {
+		expect(tree.type).toEqual(Link);
+		expect(tree.props.to.pathname).toEqual('/');
+		expect(tree.props.to.query).toEqual(MOCK_LOGOUT_TO_QUERY);
 	});
-
-	xit('appends the logout query param', function() {
-		expect(this.linkEl.getAttribute('href')).toEqual('/?logout');
-	});
-
 });
