@@ -45,7 +45,7 @@
     "jest-cli": "17.0.3",
     "joi": "10.0.5",
     "js-cookie": "^2.1.2",
-    "meetup-web-mocks": "0.1.18",
+    "meetup-web-mocks": "0.1.23",
     "node-fetch": "1.6.3",
     "react": "15.4.1",
     "react-addons-test-utils": "15.4.1",
