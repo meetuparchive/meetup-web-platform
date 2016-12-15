@@ -36,7 +36,7 @@ export default function start(
 	// (process.env.NODE_ENV === 'production')
 	require('source-map-support').install();
 
-	return getConfig()
+	return config()
 		.then(configureEnv)
 		.then(config => {
 			const baseRoutes = getRoutes(renderRequestMap, config);
@@ -45,6 +45,13 @@ export default function start(
 			const connection = {
 				host: '0.0.0.0',
 				port: config.DEV_SERVER_PORT,
+				routes: {
+					plugins: {
+						'electrode-csrf-jwt': {
+							enabled: false,
+						}
+					}
+				}
 			};
 
 			const finalPlugins = [ ...plugins, ...getPlugins(config) ];

@@ -64,7 +64,7 @@ const DOM = (props) => {
 				{head.meta.toComponent()}
 				{head.link.toComponent()}
 			</head>
-			<body style={{ margin: 0, fontFamily:'sans-serif' }}>
+			<body>
 				<div id='outlet' dangerouslySetInnerHTML={getInnerHTML(appMarkup)} />
 				<script dangerouslySetInnerHTML={getInnerHTML(`window.APP_RUNTIME=${JSON.stringify(APP_RUNTIME)};`)} />
 				<script src={`${assetPublicPath}${clientFilename}`} />

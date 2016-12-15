@@ -1,0 +1,12 @@
+{
+  "setupFiles": [
+    "<rootDir>/src/util/globals.js"
+  ],
+  "moduleFileExtensions": [
+    "js",
+    "jsx"
+  ],
+  "testEnvironment": "node",
+  "testRegex": "tests\/integration\/.*\\.int\\.jsx?$"
+}
+
