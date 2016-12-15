@@ -173,9 +173,6 @@ export const buildRequestArgs = externalRequestOpts =>
 			externalRequestOptsQuery.headers['X-Meta-Photo-Host'] = 'secure';
 			break;
 		case 'delete':
-			externalRequestOptsQuery.body = dataParams;//`?${dataParams}`;
-			externalRequestOptsQuery.headers['content-type'] = 'application/x-www-form-urlencoded';
-			break;
 		case 'post':
 			externalRequestOptsQuery.body = dataParams;
 			externalRequestOptsQuery.headers['content-type'] = 'application/x-www-form-urlencoded';
@@ -234,7 +231,7 @@ export function parseRequest(request, baseUrl) {
 		}
 	};
 
-	const queriesJSON = (request.method === 'get') ? query.queries : payload.queries;
+	const queriesJSON = request.method === 'get' ? query.queries : payload.queries;
 	const validatedQueries = Joi.validate(
 		JSON.parse(queriesJSON),
 		Joi.array().items(querySchema)
