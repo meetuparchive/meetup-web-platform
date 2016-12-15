@@ -32,7 +32,7 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 		}
 	}
 	const searchString = `?${params}`;
-	const fetchUrl = `${apiUrl}${isPost ? '' : searchString}`;
+	const fetchUrl = `${apiUrl}${(isPost) ? '' : searchString}`;
 	const fetchConfig = {
 		method,
 		headers: {
