@@ -55,6 +55,30 @@ function formatApiError(err) {
 	};
 }
 
+export const errorResponse$ = requestUrl => err =>
+	Rx.Observable.of({
+		value: formatApiError(err),
+		meta: {
+			endpoint: url.parse(requestUrl).pathname,
+		},
+	});
+
+export const parseApiValue = ([response, body]) => {
+	// treat non-success HTTP code as an error
+	if (response.statusCode < 200 || response.statusCode > 299) {
+		return formatApiError(new Error(response.statusMessage));
+	}
+	try {
+		const value = JSON.parse(body);
+		if (value && value.problem) {
+			return formatApiError(new Error(`API problem: ${value.problem}: ${value.details}`));
+		}
+		return value;
+	} catch(err) {
+		return formatApiError(err);
+	}
+};
+
 /**
  *
  * mostly error handling - any case where the API does not satisfy the
@@ -68,34 +92,16 @@ function formatApiError(err) {
  * @return responseObj the JSON-parsed text, possibly with error info
  */
 export const parseApiResponse = requestUrl => ([response, body]) => {
-	let value;
 	const meta = {
 		...parseMetaHeaders(response.headers),
 		endpoint: url.parse(requestUrl).pathname,
 	};
 
-	// treat non-success HTTP code as an error
-	if (response.statusCode < 200 || response.statusCode > 299) {
-		return {
-			value: formatApiError(new Error(response.statusMessage)),
-			meta,
-		};
-	}
-	try {
-		value = JSON.parse(body);
-		if (value && value.problem) {
-			value = formatApiError(new Error(`API problem: ${value.problem}: ${value.details}`));
-		}
-		return {
-			value,
-			meta,
-		};
-	} catch(err) {
-		return {
-			value: formatApiError(err),
-			meta,
-		};
-	}
+	return {
+		value: parseApiValue([response, body]),
+		meta,
+	};
+
 };
 
 /**
@@ -376,11 +382,8 @@ export const makeApiRequest$ = (request, API_TIMEOUT, duotoneUrls) => {
 			return request$(requestOpts)
 				.do(logApiResponse(request))             // this will leak private info in API response
 				.map(parseApiResponse(requestOpts.url))  // parse into plain object
+				.catch(errorResponse$(requestOpts.url))
 				.map(parseLoginAuth(request, query))     // login has oauth secrets - special case
-				.catch(err => Rx.Observable.of({
-					value: formatApiError(err),
-					meta: {},
-				}))
 				.map(apiResponseToQueryResponse(query))  // convert apiResponse to app-ready queryResponse
 				.map(setApiResponseDuotones);            // special duotone prop
 		});
