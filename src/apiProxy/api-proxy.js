@@ -38,17 +38,16 @@ import {
  * @return Array$ contains all API responses corresponding to the provided queries
  */
 const apiProxy$ = ({ API_TIMEOUT=8000, baseUrl='', duotoneUrls={} }) => {
-console.log('WTF AM I NOT HERE!!!!');
+
 	return request => {
-		console.log('HWERWERWWERWER    ');
 		request.log(['api', 'info'], 'Parsing api endpoint request');
 		// 1. get the queries and the 'universal' `externalRequestOpts` from the request
 		const { queries, externalRequestOpts } = parseRequest(request, baseUrl);
-console.log('REQUEST BEING MADE', queries, externalRequestOpts);
+
 		// 2. curry a function that uses `externalRequestOpts` as a base from which
 		// to build the query-specific API request options object
 		const apiConfigToRequestOptions = buildRequestArgs(externalRequestOpts);
-console.log('API CONFIG', apiConfigToRequestOptions);
+
 		request.log(['api', 'info'], JSON.stringify(queries));
 		// 3. map the queries onto an array of api request observables
 		const apiRequests$ = queries

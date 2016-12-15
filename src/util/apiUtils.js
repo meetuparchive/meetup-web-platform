@@ -160,8 +160,7 @@ export const buildRequestArgs = externalRequestOpts =>
 		}
 
 		const dataParams = querystring.stringify(params);
-console.log('   --------   externalRequestOptsQuery.method', externalRequestOptsQuery.method);
-console.log('   --------   externalRequestOptsQuery', externalRequestOptsQuery);
+
 		switch (externalRequestOptsQuery.method) {
 		case 'get':
 			externalRequestOptsQuery.url += `?${dataParams}`;
@@ -176,7 +175,7 @@ console.log('   --------   externalRequestOptsQuery', externalRequestOptsQuery);
 			externalRequestOptsQuery.headers['content-type'] = 'application/x-www-form-urlencoded';
 			break;
 		}
-console.log('---- externalRequestOptsQuery', externalRequestOptsQuery);
+
 		return externalRequestOptsQuery;
 	};
 
