@@ -34,6 +34,7 @@ MUPWEB_OAUTH_KEY=<check with an admin>
 MUPWEB_OAUTH_SECRET=<check with an admin>
 PHOTO_SCALER_SALT='<check with admin>'  # single quotes are required
 CSRF_SECRET='<any random string over 32 characters long>'
+COOKIE_ENCRYPT_SECRET='<any random string over 32 characters long>'
 ```
 
 **Note**: you _can_ use `dev.meetup.com` URLs for `API_HOST`, `OAUTH_AUTH_URL`,
