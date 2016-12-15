@@ -377,6 +377,10 @@ export const makeApiRequest$ = (request, API_TIMEOUT, duotoneUrls) => {
 				.do(logApiResponse(request))             // this will leak private info in API response
 				.map(parseApiResponse(requestOpts.url))  // parse into plain object
 				.map(parseLoginAuth(request, query))     // login has oauth secrets - special case
+				.catch(err => Rx.Observable.of({
+					value: formatApiError(err),
+					meta: {},
+				}))
 				.map(apiResponseToQueryResponse(query))  // convert apiResponse to app-ready queryResponse
 				.map(setApiResponseDuotones);            // special duotone prop
 		});
