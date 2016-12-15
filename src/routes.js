@@ -32,7 +32,7 @@ export default function getRoutes(
 		const response = reply(JSON.stringify(queryResponses))
 			.type('application/json');
 
-		const payload = request.method === 'post' ?
+		const payload = (request.method === 'post' || request.method === 'delete') ?
 			request.payload :
 			request.query;
 
@@ -80,7 +80,7 @@ export default function getRoutes(
 	};
 	const apiGetRoute = {
 		...apiProxyRoute,
-		method: ['GET', 'DELETE', 'PATCH'],
+		method: ['GET', 'PATCH'],
 		config: {
 			plugins,
 			validate: {
@@ -90,7 +90,7 @@ export default function getRoutes(
 	};
 	const apiPostRoute = {
 		...apiProxyRoute,
-		method: 'POST',
+		method: ['POST', 'DELETE'],
 		config: {
 			plugins,
 			validate: {
