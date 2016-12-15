@@ -71,11 +71,8 @@ export const parseApiValue = ([response, body]) => {
 	try {
 		if (response.statusCode === 204) { //NoContent response type
 			return {
-				value: {},
-				meta: {
-					success: true,
-					...meta
-				},
+				value: null,
+				meta: meta,
 			};
 		}
 
