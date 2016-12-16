@@ -1,8 +1,15 @@
 import Accepts from 'accepts';
 import chalk from 'chalk';
 
+const parseUrlLang = (pathname, supportedLangs) => {
+	const urlLang = pathname.split('/')[1];  // first path component
+	return supportedLangs.includes(urlLang) ? urlLang : null;
+};
+
 const getLanguage = (request, supportedLangs, defaultLang='en-US') => {
-	return Accepts(request).language(supportedLangs) || defaultLang;
+	const urlLang = parseUrlLang(request.path, supportedLangs, defaultLang);
+	const browserLang = Accepts(request).language(supportedLangs);
+	return urlLang || browserLang || defaultLang;
 };
 
 export const getAppRouteHandler = renderRequestMap => (request, reply) => {

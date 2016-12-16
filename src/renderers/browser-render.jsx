@@ -23,7 +23,7 @@ import createStore from '../util/createStore';
  * @returns {Function} a function that results in a ReactDOM.render call - can
  *   use a custom root element ID or default to `'outlet'`
  */
-function makeRenderer(routes, reducer, middleware, basename='/foo') {
+function makeRenderer(routes, reducer, middleware, basename='/') {
 	// the initial state is delivered in the HTML from the server as a plain object
 	// containing the HTML-escaped JSON string in `window.INITIAL_STATE.escapedState`.
 	// unescape the text using native `textarea.textContent` unescaping
