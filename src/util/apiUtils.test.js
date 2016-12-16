@@ -108,8 +108,15 @@ describe('parseApiValue', () => {
 		expect(parseApiValue([MOCK_RESPONSE, responeWithProblem]).error).toEqual(jasmine.any(String));
 	});
 	it('returns an object with a string "error" value for a not-ok response', () => {
+		const noContentStatus = {
+			statusCode: 204,
+			statusMessage: 'No Content',
+		};
+		const noContentResponse = { ...MOCK_RESPONSE, ...noContentStatus };
+		expect(parseApiValue([noContentResponse, ''])).toBeNull();
+	});
+	it('returns an object with a string "error" value for a not-ok response', () => {
 		const badStatus = {
-			ok: false,
 			statusCode: 500,
 			statusMessage: 'Problems',
 		};
