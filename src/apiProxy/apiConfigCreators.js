@@ -71,11 +71,11 @@ export function event(params) {
 }
 
 /**
- * photo admin endpoints
+ * admin endpoints
  */
-export function photoAdmin(params) {
+export function admin(params) {
 	return {
-		endpoint: `admin/${params.urlname}/photos`,
+		endpoint,
 		params
 	};
 }
