@@ -22,6 +22,7 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 	} = options;
 
 	const isPost = method.toLowerCase() === 'post';
+	const isDelete = method.toLowerCase() === 'delete';
 
 	const params = new URLSearchParams();
 	params.append('queries', JSON.stringify(queries));
@@ -38,7 +39,7 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 		headers: {
 			...(headers || {}),
 			'content-type': isPost ? 'application/x-www-form-urlencoded' : 'text/plain',
-			'x-csrf-jwt': isPost ? options.csrf : '',
+			'x-csrf-jwt': (isPost || isDelete) ? options.csrf : '',
 		},
 		credentials: 'same-origin'  // allow response to set-cookies
 	};
