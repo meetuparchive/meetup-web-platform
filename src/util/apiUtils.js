@@ -169,6 +169,7 @@ export const buildRequestArgs = externalRequestOpts =>
 
 		switch (externalRequestOptsQuery.method) {
 		case 'get':
+		case 'delete':
 			externalRequestOptsQuery.url += `?${dataParams}`;
 			externalRequestOptsQuery.headers['X-Meta-Photo-Host'] = 'secure';
 			break;

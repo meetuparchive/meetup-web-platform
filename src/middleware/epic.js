@@ -4,6 +4,7 @@ import { combineEpics, createEpicMiddleware } from 'redux-observable';
 import getSyncEpic from '../epics/sync';
 import getCacheEpic from '../epics/cache';
 import getPostEpic from '../epics/post';
+import getDeleteEpic from '../epics/delete';
 
 /**
  * The middleware is exported as a getter because it needs the application's
@@ -18,7 +19,8 @@ const getPlatformMiddleware = (routes, fetchQueries) => createEpicMiddleware(
 	combineEpics(
 		getSyncEpic(routes, fetchQueries),
 		getCacheEpic(),
-		getPostEpic(fetchQueries)
+		getPostEpic(fetchQueries),
+		getDeleteEpic(fetchQueries)
 	)
 );
 
