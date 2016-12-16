@@ -1,8 +1,12 @@
 import Accepts from 'accepts';
 import chalk from 'chalk';
 
+const getLanguage = (request, supportedLangs, defaultLang='en-US') => {
+	return Accepts(request).language(supportedLangs) || defaultLang;
+};
+
 export const getAppRouteHandler = renderRequestMap => (request, reply) => {
-	const requestLanguage = Accepts(request).language(Object.keys(renderRequestMap));
+	const requestLanguage = getLanguage(request, Object.keys(renderRequestMap), 'en-US');
 	request.log(['info'], chalk.green(`Request received for ${request.url.href} (${requestLanguage})`));
 
 	return renderRequestMap[requestLanguage](request)

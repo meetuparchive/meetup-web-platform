@@ -4,6 +4,7 @@ import chalk from 'chalk';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import RouterContext from 'react-router/lib/RouterContext';
+import { useBasename } from 'history';
 import match from 'react-router/lib/match';
 import { Provider } from 'react-redux';
 
@@ -56,7 +57,7 @@ function getHtml(assetPublicPath, clientFilename, initialState={}, appMarkup='')
  * @return {Object} the statusCode and result used by Hapi's `reply` API
  *   {@link http://hapijs.com/api#replyerr-result}
  */
-const getRouterRenderer = (store, clientFilename, assetPublicPath) =>
+const getRouterRenderer = (store, clientFilename, assetPublicPath, basename='/') =>
 	([ redirectLocation, renderProps ]) => {
 		// pre-render the app-specific markup, this is the string of markup that will
 		// be managed by React on the client.
@@ -69,6 +70,8 @@ const getRouterRenderer = (store, clientFilename, assetPublicPath) =>
 		let result;
 		let statusCode;
 
+		renderProps.history = useBasename(() => renderProps.history)({ basename });
+		renderProps.router = { ...renderProps.router, ...renderProps.history };
 		try {
 			appMarkup = ReactDOMServer.renderToString(
 				<Provider store={store}>
@@ -138,7 +141,8 @@ const makeRenderer = (
 	reducer,
 	clientFilename,
 	assetPublicPath,
-	middleware=[]
+	middleware=[],
+	basename='/'
 ) => request => {
 
 	middleware = middleware || [];
@@ -151,7 +155,7 @@ const makeRenderer = (
 		url,
 	} = request;
 
-	const location = url.path;
+	const location = url.path.replace(basename, '/');
 	// request protocol might be different from original request that hit proxy
 	// we want to use the proxy's protocol
 	const requestProtocol = headers['x-forwarded-proto'] || connection.info.protocol;
@@ -194,7 +198,7 @@ const makeRenderer = (
 			})
 		)
 		.flatMap(args => storeIsReady$.map(() => args))  // `sample` appears not to work - this is equivalent
-		.map(getRouterRenderer(store, clientFilename, assetPublicPath));
+		.map(getRouterRenderer(store, clientFilename, assetPublicPath, basename));
 };
 
 export default makeRenderer;

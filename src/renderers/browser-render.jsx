@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Router from 'react-router/lib/Router';
 import browserHistory from 'react-router/lib/browserHistory';
+import { useBasename } from 'history';
 import match from 'react-router/lib/match';
 import { Provider } from 'react-redux';
 import { syncHistoryWithStore } from 'react-router-redux';
@@ -22,7 +23,7 @@ import createStore from '../util/createStore';
  * @returns {Function} a function that results in a ReactDOM.render call - can
  *   use a custom root element ID or default to `'outlet'`
  */
-function makeRenderer(routes, reducer, middleware) {
+function makeRenderer(routes, reducer, middleware, basename='/foo') {
 	// the initial state is delivered in the HTML from the server as a plain object
 	// containing the HTML-escaped JSON string in `window.INITIAL_STATE.escapedState`.
 	// unescape the text using native `textarea.textContent` unescaping
@@ -31,7 +32,8 @@ function makeRenderer(routes, reducer, middleware) {
 	const unescapedStateJSON = escape.textContent;
 	const initialState = JSON.parse(unescapedStateJSON);
 	const store = createStore(routes, reducer, initialState, middleware);
-	const history = syncHistoryWithStore(browserHistory, store);
+	const normalizedHistory = useBasename(() => browserHistory)({ basename });
+	const history = syncHistoryWithStore(normalizedHistory, store);
 
 	return (rootElId='outlet') => {
 		match({ history, routes }, (error, redirectLocation, renderProps) => {
