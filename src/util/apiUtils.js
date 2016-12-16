@@ -69,11 +69,8 @@ export const parseApiValue = ([response, body]) => {
 		return formatApiError(new Error(response.statusMessage));
 	}
 	try {
-		if (response.statusCode === 204) { //NoContent response type
-			return {
-				value: null,
-				meta: meta,
-			};
+		if (response.statusCode === 204) {  // NoContent response type
+			return null;
 		}
 
 		const value = JSON.parse(body);
