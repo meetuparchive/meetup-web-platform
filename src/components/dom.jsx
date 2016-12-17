@@ -30,6 +30,7 @@ function getInnerHTML(__html) {
  */
 const DOM = (props) => {
 	const {
+		baseUrl,
 		clientFilename,
 		assetPublicPath,
 		initialState,
@@ -53,6 +54,7 @@ const DOM = (props) => {
 	const head = Helmet.rewind();
 
 	const APP_RUNTIME = {
+		baseUrl,
 		assetPublicPath,
 		escapedState,
 	};
