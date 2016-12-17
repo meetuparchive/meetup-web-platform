@@ -5,7 +5,7 @@ export const LANG_DEFAULT = 'en-US';
 
 export const getLanguage = (request, supportedLangs, defaultLang=LANG_DEFAULT) => {
 	const firstPathComponent = request.url.path.split('/')[1];
-	const urlLang = supportedLangs.includes(firstPathComponent) ? urlLang : null;
+	const urlLang = supportedLangs.includes(firstPathComponent) ? firstPathComponent : null;
 	const browserLang = Accepts(request).language(supportedLangs);
 
 	const langSourcePreference = [

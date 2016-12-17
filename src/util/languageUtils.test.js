@@ -15,16 +15,24 @@ const MOCK_HAPI_REPLY = {
 };
 
 describe('getLanguage', () => {
+	const defaultLang = 'en-US';
+	const altLang = 'fr-FR';
+	const supportedLangs = [defaultLang, altLang];
 	it('returns supported language from URL pathname, if present', () => {
-		const pathLang = 'asdf';
-		const supportedLangs = ['asdf', 'sdfg'];
-		const request = { ...MOCK_HAPI_REQUEST, url: url.parse(`${rootUrl}${pathLang}/`) };
+		const requestLang = altLang;
+		const request = { ...MOCK_HAPI_REQUEST, url: url.parse(`${rootUrl}${requestLang}/`) };
 		const lang = getLanguage(request, supportedLangs);
-		expect(lang).toEqual(pathLang);
+		expect(lang).toEqual(requestLang);
 	});
 	it('returns supported language from brower "Accept-Language" header, if present', () => {
+		const acceptLang = altLang;
+		const request = { ...MOCK_HAPI_REQUEST, headers: { 'accept-language': acceptLang } };
+		const lang = getLanguage(request, supportedLangs);
+		expect(lang).toEqual(acceptLang);
 	});
-	it('returns default language, if present', () => {
+	it('returns default language if no supported lang or URL pathname prefix', () => {
+		const lang = getLanguage(MOCK_HAPI_REQUEST, supportedLangs, defaultLang);
+		expect(lang).toEqual(defaultLang);
 	});
 });
 describe('checkLanguageRedirect', () => {
