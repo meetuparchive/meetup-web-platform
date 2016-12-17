@@ -28,84 +28,68 @@ describe('getLanguage', () => {
 	});
 });
 describe('checkLanguageRedirect', () => {
-	it('calls redirect to root path when default lang requested', () => {
+	const defaultLang = 'en-US';
+	const altLang = 'fr-FR';
+	const supportedLangs = [defaultLang, altLang];
+	function getRedirect({ requestLang, requestUrl }) {
+		const request = { ...MOCK_HAPI_REQUEST, url: url.parse(requestUrl) };
+		return checkLanguageRedirect(request, MOCK_HAPI_REPLY, requestLang, supportedLangs, defaultLang);
+	}
+	function expectRedirect(options) {
+		if (options.expectedRedirect) {
+			expect(getRedirect(options)).not.toBeNull();
+			expect(MOCK_HAPI_REPLY.redirect.calls.mostRecent().args).toEqual([options.expectedRedirect]);
+		} else {
+			expect(getRedirect(options)).toBeNull();
+			expect(MOCK_HAPI_REPLY.redirect).not.toHaveBeenCalled();
+		}
+	}
+	function testRedirect(options) {
 		spyOn(MOCK_HAPI_REPLY, 'redirect');
-		const defaultLang = 'en-US';
-		const requestLang = defaultLang;
-		const supportedLangs = [defaultLang, 'sdfg'];
-		let request, redirect;
-		request = { ...MOCK_HAPI_REQUEST, url: url.parse(`${rootUrl}${defaultLang}/`) };
-		redirect = checkLanguageRedirect(request, MOCK_HAPI_REPLY, requestLang, supportedLangs, defaultLang);
-		expect(redirect).not.toBeNull();
-		expect(MOCK_HAPI_REPLY.redirect.calls.mostRecent().args).toEqual([rootUrl]);
+		expectRedirect(options);
 
-		request = { ...MOCK_HAPI_REQUEST, url: url.parse(`${rootUrl}${defaultLang}/foo`) };
-		redirect = checkLanguageRedirect(request, MOCK_HAPI_REPLY, requestLang, supportedLangs, defaultLang);
-		expect(redirect).not.toBeNull();
-		expect(MOCK_HAPI_REPLY.redirect.calls.mostRecent().args).toEqual([`${rootUrl}foo`]);
-	});
+		options.requestUrl = `${options.requestUrl}foo`;
+		options.expectedRedirect = options.expectedRedirect && `${options.expectedRedirect}foo`;
+		expectRedirect(options);
+	}
+
+	it('calls redirect to root path when default lang requested', () =>
+		testRedirect({
+			requestLang: defaultLang,
+			requestUrl: `${rootUrl}${defaultLang}/`,
+			expectedRedirect: rootUrl,
+		})
+	);
 	it('calls redirect to requestLanguage path from incorrect language path', () => {
-		spyOn(MOCK_HAPI_REPLY, 'redirect');
-		const defaultLang = 'en-US';
-		const requestLang = 'fr-FR';
-		const supportedLangs = [defaultLang, requestLang];
-		let request, redirect;
-		request = { ...MOCK_HAPI_REQUEST, url: url.parse(`${rootUrl}${defaultLang}/`) };
-		redirect = checkLanguageRedirect(request, MOCK_HAPI_REPLY, requestLang, supportedLangs, defaultLang);
-		expect(redirect).not.toBeNull();
-		expect(MOCK_HAPI_REPLY.redirect.calls.mostRecent().args).toEqual([`${rootUrl}${requestLang}/`]);
-
-		request = { ...MOCK_HAPI_REQUEST, url: url.parse(`${rootUrl}${defaultLang}/foo`) };
-		redirect = checkLanguageRedirect(request, MOCK_HAPI_REPLY, requestLang, supportedLangs, defaultLang);
-		expect(redirect).not.toBeNull();
-		expect(MOCK_HAPI_REPLY.redirect.calls.mostRecent().args).toEqual([`${rootUrl}${requestLang}/foo`]);
+		const requestLang = altLang;
+		testRedirect({
+			requestLang,
+			requestUrl: `${rootUrl}${defaultLang}/`,
+			expectedRedirect: `${rootUrl}${requestLang}/`
+		});
 	});
 	it('calls redirect to path with requestLanguage injected if missing', () => {
-		spyOn(MOCK_HAPI_REPLY, 'redirect');
-		const defaultLang = 'en-US';
-		const requestLang = 'fr-FR';
-		const supportedLangs = [defaultLang, requestLang];
-		let request, redirect;
-		request = { ...MOCK_HAPI_REQUEST, url: url.parse(rootUrl) };
-		redirect = checkLanguageRedirect(request, MOCK_HAPI_REPLY, requestLang, supportedLangs, defaultLang);
-		expect(redirect).not.toBeNull();
-		expect(MOCK_HAPI_REPLY.redirect.calls.mostRecent().args).toEqual([`${rootUrl}${requestLang}/`]);
-
-		request = { ...MOCK_HAPI_REQUEST, url: url.parse(`${rootUrl}foo`) };
-		redirect = checkLanguageRedirect(request, MOCK_HAPI_REPLY, requestLang, supportedLangs, defaultLang);
-		expect(redirect).not.toBeNull();
-		expect(MOCK_HAPI_REPLY.redirect.calls.mostRecent().args).toEqual([`${rootUrl}${requestLang}/foo`]);
+		const requestLang = altLang;
+		testRedirect({
+			requestLang,
+			requestUrl: rootUrl,
+			expectedRedirect: `${rootUrl}${requestLang}/`,
+		});
 	});
 	it('does not redirect if non-default language requested on correct language path', () => {
-		spyOn(MOCK_HAPI_REPLY, 'redirect');
-		const defaultLang = 'en-US';
-		const requestLang = 'fr-FR';
-		const supportedLangs = [defaultLang, requestLang];
-		let request, redirect;
-		request = { ...MOCK_HAPI_REQUEST, url: url.parse(`${rootUrl}${requestLang}/`) };
-		redirect = checkLanguageRedirect(request, MOCK_HAPI_REPLY, requestLang, supportedLangs, defaultLang);
-		expect(redirect).toBeNull();
-		expect(MOCK_HAPI_REPLY.redirect).not.toHaveBeenCalled();
-
-		request = { ...MOCK_HAPI_REQUEST, url: url.parse(`${rootUrl}${requestLang}/foo`) };
-		redirect = checkLanguageRedirect(request, MOCK_HAPI_REPLY, requestLang, supportedLangs, defaultLang);
-		expect(redirect).toBeNull();
-		expect(MOCK_HAPI_REPLY.redirect).not.toHaveBeenCalled();
+		const requestLang = altLang;
+		testRedirect({
+			requestLang,
+			requestUrl: `${rootUrl}${requestLang}/`,
+			expectedRedirect: false,
+		});
 	});
 	it('ignores unsupported language prefixes', () => {
-		spyOn(MOCK_HAPI_REPLY, 'redirect');
-		const defaultLang = 'en-US';
-		const requestLang = 'abcd';
-		const supportedLangs = [defaultLang];
-		let request, redirect;
-		request = { ...MOCK_HAPI_REQUEST, url: url.parse(`${rootUrl}${requestLang}/`) };
-		redirect = checkLanguageRedirect(request, MOCK_HAPI_REPLY, requestLang, supportedLangs, defaultLang);
-		expect(redirect).toBeNull();
-		expect(MOCK_HAPI_REPLY.redirect).not.toHaveBeenCalled();
-
-		request = { ...MOCK_HAPI_REQUEST, url: url.parse(`${rootUrl}${requestLang}/foo`) };
-		redirect = checkLanguageRedirect(request, MOCK_HAPI_REPLY, requestLang, supportedLangs, defaultLang);
-		expect(redirect).toBeNull();
-		expect(MOCK_HAPI_REPLY.redirect).not.toHaveBeenCalled();
+		const requestLang = 'asdfasdf';
+		testRedirect({
+			requestLang,
+			requestUrl: `${rootUrl}${requestLang}/`,
+			expectedRedirect: false,
+		});
 	});
 });
