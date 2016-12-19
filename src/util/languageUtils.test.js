@@ -39,7 +39,8 @@ describe('checkLanguageRedirect', () => {
 	const defaultLang = 'en-US';
 	const altLang = 'fr-FR';
 	const altLang2 = 'de-DE';
-	const supportedLangs = [defaultLang, altLang, altLang2];
+	const altLang3 = 'es-ES';
+	const supportedLangs = [defaultLang, altLang, altLang2, altLang3];
 	function getRedirect({ requestLang, requestUrl }) {
 		const request = { ...MOCK_HAPI_REQUEST, url: url.parse(requestUrl) };
 		return checkLanguageRedirect(request, MOCK_HAPI_REPLY, requestLang, supportedLangs, defaultLang);
@@ -73,16 +74,13 @@ describe('checkLanguageRedirect', () => {
 	);
 	it('calls redirect to requestLanguage path from incorrect language path', () => {
 		const requestLang = altLang;
-		testRedirect({
-			requestLang,
-			requestUrl: `${rootUrl}${defaultLang}/`,
-			expectedRedirect: `${rootUrl}${requestLang}/`
-		});
-		testRedirect({
-			requestLang,
-			requestUrl: `${rootUrl}${altLang2}/`,
-			expectedRedirect: `${rootUrl}${requestLang}/`
-		});
+		supportedLangs.filter(l => l !== altLang).forEach(lang =>
+			testRedirect({
+				requestLang,
+				requestUrl: `${rootUrl}${lang}/`,
+				expectedRedirect: `${rootUrl}${requestLang}/`
+			})
+		);
 	});
 	it('calls redirect to path with requestLanguage injected if missing', () => {
 		const requestLang = altLang;

@@ -38,7 +38,7 @@ export const checkLanguageRedirect = (
 		}
 	} else if (requestLanguage !== firstPathComponent) {
 		// must redirect either by correcting the lang prefix or inserting it
-		const cleanOriginal = originalPath.replace(new RegExp(`/${supportedLangs.join('|')}/`), '');
+		const cleanOriginal = originalPath.replace(new RegExp(`^/(${supportedLangs.join('|')})/`), '/');
 		const newPathname = `/${requestLanguage}${cleanOriginal}`;
 		return redirect(newPathname);
 	}
