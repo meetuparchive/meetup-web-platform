@@ -38,7 +38,8 @@ describe('getLanguage', () => {
 describe('checkLanguageRedirect', () => {
 	const defaultLang = 'en-US';
 	const altLang = 'fr-FR';
-	const supportedLangs = [defaultLang, altLang];
+	const altLang2 = 'de-DE';
+	const supportedLangs = [defaultLang, altLang, altLang2];
 	function getRedirect({ requestLang, requestUrl }) {
 		const request = { ...MOCK_HAPI_REQUEST, url: url.parse(requestUrl) };
 		return checkLanguageRedirect(request, MOCK_HAPI_REPLY, requestLang, supportedLangs, defaultLang);
@@ -53,13 +54,15 @@ describe('checkLanguageRedirect', () => {
 		}
 	}
 	function testRedirect(options) {
-		spyOn(MOCK_HAPI_REPLY, 'redirect');
 		expectRedirect(options);
 
 		options.requestUrl = `${options.requestUrl}foo`;
 		options.expectedRedirect = options.expectedRedirect && `${options.expectedRedirect}foo`;
 		expectRedirect(options);
 	}
+	beforeEach(() => {
+		spyOn(MOCK_HAPI_REPLY, 'redirect');
+	});
 
 	it('calls redirect to root path when default lang requested', () =>
 		testRedirect({
@@ -73,6 +76,11 @@ describe('checkLanguageRedirect', () => {
 		testRedirect({
 			requestLang,
 			requestUrl: `${rootUrl}${defaultLang}/`,
+			expectedRedirect: `${rootUrl}${requestLang}/`
+		});
+		testRedirect({
+			requestLang,
+			requestUrl: `${rootUrl}${altLang2}/`,
 			expectedRedirect: `${rootUrl}${requestLang}/`
 		});
 	});
