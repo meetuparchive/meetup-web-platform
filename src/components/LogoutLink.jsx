@@ -13,6 +13,8 @@ class LogoutLink extends React.Component {
 			...other
 		} = this.props;
 
+		console.log(this.props);
+
 		return (
 			<Link
 				to={{ pathname: to, query: {logout: true} }}
@@ -25,7 +27,11 @@ class LogoutLink extends React.Component {
 }
 
 LogoutLink.propTypes = {
-	to: React.PropTypes.string.isRequired
+	to: React.PropTypes.string
+};
+
+LogoutLink.defaultProps = {
+	to: '/'
 };
 
 export default LogoutLink;
