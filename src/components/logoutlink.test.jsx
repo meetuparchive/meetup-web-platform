@@ -11,16 +11,25 @@ const MOCK_LOGOUT_TO_QUERY = {
 describe('LogoutLink', function() {
 	let tree;
 
-	beforeEach(function() {
-		renderer.render(<LogoutLink to='/' />);
-		tree = renderer.getRenderOutput();
-	});
-
 	it('exists', function() {
+		renderer.render(<LogoutLink />);
+		tree = renderer.getRenderOutput();
 		expect(tree).not.toBeNull();
 	});
 
-	it('creates a Link element with a logout to prop', function() {
+	xit('creates a Link element to current URL with logout param', function() {
+		renderer.render(<LogoutLink />);
+		tree = renderer.getRenderOutput();
+
+		expect(tree.type).toEqual(Link);
+		expect(tree.props.to.pathname).toEqual('/');
+		expect(tree.props.to.query).toEqual(MOCK_LOGOUT_TO_QUERY);
+	});
+
+	it('create a Link element using the to property with a logout param', function() {
+		renderer.render(<LogoutLink to='/' />);
+		tree = renderer.getRenderOutput();
+
 		expect(tree.type).toEqual(Link);
 		expect(tree.props.to.pathname).toEqual('/');
 		expect(tree.props.to.query).toEqual(MOCK_LOGOUT_TO_QUERY);

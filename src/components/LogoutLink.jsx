@@ -6,6 +6,12 @@ import Link from 'react-router/lib/Link';
  * @module LogoutLink
  */
 class LogoutLink extends React.Component {
+	getDefaultProps() {
+		return {
+			to: this.props.location
+		};
+	}
+
 	render() {
 		const {
 			to,
@@ -13,7 +19,8 @@ class LogoutLink extends React.Component {
 			...other
 		} = this.props;
 
-		console.log(this.props);
+		console.log(this.props.location);
+		console.log(to);
 
 		return (
 			<Link
@@ -28,10 +35,6 @@ class LogoutLink extends React.Component {
 
 LogoutLink.propTypes = {
 	to: React.PropTypes.string
-};
-
-LogoutLink.defaultProps = {
-	to: '/'
 };
 
 export default LogoutLink;
