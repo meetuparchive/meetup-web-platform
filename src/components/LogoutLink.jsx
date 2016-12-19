@@ -10,18 +10,17 @@ class LogoutLink extends React.Component {
 		const {
 			to,
 			children,
-			location,
 			...other
 		} = this.props;
 
-		const path = typeof to !== 'undefined' ? to : location;
+		const { router } = this.context;
+		console.log(router);
 
-		console.log(this.props.location);
-		console.log(path);
+		// const path = typeof to !== 'undefined' ? to : location;
 
 		return (
 			<Link
-				to={{ pathname: path, query: {logout: true} }}
+				to={{ pathname: to, query: {logout: true} }}
 				{...other}
 			>
 				{children}
@@ -32,6 +31,10 @@ class LogoutLink extends React.Component {
 
 LogoutLink.propTypes = {
 	to: React.PropTypes.string
+};
+
+LogoutLink.contextTypes = {
+	router: React.PropTypes.object
 };
 
 export default LogoutLink;
