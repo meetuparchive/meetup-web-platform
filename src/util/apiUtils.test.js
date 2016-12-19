@@ -19,11 +19,13 @@ import {
 	apiResponseToQueryResponse,
 	apiResponseDuotoneSetter,
 	buildRequestArgs,
+	errorResponse$,
 	logApiResponse,
 	makeApiRequest$,
 	makeExternalApiRequest,
 	parseRequest,
 	parseApiResponse,
+	parseApiValue,
 	parseLoginAuth,
 	queryToApiConfig,
 	groupDuotoneSetter,
@@ -73,33 +75,60 @@ describe('makeExternalApiRequest', () => {
 	});
 });
 
-describe('parseApiResponse', () => {
+describe('errorResponse$', () => {
+	it('returns the request url pathname as response.meta.endpoint', () => {
+		const endpoint = '/pathname';
+		return errorResponse$(`http://example.com${endpoint}`)(new Error())
+			.toPromise()
+			.then(response => expect(response.meta.endpoint).toEqual(endpoint));
+	});
+	it('returns the error message as the response.value.error', () => {
+		const message = 'foo';
+		return errorResponse$('http://example.com')(new Error(message))
+			.toPromise()
+			.then(response => expect(response.value.error).toEqual(message));
+	});
+});
+describe('parseApiValue', () => {
 	const MOCK_RESPONSE = {
 		headers: {},
 		statusCode: 200
 	};
 	it('converts valid JSON into an equivalent object', () => {
 		const validJSON = JSON.stringify(MOCK_GROUP);
-		expect(parseApiResponse('http://example.com')([MOCK_RESPONSE, validJSON]).value).toEqual(jasmine.any(Object));
-		expect(parseApiResponse('http://example.com')([MOCK_RESPONSE, validJSON]).value).toEqual(MOCK_GROUP);
+		expect(parseApiValue([MOCK_RESPONSE, validJSON])).toEqual(jasmine.any(Object));
+		expect(parseApiValue([MOCK_RESPONSE, validJSON])).toEqual(MOCK_GROUP);
 	});
 	it('returns an object with a string "error" value for invalid JSON', () => {
 		const invalidJSON = 'not valid';
-		expect(parseApiResponse('http://example.com')([MOCK_RESPONSE, invalidJSON]).value.error).toEqual(jasmine.any(String));
+		expect(parseApiValue([MOCK_RESPONSE, invalidJSON]).error).toEqual(jasmine.any(String));
 	});
 	it('returns an object with a string "error" value for API response with "problem"', () => {
 		const responeWithProblem = JSON.stringify(MOCK_API_PROBLEM);
-		expect(parseApiResponse('http://example.com')([MOCK_RESPONSE, responeWithProblem]).value.error).toEqual(jasmine.any(String));
+		expect(parseApiValue([MOCK_RESPONSE, responeWithProblem]).error).toEqual(jasmine.any(String));
+	});
+	it('returns an object with a string "error" value for a not-ok response', () => {
+		const noContentStatus = {
+			statusCode: 204,
+			statusMessage: 'No Content',
+		};
+		const noContentResponse = { ...MOCK_RESPONSE, ...noContentStatus };
+		expect(parseApiValue([noContentResponse, ''])).toBeNull();
 	});
 	it('returns an object with a string "error" value for a not-ok response', () => {
 		const badStatus = {
-			ok: false,
 			statusCode: 500,
 			statusMessage: 'Problems',
 		};
 		const nonOkReponse = { ...MOCK_RESPONSE, ...badStatus };
-		expect(parseApiResponse('http://example.com')([nonOkReponse, '{}']).value.error).toEqual(badStatus.statusMessage);
+		expect(parseApiValue([nonOkReponse, '{}']).error).toEqual(badStatus.statusMessage);
 	});
+});
+describe('parseApiResponse', () => {
+	const MOCK_RESPONSE = {
+		headers: {},
+		statusCode: 200
+	};
 	it('returns the flags set in the X-Meetup-Flags header', () => {
 		const headers = {
 			'x-meetup-flags': 'foo=true,bar=false',
