@@ -6,25 +6,22 @@ import Link from 'react-router/lib/Link';
  * @module LogoutLink
  */
 class LogoutLink extends React.Component {
-	getDefaultProps() {
-		return {
-			to: this.props.location
-		};
-	}
-
 	render() {
 		const {
 			to,
 			children,
+			location,
 			...other
 		} = this.props;
 
+		const path = typeof to !== 'undefined' ? to : location;
+
 		console.log(this.props.location);
-		console.log(to);
+		console.log(path);
 
 		return (
 			<Link
-				to={{ pathname: to, query: {logout: true} }}
+				to={{ pathname: path, query: {logout: true} }}
 				{...other}
 			>
 				{children}
