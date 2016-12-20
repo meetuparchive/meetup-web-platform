@@ -143,7 +143,7 @@ const makeRenderer = (
 	reducer,
 	clientFilename,
 	assetPublicPath,
-	middleware,
+	middleware=[],
 	baseUrl='/'
 ) => request => {
 
