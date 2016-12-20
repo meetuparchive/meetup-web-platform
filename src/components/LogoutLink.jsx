@@ -1,15 +1,5 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import Link from 'react-router/lib/Link';
-
-function mapStateToProps(state, ownProps) {
-	console.log('**');
-	console.log(ownProps);
-	console.log('**');
-	return {
-		locationProp: ownProps.location || {}
-	};
-}
 
 /**
  * Logout link component
@@ -19,14 +9,8 @@ class LogoutLink extends React.Component {
 	render() {
 		const {
 			to,
-			locationProp,
 			children
 		} = this.props;
-
-		console.log('---');
-		console.log(to);
-		console.log(locationProp);
-		console.log('---');
 
 		return (
 			<Link
@@ -39,7 +23,11 @@ class LogoutLink extends React.Component {
 }
 
 LogoutLink.propTypes = {
-	to: React.PropTypes.string
+	to: React.PropTypes.string,
 };
 
-export default connect(mapStateToProps)(LogoutLink);
+LogoutLink.defaultProps = {
+	to: '/'
+};
+
+export default LogoutLink;
