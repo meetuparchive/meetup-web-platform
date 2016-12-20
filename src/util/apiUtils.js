@@ -235,7 +235,7 @@ export function parseRequest(request, baseUrl) {
 		}
 	};
 
-	const queriesJSON = request.method === 'get' ? query.queries : payload.queries;
+	const queriesJSON = request.method === 'post' ? payload.queries : query.queries;
 	const validatedQueries = Joi.validate(
 		JSON.parse(queriesJSON),
 		Joi.array().items(querySchema)
