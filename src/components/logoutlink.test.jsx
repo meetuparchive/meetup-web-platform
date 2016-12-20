@@ -17,7 +17,7 @@ describe('LogoutLink', function() {
 		expect(tree).not.toBeNull();
 	});
 
-	xit('creates a Link element to current URL with logout param', function() {
+	xit('creates a Link component to the root route with a logout param', function() {
 		renderer.render(<LogoutLink />);
 		tree = renderer.getRenderOutput();
 
@@ -26,12 +26,12 @@ describe('LogoutLink', function() {
 		expect(tree.props.to.query).toEqual(MOCK_LOGOUT_TO_QUERY);
 	});
 
-	it('create a Link element using the to property with a logout param', function() {
-		renderer.render(<LogoutLink to='/' />);
+	it('creates a Link component using the `to` with a logout param', function() {
+		renderer.render(<LogoutLink to='/foo' />);
 		tree = renderer.getRenderOutput();
 
 		expect(tree.type).toEqual(Link);
-		expect(tree.props.to.pathname).toEqual('/');
+		expect(tree.props.to.pathname).toEqual('/foo');
 		expect(tree.props.to.query).toEqual(MOCK_LOGOUT_TO_QUERY);
 	});
 });
