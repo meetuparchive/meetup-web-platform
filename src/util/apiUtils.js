@@ -183,6 +183,8 @@ export const buildRequestArgs = externalRequestOpts =>
 			break;
 		}
 
+		console.log(`External request headers: ${JSON.stringify(externalRequestOptsQuery.headers)}`);
+
 		return externalRequestOptsQuery;
 	};
 
@@ -223,9 +225,10 @@ export function parseRequest(request, baseUrl) {
 	delete externalRequestHeaders['host'];
 	delete externalRequestHeaders['accept-encoding'];
 	delete externalRequestHeaders['content-length'];  // original request content-length is irrelevant
-	delete externalRequestHeaders['cf-ray']; // unique cloudflare id which will trip up api requests if present
-	
-	console.log(`External request headers: ${JSON.stringify(externalRequestHeaders)}`);
+	delete externalRequestHeaders['cf-ray']; // cloudflare headers we don't want to pass on
+	delete externalRequestHeaders['cf-ipcountry'];
+	delete externalRequestHeaders['cf-visitor'];
+	delete externalRequestHeaders['cf-connecting-ip'];
 
 	const externalRequestOpts = {
 		baseUrl,
