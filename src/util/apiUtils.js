@@ -165,8 +165,6 @@ export const buildRequestArgs = externalRequestOpts =>
 		const externalRequestOptsQuery = JSON.parse(JSON.stringify(externalRequestOpts));
 		externalRequestOptsQuery.url = encodeURI(`/${endpoint}`);
 
-		delete externalRequestOptsQuery.headers['cf-ray'];
-
 		if (flags) {
 			externalRequestOptsQuery.headers['X-Meetup-Request-Flags'] = flags.join(',');
 		}
@@ -184,8 +182,6 @@ export const buildRequestArgs = externalRequestOpts =>
 			externalRequestOptsQuery.headers['content-type'] = 'application/x-www-form-urlencoded';
 			break;
 		}
-
-		console.log(`External request query: ${JSON.stringify(externalRequestOptsQuery.headers)}`);
 
 		return externalRequestOptsQuery;
 	};
@@ -227,6 +223,9 @@ export function parseRequest(request, baseUrl) {
 	delete externalRequestHeaders['host'];
 	delete externalRequestHeaders['accept-encoding'];
 	delete externalRequestHeaders['content-length'];  // original request content-length is irrelevant
+	delete externalRequestHeaders['cf-ray']; // unique cloudflare id which will trip up api requests if present
+	
+	console.log(`External request headers: ${JSON.stringify(externalRequestHeaders)}`);
 
 	const externalRequestOpts = {
 		baseUrl,
