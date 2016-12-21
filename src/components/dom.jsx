@@ -30,11 +30,11 @@ function getInnerHTML(__html) {
  */
 const DOM = (props) => {
 	const {
+		appMarkup,
+		assetPublicPath,
 		baseUrl,
 		clientFilename,
-		assetPublicPath,
 		initialState,
-		appMarkup,
 	} = props;
 
 	/**
@@ -76,8 +76,11 @@ const DOM = (props) => {
 };
 
 DOM.propTypes = {
-	initialState: React.PropTypes.object.isRequired,
 	appMarkup: React.PropTypes.string,
+	assetPublicPath: React.PropTypes.string.isRequired,
+	baseUrl: React.PropTypes.string,
+	clientFilename: React.PropTypes.string.isRequired,
+	initialState: React.PropTypes.object.isRequired,
 };
 
 export default DOM;
