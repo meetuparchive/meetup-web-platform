@@ -1,3 +1,13 @@
+## [0.11]
+
+- **Refactored** Renderers - the `makeRenderer` functions in `server-render`
+and `browser-render` now have an optional `baseUrl` last argument corresponding
+to a non-root URL path that should be treated as the root url path of the
+application, e.g. `/foo` to serve all app routes starting at `/foo`. _Default_
+`/`. Corresponding changes in the signatures to a few application-related
+modules mean that if you're relying on direct imports of those modules, your
+code will need to be updated.
+
 ## [0.10]
 
 - **New env variable** - `COOKIE_ENCRYPT_SECRET` must be in your env vars. It
