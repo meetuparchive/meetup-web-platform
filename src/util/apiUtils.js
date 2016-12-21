@@ -223,6 +223,9 @@ export function parseRequest(request, baseUrl) {
 	delete externalRequestHeaders['host'];
 	delete externalRequestHeaders['accept-encoding'];
 	delete externalRequestHeaders['content-length'];  // original request content-length is irrelevant
+	delete externalRequestHeaders['cf-ray']; // unique cloudflare id which will trip up api requests if present
+	
+	console.log(`External request headers: ${JSON.stringify(externalRequestHeaders)}`);
 
 	const externalRequestOpts = {
 		baseUrl,
