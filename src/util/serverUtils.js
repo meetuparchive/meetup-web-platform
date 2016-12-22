@@ -41,7 +41,7 @@ export function configureEnv(config) {
  */
 export function onPreResponse(request, reply) {
 	const response = request.response;
-	if (!response.isBoom) {
+	if (!response.isBoom || request.route.path === '/api') {
 		return reply.continue();
 	}
 	const error = response;

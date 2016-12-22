@@ -1,4 +1,5 @@
 import start from '../../src/server';
+import * as apiProxyHandler from '../../src/apiProxy/apiProxyHandler';
 
 jest.mock('request', () =>
 	jest.fn(
@@ -7,7 +8,7 @@ jest.mock('request', () =>
 				cb(null, {
 					headers: {},
 					statusCode: 200,
-					elapsedTime: 1234,
+					elapsedTime: 234,
 					request: {
 						uri: {
 							query: 'foo=bar',
@@ -15,7 +16,7 @@ jest.mock('request', () =>
 						},
 						method: 'get',
 					},
-				}, '{}'), 200)
+				}, '{}'), 234)
 	)
 );
 
@@ -29,15 +30,44 @@ describe('API proxy endpoint integration tests', () => {
 			secret: random32,
 		}
 	});
-	it('calls the handler for /api', () => {
+	it('calls the GET handler for /api', () => {
+		const spyable = {
+			handler: (request, reply) => reply('okay'),
+		};
+		spyOn(spyable, 'handler').and.callThrough();
+		spyOn(apiProxyHandler, 'getApiProxyRouteHandler')
+			.and.callFake(() => spyable.handler);
+		return start({}, {}, mockConfig)
+			.then(server => {
+				const request = {
+					method: 'get',
+					url: '/api?queries=[]',
+					credentials: 'whatever',
+				};
+				return server.inject(request).then(
+					response => expect(spyable.handler).toHaveBeenCalled()
+				)
+				.then(() => server.stop());
+			});
+	});
+	it('returns a formatted array of responses from GET /api', () => {
 		const expectedResponse = JSON.stringify({
-			responses: [{}],
+			responses: [{
+				foo: {
+					type: 'foo',
+					value: {},  // from the mocked `request` module
+					meta: {
+						flags: {},
+						endpoint: '/foo',
+					},
+				}
+			}],
 		});
 		return start({}, {}, mockConfig)
 			.then(server => {
 				const request = {
 					method: 'get',
-					url: '/api?queries=[{}]',
+					url: '/api?queries=[{ "type": "foo", "params": {}, "ref": "foo", "endpoint": "foo" }]',
 					credentials: 'whatever',
 				};
 				return server.inject(request).then(

@@ -46,6 +46,11 @@ const getApiProxyRoutes = (path, env, apiProxyFn$) => {
 			validate: {
 				payload: validApiPayloadSchema
 			},
+			plugins: {
+				'electrode-csrf-jwt': {
+					enabled: true,
+				}
+			},
 		},
 	};
 
