@@ -52,10 +52,10 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 		fetchConfig
 	)
 	.then(queryResponse =>
-		queryResponse.json().then(responses =>
+		queryResponse.json().then(({ responses }) =>
 			({
 				queries,
-				responses,
+				responses: responses || [],
 				csrf: queryResponse.headers.get('x-csrf-jwt'),
 			})
 		)
