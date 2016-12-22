@@ -109,7 +109,6 @@ describe('API proxy POST endpoint integration tests', () => {
 	});
 	it('return a an object with an error key when CSRF is invalid', () => {
 		const expectedPayload = JSON.stringify(Boom.create(400, 'INVALID_JWT').output.payload);
-		console.log(expectedPayload);
 		const test = response => expect(response.payload).toEqual(expectedPayload);
 		const csrfHeaders = () => getCsrfHeaders().then(([cookieToken, headerToken]) => ([cookieToken, '']));
 

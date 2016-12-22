@@ -32,13 +32,16 @@ const getApiProxyRoutes = (path, env, apiProxyFn$) => {
 			enabled: true,
 		}
 	};
-
+	const app = {
+		jsonError: true,
+	};
 
 	const apiGetRoute = {
 		path,
 		handler,
 		method: ['GET', 'DELETE', 'PATCH'],
 		config: {
+			app,
 			plugins,
 			validate: {
 				query: validApiPayloadSchema
@@ -50,6 +53,7 @@ const getApiProxyRoutes = (path, env, apiProxyFn$) => {
 		handler,
 		method: 'POST',
 		config: {
+			app,
 			plugins,
 			validate: {
 				payload: validApiPayloadSchema
