@@ -23,13 +23,19 @@ export function app(state=DEFAULT_APP_STATE, action={}) {
 	switch (action.type) {
 	case 'CACHE_SUCCESS':  // fall through - same effect as API success
 	case 'API_SUCCESS':
-			// API_SUCCESS contains an array of responses, but we just need to build a single
-			// object to update state with
-		newState = Object.assign.apply(Object, [{}].concat(action.payload.responses));
+		// API_SUCCESS contains an array of responses, but we just need to build a single
+		// object to update state with
+		newState = action.payload.responses.reduce((s, r) => ({ ...s, ...r }), {});
+		delete state.error;
 		return { ...state, ...newState };
 	case 'LOGOUT_REQUEST':
 		// need to clear ALL private data, i.e. all data
 		return DEFAULT_APP_STATE;
+	case 'API_ERROR':
+		return {
+			...state,
+			error: action.payload
+		};
 	default:
 		return state;
 	}
