@@ -80,7 +80,7 @@ describe('removeAuthState', () => {
 			Object.keys(request.state)
 				.map(k => request.state[k])
 				.every(v => v === null)
-		).toEqual(true);
+		).toBe(true);
 	});
 });
 
