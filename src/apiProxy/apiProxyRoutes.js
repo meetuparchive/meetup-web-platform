@@ -26,23 +26,32 @@ const getApiProxyRoutes = (path, env, apiProxyFn$) => {
 	 * @returns Array query responses, which are in the format defined
 	 *   by `apiAdapter.apiResponseToQueryResponse`
 	 */
-	const handler = getApiProxyRouteHandler(proxyApiRequest$);
-
-	const apiGetRoute = {
+	const routeBase = {
 		path,
-		handler,
+		handler: getApiProxyRouteHandler(proxyApiRequest$),
+		config: {
+			plugins: {
+				'electrode-csrf-jwt': {
+					enabled: true,
+				}
+			},
+		},
+	};
+	const apiGetRoute = {
+		...routeBase,
 		method: ['GET', 'DELETE', 'PATCH'],
 		config: {
+			...routeBase.config,
 			validate: {
 				query: validApiPayloadSchema
 			},
 		},
 	};
 	const apiPostRoute = {
-		path,
-		handler,
+		...routeBase,
 		method: 'POST',
 		config: {
+			...routeBase.config,
 			validate: {
 				payload: validApiPayloadSchema
 			},
@@ -53,3 +62,4 @@ const getApiProxyRoutes = (path, env, apiProxyFn$) => {
 };
 
 export default getApiProxyRoutes;
+

@@ -123,7 +123,7 @@ export const trackApi = log => (response, queryResponses, metadata={}) => {
 	}
 	// special case - login requests need to be tracked
 	const loginResponse = queryResponses.find(r => r.login);
-	if (loginResponse) {
+	if ((loginResponse && loginResponse.login.value || {}).member) {
 		const member_id = JSON.stringify(loginResponse.login.value.member.id);
 		trackLogin(log)(response, member_id);
 	}
