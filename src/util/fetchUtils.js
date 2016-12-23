@@ -52,13 +52,18 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 		fetchConfig
 	)
 	.then(queryResponse =>
-		queryResponse.json().then(responses =>
-			({
+		queryResponse.json().then(({ responses, error, message }) => {
+			if (error) {
+				throw new Error(message);  // treat like an API error
+			}
+			return {
 				queries,
-				responses,
+				error,
+				message,
+				responses: responses || [],
 				csrf: queryResponse.headers.get('x-csrf-jwt'),
-			})
-		)
+			};
+		})
 	);
 };
 

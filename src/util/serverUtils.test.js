@@ -45,7 +45,8 @@ describe('onPreResponse', () => {
 		const errorMessage = 'foobar';
 		const errorCode = 432;
 		const request = {
-			response: Boom.create(errorCode, errorMessage)
+			response: Boom.create(errorCode, errorMessage),
+			route: {},
 		};
 		const replyObj = {
 			code() {}

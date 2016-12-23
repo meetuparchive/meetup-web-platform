@@ -2,8 +2,9 @@ import url from 'url';
 import Boom from 'boom';
 
 const handleQueryResponses = (request, reply) => queryResponses => {
-	const response = reply(JSON.stringify(queryResponses))
-		.type('application/json');
+	const response = reply(JSON.stringify({
+		responses: queryResponses,
+	})).type('application/json');
 
 	const payload = request.method === 'post' ?
 		request.payload :
