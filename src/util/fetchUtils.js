@@ -58,8 +58,6 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 			}
 			return {
 				queries,
-				error,
-				message,
 				responses: responses || [],
 				csrf: queryResponse.headers.get('x-csrf-jwt'),
 			};
