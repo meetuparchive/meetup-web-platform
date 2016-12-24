@@ -322,9 +322,12 @@ const externalRequest$ = Rx.Observable.bindNodeCallback(externalRequest);
 /**
  * Make a real external API request, return response body string
  */
-export const makeExternalApiRequest = (request, API_TIMEOUT) => requestOpts =>
-	externalRequest$(requestOpts)
-		.timeout(API_TIMEOUT);
+export const makeExternalApiRequest = (request, API_TIMEOUT) => requestOpts => {
+	const jar = externalRequest.jar();
+	return externalRequest$({ ...requestOpts, jar })
+		.timeout(API_TIMEOUT)
+		.map(([response, body]) => [response, body, jar]);
+};
 
 export const logApiResponse = appRequest => ([response, body]) => {
 	const {
@@ -377,6 +380,22 @@ export const parseLoginAuth = (request, query) => response => {
 	return response;
 };
 
+export const injectResponseCookies = request => ([response, body, jar]) => {
+	const requestUrl = response.toJSON().request.uri.href;
+	jar.getCookies(requestUrl).forEach(cookie => {
+		const cookieOptions = {
+			path: '/',
+			isHttpOnly: cookie.httpOnly,
+		};
+
+		request.plugins.requestAuth.reply.state(
+			cookie.key,
+			cookie.value.replace(/^"|"$/g, ''),
+			cookieOptions
+		);
+	});
+};
+
 /**
  * Make an API request and parse the response into the expected `response`
  * object shape
@@ -392,6 +411,7 @@ export const makeApiRequest$ = (request, API_TIMEOUT, duotoneUrls) => {
 			request.log(['api', 'info'], `REST API request: ${requestOpts.url}`);
 			return request$(requestOpts)
 				.do(logApiResponse(request))             // this will leak private info in API response
+				.do(injectResponseCookies(request))
 				.map(parseApiResponse(requestOpts.url))  // parse into plain object
 				.catch(errorResponse$(requestOpts.url))
 				.map(parseLoginAuth(request, query))     // login has oauth secrets - special case
