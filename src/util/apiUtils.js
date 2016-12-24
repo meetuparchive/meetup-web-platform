@@ -322,9 +322,16 @@ const externalRequest$ = Rx.Observable.bindNodeCallback(externalRequest);
 /**
  * Make a real external API request, return response body string
  */
-export const makeExternalApiRequest = (request, API_TIMEOUT) => requestOpts =>
-	externalRequest$(requestOpts)
-		.timeout(API_TIMEOUT);
+export const makeExternalApiRequest = (request, API_TIMEOUT) => requestOpts => {
+	let jar = null;
+	if (requestOpts.url.endsWith('/sessions')) {
+		jar = externalRequest.jar();  // create request-specific cookie jar for login cookie
+		requestOpts.jar = jar;
+	}
+	return externalRequest$(requestOpts)
+		.timeout(API_TIMEOUT)
+		.map(([response, body]) => [response, body, jar]);
+};
 
 export const logApiResponse = appRequest => ([response, body]) => {
 	const {
@@ -378,6 +385,32 @@ export const parseLoginAuth = (request, query) => response => {
 };
 
 /**
+ * When a tough-cookie cookie jar is provided, forward the cookies along with
+ * the overall /api response back to the client
+ */
+export const injectResponseCookies = request => ([response, _, jar]) => {
+	if (!jar) {
+		return;
+	}
+	const requestUrl = response.toJSON().request.uri.href;
+	jar.getCookies(requestUrl).forEach(cookie => {
+		const cookieOptions = {
+			domain: cookie.domain,
+			path: cookie.path,
+			isHttpOnly: cookie.httpOnly,
+			isSameSite: false,
+			isSecure: process.env.NODE_ENV === 'production',
+		};
+
+		request.plugins.requestAuth.reply.state(
+			cookie.key,
+			cookie.value.replace(/^"|"$/g, ''),  // remove surrounding quotes from string value
+			cookieOptions
+		);
+	});
+};
+
+/**
  * Make an API request and parse the response into the expected `response`
  * object shape
  */
@@ -392,6 +425,7 @@ export const makeApiRequest$ = (request, API_TIMEOUT, duotoneUrls) => {
 			request.log(['api', 'info'], `REST API request: ${requestOpts.url}`);
 			return request$(requestOpts)
 				.do(logApiResponse(request))             // this will leak private info in API response
+				.do(injectResponseCookies(request))
 				.map(parseApiResponse(requestOpts.url))  // parse into plain object
 				.catch(errorResponse$(requestOpts.url))
 				.map(parseLoginAuth(request, query))     // login has oauth secrets - special case
