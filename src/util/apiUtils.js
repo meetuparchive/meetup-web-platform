@@ -384,8 +384,11 @@ export const injectResponseCookies = request => ([response, body, jar]) => {
 	const requestUrl = response.toJSON().request.uri.href;
 	jar.getCookies(requestUrl).forEach(cookie => {
 		const cookieOptions = {
-			path: '/',
+			domain: cookie.domain,
+			path: cookie.path,
 			isHttpOnly: cookie.httpOnly,
+			isSameSite: false,
+			isSecure: process.env.NODE_ENV === 'production',
 		};
 
 		request.plugins.requestAuth.reply.state(
