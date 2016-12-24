@@ -9,8 +9,8 @@ import {
 } from './apiUtils';
 
 // Mock the request module with a an empty response delayed by 200ms
-jest.mock('request', () =>
-	jest.fn(
+jest.mock('request', () => {
+	const mock = jest.fn(
 		(requestOpts, cb) =>
 			setTimeout(() =>
 				cb(null, {
@@ -24,9 +24,12 @@ jest.mock('request', () =>
 						},
 						method: 'get',
 					},
-				}, '{}'), 200)
-	)
-);
+				}, '{}'), 200
+			)
+	);
+	mock.jar = jest.fn(() => 'myMockJar');
+	return mock;
+});
 
 describe('makeExternalApiRequest', () => {
 	it('calls externalRequest with requestOpts', () => {
@@ -51,6 +54,32 @@ describe('makeExternalApiRequest', () => {
 				() => expect(true).toBe(false),  // should not be called
 				err => expect(err).toEqual(jasmine.any(Error))
 			);
+	});
+	it('does not provide a jar for non-sessions endpoints', () => {
+		const requestOpts = {
+			foo: 'bar',
+			url: 'http://example.com',
+		};
+		return makeExternalApiRequest({}, 5000)(requestOpts)
+			.toPromise()
+			.then(([response, body, jar]) => {
+				expect(require('request').jar).not.toHaveBeenCalled();
+				expect(jar).toBeNull();
+			});
+
+	});
+	it('provides a cookie jar for the /sessions endpoint', () => {
+		const requestOpts = {
+			foo: 'bar',
+			url: 'http://example.com/sessions',
+		};
+		return makeExternalApiRequest({}, 5000)(requestOpts)
+			.toPromise()
+			.then(([response, body, jar]) => {
+				expect(require('request').jar).toHaveBeenCalled();
+				expect(jar).toEqual('myMockJar');
+			});
+
 	});
 });
 
