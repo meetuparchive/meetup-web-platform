@@ -1,3 +1,5 @@
+import externalRequest from 'request';
+
 import {
 	mockQueryBadType,
 	mockQuery,
@@ -20,9 +22,8 @@ import {
 	apiResponseDuotoneSetter,
 	buildRequestArgs,
 	errorResponse$,
+	injectResponseCookies,
 	logApiResponse,
-	makeApiRequest$,
-	makeExternalApiRequest,
 	parseRequest,
 	parseApiResponse,
 	parseApiValue,
@@ -30,50 +31,6 @@ import {
 	queryToApiConfig,
 	groupDuotoneSetter,
 } from './apiUtils';
-
-// Mock the request module with a an empty response delayed by 200ms
-jest.mock('request', () =>
-	jest.fn(
-		(requestOpts, cb) =>
-			setTimeout(() =>
-				cb(null, {
-					headers: {},
-					statusCode: 200,
-					elapsedTime: 1234,
-					request: {
-						uri: {
-							query: 'foo=bar',
-							pathname: '/foo',
-						},
-						method: 'get',
-					},
-				}, '{}'), 200)
-	)
-);
-
-describe('makeExternalApiRequest', () => {
-	it('calls externalRequest with requestOpts', () => {
-		const requestOpts = {
-			foo: 'bar',
-		};
-		return makeExternalApiRequest({}, 5000)(requestOpts)
-			.toPromise()
-			.then(() => require('request').mock.calls.pop()[0])
-			.then(arg => expect(arg).toBe(requestOpts));
-	});
-	it('throws an error when the API times out', () => {
-		const timeout = 100;
-		const requestOpts = {
-			foo: 'bar',
-		};
-		return makeExternalApiRequest({}, timeout)(requestOpts)
-			.toPromise()
-			.then(
-				() => expect(true).toBe(false),  // should not be called
-				err => expect(err).toEqual(jasmine.any(Error))
-			);
-	});
-});
 
 describe('errorResponse$', () => {
 	it('returns the request url pathname as response.meta.endpoint', () => {
@@ -89,6 +46,53 @@ describe('errorResponse$', () => {
 			.then(response => expect(response.value.error).toEqual(message));
 	});
 });
+
+describe('injectResponseCookies', () => {
+	const request = {
+		plugins: {
+			requestAuth: {
+				reply: {
+					state() {}
+				},
+			},
+		},
+	};
+	const responseObj = {
+		request: {
+			uri: {
+				href: 'http://example.com',
+			},
+		},
+	};
+	const response = {
+		toJSON() {
+			return responseObj;
+		},
+	};
+
+	it('does nothing without a cookie jar', () => {
+		spyOn(response, 'toJSON');
+		injectResponseCookies(request)([response, null, null]);
+		expect(response.toJSON).not.toHaveBeenCalled();
+	});
+	it('sets the provided cookies on the reply state', () => {
+		const mockJar = externalRequest.jar();
+		spyOn(request.plugins.requestAuth.reply, 'state');
+
+		// set up mock cookie jar with a dummy cookie for the response.request.uri
+		const key = 'foo';
+		const value = 'bar';
+		mockJar.setCookie(`${key}=${value}`, responseObj.request.uri.href);
+
+		injectResponseCookies(request)([response, null, mockJar]);
+		expect(request.plugins.requestAuth.reply.state).toHaveBeenCalledWith(
+			key,
+			value,
+			jasmine.any(Object)  // don't actually care about the cookie options
+		);
+	});
+});
+
 describe('parseApiValue', () => {
 	const MOCK_RESPONSE = {
 		headers: {},
@@ -488,42 +492,6 @@ describe('parseRequest', () => {
 			},
 		};
 		expect(() => parseRequest(getRequest, 'http://dummy.api.meetup.com')).toThrow();
-	});
-});
-
-describe('makeApiRequest$', () => {
-	const endpoint = 'foo';
-	it('makes a GET request', () => {
-		const query = { ...mockQuery(MOCK_RENDERPROPS) };
-		return makeApiRequest$({ log: () => {} }, 5000, {})([{ method: 'get', url: endpoint }, query])
-			.toPromise()
-			.then(() => require('request').mock.calls.pop()[0])
-			.then(arg => expect(arg.method).toBe('get'));
-	});
-	it('makes a POST request', () => {
-		const query = { ...mockQuery(MOCK_RENDERPROPS) };
-		return makeApiRequest$({ log: () => {} }, 5000, {})([{ method: 'post', url: endpoint }, query])
-			.toPromise()
-			.then(() => require('request').mock.calls.pop()[0])
-			.then(arg => expect(arg.method).toBe('post'));
-	});
-	it('responds with query.mockResponse when set', () => {
-		const mockResponse = { foo: 'bar' };
-		const query = { ...mockQuery(MOCK_RENDERPROPS), mockResponse };
-		const expectedResponse = {
-			[query.ref]: {
-				meta: {
-					flags: {},
-					requestId: 'mock request',
-					endpoint
-				},
-				type: query.type,
-				value: mockResponse,
-			}
-		};
-		return makeApiRequest$({ log: () => {} }, 5000, {})([{ url: endpoint }, query])
-			.toPromise()
-			.then(response => expect(response).toEqual(expectedResponse));
 	});
 });
 

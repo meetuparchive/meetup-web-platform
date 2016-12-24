@@ -323,8 +323,12 @@ const externalRequest$ = Rx.Observable.bindNodeCallback(externalRequest);
  * Make a real external API request, return response body string
  */
 export const makeExternalApiRequest = (request, API_TIMEOUT) => requestOpts => {
-	const jar = externalRequest.jar();
-	return externalRequest$({ ...requestOpts, jar })
+	let jar = null;
+	if (requestOpts.url.endsWith('/sessions')) {
+		jar = externalRequest.jar();  // create request-specific cookie jar for login cookie
+		requestOpts.jar = jar;
+	}
+	return externalRequest$(requestOpts)
 		.timeout(API_TIMEOUT)
 		.map(([response, body]) => [response, body, jar]);
 };
@@ -380,7 +384,14 @@ export const parseLoginAuth = (request, query) => response => {
 	return response;
 };
 
-export const injectResponseCookies = request => ([response, body, jar]) => {
+/**
+ * When a tough-cookie cookie jar is provided, forward the cookies along with
+ * the overall /api response back to the client
+ */
+export const injectResponseCookies = request => ([response, _, jar]) => {
+	if (!jar) {
+		return;
+	}
 	const requestUrl = response.toJSON().request.uri.href;
 	jar.getCookies(requestUrl).forEach(cookie => {
 		const cookieOptions = {
@@ -393,7 +404,7 @@ export const injectResponseCookies = request => ([response, body, jar]) => {
 
 		request.plugins.requestAuth.reply.state(
 			cookie.key,
-			cookie.value.replace(/^"|"$/g, ''),
+			cookie.value.replace(/^"|"$/g, ''),  // remove surrounding quotes from string value
 			cookieOptions
 		);
 	});
