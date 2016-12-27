@@ -26,6 +26,13 @@ const MOCK_RESPONSE_OK = {  // minimal representation of http.IncomingMessage
 	},
 };
 
+export const createCookieJar = apiUrl => {
+	if (url.parse(apiUrl).pathname === '/sessions') {
+		return externalRequest.jar();  // create request-specific cookie jar for login cookie
+	}
+	return null;
+};
+
 const parseResponseFlags = flagHeader =>
 	(flagHeader || '')
 		.split(',')
@@ -183,7 +190,8 @@ export const buildRequestArgs = externalRequestOpts =>
 			break;
 		}
 
-		console.log(`External request headers: ${JSON.stringify(externalRequestOptsQuery.headers)}`);
+		console.log(`External request headers: ${JSON.stringify(externalRequestOptsQuery.headers, null, 2)}`);
+		externalRequestOptsQuery.jar = createCookieJar(externalRequestOptsQuery.url);
 
 		return externalRequestOptsQuery;
 	};
@@ -323,14 +331,9 @@ const externalRequest$ = Rx.Observable.bindNodeCallback(externalRequest);
  * Make a real external API request, return response body string
  */
 export const makeExternalApiRequest = (request, API_TIMEOUT) => requestOpts => {
-	let jar = null;
-	if (requestOpts.url.endsWith('/sessions')) {
-		jar = externalRequest.jar();  // create request-specific cookie jar for login cookie
-		requestOpts.jar = jar;
-	}
 	return externalRequest$(requestOpts)
 		.timeout(API_TIMEOUT)
-		.map(([response, body]) => [response, body, jar]);
+		.map(([response, body]) => [response, body, requestOpts.jar]);
 };
 
 export const logApiResponse = appRequest => ([response, body]) => {

@@ -4,6 +4,7 @@ import {
 } from 'meetup-web-mocks/lib/app';
 
 import {
+	createCookieJar,
 	makeApiRequest$,
 	makeExternalApiRequest,
 } from './apiUtils';
@@ -31,6 +32,17 @@ jest.mock('request', () => {
 	return mock;
 });
 
+describe('createCookieJar', () => {
+	it('returns a cookie jar for /sessions endpoint', () => {
+		const jar = createCookieJar('/sessions?asdfasd');
+		expect(jar).not.toBeNull();
+	});
+	it('returns null for non-sessions endpoint', () => {
+		const jar = createCookieJar('/not-sessions?asdfasd');
+		expect(jar).toBeNull();
+	});
+});
+
 describe('makeExternalApiRequest', () => {
 	it('calls externalRequest with requestOpts', () => {
 		const requestOpts = {
@@ -55,31 +67,16 @@ describe('makeExternalApiRequest', () => {
 				err => expect(err).toEqual(jasmine.any(Error))
 			);
 	});
-	it('does not provide a jar for non-sessions endpoints', () => {
+	it('returns the requestOpts jar at array index 2', () => {
+		const timeout = 5000;
 		const requestOpts = {
 			foo: 'bar',
 			url: 'http://example.com',
+			jar: 'fooJar',
 		};
-		return makeExternalApiRequest({}, 5000)(requestOpts)
+		return makeExternalApiRequest({}, timeout)(requestOpts)
 			.toPromise()
-			.then(([response, body, jar]) => {
-				expect(require('request').jar).not.toHaveBeenCalled();
-				expect(jar).toBeNull();
-			});
-
-	});
-	it('provides a cookie jar for the /sessions endpoint', () => {
-		const requestOpts = {
-			foo: 'bar',
-			url: 'http://example.com/sessions',
-		};
-		return makeExternalApiRequest({}, 5000)(requestOpts)
-			.toPromise()
-			.then(([response, body, jar]) => {
-				expect(require('request').jar).toHaveBeenCalled();
-				expect(jar).toEqual('myMockJar');
-			});
-
+			.then(([response, body, jar]) => expect(jar).toBe(requestOpts.jar));
 	});
 });
 
