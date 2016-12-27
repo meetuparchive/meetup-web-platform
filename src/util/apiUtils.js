@@ -170,7 +170,9 @@ export const buildRequestArgs = externalRequestOpts =>
 
 		// cheap, brute-force object clone, acceptable for serializable object
 		const externalRequestOptsQuery = JSON.parse(JSON.stringify(externalRequestOpts));
+
 		externalRequestOptsQuery.url = encodeURI(`/${endpoint}`);
+		externalRequestOptsQuery.jar = createCookieJar(externalRequestOptsQuery.url);
 
 		if (flags) {
 			externalRequestOptsQuery.headers['X-Meetup-Request-Flags'] = flags.join(',');
@@ -191,7 +193,6 @@ export const buildRequestArgs = externalRequestOpts =>
 		}
 
 		console.log(`External request headers: ${JSON.stringify(externalRequestOptsQuery.headers, null, 2)}`);
-		externalRequestOptsQuery.jar = createCookieJar(externalRequestOptsQuery.url);
 
 		return externalRequestOptsQuery;
 	};
