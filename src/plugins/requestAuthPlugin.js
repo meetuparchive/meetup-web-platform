@@ -24,7 +24,7 @@ function verifyAuth(auth) {
 
 const handleLogout = request => {
 	request.log(['info', 'auth'], 'Logout received, clearing cookies to re-authenticate');
-	return removeAuthState(['oauth_token', 'refresh_token'], request, request.plugins.requestAuth.reply);
+	return removeAuthState(['MEETUP_MEMBER', 'oauth_token', 'refresh_token'], request, request.plugins.requestAuth.reply);
 };
 
 /**
@@ -48,21 +48,20 @@ export const requestAuthorizer = auth$ => request => {
 	// This is 'deferred' because we don't want to start fetching the token
 	// before we know that it's needed
 	const request$ = Rx.Observable.of(request);
-	const authType = request.state.oauth_token && 'cookie';
-
 	request.log(['info', 'auth'], 'Checking for oauth_token in request');
-	return Rx.Observable.if(
-		() => authType,
-		request$
-			.do(() => request.log(['info', 'auth'], `Request contains auth token (${authType})`)),
-		request$
-			.do(() => request.log(['info', 'auth'], 'Request does not contain auth token'))
-			.flatMap(request =>
-				auth$(request)
-					.do(applyAuthState(request, request.plugins.requestAuth.reply))
-					.map(() => request)
-			)
-	);
+
+	const authType = request.state.oauth_token && 'oauth_token' ||
+		request.state.MEETUP_MEMBER && 'MEETUP_MEMBER';
+
+	if (authType) {
+		request.log(['info', 'auth'], `Request contains auth token (${authType})`);
+		return request$;
+	}
+
+	request.log(['info', 'auth'], 'Request does not contain auth token');
+	return auth$(request)
+		.do(applyAuthState(request, request.plugins.requestAuth.reply))
+		.map(() => request);
 };
 
 /**
