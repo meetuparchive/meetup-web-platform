@@ -2,7 +2,13 @@ import chalk from 'chalk';
 import Rx from 'rxjs';
 
 import { tryJSON } from '../util/fetchUtils';
-import { applyAuthState, applyServerState, removeAuthState } from '../util/authUtils';
+import {
+	applyAuthState,
+	assignMemberState,
+	assignRequestReply,
+	configureServerState,
+	removeAuthState
+} from '../util/authUtils';
 
 /**
  * @module requestAuthPlugin
@@ -38,7 +44,7 @@ const handleLogout = request => {
  * @param {Request} request Hapi request to modify with auth token (if necessary)
  * @return {Observable} Observable that emits the request with auth applied
  */
-export const requestAuthorizer = auth$ => request => {
+export const applyRequestAuthorizer$ = auth$ => request => {
 	// logout is accomplished exclusively through a `logout` querystring value
 	if ('logout' in request.query) {
 		handleLogout(request);
@@ -176,7 +182,7 @@ const refreshToken$ = refresh_token => Rx.Observable.of({
  * @param {Object} config { OAUTH_AUTH_URL, OAUTH_ACCESS_URL, oauth }
  * @param {Object} request the Hapi request that needs to be authorized
  */
-export const requestAuth$ = config => {
+export const getRequestAuthorizer$ = config => {
 	const redirect_uri = 'http://www.meetup.com/';  // required param set in oauth consumer config
 	const anonymousCode$ = getAnonymousCode$(config, redirect_uri);
 	const accessToken$ = getAccessToken$(config, redirect_uri);
@@ -199,8 +205,8 @@ export const getAuthenticate = authorizeRequest$ => (request, reply) => {
 			request.log(['info', 'auth'], 'Request authenticated');
 		})
 		.subscribe(
-			({ state: { oauth_token } }) => {
-				const credentials = oauth_token;
+			({ state: { oauth_token, MEETUP_MEMBER } }) => {
+				const credentials = MEETUP_MEMBER || oauth_token;
 				reply.continue({ credentials, artifacts: credentials });
 			},
 			err => reply(err, null, { credentials: null })
@@ -219,26 +225,17 @@ export const getAuthenticate = authorizeRequest$ => (request, reply) => {
  *   auth stategy instance
  */
 export const oauthScheme = (server, options) => {
-	// create a single requestAuth$ stream that can be used by any route
-	const auth$ = requestAuth$(options);
-	// create a single stream for modifying an arbitrary request with anonymous auth
-	const authorizeRequest$ = requestAuthorizer(auth$);
+	configureServerState(server, options);
+	server.ext('onPreAuth', assignMemberState(options));
+	server.ext('onPreAuth', assignRequestReply);
 
-	applyServerState(server, options);
-	server.ext('onPreAuth', (request, reply) => {
-		request.state.MEETUP_MEMBER = options.API_HOST.includes('.dev.') ?
-			request.state.MEETUP_MEMBER_DEV :
-			request.state.MEETUP_MEMBER;
+	const authorizeRequest$ = applyRequestAuthorizer$(
+		getRequestAuthorizer$(options)
+	);
 
-		// Used for setting and unsetting state, not for replying to request
-		request.plugins.requestAuth = {
-			reply,
-		};
-
-		return reply.continue();
-	});
-
-	return { authenticate: getAuthenticate(authorizeRequest$) };
+	return {
+		authenticate: getAuthenticate(authorizeRequest$),
+	};
 };
 /**
  * This plugin does two things.
