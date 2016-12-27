@@ -26,6 +26,13 @@ const MOCK_RESPONSE_OK = {  // minimal representation of http.IncomingMessage
 	},
 };
 
+export const createCookieJar = apiUrl => {
+	if (url.parse(apiUrl).pathname === '/sessions') {
+		return externalRequest.jar();  // create request-specific cookie jar for login cookie
+	}
+	return null;
+};
+
 const parseResponseFlags = flagHeader =>
 	(flagHeader || '')
 		.split(',')
@@ -163,7 +170,9 @@ export const buildRequestArgs = externalRequestOpts =>
 
 		// cheap, brute-force object clone, acceptable for serializable object
 		const externalRequestOptsQuery = JSON.parse(JSON.stringify(externalRequestOpts));
+
 		externalRequestOptsQuery.url = encodeURI(`/${endpoint}`);
+		externalRequestOptsQuery.jar = createCookieJar(externalRequestOptsQuery.url);
 
 		if (flags) {
 			externalRequestOptsQuery.headers['X-Meetup-Request-Flags'] = flags.join(',');
@@ -183,7 +192,7 @@ export const buildRequestArgs = externalRequestOpts =>
 			break;
 		}
 
-		console.log(`External request headers: ${JSON.stringify(externalRequestOptsQuery.headers)}`);
+		console.log(`External request headers: ${JSON.stringify(externalRequestOptsQuery.headers, null, 2)}`);
 
 		return externalRequestOptsQuery;
 	};
@@ -201,47 +210,38 @@ export const apiResponseToQueryResponse = query => ({ value, meta }) => ({
 	}
 });
 
-/**
- * Parse request for queries and request options
- * @return {Object} { queries, externalRequestOpts }
- */
-export function parseRequest(request, baseUrl) {
+export function parseRequestHeaders(request) {
 	const {
 		headers,
-		method,
-		query,
-		payload,
 		state,
 	} = request;
+	// Forward a copy of the Hapi request headers from the client query
+	const externalRequestHeaders = { ...headers };
 
-	// Forward the Hapi request headers from the client query
-	// except for `host` and `accept-encoding`
-	// which should be provided by the external api request
-	const externalRequestHeaders = {
-		...headers,
-		authorization: `Bearer ${state.oauth_token}`,
-	};
+	if (!state.MEETUP_MEMBER) {
+		externalRequestHeaders.authorization = `Bearer ${state.oauth_token}`;
+	}
 
-	delete externalRequestHeaders['host'];
-	delete externalRequestHeaders['accept-encoding'];
+	delete externalRequestHeaders['host'];  // let app server set 'host'
+	delete externalRequestHeaders['accept-encoding'];  // let app server set 'accept'
 	delete externalRequestHeaders['content-length'];  // original request content-length is irrelevant
-	delete externalRequestHeaders['cf-ray']; // cloudflare headers we don't want to pass on
+
+	// cloudflare headers we don't want to pass on
+	delete externalRequestHeaders['cf-ray'];
 	delete externalRequestHeaders['cf-ipcountry'];
 	delete externalRequestHeaders['cf-visitor'];
 	delete externalRequestHeaders['cf-connecting-ip'];
 
-	const externalRequestOpts = {
-		baseUrl,
-		method,
-		headers: externalRequestHeaders,  // make a copy to be immutable
-		mode: 'no-cors',
-		time: true,
-		agentOptions: {
-			rejectUnauthorized: baseUrl.indexOf('.dev') === -1
-		}
-	};
+	return externalRequestHeaders;
+}
 
-	const queriesJSON = request.method === 'post' ? payload.queries : query.queries;
+export function parseRequestQueries(request) {
+	const {
+		method,
+		payload,
+		query,
+	} = request;
+	const queriesJSON = method === 'post' ? payload.queries : query.queries;
 	const validatedQueries = Joi.validate(
 		JSON.parse(queriesJSON),
 		Joi.array().items(querySchema)
@@ -249,8 +249,27 @@ export function parseRequest(request, baseUrl) {
 	if (validatedQueries.error) {
 		throw validatedQueries.error;
 	}
-	const queries = validatedQueries.value;
-	return { queries, externalRequestOpts };
+	return validatedQueries.value;
+}
+
+/**
+ * Parse request for queries and request options
+ * @return {Object} { queries, externalRequestOpts }
+ */
+export function parseRequest(request, baseUrl) {
+	return {
+		externalRequestOpts: {
+			baseUrl,
+			method: request.method,
+			headers: parseRequestHeaders(request),  // make a copy to be immutable
+			mode: 'no-cors',
+			time: true,  // time the request for logging
+			agentOptions: {
+				rejectUnauthorized: baseUrl.indexOf('.dev') === -1
+			},
+		},
+		queries: parseRequestQueries(request),
+	};
 }
 
 /**
@@ -322,9 +341,11 @@ const externalRequest$ = Rx.Observable.bindNodeCallback(externalRequest);
 /**
  * Make a real external API request, return response body string
  */
-export const makeExternalApiRequest = (request, API_TIMEOUT) => requestOpts =>
-	externalRequest$(requestOpts)
-		.timeout(API_TIMEOUT);
+export const makeExternalApiRequest = (request, API_TIMEOUT) => requestOpts => {
+	return externalRequest$(requestOpts)
+		.timeout(API_TIMEOUT)
+		.map(([response, body]) => [response, body, requestOpts.jar]);
+};
 
 export const logApiResponse = appRequest => ([response, body]) => {
 	const {
@@ -378,6 +399,32 @@ export const parseLoginAuth = (request, query) => response => {
 };
 
 /**
+ * When a tough-cookie cookie jar is provided, forward the cookies along with
+ * the overall /api response back to the client
+ */
+export const injectResponseCookies = request => ([response, _, jar]) => {
+	if (!jar) {
+		return;
+	}
+	const requestUrl = response.toJSON().request.uri.href;
+	jar.getCookies(requestUrl).forEach(cookie => {
+		const cookieOptions = {
+			domain: cookie.domain,
+			path: cookie.path,
+			isHttpOnly: cookie.httpOnly,
+			isSameSite: false,
+			isSecure: process.env.NODE_ENV === 'production',
+		};
+
+		request.plugins.requestAuth.reply.state(
+			cookie.key,
+			cookie.value.replace(/^"|"$/g, ''),  // remove surrounding quotes from string value
+			cookieOptions
+		);
+	});
+};
+
+/**
  * Make an API request and parse the response into the expected `response`
  * object shape
  */
@@ -392,6 +439,7 @@ export const makeApiRequest$ = (request, API_TIMEOUT, duotoneUrls) => {
 			request.log(['api', 'info'], `REST API request: ${requestOpts.url}`);
 			return request$(requestOpts)
 				.do(logApiResponse(request))             // this will leak private info in API response
+				.do(injectResponseCookies(request))
 				.map(parseApiResponse(requestOpts.url))  // parse into plain object
 				.catch(errorResponse$(requestOpts.url))
 				.map(parseLoginAuth(request, query))     // login has oauth secrets - special case
