@@ -210,11 +210,13 @@ export const getAuthenticate = authorizeRequest$ => (request, reply) => {
 /**
  * Request authorizing scheme
  *
- * 1. add a `.authorize` method to the request
- * 2. assign a reference to the reply interface on request.plugins.requestAuth
- * 3. add an anonymous-user-JSON-generating route (for app logout)
- * 4. return the authentication function, which ensures that all requests have
- * valid auth credentials (anonymous or logged in)
+ * 1. assign a reference to the reply interface on request.plugins.requestAuth
+ * 2. return the authentication function from getAuthenticate, which ensures
+ * that all requests have valid auth credentials (anonymous or logged in)
+ *
+ * @param {Object} server the Hapi app server instance
+ * @param {Object} options the options passed to `server.auth.strategy`for the
+ *   auth stategy instance
  */
 export const oauthScheme = (server, options) => {
 	// create a single requestAuth$ stream that can be used by any route
@@ -224,6 +226,10 @@ export const oauthScheme = (server, options) => {
 
 	applyServerState(server, options);
 	server.ext('onPreAuth', (request, reply) => {
+		request.state.MEETUP_MEMBER = options.API_HOST.includes('.dev.') ?
+			request.state.MEETUP_MEMBER_DEV :
+			request.state.MEETUP_MEMBER;
+
 		// Used for setting and unsetting state, not for replying to request
 		request.plugins.requestAuth = {
 			reply,

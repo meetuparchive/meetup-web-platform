@@ -263,7 +263,7 @@ export function parseRequest(request, baseUrl) {
 			method: request.method,
 			headers: parseRequestHeaders(request),  // make a copy to be immutable
 			mode: 'no-cors',
-			time: true,
+			time: true,  // time the request for logging
 			agentOptions: {
 				rejectUnauthorized: baseUrl.indexOf('.dev') === -1
 			},
