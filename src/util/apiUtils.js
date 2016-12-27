@@ -210,47 +210,38 @@ export const apiResponseToQueryResponse = query => ({ value, meta }) => ({
 	}
 });
 
-/**
- * Parse request for queries and request options
- * @return {Object} { queries, externalRequestOpts }
- */
-export function parseRequest(request, baseUrl) {
+export function parseRequestHeaders(request) {
 	const {
 		headers,
-		method,
-		query,
-		payload,
 		state,
 	} = request;
+	// Forward a copy of the Hapi request headers from the client query
+	const externalRequestHeaders = { ...headers };
 
-	// Forward the Hapi request headers from the client query
-	// except for `host` and `accept-encoding`
-	// which should be provided by the external api request
-	const externalRequestHeaders = {
-		...headers,
-		authorization: `Bearer ${state.oauth_token}`,
-	};
+	if (!state.MEETUP_MEMBER) {
+		externalRequestHeaders.authorization = `Bearer ${state.oauth_token}`;
+	}
 
-	delete externalRequestHeaders['host'];
-	delete externalRequestHeaders['accept-encoding'];
+	delete externalRequestHeaders['host'];  // let app server set 'host'
+	delete externalRequestHeaders['accept-encoding'];  // let app server set 'accept'
 	delete externalRequestHeaders['content-length'];  // original request content-length is irrelevant
-	delete externalRequestHeaders['cf-ray']; // cloudflare headers we don't want to pass on
+
+	// cloudflare headers we don't want to pass on
+	delete externalRequestHeaders['cf-ray'];
 	delete externalRequestHeaders['cf-ipcountry'];
 	delete externalRequestHeaders['cf-visitor'];
 	delete externalRequestHeaders['cf-connecting-ip'];
 
-	const externalRequestOpts = {
-		baseUrl,
-		method,
-		headers: externalRequestHeaders,  // make a copy to be immutable
-		mode: 'no-cors',
-		time: true,
-		agentOptions: {
-			rejectUnauthorized: baseUrl.indexOf('.dev') === -1
-		}
-	};
+	return externalRequestHeaders;
+}
 
-	const queriesJSON = request.method === 'post' ? payload.queries : query.queries;
+export function parseRequestQueries(request) {
+	const {
+		method,
+		payload,
+		query,
+	} = request;
+	const queriesJSON = method === 'post' ? payload.queries : query.queries;
 	const validatedQueries = Joi.validate(
 		JSON.parse(queriesJSON),
 		Joi.array().items(querySchema)
@@ -258,8 +249,27 @@ export function parseRequest(request, baseUrl) {
 	if (validatedQueries.error) {
 		throw validatedQueries.error;
 	}
-	const queries = validatedQueries.value;
-	return { queries, externalRequestOpts };
+	return validatedQueries.value;
+}
+
+/**
+ * Parse request for queries and request options
+ * @return {Object} { queries, externalRequestOpts }
+ */
+export function parseRequest(request, baseUrl) {
+	return {
+		externalRequestOpts: {
+			baseUrl,
+			method: request.method,
+			headers: parseRequestHeaders(request),  // make a copy to be immutable
+			mode: 'no-cors',
+			time: true,
+			agentOptions: {
+				rejectUnauthorized: baseUrl.indexOf('.dev') === -1
+			},
+		},
+		queries: parseRequestQueries(request),
+	};
 }
 
 /**
