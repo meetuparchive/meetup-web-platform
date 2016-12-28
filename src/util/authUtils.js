@@ -16,9 +16,9 @@ const YEAR_IN_MS = 1000 * 60 * 60 * 24 * 365;
 export const configureAuthState = auth => {
 	return {
 		oauth_token: {
-			value: auth.oauth_token || auth.access_token,
+			value: auth.oauth_token || auth.access_token || '',
 			opts: {
-				ttl: auth.expires_in * 1000,
+				ttl: (auth.expires_in || 0) * 1000,
 			},
 		},
 		refresh_token: {
