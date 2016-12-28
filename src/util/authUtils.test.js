@@ -87,7 +87,7 @@ describe('assignMemberState', () => {
 	it('does not reassign MEETUP_MEMBER in prod', () => {
 		const state = { ...baseState };  // make a copy
 		const request = { state };
-		assignMemberState({ API_HOST: 'www.dev.api.meetup.com' })(request, reply);
+		assignMemberState({ API_HOST: 'www.api.meetup.com' })(request, reply);
 		expect(request.state.MEETUP_MEMBER).toEqual(baseState.MEETUP_MEMBER);
 	});
 });
