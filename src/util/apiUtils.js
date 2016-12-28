@@ -7,7 +7,7 @@ import Joi from 'joi';
 import Rx from 'rxjs';
 
 import {
-	applyAuthState,
+	removeAuthState,
 } from '../util/authUtils';
 
 import {
@@ -225,11 +225,12 @@ export function parseRequestHeaders(request) {
 	// overwrite cookie header with current request state, decrypted
 	const cookies = { ...request.state };
 	const csrf = uuid.v4();
-	cookies['csrf_token'] = csrf;
-	cookies['csrf_token_dev'] = csrf;
+	console.log('\n\n', csrf, '\n\n');
+	cookies['MEETUP_CSRF'] = csrf;
+	cookies['MEETUP_CSRF_DEV'] = csrf;
 	externalRequestHeaders['csrf-token'] = csrf;
 	externalRequestHeaders.cookie = Object.keys(cookies)
-		.map(name => `${name}=${request.state[name]}`).join('; ');
+		.map(name => `${name}=${cookies[name]}`).join('; ');
 	console.log(externalRequestHeaders.cookies);
 
 	delete externalRequestHeaders['host'];  // let app server set 'host'
@@ -391,19 +392,11 @@ export const logApiResponse = appRequest => ([response, body]) => {
  * the login response unchanged
  */
 export const parseLoginAuth = (request, query) => response => {
-	if (query.type === 'login' && request.plugins.requestAuth) {
-		const {
-			oauth_token,
-			refresh_token,
-			expires_in,
-			member,
-		} = response.value;
-		applyAuthState(request, request.plugins.requestAuth.reply)({
-			oauth_token,
-			refresh_token,
-			expires_in
-		});
-		response.value = { member };
+	if (query.type === 'login' && request.plugins.requestAuth && !response.value.error) {
+		// kill the logged-out auth
+		removeAuthState(['oauth_token', 'refresh_token'], request, request.plugins.requestAuth.reply);
+		// only return the member, no oauth data
+		response.value = { member: response.value.member };
 	}
 	return response;
 };
