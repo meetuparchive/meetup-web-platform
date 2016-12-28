@@ -394,6 +394,7 @@ export const logApiResponse = appRequest => ([response, body]) => {
 		},
 		response: {
 			elapsedTime: response.elapsedTime,
+			status: response.statusCode,
 			body: body.length > 256 ? `${body.substr(0, 256)}...`: body,
 		},
 	};

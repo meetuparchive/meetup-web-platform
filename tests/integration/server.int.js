@@ -1,8 +1,7 @@
 import start from '../../src/server';
-import * as apiProxyHandler from '../../src/apiProxy/apiProxyHandler';
 import * as appRouteHandler from '../../src/routes/appRouteHandler';
 
-describe('Integration tests', () => {
+describe('General server startup tests', () => {
 	const random32 = 'asdfasdfasdfasdfasdfasdfasdfasdf';
 	const mockConfig = () => Promise.resolve({
 		API_HOST: 'www.api.meetup.com',
@@ -45,7 +44,11 @@ describe('Integration tests', () => {
 				return server.inject(requestFooRoute).then(
 					response => expect(response.payload).toEqual(expectedResponse)
 				)
-				.then(() => server.stop());
+				.then(() => server.stop())
+				.catch(err => {
+					server.stop();
+					throw err;
+				});
 			});
 	});
 	it('calls the handler for an authenticated route', () => {
@@ -67,27 +70,11 @@ describe('Integration tests', () => {
 				return server.inject(authedRequestFooRoute).then(
 					response => expect(response.payload).toEqual(expectedResponse)
 				)
-				.then(() => server.stop());
-			});
-	});
-	it('calls the handler for /api', () => {
-		const spyable = {
-			handler: (request, reply) => reply('okay'),
-		};
-		spyOn(spyable, 'handler').and.callThrough();
-		spyOn(apiProxyHandler, 'getApiProxyRouteHandler')
-			.and.callFake(() => spyable.handler);
-		return start({}, {}, mockConfig)
-			.then(server => {
-				const request = {
-					method: 'get',
-					url: '/api?queries=[]',
-					credentials: 'whatever',
-				};
-				return server.inject(request).then(
-					response => expect(spyable.handler).toHaveBeenCalled()
-				)
-				.then(() => server.stop());
+				.then(() => server.stop())
+				.catch(err => {
+					server.stop();
+					throw err;
+				});
 			});
 	});
 	it('calls the handler for /{*wild}', () => {
@@ -107,7 +94,11 @@ describe('Integration tests', () => {
 				return server.inject(request).then(
 					response => expect(spyable.handler).toHaveBeenCalled()
 				)
-				.then(() => server.stop());
+				.then(() => server.stop())
+				.catch(err => {
+					server.stop();
+					throw err;
+				});
 			});
 	});
 });
