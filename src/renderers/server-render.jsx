@@ -4,6 +4,7 @@ import chalk from 'chalk';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import RouterContext from 'react-router/lib/RouterContext';
+import { useBasename } from 'history';
 import match from 'react-router/lib/match';
 import { Provider } from 'react-redux';
 
@@ -27,9 +28,10 @@ const DOCTYPE = '<!DOCTYPE html>';
  * @module ServerRender
  */
 
-function getHtml(assetPublicPath, clientFilename, initialState={}, appMarkup='') {
+function getHtml(baseUrl, assetPublicPath, clientFilename, initialState={}, appMarkup='') {
 	const htmlMarkup = ReactDOMServer.renderToString(
 		<Dom
+			baseUrl={baseUrl}
 			assetPublicPath={assetPublicPath}
 			clientFilename={clientFilename}
 			initialState={initialState}
@@ -56,7 +58,7 @@ function getHtml(assetPublicPath, clientFilename, initialState={}, appMarkup='')
  * @return {Object} the statusCode and result used by Hapi's `reply` API
  *   {@link http://hapijs.com/api#replyerr-result}
  */
-const getRouterRenderer = (store, clientFilename, assetPublicPath) =>
+const getRouterRenderer = (store, baseUrl, clientFilename, assetPublicPath) =>
 	([ redirectLocation, renderProps ]) => {
 		// pre-render the app-specific markup, this is the string of markup that will
 		// be managed by React on the client.
@@ -70,6 +72,8 @@ const getRouterRenderer = (store, clientFilename, assetPublicPath) =>
 		let statusCode;
 
 		try {
+			renderProps.history = useBasename(() => renderProps.history)({ basename: baseUrl });
+			renderProps.router = { ...renderProps.router, ...renderProps.history };
 			appMarkup = ReactDOMServer.renderToString(
 				<Provider store={store}>
 					<RouterContext {...renderProps} />
@@ -79,6 +83,7 @@ const getRouterRenderer = (store, clientFilename, assetPublicPath) =>
 			// all the data for the full `<html>` element has been initialized by the app
 			// so go ahead and assemble the full response body
 			result = getHtml(
+				baseUrl,
 				assetPublicPath,
 				clientFilename,
 				initialState,
@@ -138,7 +143,8 @@ const makeRenderer = (
 	reducer,
 	clientFilename,
 	assetPublicPath,
-	middleware=[]
+	middleware=[],
+	baseUrl='/'
 ) => request => {
 
 	middleware = middleware || [];
@@ -148,10 +154,10 @@ const makeRenderer = (
 		headers,
 		info,
 		log,
-		url,
+		path,
 	} = request;
 
-	const location = url.path;
+	const appLocation = path.replace(`${baseUrl}/`, '/');
 	// request protocol might be different from original request that hit proxy
 	// we want to use the proxy's protocol
 	const requestProtocol = headers['x-forwarded-proto'] || connection.info.protocol;
@@ -165,7 +171,7 @@ const makeRenderer = (
 	// render skeleton if requested - the store is ready
 	if ('skeleton' in request.query) {
 		return Rx.Observable.of({
-			result: getHtml(assetPublicPath, clientFilename, store.getState()),
+			result: getHtml(baseUrl, assetPublicPath, clientFilename, store.getState()),
 			statusCode: 200
 		});
 	}
@@ -177,8 +183,8 @@ const makeRenderer = (
 	})
 	.first(state => state.preRenderChecklist.every(isReady => isReady));  // take the first ready state
 
-	request.log(['app', 'info'], `Finding route for path: '${location}'`);
-	return Rx.Observable.bindNodeCallback(match)({ location, routes })
+	request.log(['app', 'info'], `Finding route for path: '${appLocation}'`);
+	return Rx.Observable.bindNodeCallback(match)({ location: appLocation, routes })
 		.do(([redirectLocation, renderProps]) => {
 			if (!redirectLocation && !renderProps) {
 				throw Boom.notFound();
@@ -194,7 +200,7 @@ const makeRenderer = (
 			})
 		)
 		.flatMap(args => storeIsReady$.map(() => args))  // `sample` appears not to work - this is equivalent
-		.map(getRouterRenderer(store, clientFilename, assetPublicPath));
+		.map(getRouterRenderer(store, baseUrl, clientFilename, assetPublicPath));
 };
 
 export default makeRenderer;
