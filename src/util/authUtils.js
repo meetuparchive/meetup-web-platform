@@ -69,7 +69,10 @@ export function validateSecret(secret) {
 	return value;
 }
 
-export const applyServerState = (server, options) => {
+/**
+ * apply default cookie options for auth-related cookies
+ */
+export const configureAuthCookies = (server, options) => {
 	const password = validateSecret(options.COOKIE_ENCRYPT_SECRET);
 	const authCookieOptions = {
 		encoding: 'iron',
@@ -83,3 +86,21 @@ export const applyServerState = (server, options) => {
 	server.state('refresh_token', authCookieOptions);
 };
 
+export const assignMemberState = options => (request, reply) => {
+	const memberValue = options.API_HOST.includes('.dev.') ?
+		request.state.MEETUP_MEMBER_DEV :
+		request.state.MEETUP_MEMBER;
+	request.state.MEETUP_MEMBER = memberValue;
+	request.state.MEETUP_MEMBER_DEV = memberValue;
+
+	return reply.continue();
+};
+
+export const assignRequestReply = (request, reply) => {
+	// Used for setting and unsetting state, not for replying to request
+	request.plugins.requestAuth = {
+		reply,
+	};
+
+	return reply.continue();
+};
