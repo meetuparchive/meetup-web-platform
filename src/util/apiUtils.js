@@ -27,9 +27,21 @@ const MOCK_RESPONSE_OK = {  // minimal representation of http.IncomingMessage
 	},
 };
 
-export const createCookieJar = apiUrl => {
-	if (url.parse(apiUrl).pathname === '/sessions') {
-		return externalRequest.jar();  // create request-specific cookie jar for login cookie
+/**
+ * In order to receive cookies from `externalRequest` requests, this function
+ * provides a cookie jar that is specific to the request.
+ *
+ * The `requestUrl` is used to determine whether a cookie jar is needed
+ *
+ * https://github.com/request/request#examples
+ *
+ * @param {String} requestUrl the URL that will be used in the external request
+ * @return {Object} a cookie jar compatible with the npm request `jar` API
+ */
+export const createCookieJar = requestUrl => {
+	const parsedUrl = url.parse(requestUrl);
+	if (parsedUrl.pathname === '/sessions') {
+		return externalRequest.jar();  // create request/url-specific cookie jar
 	}
 	return null;
 };
@@ -399,7 +411,10 @@ export const parseLoginAuth = (request, query) => response => {
 		// kill the logged-out auth
 		removeAuthState(['oauth_token', 'refresh_token'], request, request.plugins.requestAuth.reply);
 		// only return the member, no oauth data
-		response.value = { member: response.value.member };
+		return {
+			...response,
+			value: { member: response.value.member }
+		};
 	}
 	return response;
 };
