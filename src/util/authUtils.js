@@ -69,7 +69,10 @@ export function validateSecret(secret) {
 	return value;
 }
 
-export const configureServerState = (server, options) => {
+/**
+ * apply default cookie options for auth-related cookies
+ */
+export const configureAuthCookies = (server, options) => {
 	const password = validateSecret(options.COOKIE_ENCRYPT_SECRET);
 	const authCookieOptions = {
 		encoding: 'iron',

@@ -6,7 +6,7 @@ import {
 	applyAuthState,
 	assignMemberState,
 	assignRequestReply,
-	configureServerState,
+	configureAuthCookies,
 	removeAuthState
 } from '../util/authUtils';
 
@@ -216,7 +216,8 @@ export const getAuthenticate = authorizeRequest$ => (request, reply) => {
  * Request authorizing scheme
  *
  * 1. assign a reference to the reply interface on request.plugins.requestAuth
- * 2. return the authentication function from getAuthenticate, which ensures
+ * 2. make sure the correct MEETUP_MEMBER[_DEV] cookie is used for auth
+ * 3. return the authentication function from getAuthenticate, which ensures
  * that all requests have valid auth credentials (anonymous or logged in)
  *
  * @param {Object} server the Hapi app server instance
@@ -224,9 +225,9 @@ export const getAuthenticate = authorizeRequest$ => (request, reply) => {
  *   auth stategy instance
  */
 export const oauthScheme = (server, options) => {
-	configureServerState(server, options);
-	server.ext('onPreAuth', assignMemberState(options));
-	server.ext('onPreAuth', assignRequestReply);
+	configureAuthCookies(server, options);                // apply default config for auth cookies
+	server.ext('onPreAuth', assignRequestReply);          // provide a reference to `reply` on the request
+	server.ext('onPreAuth', assignMemberState(options));  // use MEETUP_MEMBER[_DEV]
 
 	const authorizeRequest$ = applyRequestAuthorizer$(getRequestAuthorizer$(options));
 
