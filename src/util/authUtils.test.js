@@ -1,11 +1,11 @@
 import {
 	// applyAuthState,
-	applyServerState,
+	configureServerState,
 	// configureAuthState,
 	// removeAuthState,
 } from './authUtils';
 
-describe('applyServerState', () => {
+describe('configureServerState', () => {
 	const serverWithState = {
 		state: () => {},
 	};
@@ -14,7 +14,7 @@ describe('applyServerState', () => {
 			COOKIE_ENCRYPT_SECRET: 'asdklfjahsdflkjasdfhlkajsdfkljasdlkasdjhfalksdjfbalkjsdhfalsdfasdlkfasd',
 		};
 		spyOn(serverWithState, 'state');
-		applyServerState(serverWithState, goodOptions);
+		configureServerState(serverWithState, goodOptions);
 		const callArgs = serverWithState.state.calls.allArgs();
 		expect(callArgs.length).toBeGreaterThan(0);
 		callArgs.forEach(args => {
@@ -24,13 +24,13 @@ describe('applyServerState', () => {
 	});
 	it('throws an error when secret is missing', () => {
 		const missingSecretOpts = {};
-		expect(() => applyServerState(serverWithState, missingSecretOpts)).toThrow();
+		expect(() => configureServerState(serverWithState, missingSecretOpts)).toThrow();
 	});
 	it('throws an error when secret is too short', () => {
 		const shortSecretOpts = {
 			COOKIE_ENCRYPT_SECRET: 'less than 32 characters',
 		};
-		expect(() => applyServerState(serverWithState, shortSecretOpts)).toThrow();
+		expect(() => configureServerState(serverWithState, shortSecretOpts)).toThrow();
 	});
 });
 
