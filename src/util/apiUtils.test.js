@@ -22,6 +22,7 @@ import {
 	apiResponseDuotoneSetter,
 	buildRequestArgs,
 	errorResponse$,
+	getAuthHeaders,
 	injectResponseCookies,
 	logApiResponse,
 	parseRequest,
@@ -44,6 +45,20 @@ describe('errorResponse$', () => {
 		return errorResponse$('http://example.com')(new Error(message))
 			.toPromise()
 			.then(response => expect(response.value.error).toEqual(message));
+	});
+});
+
+describe('getAuthHeaders', () => {
+	it('returns authorization header if no member cookie and oauth_token', () => {
+		const oauth_token = 'foo';
+		const authHeaders = getAuthHeaders({ state: { oauth_token } });
+		expect(authHeaders.authorization.startsWith('Bearer ')).toBe(true);
+		expect(authHeaders.authorization.endsWith(oauth_token)).toBe(true);
+	});
+	it('sets MEETUP_CSRF', () => {
+		const MEETUP_MEMBER = 'foo';
+		const authHeaders = getAuthHeaders({ state: { MEETUP_MEMBER } });
+		expect(authHeaders.cookie['MEETUP_CSRF']).not.toBeNull();
 	});
 });
 

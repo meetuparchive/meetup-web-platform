@@ -212,7 +212,7 @@ export const apiResponseToQueryResponse = query => ({ value, meta }) => ({
 });
 
 export function getAuthHeaders({ state }) {
-	if (!state.MEETUP_MEMBER) {
+	if (!state.MEETUP_MEMBER && state.oauth_token) {
 		return {
 			authorization: `Bearer ${state.oauth_token}`,
 		};
