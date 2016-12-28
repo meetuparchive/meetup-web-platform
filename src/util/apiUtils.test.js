@@ -58,8 +58,17 @@ describe('getAuthHeaders', () => {
 	it('sets MEETUP_CSRF', () => {
 		const MEETUP_MEMBER = 'foo';
 		const authHeaders = getAuthHeaders({ state: { MEETUP_MEMBER } });
-		expect(authHeaders.cookie.includes('MEETUP_CSRF=')).toBe(true);
-		expect(authHeaders.cookie.includes('MEETUP_CSRF_DEV=')).toBe(true);
+		const cookies = authHeaders.cookie.split('; ').reduce((cookies, pair) => {
+			const [name, ...value] = pair.split('=');
+			return {
+				...cookies,
+				[name]: value.join('='),
+			};
+		}, {});
+
+		expect(cookies['MEETUP_CSRF']).not.toBeUndefined();
+		expect(cookies['MEETUP_CSRF_DEV']).not.toBeUndefined();
+		expect(authHeaders['csrf-token']).toEqual(cookies['MEETUP_CSRF']);
 	});
 });
 

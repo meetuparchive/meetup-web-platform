@@ -219,8 +219,8 @@ export function getAuthHeaders({ state }) {
 	}
 	const cookies = { ...state };
 	const csrf = uuid.v4();
-	cookies['MEETUP_CSRF'] = csrf;
-	cookies['MEETUP_CSRF_DEV'] = csrf;
+	cookies.MEETUP_CSRF = csrf;
+	cookies.MEETUP_CSRF_DEV = csrf;
 	const cookie = Object.keys(cookies)
 		.map(name => `${name}=${cookies[name]}`).join('; ');
 
