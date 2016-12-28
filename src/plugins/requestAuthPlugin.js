@@ -5,9 +5,9 @@ import { tryJSON } from '../util/fetchUtils';
 import {
 	applyAuthState,
 	assignMemberState,
-	assignRequestReply,
 	configureAuthCookies,
-	removeAuthState
+	removeAuthState,
+	setPluginState,
 } from '../util/authUtils';
 
 /**
@@ -30,7 +30,8 @@ function verifyAuth(auth) {
 
 const handleLogout = request => {
 	request.log(['info', 'auth'], 'Logout received, clearing cookies to re-authenticate');
-	return removeAuthState(['MEETUP_MEMBER', 'oauth_token', 'refresh_token'], request, request.plugins.requestAuth.reply);
+	const memberCookie = request.plugins.requestAuth.isDev ? 'MEETUP_MEMBER_DEV' : 'MEETUP_MEMBER';
+	return removeAuthState([memberCookie, 'oauth_token', 'refresh_token'], request, request.plugins.requestAuth.reply);
 };
 
 /**
@@ -226,7 +227,7 @@ export const getAuthenticate = authorizeRequest$ => (request, reply) => {
  */
 export const oauthScheme = (server, options) => {
 	configureAuthCookies(server, options);                // apply default config for auth cookies
-	server.ext('onPreAuth', assignRequestReply);          // provide a reference to `reply` on the request
+	server.ext('onPreAuth', setPluginState(options));     // provide a reference to `reply` on the request
 	server.ext('onPreAuth', assignMemberState(options));  // use MEETUP_MEMBER[_DEV]
 
 	const authorizeRequest$ = applyRequestAuthorizer$(getRequestAuthorizer$(options));

@@ -2,7 +2,7 @@ import Joi from 'joi';
 import {
 	applyAuthState,
 	assignMemberState,
-	assignRequestReply,
+	setPluginState,
 	configureAuthState,
 	configureAuthCookies,
 	removeAuthState,
@@ -78,23 +78,15 @@ describe('assignMemberState', () => {
 		assignMemberState({ API_HOST: 'www.api.meetup.com' })(request, reply);
 		expect(reply.continue).toHaveBeenCalled();
 	});
-	it('assigns MEETUP_MEMBER and MEETUP_MEMBER_DEV to the value of MEETUP_MEMBER', () => {
-		const state = { ...baseState };  // make a copy
-		const request = { state };
-		assignMemberState({ API_HOST: 'www.api.meetup.com' })(request, reply);
-		expect(request.state.MEETUP_MEMBER_DEV).toEqual(request.state.MEETUP_MEMBER);
-		expect(request.state.MEETUP_MEMBER_DEV).toEqual(baseState.MEETUP_MEMBER);
-	});
-	it('assigns MEETUP_MEMBER and MEETUP_MEMBER_DEV to the value of MEETUP_MEMBER_DEV in dev', () => {
+	it('assigns MEETUP_MEMBER to the value of MEETUP_MEMBER_DEV in dev', () => {
 		const state = { ...baseState };  // make a copy
 		const request = { state };
 		assignMemberState({ API_HOST: 'www.dev.api.meetup.com' })(request, reply);
-		expect(request.state.MEETUP_MEMBER_DEV).toEqual(request.state.MEETUP_MEMBER);
 		expect(request.state.MEETUP_MEMBER).toEqual(baseState.MEETUP_MEMBER_DEV);
 	});
 });
 
-describe('assignRequestReply', () => {
+describe('setPluginState', () => {
 	const reply = {
 		continue: () => {},
 	};
@@ -103,8 +95,11 @@ describe('assignRequestReply', () => {
 		const request = {
 			plugins: {},
 		};
+		const options = {
+			API_HOST: 'www.api.meetup.com',
+		};
 		spyOn(reply, 'continue');
-		assignRequestReply(request, reply);
+		setPluginState(options)(request, reply);
 		expect(reply.continue).toHaveBeenCalled();
 	});
 	it('assigns the reply as a property of the request', () => {
@@ -112,8 +107,33 @@ describe('assignRequestReply', () => {
 		const request = {
 			plugins: {},
 		};
-		assignRequestReply(request, reply);
+		const options = {
+			API_HOST: 'www.api.meetup.com',
+		};
+		setPluginState(options)(request, reply);
 		expect(request.plugins.requestAuth.reply).toBe(reply);
+	});
+	it('assigns isDev to true for dev API_HOST', () => {
+		// SIDE EFFECT - function call will modify request
+		const request = {
+			plugins: {},
+		};
+		const options = {
+			API_HOST: 'www.dev.api.meetup.com',
+		};
+		setPluginState(options)(request, reply);
+		expect(request.plugins.requestAuth.isDev).toBe(true);
+	});
+	it('assigns isDev to false for non-dev API_HOST', () => {
+		// SIDE EFFECT - function call will modify request
+		const request = {
+			plugins: {},
+		};
+		const options = {
+			API_HOST: 'www.api.meetup.com',
+		};
+		setPluginState(options)(request, reply);
+		expect(request.plugins.requestAuth.isDev).toBe(false);
 	});
 });
 

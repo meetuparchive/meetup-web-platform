@@ -86,20 +86,26 @@ export const configureAuthCookies = (server, options) => {
 	server.state('refresh_token', authCookieOptions);
 };
 
+/**
+ * The request should use different MEETUP_MEMBER cookies depending on whether
+ * it is hitting the dev API or prod API. This function will read from the
+ * correct cookie and make sure that request.state.MEETUP_MEMBER contains
+ * the correct value for the lifetime of the request
+ */
 export const assignMemberState = options => (request, reply) => {
 	const memberValue = options.API_HOST.includes('.dev.') ?
 		request.state.MEETUP_MEMBER_DEV :
 		request.state.MEETUP_MEMBER;
 	request.state.MEETUP_MEMBER = memberValue;
-	request.state.MEETUP_MEMBER_DEV = memberValue;
 
 	return reply.continue();
 };
 
-export const assignRequestReply = (request, reply) => {
+export const setPluginState = options => (request, reply) => {
 	// Used for setting and unsetting state, not for replying to request
 	request.plugins.requestAuth = {
 		reply,
+		isDev: options.API_HOST.includes('.dev.'),
 	};
 
 	return reply.continue();
