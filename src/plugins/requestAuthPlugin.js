@@ -56,8 +56,8 @@ export const applyRequestAuthorizer$ = auth$ => request => {
 	// before we know that it's needed
 	request.log(['info', 'auth'], 'Checking for oauth_token in request');
 
-	const authType = request.state.oauth_token && 'oauth_token' ||
-		request.state.MEETUP_MEMBER && 'MEETUP_MEMBER';
+	const authType = request.state.MEETUP_MEMBER && 'MEETUP_MEMBER' ||
+		request.state.oauth_token && 'oauth_token';
 
 	if (authType) {
 		request.log(['info', 'auth'], `Request contains auth token (${authType})`);
