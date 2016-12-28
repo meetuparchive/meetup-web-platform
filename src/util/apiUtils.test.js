@@ -58,7 +58,8 @@ describe('getAuthHeaders', () => {
 	it('sets MEETUP_CSRF', () => {
 		const MEETUP_MEMBER = 'foo';
 		const authHeaders = getAuthHeaders({ state: { MEETUP_MEMBER } });
-		expect(authHeaders.cookie['MEETUP_CSRF']).not.toBeNull();
+		expect(authHeaders.cookie.includes('MEETUP_CSRF=')).toBe(true);
+		expect(authHeaders.cookie.includes('MEETUP_CSRF_DEV=')).toBe(true);
 	});
 });
 
