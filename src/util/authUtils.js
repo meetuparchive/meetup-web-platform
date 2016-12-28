@@ -84,9 +84,11 @@ export const configureServerState = (server, options) => {
 };
 
 export const assignMemberState = options => (request, reply) => {
-	request.state.MEETUP_MEMBER = options.API_HOST.includes('.dev.') ?
+	const memberValue = options.API_HOST.includes('.dev.') ?
 		request.state.MEETUP_MEMBER_DEV :
 		request.state.MEETUP_MEMBER;
+	request.state.MEETUP_MEMBER = memberValue;
+	request.state.MEETUP_MEMBER_DEV = memberValue;
 
 	return reply.continue();
 };

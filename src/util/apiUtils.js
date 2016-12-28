@@ -1,5 +1,6 @@
 import querystring from 'querystring';
 import url from 'url';
+import uuid from 'uuid';
 
 import externalRequest from 'request';
 import Joi from 'joi';
@@ -221,6 +222,15 @@ export function parseRequestHeaders(request) {
 	if (!state.MEETUP_MEMBER) {
 		externalRequestHeaders.authorization = `Bearer ${state.oauth_token}`;
 	}
+	// overwrite cookie header with current request state, decrypted
+	const cookies = { ...request.state };
+	const csrf = uuid.v4();
+	cookies['csrf_token'] = csrf;
+	cookies['csrf_token_dev'] = csrf;
+	externalRequestHeaders['csrf-token'] = csrf;
+	externalRequestHeaders.cookie = Object.keys(cookies)
+		.map(name => `${name}=${request.state[name]}`).join('; ');
+	console.log(externalRequestHeaders.cookies);
 
 	delete externalRequestHeaders['host'];  // let app server set 'host'
 	delete externalRequestHeaders['accept-encoding'];  // let app server set 'accept'
