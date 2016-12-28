@@ -2,10 +2,10 @@ import Rx from 'rxjs';
 import register, {
 	getAuthenticate,
 	oauthScheme,
-	requestAuth$,
+	getRequestAuthorizer$,
 	getAnonymousCode$,
 	getAccessToken$,
-	requestAuthorizer,
+	applyRequestAuthorizer$,
 } from './requestAuthPlugin';
 
 const oauth = {
@@ -114,7 +114,7 @@ describe('getAccessToken$', () => {
 	});
 });
 
-describe('requestAuth$', () => {
+describe('getRequestAuthorizer$', () => {
 	it('returns token when provided URLs and oauth info', function(done) {
 		spyOn(global, 'fetch').and.callFake((url, opts) => {
 			if (url.startsWith(OAUTH_AUTH_URL)) {
@@ -128,7 +128,7 @@ describe('requestAuth$', () => {
 				});
 			}
 		});
-		const auth$ = requestAuth$({ oauth, OAUTH_AUTH_URL, OAUTH_ACCESS_URL }, null);
+		const auth$ = getRequestAuthorizer$({ oauth, OAUTH_AUTH_URL, OAUTH_ACCESS_URL }, null);
 
 		auth$({ ...MOCK_REQUEST }).subscribe(auth => {
 			expect(auth.oauth_token).toBe('good_token');
@@ -136,9 +136,9 @@ describe('requestAuth$', () => {
 		});
 	});
 });
-describe('requestAuthorizer', () => {
-	const auth$ = requestAuth$({ oauth, OAUTH_AUTH_URL, OAUTH_ACCESS_URL }, null);
-	const authorizeRequest$ = requestAuthorizer(auth$);
+describe('applyRequestAuthorizer$', () => {
+	const auth$ = getRequestAuthorizer$({ oauth, OAUTH_AUTH_URL, OAUTH_ACCESS_URL }, null);
+	const authorizeRequest$ = applyRequestAuthorizer$(auth$);
 	it('does not try to fetch when provided a request with an oauth token in state', () => {
 		spyOn(global, 'fetch').and.callFake((url, opts) => {
 			if (url.startsWith(OAUTH_AUTH_URL)) {
