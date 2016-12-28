@@ -40,26 +40,4 @@ describe('configureEnv', function() {
 	});
 });
 
-describe('onPreResponse', () => {
-	it('returns html containing error message', () => {
-		const errorMessage = 'foobar';
-		const errorCode = 432;
-		const request = {
-			response: Boom.create(errorCode, errorMessage)
-		};
-		const replyObj = {
-			code() {}
-		};
-		const spyable = {
-			reply: () => replyObj,
-		};
-		spyOn(replyObj, 'code');
-		spyOn(spyable, 'reply').and.callThrough();
-		const errorResponse = serverUtils.onPreResponse(request, spyable.reply);
-		expect(errorResponse).toBe(replyObj);
-		const errorMarkup = spyable.reply.calls.mostRecent().args[0];
-		expect(errorMarkup.indexOf(errorMessage)).toBeGreaterThan(-1);
-		expect(replyObj.code).toHaveBeenCalledWith(errorCode);
-	});
-});
 
