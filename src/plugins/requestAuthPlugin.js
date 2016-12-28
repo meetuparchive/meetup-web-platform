@@ -53,7 +53,6 @@ export const applyRequestAuthorizer$ = auth$ => request => {
 	// always need oauth_token, even if it's an anonymous (pre-reg) token
 	// This is 'deferred' because we don't want to start fetching the token
 	// before we know that it's needed
-	const request$ = Rx.Observable.of(request);
 	request.log(['info', 'auth'], 'Checking for oauth_token in request');
 
 	const authType = request.state.oauth_token && 'oauth_token' ||
@@ -61,7 +60,7 @@ export const applyRequestAuthorizer$ = auth$ => request => {
 
 	if (authType) {
 		request.log(['info', 'auth'], `Request contains auth token (${authType})`);
-		return request$;
+		return Rx.Observable.of(request);
 	}
 
 	request.log(['info', 'auth'], 'Request does not contain auth token');
@@ -205,7 +204,7 @@ export const getAuthenticate = authorizeRequest$ => (request, reply) => {
 			request.log(['info', 'auth'], 'Request authenticated');
 		})
 		.subscribe(
-			({ state: { oauth_token, MEETUP_MEMBER } }) => {
+			({ state: { MEETUP_MEMBER, oauth_token } }) => {
 				const credentials = MEETUP_MEMBER || oauth_token;
 				reply.continue({ credentials, artifacts: credentials });
 			},
@@ -229,9 +228,7 @@ export const oauthScheme = (server, options) => {
 	server.ext('onPreAuth', assignMemberState(options));
 	server.ext('onPreAuth', assignRequestReply);
 
-	const authorizeRequest$ = applyRequestAuthorizer$(
-		getRequestAuthorizer$(options)
-	);
+	const authorizeRequest$ = applyRequestAuthorizer$(getRequestAuthorizer$(options));
 
 	return {
 		authenticate: getAuthenticate(authorizeRequest$),

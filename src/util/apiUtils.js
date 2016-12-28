@@ -211,27 +211,30 @@ export const apiResponseToQueryResponse = query => ({ value, meta }) => ({
 	}
 });
 
-export function parseRequestHeaders(request) {
-	const {
-		headers,
-		state,
-	} = request;
-	// Forward a copy of the Hapi request headers from the client query
-	const externalRequestHeaders = { ...headers };
-
+export function getAuthHeaders({ state }) {
 	if (!state.MEETUP_MEMBER) {
-		externalRequestHeaders.authorization = `Bearer ${state.oauth_token}`;
+		return {
+			authorization: `Bearer ${state.oauth_token}`,
+		};
 	}
-	// overwrite cookie header with current request state, decrypted
-	const cookies = { ...request.state };
+	const cookies = { ...state };
 	const csrf = uuid.v4();
-	console.log('\n\n', csrf, '\n\n');
 	cookies['MEETUP_CSRF'] = csrf;
 	cookies['MEETUP_CSRF_DEV'] = csrf;
-	externalRequestHeaders['csrf-token'] = csrf;
-	externalRequestHeaders.cookie = Object.keys(cookies)
+	const cookie = Object.keys(cookies)
 		.map(name => `${name}=${cookies[name]}`).join('; ');
-	console.log(externalRequestHeaders.cookies);
+
+	return {
+		cookie,
+		'csrf-token': csrf,
+	};
+}
+
+export function parseRequestHeaders(request) {
+	const externalRequestHeaders = {
+		...request.headers,
+		...getAuthHeaders(request),
+	};
 
 	delete externalRequestHeaders['host'];  // let app server set 'host'
 	delete externalRequestHeaders['accept-encoding'];  // let app server set 'accept'
