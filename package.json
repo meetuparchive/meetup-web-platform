@@ -64,5 +64,8 @@
     "tough-cookie": "2.3.2",
     "url-search-params": "0.6.1",
     "uuid": "3.0.1"
+  },
+  "devDependencies": {
+    "iron": "4.0.4"
   }
 }
