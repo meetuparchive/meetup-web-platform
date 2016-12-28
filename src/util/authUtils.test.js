@@ -84,6 +84,12 @@ describe('assignMemberState', () => {
 		assignMemberState({ API_HOST: 'www.dev.api.meetup.com' })(request, reply);
 		expect(request.state.MEETUP_MEMBER).toEqual(baseState.MEETUP_MEMBER_DEV);
 	});
+	it('does not reassign MEETUP_MEMBER in prod', () => {
+		const state = { ...baseState };  // make a copy
+		const request = { state };
+		assignMemberState({ API_HOST: 'www.dev.api.meetup.com' })(request, reply);
+		expect(request.state.MEETUP_MEMBER).toEqual(baseState.MEETUP_MEMBER);
+	});
 });
 
 describe('setPluginState', () => {
