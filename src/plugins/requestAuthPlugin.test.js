@@ -33,6 +33,9 @@ const MOCK_REQUEST = {
 	authorize: () => Rx.Observable.of(MOCK_REQUEST),
 	query: {},
 	plugins: {},
+	server: {
+		app: {},
+	},
 };
 const MOCK_AUTHED_REQUEST = {
 	headers: MOCK_HEADERS,
@@ -41,6 +44,9 @@ const MOCK_AUTHED_REQUEST = {
 	log: (tags, data) => { console.log(data); },
 	authorize: () => Rx.Observable.of(MOCK_AUTHED_REQUEST),
 	query: {},
+	server: {
+		app: {},
+	},
 };
 MOCK_REQUEST.plugins.requestAuth = {
 	reply: MOCK_REPLY_FN

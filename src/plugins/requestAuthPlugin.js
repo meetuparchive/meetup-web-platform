@@ -4,7 +4,6 @@ import Rx from 'rxjs';
 import { tryJSON } from '../util/fetchUtils';
 import {
 	applyAuthState,
-	assignMemberState,
 	configureAuthCookies,
 	removeAuthState,
 	setPluginState,
@@ -56,7 +55,8 @@ export const applyRequestAuthorizer$ = auth$ => request => {
 	// before we know that it's needed
 	request.log(['info', 'auth'], 'Checking for oauth_token in request');
 
-	const authType = request.state.MEETUP_MEMBER && 'MEETUP_MEMBER' ||
+	const memberCookie = request.server.app.isDevConfig ? 'MEETUP_MEMBER_DEV' : 'MEETUP_MEMBER';
+	const authType = request.state[memberCookie] && memberCookie ||
 		request.state.oauth_token && 'oauth_token';
 
 	if (authType) {
@@ -205,8 +205,9 @@ export const getAuthenticate = authorizeRequest$ => (request, reply) => {
 			request.log(['info', 'auth'], 'Request authenticated');
 		})
 		.subscribe(
-			({ state: { MEETUP_MEMBER, oauth_token } }) => {
-				const credentials = MEETUP_MEMBER || oauth_token;
+			request => {
+				const memberCookie = request.server.app.isDevConfig ? 'MEETUP_MEMBER_DEV' : 'MEETUP_MEMBER';
+				const credentials = request.state[memberCookie] || request.state.oauth_token;
 				reply.continue({ credentials, artifacts: credentials });
 			},
 			err => reply(err, null, { credentials: null })
@@ -231,7 +232,6 @@ export const getAuthenticate = authorizeRequest$ => (request, reply) => {
 export const oauthScheme = (server, options) => {
 	configureAuthCookies(server, options);       // apply default config for auth cookies
 	server.ext('onPreAuth', setPluginState);     // provide a reference to `reply` on the request
-	server.ext('onPreAuth', assignMemberState);  // use MEETUP_MEMBER[_DEV]
 
 	const authorizeRequest$ = applyRequestAuthorizer$(getRequestAuthorizer$(options));
 
