@@ -74,20 +74,23 @@ describe('assignMemberState', () => {
 	it('calls reply.continue', () => {
 		spyOn(reply, 'continue');
 		const state = { ...baseState };  // make a copy
-		const request = { state };
-		assignMemberState({ API_HOST: 'www.api.meetup.com' })(request, reply);
+		const server = { app: { isDevConfig: false } };
+		const request = { state, server };
+		assignMemberState(request, reply);
 		expect(reply.continue).toHaveBeenCalled();
 	});
 	it('assigns MEETUP_MEMBER to the value of MEETUP_MEMBER_DEV in dev', () => {
 		const state = { ...baseState };  // make a copy
-		const request = { state };
-		assignMemberState({ API_HOST: 'www.dev.api.meetup.com' })(request, reply);
+		const server = { app: { isDevConfig: true } };
+		const request = { state, server };
+		assignMemberState(request, reply);
 		expect(request.state.MEETUP_MEMBER).toEqual(baseState.MEETUP_MEMBER_DEV);
 	});
 	it('does not reassign MEETUP_MEMBER in prod', () => {
 		const state = { ...baseState };  // make a copy
-		const request = { state };
-		assignMemberState({ API_HOST: 'www.api.meetup.com' })(request, reply);
+		const server = { app: { isDevConfig: false } };
+		const request = { state, server };
+		assignMemberState(request, reply);
 		expect(request.state.MEETUP_MEMBER).toEqual(baseState.MEETUP_MEMBER);
 	});
 });
@@ -101,11 +104,8 @@ describe('setPluginState', () => {
 		const request = {
 			plugins: {},
 		};
-		const options = {
-			API_HOST: 'www.api.meetup.com',
-		};
 		spyOn(reply, 'continue');
-		setPluginState(options)(request, reply);
+		setPluginState(request, reply);
 		expect(reply.continue).toHaveBeenCalled();
 	});
 	it('assigns the reply as a property of the request', () => {
@@ -113,33 +113,8 @@ describe('setPluginState', () => {
 		const request = {
 			plugins: {},
 		};
-		const options = {
-			API_HOST: 'www.api.meetup.com',
-		};
-		setPluginState(options)(request, reply);
+		setPluginState(request, reply);
 		expect(request.plugins.requestAuth.reply).toBe(reply);
-	});
-	it('assigns isDev to true for dev API_HOST', () => {
-		// SIDE EFFECT - function call will modify request
-		const request = {
-			plugins: {},
-		};
-		const options = {
-			API_HOST: 'www.dev.api.meetup.com',
-		};
-		setPluginState(options)(request, reply);
-		expect(request.plugins.requestAuth.isDev).toBe(true);
-	});
-	it('assigns isDev to false for non-dev API_HOST', () => {
-		// SIDE EFFECT - function call will modify request
-		const request = {
-			plugins: {},
-		};
-		const options = {
-			API_HOST: 'www.api.meetup.com',
-		};
-		setPluginState(options)(request, reply);
-		expect(request.plugins.requestAuth.isDev).toBe(false);
 	});
 });
 

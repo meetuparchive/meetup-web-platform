@@ -92,8 +92,8 @@ export const configureAuthCookies = (server, options) => {
  * correct cookie and make sure that request.state.MEETUP_MEMBER contains
  * the correct value for the lifetime of the request
  */
-export const assignMemberState = options => (request, reply) => {
-	const memberValue = options.API_HOST.includes('.dev.') ?
+export const assignMemberState = (request, reply) => {
+	const memberValue = request.server.app.isDevConfig ?
 		request.state.MEETUP_MEMBER_DEV :
 		request.state.MEETUP_MEMBER;
 	request.state.MEETUP_MEMBER = memberValue;
@@ -101,11 +101,10 @@ export const assignMemberState = options => (request, reply) => {
 	return reply.continue();
 };
 
-export const setPluginState = options => (request, reply) => {
+export const setPluginState = (request, reply) => {
 	// Used for setting and unsetting state, not for replying to request
 	request.plugins.requestAuth = {
 		reply,
-		isDev: options.API_HOST.includes('.dev.'),
 	};
 
 	return reply.continue();
