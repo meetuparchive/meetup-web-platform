@@ -1,21 +1,37 @@
+import querystring from 'querystring';
 import url from 'url';
 import Accepts from 'accepts';
 
 export const LANG_DEFAULT = 'en-US';
 
+export const getCookieLang = (request, supportedLangs) => {
+	const cookie = request.state.MEETUP_LANGUAGE;
+	if (!cookie) {
+		return;
+	}
+	const {
+		language,
+		country,
+	} = querystring.parse(cookie);
+	const cookieLang = `${language}-${country}`;
+	return supportedLangs.includes(cookieLang) && cookieLang;
+};
+
+export const getUrlLang = (request, supportedLangs) => {
+	const urlLang = request.url.path.split('/')[1];
+	return supportedLangs.includes(urlLang) && urlLang;
+};
+
+export const getBrowserLang = (request, supportedLangs) => {
+	return Accepts(request).language(supportedLangs);
+};
+
 export const getLanguage = (request, supportedLangs, defaultLang=LANG_DEFAULT) => {
-	const firstPathComponent = request.url.path.split('/')[1];
-	const urlLang = supportedLangs.includes(firstPathComponent) ? firstPathComponent : null;
-	const browserLang = Accepts(request).language(supportedLangs);
-
-	const langSourcePreference = [
-		urlLang,
-		browserLang,
-		defaultLang,
-	];
-
 	// return the first language hit in the order of preference
-	return langSourcePreference.find(lang => lang);
+	return getCookieLang(request, supportedLangs)
+		|| getUrlLang(request, supportedLangs)
+		|| getBrowserLang(request, supportedLangs)
+		|| defaultLang;
 };
 
 const makeRedirect = (reply, originalUrl) => redirectPathname =>
