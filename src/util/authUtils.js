@@ -69,7 +69,10 @@ export function validateSecret(secret) {
 	return value;
 }
 
-export const applyServerState = (server, options) => {
+/**
+ * apply default cookie options for auth-related cookies
+ */
+export const configureAuthCookies = (server, options) => {
 	const password = validateSecret(options.COOKIE_ENCRYPT_SECRET);
 	const authCookieOptions = {
 		encoding: 'iron',
@@ -83,3 +86,11 @@ export const applyServerState = (server, options) => {
 	server.state('refresh_token', authCookieOptions);
 };
 
+export const setPluginState = (request, reply) => {
+	// Used for setting and unsetting state, not for replying to request
+	request.plugins.requestAuth = {
+		reply,
+	};
+
+	return reply.continue();
+};
