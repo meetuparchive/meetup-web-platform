@@ -40,6 +40,11 @@ export function configureEnv(config) {
 export function server(routes, connection, plugins, platform_agent, config) {
 	const server = new Hapi.Server();
 
+	// store runtime state
+	// https://hapijs.com/api#serverapp
+	server.app = {
+		isDevConfig: checkForDevUrl(config),  // indicates dev API or prod API
+	};
 	server.decorate('reply', 'track', track(platform_agent));
 
 	return server.connection(connection)
