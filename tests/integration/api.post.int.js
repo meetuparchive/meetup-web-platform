@@ -69,6 +69,7 @@ const runTest = (test, payload=mockPostPayload, csrfHeaders=getCsrfHeaders) => s
 
 describe('API proxy POST endpoint integration tests', () => {
 	const mockConfig = () => Promise.resolve({
+		API_HOST: 'www.api.meetup.com',
 		CSRF_SECRET: random32,
 		COOKIE_ENCRYPT_SECRET: random32,
 		oauth: {
