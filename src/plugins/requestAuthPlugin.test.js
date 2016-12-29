@@ -134,17 +134,17 @@ describe('getRequestAuthorizer$', () => {
 				});
 			}
 		});
-		const auth$ = getRequestAuthorizer$({ oauth, OAUTH_AUTH_URL, OAUTH_ACCESS_URL }, null);
+		const requestAuthorizer$ = getRequestAuthorizer$({ oauth, OAUTH_AUTH_URL, OAUTH_ACCESS_URL }, null);
 
-		auth$({ ...MOCK_REQUEST }).subscribe(auth => {
+		requestAuthorizer$({ ...MOCK_REQUEST }).subscribe(auth => {
 			expect(auth.oauth_token).toBe('good_token');
 			done();
 		});
 	});
 });
 describe('applyRequestAuthorizer$', () => {
-	const auth$ = getRequestAuthorizer$({ oauth, OAUTH_AUTH_URL, OAUTH_ACCESS_URL }, null);
-	const authorizeRequest$ = applyRequestAuthorizer$(auth$);
+	const requestAuthorizer$ = getRequestAuthorizer$({ oauth, OAUTH_AUTH_URL, OAUTH_ACCESS_URL }, null);
+	const authorizeRequest$ = applyRequestAuthorizer$(requestAuthorizer$);
 	it('does not try to fetch when provided a request with an oauth token in state', () => {
 		spyOn(global, 'fetch').and.callFake((url, opts) => {
 			if (url.startsWith(OAUTH_AUTH_URL)) {

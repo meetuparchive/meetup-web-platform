@@ -39,12 +39,12 @@ const handleLogout = request => {
  * If the Request already has a valid oauth token, it is returned unchanged,
  * otherwise the request is parsed for more info and a new token is set
  *
- * @param {Observable} auth$ a function that takes a request and emits new auth
+ * @param {Observable} requestAuthorizer$ a function that takes a request and emits new auth
  *   data
  * @param {Request} request Hapi request to modify with auth token (if necessary)
  * @return {Observable} Observable that emits the request with auth applied
  */
-export const applyRequestAuthorizer$ = auth$ => request => {
+export const applyRequestAuthorizer$ = requestAuthorizer$ => request => {
 	// logout is accomplished exclusively through a `logout` querystring value
 	if ('logout' in request.query) {
 		handleLogout(request);
@@ -65,7 +65,7 @@ export const applyRequestAuthorizer$ = auth$ => request => {
 	}
 
 	request.log(['info', 'auth'], 'Request does not contain auth token');
-	return auth$(request)
+	return requestAuthorizer$(request)
 		.do(applyAuthState(request, request.plugins.requestAuth.reply))
 		.map(() => request);
 };
