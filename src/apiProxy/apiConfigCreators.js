@@ -71,6 +71,16 @@ export function event(params) {
 }
 
 /**
+ * admin endpoints
+ */
+export function admin(params) {
+	return {
+		endpoint,
+		params
+	};
+}
+
+/**
  * member object endpoints
  *
  * Note, this is different than 'Profiles' which are used to represent the
