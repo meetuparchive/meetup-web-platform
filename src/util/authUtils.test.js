@@ -1,12 +1,14 @@
 import Joi from 'joi';
 import {
 	applyAuthState,
-	applyServerState,
+	assignMemberState,
+	setPluginState,
 	configureAuthState,
+	configureAuthCookies,
 	removeAuthState,
 } from './authUtils';
 
-describe('applyServerState', () => {
+describe('configureAuthCookies', () => {
 	const serverWithState = {
 		state: () => {},
 	};
@@ -15,7 +17,7 @@ describe('applyServerState', () => {
 			COOKIE_ENCRYPT_SECRET: 'asdklfjahsdflkjasdfhlkajsdfkljasdlkasdjhfalksdjfbalkjsdhfalsdfasdlkfasd',
 		};
 		spyOn(serverWithState, 'state');
-		applyServerState(serverWithState, goodOptions);
+		configureAuthCookies(serverWithState, goodOptions);
 		const callArgs = serverWithState.state.calls.allArgs();
 		expect(callArgs.length).toBeGreaterThan(0);
 		callArgs.forEach(args => {
@@ -25,13 +27,13 @@ describe('applyServerState', () => {
 	});
 	it('throws an error when secret is missing', () => {
 		const missingSecretOpts = {};
-		expect(() => applyServerState(serverWithState, missingSecretOpts)).toThrow();
+		expect(() => configureAuthCookies(serverWithState, missingSecretOpts)).toThrow();
 	});
 	it('throws an error when secret is too short', () => {
 		const shortSecretOpts = {
 			COOKIE_ENCRYPT_SECRET: 'less than 32 characters',
 		};
-		expect(() => applyServerState(serverWithState, shortSecretOpts)).toThrow();
+		expect(() => configureAuthCookies(serverWithState, shortSecretOpts)).toThrow();
 	});
 });
 
@@ -56,6 +58,63 @@ describe('applyAuthState', () => {
 			expect(args[1]).toEqual(auth[args[0]]);
 		});
 		expect(request.state).toEqual(auth);
+	});
+});
+
+describe('assignMemberState', () => {
+	// SIDE EFFECT - this function modifies the `request` that is passed in,
+	// so make sure your tests make a _copy_ of this object
+	const baseState = {
+		MEETUP_MEMBER: 'foo',
+		MEETUP_MEMBER_DEV: 'bar',
+	};
+	const reply = {
+		continue: () => {},
+	};
+	it('calls reply.continue', () => {
+		spyOn(reply, 'continue');
+		const state = { ...baseState };  // make a copy
+		const server = { app: { isDevConfig: false } };
+		const request = { state, server };
+		assignMemberState(request, reply);
+		expect(reply.continue).toHaveBeenCalled();
+	});
+	it('assigns MEETUP_MEMBER to the value of MEETUP_MEMBER_DEV in dev', () => {
+		const state = { ...baseState };  // make a copy
+		const server = { app: { isDevConfig: true } };
+		const request = { state, server };
+		assignMemberState(request, reply);
+		expect(request.state.MEETUP_MEMBER).toEqual(baseState.MEETUP_MEMBER_DEV);
+	});
+	it('does not reassign MEETUP_MEMBER in prod', () => {
+		const state = { ...baseState };  // make a copy
+		const server = { app: { isDevConfig: false } };
+		const request = { state, server };
+		assignMemberState(request, reply);
+		expect(request.state.MEETUP_MEMBER).toEqual(baseState.MEETUP_MEMBER);
+	});
+});
+
+describe('setPluginState', () => {
+	const reply = {
+		continue: () => {},
+	};
+	it('calls reply.continue', () => {
+		// SIDE EFFECT - function call will modify request
+		const request = {
+			plugins: {},
+		};
+		spyOn(reply, 'continue');
+		setPluginState(request, reply);
+		expect(reply.continue).toHaveBeenCalled();
+	});
+	it('assigns the reply as a property of the request', () => {
+		// SIDE EFFECT - function call will modify request
+		const request = {
+			plugins: {},
+		};
+		setPluginState(request, reply);
+		expect(request.plugins.requestAuth.reply).toBe(reply);
 	});
 });
 
