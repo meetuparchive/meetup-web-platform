@@ -52,8 +52,8 @@ which happens _before_ the route handler is invoked, the `requestAuthPlugin`
 in each request to the Meetup API - this happens in
 [`api-proxy.js:parseRequest`](../apiProxy/api-proxy.js)
 4. The API proxy will also generate and send a UUID CSRF cookie and header,
-which is generated fresh for every request. The only constraint is that they
-are identical.
+which is generated fresh for every API request. The only constraint is that the
+header and cookie are identical.
 
 ## Login
 
