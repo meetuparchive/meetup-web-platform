@@ -2,7 +2,13 @@ import chalk from 'chalk';
 import Rx from 'rxjs';
 
 import { tryJSON } from '../util/fetchUtils';
-import { applyAuthState, applyServerState, removeAuthState } from '../util/authUtils';
+import {
+	applyAuthState,
+	assignMemberState,
+	configureAuthCookies,
+	removeAuthState,
+	setPluginState,
+} from '../util/authUtils';
 
 /**
  * @module requestAuthPlugin
@@ -24,7 +30,8 @@ function verifyAuth(auth) {
 
 const handleLogout = request => {
 	request.log(['info', 'auth'], 'Logout received, clearing cookies to re-authenticate');
-	return removeAuthState(['oauth_token', 'refresh_token'], request, request.plugins.requestAuth.reply);
+	const memberCookie = request.server.app.isDevConfig ? 'MEETUP_MEMBER_DEV' : 'MEETUP_MEMBER';
+	return removeAuthState([memberCookie, 'oauth_token', 'refresh_token'], request, request.plugins.requestAuth.reply);
 };
 
 /**
@@ -38,7 +45,7 @@ const handleLogout = request => {
  * @param {Request} request Hapi request to modify with auth token (if necessary)
  * @return {Observable} Observable that emits the request with auth applied
  */
-export const requestAuthorizer = auth$ => request => {
+export const applyRequestAuthorizer$ = auth$ => request => {
 	// logout is accomplished exclusively through a `logout` querystring value
 	if ('logout' in request.query) {
 		handleLogout(request);
@@ -47,22 +54,20 @@ export const requestAuthorizer = auth$ => request => {
 	// always need oauth_token, even if it's an anonymous (pre-reg) token
 	// This is 'deferred' because we don't want to start fetching the token
 	// before we know that it's needed
-	const request$ = Rx.Observable.of(request);
-	const authType = request.state.oauth_token && 'cookie';
-
 	request.log(['info', 'auth'], 'Checking for oauth_token in request');
-	return Rx.Observable.if(
-		() => authType,
-		request$
-			.do(() => request.log(['info', 'auth'], `Request contains auth token (${authType})`)),
-		request$
-			.do(() => request.log(['info', 'auth'], 'Request does not contain auth token'))
-			.flatMap(request =>
-				auth$(request)
-					.do(applyAuthState(request, request.plugins.requestAuth.reply))
-					.map(() => request)
-			)
-	);
+
+	const authType = request.state.MEETUP_MEMBER && 'MEETUP_MEMBER' ||
+		request.state.oauth_token && 'oauth_token';
+
+	if (authType) {
+		request.log(['info', 'auth'], `Request contains auth token (${authType})`);
+		return Rx.Observable.of(request);
+	}
+
+	request.log(['info', 'auth'], 'Request does not contain auth token');
+	return auth$(request)
+		.do(applyAuthState(request, request.plugins.requestAuth.reply))
+		.map(() => request);
 };
 
 /**
@@ -177,7 +182,7 @@ const refreshToken$ = refresh_token => Rx.Observable.of({
  * @param {Object} config { OAUTH_AUTH_URL, OAUTH_ACCESS_URL, oauth }
  * @param {Object} request the Hapi request that needs to be authorized
  */
-export const requestAuth$ = config => {
+export const getRequestAuthorizer$ = config => {
 	const redirect_uri = 'http://www.meetup.com/';  // required param set in oauth consumer config
 	const anonymousCode$ = getAnonymousCode$(config, redirect_uri);
 	const accessToken$ = getAccessToken$(config, redirect_uri);
@@ -200,8 +205,8 @@ export const getAuthenticate = authorizeRequest$ => (request, reply) => {
 			request.log(['info', 'auth'], 'Request authenticated');
 		})
 		.subscribe(
-			({ state: { oauth_token } }) => {
-				const credentials = oauth_token;
+			({ state: { MEETUP_MEMBER, oauth_token } }) => {
+				const credentials = MEETUP_MEMBER || oauth_token;
 				reply.continue({ credentials, artifacts: credentials });
 			},
 			err => reply(err, null, { credentials: null })
@@ -211,29 +216,25 @@ export const getAuthenticate = authorizeRequest$ => (request, reply) => {
 /**
  * Request authorizing scheme
  *
- * 1. add a `.authorize` method to the request
- * 2. assign a reference to the reply interface on request.plugins.requestAuth
- * 3. add an anonymous-user-JSON-generating route (for app logout)
- * 4. return the authentication function, which ensures that all requests have
- * valid auth credentials (anonymous or logged in)
+ * 1. assign a reference to the reply interface on request.plugins.requestAuth
+ * 2. make sure the correct MEETUP_MEMBER[_DEV] cookie is used for auth
+ * 3. return the authentication function from getAuthenticate, which ensures
+ * that all requests have valid auth credentials (anonymous or logged in)
+ *
+ * @param {Object} server the Hapi app server instance
+ * @param {Object} options the options passed to `server.auth.strategy`for the
+ *   auth stategy instance
  */
 export const oauthScheme = (server, options) => {
-	// create a single requestAuth$ stream that can be used by any route
-	const auth$ = requestAuth$(options);
-	// create a single stream for modifying an arbitrary request with anonymous auth
-	const authorizeRequest$ = requestAuthorizer(auth$);
+	configureAuthCookies(server, options);                // apply default config for auth cookies
+	server.ext('onPreAuth', setPluginState);     // provide a reference to `reply` on the request
+	server.ext('onPreAuth', assignMemberState);  // use MEETUP_MEMBER[_DEV]
 
-	applyServerState(server, options);
-	server.ext('onPreAuth', (request, reply) => {
-		// Used for setting and unsetting state, not for replying to request
-		request.plugins.requestAuth = {
-			reply,
-		};
+	const authorizeRequest$ = applyRequestAuthorizer$(getRequestAuthorizer$(options));
 
-		return reply.continue();
-	});
-
-	return { authenticate: getAuthenticate(authorizeRequest$) };
+	return {
+		authenticate: getAuthenticate(authorizeRequest$),
+	};
 };
 /**
  * This plugin does two things.

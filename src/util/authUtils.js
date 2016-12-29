@@ -69,7 +69,10 @@ export function validateSecret(secret) {
 	return value;
 }
 
-export const applyServerState = (server, options) => {
+/**
+ * apply default cookie options for auth-related cookies
+ */
+export const configureAuthCookies = (server, options) => {
 	const password = validateSecret(options.COOKIE_ENCRYPT_SECRET);
 	const authCookieOptions = {
 		encoding: 'iron',
@@ -83,3 +86,26 @@ export const applyServerState = (server, options) => {
 	server.state('refresh_token', authCookieOptions);
 };
 
+/**
+ * The request should use different MEETUP_MEMBER cookies depending on whether
+ * it is hitting the dev API or prod API. This function will read from the
+ * correct cookie and make sure that request.state.MEETUP_MEMBER contains
+ * the correct value for the lifetime of the request
+ */
+export const assignMemberState = (request, reply) => {
+	const memberValue = request.server.app.isDevConfig ?
+		request.state.MEETUP_MEMBER_DEV :
+		request.state.MEETUP_MEMBER;
+	request.state.MEETUP_MEMBER = memberValue;
+
+	return reply.continue();
+};
+
+export const setPluginState = (request, reply) => {
+	// Used for setting and unsetting state, not for replying to request
+	request.plugins.requestAuth = {
+		reply,
+	};
+
+	return reply.continue();
+};
