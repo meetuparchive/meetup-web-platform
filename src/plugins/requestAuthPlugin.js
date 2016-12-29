@@ -221,12 +221,15 @@ export const getAuthenticate = authorizeRequest$ => (request, reply) => {
  * 3. return the authentication function from getAuthenticate, which ensures
  * that all requests have valid auth credentials (anonymous or logged in)
  *
+ * https://hapijs.com/api#serverauthschemename-scheme
+ * https://hapijs.com/api#serverauthstrategyname-scheme-mode-options
+ *
  * @param {Object} server the Hapi app server instance
  * @param {Object} options the options passed to `server.auth.strategy`for the
  *   auth stategy instance
  */
 export const oauthScheme = (server, options) => {
-	configureAuthCookies(server, options);                // apply default config for auth cookies
+	configureAuthCookies(server, options);       // apply default config for auth cookies
 	server.ext('onPreAuth', setPluginState);     // provide a reference to `reply` on the request
 	server.ext('onPreAuth', assignMemberState);  // use MEETUP_MEMBER[_DEV]
 
