@@ -1,4 +1,4 @@
-import querystring from 'querystring';
+import querystring from 'qs';
 import url from 'url';
 import uuid from 'uuid';
 
@@ -8,7 +8,11 @@ import Rx from 'rxjs';
 
 import {
 	removeAuthState,
-} from '../util/authUtils';
+} from './authUtils';
+import {
+	coerceBool,
+	toCamelCase,
+} from './stringUtils';
 
 import {
 	querySchema
@@ -46,22 +50,38 @@ export const createCookieJar = requestUrl => {
 	return null;
 };
 
-const parseResponseFlags = flagHeader =>
-	(flagHeader || '')
-		.split(',')
-		.filter(pair => pair)  // ignore empty elements in the array
-		.map(pair => pair.split('='))
-		.reduce((flags, [key, val]) => {
-			flags[key] = val === 'true';
-			return flags;
-		}, {});
+const X_HEADERS = [
+	'x-total-count'
+];
 
 export const parseMetaHeaders = headers => {
-	const flags = parseResponseFlags(headers['x-meetup-flags']);
-	const requestId = headers['x-meetup-request-id'];
+	const meetupHeaders = Object.keys(headers)
+		.filter(h => h.startsWith('x-meetup-'))
+		.reduce((meta, h) => {
+			const key = toCamelCase(h.replace('x-meetup-', ''));
+			meta[key] = headers[h];
+			return meta;
+		}, {});
+
+	// special case handling for flags
+	if (meetupHeaders.flags) {
+		meetupHeaders.flags = querystring.parse(meetupHeaders.flags, {
+			delimiter: ',',
+			decoder: coerceBool,
+		});
+	}
+
+	const xHeaders = X_HEADERS.reduce((meta, h) => {
+		const key = toCamelCase(h.replace('x-', ''));
+		if (h in headers) {
+			meta[key] = headers[h];
+		}
+		return meta;
+	}, {});
+
 	return {
-		flags,
-		requestId,
+		...meetupHeaders,
+		...xHeaders,
 	};
 };
 
