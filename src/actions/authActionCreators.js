@@ -16,6 +16,7 @@ export function loginPost(params) {
 		payload: {
 			query: {
 				type: 'login',
+				endpoint: 'sessions',
 				params,
 				ref: LOGIN_REF,
 			},
