@@ -83,13 +83,3 @@ export function member(params) {
 	};
 }
 
-/**
- * login endpoint - 'sessions/'
- */
-export function login(params) {
-	return {
-		endpoint: 'sessions',
-		params
-	};
-}
-
