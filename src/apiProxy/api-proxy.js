@@ -4,7 +4,6 @@ import {
 	buildRequestArgs,
 	makeApiRequest$,
 	parseRequest,
-	queryToApiConfig,
 } from '../util/apiUtils';
 
 
@@ -51,7 +50,6 @@ const apiProxy$ = ({ API_TIMEOUT=8000, baseUrl='', duotoneUrls={} }) => {
 		request.log(['api', 'info'], JSON.stringify(queries));
 		// 3. map the queries onto an array of api request observables
 		const apiRequests$ = queries
-			.map(queryToApiConfig)
 			.map(apiConfigToRequestOptions)
 			.map((opts, i) => ([opts, queries[i]]))  // zip the query back into the opts
 			.map(makeApiRequest$(request, API_TIMEOUT, duotoneUrls));
