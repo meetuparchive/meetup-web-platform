@@ -102,7 +102,6 @@ describe('makeApiRequest$', () => {
 		const expectedResponse = {
 			[query.ref]: {
 				meta: {
-					flags: {},
 					requestId: 'mock request',
 					endpoint
 				},

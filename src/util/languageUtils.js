@@ -1,4 +1,4 @@
-import querystring from 'querystring';
+import querystring from 'qs';
 import url from 'url';
 import Accepts from 'accepts';
 
