@@ -218,7 +218,7 @@ describe('parseLoginAuth', () => {
 });
 
 describe('parseMetaHeaders', () => {
-	it('parses x-meetup headers intreturns x-meetup-flags as flags object with real booleanso camelcased obj', () => {
+	it('parses x-meetup headers intreturns x-meetup-flags as flags object with real booleans camelcased obj', () => {
 		expect(parseMetaHeaders({ 'x-meetup-foo-bar': 'whatwhat' }))
 			.toEqual({ fooBar: 'whatwhat' });
 	});
