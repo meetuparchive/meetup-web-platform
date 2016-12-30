@@ -45,12 +45,12 @@ const apiProxy$ = ({ API_TIMEOUT=8000, baseUrl='', duotoneUrls={} }) => {
 
 		// 2. curry a function that uses `externalRequestOpts` as a base from which
 		// to build the query-specific API request options object
-		const apiConfigToRequestOptions = buildRequestArgs(externalRequestOpts);
+		const queryToRequestOpts = buildRequestArgs(externalRequestOpts);
 
 		request.log(['api', 'info'], JSON.stringify(queries));
 		// 3. map the queries onto an array of api request observables
 		const apiRequests$ = queries
-			.map(apiConfigToRequestOptions)
+			.map(queryToRequestOpts)
 			.map((opts, i) => ([opts, queries[i]]))  // zip the query back into the opts
 			.map(makeApiRequest$(request, API_TIMEOUT, duotoneUrls));
 
