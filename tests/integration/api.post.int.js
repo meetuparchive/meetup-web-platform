@@ -97,7 +97,6 @@ describe('API proxy POST endpoint integration tests', () => {
 					type: mockQuery.type,
 					value: {},  // from the mocked `request` module
 					meta: {
-						flags: {},
 						endpoint: '/foo',
 					},
 				}
