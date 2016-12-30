@@ -48,6 +48,7 @@
     "js-cookie": "^2.1.2",
     "meetup-web-mocks": "0.1.23",
     "node-fetch": "1.6.3",
+    "qs": "6.3.0",
     "react": "15.4.1",
     "react-addons-test-utils": "15.4.1",
     "react-dom": "15.4.1",

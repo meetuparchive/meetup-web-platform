@@ -163,8 +163,10 @@ describe('parseApiResponse', () => {
 			'x-meetup-flags': 'foo=true,bar=false',
 		};
 		const flaggedResponse = { ...MOCK_RESPONSE, headers };
-		expect(parseApiResponse('http://example.com')([flaggedResponse, '{}']).meta.flags.foo).toBe(true);
-		expect(parseApiResponse('http://example.com')([flaggedResponse, '{}']).meta.flags.bar).toBe(false);
+		expect(parseApiResponse('http://example.com')([flaggedResponse, '{}']).meta.flags).toEqual({
+			foo: true,
+			bar: false,
+		});
 	});
 	it('returns the requestId set in the X-Meetup-Request-Id header', () => {
 		const requestId = '1234';
