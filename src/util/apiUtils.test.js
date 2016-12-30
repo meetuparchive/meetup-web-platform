@@ -29,6 +29,7 @@ import {
 	parseApiResponse,
 	parseApiValue,
 	parseLoginAuth,
+	parseMetaHeaders,
 	queryToApiConfig,
 	groupDuotoneSetter,
 } from './apiUtils';
@@ -213,6 +214,21 @@ describe('parseLoginAuth', () => {
 		const returnVal = parseLoginAuth(request, query)(loginResponse);
 		expect(authUtils.removeAuthState).not.toHaveBeenCalled();
 		expect(returnVal).toBe(loginResponse);
+	});
+});
+
+describe('parseMetaHeaders', () => {
+	it('parses x-meetup headers intreturns x-meetup-flags as flags object with real booleanso camelcased obj', () => {
+		expect(parseMetaHeaders({ 'x-meetup-foo-bar': 'whatwhat' }))
+			.toEqual({ fooBar: 'whatwhat' });
+	});
+	it('returns x-meetup-flags as flags object with real booleans', () => {
+		expect(parseMetaHeaders({ 'x-meetup-flags': 'foo=true,bar=false' }))
+			.toEqual({ flags: { foo: true, bar: false } });
+	});
+	it('parses specified x- headers', () => {
+		expect(parseMetaHeaders({ 'x-total-count': 'whatwhat' }))
+			.toEqual({ totalCount: 'whatwhat' });
 	});
 });
 

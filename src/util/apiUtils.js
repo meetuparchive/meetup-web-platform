@@ -50,8 +50,12 @@ export const createCookieJar = requestUrl => {
 	return null;
 };
 
+const X_HEADERS = [
+	'x-total-count'
+];
+
 export const parseMetaHeaders = headers => {
-	const meta = Object.keys(headers)
+	const meetupHeaders = Object.keys(headers)
 		.filter(h => h.startsWith('x-meetup-'))
 		.reduce((meta, h) => {
 			const key = toCamelCase(h.replace('x-meetup-', ''));
@@ -60,11 +64,25 @@ export const parseMetaHeaders = headers => {
 		}, {});
 
 	// special case handling for flags
-	meta.flags = querystring.parse(meta.flags, {
-		delimiter: ',',
-		decoder: coerceBool,
-	});
-	return meta;
+	if (meetupHeaders.flags) {
+		meetupHeaders.flags = querystring.parse(meetupHeaders.flags, {
+			delimiter: ',',
+			decoder: coerceBool,
+		});
+	}
+
+	const xHeaders = X_HEADERS.reduce((meta, h) => {
+		const key = toCamelCase(h.replace('x-', ''));
+		if (h in headers) {
+			meta[key] = headers[h];
+		}
+		return meta;
+	}, {});
+
+	return {
+		...meetupHeaders,
+		...xHeaders,
+	};
 };
 
 /**
