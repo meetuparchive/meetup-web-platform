@@ -1,4 +1,4 @@
-import querystring from 'querystring';
+import querystring from 'qs';
 import {
 	MOCK_API_RESULT,
 	MOCK_renderRequestMap,
