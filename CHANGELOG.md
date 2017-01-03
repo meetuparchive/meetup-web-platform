@@ -1,3 +1,8 @@
+## [0.11]
+
+- **Removed** `apiConfigCreators` no longer exists - use the query object
+directly to define the `endpoint`
+
 ## [0.10]
 
 - **New env variable** - `COOKIE_ENCRYPT_SECRET` must be in your env vars. It

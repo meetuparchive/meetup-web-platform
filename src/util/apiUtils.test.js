@@ -1,7 +1,6 @@
 import externalRequest from 'request';
 
 import {
-	mockQueryBadType,
 	mockQuery,
 	MOCK_API_PROBLEM,
 	MOCK_AUTH_HEADER,
@@ -30,7 +29,6 @@ import {
 	parseApiValue,
 	parseLoginAuth,
 	parseMetaHeaders,
-	queryToApiConfig,
 	groupDuotoneSetter,
 } from './apiUtils';
 
@@ -232,38 +230,8 @@ describe('parseMetaHeaders', () => {
 	});
 });
 
-describe('queryToApiConfig', () => {
-	it('returns endpoint, params, flags unchanged when endpoint is present', () => {
-		const query = {
-			endpoint: 'foo',
-			type: 'bar',
-			params: {
-				foo: 'bar',
-			},
-			flags: ['asdf'],
-		};
-		const expectedApiConfig = {
-			endpoint: query.endpoint,
-			params: query.params,
-			flags: query.flags,
-		};
-		expect(queryToApiConfig(query)).toEqual(expectedApiConfig);
-	});
-	it('transforms a query of known type to an object for API consumption', () => {
-		const testQueryResults = mockQuery(MOCK_RENDERPROPS);
-		expect(queryToApiConfig(testQueryResults)).toEqual(jasmine.any(Object));
-		expect(queryToApiConfig(testQueryResults).endpoint).toEqual(jasmine.any(String));
-	});
-
-	it('throws a reference error when no API handler available for query type', () => {
-		const testBadQueryResults = mockQueryBadType(MOCK_RENDERPROPS);
-		expect(() => queryToApiConfig(testBadQueryResults)).toThrow(jasmine.any(ReferenceError));
-	});
-});
-
 describe('buildRequestArgs', () => {
 	const testQueryResults = mockQuery(MOCK_RENDERPROPS);
-	const apiConfig = queryToApiConfig(testQueryResults);
 	const url = 'http://example.com';
 	const options = {
 		url,
@@ -275,9 +243,9 @@ describe('buildRequestArgs', () => {
 
 	it('Converts an api config to arguments for a node-request call', () => {
 		let method = 'get';
-		const getArgs = buildRequestArgs({ ...options, method })(apiConfig);
+		const getArgs = buildRequestArgs({ ...options, method })(testQueryResults);
 		method = 'post';
-		const postArgs = buildRequestArgs({ ...options, method })(apiConfig);
+		const postArgs = buildRequestArgs({ ...options, method })(testQueryResults);
 		expect(getArgs).toEqual(jasmine.any(Object));
 		expect(getArgs.url).toMatch(/\?.+/);  // get requests will add querystring
 		expect(getArgs.hasOwnProperty('body')).toBe(false);  // get requests will not have a body
@@ -297,19 +265,17 @@ describe('buildRequestArgs', () => {
 			},
 			flags: ['asdf'],
 		};
-		const apiConfig = queryToApiConfig(query);
-		const getArgs = buildRequestArgs({ ...options, method: 'get' })(apiConfig);
+		const getArgs = buildRequestArgs({ ...options, method: 'get' })(query);
 		expect(getArgs.headers['X-Meetup-Request-Flags']).not.toBeUndefined();
-		const postArgs = buildRequestArgs({ ...options, method: 'post' })(apiConfig);
+		const postArgs = buildRequestArgs({ ...options, method: 'post' })(query);
 		expect(postArgs.headers['X-Meetup-Request-Flags']).not.toBeUndefined();
 	});
 
 	const testQueryResults_utf8 = mockQuery(MOCK_RENDERPROPS_UTF8);
-	const apiConfig_utf8 = queryToApiConfig(testQueryResults_utf8);
 
 	it('Properly encodes the URL', () => {
 		const method = 'get';
-		const getArgs = buildRequestArgs({ ...options, method })(apiConfig_utf8);
+		const getArgs = buildRequestArgs({ ...options, method })(testQueryResults_utf8);
 		const { pathname } = require('url').parse(getArgs.url);
 		expect(/^[\x00-\xFF]*$/.test(pathname)).toBe(true);  // eslint-disable-line no-control-regex
 	});
