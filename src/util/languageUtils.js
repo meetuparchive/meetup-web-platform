@@ -28,7 +28,7 @@ export const getBrowserLang = (request, supportedLangs) => {
 
 export const getLanguage = (request, supportedLangs, defaultLang=LANG_DEFAULT) => {
 	// return the first language hit in the order of preference
-	supportedLangs = supportedLangs.sort(l => l !== defaultLang);
+	supportedLangs.sort(l => l !== defaultLang);
 	return getCookieLang(request, supportedLangs)
 		|| getUrlLang(request, supportedLangs)
 		|| getBrowserLang(request, supportedLangs)
@@ -46,7 +46,7 @@ export const checkLanguageRedirect = (
 	defaultLang=LANG_DEFAULT
 ) => {
 	// ensure defaultLang is first in supportedLangs
-	supportedLangs = supportedLangs.sort(l => l !== defaultLang);
+	supportedLangs.sort(l => l !== defaultLang);
 	const originalPath = request.url.pathname;
 	const firstPathComponent = originalPath.split('/')[1];
 	const redirect = makeRedirect(reply, request.url);
