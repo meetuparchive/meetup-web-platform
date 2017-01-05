@@ -22,6 +22,12 @@ export const getUrlLang = (request, supportedLangs) => {
 	return supportedLangs.includes(urlLang) && urlLang;
 };
 
+/**
+ * @param {Object} request Hapi request from browser
+ * @param {Array} supportedLangs a _sorted_ list of supported langs, with
+ *   preferred languages first
+ * @return {String|Boolean} language code
+ */
 export const getBrowserLang = (request, supportedLangs) => {
 	return Accepts(request).language(supportedLangs);
 };
