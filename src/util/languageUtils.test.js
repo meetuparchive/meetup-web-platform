@@ -19,10 +19,11 @@ const MOCK_HAPI_REPLY = {
 	redirect() {},
 };
 const defaultLang = 'en-US';
+const similarToDefault = 'en-AU';
 const altLang = 'fr-FR';
 const altLang2 = 'de-DE';
 const altLang3 = 'es-ES';
-const supportedLangs = [defaultLang, altLang, altLang2, altLang3];
+const supportedLangs = [similarToDefault, defaultLang, altLang, altLang2, altLang3];
 describe('getCookieLang', () => {
 	it('returns undefined when no cookie in state', () => {
 		const request = { ...MOCK_HAPI_REQUEST };
@@ -59,6 +60,13 @@ describe('getBrowserLang', () => {
 		const request = { ...MOCK_HAPI_REQUEST, headers: { 'accept-language': acceptLang } };
 		const lang = getBrowserLang(request, supportedLangs);
 		expect(lang).toBe(false);
+	});
+	it('returns en-US instead of en-AU for "en" if en-US is preferred', () => {
+		const acceptLang = 'en';
+		const supportedLangs = ['en-US', 'en-AU'];  // sorted by preference
+		const request = { ...MOCK_HAPI_REQUEST, headers: { 'accept-language': acceptLang } };
+		const lang = getBrowserLang(request, supportedLangs);
+		expect(lang).toEqual('en-US');
 	});
 	it('returns supported language from brower "Accept-Language" header, if present', () => {
 		const acceptLang = altLang;
