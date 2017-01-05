@@ -4,28 +4,40 @@ import Stream from 'stream';
 
 import { logTrack } from '../util/tracking';
 
+const testTransform = (tracker, trackInfo, test) =>
+	new Promise((resolve, reject) => {
+		tracker._transform({ data: JSON.stringify(trackInfo) }, null, (err, val) => {
+			if (err) {
+				reject(err);
+			}
+			resolve(val);
+		});
+	})
+	.then(test);
+
 describe('GoodMeetupTracking', () => {
 	it('creates a transform stream', () => {
 		expect(new GoodMeetupTracking() instanceof Stream.Transform).toBe(true);
 	});
 	it('transforms input into avro Buffer', () => {
-		const tracker = new GoodMeetupTracking({
+		const config = {
 			schema: avro.parse({
 				type: 'record',
 				fields: [
 					{ name: 'requestId', type: 'string'},
 				]
 			}),
-		});
-		return new Promise((resolve, reject) => {
-			tracker._transform({ data: JSON.stringify({ requestId: 'foo' }) }, null, (err, val) => {
-				if (err) {
-					reject(err);
-				}
-				resolve(val);
-			});
-		})
-		.then(val => expect(val instanceof Buffer).toBe(true));
+		};
+		const tracker = new GoodMeetupTracking(config);
+		const trackInfo = { requestId: 'foo' };
+		return testTransform(
+			tracker,
+			trackInfo,
+			val => {
+				expect(val instanceof Buffer).toBe(true);
+				expect(tracker._settings.schema.fromBuffer(val)).toEqual(trackInfo);
+			}
+		);
 	});
 });
 
@@ -39,22 +51,27 @@ describe('Integration with tracking logs', () => {
 	const trackInfo = logTrack('WEB')(response, {
 		memberId: 1234,
 		trackId: 'foo',
-		sessionId: 'bar',
+		sessionId: 'bar',  // not part of v3 spec
 		url: 'asdf',
 	});
 
 	it('encodes standard output from logTrack', () => {
 		const tracker = new GoodMeetupTracking();
 
-		return new Promise((resolve, reject) => {
-			tracker._transform({ data: JSON.stringify(trackInfo) }, null, (err, val) => {
-				if (err) {
-					reject(err);
-				}
-				resolve(val);
-			});
-		})
-		.then(val => expect(val instanceof Buffer).toBe(true));
+		return testTransform(
+			tracker,
+			trackInfo,
+			val => {
+				expect(val instanceof Buffer).toBe(true);
+				const trackedInfo = tracker._settings.schema.fromBuffer(val);
+				const expectedTrackInfo = {
+					...trackInfo,
+					aggregratedUrl: ''  // misspelled, unused field in v3 spec
+				};
+				delete expectedTrackInfo.sessionId;  // not part of v3 spec
+				expect(trackedInfo).toEqual(expectedTrackInfo);
+			}
+		);
 	});
 
 });

@@ -167,8 +167,8 @@ export const logTrack = platformAgent => (response, trackInfo) => {
 	const trackLog = {
 		timestamp: new Date().getTime().toString(),
 		requestId: uuid.v4(),
-		ip: requestHeaders['remote-addr'],
-		agent: requestHeaders['user-agent'],
+		ip: requestHeaders['remote-addr'] || '',
+		agent: requestHeaders['user-agent'] || '',
 		platform: 'meetup-web-platform',
 		platformAgent: 'WEB',  // TODO: set this more accurately, using allowed values from avro schema
 		mobileWeb: false,
