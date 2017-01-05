@@ -21,6 +21,7 @@ describe('GoodMeetupTracking', () => {
 	});
 	it('transforms input into avro Buffer', () => {
 		const config = {
+			postData() {},
 			schema: avro.parse({
 				type: 'record',
 				fields: [
@@ -56,7 +57,9 @@ describe('Integration with tracking logs', () => {
 	});
 
 	it('encodes standard output from logTrack', () => {
-		const tracker = new GoodMeetupTracking();
+		const tracker = new GoodMeetupTracking({
+			postData() {},
+		});
 
 		return testTransform(
 			tracker,

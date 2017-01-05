@@ -9,6 +9,11 @@ const Stream = require('stream');
 
 const internals = {
 	defaults: {
+		postData(avroBuff) {
+			return request.post('http://beta2.dev.meetup.com:8000/api', { body: avroBuff }, () => {
+				console.log('dondond');
+			});
+		},
 		schema: avro.parse({
 			namespace: 'com.meetup.base.avro',
 			type: 'record',
@@ -18,14 +23,14 @@ const internals = {
 				{ name: 'requestId', type: 'string'},
 				{ name: 'timestamp', type: 'string'},
 				{ name: 'url', type: 'string'},
-				{ name: 'aggregratedUrl', type: 'string', default: ''},
+				{ name: 'aggregratedUrl', type: 'string', default: ''},  // it's misspelled in the original spec
 				{ name: 'ip', type: 'string', default: ''},
 				{ name: 'agent', type: 'string', default: ''},
 				{ name: 'memberId', type: 'int'},
 				{ name: 'trackId', type: 'string'},
 				{ name: 'mobileWeb', type: 'boolean'},
 				{ name: 'platform', type: 'string'},
-				{ name: 'referer', type: 'string'},
+				{ name: 'referer', type: 'string'},  // it's misspelled in the original spec
 				{ name: 'trax', type: { type: 'map', values: 'string'}},
 				{
 					name: 'platformAgent',
@@ -62,11 +67,8 @@ class GoodMeetupTracking extends Stream.Transform {
 	_transform(event, enc, next) {
 		const data = JSON.parse(event.data);
 		const avroBuff = this._settings.schema.toBuffer(data);
-		// console.log('avrobuff', JSON.stringify(this._settings.schema.fromBuffer(avroBuff)));
+		this._settings.postData(avroBuff);
 
-		// request.post('http://beta2.dev.meetup.com:8000/api', { body: avroBuff }, () => {
-			// console.log('dondond');
-		// });
 		return next(null, avroBuff);
 	}
 }
