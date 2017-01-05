@@ -4,6 +4,7 @@
 
 const avro = require('avsc');
 const Hoek = require('hoek');
+const request = require('request');
 const Stream = require('stream');
 
 const internals = {
@@ -63,6 +64,9 @@ class GoodMeetupTracking extends Stream.Transform {
 		const avroBuff = this._settings.schema.toBuffer(data);
 		// console.log('avrobuff', JSON.stringify(this._settings.schema.fromBuffer(avroBuff)));
 
+		// request.post('http://beta2.dev.meetup.com:8000/api', { body: avroBuff }, () => {
+			// console.log('dondond');
+		// });
 		return next(null, avroBuff);
 	}
 }
