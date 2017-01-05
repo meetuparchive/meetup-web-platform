@@ -81,7 +81,7 @@ export const trackLogout = log => response =>
 		response,
 		{
 			description: 'logout',
-			memberId: updateMemberId(response),
+			memberId: parseInt(updateMemberId(response), 10),
 			trackIdFrom: response.request.state.track_id,
 			trackId: updateTrackId(response, true),
 			sessionId: response.request.state.session_id,
@@ -102,11 +102,11 @@ export const trackNav = log => (response, queryResponses, url, referrer) => {
 		response,
 		{
 			description: 'nav',
-			memberId: response.request.state.member_id,
+			memberId: parseInt(response.request.state.member_id, 10),
 			trackId: response.request.state.track_id,
 			sessionId: response.request.state.session_id,
 			url,
-			referrer,
+			referer: referrer || '',
 			apiRequests,
 		}
 	);
@@ -137,7 +137,7 @@ export const trackLogin = log => (response, memberId) =>
 		response,
 		{
 			description: 'login',
-			memberId: updateMemberId(response, memberId),
+			memberId: parseInt(updateMemberId(response, memberId), 10),
 			trackIdFrom: response.request.state.track_id,
 			trackId: updateTrackId(response, true),
 			sessionId: response.request.state.session_id,
@@ -154,7 +154,7 @@ export const trackSession = log => response => {
 		response,
 		{
 			description: 'session',
-			memberId: response.request.state.member_id,
+			memberId: parseInt(response.request.state.member_id, 10),
 			trackId: updateTrackId(response),
 			sessionId: newSessionId(response),
 			url: response.request.url.path,
@@ -165,12 +165,15 @@ export const trackSession = log => response => {
 export const logTrack = platformAgent => (response, trackInfo) => {
 	const requestHeaders = response.request.headers;
 	const trackLog = {
-		timestamp: new Date().getTime(),
+		timestamp: new Date().getTime().toString(),
 		requestId: uuid.v4(),
 		ip: requestHeaders['remote-addr'],
 		agent: requestHeaders['user-agent'],
 		platform: 'meetup-web-platform',
-		platformAgent,
+		platformAgent: 'WEB',  // TODO: set this more accurately, using allowed values from avro schema
+		mobileWeb: false,
+		referer: '',
+		trax: {},
 		...trackInfo,
 	};
 	// response.request.log will provide timestaemp

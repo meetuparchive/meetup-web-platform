@@ -5,10 +5,7 @@
 const avro = require('avsc');
 const Hoek = require('hoek');
 const Stream = require('stream');
-const SafeStringify = require('json-stringify-safe');
 
-// TODO: figure out how to load the JSON from Activity_v3.avsc into the schema
-// Might want to just enter it manually
 const internals = {
 	defaults: {
 		schema: avro.parse({
@@ -62,20 +59,11 @@ class GoodMeetupTracking extends Stream.Transform {
 	 * @param {Object} data a Good event object
 	 */
 	_transform(event, enc, next) {
-		console.log('\n\nstarting\n\n');
-		const data = typeof event.data === 'object' ? SafeStringify(event.data) : event.data;
+		const data = JSON.parse(event.data);
+		const avroBuff = this._settings.schema.toBuffer(data);
+		// console.log('avrobuff', JSON.stringify(this._settings.schema.fromBuffer(avroBuff)));
 
-		try {
-			const avroBuff = this._settings.schema.toBuffer(data);
-			console.log('\n\nhere go\n\n');
-			console.log('avrobuff', this._settings.schema.fromBuffer(avroBuff));
-			console.log('avrobuff', JSON.stringify(this._settings.schema.fromBuffer(avroBuff)));
-
-			return next(null, avroBuff);
-		} catch(e) {
-			console.error(e);
-			console.log('nopenopenope\n\n');
-		}
+		return next(null, avroBuff);
 	}
 }
 
