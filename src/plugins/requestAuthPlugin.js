@@ -210,7 +210,10 @@ export const getAuthenticate = authorizeRequest$ => (request, reply) => {
 				const credentials = request.state[memberCookie] || request.state.oauth_token;
 				reply.continue({ credentials, artifacts: credentials });
 			},
-			err => reply(err, null, { credentials: null })
+			err => {
+				request.log(['error', 'auth'], err);
+				reply(err, null, { credentials: null });
+			}
 		);
 };
 
