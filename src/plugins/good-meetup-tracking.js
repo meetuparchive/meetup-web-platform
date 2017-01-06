@@ -10,12 +10,20 @@ const Stream = require('stream');
 const internals = {
 	defaults: {
 		endpoint: 'http://beta2.dev.meetup.com:8000/api',
+		/**
+		 * @param {String} endpoint avro logging endpoint
+		 * @param {Buffer} body the buffer containing the avro-encoded data
+		 */
 		postData(endpoint, body) {
+			// send the data to the endpoint
 			return request.post(
 				endpoint,
-				{ body }, (response, body) => {}
+				{ body },
+				(response, body) => {}  // don't really care about the response currently
 			);
 		},
+		// currently the schema is manually copied from
+		// https://github.dev.meetup.com/meetup/meetup/blob/master/modules/base/src/main/versioned_avro/Activity_v3.avsc
 		schema: avro.parse({
 			namespace: 'com.meetup.base.avro',
 			type: 'record',

@@ -172,7 +172,7 @@ export const logTrack = platformAgent => (response, trackInfo) => {
 		platform: 'meetup-web-platform',
 		platformAgent: 'WEB',  // TODO: set this more accurately, using allowed values from avro schema
 		mobileWeb: false,
-		referer: '',
+		referer: '',  // misspelled to align with schema
 		trax: {},
 		...trackInfo,
 	};
