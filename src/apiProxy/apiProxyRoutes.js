@@ -35,6 +35,18 @@ const getApiProxyRoutes = (path, env, apiProxyFn$) => {
 					enabled: true,
 				}
 			},
+			ext: {
+				onPreResponse: {
+					method: (request, reply) => {
+						const response = request.response;
+						console.log('\n\nhere', response.isBoom);
+						if (response.isBoom) {
+							console.error('badbadbad', response);
+						}
+						reply.continue();
+					},
+				},
+			},
 		},
 	};
 	const apiGetRoute = {
