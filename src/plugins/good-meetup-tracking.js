@@ -9,10 +9,12 @@ const Stream = require('stream');
 
 const internals = {
 	defaults: {
-		postData(avroBuff) {
-			return request.post('http://beta2.dev.meetup.com:8000/api', { body: avroBuff }, () => {
-				console.log('dondond');
-			});
+		endpoint: 'http://beta2.dev.meetup.com:8000/api',
+		postData(endpoint, body) {
+			return request.post(
+				endpoint,
+				{ body }, (response, body) => {}
+			);
 		},
 		schema: avro.parse({
 			namespace: 'com.meetup.base.avro',
@@ -67,7 +69,7 @@ class GoodMeetupTracking extends Stream.Transform {
 	_transform(event, enc, next) {
 		const data = JSON.parse(event.data);
 		const avroBuff = this._settings.schema.toBuffer(data);
-		this._settings.postData(avroBuff);
+		this._settings.postData(this._settings.endpoint, avroBuff);
 
 		return next(null, avroBuff);
 	}

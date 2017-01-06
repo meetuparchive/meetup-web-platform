@@ -17,7 +17,7 @@ const testTransform = (tracker, trackInfo, test) =>
 
 describe('GoodMeetupTracking', () => {
 	it('creates a transform stream', () => {
-		expect(new GoodMeetupTracking() instanceof Stream.Transform).toBe(true);
+		expect(new GoodMeetupTracking()).toEqual(jasmine.any(Stream.Transform));
 	});
 	it('transforms input into avro Buffer', () => {
 		const config = {
@@ -35,7 +35,7 @@ describe('GoodMeetupTracking', () => {
 			tracker,
 			trackInfo,
 			val => {
-				expect(val instanceof Buffer).toBe(true);
+				expect(val).toEqual(jasmine.any(Buffer));
 				expect(tracker._settings.schema.fromBuffer(val)).toEqual(trackInfo);
 			}
 		);
@@ -65,7 +65,7 @@ describe('Integration with tracking logs', () => {
 			tracker,
 			trackInfo,
 			val => {
-				expect(val instanceof Buffer).toBe(true);
+				expect(val).toEqual(jasmine.any(Buffer));
 				const trackedInfo = tracker._settings.schema.fromBuffer(val);
 				const expectedTrackInfo = {
 					...trackInfo,
@@ -73,6 +73,24 @@ describe('Integration with tracking logs', () => {
 				};
 				delete expectedTrackInfo.sessionId;  // not part of v3 spec
 				expect(trackedInfo).toEqual(expectedTrackInfo);
+			}
+		);
+	});
+
+	it('calls config.postData with an endpoint string and the buffer', () => {
+		const config = {
+			endpoint: 'foo',
+			postData() {},
+		};
+		spyOn(config, 'postData');
+		const tracker = new GoodMeetupTracking(config);
+
+		return testTransform(
+			tracker,
+			trackInfo,
+			val => {
+				expect(config.postData)
+					.toHaveBeenCalledWith(config.endpoint, val);
 			}
 		);
 	});
