@@ -110,17 +110,17 @@ describe('logged-out member state', () => {
 			refresh_token: 'asdfasdf',
 		};
 		const test = response => {
-			expect(response.request.state.oauth_token).toBe(expectedOauthToken);
+			expect(response.headers['set-cookie'][0].startsWith('oauth_token')).toBe(true);
 		};
 		return getEncryptedToken(cookies.refresh_token)
 			.then(refresh_token => testAuth({ refresh_token }, test));
 	});
 	it('gets a new oauth_token and refresh_token when no auth provided', () => {
 		// mock fetch for auth, grant_type: refresh_token
-		const expectedOauthToken = 'foobar';
 		const cookies = {};
 		const test = response => {
-			expect(response.request.state.oauth_token).toBe(expectedOauthToken);
+			expect(response.headers['set-cookie'][0].startsWith('oauth_token')).toBe(true);
+			expect(response.headers['set-cookie'][1].startsWith('refresh_token')).toBe(true);
 		};
 		return testAuth(cookies, test);
 	});
