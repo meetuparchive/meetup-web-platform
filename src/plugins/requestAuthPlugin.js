@@ -207,13 +207,12 @@ export const getAuthenticate = authorizeRequest$ => (request, reply) => {
 		.subscribe(
 			request => {
 				const memberCookie = request.server.app.isDevConfig ? 'MEETUP_MEMBER_DEV' : 'MEETUP_MEMBER';
-				const credentials = request.state[memberCookie] || request.state.oauth_token;
+				const credentials = request.state[memberCookie] ||
+					request.state.oauth_token ||
+					request.state.__raw_oauth_token;
 				reply.continue({ credentials, artifacts: credentials });
 			},
-			err => {
-				request.log(['error', 'auth'], err);
-				reply(err, null, { credentials: null });
-			}
+			err => reply(err, null, { credentials: null })
 		);
 };
 
