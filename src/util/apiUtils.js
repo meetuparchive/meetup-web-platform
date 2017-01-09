@@ -209,9 +209,11 @@ export const apiResponseToQueryResponse = query => ({ value, meta }) => ({
 });
 
 export function getAuthHeaders({ state }) {
-	if (!state.MEETUP_MEMBER && state.oauth_token) {
+	// internal server requests may set non-encoded token cookie __raw_oauth_token
+	const oauth_token = state.oauth_token || state.__raw_oauth_token;
+	if (!state.MEETUP_MEMBER && oauth_token) {
 		return {
-			authorization: `Bearer ${state.oauth_token}`,
+			authorization: `Bearer ${oauth_token}`,
 		};
 	}
 	const cookies = { ...state };
