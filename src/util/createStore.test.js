@@ -1,4 +1,4 @@
-import createStore from './createStore';
+import createStore, { mergeRawCookies } from './createStore';
 
 const MOCK_ROUTES = {};
 const IDENTITY_REDUCER = state => state;
@@ -36,3 +36,23 @@ describe('createStore', () => {
 	});
 
 });
+
+describe('mergeRawCookies', () => {
+	it('combines request.state cookies with a `__raw_` prefix with the raw request cookie header string', () => {
+		const request = {
+			state: {
+				__raw_foo: 'bar',
+				bar: 'baz',  // ignored because it doesn't start with __raw_
+			},
+			raw: {
+				req: {
+					headers: {
+						cookie: 'foo=bar',
+					},
+				},
+			},
+		};
+		expect(mergeRawCookies(request)).toEqual('foo=bar; __raw_foo=bar');
+	});
+});
+

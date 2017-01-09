@@ -111,6 +111,7 @@ describe('logged-out member state', () => {
 		};
 		const test = response => {
 			expect(response.headers['set-cookie'][0].startsWith('oauth_token')).toBe(true);
+			expect(response.request.state.__raw_oauth_token).toBe(expectedOauthToken);
 		};
 		return getEncryptedToken(cookies.refresh_token)
 			.then(refresh_token => testAuth({ refresh_token }, test));
