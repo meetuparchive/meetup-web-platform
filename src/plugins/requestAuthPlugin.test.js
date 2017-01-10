@@ -37,19 +37,15 @@ const MOCK_REQUEST = {
 		app: {},
 	},
 };
-const MOCK_AUTHED_REQUEST = {
-	headers: MOCK_HEADERS,
-	state: { oauth_token: 'good_token' },
-	app: {},
-	log: (tags, data) => { console.log(data); },
-	authorize: () => Rx.Observable.of(MOCK_AUTHED_REQUEST),
-	query: {},
-	server: {
-		app: {},
-	},
-};
 MOCK_REQUEST.plugins.requestAuth = {
 	reply: MOCK_REPLY_FN
+};
+
+const MOCK_AUTHED_REQUEST = {
+	...MOCK_REQUEST,
+	state: { oauth_token: 'good_token' },
+	log: (tags, data) => { console.log(data); },
+	authorize: () => Rx.Observable.of(MOCK_AUTHED_REQUEST),
 };
 
 const GOOD_MOCK_FETCH_RESULT = Promise.resolve({
@@ -145,25 +141,62 @@ describe('getRequestAuthorizer$', () => {
 describe('applyRequestAuthorizer$', () => {
 	const requestAuthorizer$ = getRequestAuthorizer$({ oauth, OAUTH_AUTH_URL, OAUTH_ACCESS_URL }, null);
 	const authorizeRequest$ = applyRequestAuthorizer$(requestAuthorizer$);
-	it('does not try to fetch when provided a request with an oauth token in state', () => {
-		spyOn(global, 'fetch').and.callFake((url, opts) => {
-			if (url.startsWith(OAUTH_AUTH_URL)) {
-				return Promise.resolve({
-					text: () => Promise.resolve('{ "code": 1234 }')
-				});
-			}
-			if (url.startsWith(OAUTH_ACCESS_URL)) {
-				return Promise.resolve({
-					text: () => Promise.resolve('{ "oauth_token": "good_token" }')
-				});
-			}
-		});
+	it('does not try to fetch when provided a request with oauth_token in state', () => {
+		spyOn(global, 'fetch');
 
-		return authorizeRequest$({ ...MOCK_AUTHED_REQUEST })
-			.toPromise()
-			.then(request => {
-				expect(global.fetch).not.toHaveBeenCalled();
-			});
+		return authorizeRequest$({
+			...MOCK_REQUEST,
+			state: {
+				oauth_token: 'foo',
+			}
+		})
+		.toPromise()
+		.then(request => {
+			expect(global.fetch).not.toHaveBeenCalled();
+		});
+	});
+	it('does not try to fetch when provided a request with __internal_oauth_token in state', () => {
+		spyOn(global, 'fetch');
+
+		return authorizeRequest$({
+			...MOCK_REQUEST,
+			state: {
+				__internal_oauth_token: 'foo',
+			}
+		})
+		.toPromise()
+		.then(request => {
+			expect(global.fetch).not.toHaveBeenCalled();
+		});
+	});
+	it('does not try to fetch when provided a request with MEETUP_MEMBER in state', () => {
+		spyOn(global, 'fetch');
+
+		return authorizeRequest$({
+			...MOCK_REQUEST,
+			state: {
+				MEETUP_MEMBER: 'foo',
+			}
+		})
+		.toPromise()
+		.then(request => {
+			expect(global.fetch).not.toHaveBeenCalled();
+		});
+	});
+	it('does not try to fetch when provided a request with MEETUP_MEMBER_DEV in state', () => {
+		spyOn(global, 'fetch');
+
+		return authorizeRequest$({
+			...MOCK_AUTHED_REQUEST,
+			state: {
+				MEETUP_MEMBER_DEV: 'foo',
+			},
+			server: { app: { isDevConfig: true } },
+		})
+		.toPromise()
+		.then(request => {
+			expect(global.fetch).not.toHaveBeenCalled();
+		});
 	});
 	it('calls fetch when provided a request without an oauth token in state', () => {
 		spyOn(global, 'fetch').and.callFake((url, opts) => {
