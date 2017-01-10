@@ -61,6 +61,12 @@ describe('mergeRawCookies', () => {
 	it('combines request.state cookies with a `__internal_` prefix with the raw request cookie header string', () => {
 		expect(mergeRawCookies(serverRequest)).toEqual('foo=bar; __internal_foo=bar');
 	});
+	it('works when request contains no cookies', () => {
+		expect(mergeRawCookies({
+			...serverRequest,
+			raw: { req: { headers: {} } },
+		})).toEqual('__internal_foo=bar');
+	});
 });
 
 describe('serverFetchQueries', () => {

@@ -45,7 +45,7 @@ export function mergeRawCookies(request) {
 			...({ [name]: request.state[name] })
 		}), {});
 
-	return mergeCookies(request.raw.req.headers.cookie, injectedCookies);
+	return mergeCookies(request.raw.req.headers.cookie || '', injectedCookies);
 }
 
 /**
