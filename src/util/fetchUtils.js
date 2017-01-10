@@ -88,9 +88,8 @@ export const mergeCookies = (rawCookieHeader, newCookies) => {
 		...oldCookies,
 		...newCookies,
 	};
-	return [
-		...Object.keys(mergedCookies)
-			.map(name => `${name}=${mergedCookies[name]}`),
-	].join('; ');
+	return Object.keys(mergedCookies)
+		.map(name => `${name}=${mergedCookies[name]}`)
+		.join('; ');
 };
 

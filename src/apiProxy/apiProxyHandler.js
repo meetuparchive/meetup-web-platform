@@ -2,7 +2,6 @@ import url from 'url';
 import Boom from 'boom';
 
 const handleQueryResponses = (request, reply) => queryResponses => {
-	request.log(['api', 'debug'], 'about to respond\n');
 	const response = reply(JSON.stringify({
 		responses: queryResponses,
 	})).type('application/json');

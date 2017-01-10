@@ -39,9 +39,11 @@ const getApiProxyRoutes = (path, env, apiProxyFn$) => {
 				onPreResponse: {
 					method: (request, reply) => {
 						const response = request.response;
-						console.log('\n\nhere', response.isBoom);
 						if (response.isBoom) {
-							console.error('badbadbad', response);
+							request.log(
+								['error'],
+								`${request.url.href} responded with:\n ${response.stack}`
+							);
 						}
 						reply.continue();
 					},
