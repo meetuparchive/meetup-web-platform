@@ -39,7 +39,7 @@ function finalCreateStore(routes, reducer, initialState=null, middleware=[], fet
 
 export function mergeRawCookies(request) {
 	const injectedCookies = Object.keys(request.state)
-		.filter(name => name.startsWith('__raw_'))
+		.filter(name => name.startsWith('__internal_'))
 		.reduce((cookies, name) => ({
 			...cookies,
 			...({ [name]: request.state[name] })

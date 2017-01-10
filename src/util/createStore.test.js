@@ -9,8 +9,8 @@ const MOCK_ROUTES = {};
 const IDENTITY_REDUCER = state => state;
 const serverRequest = {
 	state: {
-		__raw_foo: 'bar',
-		bar: 'baz',  // ignored because it doesn't start with __raw_
+		__internal_foo: 'bar',
+		bar: 'baz',  // ignored because it doesn't start with __internal_
 	},
 	url: url.parse('http://example.com'),
 	raw: {
@@ -58,8 +58,8 @@ describe('createStore', () => {
 });
 
 describe('mergeRawCookies', () => {
-	it('combines request.state cookies with a `__raw_` prefix with the raw request cookie header string', () => {
-		expect(mergeRawCookies(serverRequest)).toEqual('foo=bar; __raw_foo=bar');
+	it('combines request.state cookies with a `__internal_` prefix with the raw request cookie header string', () => {
+		expect(mergeRawCookies(serverRequest)).toEqual('foo=bar; __internal_foo=bar');
 	});
 });
 
@@ -92,7 +92,7 @@ describe('serverFetchQueries', () => {
 		};
 		serverFetchQueries(serverRequest)(apiUrl, options);
 		const callArgs = fetchUtils.fetchQueries.calls.mostRecent().args;
-		expect(callArgs[1].headers.cookie).toEqual('bim=bam; foo=bar; __raw_foo=bar');
+		expect(callArgs[1].headers.cookie).toEqual('bim=bam; foo=bar; __internal_foo=bar');
 	});
 });
 
