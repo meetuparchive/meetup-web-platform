@@ -1,7 +1,27 @@
-import createStore from './createStore';
+import url from 'url';
+import createStore, {
+	mergeRawCookies,
+	serverFetchQueries
+} from './createStore';
+import * as fetchUtils from './fetchUtils';
 
 const MOCK_ROUTES = {};
 const IDENTITY_REDUCER = state => state;
+const serverRequest = {
+	state: {
+		__raw_foo: 'bar',
+		bar: 'baz',  // ignored because it doesn't start with __raw_
+	},
+	url: url.parse('http://example.com'),
+	raw: {
+		req: {
+			headers: {
+				cookie: 'foo=bar',
+			},
+		},
+	},
+};
+
 describe('createStore', () => {
 	it('creates a store with store functions', () => {
 		const basicStore = createStore(MOCK_ROUTES, IDENTITY_REDUCER);
@@ -36,3 +56,43 @@ describe('createStore', () => {
 	});
 
 });
+
+describe('mergeRawCookies', () => {
+	it('combines request.state cookies with a `__raw_` prefix with the raw request cookie header string', () => {
+		expect(mergeRawCookies(serverRequest)).toEqual('foo=bar; __raw_foo=bar');
+	});
+});
+
+describe('serverFetchQueries', () => {
+	it('calls fetchQueries with modified options', () => {
+		spyOn(fetchUtils, 'fetchQueries');
+		const apiUrl = 'http://example.com';
+		const options = {};
+		serverFetchQueries(serverRequest)(apiUrl, options);
+		expect(fetchUtils.fetchQueries).toHaveBeenCalledWith(
+			apiUrl,
+			jasmine.any(Object)
+		);
+	});
+	it('defaults referer to request.url.pathname', () => {
+		spyOn(fetchUtils, 'fetchQueries');
+		const apiUrl = 'http://example.com';
+		const options = {};
+		serverFetchQueries(serverRequest)(apiUrl, options);
+		const callArgs = fetchUtils.fetchQueries.calls.mostRecent().args;
+		expect(callArgs[1].headers.referer).toEqual(serverRequest.url.pathname);
+	});
+	it('appends request headers to option headers', () => {
+		spyOn(fetchUtils, 'fetchQueries');
+		const apiUrl = 'http://example.com';
+		const options = {
+			headers: {
+				cookie: 'bim=bam',
+			},
+		};
+		serverFetchQueries(serverRequest)(apiUrl, options);
+		const callArgs = fetchUtils.fetchQueries.calls.mostRecent().args;
+		expect(callArgs[1].headers.cookie).toEqual('bim=bam; foo=bar; __raw_foo=bar');
+	});
+});
+
