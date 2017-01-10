@@ -21,6 +21,16 @@ describe('fetchQueries', () => {
 				}[key]),
 			},
 		});
+	const fakeSuccessError = () =>
+		Promise.resolve({
+			json: () => Promise.resolve({ error: 'you lose' }),
+			headers: {
+				get: key => ({
+					'x-csrf-jwt': csrfJwt,
+				}[key]),
+			},
+		});
+
 
 	it('returns an object with queries and responses arrays', () => {
 		spyOn(global, 'fetch').and.callFake(fakeSuccess);
@@ -36,6 +46,15 @@ describe('fetchQueries', () => {
 
 		return fetchUtils.fetchQueries(API_URL.toString(), { method: 'GET' })(queries)
 			.then(response => expect(response.csrf).toEqual(csrfJwt));
+	});
+	it('returns a promise that will reject when response contains error prop', () => {
+		spyOn(global, 'fetch').and.callFake(fakeSuccessError);
+
+		return fetchUtils.fetchQueries(API_URL.toString(), { method: 'GET' })(queries)
+			.then(
+				response => expect(true).toBe(false),
+				err => expect(err).toEqual(jasmine.any(Error))
+			);
 	});
 	describe('GET', () => {
 		it('GET calls fetch with API url and queries, metadata, logout querystring params', () => {
@@ -150,9 +169,13 @@ describe('tryJSON', () => {
 	});
 });
 
-describe('makeCookieHeader', () => {
+describe('mergeCookies', () => {
 	it('makes a cookie header string from a { key<string> : value<string> } object', () => {
-		expect(fetchUtils.makeCookieHeader({ foo: 'foo', bar: 'bar' }))
+		expect(fetchUtils.mergeCookies('bim=bam', { foo: 'foo', bar: 'bar' }))
+			.toEqual('bim=bam; foo=foo; bar=bar');
+	});
+	it('overwrites existing cookies with new cookies', () => {
+		expect(fetchUtils.mergeCookies('foo=meetup', { foo: 'foo', bar: 'bar' }))
 			.toEqual('foo=foo; bar=bar');
 	});
 });

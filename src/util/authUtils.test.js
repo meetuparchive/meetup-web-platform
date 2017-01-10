@@ -56,7 +56,10 @@ describe('applyAuthState', () => {
 			expect(args[0] in auth).toBe(true);
 			expect(args[1]).toEqual(auth[args[0]]);
 		});
-		expect(request.state).toEqual(auth);
+		expect(request.state).toEqual({
+			__internal_oauth_token: auth.oauth_token,
+			__internal_refresh_token: auth.refresh_token,
+		});
 	});
 });
 

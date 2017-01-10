@@ -56,8 +56,12 @@ export const applyRequestAuthorizer$ = requestAuthorizer$ => request => {
 	request.log(['info', 'auth'], 'Checking for oauth_token in request');
 
 	const memberCookie = request.server.app.isDevConfig ? 'MEETUP_MEMBER_DEV' : 'MEETUP_MEMBER';
-	const authType = request.state[memberCookie] && memberCookie ||
-		request.state.oauth_token && 'oauth_token';
+	const allowedAuthTypes = [memberCookie, 'oauth_token', '__internal_oauth_token'];
+	// search for a request.state cookie name that matches an allowed auth type
+	const authType = allowedAuthTypes.reduce(
+		(found, allowedType) => found || request.state[allowedType] && allowedType,
+		null
+	);
 
 	if (authType) {
 		request.log(['info', 'auth'], `Request contains auth token (${authType})`);
@@ -207,7 +211,9 @@ export const getAuthenticate = authorizeRequest$ => (request, reply) => {
 		.subscribe(
 			request => {
 				const memberCookie = request.server.app.isDevConfig ? 'MEETUP_MEMBER_DEV' : 'MEETUP_MEMBER';
-				const credentials = request.state[memberCookie] || request.state.oauth_token;
+				const credentials = request.state[memberCookie] ||
+					request.state.oauth_token ||
+					request.state.__internal_oauth_token;
 				reply.continue({ credentials, artifacts: credentials });
 			},
 			err => reply(err, null, { credentials: null })
