@@ -1,3 +1,4 @@
+import { browserHistory } from 'react-router';
 import 'rxjs/Observable';
 import { ActionsObservable } from 'redux-observable';
 import { LOCATION_CHANGE } from 'react-router-redux';
@@ -22,6 +23,7 @@ import {
 
 import getSyncEpic from '../epics/sync';
 import * as syncActionCreators from '../actions/syncActionCreators';
+import * as authActionCreators from '../actions/authActionCreators';
 
 /**
  * @module SyncEpicTest
@@ -53,17 +55,31 @@ describe('Sync epic', () => {
 			.then(epicIgnoreAction(SyncEpic, serverRender));
 	});
 
-	it('emits LOCATION_CHANGE on LOCATION_SYNC', function() {
+	it('strips logout query and calls browserHistory.replace on LOGIN_SUCCESS', function() {
+		spyOn(browserHistory, 'replace');
 		const mockFetchQueries = () => () => Promise.resolve({});
+		const locationWithLogout = {
+			...MOCK_APP_STATE.routing.locationBeforeTransitions,
+			query: { logout: true },
+		};
+		const locationWithoutLogout = {
+			...locationWithLogout,
+			query: {},
+		};
+		const MOCK_APP_STATE_LOGOUT = {
+			...MOCK_APP_STATE,
+			routing: {
+				locationBeforeTransitions: locationWithLogout
+			}
+		};
 
-		const locationSync = syncActionCreators.locationSync();
+		const locationSync = authActionCreators.loginSuccess();
 		const action$ = ActionsObservable.of(locationSync);
-		const fakeStore = createFakeStore(MOCK_APP_STATE);
+		const fakeStore = createFakeStore(MOCK_APP_STATE_LOGOUT);
 		return getSyncEpic(routes, mockFetchQueries)(action$, fakeStore)
 			.toPromise()
-			.then(action => {
-				expect(action.type).toEqual(LOCATION_CHANGE);
-				expect(action.payload).toEqual(MOCK_APP_STATE.routing.locationBeforeTransitions);
+			.then(() => {
+				expect(browserHistory.replace).toHaveBeenCalledWith(locationWithoutLogout);
 			});
 	});
 
