@@ -19,14 +19,14 @@ export function duotoneRef(light, dark) {
 }
 
 // duotone pairs in the format [multiply, screen] (or [light, dark])
-const HYPERCOLOR = ['ff7900', '7700c8'];
-const SIZZURP = ['48ffcb', '8a00eb'];
-const JUNIOR_VARSITY = ['ffc600', '2737ff'];
-const MIGHTY_DUCKS = ['00d8ff', 'fa002f'];
-const MERMAID = ['36c200', '002fff'];
-const GINGER_BEER = ['ffde00', '55005a'];
-const BUBBLICIOUS = ['ff646a', '000ddf'];
-const LEMON_LIME = ['fed239', '36c200'];
+const HYPERCOLOR =      ['ff7900', '7700c8'];
+const SIZZURP =         ['48ffcb', '8a00eb'];
+const JUNIOR_VARSITY =  ['ffc600', '2737ff'];
+const MIGHTY_DUCKS =    ['00a8ff', 'fa002f'];
+const MERMAID =         ['36c200', '002fff'];
+const GINGER_BEER =     ['ffae00', 'ff005a'];
+const BUBBLICIOUS =     ['ff646a', '000ddf'];
+const LEMON_LIME =      ['bdb202', '24a601'];
 
 /**
  * Supported duotone color pairs (hex)
