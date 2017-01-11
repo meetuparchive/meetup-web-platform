@@ -5,6 +5,7 @@ import { tryJSON } from '../util/fetchUtils';
 import {
 	applyAuthState,
 	configureAuthCookies,
+	getMemberCookieName,
 	removeAuthState,
 	setPluginState,
 } from '../util/authUtils';
@@ -26,9 +27,6 @@ function verifyAuth(auth) {
 	}
 	return auth;
 }
-
-const getMemberCookieName = request =>
-	request.server.app.isDevConfig ? 'MEETUP_MEMBER_DEV' : 'MEETUP_MEMBER';
 
 const handleLogout = request => {
 	request.log(['info', 'auth'], 'Logout received, clearing cookies to re-authenticate');

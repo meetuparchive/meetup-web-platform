@@ -94,3 +94,7 @@ export const setPluginState = (request, reply) => {
 
 	return reply.continue();
 };
+
+export const getMemberCookieName = request =>
+	request.server.app.isDevConfig ? 'MEETUP_MEMBER_DEV' : 'MEETUP_MEMBER';
+
