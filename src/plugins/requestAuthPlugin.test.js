@@ -270,8 +270,12 @@ describe('getAuthenticate', () => {
 	});
 	it('calls reply.continue with credentials and artifacts', () => {
 		spyOn(MOCK_REPLY_FN, 'continue');
+		const request = {
+			...MOCK_AUTHED_REQUEST,
+			plugins: { requestAuth: { authType: 'oauth_token' } }
+		};
 		return new Promise((resolve, reject) =>
-			getAuthenticate(x => Rx.Observable.of(x))({ ...MOCK_AUTHED_REQUEST }, MOCK_REPLY_FN)
+			getAuthenticate(x => Rx.Observable.of(x))(request, MOCK_REPLY_FN)
 				.add(() => {
 					expect(MOCK_REPLY_FN.continue)
 						.toHaveBeenCalledWith({
