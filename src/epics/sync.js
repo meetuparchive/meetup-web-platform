@@ -32,9 +32,16 @@ export const getNavEpic = routes => {
 					referrer: currentLocation.pathname,
 					logout: 'logout' in payload.query,
 				};
-				return activeQueries$(payload)  // find the queries for the location
+
+				const apiRequestActions$ = activeQueries$(payload)  // find the queries for the location
 					.map(queries => apiRequest(queries, requestMetadata))
 					.do(() => currentLocation = payload);  // update to new location
+
+				// emit cache clear _only_ when logout requested
+				const cacheClearAction$ = requestMetadata.logout ?
+					Observable.of({ type: 'CACHE_CLEAR' }) : Observable.empty();
+
+				return Observable.merge(cacheClearAction$, apiRequestActions$);
 			});
 };
 
