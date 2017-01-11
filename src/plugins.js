@@ -9,8 +9,15 @@ import requestAuthPlugin from './plugins/requestAuthPlugin';
  */
 
 export function getCsrfPlugin(secret) {
+	const register = (server, options, next) => {
+		server.state('x-csrf-jwt', {
+			isSecure: process.env.NODE_ENV === 'production',
+		});
+		return CsrfPlugin.register(server, options, next);
+	};
+	register.attributes = CsrfPlugin.register.attributes;
 	return {
-		register: CsrfPlugin.register,
+		register,
 		options: {
 			secret,
 		}

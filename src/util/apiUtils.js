@@ -1,19 +1,23 @@
-import querystring from 'querystring';
+import querystring from 'qs';
 import url from 'url';
+import uuid from 'uuid';
 
 import externalRequest from 'request';
 import Joi from 'joi';
 import Rx from 'rxjs';
 
 import {
-	applyAuthState,
-} from '../util/authUtils';
+	removeAuthState,
+} from './authUtils';
+import {
+	coerceBool,
+	toCamelCase,
+} from './stringUtils';
 
 import {
 	querySchema
 } from './validation';
 import { duotoneRef } from './duotone';
-import * as apiConfigCreators from '../apiProxy/apiConfigCreators';
 
 const MOCK_RESPONSE_OK = {  // minimal representation of http.IncomingMessage
 	statusCode: 200,
@@ -26,22 +30,57 @@ const MOCK_RESPONSE_OK = {  // minimal representation of http.IncomingMessage
 	},
 };
 
-const parseResponseFlags = flagHeader =>
-	(flagHeader || '')
-		.split(',')
-		.filter(pair => pair)  // ignore empty elements in the array
-		.map(pair => pair.split('='))
-		.reduce((flags, [key, val]) => {
-			flags[key] = val === 'true';
-			return flags;
-		}, {});
+/**
+ * In order to receive cookies from `externalRequest` requests, this function
+ * provides a cookie jar that is specific to the request.
+ *
+ * The `requestUrl` is used to determine whether a cookie jar is needed
+ *
+ * https://github.com/request/request#examples
+ *
+ * @param {String} requestUrl the URL that will be used in the external request
+ * @return {Object} a cookie jar compatible with the npm request `jar` API
+ */
+export const createCookieJar = requestUrl => {
+	const parsedUrl = url.parse(requestUrl);
+	if (parsedUrl.pathname === '/sessions') {
+		return externalRequest.jar();  // create request/url-specific cookie jar
+	}
+	return null;
+};
+
+const X_HEADERS = [
+	'x-total-count'
+];
 
 export const parseMetaHeaders = headers => {
-	const flags = parseResponseFlags(headers['x-meetup-flags']);
-	const requestId = headers['x-meetup-request-id'];
+	const meetupHeaders = Object.keys(headers)
+		.filter(h => h.startsWith('x-meetup-'))
+		.reduce((meta, h) => {
+			const key = toCamelCase(h.replace('x-meetup-', ''));
+			meta[key] = headers[h];
+			return meta;
+		}, {});
+
+	// special case handling for flags
+	if (meetupHeaders.flags) {
+		meetupHeaders.flags = querystring.parse(meetupHeaders.flags, {
+			delimiter: ',',
+			decoder: coerceBool,
+		});
+	}
+
+	const xHeaders = X_HEADERS.reduce((meta, h) => {
+		const key = toCamelCase(h.replace('x-', ''));
+		if (h in headers) {
+			meta[key] = headers[h];
+		}
+		return meta;
+	}, {});
+
 	return {
-		flags,
-		requestId,
+		...meetupHeaders,
+		...xHeaders,
 	};
 };
 
@@ -54,6 +93,34 @@ function formatApiError(err) {
 		error: err.message
 	};
 }
+
+export const errorResponse$ = requestUrl => err =>
+	Rx.Observable.of({
+		value: formatApiError(err),
+		meta: {
+			endpoint: url.parse(requestUrl).pathname,
+		},
+	});
+
+export const parseApiValue = ([response, body]) => {
+	// treat non-success HTTP code as an error
+	if (response.statusCode < 200 || response.statusCode > 299) {
+		return formatApiError(new Error(response.statusMessage));
+	}
+	try {
+		if (response.statusCode === 204) {  // NoContent response type
+			return null;
+		}
+
+		const value = JSON.parse(body);
+		if (value && value.problem) {
+			return formatApiError(new Error(`API problem: ${value.problem}: ${value.details}`));
+		}
+		return value;
+	} catch(err) {
+		return formatApiError(err);
+	}
+};
 
 /**
  *
@@ -68,69 +135,17 @@ function formatApiError(err) {
  * @return responseObj the JSON-parsed text, possibly with error info
  */
 export const parseApiResponse = requestUrl => ([response, body]) => {
-	let value;
 	const meta = {
 		...parseMetaHeaders(response.headers),
 		endpoint: url.parse(requestUrl).pathname,
 	};
 
-	// treat non-success HTTP code as an error
-	if (response.statusCode < 200 || response.statusCode > 299) {
-		return {
-			value: formatApiError(new Error(response.statusMessage)),
-			meta,
-		};
-	}
-	try {
-		value = JSON.parse(body);
-		if (value && value.problem) {
-			value = formatApiError(new Error(`API problem: ${value.problem}: ${value.details}`));
-		}
-		return {
-			value,
-			meta,
-		};
-	} catch(err) {
-		return {
-			value: formatApiError(err),
-			meta,
-		};
-	}
-};
-
-/**
- * Translate a query into an API `endpoint` + `params`. The translation is based
- * on the Meetup REST API.
- *
- * This function serves as an adapter between the structure of a query and the
- * API-specific config needed to get that data. Note that *each* required
- * endpoint needs to be manually configured
- *
- * {@link http://www.meetup.com/meetup_api/docs/batch/}
- *
- * @param {Object} query a query object from the application
- * @return {Object} the arguments for api request, including endpoint
- */
-export function queryToApiConfig({ endpoint, ref, type, params, flags }) {
-	if (!endpoint) {
-		console.warn(
-			'Queries without an explicit `endpoint` key are deprecated.',
-			'Please specify the endpoint and params in the query function directly.',
-			`Query: ${JSON.stringify({ ref, type })}`
-		);
-		if (!(type in apiConfigCreators)) {
-			throw new ReferenceError(`No API specified for query type ${type} and no endpoint provided`);
-		}
-		const baseConfig = apiConfigCreators[type](params);
-		endpoint = baseConfig.endpoint;
-		params = baseConfig.params;
-	}
 	return {
-		endpoint,
-		params,
-		flags,
+		value: parseApiValue([response, body]),
+		meta,
 	};
-}
+
+};
 
 /**
  * Transform each query into the arguments needed for a `request` call.
@@ -143,7 +158,7 @@ export function queryToApiConfig({ endpoint, ref, type, params, flags }) {
  *
  * @param {Object} externalRequestOpts request options that will be applied to
  *   every query request
- * @param {Object} apiConfig { endpoint, params, flags }
+ * @param {Object} query { endpoint, params, flags }
  *   call)
  * @return {Object} externalRequestOptsQuery argument for the call to
  *   `externalRequest` for the query
@@ -153,7 +168,9 @@ export const buildRequestArgs = externalRequestOpts =>
 
 		// cheap, brute-force object clone, acceptable for serializable object
 		const externalRequestOptsQuery = JSON.parse(JSON.stringify(externalRequestOpts));
+
 		externalRequestOptsQuery.url = encodeURI(`/${endpoint}`);
+		externalRequestOptsQuery.jar = createCookieJar(externalRequestOptsQuery.url);
 
 		if (flags) {
 			externalRequestOptsQuery.headers['X-Meetup-Request-Flags'] = flags.join(',');
@@ -163,6 +180,7 @@ export const buildRequestArgs = externalRequestOpts =>
 
 		switch (externalRequestOptsQuery.method) {
 		case 'get':
+		case 'delete':
 			externalRequestOptsQuery.url += `?${dataParams}`;
 			externalRequestOptsQuery.headers['X-Meta-Photo-Host'] = 'secure';
 			externalRequestOptsQuery.headers['X-Meta-Stringify-Ids'] = true;
@@ -172,6 +190,8 @@ export const buildRequestArgs = externalRequestOpts =>
 			externalRequestOptsQuery.headers['content-type'] = 'application/x-www-form-urlencoded';
 			break;
 		}
+
+		console.log(`External request headers: ${JSON.stringify(externalRequestOptsQuery.headers, null, 2)}`);
 
 		return externalRequestOptsQuery;
 	};
@@ -189,43 +209,51 @@ export const apiResponseToQueryResponse = query => ({ value, meta }) => ({
 	}
 });
 
-/**
- * Parse request for queries and request options
- * @return {Object} { queries, externalRequestOpts }
- */
-export function parseRequest(request, baseUrl) {
-	const {
-		headers,
-		method,
-		query,
-		payload,
-		state,
-	} = request;
+export function getAuthHeaders({ state }) {
+	if (!state.MEETUP_MEMBER && state.oauth_token) {
+		return {
+			authorization: `Bearer ${state.oauth_token}`,
+		};
+	}
+	const cookies = { ...state };
+	const csrf = uuid.v4();
+	cookies.MEETUP_CSRF = csrf;
+	cookies.MEETUP_CSRF_DEV = csrf;
+	const cookie = Object.keys(cookies)
+		.map(name => `${name}=${cookies[name]}`).join('; ');
 
-	// Forward the Hapi request headers from the client query
-	// except for `host` and `accept-encoding`
-	// which should be provided by the external api request
+	return {
+		cookie,
+		'csrf-token': csrf,
+	};
+}
+
+export function parseRequestHeaders(request) {
 	const externalRequestHeaders = {
-		...headers,
-		authorization: `Bearer ${state.oauth_token}`,
+		...request.headers,
+		...getAuthHeaders(request),
 	};
 
-	delete externalRequestHeaders['host'];
-	delete externalRequestHeaders['accept-encoding'];
+	delete externalRequestHeaders['host'];  // let app server set 'host'
+	delete externalRequestHeaders['accept-encoding'];  // let app server set 'accept'
 	delete externalRequestHeaders['content-length'];  // original request content-length is irrelevant
 
-	const externalRequestOpts = {
-		baseUrl,
-		method,
-		headers: externalRequestHeaders,  // make a copy to be immutable
-		mode: 'no-cors',
-		time: true,
-		agentOptions: {
-			rejectUnauthorized: baseUrl.indexOf('.dev') === -1
-		}
-	};
+	// cloudflare headers we don't want to pass on
+	delete externalRequestHeaders['cf-ray'];
+	delete externalRequestHeaders['cf-ipcountry'];
+	delete externalRequestHeaders['cf-visitor'];
+	delete externalRequestHeaders['cf-connecting-ip'];
 
-	const queriesJSON = request.method === 'get' ? query.queries : payload.queries;
+	return externalRequestHeaders;
+}
+
+export function parseRequestQueries(request) {
+	const {
+		method,
+		payload,
+		query,
+	} = request;
+	const queriesJSON = method === 'post' ? payload.queries : query.queries;
 	const validatedQueries = Joi.validate(
 		JSON.parse(queriesJSON),
 		Joi.array().items(querySchema)
@@ -233,8 +261,27 @@ export function parseRequest(request, baseUrl) {
 	if (validatedQueries.error) {
 		throw validatedQueries.error;
 	}
-	const queries = validatedQueries.value;
-	return { queries, externalRequestOpts };
+	return validatedQueries.value;
+}
+
+/**
+ * Parse request for queries and request options
+ * @return {Object} { queries, externalRequestOpts }
+ */
+export function parseRequest(request, baseUrl) {
+	return {
+		externalRequestOpts: {
+			baseUrl,
+			method: request.method,
+			headers: parseRequestHeaders(request),  // make a copy to be immutable
+			mode: 'no-cors',
+			time: true,  // time the request for logging
+			agentOptions: {
+				rejectUnauthorized: baseUrl.indexOf('.dev') === -1
+			},
+		},
+		queries: parseRequestQueries(request),
+	};
 }
 
 /**
@@ -306,9 +353,11 @@ const externalRequest$ = Rx.Observable.bindNodeCallback(externalRequest);
 /**
  * Make a real external API request, return response body string
  */
-export const makeExternalApiRequest = (request, API_TIMEOUT) => requestOpts =>
-	externalRequest$(requestOpts)
-		.timeout(API_TIMEOUT, new Error('API response timeout'));
+export const makeExternalApiRequest = (request, API_TIMEOUT) => requestOpts => {
+	return externalRequest$(requestOpts)
+		.timeout(API_TIMEOUT)
+		.map(([response, body]) => [response, body, requestOpts.jar]);
+};
 
 export const logApiResponse = appRequest => ([response, body]) => {
 	const {
@@ -331,6 +380,7 @@ export const logApiResponse = appRequest => ([response, body]) => {
 		},
 		response: {
 			elapsedTime: response.elapsedTime,
+			status: response.statusCode,
 			body: body.length > 256 ? `${body.substr(0, 256)}...`: body,
 		},
 	};
@@ -344,21 +394,42 @@ export const logApiResponse = appRequest => ([response, body]) => {
  * the login response unchanged
  */
 export const parseLoginAuth = (request, query) => response => {
-	if (query.type === 'login' && request.plugins.requestAuth) {
-		const {
-			oauth_token,
-			refresh_token,
-			expires_in,
-			member,
-		} = response.value;
-		applyAuthState(request, request.plugins.requestAuth.reply)({
-			oauth_token,
-			refresh_token,
-			expires_in
-		});
-		response.value = { member };
+	if (query.type === 'login' && request.plugins.requestAuth && !response.value.error) {
+		// kill the logged-out auth
+		removeAuthState(['oauth_token', 'refresh_token'], request, request.plugins.requestAuth.reply);
+		// only return the member, no oauth data
+		return {
+			...response,
+			value: { member: response.value.member }
+		};
 	}
 	return response;
+};
+
+/**
+ * When a tough-cookie cookie jar is provided, forward the cookies along with
+ * the overall /api response back to the client
+ */
+export const injectResponseCookies = request => ([response, _, jar]) => {
+	if (!jar) {
+		return;
+	}
+	const requestUrl = response.toJSON().request.uri.href;
+	jar.getCookies(requestUrl).forEach(cookie => {
+		const cookieOptions = {
+			domain: cookie.domain,
+			path: cookie.path,
+			isHttpOnly: cookie.httpOnly,
+			isSameSite: false,
+			isSecure: process.env.NODE_ENV === 'production',
+		};
+
+		request.plugins.requestAuth.reply.state(
+			cookie.key,
+			cookie.value.replace(/^"|"$/g, ''),  // remove surrounding quotes from string value
+			cookieOptions
+		);
+	});
 };
 
 /**
@@ -376,7 +447,9 @@ export const makeApiRequest$ = (request, API_TIMEOUT, duotoneUrls) => {
 			request.log(['api', 'info'], `REST API request: ${requestOpts.url}`);
 			return request$(requestOpts)
 				.do(logApiResponse(request))             // this will leak private info in API response
+				.do(injectResponseCookies(request))
 				.map(parseApiResponse(requestOpts.url))  // parse into plain object
+				.catch(errorResponse$(requestOpts.url))
 				.map(parseLoginAuth(request, query))     // login has oauth secrets - special case
 				.map(apiResponseToQueryResponse(query))  // convert apiResponse to app-ready queryResponse
 				.map(setApiResponseDuotones);            // special duotone prop

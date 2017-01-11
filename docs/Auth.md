@@ -7,11 +7,13 @@ authenticated. It is a _cookie-based_ auth system, so the server is responsible
 for reading and writing the relevant cookies from/to the browser client with
 every request.
 
-There are two auth cookies:
+There are two auth cookies for logged-out users:
 
 1. `oauth_token` - expiration time determined by the authentication endpoint
 2. `refresh_token` - does not expire, but will be set to a new token whenever
 one is received from the authentication endpoint.
+
+And one cookie for logged-in users: `MEETUP_MEMBER` (or `MEETUP_MEMBER_DEV`)
 
 ## Overview
 
@@ -26,11 +28,6 @@ and writes auth cookies that will allow the request source (browser or server)
 to call the Meetup API. This function requires the platform's oauth consumer
 `KEY` and `SECRET`.
 
-The `requestAuth` plugin also sets a handler for the Hapi server's
-[`'onPreAuth'` extension point](http://hapijs.com/api#request-lifecycle)
-that will store a reference to the current request's `reply` interface in order
-to set cookies on the response, if necessary.
-
 ## Request auth lifecycle
 
 In the `auth` step of the [Hapi request lifecycle](http://hapijs.com/api#request-lifecycle),
@@ -40,7 +37,7 @@ which happens _before_ the route handler is invoked, the `requestAuthPlugin`
 1. Does the request contain a `logout` query param?
   - **YES**: clear all auth cookies from the request
   - **NO**: continue
-2. Does the request contain an `oauth_token` cookie?
+2. Does the request contain an `oauth_token` or `MEETUP_MEMBER` cookie?
   - **YES**: continue
   - **NO**: Does the request contain a `refresh_token` cookie?
     - **YES**: Get a new access token using the `refresh_token` grant
@@ -50,28 +47,25 @@ which happens _before_ the route handler is invoked, the `requestAuthPlugin`
     - Apply the new `oauth_token` to the `request` **AND** the `reply` to send
       it back to the client
 3. If the Meetup API is being called (which is basically for all requests), the
-`oauth_token` in the request cookie will be converted to an `Authorization` header
-in each request to the Meetup API - this happens in [`api-proxy.js:parseRequest`](../apiProxy/api-proxy.js)
+`MEETUP_MEMBER` cookie will be forwarded for logged-in requests, or the
+`oauth_token` cookie will be converted to an `Authorization` header
+in each request to the Meetup API - this happens in
+[`api-proxy.js:parseRequest`](../apiProxy/api-proxy.js)
+4. The API proxy will also generate and send a UUID CSRF cookie and header,
+which is generated fresh for every API request. The only constraint is that the
+header and cookie are identical.
 
 ## Login
 
-Logging in is a special kind of API request that needs to set new `reply` cookies
-from the `api-proxy` module - it is independent of the `requestAuthPlugin` but
-must set cookies with the same format so that they can be used by
-`requestAuthPlugin` for future requests. When the `api-proxy` makes
-its API requests, it looks for login-related data in the API response:
-  - Assume that the request was made by a POST from the browser (the app server never
-    generates a login request on its own), which allows response cookies to be set
-  - Does the API response contain data under the `'login'` key?
-    - **NO**: return response directly
-    - **YES**
-      - Assume the response is formatted like a response from the `/sessions`
-        API endpoint
-      - read the `oauth_token`, `refresh_token`, and `expires_in` data from
-        the API response
-      - Create and apply new oauth cookies to the `reply` to set the new cookies
-        in the browser
-      - return _only_ the `member` data, not the auth data, as the API response
+Logging in is a special kind of API request that receives a new MEETUP_MEMBER
+cookie from the `/sessions` API endpoint that must be forwarded to the browser.
+When the `api-proxy` makes its API requests, it creates a 'cookie jar' to store
+cookies that are returned by the API (when necessary). When processing each API
+response, the API proxy reads from this cookie jar and sends the cookies along
+to the browser.
+
+The API proxy also strips oauth-related data from the `/sessions` response in
+order to avoid leaking auth information.
 
 ## Logout
 

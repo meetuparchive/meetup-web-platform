@@ -30,10 +30,11 @@ function getInnerHTML(__html) {
  */
 const DOM = (props) => {
 	const {
-		clientFilename,
-		assetPublicPath,
-		initialState,
 		appMarkup,
+		assetPublicPath,
+		baseUrl,
+		clientFilename,
+		initialState,
 	} = props;
 
 	/**
@@ -53,6 +54,7 @@ const DOM = (props) => {
 	const head = Helmet.rewind();
 
 	const APP_RUNTIME = {
+		baseUrl,
 		assetPublicPath,
 		escapedState,
 	};
@@ -64,7 +66,7 @@ const DOM = (props) => {
 				{head.meta.toComponent()}
 				{head.link.toComponent()}
 			</head>
-			<body style={{ margin: 0, fontFamily:'sans-serif' }}>
+			<body>
 				<div id='outlet' dangerouslySetInnerHTML={getInnerHTML(appMarkup)} />
 				<script dangerouslySetInnerHTML={getInnerHTML(`window.APP_RUNTIME=${JSON.stringify(APP_RUNTIME)};`)} />
 				<script src={`${assetPublicPath}${clientFilename}`} />
@@ -74,8 +76,11 @@ const DOM = (props) => {
 };
 
 DOM.propTypes = {
-	initialState: React.PropTypes.object.isRequired,
 	appMarkup: React.PropTypes.string,
+	assetPublicPath: React.PropTypes.string.isRequired,
+	baseUrl: React.PropTypes.string,
+	clientFilename: React.PropTypes.string.isRequired,
+	initialState: React.PropTypes.object.isRequired,
 };
 
 export default DOM;

@@ -16,9 +16,9 @@ const YEAR_IN_MS = 1000 * 60 * 60 * 24 * 365;
 export const configureAuthState = auth => {
 	return {
 		oauth_token: {
-			value: auth.oauth_token || auth.access_token,
+			value: auth.oauth_token || auth.access_token || '',
 			opts: {
-				ttl: auth.expires_in * 1000,
+				ttl: (auth.expires_in || 0) * 1000,
 			},
 		},
 		refresh_token: {
@@ -69,12 +69,15 @@ export function validateSecret(secret) {
 	return value;
 }
 
-export const applyServerState = (server, options) => {
+/**
+ * apply default cookie options for auth-related cookies
+ */
+export const configureAuthCookies = (server, options) => {
 	const password = validateSecret(options.COOKIE_ENCRYPT_SECRET);
 	const authCookieOptions = {
 		encoding: 'iron',
 		password,
-		// isSecure: process.env.NODE_ENV === 'production',   // enable when SSL is active
+		isSecure: process.env.NODE_ENV === 'production',
 		path: '/',
 		isHttpOnly: true,
 		clearInvalid: true,
@@ -83,3 +86,11 @@ export const applyServerState = (server, options) => {
 	server.state('refresh_token', authCookieOptions);
 };
 
+export const setPluginState = (request, reply) => {
+	// Used for setting and unsetting state, not for replying to request
+	request.plugins.requestAuth = {
+		reply,
+	};
+
+	return reply.continue();
+};

@@ -1,5 +1,6 @@
+import externalRequest from 'request';
+
 import {
-	mockQueryBadType,
 	mockQuery,
 	MOCK_API_PROBLEM,
 	MOCK_AUTH_HEADER,
@@ -19,94 +20,152 @@ import {
 	apiResponseToQueryResponse,
 	apiResponseDuotoneSetter,
 	buildRequestArgs,
+	errorResponse$,
+	getAuthHeaders,
+	injectResponseCookies,
 	logApiResponse,
-	makeApiRequest$,
-	makeExternalApiRequest,
 	parseRequest,
 	parseApiResponse,
+	parseApiValue,
 	parseLoginAuth,
-	queryToApiConfig,
+	parseMetaHeaders,
 	groupDuotoneSetter,
 } from './apiUtils';
 
-// Mock the request module with a an empty response delayed by 200ms
-jest.mock('request', () =>
-	jest.fn(
-		(requestOpts, cb) =>
-			setTimeout(() =>
-				cb(null, {
-					headers: {},
-					statusCode: 200,
-					elapsedTime: 1234,
-					request: {
-						uri: {
-							query: 'foo=bar',
-							pathname: '/foo',
-						},
-						method: 'get',
-					},
-				}, '{}'), 200)
-	)
-);
-
-describe('makeExternalApiRequest', () => {
-	it('calls externalRequest with requestOpts', () => {
-		const requestOpts = {
-			foo: 'bar',
-		};
-		return makeExternalApiRequest({}, 5000)(requestOpts)
+describe('errorResponse$', () => {
+	it('returns the request url pathname as response.meta.endpoint', () => {
+		const endpoint = '/pathname';
+		return errorResponse$(`http://example.com${endpoint}`)(new Error())
 			.toPromise()
-			.then(() => require('request').mock.calls.pop()[0])
-			.then(arg => expect(arg).toBe(requestOpts));
+			.then(response => expect(response.meta.endpoint).toEqual(endpoint));
 	});
-	it('throws an error when the API times out', () => {
-		const timeout = 100;
-		const requestOpts = {
-			foo: 'bar',
-		};
-		return makeExternalApiRequest({}, timeout)(requestOpts)
+	it('returns the error message as the response.value.error', () => {
+		const message = 'foo';
+		return errorResponse$('http://example.com')(new Error(message))
 			.toPromise()
-			.then(
-				() => expect(true).toBe(false),  // should not be called
-				err => expect(err).toEqual(jasmine.any(Error))
-			);
+			.then(response => expect(response.value.error).toEqual(message));
 	});
 });
 
-describe('parseApiResponse', () => {
+describe('getAuthHeaders', () => {
+	it('returns authorization header if no member cookie and oauth_token', () => {
+		const oauth_token = 'foo';
+		const authHeaders = getAuthHeaders({ state: { oauth_token } });
+		expect(authHeaders.authorization.startsWith('Bearer ')).toBe(true);
+		expect(authHeaders.authorization.endsWith(oauth_token)).toBe(true);
+	});
+	it('sets MEETUP_CSRF', () => {
+		const MEETUP_MEMBER = 'foo';
+		const authHeaders = getAuthHeaders({ state: { MEETUP_MEMBER } });
+		const cookies = authHeaders.cookie.split('; ').reduce((cookies, pair) => {
+			const [name, ...value] = pair.split('=');
+			return {
+				...cookies,
+				[name]: value.join('='),
+			};
+		}, {});
+
+		expect(cookies['MEETUP_CSRF']).not.toBeUndefined();
+		expect(cookies['MEETUP_CSRF_DEV']).not.toBeUndefined();
+		expect(authHeaders['csrf-token']).toEqual(cookies['MEETUP_CSRF']);
+	});
+});
+
+describe('injectResponseCookies', () => {
+	const request = {
+		plugins: {
+			requestAuth: {
+				reply: {
+					state() {}
+				},
+			},
+		},
+	};
+	const responseObj = {
+		request: {
+			uri: {
+				href: 'http://example.com',
+			},
+		},
+	};
+	const response = {
+		toJSON() {
+			return responseObj;
+		},
+	};
+
+	it('does nothing without a cookie jar', () => {
+		spyOn(response, 'toJSON');
+		injectResponseCookies(request)([response, null, null]);
+		expect(response.toJSON).not.toHaveBeenCalled();
+	});
+	it('sets the provided cookies on the reply state', () => {
+		const mockJar = externalRequest.jar();
+		spyOn(request.plugins.requestAuth.reply, 'state');
+
+		// set up mock cookie jar with a dummy cookie for the response.request.uri
+		const key = 'foo';
+		const value = 'bar';
+		mockJar.setCookie(`${key}=${value}`, responseObj.request.uri.href);
+
+		injectResponseCookies(request)([response, null, mockJar]);
+		expect(request.plugins.requestAuth.reply.state).toHaveBeenCalledWith(
+			key,
+			value,
+			jasmine.any(Object)  // don't actually care about the cookie options
+		);
+	});
+});
+
+describe('parseApiValue', () => {
 	const MOCK_RESPONSE = {
 		headers: {},
 		statusCode: 200
 	};
 	it('converts valid JSON into an equivalent object', () => {
 		const validJSON = JSON.stringify(MOCK_GROUP);
-		expect(parseApiResponse('http://example.com')([MOCK_RESPONSE, validJSON]).value).toEqual(jasmine.any(Object));
-		expect(parseApiResponse('http://example.com')([MOCK_RESPONSE, validJSON]).value).toEqual(MOCK_GROUP);
+		expect(parseApiValue([MOCK_RESPONSE, validJSON])).toEqual(jasmine.any(Object));
+		expect(parseApiValue([MOCK_RESPONSE, validJSON])).toEqual(MOCK_GROUP);
 	});
 	it('returns an object with a string "error" value for invalid JSON', () => {
 		const invalidJSON = 'not valid';
-		expect(parseApiResponse('http://example.com')([MOCK_RESPONSE, invalidJSON]).value.error).toEqual(jasmine.any(String));
+		expect(parseApiValue([MOCK_RESPONSE, invalidJSON]).error).toEqual(jasmine.any(String));
 	});
 	it('returns an object with a string "error" value for API response with "problem"', () => {
 		const responeWithProblem = JSON.stringify(MOCK_API_PROBLEM);
-		expect(parseApiResponse('http://example.com')([MOCK_RESPONSE, responeWithProblem]).value.error).toEqual(jasmine.any(String));
+		expect(parseApiValue([MOCK_RESPONSE, responeWithProblem]).error).toEqual(jasmine.any(String));
+	});
+	it('returns an object with a string "error" value for a not-ok response', () => {
+		const noContentStatus = {
+			statusCode: 204,
+			statusMessage: 'No Content',
+		};
+		const noContentResponse = { ...MOCK_RESPONSE, ...noContentStatus };
+		expect(parseApiValue([noContentResponse, ''])).toBeNull();
 	});
 	it('returns an object with a string "error" value for a not-ok response', () => {
 		const badStatus = {
-			ok: false,
 			statusCode: 500,
 			statusMessage: 'Problems',
 		};
 		const nonOkReponse = { ...MOCK_RESPONSE, ...badStatus };
-		expect(parseApiResponse('http://example.com')([nonOkReponse, '{}']).value.error).toEqual(badStatus.statusMessage);
+		expect(parseApiValue([nonOkReponse, '{}']).error).toEqual(badStatus.statusMessage);
 	});
+});
+describe('parseApiResponse', () => {
+	const MOCK_RESPONSE = {
+		headers: {},
+		statusCode: 200
+	};
 	it('returns the flags set in the X-Meetup-Flags header', () => {
 		const headers = {
 			'x-meetup-flags': 'foo=true,bar=false',
 		};
 		const flaggedResponse = { ...MOCK_RESPONSE, headers };
-		expect(parseApiResponse('http://example.com')([flaggedResponse, '{}']).meta.flags.foo).toBe(true);
-		expect(parseApiResponse('http://example.com')([flaggedResponse, '{}']).meta.flags.bar).toBe(false);
+		expect(parseApiResponse('http://example.com')([flaggedResponse, '{}']).meta.flags).toEqual({
+			foo: true,
+			bar: false,
+		});
 	});
 	it('returns the requestId set in the X-Meetup-Request-Id header', () => {
 		const requestId = '1234';
@@ -119,66 +178,60 @@ describe('parseApiResponse', () => {
 });
 
 describe('parseLoginAuth', () => {
-	it('calls applyAuthState for login responses', () => {
-		spyOn(authUtils, 'applyAuthState').and.returnValue(() => {});
+	it('calls removeAuthState for login responses', () => {
+		spyOn(authUtils, 'removeAuthState').and.returnValue(() => {});
 		const request = { plugins: { requestAuth: {} } };
 		const query = { type: 'login' };
 		const loginResponse = { type: 'login', value: {} };
 		parseLoginAuth(request, query)(loginResponse);
-		expect(authUtils.applyAuthState).toHaveBeenCalled();
+		expect(authUtils.removeAuthState).toHaveBeenCalled();
 	});
-	it('does not call applyAuthState for non-login responses', () => {
-		spyOn(authUtils, 'applyAuthState').and.returnValue(() => {});
+	it('does not call removeAuthState for non-login responses', () => {
+		spyOn(authUtils, 'removeAuthState').and.returnValue(() => {});
 		const request = { plugins: { requestAuth: {} } };
 		const query = { type: 'member' };
 		const apiResponse = { type: 'member', value: {} };
 		const returnVal = parseLoginAuth(request, query)(apiResponse);
-		expect(authUtils.applyAuthState).not.toHaveBeenCalled();
+		expect(authUtils.removeAuthState).not.toHaveBeenCalled();
 		expect(returnVal).toBe(apiResponse);
 	});
-	it('does not call applyAuthState when request.plugins does not exist', () => {
-		spyOn(authUtils, 'applyAuthState').and.returnValue(() => {});
+	it('does not call removeAuthState when request.plugins does not exist', () => {
+		spyOn(authUtils, 'removeAuthState').and.returnValue(() => {});
 		const request = { plugins: {} };
 		const query = { type: 'login' };
 		const loginResponse = { type: 'login', value: {} };
 		const returnVal = parseLoginAuth(request, query)(loginResponse);
-		expect(authUtils.applyAuthState).not.toHaveBeenCalled();
+		expect(authUtils.removeAuthState).not.toHaveBeenCalled();
+		expect(returnVal).toBe(loginResponse);
+	});
+	it('does not call removeAuthState when response has errors', () => {
+		spyOn(authUtils, 'removeAuthState').and.returnValue(() => {});
+		const request = { plugins: {} };
+		const query = { type: 'login' };
+		const loginResponse = { type: 'login', value: { error: true } };
+		const returnVal = parseLoginAuth(request, query)(loginResponse);
+		expect(authUtils.removeAuthState).not.toHaveBeenCalled();
 		expect(returnVal).toBe(loginResponse);
 	});
 });
 
-describe('queryToApiConfig', () => {
-	it('returns endpoint, params, flags unchanged when endpoint is present', () => {
-		const query = {
-			endpoint: 'foo',
-			type: 'bar',
-			params: {
-				foo: 'bar',
-			},
-			flags: ['asdf'],
-		};
-		const expectedApiConfig = {
-			endpoint: query.endpoint,
-			params: query.params,
-			flags: query.flags,
-		};
-		expect(queryToApiConfig(query)).toEqual(expectedApiConfig);
+describe('parseMetaHeaders', () => {
+	it('returns x-meetup-flags as flags object with real booleans camelcased', () => {
+		expect(parseMetaHeaders({ 'x-meetup-foo-bar': 'whatwhat' }))
+			.toEqual({ fooBar: 'whatwhat' });
 	});
-	it('transforms a query of known type to an object for API consumption', () => {
-		const testQueryResults = mockQuery(MOCK_RENDERPROPS);
-		expect(queryToApiConfig(testQueryResults)).toEqual(jasmine.any(Object));
-		expect(queryToApiConfig(testQueryResults).endpoint).toEqual(jasmine.any(String));
+	it('returns x-meetup-flags as flags object with real booleans', () => {
+		expect(parseMetaHeaders({ 'x-meetup-flags': 'foo=true,bar=false' }))
+			.toEqual({ flags: { foo: true, bar: false } });
 	});
-
-	it('throws a reference error when no API handler available for query type', () => {
-		const testBadQueryResults = mockQueryBadType(MOCK_RENDERPROPS);
-		expect(() => queryToApiConfig(testBadQueryResults)).toThrow(jasmine.any(ReferenceError));
+	it('parses specified x- headers', () => {
+		expect(parseMetaHeaders({ 'x-total-count': 'whatwhat' }))
+			.toEqual({ totalCount: 'whatwhat' });
 	});
 });
 
 describe('buildRequestArgs', () => {
 	const testQueryResults = mockQuery(MOCK_RENDERPROPS);
-	const apiConfig = queryToApiConfig(testQueryResults);
 	const url = 'http://example.com';
 	const options = {
 		url,
@@ -190,9 +243,9 @@ describe('buildRequestArgs', () => {
 
 	it('Converts an api config to arguments for a node-request call', () => {
 		let method = 'get';
-		const getArgs = buildRequestArgs({ ...options, method })(apiConfig);
+		const getArgs = buildRequestArgs({ ...options, method })(testQueryResults);
 		method = 'post';
-		const postArgs = buildRequestArgs({ ...options, method })(apiConfig);
+		const postArgs = buildRequestArgs({ ...options, method })(testQueryResults);
 		expect(getArgs).toEqual(jasmine.any(Object));
 		expect(getArgs.url).toMatch(/\?.+/);  // get requests will add querystring
 		expect(getArgs.hasOwnProperty('body')).toBe(false);  // get requests will not have a body
@@ -212,19 +265,17 @@ describe('buildRequestArgs', () => {
 			},
 			flags: ['asdf'],
 		};
-		const apiConfig = queryToApiConfig(query);
-		const getArgs = buildRequestArgs({ ...options, method: 'get' })(apiConfig);
+		const getArgs = buildRequestArgs({ ...options, method: 'get' })(query);
 		expect(getArgs.headers['X-Meetup-Request-Flags']).not.toBeUndefined();
-		const postArgs = buildRequestArgs({ ...options, method: 'post' })(apiConfig);
+		const postArgs = buildRequestArgs({ ...options, method: 'post' })(query);
 		expect(postArgs.headers['X-Meetup-Request-Flags']).not.toBeUndefined();
 	});
 
 	const testQueryResults_utf8 = mockQuery(MOCK_RENDERPROPS_UTF8);
-	const apiConfig_utf8 = queryToApiConfig(testQueryResults_utf8);
 
 	it('Properly encodes the URL', () => {
 		const method = 'get';
-		const getArgs = buildRequestArgs({ ...options, method })(apiConfig_utf8);
+		const getArgs = buildRequestArgs({ ...options, method })(testQueryResults_utf8);
 		const { pathname } = require('url').parse(getArgs.url);
 		expect(/^[\x00-\xFF]*$/.test(pathname)).toBe(true);  // eslint-disable-line no-control-regex
 	});
@@ -459,42 +510,6 @@ describe('parseRequest', () => {
 			},
 		};
 		expect(() => parseRequest(getRequest, 'http://dummy.api.meetup.com')).toThrow();
-	});
-});
-
-describe('makeApiRequest$', () => {
-	const endpoint = 'foo';
-	it('makes a GET request', () => {
-		const query = { ...mockQuery(MOCK_RENDERPROPS) };
-		return makeApiRequest$({ log: () => {} }, 5000, {})([{ method: 'get', url: endpoint }, query])
-			.toPromise()
-			.then(() => require('request').mock.calls.pop()[0])
-			.then(arg => expect(arg.method).toBe('get'));
-	});
-	it('makes a POST request', () => {
-		const query = { ...mockQuery(MOCK_RENDERPROPS) };
-		return makeApiRequest$({ log: () => {} }, 5000, {})([{ method: 'post', url: endpoint }, query])
-			.toPromise()
-			.then(() => require('request').mock.calls.pop()[0])
-			.then(arg => expect(arg.method).toBe('post'));
-	});
-	it('responds with query.mockResponse when set', () => {
-		const mockResponse = { foo: 'bar' };
-		const query = { ...mockQuery(MOCK_RENDERPROPS), mockResponse };
-		const expectedResponse = {
-			[query.ref]: {
-				meta: {
-					flags: {},
-					requestId: 'mock request',
-					endpoint
-				},
-				type: query.type,
-				value: mockResponse,
-			}
-		};
-		return makeApiRequest$({ log: () => {} }, 5000, {})([{ url: endpoint }, query])
-			.toPromise()
-			.then(response => expect(response).toEqual(expectedResponse));
 	});
 });
 

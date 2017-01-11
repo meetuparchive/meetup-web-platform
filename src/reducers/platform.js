@@ -23,13 +23,19 @@ export function app(state=DEFAULT_APP_STATE, action={}) {
 	switch (action.type) {
 	case 'CACHE_SUCCESS':  // fall through - same effect as API success
 	case 'API_SUCCESS':
-			// API_SUCCESS contains an array of responses, but we just need to build a single
-			// object to update state with
-		newState = Object.assign.apply(Object, [{}].concat(action.payload.responses));
+		// API_SUCCESS contains an array of responses, but we just need to build a single
+		// object to update state with
+		newState = action.payload.responses.reduce((s, r) => ({ ...s, ...r }), {});
+		delete state.error;
 		return { ...state, ...newState };
 	case 'LOGOUT_REQUEST':
 		// need to clear ALL private data, i.e. all data
 		return DEFAULT_APP_STATE;
+	case 'API_ERROR':
+		return {
+			...state,
+			error: action.payload
+		};
 	default:
 		return state;
 	}
@@ -40,10 +46,13 @@ export function config(state={}, action) {
 		apiUrl,
 		trackId;
 
-	switch(action.type) {
-	case 'API_SUCCESS':
+	if ((action.meta || {}).csrf) {
+		// any CSRF-bearing action should update state
 		csrf = action.meta.csrf;
-		return { ...state, csrf };
+		// create a copy of state with updated csrf
+		state = { ...state, csrf };
+	}
+	switch(action.type) {
 	case 'CONFIGURE_API_URL':
 		apiUrl = action.payload;
 		return { ...state, apiUrl };
