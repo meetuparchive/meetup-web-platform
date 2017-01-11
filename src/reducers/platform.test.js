@@ -1,3 +1,4 @@
+import * as syncActionCreators from '../actions/syncActionCreators';
 import {
 	DEFAULT_APP_STATE,
 	app,
@@ -9,6 +10,10 @@ describe('reducer', () => {
 	});
 	it('returns default state for empty action', () => {
 		expect(app(undefined, {})).toEqual(DEFAULT_APP_STATE);
+	});
+	it('re-sets app state on logout API_REQUEST', () => {
+		const logoutRequest = syncActionCreators.apiRequest([], { logout: true });
+		expect(app(this.MOCK_STATE, logoutRequest)).toEqual(DEFAULT_APP_STATE);
 	});
 	it('assembles success responses into single state tree', () => {
 		const API_SUCCESS = {
