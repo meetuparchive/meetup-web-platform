@@ -43,6 +43,25 @@ describe('Sync epic', () => {
 			done
 		);
 	});
+	it('emits CACHE_CLEAR and API_REQUEST for nav-related actions with logout query', function() {
+		const logoutLocation = {
+			...MOCK_RENDERPROPS.location,
+			query: {
+				...MOCK_RENDERPROPS.query,
+				logout: true,
+			}
+		};
+		const locationChange = { type: LOCATION_CHANGE, payload: logoutLocation };
+
+		const action$ = ActionsObservable.of(locationChange);
+		return getSyncEpic(MOCK_ROUTES)(action$)
+			.toArray()
+			.toPromise()
+			.then(actions => {
+				expect(actions[0].type).toEqual('CACHE_CLEAR');
+				expect(actions[1].type).toEqual('API_REQUEST');
+			});
+	});
 	it('does not emit for nav-related actions without matched query', () => {
 		const SyncEpic = getSyncEpic(MOCK_ROUTES);
 

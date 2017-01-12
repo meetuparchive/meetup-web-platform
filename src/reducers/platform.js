@@ -21,6 +21,11 @@ export function app(state=DEFAULT_APP_STATE, action={}) {
 	let newState;
 
 	switch (action.type) {
+	case 'API_REQUEST':
+		if (action.meta.logout) {
+			return DEFAULT_APP_STATE;  // clear app state during logout
+		}
+		return state;
 	case 'CACHE_SUCCESS':  // fall through - same effect as API success
 	case 'API_SUCCESS':
 		// API_SUCCESS contains an array of responses, but we just need to build a single
@@ -28,9 +33,6 @@ export function app(state=DEFAULT_APP_STATE, action={}) {
 		newState = action.payload.responses.reduce((s, r) => ({ ...s, ...r }), {});
 		delete state.error;
 		return { ...state, ...newState };
-	case 'LOGOUT_REQUEST':
-		// need to clear ALL private data, i.e. all data
-		return DEFAULT_APP_STATE;
 	case 'API_ERROR':
 		return {
 			...state,
