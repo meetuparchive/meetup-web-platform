@@ -73,8 +73,7 @@ const getRouterRenderer = (store, baseUrl, clientFilename, assetPublicPath) =>
 		let statusCode;
 
 		try {
-			renderProps.history = useBasename(() => renderProps.history)({ basename: baseUrl });
-			renderProps.router = { ...renderProps.router, ...renderProps.history };
+			renderProps.router.history = useBasename(() => renderProps.router.history)({ basename: baseUrl });
 			appMarkup = ReactDOMServer.renderToString(
 				<Provider store={store}>
 					<RouterContext {...renderProps} />
