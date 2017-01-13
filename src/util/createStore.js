@@ -9,17 +9,17 @@ import { fetchQueries, makeCookieHeader } from '../util/fetchUtils';
 const noopMiddleware = store => next => action => next(action);
 
 /**
- * This function consumes app-specific routes, reducer, state, and middleware
- * data in order to set up a general meetup web platform 'createStore' function
- *
- * This function is then called to return an actual Redux store
+ * The platform has a specific set of middleware that must be applied to the
+ * store in order for it to work. This store enhancer consumes a few app-
+ * specific configuration options to set up the middleware enhancer correctly
  *
  * @param {Object} routes the React Router routes object
  * @param {Array} middleware additional middleware to inject into store
- * @param {Function} a function that accepts queries and returns a Promise
+ * @param {Function} fetchQueriesFn a function that accepts queries and returns a Promise
  *   that resolves with API results
+ * @return {Function} A Redux store enhancer function
  */
-export function getPlatformMiddlewareEnhancer(routes, middleware, fetchQueriesFn=fetchQueries) {
+export function getPlatformMiddlewareEnhancer(routes, middleware, fetchQueriesFn) {
 	// **All** middleware gets added here
 	const middlewareToApply = [
 		getPlatformMiddleware(routes, fetchQueriesFn),
@@ -59,6 +59,10 @@ const serverFetchQueries = request => (api, options) => {
  * This getServerCreateStore function will therefore return a store creator that
  * is specifically tailored to making API requests that correspond to the
  * incoming request from the browser
+ *
+ * @param {Object} routes the React Router routes object
+ * @param {Array} middleware additional middleware to inject into store
+ * @param {Object} request the Hapi request for this store
  */
 export function getServerCreateStore(
 	routes,
