@@ -15,12 +15,11 @@ const noopMiddleware = store => next => action => next(action);
  * This function is then called to return an actual Redux store
  *
  * @param {Object} routes the React Router routes object
- * @param {Function} reducer the root Redux reducer for the app
- * @param {Object} initialState (optional) initial state of the store
- * @param {Function} middleware (optional) any app-specific middleware that
- *   should be applied to the store
+ * @param {Array} middleware additional middleware to inject into store
+ * @param {Function} a function that accepts queries and returns a Promise
+ *   that resolves with API results
  */
-function finalCreateStore(routes, reducer, initialState=null, middleware=[], fetchQueriesFn=fetchQueries) {
+export function platformMiddlewareEnhancer(routes, middleware, fetchQueriesFn=fetchQueries) {
 	// **All** middleware gets added here
 	const middlewareToApply = [
 		getPlatformMiddleware(routes, fetchQueriesFn),
@@ -29,12 +28,10 @@ function finalCreateStore(routes, reducer, initialState=null, middleware=[], fet
 	];
 	const appliedMiddleware = applyMiddleware(...middlewareToApply);
 
-	const createStoreWithMiddleware = compose(
+	return compose(
 		appliedMiddleware,
 		typeof window !== 'undefined' && window.devToolsExtension ? window.devToolsExtension() : fn => fn
-	)(createStore);
-
-	return createStoreWithMiddleware(reducer, initialState);
+	);
 }
 
 /**
@@ -59,24 +56,30 @@ const serverFetchQueries = request => (api, options) => {
  * server does not know which cookies to pass along to the `fetch` function
  * inside the sync middleware.
  *
- * This createServerStore function will therefore return a store that is
- * specifically tailored to making API requests that correspond to the incoming
- * request from the browser
+ * This getServerCreateStore function will therefore return a store creator that
+ * is specifically tailored to making API requests that correspond to the
+ * incoming request from the browser
  */
-export function createServerStore(
+export function getServerCreateStore(
 	routes,
-	reducer,
-	initialState,
 	middleware,
-	request) {
-	return finalCreateStore(
+	request
+) {
+	return platformMiddlewareEnhancer(
 		routes,
-		reducer,
-		initialState,
 		middleware,
 		serverFetchQueries(request)
-	);
+	)(createStore);
 }
 
-export default finalCreateStore;
+export function getBrowserCreateStore(
+	routes,
+	middleware
+) {
+	return platformMiddlewareEnhancer(
+		routes,
+		middleware,
+		fetchQueries
+	)(createStore);
+}
 

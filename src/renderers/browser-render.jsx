@@ -6,7 +6,7 @@ import { useBasename } from 'history';
 import match from 'react-router/lib/match';
 import { Provider } from 'react-redux';
 import { syncHistoryWithStore } from 'react-router-redux';
-import createStore from '../util/createStore';
+import { getBrowserCreateStore } from '../util/createStore';
 
 /**
  * This function creates a 'renderer', which is just a function that, when
@@ -31,7 +31,8 @@ function makeRenderer(routes, reducer, middleware=[], basename='/') {
 	escape.innerHTML = window.APP_RUNTIME.escapedState;
 	const unescapedStateJSON = escape.textContent;
 	const initialState = JSON.parse(unescapedStateJSON);
-	const store = createStore(routes, reducer, initialState, middleware);
+	const createStore = getBrowserCreateStore(routes, middleware);
+	const store = createStore(reducer, initialState);
 	const normalizedHistory = useBasename(() => browserHistory)({ basename });
 	const history = syncHistoryWithStore(normalizedHistory, store);
 
