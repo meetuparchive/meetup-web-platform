@@ -19,7 +19,7 @@ const noopMiddleware = store => next => action => next(action);
  * @param {Function} a function that accepts queries and returns a Promise
  *   that resolves with API results
  */
-export function platformMiddlewareEnhancer(routes, middleware, fetchQueriesFn=fetchQueries) {
+export function getPlatformMiddlewareEnhancer(routes, middleware, fetchQueriesFn=fetchQueries) {
 	// **All** middleware gets added here
 	const middlewareToApply = [
 		getPlatformMiddleware(routes, fetchQueriesFn),
@@ -65,21 +65,23 @@ export function getServerCreateStore(
 	middleware,
 	request
 ) {
-	return platformMiddlewareEnhancer(
+	const middlewareEnhancer = getPlatformMiddlewareEnhancer(
 		routes,
 		middleware,
 		serverFetchQueries(request)
-	)(createStore);
+	);
+	return middlewareEnhancer(createStore);
 }
 
 export function getBrowserCreateStore(
 	routes,
 	middleware
 ) {
-	return platformMiddlewareEnhancer(
+	const middlewareEnhancer = getPlatformMiddlewareEnhancer(
 		routes,
 		middleware,
 		fetchQueries
-	)(createStore);
+	);
+	return middlewareEnhancer(createStore);
 }
 
