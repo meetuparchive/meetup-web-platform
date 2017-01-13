@@ -8,7 +8,7 @@ import { useBasename } from 'history';
 import match from 'react-router/lib/match';
 import { Provider } from 'react-redux';
 
-import { createServerStore } from '../util/createStore';
+import { getServerCreateStore } from '../util/createStore';
 import Dom from '../components/dom';
 import NotFound from '../components/NotFound';
 import { polyfillNodeIntl } from '../util/localizationUtils';
@@ -166,7 +166,9 @@ const makeRenderer = (
 	const apiUrl = `${requestProtocol}://${info.host}/api`;
 
 	// create the store
-	const store = createServerStore(routes, reducer, {}, middleware, request);
+	const initialState = {};
+	const createStore = getServerCreateStore(routes, middleware, request);
+	const store = createStore(reducer, initialState);
 	// load initial config
 	dispatchConfig(store, { apiUrl, log: log.bind(request) });
 
