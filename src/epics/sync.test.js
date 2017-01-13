@@ -14,6 +14,7 @@ import {
 	mockQuery,
 	MOCK_APP_STATE,
 	MOCK_RENDERPROPS,
+	MOCK_ROUTES,
 } from 'meetup-web-mocks/lib/app';
 
 import {
@@ -23,30 +24,6 @@ import {
 import getSyncEpic from '../epics/sync';
 import * as syncActionCreators from '../actions/syncActionCreators';
 import * as authActionCreators from '../actions/authActionCreators';
-
-const MOCK_ROUTES = [
-	{
-		path: '/noQuery',
-		component: () => {},
-	},
-	{
-		path: '/',
-		component: () => {},
-		query: () => mockQuery({}),
-		childRoutes: [
-			{
-				path: 'foo',
-				component: () => {},
-				query: () => mockQuery({})
-			},
-			{
-				path: 'nullQuery',
-				component: () => {},
-				query: () => null
-			}
-		]
-	},
-];
 
 /**
  * @module SyncEpicTest
