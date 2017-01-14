@@ -4,16 +4,16 @@
  */
 import { applyMiddleware, createStore, compose } from 'redux';
 import getPlatformMiddleware from '../middleware/epic';
-import { fetchQueries, makeCookieHeader } from '../fetchUtils';
-import getClickTracker from '../clickTracking';
+import { fetchQueries, makeCookieHeader } from './fetchUtils';
+import getClickTracker from './clickTracking';
 
 const noopMiddleware = store => next => action => next(action);
 
 export const clickTrackEnhancer = createStore => (reducer, initialState, enhancer) => {
 	const store = createStore(reducer, initialState, enhancer);
 	const clickTracker = getClickTracker(store);
-	document.body.addEventListenter('click', clickTracker);
-	document.body.addEventListenter('change', clickTracker);
+	document.body.addEventListener('click', clickTracker);
+	document.body.addEventListener('change', clickTracker);
 
 	return store;
 };
