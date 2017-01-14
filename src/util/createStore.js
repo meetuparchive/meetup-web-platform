@@ -36,12 +36,7 @@ export function getPlatformMiddlewareEnhancer(routes, middleware, fetchQueriesFn
 		typeof window !== 'undefined' && window.mupDevTools ? window.mupDevTools() : noopMiddleware,
 		...middleware,
 	];
-	const appliedMiddleware = applyMiddleware(...middlewareToApply);
-
-	return compose(
-		appliedMiddleware,
-		typeof window !== 'undefined' && window.devToolsExtension ? window.devToolsExtension() : fn => fn
-	);
+	return applyMiddleware(...middlewareToApply);
 }
 
 /**
@@ -98,7 +93,8 @@ export function getBrowserCreateStore(
 	);
 	const enhancer = compose(
 		middlewareEnhancer,
-		clickTrackEnhancer
+		clickTrackEnhancer,
+		window.devToolsExtension ? window.devToolsExtension() : fn => fn  // this must be last enhancer
 	);
 	return enhancer(createStore);
 }
