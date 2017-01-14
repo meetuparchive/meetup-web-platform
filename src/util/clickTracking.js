@@ -1,4 +1,3 @@
-const COOKIE_NAME = 'click-track';
 const DATA_ATTR = 'clicktrack';
 
 function cleanTrackingUrl() {
@@ -37,14 +36,9 @@ function cleanTrackingUrl() {
  * @param {Function} trackClick function to track clicks
  * @return {undefined} side effects only
  */
-function overrideNativeEventMethods(trackClick) {
+function trackStopPropagation(trackClick) {
+	// set reference to un-modified stopPropagation
 	Event.prototype.originalStopPropagation = Event.prototype.stopPropagation;
-	Event.prototype.stopPropagation = function() {
-		if (this.originalEvent && this.originalEvent.type === 'click') {
-			(this);
-		}
-		return this.originalStopPropagation();
-	};
 
 	/**
 	 * A special jQuery events method that hooks the click tracking into events
@@ -52,59 +46,65 @@ function overrideNativeEventMethods(trackClick) {
 	 */
 	Event.prototype.stopPropAndTrack = function() {
 		trackClick(this);
-		return this.stopPropagation();  // ensure return value is the same as normal stopProp call
+		return this.originalStopPropagation();
+	};
+
+	// override stopPropagation to track clicks
+	Event.prototype.stopPropagation = function() {
+		if (this.originalEvent && this.originalEvent.type === 'click') {
+			return this.stopPropAndTrack();
+		}
+		return this.originalStopPropagation();
 	};
 }
 
-
+/**
+ * Get a descriptive string for the HTML element passed in, e.g.
+ *
+ * `tagName#id.class1.class2`
+ *
+ * @param {HTMLElement} element the element to describe
+ * @param {Boolean} idOnly only use id in description
+ */
 function elementShorthand(element, idOnly) {
-	// tagName#id.class1.class2
-	var tag = element.tagName.toLowerCase(),
-		id = element.id ? `#${element.id}` : '',
-		classes = '',
-		_reClass = /(\S+)/g;  // regex capture classes from element.className
-
-	if (!idOnly) {
-		classes = element.className ? `.${element.className.match(_reClass).join('.')}` : '';
+	const id = element.id ? `#${element.id}` : '';
+	if (id && idOnly) {
+		return id;
 	}
+	const tag = element.tagName.toLowerCase();
+	const classes = element.classList.join('.');
 
-	return ((id && idOnly) ? '' : tag) + id + classes;
+	return `${tag}${id}${classes}`;
 }
 
-function activateClickTracking() {
-	const _clickHistory = [];	// history of in-page clicks for *this request*
+function _getData(e) {
+	const target = e.target;
+	const useChildData = e.type === 'change' && target.tagName.toLowerCase() === 'select';
+	const el = useChildData ? target.children[target.selectedIndex] : target;
+	const data = el.dataset(DATA_ATTR);
 
-	const _fixedEncodeURIComponent = str =>
-		encodeURIComponent(str).replace(/[!'()*]/g, c => `%${c.charCodeAt(0).toString(16)}`);
-
-	// TODO: rewrite w/o jquery
-	function _getData(e) {
-		const target = e.target;
-		const useChildData = e.type === 'change' && target.tagName.toLowerCase() === 'select';
-		const el = useChildData ? target.children[target.selectedIndex] : target;
-		const data = el.dataset(DATA_ATTR);
-
-		return typeof(data) === 'object' && !(data instanceof Array) ? data : {};
+	try {
+		return JSON.parse(data);
+	} catch(err) {
+		// data is not JSON-formatted
+		return {};
 	}
+}
 
+function getTrackClick(store) {
 	/**
-	 * jQuery event handler that writes a history of in-page clicks for the
-	 * current request to a session cookie. For each click, a map of metadata
-	 * is appended to a list, which is saved back to the cookie.
+	 * Event handler that emits data about each in-page click
 	 *
-	 * The 'history' is reset on every request.
-	 *
-	 * metadata:
-	 * {
+	 * metadata: {
 	 *   "lineage": <String representing 'this' location in DOM>,
 	 *   "linkText": <this.text>,
 	 *   "coords": [x offset from midline (elinate screen-width dependency, y (top) offset],
 	 *   "data": { data on clicked element matching the tracking suffix }
 	 * }
 	 *
-	 * @param  {Event} e [description]
+	 * @param  {Event} e the click (or other) DOM event
 	 */
-	function _trackClickHandler(e) {
+	function trackClick(e) {
 		const el = e.target;
 		if (e.type === 'change' && !e.target.dataset(DATA_ATTR)) {
 			// ignore change events on elements without data-clicktrack
@@ -118,7 +118,6 @@ function activateClickTracking() {
 		const x = Math.round(targetPosition.left - docMidlineOffset);
 		const y = Math.round(targetPosition.top);
 		const data = _getData(e);
-		let cookieVal;
 
 		// 1. Build array of DOM tag lineage
 		clickLineage.push(elementShorthand(el));  // full shorthand for clicked el
@@ -128,48 +127,24 @@ function activateClickTracking() {
 		}
 
 		// 2. Assemble click metadata and add to _clickHistory
-		_clickHistory.push({
-			lineage: clickLineage.join('<'),
-			linkText: linkText,
-			coords: [x, y],
-			data: data
+		store.dispatch({
+			type: 'CLICK_TRACK',
+			payload: {
+				lineage: clickLineage.join('<'),
+				linkText: linkText,
+				coords: [x, y],
+				data: data
+			}
 		});
-		cookieVal = JSON.stringify({ history: _clickHistory });
-		while (cookieVal.length > 4000) {  // 4000 chars leaves room for url-encoding chars
-			// remove oldest click and try again
-			_clickHistory.shift();
-			cookieVal = JSON.stringify({ history: _clickHistory });
-		}
 
-		// TODO: use js-cookie to set cookie
-		Cookies.setCookie(
-			COOKIE_NAME,
-			_fixedEncodeURIComponent(cookieVal),
-			null, null, null, null,
-			true
-		);  // we are doing the URI encoding ourselves, skip `escape`
+		// cookieVal = JSON.stringify({ history: _clickHistory });
 	}
 
-	overrideNativeEventMethods(_trackClickHandler);
+	trackStopPropagation(trackClick);
+	cleanTrackingUrl();
 
-	/**
-	 * Attached the tracking click handler
-	 * @param  {jQuery} $
-	 * @param  {muModule} Cookies provides setCookie
-	 */
-	function trackClicks() {
-		// Passing `true` in `event.data` causes the event handler to check if
-		// the target has a `data-hdfs` attribute. If so, it defers handling the
-		// event to the event listener delegated to the `data-hdfs` data attribute.
-		document.body.addEventListenter('click', _trackClickHandler);
-		document.body.addEventListenter('change', _trackClickHandler);
-
-		cleanTrackingUrl();
-
-	}
-
-	return trackClicks;
+	return trackClick;
 }
 
-export default activateClickTracking;
+export default getTrackClick;
 
