@@ -31,17 +31,14 @@ import * as authActionCreators from '../actions/authActionCreators';
 describe('Sync epic', () => {
 	const routes = {};
 	it('does not pass through arbitrary actions', epicIgnoreAction(getSyncEpic(MOCK_ROUTES)));
-	it('emits API_REQUEST for nav-related actions with matched query', function(done) {
+	it('emits API_REQUEST for nav-related actions with matched query', function() {
 		const locationChange = { type: LOCATION_CHANGE, payload: MOCK_RENDERPROPS.location };
 		const serverRender = { type: '@@server/RENDER', payload: MOCK_RENDERPROPS.location };
 
 		const action$ = ActionsObservable.of(locationChange, serverRender);
-		const epic$ = getSyncEpic(MOCK_ROUTES)(action$);
-		epic$.subscribe(
-			action => expect(action.type).toEqual('API_REQUEST'),
-			null,
-			done
-		);
+		return getSyncEpic(MOCK_ROUTES)(action$)
+			.toPromise()
+			.then(action => expect(action.type).toEqual('API_REQUEST'));
 	});
 	it('emits CACHE_CLEAR and API_REQUEST for nav-related actions with logout query', function() {
 		const logoutLocation = {
@@ -73,6 +70,18 @@ describe('Sync epic', () => {
 		return epicIgnoreAction(SyncEpic, locationChange)()
 			.then(epicIgnoreAction(SyncEpic, serverRender));
 	});
+	it('does not emit for nav-related actions with query functions that return null', () => {
+		const SyncEpic = getSyncEpic(MOCK_ROUTES);
+
+		const pathname = '/nullQuery';
+		const noMatchLocation = { ...MOCK_RENDERPROPS.location, pathname };
+		const locationChange = { type: LOCATION_CHANGE, payload: noMatchLocation };
+		const serverRender = { type: '@@server/RENDER', payload: noMatchLocation };
+
+		return epicIgnoreAction(SyncEpic, locationChange)()
+			.then(epicIgnoreAction(SyncEpic, serverRender));
+	});
+
 
 	it('strips logout query and calls browserHistory.replace on LOGIN_SUCCESS', function() {
 		spyOn(browserHistory, 'replace');
