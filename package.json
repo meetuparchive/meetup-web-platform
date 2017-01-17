@@ -63,7 +63,7 @@
     "redux-observable": "0.12.2",
     "request": "2.79.0",
     "rxjs": "5.0.3",
-    "source-map-support": "0.4.9",
+    "source-map-support": "0.4.10",
     "tough-cookie": "2.3.2",
     "url-search-params": "0.6.1",
     "uuid": "3.0.1"
