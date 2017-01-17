@@ -10,6 +10,7 @@ import { Provider } from 'react-redux';
 
 import { createServerStore } from '../util/createStore';
 import Dom from '../components/dom';
+import NotFound from '../components/NotFound';
 import { polyfillNodeIntl } from '../util/localizationUtils';
 
 import {
@@ -72,8 +73,7 @@ const getRouterRenderer = (store, baseUrl, clientFilename, assetPublicPath) =>
 		let statusCode;
 
 		try {
-			renderProps.history = useBasename(() => renderProps.history)({ basename: baseUrl });
-			renderProps.router = { ...renderProps.router, ...renderProps.history };
+			renderProps.router.history = useBasename(() => renderProps.router.history)({ basename: baseUrl });
 			appMarkup = ReactDOMServer.renderToString(
 				<Provider store={store}>
 					<RouterContext {...renderProps} />
@@ -89,7 +89,9 @@ const getRouterRenderer = (store, baseUrl, clientFilename, assetPublicPath) =>
 				initialState,
 				appMarkup
 			);
-			statusCode = renderProps.routes.pop().statusCode || 200;
+			statusCode = NotFound.rewind() ||  // if NotFound is mounted, return 404
+				renderProps.routes.pop().statusCode ||
+				200;
 		} catch(e) {
 			// log the error stack here because Observable logs not great
 			console.error(e.stack);

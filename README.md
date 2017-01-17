@@ -220,7 +220,7 @@ the page is refreshed/reloaded without the param in the querystring.
 http://localhost:8000/ny-tech/?__nocache
 ```
 
-### POST
+#### POST
 
 `POST` API requests are handled by `PostMiddleware`, which provides a generalized
 interface for sending data to the API and handling return values. The middleware
@@ -232,6 +232,34 @@ their return values will be `dispatch`ed by the middleware in the API success/er
 case.
 
 Use reducers to parse the response and update application state.
+
+## Client
+
+### Rendering 'empty' state with `<NotFound>`
+
+To correctly render a 'not found' state for a feature, you should render a
+`<NotFound>` component, which the server will use to set the response status to
+404.
+
+#### Example:
+
+```jsx
+import NotFound from 'meetup-web-platform/lib/components/NotFound';
+
+class GroupContainer extends React.Component {
+	render() {
+		if (!this.props.group) {
+			return (
+				<NotFound>
+					<h1>Sorry, no matching group was found</h1>
+				</NotFound>
+			);
+		}
+
+		return <GroupDetail group={this.props.group} />;
+	}
+}
+```
 
 ## Tracking
 
