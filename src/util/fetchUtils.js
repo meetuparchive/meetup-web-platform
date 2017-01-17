@@ -1,3 +1,4 @@
+import cookie from 'cookie';
 /**
  * A module for middleware that would like to make external calls through `fetch`
  * @module fetchUtils
@@ -75,8 +76,20 @@ export const tryJSON = reqUrl => response => {
 	return response.text().then(text => JSON.parse(text));
 };
 
-export const makeCookieHeader = cookieObj =>
-	Object.keys(cookieObj)
-		.map(name => `${name}=${cookieObj[name]}`)
+/**
+ * @param {String} rawCookieHeader a 'cookie' header string
+ * @param {Object} newCookies an object of name-value cookies to inject
+ */
+export const mergeCookies = (rawCookieHeader, newCookies) => {
+	// request.state has _parsed_ cookies, but we need to send raw cookies
+	// _except_ when the incoming request has been back-populated with new 'raw' cookies
+	const oldCookies = cookie.parse(rawCookieHeader);
+	const mergedCookies = {
+		...oldCookies,
+		...newCookies,
+	};
+	return Object.keys(mergedCookies)
+		.map(name => `${name}=${mergedCookies[name]}`)
 		.join('; ');
+};
 

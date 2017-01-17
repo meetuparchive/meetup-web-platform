@@ -4,7 +4,7 @@
  */
 import { applyMiddleware, createStore, compose } from 'redux';
 import getPlatformMiddleware from '../middleware/epic';
-import { fetchQueries, makeCookieHeader } from '../util/fetchUtils';
+import { fetchQueries, mergeCookies } from '../util/fetchUtils';
 
 const noopMiddleware = store => next => action => next(action);
 
@@ -37,6 +37,17 @@ function finalCreateStore(routes, reducer, initialState=null, middleware=[], fet
 	return createStoreWithMiddleware(reducer, initialState);
 }
 
+export function mergeRawCookies(request) {
+	const injectedCookies = Object.keys(request.state)
+		.filter(name => name.startsWith('__internal_'))
+		.reduce((cookies, name) => ({
+			...cookies,
+			...({ [name]: request.state[name] })
+		}), {});
+
+	return mergeCookies(request.raw.req.headers.cookie || '', injectedCookies);
+}
+
 /**
  * wrap the `fetchQueries` function with a function that injects cookies into
  * the request
@@ -44,12 +55,12 @@ function finalCreateStore(routes, reducer, initialState=null, middleware=[], fet
  * @param {Object} cookieState { name: value } object of cookies to inject
  * @return {Function} a fetchQueries function
  */
-const serverFetchQueries = request => (api, options) => {
-	const cookie = makeCookieHeader(request.state);
+export const serverFetchQueries = request => (api, options) => {
 	options.headers = options.headers || {};
+	const serverCookie = mergeRawCookies(request);
 	options.headers.cookie = options.headers.cookie ?
-		`${options.headers.cookie}; ${cookie}` :
-		cookie;
+		`${options.headers.cookie}; ${serverCookie}` :
+		serverCookie;
 	options.headers.referer = options.headers.referer || request.url.pathname;
 	return fetchQueries(api, options);
 };
