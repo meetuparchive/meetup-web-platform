@@ -1,12 +1,20 @@
 import url from 'url';
-import createStore, {
+import { createStore } from 'redux';
+import {
+	getPlatformMiddlewareEnhancer,
+	getBrowserCreateStore,
+	getServerCreateStore,
 	mergeRawCookies,
-	serverFetchQueries
+	serverFetchQueries,
 } from './createStore';
-import * as fetchUtils from './fetchUtils';
 
+import * as fetchUtils from './fetchUtils';
 const MOCK_ROUTES = {};
 const IDENTITY_REDUCER = state => state;
+const MOCK_HAPI_REQUEST = {
+	state: {}
+};
+
 const serverRequest = {
 	state: {
 		__internal_foo: 'bar',
@@ -22,21 +30,24 @@ const serverRequest = {
 	},
 };
 
-describe('createStore', () => {
+function testCreateStore(createStoreFn) {
 	it('creates a store with store functions', () => {
-		const basicStore = createStore(MOCK_ROUTES, IDENTITY_REDUCER);
+		const basicStore = createStoreFn(IDENTITY_REDUCER);
 		expect(basicStore.getState).toEqual(jasmine.any(Function));
 		expect(basicStore.dispatch).toEqual(jasmine.any(Function));
 	});
 	it('creates a store with supplied initialState', (done) => {
 		const initialState = { foo: 'bar' };
-		const basicStore = createStore(MOCK_ROUTES, IDENTITY_REDUCER, initialState);
+		const basicStore = createStoreFn(IDENTITY_REDUCER, initialState);
 		basicStore.subscribe(() => {
 			expect(basicStore.getState()).toEqual(initialState);
 			done();
 		});
 		basicStore.dispatch({ type: 'dummy' });
 	});
+}
+
+describe('getPlatformMiddlewareEnhancer', () => {
 	it('applies custom middleware', () => {
 		// To determine whether custom middleware is being applied, this test
 		// simply spies on the middleware function to see if it's called during
@@ -46,15 +57,19 @@ describe('createStore', () => {
 			middleware: store => next => action => next(action)
 		};
 		spyOn(spyable, 'middleware').and.callThrough();
-		createStore(
-			MOCK_ROUTES,
-			IDENTITY_REDUCER,
-			null,  // initialState doesn't matter
-			[spyable.middleware]
-		);
+		const platformMiddlewareEnhancer = getPlatformMiddlewareEnhancer(MOCK_ROUTES, [spyable.middleware]);
+		const enhancedCreateStore = platformMiddlewareEnhancer(createStore);
+		enhancedCreateStore(IDENTITY_REDUCER);
 		expect(spyable.middleware).toHaveBeenCalled();
 	});
+});
 
+describe('getBrowserCreateStore', () => {
+	testCreateStore(getBrowserCreateStore(MOCK_ROUTES, []));
+});
+
+describe('getServerCreateStore', () => {
+	testCreateStore(getServerCreateStore(MOCK_ROUTES, [], MOCK_HAPI_REQUEST));
 });
 
 describe('mergeRawCookies', () => {
