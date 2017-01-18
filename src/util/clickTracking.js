@@ -72,7 +72,7 @@ function elementShorthand(element, idOnly) {
 		return id;
 	}
 	const tag = element.tagName.toLowerCase();
-	const classes = element.classList.join('.');
+	const classes = `.${[ ...element.classList ].join('.')}`;
 
 	return `${tag}${id}${classes}`;
 }
@@ -81,7 +81,7 @@ function _getData(e) {
 	const target = e.target;
 	const useChildData = e.type === 'change' && target.tagName.toLowerCase() === 'select';
 	const el = useChildData ? target.children[target.selectedIndex] : target;
-	const data = el.dataset(DATA_ATTR);
+	const data = el.dataset[DATA_ATTR];
 
 	try {
 		return JSON.parse(data);
@@ -106,7 +106,7 @@ function getTrackClick(store) {
 	 */
 	function trackClick(e) {
 		const el = e.target;
-		if (e.type === 'change' && !e.target.dataset(DATA_ATTR)) {
+		if (e.type === 'change' && !e.target.dataset[DATA_ATTR]) {
 			// ignore change events on elements without data-clicktrack
 			return;
 		}
