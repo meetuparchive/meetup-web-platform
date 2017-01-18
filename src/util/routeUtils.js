@@ -22,7 +22,8 @@ function getActiveRouteQueries([ , { routes, location, params }]) {
 			const routeQueries = query instanceof Array ? query : [query];
 			return queries.concat(routeQueries);
 		}, [])
-		.map(query => query({ location, params }));  // call the query function
+		.map(queryFn => queryFn({ location, params }))  // call the query function
+		.filter(query => query);  // empty return values should not be sent
 
 	return queries;
 }
