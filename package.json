@@ -68,8 +68,8 @@
     "uuid": "3.0.1"
   },
   "devDependencies": {
-    "intl-messageformat": "^1.3.0",
-    "intl-relativeformat": "^1.3.0",
+    "intl-messageformat": "1.3.0",
+    "intl-relativeformat": "1.3.0",
     "iron": "4.0.4"
   }
 }
