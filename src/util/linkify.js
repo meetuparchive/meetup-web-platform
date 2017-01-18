@@ -1,5 +1,5 @@
 
-const URL_REGEX = /((((ht|f){1}(tps?:[/][/]){1}))[-a-zA-Z0-9@:;%_\+.~#?&/=]+)/gm;
+export const URL_REGEX = /((((ht|f){1}(tps?:[/][/]){1}))[-a-zA-Z0-9@:;%_\+.~#?&/=]+)/gm;
 
 /**
  * Generates HTML link tag element with target

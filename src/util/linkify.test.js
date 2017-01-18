@@ -1,4 +1,4 @@
-import linkify from './linkify';
+import linkify, { URL_REGEX } from './linkify';
 
 describe('linkify', () => {
 	const httpBase = 'http://www.meetup.com',
@@ -31,5 +31,12 @@ describe('linkify', () => {
 		const paragraphTextBase = `Did you know ${httpBase} is a cool site?`;
 		const expectedParagraphLink = `Did you know ${expectedLink} is a cool site?`;
 		expect(linkify(paragraphTextBase)).toBe(expectedParagraphLink);
+	});
+});
+
+describe('Link Regex', () => {
+	it('should match basic url', () => {
+		const httpBase = 'http://www.meetup.com';
+		expect(URL_REGEX.test(httpBase)).toBe(true);
 	});
 });
