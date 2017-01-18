@@ -1,3 +1,4 @@
+import { browserHistory } from 'react-router';
 import 'rxjs/Observable';
 import { ActionsObservable } from 'redux-observable';
 import { LOCATION_CHANGE } from 'react-router-redux';
@@ -22,6 +23,7 @@ import {
 
 import getSyncEpic from '../epics/sync';
 import * as syncActionCreators from '../actions/syncActionCreators';
+import * as authActionCreators from '../actions/authActionCreators';
 
 /**
  * @module SyncEpicTest
@@ -29,17 +31,33 @@ import * as syncActionCreators from '../actions/syncActionCreators';
 describe('Sync epic', () => {
 	const routes = {};
 	it('does not pass through arbitrary actions', epicIgnoreAction(getSyncEpic(MOCK_ROUTES)));
-	it('emits API_REQUEST for nav-related actions with matched query', function(done) {
+	it('emits API_REQUEST for nav-related actions with matched query', function() {
 		const locationChange = { type: LOCATION_CHANGE, payload: MOCK_RENDERPROPS.location };
 		const serverRender = { type: '@@server/RENDER', payload: MOCK_RENDERPROPS.location };
 
 		const action$ = ActionsObservable.of(locationChange, serverRender);
-		const epic$ = getSyncEpic(MOCK_ROUTES)(action$);
-		epic$.subscribe(
-			action => expect(action.type).toEqual('API_REQUEST'),
-			null,
-			done
-		);
+		return getSyncEpic(MOCK_ROUTES)(action$)
+			.toPromise()
+			.then(action => expect(action.type).toEqual('API_REQUEST'));
+	});
+	it('emits CACHE_CLEAR and API_REQUEST for nav-related actions with logout query', function() {
+		const logoutLocation = {
+			...MOCK_RENDERPROPS.location,
+			query: {
+				...MOCK_RENDERPROPS.query,
+				logout: true,
+			}
+		};
+		const locationChange = { type: LOCATION_CHANGE, payload: logoutLocation };
+
+		const action$ = ActionsObservable.of(locationChange);
+		return getSyncEpic(MOCK_ROUTES)(action$)
+			.toArray()
+			.toPromise()
+			.then(actions => {
+				expect(actions[0].type).toEqual('CACHE_CLEAR');
+				expect(actions[1].type).toEqual('API_REQUEST');
+			});
 	});
 	it('does not emit for nav-related actions without matched query', () => {
 		const SyncEpic = getSyncEpic(MOCK_ROUTES);
@@ -52,18 +70,44 @@ describe('Sync epic', () => {
 		return epicIgnoreAction(SyncEpic, locationChange)()
 			.then(epicIgnoreAction(SyncEpic, serverRender));
 	});
+	it('does not emit for nav-related actions with query functions that return null', () => {
+		const SyncEpic = getSyncEpic(MOCK_ROUTES);
 
-	it('emits LOCATION_CHANGE on LOCATION_SYNC', function() {
+		const pathname = '/nullQuery';
+		const noMatchLocation = { ...MOCK_RENDERPROPS.location, pathname };
+		const locationChange = { type: LOCATION_CHANGE, payload: noMatchLocation };
+		const serverRender = { type: '@@server/RENDER', payload: noMatchLocation };
+
+		return epicIgnoreAction(SyncEpic, locationChange)()
+			.then(epicIgnoreAction(SyncEpic, serverRender));
+	});
+
+
+	it('strips logout query and calls browserHistory.replace on LOGIN_SUCCESS', function() {
+		spyOn(browserHistory, 'replace');
 		const mockFetchQueries = () => () => Promise.resolve({});
+		const locationWithLogout = {
+			...MOCK_APP_STATE.routing.locationBeforeTransitions,
+			query: { logout: true },
+		};
+		const locationWithoutLogout = {
+			...locationWithLogout,
+			query: {},
+		};
+		const MOCK_APP_STATE_LOGOUT = {
+			...MOCK_APP_STATE,
+			routing: {
+				locationBeforeTransitions: locationWithLogout
+			}
+		};
 
-		const locationSync = syncActionCreators.locationSync();
+		const locationSync = authActionCreators.loginSuccess();
 		const action$ = ActionsObservable.of(locationSync);
-		const fakeStore = createFakeStore(MOCK_APP_STATE);
+		const fakeStore = createFakeStore(MOCK_APP_STATE_LOGOUT);
 		return getSyncEpic(routes, mockFetchQueries)(action$, fakeStore)
 			.toPromise()
-			.then(action => {
-				expect(action.type).toEqual(LOCATION_CHANGE);
-				expect(action.payload).toEqual(MOCK_APP_STATE.routing.locationBeforeTransitions);
+			.then(() => {
+				expect(browserHistory.replace).toHaveBeenCalledWith(locationWithoutLogout);
 			});
 	});
 

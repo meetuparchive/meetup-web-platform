@@ -17,7 +17,7 @@ export function apiSuccess({ queries, responses, csrf }) {
 }
 
 export function apiError(err) {
-	console.error(err.message);
+	console.error('API_ERROR: ', err.stack);
 	return {
 		type: 'API_ERROR',
 		payload: err,
@@ -28,13 +28,5 @@ export function apiComplete() {
 	return {
 		type: 'API_COMPLETE'
 	};
-}
-
-/**
- * A simple signal to indicate that the app should re-sync data with the
- * current router location. Usually used for authorization changes
- */
-export function locationSync() {
-	return { type: 'LOCATION_SYNC' };
 }
 

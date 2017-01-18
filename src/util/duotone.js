@@ -87,7 +87,7 @@ export function generateSignedDuotoneUrl(salt, [light, dark]) {
 	const spec = `event/rx300x400/${ref}`;
 	const signature = crypto.createHash('sha1').update(`${spec}${salt}`).digest('hex').substring(0, 10);
 	return {
-		[ref]: `http://photos1.meetupstatic.com/photo_api/${spec}/sg${signature}`
+		[ref]: `https://a248.e.akamai.net/secure.meetupstatic.com/photo_api/${spec}/sg${signature}`
 	};
 }
 

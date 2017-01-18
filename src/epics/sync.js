@@ -1,5 +1,7 @@
 import { Observable } from 'rxjs';
+import { useBasename } from 'history';
 import { combineEpics } from 'redux-observable';
+import { browserHistory } from 'react-router';
 import { LOCATION_CHANGE } from 'react-router-redux';
 import {
 	apiRequest,
@@ -32,9 +34,16 @@ export const getNavEpic = routes => {
 					referrer: currentLocation.pathname,
 					logout: 'logout' in payload.query,
 				};
-				return activeQueries$(payload)  // find the queries for the location
+
+				const apiRequestActions$ = activeQueries$(payload)  // find the queries for the location
 					.map(queries => apiRequest(queries, requestMetadata))
 					.do(() => currentLocation = payload);  // update to new location
+
+				// emit cache clear _only_ when logout requested
+				const cacheClearAction$ = requestMetadata.logout ?
+					Observable.of({ type: 'CACHE_CLEAR' }) : Observable.empty();
+
+				return Observable.merge(cacheClearAction$, apiRequestActions$);
 			});
 };
 
@@ -42,13 +51,22 @@ export const getNavEpic = routes => {
  * Any action that should reload the API data should be handled here, e.g.
  * LOGIN_SUCCESS, which should force the app to reload in an 'authorized'
  * state
+ *
+ * Note: this action is only possible in the browser, not the server, so
+ * `browserHistory` is safe to use here.
  */
 export const locationSyncEpic = (action$, store) =>
-	action$.ofType('LOCATION_SYNC', 'LOGIN_SUCCESS')
-		.map(() => ({
-			type: LOCATION_CHANGE,
-			payload: store.getState().routing.locationBeforeTransitions,
-		}));
+	action$.ofType('LOGIN_SUCCESS')
+		.do(() => {
+			const location = {
+				...store.getState().routing.locationBeforeTransitions
+			};
+			delete location.query.logout;
+			useBasename(() => browserHistory)({
+				basename: location.basename
+			}).replace(location);  // this will trigger a LOCATION_CHANGE
+		})
+		.ignoreElements();
 
 /**
  * Listen for actions that provide queries to send to the api - mainly
