@@ -88,9 +88,9 @@ describe('Integration with tracking logs', () => {
 		return testTransform(
 			tracker,
 			trackInfo,
-			val => {
+			body => {
 				expect(config.postData)
-					.toHaveBeenCalledWith(config.endpoint, val);
+					.toHaveBeenCalledWith(config.endpoint, { body }, jasmine.any(Function));
 			}
 		);
 	});

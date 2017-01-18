@@ -14,14 +14,7 @@ const internals = {
 		 * @param {String} endpoint avro logging endpoint
 		 * @param {Buffer} body the buffer containing the avro-encoded data
 		 */
-		postData(endpoint, body) {
-			// send the data to the endpoint
-			return request.post(
-				endpoint,
-				{ body },
-				(response, body) => {}  // don't really care about the response currently
-			);
-		},
+		postData: request.post.bind(request),
 		// currently the schema is manually copied from
 		// https://github.dev.meetup.com/meetup/meetup/blob/master/modules/base/src/main/versioned_avro/Activity_v3.avsc
 		schema: avro.parse({
@@ -77,7 +70,7 @@ class GoodMeetupTracking extends Stream.Transform {
 	_transform(event, enc, next) {
 		const data = JSON.parse(event.data);
 		const avroBuff = this._settings.schema.toBuffer(data);
-		this._settings.postData(this._settings.endpoint, avroBuff);
+		this._settings.postData(this._settings.endpoint, { body: avroBuff }, () => {});
 
 		return next(null, avroBuff);
 	}

@@ -86,11 +86,11 @@ export const trackLogout = log => response =>
 		response,
 		{
 			description: 'logout',
-			memberId: parseInt(updateMemberId(response), 10),
-			trackIdFrom: response.request.state[TRACK_ID_COOKIE],
+			memberId: parseInt(updateMemberId(response), 10) || 0,
+			trackIdFrom: response.request.state[TRACK_ID_COOKIE] || '',
 			trackId: updateTrackId(response, true),
 			sessionId: response.request.state[SESSION_ID_COOKIE],
-			url: response.request.info.referrer,
+			url: response.request.info.referrer | '',
 		}
 	);
 
@@ -107,10 +107,10 @@ export const trackNav = log => (response, queryResponses, url, referrer) => {
 		response,
 		{
 			description: 'nav',
-			memberId: parseInt(response.request.state[MEMBER_ID_COOKIE], 10),
-			trackId: response.request.state[TRACK_ID_COOKIE],
-			sessionId: response.request.state[SESSION_ID_COOKIE],
-			url,
+			memberId: parseInt(response.request.state[MEMBER_ID_COOKIE], 10) || 0,
+			trackId: response.request.state[TRACK_ID_COOKIE] || '',
+			sessionId: response.request.state[SESSION_ID_COOKIE] || '',
+			url: url || '',
 			referer: referrer || '',
 			apiRequests,
 		}
@@ -142,11 +142,11 @@ export const trackLogin = log => (response, memberId) =>
 		response,
 		{
 			description: 'login',
-			memberId: parseInt(updateMemberId(response, memberId), 10),
-			trackIdFrom: response.request.state[TRACK_ID_COOKIE],
+			memberId: parseInt(updateMemberId(response, memberId), 10) || 0,
+			trackIdFrom: response.request.state[TRACK_ID_COOKIE] || '',
 			trackId: updateTrackId(response, true),
 			sessionId: response.request.state[SESSION_ID_COOKIE],
-			url: response.request.info.referrer,
+			url: response.request.info.referrer || '',
 		}
 	);
 
@@ -159,7 +159,7 @@ export const trackSession = log => response => {
 		response,
 		{
 			description: 'session',
-			memberId: parseInt(response.request.state[MEMBER_ID_COOKIE], 10),
+			memberId: parseInt(response.request.state[MEMBER_ID_COOKIE], 10) || 0,
 			trackId: updateTrackId(response),
 			sessionId: newSessionId(response),
 			url: response.request.url.path,

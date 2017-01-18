@@ -4,8 +4,8 @@ import uuid from 'uuid';
 import start from '../../src/server';
 import * as apiProxyHandler from '../../src/apiProxy/apiProxyHandler';
 
-jest.mock('request', () =>
-	jest.fn(
+jest.mock('request', () => {
+	const mock = jest.fn(
 		(requestOpts, cb) =>
 			setTimeout(() =>
 				cb(null, {
@@ -19,9 +19,10 @@ jest.mock('request', () =>
 						method: 'post',
 					},
 				}, '{}'), 234)
-	)
-);
-
+	);
+	mock.post = jest.fn();
+	return mock;
+});
 
 const mockQuery = { type: 'foo', params: {}, ref: 'foo', endpoint: 'foo' };
 const mockPostPayload = {
