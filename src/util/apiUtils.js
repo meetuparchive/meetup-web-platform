@@ -18,7 +18,6 @@ import {
 	querySchema
 } from './validation';
 import { duotoneRef } from './duotone';
-import * as apiConfigCreators from '../apiProxy/apiConfigCreators';
 
 const MOCK_RESPONSE_OK = {  // minimal representation of http.IncomingMessage
 	statusCode: 200,
@@ -149,40 +148,6 @@ export const parseApiResponse = requestUrl => ([response, body]) => {
 };
 
 /**
- * Translate a query into an API `endpoint` + `params`. The translation is based
- * on the Meetup REST API.
- *
- * This function serves as an adapter between the structure of a query and the
- * API-specific config needed to get that data. Note that *each* required
- * endpoint needs to be manually configured
- *
- * {@link http://www.meetup.com/meetup_api/docs/batch/}
- *
- * @param {Object} query a query object from the application
- * @return {Object} the arguments for api request, including endpoint
- */
-export function queryToApiConfig({ endpoint, ref, type, params, flags }) {
-	if (!endpoint) {
-		console.warn(
-			'Queries without an explicit `endpoint` key are deprecated.',
-			'Please specify the endpoint and params in the query function directly.',
-			`Query: ${JSON.stringify({ ref, type })}`
-		);
-		if (!(type in apiConfigCreators)) {
-			throw new ReferenceError(`No API specified for query type ${type} and no endpoint provided`);
-		}
-		const baseConfig = apiConfigCreators[type](params);
-		endpoint = baseConfig.endpoint;
-		params = baseConfig.params;
-	}
-	return {
-		endpoint,
-		params,
-		flags,
-	};
-}
-
-/**
  * Transform each query into the arguments needed for a `request` call.
  *
  * Some request options are constant for all queries, and these are curried into
@@ -193,7 +158,7 @@ export function queryToApiConfig({ endpoint, ref, type, params, flags }) {
  *
  * @param {Object} externalRequestOpts request options that will be applied to
  *   every query request
- * @param {Object} apiConfig { endpoint, params, flags }
+ * @param {Object} query { endpoint, params, flags }
  *   call)
  * @return {Object} externalRequestOptsQuery argument for the call to
  *   `externalRequest` for the query
@@ -244,9 +209,11 @@ export const apiResponseToQueryResponse = query => ({ value, meta }) => ({
 });
 
 export function getAuthHeaders({ state }) {
-	if (!state.MEETUP_MEMBER && state.oauth_token) {
+	// internal server requests may set non-encoded token cookie __internal_oauth_token
+	const oauth_token = state.oauth_token || state.__internal_oauth_token;
+	if (!state.MEETUP_MEMBER && oauth_token) {
 		return {
-			authorization: `Bearer ${state.oauth_token}`,
+			authorization: `Bearer ${oauth_token}`,
 		};
 	}
 	const cookies = { ...state };

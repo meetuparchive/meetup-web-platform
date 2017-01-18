@@ -1,10 +1,10 @@
 import Joi from 'joi';
 
 export const querySchema = Joi.object({
-	type: Joi.string().required(),
-	ref: Joi.string().required(),
-	params: Joi.object().required(),
+	endpoint: Joi.string().required(),
 	flags: Joi.array(),
-	endpoint: Joi.string(),
+	params: Joi.object(),
+	ref: Joi.string().required(),
+	type: Joi.string().required(),
 });
 

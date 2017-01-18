@@ -4,37 +4,40 @@
  */
 import { applyMiddleware, createStore, compose } from 'redux';
 import getPlatformMiddleware from '../middleware/epic';
-import { fetchQueries, makeCookieHeader } from '../util/fetchUtils';
+import { fetchQueries, mergeCookies } from '../util/fetchUtils';
 
 const noopMiddleware = store => next => action => next(action);
 
 /**
- * This function consumes app-specific routes, reducer, state, and middleware
- * data in order to set up a general meetup web platform 'createStore' function
- *
- * This function is then called to return an actual Redux store
+ * The platform has a specific set of middleware that must be applied to the
+ * store in order for it to work. This store enhancer consumes a few app-
+ * specific configuration options to set up the middleware enhancer correctly
  *
  * @param {Object} routes the React Router routes object
- * @param {Function} reducer the root Redux reducer for the app
- * @param {Object} initialState (optional) initial state of the store
- * @param {Function} middleware (optional) any app-specific middleware that
- *   should be applied to the store
+ * @param {Array} middleware additional middleware to inject into store
+ * @param {Function} fetchQueriesFn a function that accepts queries and returns a Promise
+ *   that resolves with API results
+ * @return {Function} A Redux store enhancer function
  */
-function finalCreateStore(routes, reducer, initialState=null, middleware=[], fetchQueriesFn=fetchQueries) {
+export function getPlatformMiddlewareEnhancer(routes, middleware, fetchQueriesFn) {
 	// **All** middleware gets added here
 	const middlewareToApply = [
 		getPlatformMiddleware(routes, fetchQueriesFn),
 		typeof window !== 'undefined' && window.mupDevTools ? window.mupDevTools() : noopMiddleware,
 		...middleware,
 	];
-	const appliedMiddleware = applyMiddleware(...middlewareToApply);
+	return applyMiddleware(...middlewareToApply);
+}
 
-	const createStoreWithMiddleware = compose(
-		appliedMiddleware,
-		typeof window !== 'undefined' && window.devToolsExtension ? window.devToolsExtension() : fn => fn
-	)(createStore);
+export function mergeRawCookies(request) {
+	const injectedCookies = Object.keys(request.state)
+		.filter(name => name.startsWith('__internal_'))
+		.reduce((cookies, name) => ({
+			...cookies,
+			...({ [name]: request.state[name] })
+		}), {});
 
-	return createStoreWithMiddleware(reducer, initialState);
+	return mergeCookies(request.raw.req.headers.cookie || '', injectedCookies);
 }
 
 /**
@@ -44,12 +47,12 @@ function finalCreateStore(routes, reducer, initialState=null, middleware=[], fet
  * @param {Object} cookieState { name: value } object of cookies to inject
  * @return {Function} a fetchQueries function
  */
-const serverFetchQueries = request => (api, options) => {
-	const cookie = makeCookieHeader(request.state);
+export const serverFetchQueries = request => (api, options) => {
 	options.headers = options.headers || {};
+	const serverCookie = mergeRawCookies(request);
 	options.headers.cookie = options.headers.cookie ?
-		`${options.headers.cookie}; ${cookie}` :
-		cookie;
+		`${options.headers.cookie}; ${serverCookie}` :
+		serverCookie;
 	options.headers.referer = options.headers.referer || request.url.pathname;
 	return fetchQueries(api, options);
 };
@@ -59,24 +62,40 @@ const serverFetchQueries = request => (api, options) => {
  * server does not know which cookies to pass along to the `fetch` function
  * inside the sync middleware.
  *
- * This createServerStore function will therefore return a store that is
- * specifically tailored to making API requests that correspond to the incoming
- * request from the browser
+ * This getServerCreateStore function will therefore return a store creator that
+ * is specifically tailored to making API requests that correspond to the
+ * incoming request from the browser
+ *
+ * @param {Object} routes the React Router routes object
+ * @param {Array} middleware additional middleware to inject into store
+ * @param {Object} request the Hapi request for this store
  */
-export function createServerStore(
+export function getServerCreateStore(
 	routes,
-	reducer,
-	initialState,
 	middleware,
-	request) {
-	return finalCreateStore(
+	request
+) {
+	const middlewareEnhancer = getPlatformMiddlewareEnhancer(
 		routes,
-		reducer,
-		initialState,
 		middleware,
 		serverFetchQueries(request)
 	);
+	return middlewareEnhancer(createStore);
 }
 
-export default finalCreateStore;
+export function getBrowserCreateStore(
+	routes,
+	middleware
+) {
+	const middlewareEnhancer = getPlatformMiddlewareEnhancer(
+		routes,
+		middleware,
+		fetchQueries
+	);
+	const enhancer = compose(
+		middlewareEnhancer,
+		window.devToolsExtension ? window.devToolsExtension() : fn => fn  // this must be last enhancer
+	);
+	return enhancer(createStore);
+}
 
