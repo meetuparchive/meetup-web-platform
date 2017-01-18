@@ -5,8 +5,18 @@
 import { applyMiddleware, createStore, compose } from 'redux';
 import getPlatformMiddleware from '../middleware/epic';
 import { fetchQueries, mergeCookies } from '../util/fetchUtils';
+import getClickTracker from './clickTracking';
 
 const noopMiddleware = store => next => action => next(action);
+
+export const clickTrackEnhancer = createStore => (reducer, initialState, enhancer) => {
+	const store = createStore(reducer, initialState, enhancer);
+	const clickTracker = getClickTracker(store);
+	document.body.addEventListener('click', clickTracker);
+	document.body.addEventListener('change', clickTracker);
+
+	return store;
+};
 
 /**
  * The platform has a specific set of middleware that must be applied to the
@@ -94,6 +104,7 @@ export function getBrowserCreateStore(
 	);
 	const enhancer = compose(
 		middlewareEnhancer,
+		clickTrackEnhancer,
 		window.devToolsExtension ? window.devToolsExtension() : fn => fn  // this must be last enhancer
 	);
 	return enhancer(createStore);
