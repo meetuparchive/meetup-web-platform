@@ -1,13 +1,18 @@
 import uuid from 'uuid';
 
+const isProd = process.env.NODE_ENV === 'production';
+
 const YEAR_IN_MS = 1000 * 60 * 60 * 24 * 365;
 const COOKIE_OPTS = {
 	encoding: 'none',
 	path: '/',
 	isHttpOnly: true,
-	isSecure: process.env.NODE_ENV === 'production',
+	isSecure: isProd,
 };
 
+export const MEMBER_ID_COOKIE = isProd ? 'MEETUP_MEMBER' : 'MEETUP_MEMBER_DEV';
+export const TRACK_ID_COOKIE = isProd ? 'TRACK_ID' : 'TRACK_ID_DEV';
+export const SESSION_ID_COOKIE = isProd ? 'SESSION_ID' : 'SESSION_ID_DEV';
 
 /**
  * @method newSessionId
@@ -17,41 +22,41 @@ const COOKIE_OPTS = {
  * @param {Object} hapi response object
  */
 export const newSessionId = response => {
-	const session_id = uuid.v4();
+	const sessionId = uuid.v4();
 	response.state(
-		'session_id',
-		session_id,
+		SESSION_ID_COOKIE,
+		sessionId,
 		COOKIE_OPTS
 	);
-	return session_id;
+	return sessionId;
 };
 
 /**
- * getter/setter for member_id cookie: if member_id is not passed, the cookie
+ * getter/setter for memberId cookie: if memberId is not passed, the cookie
  * will be unset
  */
-export const updateMemberId = (response, member_id) => {
-	if (!member_id) {
-		response.unstate('member_id');
-		return response.request.state.member_id;
+export const updateMemberId = (response, memberId) => {
+	if (!memberId) {
+		response.unstate(MEMBER_ID_COOKIE);
+		return response.request.state[MEMBER_ID_COOKIE];
 	}
 	response.state(
-		'member_id',
-		member_id,
+		MEMBER_ID_COOKIE,
+		memberId,
 		{
 			...COOKIE_OPTS,
 			ttl: YEAR_IN_MS * 20,
 		}
 	);
-	return member_id;
+	return memberId;
 };
 
 /**
  * @method updateTrackId
  *
- * Initialize the track_id for member or anonymous user - the longest-living id
+ * Initialize the trackId for member or anonymous user - the longest-living id
  * we can assigned to a user. Stays in place until login or logout, when it is
- * exchanged for a new track_id
+ * exchanged for a new trackId
  *
  *  - If the user has a tracking cookie already set, do nothing.
  *  - Otherwise, generate a new uuid and set a tracking cookie.
@@ -59,21 +64,21 @@ export const updateMemberId = (response, member_id) => {
  * @param {Object} hapi response object
  */
 export const updateTrackId = (response, doRefresh) => {
-	let track_id = response.request.state.track_id;
+	let trackId = response.request.state[TRACK_ID_COOKIE];
 
-	if (!track_id || doRefresh) {
-		// Generate a new track_id cookie
-		track_id = uuid.v4();
+	if (!trackId || doRefresh) {
+		// Generate a new trackId cookie
+		trackId = uuid.v4();
 		response.state(
-			'track_id',
-			track_id,
+			TRACK_ID_COOKIE,
+			trackId,
 			{
 				...COOKIE_OPTS,
 				ttl: YEAR_IN_MS * 20,
 			}
 		);
 	}
-	return track_id;
+	return trackId;
 };
 
 export const trackLogout = log => response =>
@@ -81,11 +86,11 @@ export const trackLogout = log => response =>
 		response,
 		{
 			description: 'logout',
-			member_id: updateMemberId(response),
-			track_id_from: response.request.state.track_id,
-			track_id: updateTrackId(response, true),
-			session_id: response.request.state.session_id,
-			url: response.request.info.referrer,
+			memberId: parseInt(updateMemberId(response), 10) || 0,
+			trackIdFrom: response.request.state[TRACK_ID_COOKIE] || '',
+			trackId: updateTrackId(response, true),
+			sessionId: response.request.state[SESSION_ID_COOKIE],
+			url: response.request.info.referrer | '',
 		}
 	);
 
@@ -102,11 +107,11 @@ export const trackNav = log => (response, queryResponses, url, referrer) => {
 		response,
 		{
 			description: 'nav',
-			member_id: response.request.state.member_id,
-			track_id: response.request.state.track_id,
-			session_id: response.request.state.session_id,
-			url,
-			referrer,
+			memberId: parseInt(response.request.state[MEMBER_ID_COOKIE], 10) || 0,
+			trackId: response.request.state[TRACK_ID_COOKIE] || '',
+			sessionId: response.request.state[SESSION_ID_COOKIE] || '',
+			url: url || '',
+			referer: referrer || '',
 			apiRequests,
 		}
 	);
@@ -124,29 +129,29 @@ export const trackApi = log => (response, queryResponses, metadata={}) => {
 	// special case - login requests need to be tracked
 	const loginResponse = queryResponses.find(r => r.login);
 	if ((loginResponse && loginResponse.login.value || {}).member) {
-		const member_id = JSON.stringify(loginResponse.login.value.member.id);
-		trackLogin(log)(response, member_id);
+		const memberId = JSON.stringify(loginResponse.login.value.member.id);
+		trackLogin(log)(response, memberId);
 	}
 	if ('logout' in response.request.query) {
 		trackLogout(log)(response);
 	}
 };
 
-export const trackLogin = log => (response, member_id) =>
+export const trackLogin = log => (response, memberId) =>
 	log(
 		response,
 		{
 			description: 'login',
-			member_id: updateMemberId(response, member_id),
-			track_id_from: response.request.state.track_id,
-			track_id: updateTrackId(response, true),
-			session_id: response.request.state.session_id,
-			url: response.request.info.referrer,
+			memberId: parseInt(updateMemberId(response, memberId), 10) || 0,
+			trackIdFrom: response.request.state[TRACK_ID_COOKIE] || '',
+			trackId: updateTrackId(response, true),
+			sessionId: response.request.state[SESSION_ID_COOKIE],
+			url: response.request.info.referrer || '',
 		}
 	);
 
 export const trackSession = log => response => {
-	if (response.request.state.session_id) {
+	if (response.request.state[SESSION_ID_COOKIE]) {
 		// if there's already a session id, there's nothing to track
 		return null;
 	}
@@ -154,22 +159,26 @@ export const trackSession = log => response => {
 		response,
 		{
 			description: 'session',
-			member_id: response.request.state.member_id,
-			track_id: updateTrackId(response),
-			session_id: newSessionId(response),
+			memberId: parseInt(response.request.state[MEMBER_ID_COOKIE], 10) || 0,
+			trackId: updateTrackId(response),
+			sessionId: newSessionId(response),
 			url: response.request.url.path,
 		}
 	);
 };
 
-export const logTrack = platform_agent => (response, trackInfo) => {
+export const logTrack = platformAgent => (response, trackInfo) => {
 	const requestHeaders = response.request.headers;
 	const trackLog = {
-		request_id: uuid.v4(),
-		ip: requestHeaders['remote-addr'],
-		agent: requestHeaders['user-agent'],
+		timestamp: new Date().getTime().toString(),
+		requestId: uuid.v4(),
+		ip: requestHeaders['remote-addr'] || '',
+		agent: requestHeaders['user-agent'] || '',
 		platform: 'meetup-web-platform',
-		platform_agent,
+		platformAgent: 'WEB',  // TODO: set this more accurately, using allowed values from avro schema
+		mobileWeb: false,
+		referer: '',  // misspelled to align with schema
+		trax: {},
 		...trackInfo,
 	};
 	// response.request.log will provide timestaemp
@@ -177,8 +186,8 @@ export const logTrack = platform_agent => (response, trackInfo) => {
 	return trackLog;
 };
 
-export default function decorateTrack(platform_agent) {
-	const log = logTrack(platform_agent);
+export default function decorateTrack(platformAgent) {
+	const log = logTrack(platformAgent);
 	const api = trackApi(log);
 	const login = trackLogin(log);
 	const logout = trackLogout(log);
