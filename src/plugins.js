@@ -31,7 +31,7 @@ export function getCsrfPlugin(secret) {
  * @see {@link https://github.com/hapijs/good}
  */
 export function getConsoleLogPlugin() {
-	const logFilter = process.env.LOG_FILTER || '*';
+	const logFilter = process.env.LOG_FILTER || { include: [], exclude: ['tracking'] };
 	return {
 		register: Good,
 		options: {

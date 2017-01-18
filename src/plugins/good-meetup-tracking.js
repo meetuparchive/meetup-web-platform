@@ -4,17 +4,18 @@
 
 const avro = require('avsc');
 const Hoek = require('hoek');
-const request = require('request');
+// const request = require('request');
 const Stream = require('stream');
 
 const internals = {
 	defaults: {
-		endpoint: 'http://beta2.dev.meetup.com:8000/api',
+		endpoint: 'http://log.analytics.mup-prod.mup.zone',
 		/**
 		 * @param {String} endpoint avro logging endpoint
 		 * @param {Buffer} body the buffer containing the avro-encoded data
 		 */
-		postData: request.post.bind(request),
+		// postData: request.post.bind(request),
+		postData: () => {},
 		// currently the schema is manually copied from
 		// https://github.dev.meetup.com/meetup/meetup/blob/master/modules/base/src/main/versioned_avro/Activity_v3.avsc
 		schema: avro.parse({
@@ -68,8 +69,11 @@ class GoodMeetupTracking extends Stream.Transform {
 	 * @param {Object} data a Good event object
 	 */
 	_transform(event, enc, next) {
-		const data = JSON.parse(event.data);
-		const avroBuff = this._settings.schema.toBuffer(data);
+		// log the data to stdout for Stackdriver
+		console.log(JSON.stringify(event.data));
+
+		// format data for avro
+		const avroBuff = this._settings.schema.toBuffer(event.data);
 		this._settings.postData(this._settings.endpoint, { body: avroBuff }, () => {});
 
 		return next(null, avroBuff);

@@ -169,8 +169,9 @@ export const trackSession = log => response => {
 
 export const logTrack = platformAgent => (response, trackInfo) => {
 	const requestHeaders = response.request.headers;
-	const trackLog = {
-		timestamp: new Date().getTime().toString(),
+	const eventDate = new Date();
+	const record = {
+		timestamp: eventDate.getTime().toString(),
 		requestId: uuid.v4(),
 		ip: requestHeaders['remote-addr'] || '',
 		agent: requestHeaders['user-agent'] || '',
@@ -181,9 +182,16 @@ export const logTrack = platformAgent => (response, trackInfo) => {
 		trax: {},
 		...trackInfo,
 	};
-	// response.request.log will provide timestaemp
-	response.request.log(['tracking'], JSON.stringify(trackLog, null, 2));
-	return trackLog;
+
+	const data = {
+		name: 'Activity',
+		record,
+		version: 3,
+		schemaUrl: 'gs://avro_schemas/Activity_v3.avsc',
+		date: `${eventDate.getUTCFullYear()}-${eventDate.getUTCMonth() + 1}-${eventDate.getUTCDate()}`,
+	};
+	response.request.log(['tracking'], JSON.stringify(data));
+	return data;
 };
 
 export default function decorateTrack(platformAgent) {
