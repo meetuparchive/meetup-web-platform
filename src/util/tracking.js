@@ -1,13 +1,18 @@
 import uuid from 'uuid';
 
+const isProd = process.env.NODE_ENV === 'production';
+
 const YEAR_IN_MS = 1000 * 60 * 60 * 24 * 365;
 const COOKIE_OPTS = {
 	encoding: 'none',
 	path: '/',
 	isHttpOnly: true,
-	isSecure: process.env.NODE_ENV === 'production',
+	isSecure: isProd,
 };
 
+export const MEMBER_ID_COOKIE = isProd ? 'MEETUP_MEMBER' : 'MEETUP_MEMBER_DEV';
+export const TRACK_ID_COOKIE = isProd ? 'TRACK_ID' : 'TRACK_ID_DEV';
+export const SESSION_ID_COOKIE = isProd ? 'SESSION_ID' : 'SESSION_ID_DEV';
 
 /**
  * @method newSessionId
@@ -19,7 +24,7 @@ const COOKIE_OPTS = {
 export const newSessionId = response => {
 	const sessionId = uuid.v4();
 	response.state(
-		'session_id',
+		SESSION_ID_COOKIE,
 		sessionId,
 		COOKIE_OPTS
 	);
@@ -32,11 +37,11 @@ export const newSessionId = response => {
  */
 export const updateMemberId = (response, memberId) => {
 	if (!memberId) {
-		response.unstate('memberId');
-		return response.request.state.memberId;
+		response.unstate(MEMBER_ID_COOKIE);
+		return response.request.state[MEMBER_ID_COOKIE];
 	}
 	response.state(
-		'memberId',
+		MEMBER_ID_COOKIE,
 		memberId,
 		{
 			...COOKIE_OPTS,
@@ -49,9 +54,9 @@ export const updateMemberId = (response, memberId) => {
 /**
  * @method updateTrackId
  *
- * Initialize the track_id for member or anonymous user - the longest-living id
+ * Initialize the trackId for member or anonymous user - the longest-living id
  * we can assigned to a user. Stays in place until login or logout, when it is
- * exchanged for a new track_id
+ * exchanged for a new trackId
  *
  *  - If the user has a tracking cookie already set, do nothing.
  *  - Otherwise, generate a new uuid and set a tracking cookie.
@@ -59,13 +64,13 @@ export const updateMemberId = (response, memberId) => {
  * @param {Object} hapi response object
  */
 export const updateTrackId = (response, doRefresh) => {
-	let trackId = response.request.state.track_id;
+	let trackId = response.request.state[TRACK_ID_COOKIE];
 
 	if (!trackId || doRefresh) {
-		// Generate a new track_id cookie
+		// Generate a new trackId cookie
 		trackId = uuid.v4();
 		response.state(
-			'track_id',
+			TRACK_ID_COOKIE,
 			trackId,
 			{
 				...COOKIE_OPTS,
@@ -82,9 +87,9 @@ export const trackLogout = log => response =>
 		{
 			description: 'logout',
 			memberId: parseInt(updateMemberId(response), 10),
-			trackIdFrom: response.request.state.track_id,
+			trackIdFrom: response.request.state[TRACK_ID_COOKIE],
 			trackId: updateTrackId(response, true),
-			sessionId: response.request.state.session_id,
+			sessionId: response.request.state[SESSION_ID_COOKIE],
 			url: response.request.info.referrer,
 		}
 	);
@@ -102,9 +107,9 @@ export const trackNav = log => (response, queryResponses, url, referrer) => {
 		response,
 		{
 			description: 'nav',
-			memberId: parseInt(response.request.state.member_id, 10),
-			trackId: response.request.state.track_id,
-			sessionId: response.request.state.session_id,
+			memberId: parseInt(response.request.state[MEMBER_ID_COOKIE], 10),
+			trackId: response.request.state[TRACK_ID_COOKIE],
+			sessionId: response.request.state[SESSION_ID_COOKIE],
 			url,
 			referer: referrer || '',
 			apiRequests,
@@ -138,15 +143,15 @@ export const trackLogin = log => (response, memberId) =>
 		{
 			description: 'login',
 			memberId: parseInt(updateMemberId(response, memberId), 10),
-			trackIdFrom: response.request.state.track_id,
+			trackIdFrom: response.request.state[TRACK_ID_COOKIE],
 			trackId: updateTrackId(response, true),
-			sessionId: response.request.state.session_id,
+			sessionId: response.request.state[SESSION_ID_COOKIE],
 			url: response.request.info.referrer,
 		}
 	);
 
 export const trackSession = log => response => {
-	if (response.request.state.session_id) {
+	if (response.request.state[SESSION_ID_COOKIE]) {
 		// if there's already a session id, there's nothing to track
 		return null;
 	}
@@ -154,7 +159,7 @@ export const trackSession = log => response => {
 		response,
 		{
 			description: 'session',
-			memberId: parseInt(response.request.state.member_id, 10),
+			memberId: parseInt(response.request.state[MEMBER_ID_COOKIE], 10),
 			trackId: updateTrackId(response),
 			sessionId: newSessionId(response),
 			url: response.request.url.path,
