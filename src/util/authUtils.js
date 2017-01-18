@@ -47,7 +47,7 @@ export const applyAuthState = (request, reply) => auth => {
 	Object.keys(authState).forEach(name => {
 		const cookieVal = authState[name];
 		// apply to request
-		request.state[name] = cookieVal.value;
+		request.state[`__internal_${name}`] = cookieVal.value;  // this will only be used for generating internal requests
 		// apply to response - note this special `request.authorize.reply` prop assigned onPreAuth
 		reply.state(name, cookieVal.value, cookieVal.opts);
 	});
@@ -94,3 +94,7 @@ export const setPluginState = (request, reply) => {
 
 	return reply.continue();
 };
+
+export const getMemberCookieName = request =>
+	request.server.app.isDevConfig ? 'MEETUP_MEMBER_DEV' : 'MEETUP_MEMBER';
+
