@@ -82,7 +82,7 @@ describe('Integration with tracking logs', () => {
 		);
 	});
 
-	it('calls config.postData with an endpoint string and the buffer', () => {
+	it('calls config.postData with an endpoint string and the output of the avro transform', () => {
 		const config = {
 			endpoint: 'foo',
 			postData() {},
