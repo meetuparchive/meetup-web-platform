@@ -1,5 +1,6 @@
 import CsrfPlugin from 'electrode-csrf-jwt';
 import Good from 'good';
+import GoodMeetupTracking from './plugins/good-meetup-tracking';
 import requestAuthPlugin from './plugins/requestAuthPlugin';
 
 /**
@@ -30,7 +31,7 @@ export function getCsrfPlugin(secret) {
  * @see {@link https://github.com/hapijs/good}
  */
 export function getConsoleLogPlugin() {
-	const logFilter = process.env.LOG_FILTER || '*';
+	const logFilter = process.env.LOG_FILTER || { include: [], exclude: ['tracking'] };
 	return {
 		register: Good,
 		options: {
@@ -53,7 +54,18 @@ export function getConsoleLogPlugin() {
 						}]
 					},
 					'stdout'  // pipe to stdout
-				]
+				],
+				tracking: [
+					{
+						module: 'good-squeeze',
+						name: 'Squeeze',
+						args: [{
+							request: 'tracking'
+						}],
+					}, {
+						module: GoodMeetupTracking,
+					}
+				],
 			}
 		}
 	};
