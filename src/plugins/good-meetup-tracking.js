@@ -70,21 +70,22 @@ class GoodMeetupTracking extends Stream.Transform {
 	 */
 	_transform(event, enc, next) {
 		// log the data to stdout for Stackdriver
-		console.log(JSON.stringify(event.data));
+		console.log(event.data);
+		const eventData = JSON.parse(event.data);
 
-		const record = this._settings.schema.toBuffer(event.data).toString('base64');
+		const record = this._settings.schema.toBuffer(eventData);
 
-		const eventDate = new Date(event.data.timestamp);
+		const eventDate = new Date(parseInt(eventData.timestamp, 10));
 		const data = {
 			name: 'Activity',
-			record,
+			record: record.toString('base64'),
 			version: 3,
 			schemaUrl: 'gs://avro_schemas/Activity_v3.avsc',
 			date: `${eventDate.getUTCFullYear()}-${eventDate.getUTCMonth() + 1}-${eventDate.getUTCDate()}`,
 		};
 
 		// format data for avro
-		this._settings.postData(this._settings.endpoint, { body: JSON.stringify(data) }, () => {});
+		this._settings.postData(this._settings.endpoint, { body: data }, () => {});
 
 		return next(null, data);
 	}

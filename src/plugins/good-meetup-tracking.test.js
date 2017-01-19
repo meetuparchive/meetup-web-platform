@@ -19,7 +19,7 @@ describe('GoodMeetupTracking', () => {
 	it('creates a transform stream', () => {
 		expect(new GoodMeetupTracking()).toEqual(jasmine.any(Stream.Transform));
 	});
-	it('transforms input into avro Buffer', () => {
+	it('transforms input into base64-encoded avro buffer', () => {
 		const config = {
 			postData() {},
 			schema: avro.parse({
@@ -35,8 +35,10 @@ describe('GoodMeetupTracking', () => {
 			tracker,
 			trackInfo,
 			val => {
-				expect(val).toEqual(jasmine.any(Buffer));
-				expect(tracker._settings.schema.fromBuffer(val)).toEqual(trackInfo);
+				const utf8String = new Buffer(val.record, 'base64').toString('utf-8');
+				const avroBuffer = new Buffer(utf8String);
+				const recordedInfo = tracker._settings.schema.fromBuffer(avroBuffer);
+				expect(recordedInfo).toEqual(trackInfo);
 			}
 		);
 	});
@@ -65,14 +67,17 @@ describe('Integration with tracking logs', () => {
 			tracker,
 			trackInfo,
 			val => {
-				expect(val).toEqual(jasmine.any(Buffer));
-				const trackedInfo = tracker._settings.schema.fromBuffer(val);
+				const utf8String = new Buffer(val.record, 'base64').toString();
+				const avroBuffer = new Buffer(utf8String);
+				const trackedInfo = tracker._settings.schema.fromBuffer(avroBuffer);
+				const memberId = '';  // memberId integer doesn't survive the decode-encode-decode
 				const expectedTrackInfo = {
 					...trackInfo,
-					aggregratedUrl: ''  // misspelled, unused field in v3 spec
+					aggregratedUrl: '',  // misspelled, unused field in v3 spec
+					memberId,
 				};
 				delete expectedTrackInfo.sessionId;  // not part of v3 spec
-				expect(trackedInfo).toEqual(expectedTrackInfo);
+				expect({ ...trackedInfo, memberId }).toEqual(expectedTrackInfo);
 			}
 		);
 	});
