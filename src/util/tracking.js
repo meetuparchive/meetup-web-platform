@@ -183,15 +183,8 @@ export const logTrack = platformAgent => (response, trackInfo) => {
 		...trackInfo,
 	};
 
-	const data = {
-		name: 'Activity',
-		record,
-		version: 3,
-		schemaUrl: 'gs://avro_schemas/Activity_v3.avsc',
-		date: `${eventDate.getUTCFullYear()}-${eventDate.getUTCMonth() + 1}-${eventDate.getUTCDate()}`,
-	};
-	response.request.log(['tracking'], JSON.stringify(data));
-	return data;
+	response.request.log(['tracking'], JSON.stringify(record));
+	return record;
 };
 
 export default function decorateTrack(platformAgent) {
