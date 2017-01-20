@@ -46,6 +46,8 @@
     "redux-observable": "0.12.2",
     "request": "2.79.0",
     "source-map-support": "0.4.10",
+    "tough-cookie": "2.3.2",
+    "url-regex": "4.0.0",
     "url-search-params": "0.6.1",
     "uuid": "3.0.1"
   },
