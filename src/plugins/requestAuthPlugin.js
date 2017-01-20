@@ -37,6 +37,16 @@ const handleLogout = request => {
 	);
 };
 
+function getAuthType(request) {
+	const memberCookie = getMemberCookieName(request);
+	const allowedAuthTypes = [memberCookie, 'oauth_token', '__internal_oauth_token'];
+	// search for a request.state cookie name that matches an allowed auth type
+	return allowedAuthTypes.reduce(
+		(authType, allowedType) => authType || request.state[allowedType] && allowedType,
+		null
+	);
+}
+
 /**
  * Ensure that the passed-in Request contains a valid Oauth token
  *
@@ -58,14 +68,7 @@ export const applyRequestAuthorizer$ = requestAuthorizer$ => request => {
 	// This is 'deferred' because we don't want to start fetching the token
 	// before we know that it's needed
 	request.log(['info', 'auth'], 'Checking for oauth_token in request');
-
-	const memberCookie = getMemberCookieName(request);
-	const allowedAuthTypes = [memberCookie, 'oauth_token', '__internal_oauth_token'];
-	// search for a request.state cookie name that matches an allowed auth type
-	const authType = allowedAuthTypes.reduce(
-		(authType, allowedType) => authType || request.state[allowedType] && allowedType,
-		null
-	);
+	const authType = getAuthType(request);
 
 	if (authType) {
 		request.log(['info', 'auth'], `Request contains auth token (${authType})`);
@@ -74,7 +77,7 @@ export const applyRequestAuthorizer$ = requestAuthorizer$ => request => {
 	}
 
 	request.log(['info', 'auth'], 'Request does not contain auth token');
-	return requestAuthorizer$(request)
+	return requestAuthorizer$(request)  // get anonymous oauth_token
 		.do(applyAuthState(request, request.plugins.requestAuth.reply))
 		.map(() => request);
 };
@@ -215,8 +218,7 @@ export const getAuthenticate = authorizeRequest$ => (request, reply) => {
 		})
 		.subscribe(
 			request => {
-				const { authType } = request.plugins.requestAuth;
-				const credentials = request.state[authType];
+				const credentials = request.state[getAuthType(request)];
 				reply.continue({ credentials, artifacts: credentials });
 			},
 			err => reply(err, null, { credentials: null })
