@@ -33,6 +33,7 @@ const getEncryptedToken = token => new Promise((resolve, reject) =>
 );
 
 const expectedOauthToken = 'foobar';
+const expectedResponse = 'barfoo';
 
 const testAuth = (cookies, test, makeRequest=cookieRequest) => {
 	spyOn(global, 'fetch').and.callFake((url, opts) => {
@@ -52,7 +53,7 @@ const testAuth = (cookies, test, makeRequest=cookieRequest) => {
 	const fooRoute = {
 		method: 'get',
 		path: '/foo',
-		handler: (request, reply) => reply('bar')
+		handler: (request, reply) => reply(expectedResponse)
 	};
 	const server = new Hapi.Server();
 	return server
@@ -70,6 +71,7 @@ describe('logged-in member state', () => {
 	it('Passes MEETUP_MEMBER value as request credentials', () => {
 		const cookies = { MEETUP_MEMBER: 'foo' };
 		const test = response => {
+			expect(response.payload).toEqual(expectedResponse);
 			expect(response.request.auth.credentials).toBe(cookies.MEETUP_MEMBER);
 		};
 		return testAuth(cookies, test);
@@ -85,6 +87,7 @@ describe('logged-in member state', () => {
 		});
 		const cookies = { MEETUP_MEMBER: 'foo' };
 		const test = response => {
+			expect(response.payload).toEqual(expectedResponse);
 			expect(response.request.state.MEETUP_MEMBER).toBeNull();
 		};
 		return testAuth(cookies, test, makeLogoutRequest);
@@ -97,8 +100,10 @@ describe('logged-out member state', () => {
 		const cookies = {
 			oauth_token: 'foo_oauth',
 		};
-		const test = response =>
+		const test = response => {
+			expect(response.payload).toEqual(expectedResponse);
 			expect(response.request.auth.credentials).toBe(cookies.oauth_token);
+		};
 
 		return getEncryptedToken(cookies.oauth_token)
 			.then(oauth_token => testAuth({ oauth_token }, test));
@@ -110,6 +115,7 @@ describe('logged-out member state', () => {
 			refresh_token: 'asdfasdf',
 		};
 		const test = response => {
+			expect(response.payload).toEqual(expectedResponse);
 			expect(response.headers['set-cookie'][0].startsWith('oauth_token')).toBe(true);
 			expect(response.request.state.__internal_oauth_token).toBe(expectedOauthToken);
 		};
@@ -120,6 +126,7 @@ describe('logged-out member state', () => {
 		// mock fetch for auth, grant_type: refresh_token
 		const cookies = {};
 		const test = response => {
+			expect(response.payload).toEqual(expectedResponse);
 			expect(response.headers['set-cookie'][0].startsWith('oauth_token')).toBe(true);
 			expect(response.headers['set-cookie'][1].startsWith('refresh_token')).toBe(true);
 		};
