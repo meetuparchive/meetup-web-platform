@@ -1,5 +1,4 @@
-
-export const URL_REGEX = /((((ht|f){1}(tps?:[/][/]){1}))[-a-zA-Z0-9@:;%_\+.~#?&/=]+)/gm;
+import urlRegex from 'url-regex';
 
 /**
  * Generates HTML link tag element with target
@@ -12,9 +11,9 @@ export const URL_REGEX = /((((ht|f){1}(tps?:[/][/]){1}))[-a-zA-Z0-9@:;%_\+.~#?&/
 const createLink = options => href => {
 	const target = options.target || '';
 	const targetAttr = `target="${target}"`;
-	const relAttr = target === '_blank' ? ' rel="noopener noreferrer"' : '';
+	const relAttr = target === '_blank' ? 'rel="noopener noreferrer"' : '';
 
-	return `<a href="${href}" title="${href}" ${targetAttr}${relAttr}>${href}</a>`;
+	return `<a href="${href}" title="${href}" ${targetAttr} ${relAttr}>${href}</a>`;
 }
 
 /**
@@ -30,5 +29,5 @@ export default function linkify(text, options) {
 		return '';
 	}
 
-	return text.replace(URL_REGEX, createLink(options || {}));
+	return text.replace(urlRegex(), createLink(options || {}));
 }
