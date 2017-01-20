@@ -36,7 +36,7 @@ function cleanTrackingUrl() {
  * @param {Function} trackClick function to track clicks
  * @return {undefined} side effects only
  */
-function trackStopPropagation(trackClick) {
+export function trackStopPropagation(trackClick) {
 	// set reference to un-modified stopPropagation
 	Event.prototype.originalStopPropagation = Event.prototype.stopPropagation;
 
@@ -103,6 +103,7 @@ function getTrackClick(store) {
 	 * }
 	 *
 	 * @param  {Event} e the click (or other) DOM event
+	 * @return {Object} a Redux action describing the click
 	 */
 	function trackClick(e) {
 		const el = e.target;
@@ -126,8 +127,8 @@ function getTrackClick(store) {
 			clickLineage.push(elementShorthand(currentEl, true));  // id/tag only for parents
 		}
 
-		// 2. Assemble click metadata and add to _clickHistory
-		store.dispatch({
+		// 2. Create click action with metadata
+		const clickTrackAction = {
 			type: 'CLICK_TRACK',
 			payload: {
 				lineage: clickLineage.join('<'),
@@ -135,9 +136,12 @@ function getTrackClick(store) {
 				coords: [x, y],
 				data: data
 			}
-		});
+		};
 
-		// cookieVal = JSON.stringify({ history: _clickHistory });
+		// 3. dispatch the action
+		store.dispatch(clickTrackAction);
+
+		return clickTrackAction;
 	}
 
 	trackStopPropagation(trackClick);
