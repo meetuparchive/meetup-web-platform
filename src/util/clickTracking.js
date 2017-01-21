@@ -31,30 +31,30 @@ function cleanTrackingUrl() {
 	*/
 }
 
+// set reference to un-modified stopPropagation
+const originalStopPropagation = Event.prototype.stopPropagation;
+
 /**
  * Overriding stopPropagation for maximum click tracking
  * @param {Function} trackClick function to track clicks
  * @return {undefined} side effects only
  */
 export function trackStopPropagation(trackClick) {
-	// set reference to un-modified stopPropagation
-	Event.prototype.originalStopPropagation = Event.prototype.stopPropagation;
-
 	/**
 	 * A special jQuery events method that hooks the click tracking into events
 	 * that would never bubble to document.body
 	 */
 	Event.prototype.stopPropAndTrack = function() {
 		trackClick(this);
-		return this.originalStopPropagation();
+		return originalStopPropagation.call(this);
 	};
 
 	// override stopPropagation to track clicks
 	Event.prototype.stopPropagation = function() {
-		if (this.originalEvent && this.originalEvent.type === 'click') {
-			return this.stopPropAndTrack();
+		if (this.type === 'click') {
+			trackClick(this);
 		}
-		return this.originalStopPropagation();
+		return originalStopPropagation.call(this);
 	};
 }
 
@@ -81,9 +81,9 @@ function _getData(e) {
 	const target = e.target;
 	const useChildData = e.type === 'change' && target.tagName.toLowerCase() === 'select';
 	const el = useChildData ? target.children[target.selectedIndex] : target;
-	const data = el.dataset[DATA_ATTR];
 
 	try {
+		const data = (el.dataset || {})[DATA_ATTR] || '{}';
 		return JSON.parse(data);
 	} catch(err) {
 		// data is not JSON-formatted
@@ -137,6 +137,7 @@ function getTrackClick(store) {
 				data: data
 			}
 		};
+		console.log('asdfasdfs', el);
 
 		// 3. dispatch the action
 		store.dispatch(clickTrackAction);
