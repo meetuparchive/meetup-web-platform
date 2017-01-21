@@ -113,6 +113,13 @@ describe('checkLanguageRedirect', () => {
 			expectedRedirect: rootUrl,
 		})
 	);
+	it('calls redirect to root path when default lang requested on incorrect language path', () =>
+		testRedirect({
+			requestLang: defaultLang,
+			requestUrl: `${rootUrl}${altLang}/`,
+			expectedRedirect: rootUrl,
+		})
+	);
 	it('calls redirect to requestLanguage path from incorrect language path', () => {
 		const requestLang = altLang;
 		supportedLangs.filter(l => l !== altLang).forEach(lang =>
