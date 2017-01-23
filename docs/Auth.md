@@ -73,8 +73,8 @@ Logging out is handled by `requestAuthPlugin` as described above. However, since
 is querystring-based when navigating the _app_ URLs, and SPA navigation doesn't _directly_
 hit the app server, the [`fetchUtils.js:fetchQueries`](../util/fetchUtils.js) function is responsible for
 injecting the `logout` querystring property when creating a navigation-based API request
-to the `/api` endpoint - it does this by checking whether the current _app_ location
-contains the querystring value, and adds it to the `/api` request querystring if so.
+to the `/mu_api` endpoint - it does this by checking whether the current _app_ location
+contains the querystring value, and adds it to the `/mu_api` request querystring if so.
 
-The response to this `/api` request will provide logged-out data and new 'anonymous user'
+The response to this `/mu_api` request will provide logged-out data and new 'anonymous user'
 oauth tokens in the `Set-Cookie` header.

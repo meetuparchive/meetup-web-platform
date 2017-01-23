@@ -31,7 +31,7 @@ describe('API proxy endpoint integration tests', () => {
 			secret: random32,
 		}
 	});
-	it('calls the GET handler for /api', () => {
+	it('calls the GET handler for /mu_api', () => {
 		const spyable = {
 			handler: (request, reply) => reply('okay'),
 		};
@@ -42,7 +42,7 @@ describe('API proxy endpoint integration tests', () => {
 			.then(server => {
 				const request = {
 					method: 'get',
-					url: '/api?queries=[]',
+					url: '/mu_api?queries=[]',
 					credentials: 'whatever',
 				};
 				return server.inject(request).then(
@@ -51,7 +51,7 @@ describe('API proxy endpoint integration tests', () => {
 				.then(() => server.stop());
 			});
 	});
-	it('returns a formatted array of responses from GET /api', () => {
+	it('returns a formatted array of responses from GET /mu_api', () => {
 		const expectedResponse = JSON.stringify({
 			responses: [{
 				foo: {
@@ -67,7 +67,7 @@ describe('API proxy endpoint integration tests', () => {
 			.then(server => {
 				const request = {
 					method: 'get',
-					url: '/api?queries=[{ "type": "foo", "params": {}, "ref": "foo", "endpoint": "foo" }]',
+					url: '/mu_api?queries=[{ "type": "foo", "params": {}, "ref": "foo", "endpoint": "foo" }]',
 					credentials: 'whatever',
 				};
 				return server.inject(request).then(
