@@ -24,6 +24,9 @@ import {
 import getSyncEpic from '../epics/sync';
 import * as syncActionCreators from '../actions/syncActionCreators';
 import * as authActionCreators from '../actions/authActionCreators';
+import {
+	CLICK_TRACK_CLEAR_ACTION,
+} from '../actions/clickActionCreators';
 
 /**
  * @module SyncEpicTest
@@ -31,16 +34,21 @@ import * as authActionCreators from '../actions/authActionCreators';
 describe('Sync epic', () => {
 	const routes = {};
 	it('does not pass through arbitrary actions', epicIgnoreAction(getSyncEpic(MOCK_ROUTES)));
-	it('emits API_REQUEST for nav-related actions with matched query', function() {
+	it('emits API_REQUEST and CLICK_TRACK_CLEAR for nav-related actions with matched query', function() {
 		const locationChange = { type: LOCATION_CHANGE, payload: MOCK_RENDERPROPS.location };
 		const serverRender = { type: '@@server/RENDER', payload: MOCK_RENDERPROPS.location };
 
 		const action$ = ActionsObservable.of(locationChange, serverRender);
 		return getSyncEpic(MOCK_ROUTES)(action$)
+			.toArray()
 			.toPromise()
-			.then(action => expect(action.type).toEqual('API_REQUEST'));
+			.then(actions => {
+				const types = actions.map(a => a.type);
+				expect(types.includes('API_REQUEST')).toBe(true);
+				expect(types.includes(CLICK_TRACK_CLEAR_ACTION)).toBe(true);
+			});
 	});
-	it('emits CACHE_CLEAR and API_REQUEST for nav-related actions with logout query', function() {
+	it('emits API_REQUEST, CACHE_CLEAR, and CLICK_TRACK_CLEAR for nav-related actions with logout query', function() {
 		const logoutLocation = {
 			...MOCK_RENDERPROPS.location,
 			query: {
@@ -55,8 +63,10 @@ describe('Sync epic', () => {
 			.toArray()
 			.toPromise()
 			.then(actions => {
-				expect(actions[0].type).toEqual('CACHE_CLEAR');
-				expect(actions[1].type).toEqual('API_REQUEST');
+				const types = actions.map(a => a.type);
+				expect(types.includes('API_REQUEST')).toBe(true);
+				expect(types.includes('CACHE_CLEAR')).toBe(true);
+				expect(types.includes(CLICK_TRACK_CLEAR_ACTION)).toBe(true);
 			});
 	});
 	it('does not emit for nav-related actions without matched query', () => {

@@ -9,6 +9,9 @@ import {
 	apiError,
 	apiComplete,
 } from '../actions/syncActionCreators';
+import {
+	clearClick,
+} from '../actions/clickActionCreators';
 import { activeRouteQueries$ } from '../util/routeUtils';
 
 /**
@@ -43,7 +46,9 @@ export const getNavEpic = routes => {
 				const cacheClearAction$ = requestMetadata.logout ?
 					Observable.of({ type: 'CACHE_CLEAR' }) : Observable.empty();
 
-				return Observable.merge(cacheClearAction$, apiRequestActions$);
+				const clickClearAction$ = Observable.of(clearClick());
+
+				return Observable.merge(apiRequestActions$, cacheClearAction$, clickClearAction$);
 			});
 };
 
