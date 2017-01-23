@@ -5,6 +5,7 @@ import { tryJSON } from '../util/fetchUtils';
 import {
 	applyAuthState,
 	configureAuthCookies,
+	getMemberCookieName,
 	removeAuthState,
 	setPluginState,
 } from '../util/authUtils';
@@ -29,9 +30,22 @@ function verifyAuth(auth) {
 
 const handleLogout = request => {
 	request.log(['info', 'auth'], 'Logout received, clearing cookies to re-authenticate');
-	const memberCookie = request.server.app.isDevConfig ? 'MEETUP_MEMBER_DEV' : 'MEETUP_MEMBER';
-	return removeAuthState([memberCookie, 'oauth_token', 'refresh_token'], request, request.plugins.requestAuth.reply);
+	return removeAuthState(
+		[getMemberCookieName(request), 'oauth_token', 'refresh_token'],
+		request,
+		request.plugins.requestAuth.reply
+	);
 };
+
+function getAuthType(request) {
+	const memberCookie = getMemberCookieName(request);
+	const allowedAuthTypes = [memberCookie, 'oauth_token', '__internal_oauth_token'];
+	// search for a request.state cookie name that matches an allowed auth type
+	return allowedAuthTypes.reduce(
+		(authType, allowedType) => authType || request.state[allowedType] && allowedType,
+		null
+	);
+}
 
 /**
  * Ensure that the passed-in Request contains a valid Oauth token
@@ -54,18 +68,16 @@ export const applyRequestAuthorizer$ = requestAuthorizer$ => request => {
 	// This is 'deferred' because we don't want to start fetching the token
 	// before we know that it's needed
 	request.log(['info', 'auth'], 'Checking for oauth_token in request');
-
-	const memberCookie = request.server.app.isDevConfig ? 'MEETUP_MEMBER_DEV' : 'MEETUP_MEMBER';
-	const authType = request.state[memberCookie] && memberCookie ||
-		request.state.oauth_token && 'oauth_token';
+	const authType = getAuthType(request);
 
 	if (authType) {
 		request.log(['info', 'auth'], `Request contains auth token (${authType})`);
+		request.plugins.requestAuth.authType = authType;
 		return Rx.Observable.of(request);
 	}
 
 	request.log(['info', 'auth'], 'Request does not contain auth token');
-	return requestAuthorizer$(request)
+	return requestAuthorizer$(request)  // get anonymous oauth_token
 		.do(applyAuthState(request, request.plugins.requestAuth.reply))
 		.map(() => request);
 };
@@ -206,8 +218,7 @@ export const getAuthenticate = authorizeRequest$ => (request, reply) => {
 		})
 		.subscribe(
 			request => {
-				const memberCookie = request.server.app.isDevConfig ? 'MEETUP_MEMBER_DEV' : 'MEETUP_MEMBER';
-				const credentials = request.state[memberCookie] || request.state.oauth_token;
+				const credentials = request.state[getAuthType(request)];
 				reply.continue({ credentials, artifacts: credentials });
 			},
 			err => reply(err, null, { credentials: null })
