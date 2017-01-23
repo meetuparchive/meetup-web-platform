@@ -1,13 +1,18 @@
 import * as clickTracking from './clickTracking';
 
-const document = global.document;
-global.document = {
-	body: {
-		clientWidth: 100,
-	}
-};
-
 describe('trackStopPropagation', () => {
+	let document;
+	beforeEach(() => {
+		document = global.document;
+		global.document = {
+			body: {
+				clientWidth: 100,
+			}
+		};
+	});
+	afterEach(() => {
+		global.document = document;
+	});
 	it('adds Event.prototype.stopPropAndTrack', () => {
 		clickTracking.trackStopPropagation(() => {});
 		expect(Event.prototype.stopPropAndTrack).toBeDefined();
@@ -41,7 +46,6 @@ describe('trackStopPropagation', () => {
 			expect(spyable.dummyListener).toHaveBeenCalled();
 		});
 	});
+	global.document = document;
 });
-
-global.document = document;
 
