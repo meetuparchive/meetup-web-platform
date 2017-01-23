@@ -1,10 +1,12 @@
+import * as clickActionCreators from '../actions/clickActionCreators';
 import * as syncActionCreators from '../actions/syncActionCreators';
 import {
 	DEFAULT_APP_STATE,
 	app,
+	clickTracking,
 } from './platform';
 
-describe('reducer', () => {
+describe('app reducer', () => {
 	beforeEach(function() {
 		this.MOCK_STATE = { foo: 'bar' };
 	});
@@ -37,3 +39,18 @@ describe('reducer', () => {
 		expect(errorState.error).toBe(API_ERROR.payload);
 	});
 });
+
+describe('clickTracking reducer', () => {
+	it('appends a click action to state.clicks', () => {
+		const initialState = { clicks: [{ bar: 'baz' }] };
+		const click = { foo: 'bar' };
+		const action = clickActionCreators.click(click);
+		expect(clickTracking(initialState, action).clicks.length).toBe(2);
+		expect(clickTracking(initialState, action).clicks[1]).toEqual(click);
+	});
+	it('returns unmodified state for non-click actions', () => {
+		const initialState = { clicks: [{ bar: 'baz' }] };
+		expect(clickTracking(initialState, { type: 'FOO' })).toBe(initialState);
+	});
+});
+
