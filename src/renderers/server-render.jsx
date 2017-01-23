@@ -163,7 +163,7 @@ const makeRenderer = (
 	// request protocol might be different from original request that hit proxy
 	// we want to use the proxy's protocol
 	const requestProtocol = headers['x-forwarded-proto'] || connection.info.protocol;
-	const apiUrl = `${requestProtocol}://${info.host}/api`;
+	const apiUrl = `${requestProtocol}://${info.host}/mu_api`;
 
 	// create the store
 	const initialState = {};
