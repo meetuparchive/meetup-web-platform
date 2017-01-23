@@ -5,6 +5,7 @@
 
 import { combineReducers } from 'redux';
 import { routerReducer } from 'react-router-redux';
+import { CLICK_TRACK_ACTION } from '../actions/clickActionCreators';
 
 export const DEFAULT_APP_STATE = {};
 export const DEFAULT_AUTH_STATE = {};
@@ -41,6 +42,28 @@ export function app(state=DEFAULT_APP_STATE, action={}) {
 	default:
 		return state;
 	}
+}
+
+const DEFAULT_CLICK_TRACK = { clicks: [] };
+/**
+ * @param {Object} data extensible object to store click data {
+ *   clicks: array
+ * }
+ * @param {Object} action the dispatched action
+ * @return {Object} new state
+ */
+export function clickTracking(state=DEFAULT_CLICK_TRACK, action) {
+	if (action.type === CLICK_TRACK_ACTION) {
+		const clicks = [
+			...state.clicks,
+			action.payload,
+		];
+		return {
+			...state,
+			clicks,
+		};
+	}
+	return state;
 }
 
 export function config(state={}, action) {
@@ -84,6 +107,7 @@ const routing = routerReducer;
 
 const platformReducers = {
 	app,
+	clickTracking,
 	config,
 	preRenderChecklist,
 	routing,
