@@ -30,7 +30,7 @@ describe('routes', () => {
 	it('serves the api route', () => {
 		const validQuery = { type: 'a', ref: 'b', params: {} };
 		const qs = querystring.stringify({ queries: JSON.stringify([validQuery]) });
-		return getResponse({ url: `/api?${qs}` })
+		return getResponse({ url: `/mu_api?${qs}` })
 			.then(response => expect(JSON.parse(response.payload)).toEqual({
 				responses: MOCK_API_RESULT
 			}));

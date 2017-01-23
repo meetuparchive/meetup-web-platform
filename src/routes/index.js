@@ -12,7 +12,7 @@ export default function getRoutes(renderRequestMap, env, apiProxyFn$ = apiProxy$
 	);
 
 	return [
-		...getApiProxyRoutes('/api', env, apiProxyFn$),
+		...getApiProxyRoutes('/mu_api', env, apiProxyFn$),
 		getApplicationRoute(renderRequestMap),
 	];
 }
