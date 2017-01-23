@@ -1,6 +1,7 @@
 import url from 'url';
 import { createStore } from 'redux';
 import {
+	clickTrackEnhancer,
 	getPlatformMiddlewareEnhancer,
 	getBrowserCreateStore,
 	getServerCreateStore,
@@ -47,6 +48,19 @@ function testCreateStore(createStoreFn) {
 	});
 }
 
+describe('clickTrackEnhancer', () => {
+	it('adds event listeners to document.body', () => {
+		spyOn(document.body, 'addEventListener');
+		const enhancedCreateStore = clickTrackEnhancer(createStore);
+		enhancedCreateStore(IDENTITY_REDUCER);
+		const args = document.body.addEventListener.calls.allArgs();
+		const eventNames = args.map(a => a[0]);
+		const handlers = args.map(a => a[1]);
+
+		expect(eventNames).toEqual(['click', 'change']);
+		expect(handlers.every(h => h instanceof Function)).toBe(true);
+	});
+});
 describe('getPlatformMiddlewareEnhancer', () => {
 	it('applies custom middleware', () => {
 		// To determine whether custom middleware is being applied, this test
