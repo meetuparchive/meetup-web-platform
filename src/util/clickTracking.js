@@ -137,7 +137,6 @@ function getTrackClick(store) {
 				data: data
 			}
 		};
-		console.log('asdfasdfs', el);
 
 		// 3. dispatch the action
 		store.dispatch(clickTrackAction);
