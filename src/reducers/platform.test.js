@@ -2,6 +2,7 @@ import * as clickActionCreators from '../actions/clickActionCreators';
 import * as syncActionCreators from '../actions/syncActionCreators';
 import {
 	DEFAULT_APP_STATE,
+	DEFAULT_CLICK_TRACK,
 	app,
 	clickTracking,
 } from './platform';
@@ -47,6 +48,11 @@ describe('clickTracking reducer', () => {
 		const action = clickActionCreators.click(click);
 		expect(clickTracking(initialState, action).clicks.length).toBe(2);
 		expect(clickTracking(initialState, action).clicks[1]).toEqual(click);
+	});
+	it('clears click data on clear clicks', () => {
+		const initialState = { clicks: [{ bar: 'baz' }] };
+		const action = clickActionCreators.clearClick();
+		expect(clickTracking(initialState, action)).toBe(DEFAULT_CLICK_TRACK);
 	});
 	it('returns unmodified state for non-click actions', () => {
 		const initialState = { clicks: [{ bar: 'baz' }] };

@@ -5,10 +5,12 @@
 
 import { combineReducers } from 'redux';
 import { routerReducer } from 'react-router-redux';
-import { CLICK_TRACK_ACTION } from '../actions/clickActionCreators';
+import {
+	CLICK_TRACK_ACTION,
+	CLICK_TRACK_CLEAR_ACTION
+} from '../actions/clickActionCreators';
 
 export const DEFAULT_APP_STATE = {};
-export const DEFAULT_AUTH_STATE = {};
 
 /**
  * The primary reducer for data provided by the API
@@ -44,7 +46,7 @@ export function app(state=DEFAULT_APP_STATE, action={}) {
 	}
 }
 
-const DEFAULT_CLICK_TRACK = { clicks: [] };
+export const DEFAULT_CLICK_TRACK = { clicks: [] };
 /**
  * @param {Object} data extensible object to store click data {
  *   clicks: array
@@ -62,6 +64,9 @@ export function clickTracking(state=DEFAULT_CLICK_TRACK, action) {
 			...state,
 			clicks,
 		};
+	}
+	if (action.type === CLICK_TRACK_CLEAR_ACTION) {
+		return DEFAULT_CLICK_TRACK;
 	}
 	return state;
 }
