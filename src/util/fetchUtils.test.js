@@ -6,6 +6,34 @@ import {
 } from 'meetup-web-mocks/lib/api';
 import * as fetchUtils from './fetchUtils';
 
+describe('mergeClickCookie', () => {
+	it('merges stringified clicktracking data into "clickTracking" cookie header string', () => {
+		const initHeader = 'foo=bar';
+		const clickTracking = {
+			clicks: [{ bar: 'foo' }],
+		};
+		expect(fetchUtils.mergeClickCookie(initHeader, clickTracking))
+			.toEqual(`foo=bar; clickTracking=${JSON.stringify(clickTracking)}`);
+	});
+	it('creates stringified clicktracking cookie header string when no header string provided', () => {
+		const initHeader = undefined;
+		const clickTracking = {
+			clicks: [{ bar: 'foo' }],
+		};
+		expect(fetchUtils.mergeClickCookie(initHeader, clickTracking))
+			.toEqual(`clickTracking=${JSON.stringify(clickTracking)}`);
+	});
+	it('returns unmodified header when no clicks', () => {
+		const clickTracking = { clicks: [] };
+		const undefinedHeader = undefined;
+		const stringHeader = 'foo=bar';
+		expect(fetchUtils.mergeClickCookie(undefinedHeader, clickTracking))
+			.toBe(undefinedHeader);
+		expect(fetchUtils.mergeClickCookie(stringHeader, clickTracking))
+			.toBe(stringHeader);
+	});
+});
+
 describe('fetchQueries', () => {
 	const API_URL = new URL('http://api.example.com/');
 	const queries = [mockQuery({})];
@@ -76,6 +104,24 @@ describe('fetchQueries', () => {
 					expect(calledWith[1].method).toEqual('GET');
 				});
 		});
+
+		it('GET calls fetch with cookie header containing clicktracking', () => {
+			const clickTracking = {
+				clicks: [{ bar: 'foo' }],
+			};
+			spyOn(global, 'fetch').and.callFake(fakeSuccess);
+
+			return fetchUtils.fetchQueries(
+				API_URL.toString(),
+				getRequest
+			)(queries, { ...meta, clickTracking, logout: true })
+				.then(() => {
+					const calledWith = global.fetch.calls.mostRecent().args;
+					expect(calledWith[1].headers.cookie)
+						.toEqual(`clickTracking=${JSON.stringify(clickTracking)}`);
+				});
+		});
+
 		it('GET without meta calls fetch without metadata querystring params', () => {
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
