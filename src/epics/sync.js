@@ -36,6 +36,7 @@ export const getNavEpic = routes => {
 				const requestMetadata = {
 					referrer: currentLocation.pathname,
 					logout: 'logout' in payload.query,
+					clickTracking: store.getState().clickTracking,
 				};
 
 				const apiRequestActions$ = activeQueries$(payload)  // find the queries for the location

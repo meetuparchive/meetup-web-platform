@@ -28,7 +28,16 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 	const params = new URLSearchParams();
 	params.append('queries', JSON.stringify(queries));
 	if (meta) {
-		params.append('metadata', JSON.stringify(meta));
+		if (meta.clickTracking) {
+			headers.cookie = mergeCookies(
+				headers.cookie || '',
+				{ clickTracking: JSON.stringify(meta.clickTracking) }
+			);
+		}
+		const metadata = {
+			referrer: meta.referrer,
+		};
+		params.append('metadata', JSON.stringify(metadata));
 		if (meta.logout) {
 			params.append('logout', true);
 		}
