@@ -9,9 +9,11 @@ import * as fetchUtils from './fetchUtils';
 describe('fetchQueries', () => {
 	const API_URL = new URL('http://api.example.com/');
 	const queries = [mockQuery({})];
-	const meta = { foo: 'bar' };
+	const meta = { foo: 'bar', clickTracking: { clicks: [] } };
 	const responses = [MOCK_GROUP];
 	const csrfJwt = 'encodedstuff';
+	const getRequest = { method: 'GET', headers: {} };
+	const postRequest = { method: 'POST', csrf: csrfJwt, headers: {} };
 	const fakeSuccess = () =>
 		Promise.resolve({
 			json: () => Promise.resolve(responses),
@@ -35,7 +37,7 @@ describe('fetchQueries', () => {
 	it('returns an object with queries and responses arrays', () => {
 		spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
-		return fetchUtils.fetchQueries(API_URL.toString(), { method: 'GET' })(queries)
+		return fetchUtils.fetchQueries(API_URL.toString(), getRequest)(queries)
 			.then(response => {
 				expect(response.queries).toEqual(jasmine.any(Array));
 				expect(response.responses).toEqual(jasmine.any(Array));
@@ -44,13 +46,13 @@ describe('fetchQueries', () => {
 	it('returns an object with csrf prop read from response headers', () => {
 		spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
-		return fetchUtils.fetchQueries(API_URL.toString(), { method: 'GET' })(queries)
+		return fetchUtils.fetchQueries(API_URL.toString(), getRequest)(queries)
 			.then(response => expect(response.csrf).toEqual(csrfJwt));
 	});
 	it('returns a promise that will reject when response contains error prop', () => {
 		spyOn(global, 'fetch').and.callFake(fakeSuccessError);
 
-		return fetchUtils.fetchQueries(API_URL.toString(), { method: 'GET' })(queries)
+		return fetchUtils.fetchQueries(API_URL.toString(), getRequest)(queries)
 			.then(
 				response => expect(true).toBe(false),
 				err => expect(err).toEqual(jasmine.any(Error))
@@ -62,7 +64,7 @@ describe('fetchQueries', () => {
 
 			return fetchUtils.fetchQueries(
 				API_URL.toString(),
-				{ method: 'GET' }
+				getRequest
 			)(queries, { ...meta, logout: true })
 				.then(() => {
 					const calledWith = global.fetch.calls.mostRecent().args;
@@ -79,7 +81,7 @@ describe('fetchQueries', () => {
 
 			return fetchUtils.fetchQueries(
 				API_URL.toString(),
-				{ method: 'GET' }
+				getRequest
 			)(queries).then(() => {
 				const calledWith = global.fetch.calls.mostRecent().args;
 				const url = new URL(calledWith[0]);
@@ -96,7 +98,7 @@ describe('fetchQueries', () => {
 
 			return fetchUtils.fetchQueries(
 				API_URL.toString(),
-				{ method: 'POST', csrf: csrfJwt }
+				postRequest
 			)(queries, meta)
 				.then(() => {
 					const calledWith = global.fetch.calls.mostRecent().args;
@@ -114,7 +116,7 @@ describe('fetchQueries', () => {
 
 			return fetchUtils.fetchQueries(
 				API_URL.toString(),
-				{ method: 'POST', csrf: csrfJwt }
+				postRequest
 			)(queries)
 				.then(() => {
 					const calledWith = global.fetch.calls.mostRecent().args;
