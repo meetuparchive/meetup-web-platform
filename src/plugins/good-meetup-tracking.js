@@ -10,10 +10,7 @@ const Stream = require('stream');
 const internals = {
 	defaults: {
 		endpoint: 'http://log.analytics.mup-prod.mup.zone/log',
-		/**
-		 * @param {String} endpoint avro logging endpoint
-		 * @param {Buffer} body the buffer containing the avro-encoded data
-		 */
+		// in prod, make a `request` call, otherwise no-op
 		postData: process.env.NODE_ENV === 'production' ?
 			request.post.bind(request) :
 			() => {},
@@ -56,6 +53,10 @@ const internals = {
  * schema
  */
 class GoodMeetupTracking extends Stream.Transform {
+	/**
+	 * @param {Object} config the config options for a Stream.Transform
+	 * @return {undefined} side effects only
+	 */
 	constructor(config) {
 		super({ objectMode: true });
 
@@ -83,7 +84,10 @@ class GoodMeetupTracking extends Stream.Transform {
 	 * Receive event data and do something with it - package into avro buffer,
 	 * send it
 	 *
-	 * @param {Object} data a Good event object
+	 * @param {Object} event a Good event object
+	 * @param {String|undefined} enc Not sure what this is used for - ignored
+	 * @param {Function} next the next transform in the chain of Stream.Transform
+	 * @return {Object} the output of calling the next transform in the chain
 	 */
 	_transform(event, enc, next) {
 		// log the data to stdout for Stackdriver
