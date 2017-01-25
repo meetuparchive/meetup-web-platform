@@ -4,7 +4,7 @@
 
 const avro = require('avsc');
 const Hoek = require('hoek');
-// const request = require('request');
+const request = require('request');
 const Stream = require('stream');
 
 const internals = {
@@ -14,8 +14,9 @@ const internals = {
 		 * @param {String} endpoint avro logging endpoint
 		 * @param {Buffer} body the buffer containing the avro-encoded data
 		 */
-		// postData: request.post.bind(request),
-		postData: () => {},
+		postData: process.env.NODE_ENV === 'production' ?
+			request.post.bind(request) :
+			() => {},
 		// currently the schema is manually copied from
 		// https://github.dev.meetup.com/meetup/meetup/blob/master/modules/base/src/main/versioned_avro/Activity_v3.avsc
 		schema: avro.parse({
@@ -63,6 +64,22 @@ class GoodMeetupTracking extends Stream.Transform {
 	}
 
 	/**
+	 * @param {Error|null} err error returned from failed request
+	 * @param {http.IncomingMessage} response the response object
+	 * @param {String} body the body of the response
+	 * @return {undefined} side effects only
+	 */
+	static postDataCallback(err, response, body) {
+		if (err) {
+			console.error(err);
+			return;
+		}
+		if (response && response.statusCode !== 200) {
+			console.error(`Activity track logging error: ${body}`);
+		}
+	}
+
+	/**
 	 * Receive event data and do something with it - package into avro buffer,
 	 * send it
 	 *
@@ -81,11 +98,15 @@ class GoodMeetupTracking extends Stream.Transform {
 			record: record.toString('base64'),
 			version: 3,
 			schemaUrl: 'gs://avro_schemas/Activity_v3.avsc',
-			date: `${eventDate.getUTCFullYear()}-${eventDate.getUTCMonth() + 1}-${eventDate.getUTCDate()}`,
+			date: eventDate.toISOString().substr(0, 10),  // YYYY-MM-DD
 		};
 
 		// format data for avro
-		this._settings.postData(this._settings.endpoint, { body: data }, () => {});
+		this._settings.postData(
+			this._settings.endpoint,
+			{ body: data },
+			GoodMeetupTracking.postDataCallback
+		);
 
 		return next(null, data);
 	}

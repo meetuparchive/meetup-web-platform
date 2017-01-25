@@ -16,6 +16,24 @@ const testTransform = (tracker, trackInfo, test) =>
 	.then(test);
 
 describe('GoodMeetupTracking', () => {
+	describe('static postDataCallback', () => {
+		it('logs an error when an error occurs', () => {
+			spyOn(global.console, 'error');
+			const expectedError = new Error('nope');
+			GoodMeetupTracking.postDataCallback(expectedError, null, null);
+			expect(global.console.error).toHaveBeenCalledWith(expectedError);
+		});
+		it('logs an error when response status is not 200', () => {
+			spyOn(global.console, 'error');
+			const response = {
+				statusCode: 400,
+			};
+			const body = 'Bad Request';
+			GoodMeetupTracking.postDataCallback(null, response, body);
+			expect(global.console.error).toHaveBeenCalled();
+		});
+	});
+
 	it('creates a transform stream', () => {
 		expect(new GoodMeetupTracking()).toEqual(jasmine.any(Stream.Transform));
 	});
@@ -25,12 +43,13 @@ describe('GoodMeetupTracking', () => {
 			schema: avro.parse({
 				type: 'record',
 				fields: [
-					{ name: 'requestId', type: 'string'},
+					{ name: 'requestId', type: 'string' },
+					{ name: 'timestamp', type: 'string' },
 				]
 			}),
 		};
 		const tracker = new GoodMeetupTracking(config);
-		const trackInfo = { requestId: 'foo' };
+		const trackInfo = { requestId: 'foo', timestamp: new Date().getTime().toString() };
 		return testTransform(
 			tracker,
 			trackInfo,
