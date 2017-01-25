@@ -9,7 +9,7 @@ const Stream = require('stream');
 
 const internals = {
 	defaults: {
-		endpoint: 'http://log.analytics.mup-prod.mup.zone',
+		endpoint: 'http://log.analytics.mup-prod.mup.zone/log',
 		/**
 		 * @param {String} endpoint avro logging endpoint
 		 * @param {Buffer} body the buffer containing the avro-encoded data
