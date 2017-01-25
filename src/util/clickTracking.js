@@ -32,7 +32,7 @@ function cleanTrackingUrl() {
 }
 
 // set reference to un-modified stopPropagation
-const originalStopPropagation = Event.prototype.stopPropagation;
+const originalStopPropagation = typeof Event !== 'undefined' && Event.prototype.stopPropagation;
 
 /**
  * Overriding stopPropagation for maximum click tracking
