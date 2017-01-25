@@ -53,7 +53,7 @@ const runTest = (test, payload=mockPostPayload, csrfHeaders=getCsrfHeaders) => s
 			};
 			const request = {
 				method: 'post',
-				url: '/api',
+				url: '/mu_api',
 				payload,
 				credentials: 'whatever',
 				headers,
@@ -78,7 +78,7 @@ describe('API proxy POST endpoint integration tests', () => {
 			secret: random32,
 		}
 	});
-	it('calls the POST handler for /api', () => {
+	it('calls the POST handler for /mu_api', () => {
 		const spyable = {
 			handler: (request, reply) => reply('okay'),
 		};
@@ -91,7 +91,7 @@ describe('API proxy POST endpoint integration tests', () => {
 		return start({}, {}, mockConfig)
 			.then(runTest(test));
 	});
-	it('returns a formatted array of responses from POST /api', () => {
+	it('returns a formatted array of responses from POST /mu_api', () => {
 		const expectedResponse = JSON.stringify({
 			responses: [{
 				[mockQuery.ref]: {
