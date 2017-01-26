@@ -364,7 +364,7 @@ export const makeExternalApiRequest = (request, API_TIMEOUT) => requestOpts => {
 		.map(([response, body]) => [response, body, requestOpts.jar]);
 };
 
-export const logApiResponse = appRequest => ([response, body]) => {
+export const logApiResponse = ([response, body]) => {
 	const {
 		uri: {
 			query,
@@ -456,7 +456,7 @@ export const makeApiRequest$ = (request, API_TIMEOUT, duotoneUrls) => {
 		return Rx.Observable.defer(() => {
 			request.log(['api', 'info'], `REST API request: ${requestOpts.url}`);
 			return request$(requestOpts)
-				.do(logApiResponse(request))             // this will leak private info in API response
+				.do(logApiResponse)             // this will leak private info in API response
 				.do(injectResponseCookies(request))
 				.map(parseApiResponse(requestOpts.url))  // parse into plain object
 				.catch(errorResponse$(requestOpts.url))
