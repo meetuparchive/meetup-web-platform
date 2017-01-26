@@ -1,4 +1,3 @@
-import querystring from 'querystring';
 import avro from 'avsc';
 import GoodMeetupTracking from './good-meetup-tracking';
 import Stream from 'stream';
@@ -27,9 +26,9 @@ describe('GoodMeetupTracking', () => {
 		it('logs an error when response status is not 200', () => {
 			spyOn(global.console, 'error');
 			const response = {
-				statusCode: 400,
+				statusCode: 410,
 			};
-			const body = 'Bad Request';
+			const body = 'Bad Test Request';
 			GoodMeetupTracking.postDataCallback(null, response, body);
 			expect(global.console.error).toHaveBeenCalled();
 		});
@@ -40,7 +39,6 @@ describe('GoodMeetupTracking', () => {
 	});
 	it('transforms input into base64-encoded avro buffer', () => {
 		const config = {
-			postData() {},
 			schema: avro.parse({
 				type: 'record',
 				fields: [
@@ -79,9 +77,7 @@ describe('Integration with tracking logs', () => {
 	});
 
 	it('encodes standard output from logTrack', () => {
-		const tracker = new GoodMeetupTracking({
-			postData() {},
-		});
+		const tracker = new GoodMeetupTracking();
 
 		return testTransform(
 			tracker,
@@ -114,9 +110,12 @@ describe('Integration with tracking logs', () => {
 			tracker,
 			trackInfo,
 			data => {
-				const body = querystring.stringify(data);
+				const body = JSON.stringify(data);
+				const headers = {
+					'Content-Type': 'application/json',
+				};
 				expect(config.postData)
-					.toHaveBeenCalledWith(config.endpoint, { body }, jasmine.any(Function));
+					.toHaveBeenCalledWith(config.endpoint, { headers, body }, jasmine.any(Function));
 			}
 		);
 	});
