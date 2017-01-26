@@ -1,4 +1,7 @@
 import {
+	MEMBER_ID_COOKIE,
+	SESSION_ID_COOKIE,
+	TRACK_ID_COOKIE,
 	newSessionId,
 	updateTrackId,
 	updateMemberId,
@@ -25,24 +28,24 @@ describe('tracking state setters', () => {
 	it('sets session id', () => {
 		const responseWithoutSessionId = MOCK_HAPI_RESPONSE;
 		spyOn(responseWithoutSessionId, 'state');
-		const session_id = newSessionId(responseWithoutSessionId);
-		expect(UUID_V4_REGEX.test(session_id)).toBe(true);
+		const sessionId = newSessionId(responseWithoutSessionId);
+		expect(UUID_V4_REGEX.test(sessionId)).toBe(true);
 		expect(responseWithoutSessionId.state)
-			.toHaveBeenCalledWith('session_id', session_id, jasmine.any(Object));
+			.toHaveBeenCalledWith(SESSION_ID_COOKIE, sessionId, jasmine.any(Object));
 	});
 	it('sets track id if not set', () => {
 		const responseWithoutTrackId = MOCK_HAPI_RESPONSE;
 		spyOn(responseWithoutTrackId, 'state');
-		const track_id = updateTrackId(responseWithoutTrackId);
-		expect(UUID_V4_REGEX.test(track_id)).toBe(true);
+		const trackId = updateTrackId(responseWithoutTrackId);
+		expect(UUID_V4_REGEX.test(trackId)).toBe(true);
 		expect(responseWithoutTrackId.state)
-			.toHaveBeenCalledWith('track_id', track_id, jasmine.any(Object));
+			.toHaveBeenCalledWith(TRACK_ID_COOKIE, trackId, jasmine.any(Object));
 	});
 	it('does not set track id if already set', () => {
-		const track_id = 'foo';
+		const trackId = 'foo';
 		const request = {
 			...MOCK_HAPI_RESPONSE.request,
-			state: { track_id },
+			state: { [TRACK_ID_COOKIE]: trackId },
 		};
 		const responseWithTrackId = {
 			...MOCK_HAPI_RESPONSE,
@@ -52,69 +55,69 @@ describe('tracking state setters', () => {
 		expect(responseWithTrackId.state).not.toHaveBeenCalled();
 	});
 	it('sets new track id if doRefresh is true', () => {
-		const track_id = 'foo';
+		const trackId = 'foo';
 		const doRefresh = true;
 		const request = {
 			...MOCK_HAPI_RESPONSE.request,
-			state: { track_id },
+			state: { [TRACK_ID_COOKIE]: trackId },
 		};
 		const responseWithTrackId = {
 			...MOCK_HAPI_RESPONSE,
 			request,
 		};
 		spyOn(responseWithTrackId, 'state');
-		const new_track_id = updateTrackId(responseWithTrackId, doRefresh);
-		expect(new_track_id).not.toBe(track_id);
+		const newTrackId = updateTrackId(responseWithTrackId, doRefresh);
+		expect(newTrackId).not.toBe(trackId);
 		expect(responseWithTrackId.state)
-			.toHaveBeenCalledWith('track_id', new_track_id, jasmine.any(Object));
+			.toHaveBeenCalledWith(TRACK_ID_COOKIE, newTrackId, jasmine.any(Object));
 	});
-	it('always sets member_id to passed-in value', () => {
-		const member_id = 1234;
+	it('always sets memberId to passed-in value', () => {
+		const memberId = 1234;
 		spyOn(MOCK_HAPI_RESPONSE, 'state');
-		const new_member_id = updateMemberId(MOCK_HAPI_RESPONSE, member_id);
-		expect(new_member_id).toBe(member_id);
+		const newMemberId = updateMemberId(MOCK_HAPI_RESPONSE, memberId);
+		expect(newMemberId).toBe(memberId);
 		expect(MOCK_HAPI_RESPONSE.state)
-			.toHaveBeenCalledWith('member_id', member_id, jasmine.any(Object));
+			.toHaveBeenCalledWith(MEMBER_ID_COOKIE, memberId, jasmine.any(Object));
 
 	});
-	it('overrides request\'s member_id', () => {
-		const member_id = 'foo';
+	it('overrides request\'s memberId', () => {
+		const memberId = 'foo';
 		const request = {
 			...MOCK_HAPI_RESPONSE.request,
-			state: { member_id },
+			state: { [MEMBER_ID_COOKIE]: memberId },
 		};
 		const responseWithMemberIdRequest = {
 			...MOCK_HAPI_RESPONSE,
 			request
 		};
 		spyOn(responseWithMemberIdRequest, 'state');
-		const new_member_id = 'bar';
-		const returned_member_id = updateMemberId(responseWithMemberIdRequest, new_member_id);
-		expect(returned_member_id).toBe(new_member_id);
+		const newMemberId = 'bar';
+		const returned_member_id = updateMemberId(responseWithMemberIdRequest, newMemberId);
+		expect(returned_member_id).toBe(newMemberId);
 		expect(responseWithMemberIdRequest.state)
-			.toHaveBeenCalledWith('member_id', new_member_id, jasmine.any(Object));
+			.toHaveBeenCalledWith(MEMBER_ID_COOKIE, newMemberId, jasmine.any(Object));
 	});
-	it('unsets member_id if none passed in', () => {
+	it('unsets memberId if none passed in', () => {
 		spyOn(MOCK_HAPI_RESPONSE, 'unstate');
 		spyOn(MOCK_HAPI_RESPONSE, 'state');
 		updateMemberId(MOCK_HAPI_RESPONSE);
-		expect(MOCK_HAPI_RESPONSE.unstate).toHaveBeenCalledWith('member_id');
+		expect(MOCK_HAPI_RESPONSE.unstate).toHaveBeenCalledWith(MEMBER_ID_COOKIE);
 		expect(MOCK_HAPI_RESPONSE.state).not.toHaveBeenCalled();
 	});
-	it('returns request\'s member_id, if present, when un-setting', () => {
-		const member_id = 'foo';
+	it('returns request\'s memberId, if present, when un-setting', () => {
+		const memberId = 'foo';
 		const request = {
 			...MOCK_HAPI_RESPONSE.request,
-			state: { member_id },
+			state: { [MEMBER_ID_COOKIE]: memberId },
 		};
 		const responseWithMemberIdRequest = {
 			...MOCK_HAPI_RESPONSE,
 			request
 		};
-		const request_member_id = updateMemberId(responseWithMemberIdRequest);
-		expect(request_member_id).toBe(member_id);
-		const no_request_member_id = updateMemberId(MOCK_HAPI_RESPONSE);
-		expect(no_request_member_id).toBeUndefined();
+		const requestMemberId = updateMemberId(responseWithMemberIdRequest);
+		expect(requestMemberId).toBe(memberId);
+		const noRequestMemberId = updateMemberId(MOCK_HAPI_RESPONSE);
+		expect(noRequestMemberId).toBeUndefined();
 	});
 });
 
@@ -122,14 +125,14 @@ describe('tracking loggers', () => {
 	const spyable = {
 		log: (response, info) => info,
 	};
-	it('trackLogout: calls logger with "logout", new track_id, old session_id, member_id, track_id_from', () => {
+	it('trackLogout: calls logger with "logout", new trackId, old sessionId, memberId, trackIdFrom', () => {
 		spyOn(spyable, 'log').and.callThrough();
 		const request = {
 			...MOCK_HAPI_RESPONSE.request,
 			state: {
-				member_id: 1234,
-				session_id: 2345,
-				track_id: 3456,
+				[MEMBER_ID_COOKIE]: 1234,
+				[SESSION_ID_COOKIE]: 2345,
+				[TRACK_ID_COOKIE]: 3456,
 			},
 		};
 		const reponseWithState = {
@@ -142,42 +145,42 @@ describe('tracking loggers', () => {
 		expect(spyable.log).toHaveBeenCalled();
 		expect(trackInfo.description).toEqual('logout');  // this may change, but need to ensure tag is always correct
 		// new
-		expect(trackInfo.track_id).toBeDefined();
-		expect(trackInfo.track_id).not.toEqual(request.state.track_id);
+		expect(trackInfo.trackId).toBeDefined();
+		expect(trackInfo.trackId).not.toEqual(request.state[TRACK_ID_COOKIE]);
 		// old
-		expect(trackInfo.track_id_from).toBeDefined();
-		expect(trackInfo.track_id_from).toEqual(request.state.track_id);
-		expect(trackInfo.session_id).toEqual(request.state.session_id);
-		expect(trackInfo.member_id).toEqual(request.state.member_id);
+		expect(trackInfo.trackIdFrom).toBeDefined();
+		expect(trackInfo.trackIdFrom).toEqual(request.state[TRACK_ID_COOKIE]);
+		expect(trackInfo.sessionId).toEqual(request.state[SESSION_ID_COOKIE]);
+		expect(trackInfo.memberId).toEqual(request.state[MEMBER_ID_COOKIE]);
 	});
-	it('trackLogin: calls logger with "login", new member_id & track_id, old session_id', () => {
+	it('trackLogin: calls logger with "login", new memberId & trackId, old sessionId', () => {
 		spyOn(spyable, 'log').and.callThrough();
 		const request = {
 			...MOCK_HAPI_RESPONSE.request,
 			state: {
-				session_id: 2345,
-				track_id: 3456,
+				[SESSION_ID_COOKIE]: 2345,
+				[TRACK_ID_COOKIE]: 3456,
 			},
 		};
 		const reponseWithState = {
 			...MOCK_HAPI_RESPONSE,
 			request
 		};
-		const member_id = 1234;
+		const memberId = 1234;
 
-		trackLogin(spyable.log)(reponseWithState, member_id);
+		trackLogin(spyable.log)(reponseWithState, memberId);
 		expect(spyable.log).toHaveBeenCalled();
 		const trackInfo = spyable.log.calls.mostRecent().args[1];
 		expect(spyable.log).toHaveBeenCalled();
 		expect(trackInfo.description).toEqual('login');  // this may change, but need to ensure tag is always correct
 		// new
-		expect(trackInfo.track_id).toBeDefined();
-		expect(trackInfo.track_id).not.toEqual(request.state.track_id);
-		expect(trackInfo.member_id).toEqual(member_id);
+		expect(trackInfo.trackId).toBeDefined();
+		expect(trackInfo.trackId).not.toEqual(request.state[TRACK_ID_COOKIE]);
+		expect(trackInfo.memberId).toEqual(memberId);
 		// old
-		expect(trackInfo.track_id_from).toBeDefined();
-		expect(trackInfo.track_id_from).toEqual(request.state.track_id);
-		expect(trackInfo.session_id).toEqual(request.state.session_id);
+		expect(trackInfo.trackIdFrom).toBeDefined();
+		expect(trackInfo.trackIdFrom).toEqual(request.state[TRACK_ID_COOKIE]);
+		expect(trackInfo.sessionId).toEqual(request.state[SESSION_ID_COOKIE]);
 	});
 	it('trackApi: calls logger with "login" when login in queryResponses', () => {
 		spyOn(spyable, 'log').and.callThrough();
@@ -207,13 +210,13 @@ describe('tracking loggers', () => {
 		const trackInfo = spyable.log.calls.mostRecent().args[1];
 		expect(trackInfo.description).toEqual('logout');
 	});
-	it('trackSession: calls logger with "session", new session_id, old track_id & member_id', () => {
+	it('trackSession: calls logger with "session", new sessionId, old trackId & memberId', () => {
 		spyOn(spyable, 'log').and.callThrough();
 		const request = {
 			...MOCK_HAPI_RESPONSE.request,
 			state: {
-				member_id: 1234,
-				track_id: 3456,
+				[MEMBER_ID_COOKIE]: 1234,
+				[TRACK_ID_COOKIE]: 3456,
 			},
 		};
 		const reponseWithState = {
@@ -226,21 +229,21 @@ describe('tracking loggers', () => {
 		const trackInfo = spyable.log.calls.mostRecent().args[1];
 		expect(trackInfo.description).toEqual('session');  // this may change, but need to ensure tag is always correct
 		// new
-		expect(trackInfo.session_id).toBeDefined();
-		expect(trackInfo.session_id).not.toEqual(request.state.session_id);
+		expect(trackInfo.sessionId).toBeDefined();
+		expect(trackInfo.sessionId).not.toEqual(request.state[SESSION_ID_COOKIE]);
 		// old
-		expect(trackInfo.track_id).toBeDefined();
-		expect(trackInfo.track_id).toEqual(request.state.track_id);
-		expect(trackInfo.member_id).toEqual(request.state.member_id);
+		expect(trackInfo.trackId).toBeDefined();
+		expect(trackInfo.trackId).toEqual(request.state[TRACK_ID_COOKIE]);
+		expect(trackInfo.memberId).toEqual(request.state[MEMBER_ID_COOKIE]);
 	});
-	it('trackSession: does not call logger when session_id exists', () => {
+	it('trackSession: does not call logger when sessionId exists', () => {
 		spyOn(spyable, 'log').and.callThrough();
 		const request = {
 			...MOCK_HAPI_RESPONSE.request,
 			state: {
-				member_id: 1234,
-				session_id: 2345,
-				track_id: 3456,
+				[MEMBER_ID_COOKIE]: 1234,
+				[SESSION_ID_COOKIE]: 2345,
+				[TRACK_ID_COOKIE]: 3456,
 			},
 		};
 		const reponseWithState = {
