@@ -32,33 +32,35 @@ const getMockFetch = (mockResponseValue=[{}], headers={}) =>
 		},
 	});
 
-const clientFilename = 'client.whatever.js';
-const assetPublicPath = '//whatever';
-
 const expectedOutputMessage = 'Looking good';
-const TestRender = props => <div>{expectedOutputMessage}</div>;
 
+const getMockRenderRequestMap = () => {
+	const clientFilename = 'client.whatever.js';
+	const assetPublicPath = '//whatever';
 
-const routes = {
-	path: '/ny-tech',
-	component: TestRender,
-	query: () => ({}),
-};
-const reducer = makeRootReducer();
+	const TestRenderComponent = props => <div>{expectedOutputMessage}</div>;
 
-const basename = '/';
+	const routes = {
+		path: '/ny-tech',
+		component: TestRenderComponent,
+		query: () => ({}),
+	};
+	const reducer = makeRootReducer();
 
-const renderRequest$ = makeRenderer(
-	routes,
-	reducer,
-	clientFilename,
-	assetPublicPath,
-	[],
-	basename
-);
+	const basename = '/';
 
-const renderRequestMap = {
-	'en-US': renderRequest$,
+	const renderRequest$ = makeRenderer(
+		routes,
+		reducer,
+		clientFilename,
+		assetPublicPath,
+		[],
+		basename
+	);
+
+	return {
+		'en-US': renderRequest$,
+	};
 };
 
 describe('Full dummy app render', () => {
@@ -74,7 +76,7 @@ describe('Full dummy app render', () => {
 	});
 	it('calls the handler for /{*wild}', () => {
 		spyOn(global, 'fetch').and.returnValue(getMockFetch());
-		return start(renderRequestMap, {}, mockConfig)
+		return start(getMockRenderRequestMap(), {}, mockConfig)
 			.then(server => {
 				const request = {
 					method: 'get',
