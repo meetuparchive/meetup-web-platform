@@ -7,11 +7,14 @@ const Hoek = require('hoek');
 const request = require('request');
 const Stream = require('stream');
 
+const doPost = process.env.NODE_ENV === 'production' &&
+	process.env.CONTINUOUS_INTEGRATION !== 'true';
+
 const internals = {
 	defaults: {
 		endpoint: 'http://log.analytics.mup-prod.mup.zone/log',
 		// in prod, make a `request` call, otherwise no-op
-		postData: process.env.NODE_ENV === 'production' ?
+		postData: doPost ?
 			request.post.bind(request) :
 			() => {},
 		// currently the schema is manually copied from
