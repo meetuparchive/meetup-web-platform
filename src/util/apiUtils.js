@@ -190,7 +190,11 @@ export const buildRequestArgs = externalRequestOpts =>
 			break;
 		}
 
-		console.log(`External request headers: ${JSON.stringify(externalRequestOptsQuery.headers, null, 2)}`);
+		// production logs will automatically be JSON-parsed in Stackdriver
+		console.log(JSON.stringify({
+			type: 'External request headers',
+			payload: externalRequestOptsQuery.headers
+		}));
 
 		return externalRequestOptsQuery;
 	};
@@ -385,7 +389,12 @@ export const logApiResponse = appRequest => ([response, body]) => {
 			body: body.length > 256 ? `${body.substr(0, 256)}...`: body,
 		},
 	};
-	appRequest.log(['api', 'info'], JSON.stringify(responseLog, null, 2));
+
+	// production logs will automatically be JSON-parsed in Stackdriver
+	console.log(JSON.stringify({
+		type: 'REST API response JSON',
+		payload: responseLog
+	}));
 };
 
 /**
