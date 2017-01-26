@@ -1,3 +1,4 @@
+import querystring from 'querystring';
 import avro from 'avsc';
 import GoodMeetupTracking from './good-meetup-tracking';
 import Stream from 'stream';
@@ -112,7 +113,8 @@ describe('Integration with tracking logs', () => {
 		return testTransform(
 			tracker,
 			trackInfo,
-			body => {
+			data => {
+				const body = querystring.stringify(data);
 				expect(config.postData)
 					.toHaveBeenCalledWith(config.endpoint, { body }, jasmine.any(Function));
 			}

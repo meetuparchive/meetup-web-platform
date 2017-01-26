@@ -4,6 +4,7 @@
 
 const avro = require('avsc');
 const Hoek = require('hoek');
+const querystring = require('querystring');
 const request = require('request');
 const Stream = require('stream');
 
@@ -111,7 +112,7 @@ class GoodMeetupTracking extends Stream.Transform {
 		// format data for avro
 		this._settings.postData(
 			this._settings.endpoint,
-			{ body: data },
+			{ body: querystring.stringify(data) },
 			GoodMeetupTracking.postDataCallback
 		);
 
