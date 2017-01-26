@@ -92,8 +92,11 @@ class GoodMeetupTracking extends Stream.Transform {
 	 */
 	_transform(event, enc, next) {
 		// log the data to stdout for Stackdriver
-		console.log(event.data);
 		const eventData = JSON.parse(event.data);
+		console.log(JSON.stringify({
+			type: 'Tracking event log',
+			payload: eventData,
+		}));
 
 		const record = this._settings.schema.toBuffer(eventData);
 
