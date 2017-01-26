@@ -1,3 +1,4 @@
+import React from 'react';
 import makeRenderer from '../../src/renderers/server-render';
 import makeRootReducer from '../../src/reducers/platform';
 
@@ -34,9 +35,13 @@ const getMockFetch = (mockResponseValue=[{}], headers={}) =>
 const clientFilename = 'client.whatever.js';
 const assetPublicPath = '//whatever';
 
+const expectedOutputMessage = 'Looking good';
+const TestRender = props => <div>{expectedOutputMessage}</div>;
+
+
 const routes = {
 	path: '/ny-tech',
-	component: 'div',
+	component: TestRender,
 	query: () => ({}),
 };
 const reducer = makeRootReducer();
@@ -77,7 +82,7 @@ describe('Full dummy app render', () => {
 					credentials: 'whatever',
 				};
 				return server.inject(request).then(
-					response => expect(true).toBe(false)
+					response => expect(response.payload).toContain(expectedOutputMessage)
 				)
 				.then(() => server.stop())
 				.catch(err => {
