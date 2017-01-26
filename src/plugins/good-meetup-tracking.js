@@ -102,7 +102,7 @@ class GoodMeetupTracking extends Stream.Transform {
 			name: 'Activity',
 			record: record.toString('base64'),
 			version: 3,
-			schemaUrl: 'gs://avro_schemas/Activity_v3.avsc',
+			schemaUrl: 'gs://meetup-logs/avro_schemas/Activity_v3.avsc',
 			date: eventDate.toISOString().substr(0, 10),  // YYYY-MM-DD
 		};
 
