@@ -1,10 +1,9 @@
 import * as clickTracking from './clickTracking';
 
 /*
- * **** DISABLED ******
- *
- * This is disabled because tests don't have `global.documnet` defined in
- * Travis. Everything works locally, however.
+ * This test suite is disabled n Travis because tests don't have
+ * `global.document` defined in Travis for some reason. It works fine locally,
+ * however.
  *
  * This testing is tricky because Jest uses jsdom to generate a browser-like
  * Javascript environment, but it doesn't play nice with being modified - there
@@ -15,7 +14,8 @@ import * as clickTracking from './clickTracking';
  * that seems to me like a heavy refactor that is specifically for unit testing
  * - mikem Feb 2017
  */
-xdescribe('trackStopPropagation', () => {
+const testFunc = process.env.TRAVIS ? xdescribe : describe;
+testFunc('trackStopPropagation', () => {
 	let document;
 	beforeEach(() => {
 		document = global.document;

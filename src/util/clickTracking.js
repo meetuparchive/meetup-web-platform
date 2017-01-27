@@ -41,7 +41,7 @@ const originalStopPropagation = typeof Event !== 'undefined' && Event.prototype.
  */
 export function trackStopPropagation(trackClick) {
 	/**
-	 * A special jQuery events method that hooks the click tracking into events
+	 * A special Event object method that hooks the click tracking into events
 	 * that would never bubble to document.body
 	 */
 	Event.prototype.stopPropAndTrack = function() {
