@@ -40,7 +40,7 @@ after_success:
   - echo "NPM_TAG=$NPM_TAG"
   - >
     [ "${TRAVIS_BRANCH}" = "master" ] &&
-    yarn version --new-version $GIT_TAG &&
+    yarn version --no-git-tag-version --new-version $GIT_TAG &&
     git push -q https://$GITHUB_USER:$GITHUB_TOKEN@github.com/$TRAVIS_REPO_SLUG --tags &&
     yarn publish --tag $NPM_TAG ||
     echo "skipping versioning"
