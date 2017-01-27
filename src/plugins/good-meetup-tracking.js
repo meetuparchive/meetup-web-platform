@@ -7,14 +7,12 @@ const Hoek = require('hoek');
 const request = require('request');
 const Stream = require('stream');
 
-const doPost = process.env.NODE_ENV === 'production' &&
-	process.env.CONTINUOUS_INTEGRATION !== 'true';
-
 const internals = {
 	defaults: {
+
 		endpoint: 'http://log.analytics.mup-prod.mup.zone/log',
 		// in prod, make a `request` call, otherwise no-op
-		postData: doPost ?
+		postData: process.env.NODE_ENV === 'production' ?
 			request.post.bind(request) :
 			() => {},
 		// currently the schema is manually copied from
@@ -104,14 +102,19 @@ class GoodMeetupTracking extends Stream.Transform {
 			name: 'Activity',
 			record: record.toString('base64'),
 			version: 3,
-			schemaUrl: 'gs://avro_schemas/Activity_v3.avsc',
+			schemaUrl: 'gs://meetup-logs/avro_schemas/Activity_v3.avsc',
 			date: eventDate.toISOString().substr(0, 10),  // YYYY-MM-DD
+		};
+
+		const body = JSON.stringify(data);
+		const headers = {
+			'Content-Type': 'application/json',
 		};
 
 		// format data for avro
 		this._settings.postData(
 			this._settings.endpoint,
-			{ body: data },
+			{ headers, body },
 			GoodMeetupTracking.postDataCallback
 		);
 
