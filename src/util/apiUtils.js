@@ -12,6 +12,7 @@ import {
 import {
 	coerceBool,
 	toCamelCase,
+	removeSurroundingQuotes
 } from './stringUtils';
 
 import {
@@ -436,7 +437,7 @@ export const injectResponseCookies = request => ([response, _, jar]) => {
 
 		request.plugins.requestAuth.reply.state(
 			cookie.key,
-			cookie.value.replace(/^"|"$/g, ''),  // remove surrounding quotes from string value
+			removeSurroundingQuotes(cookie.value),
 			cookieOptions
 		);
 	});
