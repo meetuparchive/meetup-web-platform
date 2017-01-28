@@ -178,9 +178,5 @@ describe('mergeCookies', () => {
 		expect(fetchUtils.mergeCookies('foo=meetup', { foo: 'foo', bar: 'bar' }))
 			.toEqual('foo=foo; bar=bar');
 	});
-	it('strips single quotes from raw cookie headers', () => {
-		expect(fetchUtils.mergeCookies("'bing=bong; foo=bar'", {}))
-			.toEqual('bing=bong; foo=bar');
-	});
 });
 
