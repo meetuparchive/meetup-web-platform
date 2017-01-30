@@ -57,8 +57,9 @@ export const checkLanguageRedirect = (
 	const firstPathComponent = originalPath.split('/')[1];
 	const redirect = makeRedirect(reply, request.url);
 	if (requestLanguage === defaultLang) {
-		if (requestLanguage === firstPathComponent) {
-			request.log(['info'], `Redundant ${defaultLang} path prefix, redirecting`);
+		// ensure that we are serving from un-prefixed URL
+		if (supportedLangs.includes(firstPathComponent)) {
+			request.log(['info'], `Incorrect lang path prefix (${firstPathComponent}), redirecting`);
 			return redirect(originalPath.replace(`/${firstPathComponent}`, ''));
 		}
 	} else if (requestLanguage !== firstPathComponent) {

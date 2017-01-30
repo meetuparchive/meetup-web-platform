@@ -33,7 +33,7 @@ function cleanTrackingUrl() {
 }
 
 // set reference to un-modified stopPropagation
-const originalStopPropagation = Event.prototype.stopPropagation;
+const originalStopPropagation = typeof Event !== 'undefined' && Event.prototype.stopPropagation;
 
 /**
  * Overriding stopPropagation for maximum click tracking
@@ -42,7 +42,7 @@ const originalStopPropagation = Event.prototype.stopPropagation;
  */
 export function trackStopPropagation(trackClick) {
 	/**
-	 * A special jQuery events method that hooks the click tracking into events
+	 * A special Event object method that hooks the click tracking into events
 	 * that would never bubble to document.body
 	 */
 	Event.prototype.stopPropAndTrack = function() {

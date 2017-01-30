@@ -12,6 +12,7 @@ import {
 import {
 	coerceBool,
 	toCamelCase,
+	removeSurroundingQuotes
 } from './stringUtils';
 
 import {
@@ -190,7 +191,11 @@ export const buildRequestArgs = externalRequestOpts =>
 			break;
 		}
 
-		console.log(`External request headers: ${JSON.stringify(externalRequestOptsQuery.headers, null, 2)}`);
+		// production logs will automatically be JSON-parsed in Stackdriver
+		console.log(JSON.stringify({
+			type: 'External request headers',
+			payload: externalRequestOptsQuery.headers
+		}));
 
 		return externalRequestOptsQuery;
 	};
@@ -360,7 +365,7 @@ export const makeExternalApiRequest = (request, API_TIMEOUT) => requestOpts => {
 		.map(([response, body]) => [response, body, requestOpts.jar]);
 };
 
-export const logApiResponse = appRequest => ([response, body]) => {
+export const logApiResponse = ([response, body]) => {
 	const {
 		uri: {
 			query,
@@ -385,7 +390,12 @@ export const logApiResponse = appRequest => ([response, body]) => {
 			body: body.length > 256 ? `${body.substr(0, 256)}...`: body,
 		},
 	};
-	appRequest.log(['api', 'info'], JSON.stringify(responseLog, null, 2));
+
+	// production logs will automatically be JSON-parsed in Stackdriver
+	console.log(JSON.stringify({
+		type: 'REST API response JSON',
+		payload: responseLog
+	}));
 };
 
 /**
@@ -427,7 +437,7 @@ export const injectResponseCookies = request => ([response, _, jar]) => {
 
 		request.plugins.requestAuth.reply.state(
 			cookie.key,
-			cookie.value.replace(/^"|"$/g, ''),  // remove surrounding quotes from string value
+			removeSurroundingQuotes(cookie.value),
 			cookieOptions
 		);
 	});
@@ -447,7 +457,7 @@ export const makeApiRequest$ = (request, API_TIMEOUT, duotoneUrls) => {
 		return Rx.Observable.defer(() => {
 			request.log(['api', 'info'], `REST API request: ${requestOpts.url}`);
 			return request$(requestOpts)
-				.do(logApiResponse(request))             // this will leak private info in API response
+				.do(logApiResponse)             // this will leak private info in API response
 				.do(injectResponseCookies(request))
 				.map(parseApiResponse(requestOpts.url))  // parse into plain object
 				.catch(errorResponse$(requestOpts.url))
