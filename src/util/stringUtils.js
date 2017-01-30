@@ -17,10 +17,22 @@ export function toCamelCase(s) {
 	return s.replace(/-(\w)/g, g => g[1].toUpperCase());
 }
 
-/*
- * Remove surrounding quotes from a string (' and ").
+/**
+ *
+ * It appears that sometimes we add some data that shouldn't be in cookies.
+ * This removes surrounding quotes, URI encodes, and then unescapes the cookie
+ * separator.
+ *
+ * @param {String} rawCookies A cookie header from the browser
+ * @return {String} Properly esacaped and formatted cookies
  */
-export function removeSurroundingQuotes(str) {
-	return str.replace(/^["|']|["|']$/g, '')
+
+export function cleanRawCookies(rawCookies) {
+	return encodeURI(
+		rawCookies
+	)
+	.replace(/^[']|[']$/g, '') //replace surrounding single quotes
+	.replace(/;%20/g, '; ') //Make sure we unencode the actual cookie separator
 }
+
 

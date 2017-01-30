@@ -12,7 +12,7 @@ import {
 import {
 	coerceBool,
 	toCamelCase,
-	removeSurroundingQuotes
+	cleanRawCookies
 } from './stringUtils';
 
 import {
@@ -437,7 +437,7 @@ export const injectResponseCookies = request => ([response, _, jar]) => {
 
 		request.plugins.requestAuth.reply.state(
 			cookie.key,
-			removeSurroundingQuotes(cookie.value),
+			cleanRawCookies(cookie.value),
 			cookieOptions
 		);
 	});
