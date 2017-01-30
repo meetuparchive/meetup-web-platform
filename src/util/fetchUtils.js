@@ -87,9 +87,6 @@ export const mergeCookies = (rawCookieHeader, newCookies) => {
 	const oldCookies = cookie.parse(
 		cleanRawCookies(rawCookieHeader)
 	);
-	console.info(`\n\n======\n`);
-	console.dir(oldCookies);
-	console.info(`\n\n======\n`);
 	const mergedCookies = {
 		...oldCookies,
 		...newCookies,
