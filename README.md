@@ -57,7 +57,7 @@ is determined exclusively by the Travis build number for pushes to `master`.
 Major and minor versions are hard-coded into the [Makefile](Makefile#L2).
 
 Manual pushes to `master` and PR merges to master will be built by Travis, and
-will kick off the npm publish routine. The currently-published version of the
+will kick off the yarn publish routine. The currently-published version of the
 package is shown on the repo homepage on GitHub in a badge at the top of the
 README.
 
@@ -86,7 +86,7 @@ If you click the disclosure arrow, the version number will be displayed, e.g.
 You can then install this beta version into your consumer application with
 
 ```sh
-> npm install meetup-web-platform@<version tag>
+> yarn install meetup-web-platform@<version tag>
 ```
 
 Each time you push a change to your `meetup-web-platform` PR, you'll need to

@@ -7,8 +7,8 @@
     "build": "babel src --out-dir lib --ignore test.js,test.jsx",
     "coveralls": "cat coverage/lcov.info | coveralls",
     "lint": "eslint . --ext .js,.jsx --fix",
-    "prepublish": "npm run build",
-    "test": "npm run test:unit && npm run test:integration",
+    "prepublish": "yarn run build",
+    "test": "yarn run test:unit && yarn run test:integration",
     "test:unit": "jest --silent --config jest.config.json --coverage",
     "test:integration": "jest --silent --config jest.int.config.json"
   },
@@ -24,6 +24,7 @@
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "dependencies": {
     "accepts": "^1.3.3",
+    "avsc": "4.1.11",
     "boom": "4.2.0",
     "chalk": "^1.1.3",
     "cookie": "0.3.1",
@@ -66,14 +67,21 @@
     "babel-preset-react": "6.16.0",
     "babel-preset-stage-2": "6.18.0",
     "coveralls": "2.11.15",
-    "eslint": "3.13.1",
+    "eslint": "3.14.1",
     "eslint-plugin-react": "6.9.0",
     "intl-messageformat": "1.3.0",
     "intl-relativeformat": "1.3.0",
     "iron": "4.0.4",
     "jest-cli": "18.1.0",
     "meetup-web-mocks": "0.1.51",
+    "react": "^15.4.2",
+    "react-helmet": "^3.3.2",
+    "react-intl": "^2.2.3",
+    "react-redux": "^5.0.2",
+    "react-router": "^3.0.2",
     "react-addons-test-utils": "15.4.2",
+    "redux": "^3.5.2",
+    "rxjs": "^5.0.3",
     "tough-cookie": "2.3.2"
   }
 }
