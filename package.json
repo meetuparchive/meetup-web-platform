@@ -74,7 +74,14 @@
     "iron": "4.0.4",
     "jest-cli": "18.1.0",
     "meetup-web-mocks": "0.1.51",
+    "react": "^15.4.2",
+    "react-helmet": "^3.3.2",
+    "react-intl": "^2.2.3",
+    "react-redux": "^5.0.2",
+    "react-router": "^3.0.2",
     "react-addons-test-utils": "15.4.2",
+    "redux": "^3.5.2",
+    "rxjs": "^5.0.3",
     "tough-cookie": "2.3.2"
   }
 }
