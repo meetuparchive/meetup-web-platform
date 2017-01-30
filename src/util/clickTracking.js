@@ -1,3 +1,4 @@
+import { click } from '../actions/clickActionCreators';
 const DATA_ATTR = 'clicktrack';
 
 function cleanTrackingUrl() {
@@ -128,15 +129,12 @@ function getTrackClick(store) {
 		}
 
 		// 2. Create click action with metadata
-		const clickTrackAction = {
-			type: 'CLICK_TRACK',
-			payload: {
-				lineage: clickLineage.join('<'),
-				linkText: linkText,
-				coords: [x, y],
-				data: data
-			}
-		};
+		const clickTrackAction = click({
+			lineage: clickLineage.join('<'),
+			linkText: linkText,
+			coords: [x, y],
+			data: data
+		});
 
 		// 3. dispatch the action
 		store.dispatch(clickTrackAction);
