@@ -47,7 +47,7 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 	};
 	if (isPost) {
 		// assume client side
-		fetchConfig.body = params;
+		fetchConfig.body = params.toString();
 	}
 	return fetch(
 		fetchUrl,
