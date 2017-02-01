@@ -4,7 +4,7 @@
   "description": "A collection of Node web application utilities developed for the Meetup web platform",
   "main": "./lib/index.js",
   "scripts": {
-    "build": "babel src --out-dir lib --ignore test.js,test.jsx",
+    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps",
     "coveralls": "cat coverage/lcov.info | coveralls",
     "lint": "eslint . --ext .js,.jsx --fix",
     "prepublish": "yarn run build",
