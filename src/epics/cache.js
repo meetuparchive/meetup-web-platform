@@ -18,8 +18,7 @@ import {
 
 
 export function checkEnable() {
-	if (typeof window !== 'undefined' && window.location && window.location !== 'about:blank') {
-		console.log('href', window.location.href);
+	if (typeof window !== 'undefined' && window.location) {
 		const currentUrl = new URL(window.location.href);
 		return !currentUrl.searchParams.has('__nocache');
 	}
