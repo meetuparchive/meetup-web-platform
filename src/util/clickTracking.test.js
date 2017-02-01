@@ -14,8 +14,7 @@ import * as clickTracking from './clickTracking';
  * that seems to me like a heavy refactor that is specifically for unit testing
  * - mikem Feb 2017
  */
-const testFunc = process.env.TRAVIS ? xdescribe : describe;
-testFunc('trackStopPropagation', () => {
+xdescribe('trackStopPropagation', () => {
 	let document;
 	beforeEach(() => {
 		document = global.document;
