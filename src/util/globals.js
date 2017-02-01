@@ -1,8 +1,7 @@
-import URLSearchParams from 'url-search-params';
 import fetch from 'node-fetch';
 
 // hello polyfills
-global.URLSearchParams = URLSearchParams;
+global.URL = require('url').URL;
 global.fetch = fetch;
 
 // runtime values needed by browser and server

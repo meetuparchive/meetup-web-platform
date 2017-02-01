@@ -26,16 +26,14 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 	const isPost = method.toLowerCase() === 'post';
 	const isDelete = method.toLowerCase() === 'delete';
 
-	const params = new URLSearchParams();
-	params.append('queries', JSON.stringify(queries));
+	const fetchUrl = new URL(apiUrl);
+	fetchUrl.searchParams.append('queries', JSON.stringify(queries));
 	if (meta) {
-		params.append('metadata', JSON.stringify(meta));
+		fetchUrl.searchParams.append('metadata', JSON.stringify(meta));
 		if (meta.logout) {
-			params.append('logout', true);
+			fetchUrl.searchParams.append('logout', true);
 		}
 	}
-	const searchString = `?${params}`;
-	const fetchUrl = `${apiUrl}${isPost ? '' : searchString}`;
 	const fetchConfig = {
 		method,
 		headers: {
@@ -47,10 +45,10 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 	};
 	if (isPost) {
 		// assume client side
-		fetchConfig.body = params.toString();
+		fetchConfig.body = fetchUrl.searchParams.toString();
 	}
 	return fetch(
-		fetchUrl,
+		isPost ? apiUrl : fetchUrl.toString(),
 		fetchConfig
 	)
 	.then(queryResponse =>
