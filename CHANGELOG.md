@@ -1,6 +1,7 @@
 ## [1.0]
 
 - **Require Node v7** for require('url').URL
+- **Require window.URL** polyfill for browsers without native support
 
 ## [0.11]
 

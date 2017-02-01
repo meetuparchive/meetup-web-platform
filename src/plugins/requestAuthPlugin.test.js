@@ -239,8 +239,8 @@ describe('register', () => {
 
 describe('oauthScheme', () => {
 	const options = {
-		OAUTH_AUTH_URL: 'http://example.com/fake_auth',
-		OAUTH_ACCESS_URL: 'http://example.com/fake_access',
+		OAUTH_AUTH_URL,
+		OAUTH_ACCESS_URL,
 		oauth: {
 			key: '1234',
 			secret: 'abcd',
