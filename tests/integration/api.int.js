@@ -4,11 +4,12 @@ import * as apiProxyHandler from '../../src/apiProxy/apiProxyHandler';
 jest.mock('request', () => {
 	const mock = jest.fn(
 		(requestOpts, cb) =>
-			setTimeout(() =>
+			setTimeout(() => {
+				console.log('calling callback');
 				cb(null, {
 					headers: {},
 					statusCode: 200,
-					elapsedTime: 234,
+					elapsedTime: 2,
 					request: {
 						uri: {
 							query: 'foo=bar',
@@ -16,7 +17,8 @@ jest.mock('request', () => {
 						},
 						method: 'get',
 					},
-				}, '{}'), 234)
+				}, '{}');
+			}, 2)
 	);
 	mock.post = jest.fn();
 	return mock;
@@ -26,6 +28,7 @@ describe('API proxy endpoint integration tests', () => {
 	const random32 = 'asdfasdfasdfasdfasdfasdfasdfasdf';
 	const mockConfig = () => Promise.resolve({
 		API_HOST: 'www.api.meetup.com',
+		API_TIMEOUT: 10,
 		CSRF_SECRET: random32,
 		COOKIE_ENCRYPT_SECRET: random32,
 		oauth: {
@@ -53,15 +56,7 @@ describe('API proxy endpoint integration tests', () => {
 				.then(() => server.stop());
 			});
 	});
-	it.only('returns a formatted array of responses from GET /mu_api', () => {
-
-
-
-		// THE API_TIMEOUT IS BEING INVOKED - RESPONSE IS NOT BEING DELIVERED AS EXPECTED
-
-
-
-
+	it('returns a formatted array of responses from GET /mu_api', () => {
 		const expectedResponse = JSON.stringify({
 			responses: [{
 				foo: {

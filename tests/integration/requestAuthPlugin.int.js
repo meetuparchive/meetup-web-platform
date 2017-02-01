@@ -19,6 +19,7 @@ const makeMockFetchResponse = responseObj => Promise.resolve({
 const random32 = 'asdfasdfasdfasdfasdfasdfasdfasdf';
 const options = {
 	API_HOST: 'www.api.meetup.com',
+	API_TIMEOUT: 10,
 	CSRF_SECRET: random32,
 	COOKIE_ENCRYPT_SECRET: random32,
 	OAUTH_AUTH_URL: 'https://secure.dev.meetup.com/oauth2/authorize',
