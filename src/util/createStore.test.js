@@ -49,11 +49,18 @@ function testCreateStore(createStoreFn) {
 }
 
 describe('clickTrackEnhancer', () => {
+	global.window = {};
+	global.Event = function() {};
+	global.document = {
+		body: {
+			addEventListener() {},
+		},
+	};
 	it('adds event listeners to document.body', () => {
-		spyOn(document.body, 'addEventListener');
+		spyOn(global.document.body, 'addEventListener');
 		const enhancedCreateStore = clickTrackEnhancer(createStore);
 		enhancedCreateStore(IDENTITY_REDUCER);
-		const args = document.body.addEventListener.calls.allArgs();
+		const args = global.document.body.addEventListener.calls.allArgs();
 		const eventNames = args.map(a => a[0]);
 		const handlers = args.map(a => a[1]);
 

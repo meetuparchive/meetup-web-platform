@@ -18,9 +18,10 @@ import {
 
 
 export function checkEnable() {
-	if (typeof window !== 'undefined' && window.location) {
-		const params = new URLSearchParams(window.location.search.slice(1));
-		return !params.has('__nocache');
+	if (typeof window !== 'undefined' && window.location && window.location !== 'about:blank') {
+		console.log('href', window.location.href);
+		const currentUrl = new URL(window.location.href);
+		return !currentUrl.searchParams.has('__nocache');
 	}
 	return true;
 }
