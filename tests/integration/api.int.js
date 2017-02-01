@@ -53,7 +53,15 @@ describe('API proxy endpoint integration tests', () => {
 				.then(() => server.stop());
 			});
 	});
-	it('returns a formatted array of responses from GET /mu_api', () => {
+	it.only('returns a formatted array of responses from GET /mu_api', () => {
+
+
+
+		// THE API_TIMEOUT IS BEING INVOKED - RESPONSE IS NOT BEING DELIVERED AS EXPECTED
+
+
+
+
 		const expectedResponse = JSON.stringify({
 			responses: [{
 				foo: {
