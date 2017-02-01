@@ -65,6 +65,7 @@ const DOM = (props) => {
 				{head.title.toComponent()}
 				{head.meta.toComponent()}
 				{head.link.toComponent()}
+				{head.script.toComponent()}
 			</head>
 			<body>
 				<div id='outlet' dangerouslySetInnerHTML={getInnerHTML(appMarkup)} />
