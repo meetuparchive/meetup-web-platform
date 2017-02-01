@@ -1,3 +1,7 @@
+## [1.0]
+
+- **Require Node v7** for require('url').URL
+
 ## [0.11]
 
 - **Removed** `apiConfigCreators` no longer exists - use the query object
