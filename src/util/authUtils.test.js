@@ -10,6 +10,7 @@ import {
 describe('configureAuthCookies', () => {
 	const serverWithState = {
 		state: () => {},
+		app: {},
 	};
 	it('calls server.state for each auth cookie name', () => {
 		const goodOptions = {
