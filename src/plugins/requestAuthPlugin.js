@@ -31,14 +31,14 @@ function verifyAuth(auth) {
 const handleLogout = request => {
 	request.log(['info', 'auth'], 'Logout received, clearing cookies to re-authenticate');
 	return removeAuthState(
-		[getMemberCookieName(request), 'oauth_token', 'refresh_token'],
+		[getMemberCookieName(request.server), 'oauth_token', 'refresh_token'],
 		request,
 		request.plugins.requestAuth.reply
 	);
 };
 
 function getAuthType(request) {
-	const memberCookie = getMemberCookieName(request);
+	const memberCookie = getMemberCookieName(request.server);
 	const allowedAuthTypes = [memberCookie, 'oauth_token', '__internal_oauth_token'];
 	// search for a request.state cookie name that matches an allowed auth type
 	return allowedAuthTypes.reduce(
