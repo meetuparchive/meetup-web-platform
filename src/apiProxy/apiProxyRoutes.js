@@ -49,6 +49,9 @@ const getApiProxyRoutes = (path, env, apiProxyFn$) => {
 					},
 				},
 			},
+			state: {
+				failAction: 'ignore',  // ignore cookie validation, just accept
+			},
 		},
 	};
 	const apiGetRoute = {

@@ -1,7 +1,6 @@
 import {
 	coerceBool,
 	toCamelCase,
-	removeSurroundingQuotes,
 } from './stringUtils';
 
 describe('coerceBool', () => {
@@ -28,14 +27,4 @@ describe('toCamelCase', () => {
 		expect(toCamelCase('this-is-compLICAT-ED')).toEqual('thisIsCompLICATED');
 	});
 });
-describe('removeSurroundingQuotes', () => {
-	const singleQuotedString = `'single "quotes" have more fun'`;
-	const doubleQuotedString = `"double quotes are 'better' than one"`;
 
-	it('Removes surrounding single quotes', () => {
-		expect(removeSurroundingQuotes(singleQuotedString)).toEqual(`single "quotes" have more fun`);
-	});
-	it('Removes surrounding double quotes', () => {
-		expect(removeSurroundingQuotes(doubleQuotedString)).toEqual(`double quotes are 'better' than one`);
-	});
-});

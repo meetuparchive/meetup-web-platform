@@ -17,10 +17,3 @@ export function toCamelCase(s) {
 	return s.replace(/-(\w)/g, g => g[1].toUpperCase());
 }
 
-/*
- * Remove surrounding quotes from a string (' and ").
- */
-export function removeSurroundingQuotes(str) {
-	return str.replace(/^["|']|["|']$/g, '')
-}
-

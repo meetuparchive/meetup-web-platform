@@ -10,7 +10,7 @@ const COOKIE_OPTS = {
 	isSecure: isProd,
 };
 
-export const MEMBER_ID_COOKIE = isProd ? 'MEETUP_MEMBER' : 'MEETUP_MEMBER_DEV';
+export const MEMBER_ID_COOKIE = isProd ? 'MEETUP_MEMBER_ID' : 'MEETUP_MEMBER_ID_DEV';
 export const TRACK_ID_COOKIE = isProd ? 'TRACK_ID' : 'TRACK_ID_DEV';
 export const SESSION_ID_COOKIE = isProd ? 'SESSION_ID' : 'SESSION_ID_DEV';
 
