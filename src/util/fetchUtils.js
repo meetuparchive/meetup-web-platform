@@ -5,8 +5,8 @@ import { cleanRawCookies } from './stringUtils';
  * @module fetchUtils
  */
 
-export const mergeClickCookie = (cookieHeader, clickTracking) => {
-	if (((clickTracking || {}).clicks || []).length) {
+export const mergeClickCookie = (cookieHeader, clickTracking={ clicks: [] }) => {
+	if (clickTracking.clicks.length) {
 		const clickCookie = {
 			clickTracking: JSON.stringify(clickTracking)
 		};
