@@ -67,10 +67,11 @@ describe('fetchQueries', () => {
 				.then(() => {
 					const calledWith = global.fetch.calls.mostRecent().args;
 					const url = new URL(calledWith[0]);
+					console.warn(calledWith[0]);
 					expect(url.origin).toBe(API_URL.origin);
-					expect(new URLSearchParams(url.search).has('queries')).toBe(true);
-					expect(new URLSearchParams(url.search).has('metadata')).toBe(true);
-					expect(new URLSearchParams(url.search).get('logout')).toBe('true');
+					expect(url.searchParams.has('queries')).toBe(true);
+					expect(url.searchParams.has('metadata')).toBe(true);
+					expect(url.searchParams.has('logout')).toBe(true);
 					expect(calledWith[1].method).toEqual('GET');
 				});
 		});
@@ -84,8 +85,8 @@ describe('fetchQueries', () => {
 				const calledWith = global.fetch.calls.mostRecent().args;
 				const url = new URL(calledWith[0]);
 				expect(url.origin).toBe(API_URL.origin);
-				expect(new URLSearchParams(url.search).has('queries')).toBe(true);
-				expect(new URLSearchParams(url.search).has('metadata')).toBe(false);
+				expect(url.searchParams.has('queries')).toBe(true);
+				expect(url.searchParams.has('metadata')).toBe(false);
 				expect(calledWith[1].method).toEqual('GET');
 			});
 		});
@@ -104,8 +105,10 @@ describe('fetchQueries', () => {
 					const options = calledWith[1];
 					expect(url.toString()).toBe(API_URL.toString());
 					expect(options.method).toEqual('POST');
-					expect(new URLSearchParams(options.body).has('queries')).toBe(true);
-					expect(new URLSearchParams(options.body).has('metadata')).toBe(true);
+					// build a dummy url to hold the url-encoded body as searchstring
+					const dummyUrl = new URL(`http://example.com?${options.body}`);
+					expect(dummyUrl.searchParams.has('queries')).toBe(true);
+					expect(dummyUrl.searchParams.has('metadata')).toBe(true);
 					expect(options.headers['x-csrf-jwt']).toEqual(csrfJwt);
 				});
 		});
@@ -122,8 +125,9 @@ describe('fetchQueries', () => {
 					const options = calledWith[1];
 					expect(url.toString()).toBe(API_URL.toString());
 					expect(options.method).toEqual('POST');
-					expect(new URLSearchParams(options.body).has('queries')).toBe(true);
-					expect(new URLSearchParams(options.body).has('metadata')).toBe(false);
+					const dummyUrl = new URL(`http://example.com?${options.body}`);
+					expect(dummyUrl.searchParams.has('queries')).toBe(true);
+					expect(dummyUrl.searchParams.has('metadata')).toBe(false);
 					expect(options.headers['x-csrf-jwt']).toEqual(csrfJwt);
 				});
 		});
