@@ -1,3 +1,4 @@
+import { mockConfig } from '../mocks';
 import React from 'react';
 import makeRenderer from '../../src/renderers/server-render';
 import makeRootReducer from '../../src/reducers/platform';
@@ -64,19 +65,6 @@ const getMockRenderRequestMap = () => {
 };
 
 describe('Full dummy app render', () => {
-	const random32 = 'asdfasdfasdfasdfasdfasdfasdfasdf';
-	const mockConfig = () => Promise.resolve({
-		API_HOST: 'www.api.meetup.com',
-		API_TIMEOUT: 10,
-		OAUTH_ACCESS_URL: 'http://example.com/access',
-		OAUTH_AUTH_URL: 'http://example.com/auth',
-		CSRF_SECRET: random32,
-		COOKIE_ENCRYPT_SECRET: random32,
-		oauth: {
-			key: random32,
-			secret: random32,
-		}
-	});
 	it('calls the handler for /{*wild}', () => {
 		spyOn(global, 'fetch').and.returnValue(getMockFetch());
 		return start(getMockRenderRequestMap(), {}, mockConfig)

@@ -1,19 +1,8 @@
+import { mockConfig } from '../mocks';
 import start from '../../src/server';
 import * as appRouteHandler from '../../src/routes/appRouteHandler';
 
 describe('General server startup tests', () => {
-	const random32 = 'asdfasdfasdfasdfasdfasdfasdfasdf';
-	const mockConfig = () => Promise.resolve({
-		API_HOST: 'www.api.meetup.com',
-		OAUTH_ACCESS_URL: 'http://example.com/access',
-		OAUTH_AUTH_URL: 'http://example.com/auth',
-		CSRF_SECRET: random32,
-		COOKIE_ENCRYPT_SECRET: random32,
-		oauth: {
-			key: random32,
-			secret: random32,
-		}
-	});
 	it('starts the server', () => {
 		const fooRoute = {
 			method: 'get',
