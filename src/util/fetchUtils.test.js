@@ -6,12 +6,42 @@ import {
 } from 'meetup-web-mocks/lib/api';
 import * as fetchUtils from './fetchUtils';
 
+describe('mergeClickCookie', () => {
+	it('merges stringified clicktracking data into "clickTracking" cookie header string', () => {
+		const initHeader = 'foo=bar';
+		const clickTracking = {
+			clicks: [{ bar: 'foo' }],
+		};
+		expect(fetchUtils.mergeClickCookie(initHeader, clickTracking))
+			.toEqual(`foo=bar; clickTracking=${JSON.stringify(clickTracking)}`);
+	});
+	it('creates stringified clicktracking cookie header string when no header string provided', () => {
+		const initHeader = undefined;
+		const clickTracking = {
+			clicks: [{ bar: 'foo' }],
+		};
+		expect(fetchUtils.mergeClickCookie(initHeader, clickTracking))
+			.toEqual(`clickTracking=${JSON.stringify(clickTracking)}`);
+	});
+	it('returns unmodified header when no clicks', () => {
+		const clickTracking = { clicks: [] };
+		const undefinedHeader = undefined;
+		const stringHeader = 'foo=bar';
+		expect(fetchUtils.mergeClickCookie(undefinedHeader, clickTracking))
+			.toBe(undefinedHeader);
+		expect(fetchUtils.mergeClickCookie(stringHeader, clickTracking))
+			.toBe(stringHeader);
+	});
+});
+
 describe('fetchQueries', () => {
 	const API_URL = new URL('http://api.example.com/');
 	const queries = [mockQuery({})];
-	const meta = { foo: 'bar' };
+	const meta = { foo: 'bar', clickTracking: { clicks: [] } };
 	const responses = [MOCK_GROUP];
 	const csrfJwt = 'encodedstuff';
+	const getRequest = { method: 'GET', headers: {} };
+	const postRequest = { method: 'POST', csrf: csrfJwt, headers: {} };
 	const fakeSuccess = () =>
 		Promise.resolve({
 			json: () => Promise.resolve(responses),
@@ -35,7 +65,7 @@ describe('fetchQueries', () => {
 	it('returns an object with queries and responses arrays', () => {
 		spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
-		return fetchUtils.fetchQueries(API_URL.toString(), { method: 'GET' })(queries)
+		return fetchUtils.fetchQueries(API_URL.toString(), getRequest)(queries)
 			.then(response => {
 				expect(response.queries).toEqual(jasmine.any(Array));
 				expect(response.responses).toEqual(jasmine.any(Array));
@@ -44,13 +74,13 @@ describe('fetchQueries', () => {
 	it('returns an object with csrf prop read from response headers', () => {
 		spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
-		return fetchUtils.fetchQueries(API_URL.toString(), { method: 'GET' })(queries)
+		return fetchUtils.fetchQueries(API_URL.toString(), getRequest)(queries)
 			.then(response => expect(response.csrf).toEqual(csrfJwt));
 	});
 	it('returns a promise that will reject when response contains error prop', () => {
 		spyOn(global, 'fetch').and.callFake(fakeSuccessError);
 
-		return fetchUtils.fetchQueries(API_URL.toString(), { method: 'GET' })(queries)
+		return fetchUtils.fetchQueries(API_URL.toString(), getRequest)(queries)
 			.then(
 				response => expect(true).toBe(false),
 				err => expect(err).toEqual(jasmine.any(Error))
@@ -62,7 +92,7 @@ describe('fetchQueries', () => {
 
 			return fetchUtils.fetchQueries(
 				API_URL.toString(),
-				{ method: 'GET' }
+				getRequest
 			)(queries, { ...meta, logout: true })
 				.then(() => {
 					const calledWith = global.fetch.calls.mostRecent().args;
@@ -75,12 +105,30 @@ describe('fetchQueries', () => {
 					expect(calledWith[1].method).toEqual('GET');
 				});
 		});
+
+		it('GET calls fetch with cookie header containing clicktracking', () => {
+			const clickTracking = {
+				clicks: [{ bar: 'foo' }],
+			};
+			spyOn(global, 'fetch').and.callFake(fakeSuccess);
+
+			return fetchUtils.fetchQueries(
+				API_URL.toString(),
+				getRequest
+			)(queries, { ...meta, clickTracking, logout: true })
+				.then(() => {
+					const calledWith = global.fetch.calls.mostRecent().args;
+					expect(calledWith[1].headers.cookie)
+						.toEqual(`clickTracking=${JSON.stringify(clickTracking)}`);
+				});
+		});
+
 		it('GET without meta calls fetch without metadata querystring params', () => {
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
 			return fetchUtils.fetchQueries(
 				API_URL.toString(),
-				{ method: 'GET' }
+				getRequest
 			)(queries).then(() => {
 				const calledWith = global.fetch.calls.mostRecent().args;
 				const url = new URL(calledWith[0]);
@@ -97,7 +145,7 @@ describe('fetchQueries', () => {
 
 			return fetchUtils.fetchQueries(
 				API_URL.toString(),
-				{ method: 'POST', csrf: csrfJwt }
+				postRequest
 			)(queries, meta)
 				.then(() => {
 					const calledWith = global.fetch.calls.mostRecent().args;
@@ -117,7 +165,7 @@ describe('fetchQueries', () => {
 
 			return fetchUtils.fetchQueries(
 				API_URL.toString(),
-				{ method: 'POST', csrf: csrfJwt }
+				postRequest
 			)(queries)
 				.then(() => {
 					const calledWith = global.fetch.calls.mostRecent().args;

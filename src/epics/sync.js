@@ -9,6 +9,9 @@ import {
 	apiError,
 	apiComplete,
 } from '../actions/syncActionCreators';
+import {
+	clearClick,
+} from '../actions/clickActionCreators';
 import { activeRouteQueries$ } from '../util/routeUtils';
 
 /**
@@ -33,6 +36,7 @@ export const getNavEpic = routes => {
 				const requestMetadata = {
 					referrer: currentLocation.pathname,
 					logout: 'logout' in payload.query,
+					clickTracking: store.getState().clickTracking,
 				};
 
 				const apiRequestActions$ = activeQueries$(payload)  // find the queries for the location
@@ -43,7 +47,9 @@ export const getNavEpic = routes => {
 				const cacheClearAction$ = requestMetadata.logout ?
 					Observable.of({ type: 'CACHE_CLEAR' }) : Observable.empty();
 
-				return Observable.merge(cacheClearAction$, apiRequestActions$);
+				const clickClearAction$ = Observable.of(clearClick());
+
+				return Observable.merge(apiRequestActions$, cacheClearAction$, clickClearAction$);
 			});
 };
 
