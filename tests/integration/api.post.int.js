@@ -1,8 +1,6 @@
 import Boom from 'boom';
-import csrf from 'electrode-csrf-jwt/lib/csrf';
-import uuid from 'uuid';
-
 import {
+	getCsrfHeaders,
 	mockConfig,
 } from '../mocks';
 import start from '../../src/server';
@@ -33,20 +31,6 @@ const mockPostPayload = {
 	queries: JSON.stringify([mockQuery])
 };
 
-function getCsrfHeaders() {
-	const options = {
-		secret:  'asdfasdfasdfasdfasdfasdfasdfasdf',
-	};
-	const id = uuid.v4();
-	const headerPayload = {type: 'header', uuid: id};
-	const cookiePayload = {type: 'cookie', uuid: id};
-
-	return csrf.create(headerPayload, options)
-		.then(headerToken => {
-			return csrf.create(cookiePayload, options)
-				.then(cookieToken => ([headerToken, cookieToken]));
-		});
-}
 const runTest = (test, payload=mockPostPayload, csrfHeaders=getCsrfHeaders) => server =>
 	csrfHeaders()
 		.then(([headerToken, cookieToken]) => {

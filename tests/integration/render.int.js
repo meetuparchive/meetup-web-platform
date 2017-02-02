@@ -1,8 +1,8 @@
-import { mockConfig } from '../mocks';
-import React from 'react';
-import makeRenderer from '../../src/renderers/server-render';
-import makeRootReducer from '../../src/reducers/platform';
-
+import {
+	getMockFetch,
+	getMockRenderRequestMap,
+	mockConfig,
+} from '../mocks';
 import start from '../../src/server';
 
 jest.mock('request', () =>
@@ -24,45 +24,7 @@ jest.mock('request', () =>
 	)
 );
 
-const getMockFetch = (mockResponseValue=[{}], headers={}) =>
-	Promise.resolve({
-		text: () => Promise.resolve(JSON.stringify(mockResponseValue)),
-		json: () => Promise.resolve(mockResponseValue),
-		headers: {
-			get: key => headers[key],
-		},
-	});
-
 const expectedOutputMessage = 'Looking good';
-
-const getMockRenderRequestMap = () => {
-	const clientFilename = 'client.whatever.js';
-	const assetPublicPath = '//whatever';
-
-	const TestRenderComponent = props => <div>{expectedOutputMessage}</div>;
-
-	const routes = {
-		path: '/ny-tech',
-		component: TestRenderComponent,
-		query: () => ({}),
-	};
-	const reducer = makeRootReducer();
-
-	const basename = '/';
-
-	const renderRequest$ = makeRenderer(
-		routes,
-		reducer,
-		clientFilename,
-		assetPublicPath,
-		[],
-		basename
-	);
-
-	return {
-		'en-US': renderRequest$,
-	};
-};
 
 describe('Full dummy app render', () => {
 	it('calls the handler for /{*wild}', () => {
