@@ -12,7 +12,6 @@ import {
 import {
 	coerceBool,
 	toCamelCase,
-	cleanRawCookies
 } from './stringUtils';
 
 import {
@@ -433,11 +432,12 @@ export const injectResponseCookies = request => ([response, _, jar]) => {
 			isHttpOnly: cookie.httpOnly,
 			isSameSite: false,
 			isSecure: process.env.NODE_ENV === 'production',
+			strictHeader: false,  // Can't enforce RFC 6265 cookie validation on external services
 		};
 
 		request.plugins.requestAuth.reply.state(
 			cookie.key,
-			cleanRawCookies(cookie.value),
+			cookie.value,
 			cookieOptions
 		);
 	});

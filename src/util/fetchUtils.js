@@ -1,5 +1,4 @@
 import cookie from 'cookie';
-import { cleanRawCookies } from './stringUtils';
 /**
  * A module for middleware that would like to make external calls through `fetch`
  * @module fetchUtils
@@ -84,9 +83,7 @@ export const tryJSON = reqUrl => response => {
 export const mergeCookies = (rawCookieHeader, newCookies) => {
 	// request.state has _parsed_ cookies, but we need to send raw cookies
 	// _except_ when the incoming request has been back-populated with new 'raw' cookies
-	const oldCookies = cookie.parse(
-		cleanRawCookies(rawCookieHeader)
-	);
+	const oldCookies = cookie.parse(rawCookieHeader);
 	const mergedCookies = {
 		...oldCookies,
 		...newCookies,
