@@ -11,6 +11,7 @@
     "js",
     "jsx"
   ],
+  "testEnvironment": "node",
   "testRegex": "src\/.*\\.test\\.jsx?$"
 }
 

@@ -1,14 +1,18 @@
 import start from '../../src/server';
+import {
+	mockConfig,
+} from '../mocks';
 import * as apiProxyHandler from '../../src/apiProxy/apiProxyHandler';
 
 jest.mock('request', () => {
 	const mock = jest.fn(
 		(requestOpts, cb) =>
-			setTimeout(() =>
+			setTimeout(() => {
+				console.log('calling callback');
 				cb(null, {
 					headers: {},
 					statusCode: 200,
-					elapsedTime: 234,
+					elapsedTime: 2,
 					request: {
 						uri: {
 							query: 'foo=bar',
@@ -16,23 +20,14 @@ jest.mock('request', () => {
 						},
 						method: 'get',
 					},
-				}, '{}'), 234)
+				}, '{}');
+			}, 2)
 	);
 	mock.post = jest.fn();
 	return mock;
 });
 
 describe('API proxy endpoint integration tests', () => {
-	const random32 = 'asdfasdfasdfasdfasdfasdfasdfasdf';
-	const mockConfig = () => Promise.resolve({
-		API_HOST: 'www.api.meetup.com',
-		CSRF_SECRET: random32,
-		COOKIE_ENCRYPT_SECRET: random32,
-		oauth: {
-			key: random32,
-			secret: random32,
-		}
-	});
 	it('calls the GET handler for /mu_api', () => {
 		const spyable = {
 			handler: (request, reply) => reply('okay'),

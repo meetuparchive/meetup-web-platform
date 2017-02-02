@@ -94,11 +94,10 @@ export function getAnonymousCode$({ API_TIMEOUT=5000, OAUTH_AUTH_URL, oauth }, r
 		throw new ReferenceError('OAuth consumer key is required');
 	}
 
-	const authParams = new URLSearchParams();
-	authParams.append('response_type', 'anonymous_code');
-	authParams.append('client_id', oauth.key);
-	authParams.append('redirect_uri', redirect_uri);
-	const authURL = `${OAUTH_AUTH_URL}?${authParams}`;
+	const authURL = new URL(OAUTH_AUTH_URL);
+	authURL.searchParams.append('response_type', 'anonymous_code');
+	authURL.searchParams.append('client_id', oauth.key);
+	authURL.searchParams.append('redirect_uri', redirect_uri);
 	const requestOpts = {
 		method: 'GET',
 		headers: {
@@ -108,7 +107,7 @@ export function getAnonymousCode$({ API_TIMEOUT=5000, OAUTH_AUTH_URL, oauth }, r
 
 	return Rx.Observable.defer(() => {
 		console.log(`Fetching anonymous auth code from ${OAUTH_AUTH_URL}`);
-		return Rx.Observable.fromPromise(fetch(authURL, requestOpts))
+		return Rx.Observable.fromPromise(fetch(authURL.toString(), requestOpts))
 			.timeout(API_TIMEOUT)
 			.flatMap(tryJSON(OAUTH_AUTH_URL))
 			.map(({ code }) => ({
@@ -149,11 +148,11 @@ export const getAccessToken$ = ({ API_TIMEOUT=5000, OAUTH_ACCESS_URL, oauth }, r
 				'Cache-Control': headers['cache-control']
 			},
 		};
-		const accessParams = Object.keys(params)
-			.reduce((accessParams, key) => {
-				accessParams.append(key, params[key]);
-				return accessParams;
-			}, new URLSearchParams());
+		const accessUrl = Object.keys(params)
+			.reduce((accessUrl, key) => {
+				accessUrl.searchParams.append(key, params[key]);
+				return accessUrl;
+			}, new URL(OAUTH_ACCESS_URL));
 
 		return ({ grant_type, token }) => {
 
@@ -162,19 +161,17 @@ export const getAccessToken$ = ({ API_TIMEOUT=5000, OAUTH_ACCESS_URL, oauth }, r
 				throw new ReferenceError('No grant token provided - cannot obtain access token');
 			}
 
-			accessParams.append('grant_type', grant_type);
+			accessUrl.searchParams.append('grant_type', grant_type);
 			if (grant_type === 'anonymous_code') {
 				console.log(`Fetching anonymous access_token from ${OAUTH_ACCESS_URL}`);
-				accessParams.append('code', token);
+				accessUrl.searchParams.append('code', token);
 			}
 			if (grant_type === 'refresh_token') {
 				console.log(`Refreshing access_token from ${OAUTH_ACCESS_URL}`);
-				accessParams.append('refresh_token', token);
+				accessUrl.searchParams.append('refresh_token', token);
 			}
 
-			const url = `${OAUTH_ACCESS_URL}?${accessParams}`;
-
-			return Rx.Observable.fromPromise(fetch(url, requestOpts))
+			return Rx.Observable.fromPromise(fetch(accessUrl.toString(), requestOpts))
 				.timeout(API_TIMEOUT)
 				.flatMap(tryJSON(OAUTH_ACCESS_URL));
 		};
