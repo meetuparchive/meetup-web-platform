@@ -1,7 +1,7 @@
 import {
 	coerceBool,
 	toCamelCase,
-	cleanRawCookies,
+	removeSurroundingQuotes,
 } from './stringUtils';
 
 describe('coerceBool', () => {
@@ -28,15 +28,14 @@ describe('toCamelCase', () => {
 		expect(toCamelCase('this-is-compLICAT-ED')).toEqual('thisIsCompLICATED');
 	});
 });
-describe('cleanRawCookies', () => {
+describe('removeSurroundingQuotes', () => {
 	const singleQuotedString = `'single "quotes" have more fun'`;
-	const cookieSeparatorString = `foo=bar; baz="something with spaces"`;
-
+	const doubleQuotedString = `"double quotes are 'better' than one"`;
 
 	it('Removes surrounding single quotes', () => {
-		expect(cleanRawCookies(singleQuotedString)).toEqual(`single%20%22quotes%22%20have%20more%20fun`);
+		expect(removeSurroundingQuotes(singleQuotedString)).toEqual(`single "quotes" have more fun`);
 	});
-	it('Doesn\'t encode the cookie separator', () => {
-		expect(cleanRawCookies(cookieSeparatorString)).toEqual(`foo=bar; baz=%22something%20with%20spaces%22`);
+	it('Removes surrounding double quotes', () => {
+		expect(removeSurroundingQuotes(doubleQuotedString)).toEqual(`double quotes are 'better' than one`);
 	});
 });
