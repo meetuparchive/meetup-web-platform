@@ -11,7 +11,7 @@ jest.mock('request', () =>
 				cb(null, {
 					headers: {},
 					statusCode: 200,
-					elapsedTime: 234,
+					elapsedTime: 2,
 					request: {
 						uri: {
 							query: 'foo=bar',
@@ -19,7 +19,7 @@ jest.mock('request', () =>
 						},
 						method: 'get',
 					},
-				}, '{}'), 234)
+				}, '{}'), 2)
 	)
 );
 
@@ -67,6 +67,7 @@ describe('Full dummy app render', () => {
 	const random32 = 'asdfasdfasdfasdfasdfasdfasdfasdf';
 	const mockConfig = () => Promise.resolve({
 		API_HOST: 'www.api.meetup.com',
+		API_TIMEOUT: 10,
 		OAUTH_ACCESS_URL: 'http://example.com/access',
 		OAUTH_AUTH_URL: 'http://example.com/auth',
 		CSRF_SECRET: random32,

@@ -11,14 +11,14 @@ jest.mock('request', () => {
 				cb(null, {
 					headers: {},
 					statusCode: 200,
-					elapsedTime: 234,
+					elapsedTime: 2,
 					request: {
 						uri: {
 							pathname: '/foo',
 						},
 						method: 'post',
 					},
-				}, '{}'), 234)
+				}, '{}'), 2)
 	);
 	mock.post = jest.fn();
 	return mock;
@@ -71,6 +71,7 @@ const runTest = (test, payload=mockPostPayload, csrfHeaders=getCsrfHeaders) => s
 describe('API proxy POST endpoint integration tests', () => {
 	const mockConfig = () => Promise.resolve({
 		API_HOST: 'www.api.meetup.com',
+		API_TIMEOUT: 10,
 		OAUTH_ACCESS_URL: 'http://example.com/access',
 		OAUTH_AUTH_URL: 'http://example.com/auth',
 		CSRF_SECRET: random32,
