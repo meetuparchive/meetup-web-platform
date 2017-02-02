@@ -5,6 +5,19 @@ import { cleanRawCookies } from './stringUtils';
  * @module fetchUtils
  */
 
+export const mergeClickCookie = (cookieHeader, clickTracking={ clicks: [] }) => {
+	if (clickTracking.clicks.length) {
+		const clickCookie = {
+			clickTracking: JSON.stringify(clickTracking)
+		};
+		return mergeCookies(
+			cookieHeader || '',
+			clickCookie
+		);
+	}
+	return cookieHeader;
+};
+
 /**
  * Wrapper around `fetch` to send an array of queries to the server. It ensures
  * that the request will have the required Oauth access token and constructs
@@ -29,10 +42,22 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 	const params = new URLSearchParams();
 	params.append('queries', JSON.stringify(queries));
 	if (meta) {
-		params.append('metadata', JSON.stringify(meta));
-		if (meta.logout) {
+		const {
+			clickTracking,
+			logout,
+			...metadata
+		} = meta;
+		// inject click tracking cookie
+		headers.cookie = mergeClickCookie(headers.cookie, clickTracking);
+
+		// special logout param
+		if (logout) {
 			params.append('logout', true);
 		}
+
+		// send other metadata in querystring
+		params.append('metadata', JSON.stringify(metadata));
+
 	}
 	const searchString = `?${params}`;
 	const fetchUrl = `${apiUrl}${isPost ? '' : searchString}`;
