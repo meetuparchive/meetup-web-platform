@@ -6,7 +6,7 @@ import { cleanRawCookies } from './stringUtils';
  */
 
 export const mergeClickCookie = (cookieHeader, clickTracking) => {
-	if ((clickTracking || {}).clicks.length) {
+	if (((clickTracking || {}).clicks || []).length) {
 		const clickCookie = {
 			clickTracking: JSON.stringify(clickTracking)
 		};
