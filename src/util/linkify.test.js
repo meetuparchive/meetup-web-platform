@@ -2,18 +2,18 @@ import linkify from './linkify';
 
 describe('linkify', () => {
 	const httpBase = 'http://www.meetup.com',
-		 expectedLink = '<a href="http://www.meetup.com" title="http://www.meetup.com" target="" >http://www.meetup.com</a>';
+		 expectedLink = '<a class="link" href="http://www.meetup.com" title="http://www.meetup.com" target="" >http://www.meetup.com</a>';
 
 	it('should turn a link text with http into a HTML anchor with http', () => {
 		expect(linkify(httpBase)).toBe(expectedLink);
 	});
 	it('should turn a link text with https into a HTML anchor with https', () => {
 		const secureBase = 'https://secure.meetup.com';
-		const expectedSecureLink = '<a href="https://secure.meetup.com" title="https://secure.meetup.com" target="" >https://secure.meetup.com</a>';
+		const expectedSecureLink = '<a class="link" href="https://secure.meetup.com" title="https://secure.meetup.com" target="" >https://secure.meetup.com</a>';
 		expect(linkify(secureBase)).toBe(expectedSecureLink);
 	});
 	it('should turn a link text with a target into an HTML anchor with a target', () => {
-		const targetLink = '<a href="http://www.meetup.com" title="http://www.meetup.com" target="foo" >http://www.meetup.com</a>';
+		const targetLink = '<a class="link" href="http://www.meetup.com" title="http://www.meetup.com" target="foo" >http://www.meetup.com</a>';
 		expect(linkify(httpBase, { target: 'foo' })).toBe(targetLink);
 	});
 	it('should turn a link text with a `_blank` target into an HTML anchor with `rel="noopener noreferrer"`', () => {

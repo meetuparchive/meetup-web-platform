@@ -4,7 +4,7 @@
   "description": "A collection of Node web application utilities developed for the Meetup web platform",
   "main": "./lib/index.js",
   "scripts": {
-    "build": "babel src --out-dir lib --ignore test.js,test.jsx",
+    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps",
     "coveralls": "cat coverage/lcov.info | coveralls",
     "lint": "eslint . --ext .js,.jsx --fix",
     "prepublish": "yarn run build",
@@ -46,9 +46,9 @@
     "redbox-react": "1.3.3",
     "redux-observable": "0.12.2",
     "request": "2.79.0",
-    "source-map-support": "0.4.10",
+    "source-map-support": "0.4.11",
     "tough-cookie": "2.3.2",
-    "url-regex": "4.0.0",
+    "url-regex": "3.2.0",
     "url-search-params": "0.6.1",
     "uuid": "3.0.1"
   },

@@ -152,8 +152,8 @@ describe('fetchQueries', () => {
 					const options = calledWith[1];
 					expect(url.toString()).toBe(API_URL.toString());
 					expect(options.method).toEqual('POST');
-					expect(options.body.has('queries')).toBe(true);
-					expect(options.body.has('metadata')).toBe(true);
+					expect(new URLSearchParams(options.body).has('queries')).toBe(true);
+					expect(new URLSearchParams(options.body).has('metadata')).toBe(true);
 					expect(options.headers['x-csrf-jwt']).toEqual(csrfJwt);
 				});
 		});
@@ -170,8 +170,8 @@ describe('fetchQueries', () => {
 					const options = calledWith[1];
 					expect(url.toString()).toBe(API_URL.toString());
 					expect(options.method).toEqual('POST');
-					expect(options.body.has('queries')).toBe(true);
-					expect(options.body.has('metadata')).toBe(false);
+					expect(new URLSearchParams(options.body).has('queries')).toBe(true);
+					expect(new URLSearchParams(options.body).has('metadata')).toBe(false);
 					expect(options.headers['x-csrf-jwt']).toEqual(csrfJwt);
 				});
 		});
