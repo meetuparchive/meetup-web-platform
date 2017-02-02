@@ -20,6 +20,7 @@ const MOCK_SERVER = {
 	},
 	ext: () => {},
 	state: () => {},
+	app: {}
 };
 const MOCK_HEADERS = {};
 const MOCK_REPLY_FN = () => {};
