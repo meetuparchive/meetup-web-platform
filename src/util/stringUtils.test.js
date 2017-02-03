@@ -1,7 +1,6 @@
 import {
 	coerceBool,
 	toCamelCase,
-	cleanRawCookies,
 } from './stringUtils';
 
 describe('coerceBool', () => {
@@ -28,15 +27,4 @@ describe('toCamelCase', () => {
 		expect(toCamelCase('this-is-compLICAT-ED')).toEqual('thisIsCompLICATED');
 	});
 });
-describe('cleanRawCookies', () => {
-	const singleQuotedString = `'single "quotes" have more fun'`;
-	const cookieSeparatorString = `foo=bar; baz="something with spaces"`;
 
-
-	it('Removes surrounding single quotes', () => {
-		expect(cleanRawCookies(singleQuotedString)).toEqual(`single%20%22quotes%22%20have%20more%20fun`);
-	});
-	it('Doesn\'t encode the cookie separator', () => {
-		expect(cleanRawCookies(cookieSeparatorString)).toEqual(`foo=bar; baz=%22something%20with%20spaces%22`);
-	});
-});
