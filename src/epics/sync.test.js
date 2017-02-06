@@ -1,4 +1,3 @@
-import { browserHistory } from 'react-router';
 import 'rxjs/Observable';
 import { ActionsObservable } from 'redux-observable';
 import { LOCATION_CHANGE } from 'react-router-redux';
@@ -24,6 +23,12 @@ import {
 import getSyncEpic from '../epics/sync';
 import * as syncActionCreators from '../actions/syncActionCreators';
 import * as authActionCreators from '../actions/authActionCreators';
+
+jest.mock('react-router', () => ({
+	browserHistory: {
+		replace: jest.fn(() => {}),
+	},
+}));
 
 /**
  * @module SyncEpicTest
@@ -84,7 +89,6 @@ describe('Sync epic', () => {
 
 
 	it('strips logout query and calls browserHistory.replace on LOGIN_SUCCESS', function() {
-		spyOn(browserHistory, 'replace');
 		const mockFetchQueries = () => () => Promise.resolve({});
 		const locationWithLogout = {
 			...MOCK_APP_STATE.routing.locationBeforeTransitions,
@@ -107,7 +111,7 @@ describe('Sync epic', () => {
 		return getSyncEpic(routes, mockFetchQueries)(action$, fakeStore)
 			.toPromise()
 			.then(() => {
-				expect(browserHistory.replace).toHaveBeenCalledWith(locationWithoutLogout);
+				expect(require('react-router').browserHistory.replace).toHaveBeenCalledWith(locationWithoutLogout);
 			});
 	});
 

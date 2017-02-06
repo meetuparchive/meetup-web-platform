@@ -57,16 +57,19 @@ export const getNavEpic = routes => {
  */
 export const locationSyncEpic = (action$, store) =>
 	action$.ofType('LOGIN_SUCCESS')
-		.do(() => {
+		.map(() => {
 			const location = {
 				...store.getState().routing.locationBeforeTransitions
 			};
 			delete location.query.logout;
+			return location;
+		})
+		.do(location => {
 			useBasename(() => browserHistory)({
 				basename: location.basename
-			}).replace(location);  // this will trigger a LOCATION_CHANGE
+			}).replace(location);  // this will not trigger a LOCATION_CHANGE
 		})
-		.ignoreElements();
+		.map(location => ({ type: LOCATION_CHANGE, payload: location }));
 
 /**
  * Listen for actions that provide queries to send to the api - mainly

@@ -20,6 +20,7 @@ const MOCK_SERVER = {
 	},
 	ext: () => {},
 	state: () => {},
+	app: {}
 };
 const MOCK_HEADERS = {};
 const MOCK_REPLY_FN = () => {};
@@ -53,8 +54,8 @@ const GOOD_MOCK_FETCH_RESULT = Promise.resolve({
 });
 const BAD_MOCK_FETCH_RESULT = Promise.resolve({ text: () => Promise.resolve(undefined) });
 
-const OAUTH_AUTH_URL = 'auth_fakeout';
-const OAUTH_ACCESS_URL = 'access_fakeout';
+const OAUTH_AUTH_URL = 'http://example.com/auth_fakeout';
+const OAUTH_ACCESS_URL = 'http://example.com/access_fakeout';
 const MOCK_CODE = { grant_type: 'anonymous_code', token: 'mock_anon_code' };
 
 describe('getAnonymousCode$', () => {
@@ -239,8 +240,8 @@ describe('register', () => {
 
 describe('oauthScheme', () => {
 	const options = {
-		OAUTH_AUTH_URL: '',
-		OAUTH_ACCESS_URL: '',
+		OAUTH_AUTH_URL,
+		OAUTH_ACCESS_URL,
 		oauth: {
 			key: '1234',
 			secret: 'abcd',
