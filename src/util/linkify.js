@@ -13,7 +13,7 @@ const createLink = options => href => {
 	const targetAttr = `target="${target}"`;
 	const relAttr = target === '_blank' ? 'rel="noopener noreferrer"' : '';
 
-	return `<a href="${href}" title="${href}" ${targetAttr} ${relAttr}>${href}</a>`;
+	return `<a class="link" href="${href}" title="${href}" ${targetAttr} ${relAttr}>${href}</a>`;
 }
 
 /**

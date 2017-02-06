@@ -2,6 +2,10 @@
   "name": "meetup-web-platform",
   "version": "0.0.0",
   "description": "A collection of Node web application utilities developed for the Meetup web platform",
+  "engineStrict" : true,
+  "engines": {
+    "node": "^7.0.0"
+  },
   "main": "./lib/index.js",
   "scripts": {
     "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps",
@@ -37,7 +41,7 @@
     "history": "3.2.1",
     "idb-keyval": "2.3.0",
     "intl": "1.2.5",
-    "joi": "10.2.0",
+    "joi": "10.2.1",
     "node-fetch": "1.6.3",
     "qs": "6.3.0",
     "react-dom": "15.4.2",
@@ -49,10 +53,9 @@
     "source-map-support": "0.4.11",
     "tough-cookie": "2.3.2",
     "url-regex": "3.2.0",
-    "url-search-params": "0.6.1",
     "uuid": "3.0.1"
   },
-  "peerDependencies":{
+  "peerDependencies": {
     "react": "^15.4.2",
     "react-helmet": "^3.3.2",
     "react-intl": "^2.2.3",
@@ -75,11 +78,11 @@
     "jest-cli": "18.1.0",
     "meetup-web-mocks": "0.1.51",
     "react": "^15.4.2",
+    "react-addons-test-utils": "15.4.2",
     "react-helmet": "^3.3.2",
     "react-intl": "^2.2.3",
     "react-redux": "^5.0.2",
     "react-router": "^3.0.2",
-    "react-addons-test-utils": "15.4.2",
     "redux": "^3.5.2",
     "rxjs": "^5.0.3",
     "tough-cookie": "2.3.2"

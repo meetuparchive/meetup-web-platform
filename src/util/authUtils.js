@@ -69,21 +69,26 @@ export function validateSecret(secret) {
 	return value;
 }
 
+export const getMemberCookieName = server =>
+	server.app.isDevConfig ? 'MEETUP_MEMBER_DEV' : 'MEETUP_MEMBER';
+
 /**
  * apply default cookie options for auth-related cookies
  */
 export const configureAuthCookies = (server, options) => {
 	const password = validateSecret(options.COOKIE_ENCRYPT_SECRET);
+	const isSecure = process.env.NODE_ENV === 'production';
 	const authCookieOptions = {
 		encoding: 'iron',
 		password,
-		isSecure: process.env.NODE_ENV === 'production',
+		isSecure,
 		path: '/',
 		isHttpOnly: true,
 		clearInvalid: true,
 	};
 	server.state('oauth_token', authCookieOptions);
 	server.state('refresh_token', authCookieOptions);
+	server.state(getMemberCookieName(server), { isSecure, isHttpOnly: true });
 };
 
 export const setPluginState = (request, reply) => {
@@ -94,7 +99,4 @@ export const setPluginState = (request, reply) => {
 
 	return reply.continue();
 };
-
-export const getMemberCookieName = request =>
-	request.server.app.isDevConfig ? 'MEETUP_MEMBER_DEV' : 'MEETUP_MEMBER';
 
