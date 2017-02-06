@@ -1310,9 +1310,9 @@ ecdsa-sig-formatter@1.0.9:
     base64url "^2.0.0"
     safe-buffer "^5.0.1"
 
-electrode-csrf-jwt@1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/electrode-csrf-jwt/-/electrode-csrf-jwt-1.2.0.tgz#b8cdb682f0d1126eb6af76ca8500ec6a20ca192d"
+electrode-csrf-jwt@1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/electrode-csrf-jwt/-/electrode-csrf-jwt-1.2.1.tgz#1006eb06bced930c82b7002fcd4be5b53cced807"
   dependencies:
     bluebird "^3.4.6"
     boom "^4.0.0"
@@ -2497,9 +2497,9 @@ jodid25519@^1.0.0:
   dependencies:
     jsbn "~0.1.0"
 
-joi@10.2.0, joi@10.x.x:
-  version "10.2.0"
-  resolved "https://registry.yarnpkg.com/joi/-/joi-10.2.0.tgz#2c9dba08240d453e58145667f0d5006de527e328"
+joi@10.2.1, joi@10.x.x:
+  version "10.2.1"
+  resolved "https://registry.yarnpkg.com/joi/-/joi-10.2.1.tgz#f3a5f6a492d311735f17b109487646c2194aa92d"
   dependencies:
     hoek "4.x.x"
     isemail "2.x.x"
