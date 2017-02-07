@@ -1,5 +1,4 @@
 import https from 'https';
-import Boom from 'boom';
 import * as serverUtils from './serverUtils';
 
 describe('checkForDevUrl', () => {
@@ -40,4 +39,26 @@ describe('configureEnv', function() {
 	});
 });
 
+describe('onRequestExtension', () => {
+	it('calls reply.continue', () => {
+		const reply = {
+			continue: () => {},
+		};
+		spyOn(reply, 'continue');
+		serverUtils.onRequestExtension({}, reply);
+		expect(reply.continue).toHaveBeenCalled();
+	});
+	it('calls console.log with request headers', () => {
+		const reply = {
+			continue: () => {},
+		};
+		const request = {
+			headers: 'foo',
+		};
+		spyOn(global.console, 'log');
+		serverUtils.onRequestExtension(request, reply);
+		const calledWith = console.log.calls.mostRecent().args[0];
+		expect(JSON.parse(calledWith).headers).toBe(request.headers);
+	});
+});
 

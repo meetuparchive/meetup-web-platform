@@ -20,6 +20,27 @@ export function checkForDevUrl(value) {
 	return false;
 }
 
+export function onRequestExtension(request, reply) {
+	console.log(JSON.stringify({
+		message: 'Request info',
+		headers: request.headers,
+	}));
+	reply.continue();
+}
+
+/**
+ * Use server.ext to add functions to request/server extension points
+ * @param {Object} server Hapi server
+ * @return {Object} Hapi server
+ */
+export function registerExtensionEvents(server) {
+	server.ext({
+		type: 'onRequest',
+		method: onRequestExtension,
+	});
+	return server;
+}
+
 /**
  * Make any environment changes that need to be made in response to the provided
  * config
@@ -49,6 +70,7 @@ export function server(routes, connection, plugins, platform_agent, config) {
 
 	return server.connection(connection)
 		.register(plugins)
+		.then(() => registerExtensionEvents(server))
 		.then(() => server.auth.strategy('default', 'oauth', true, config))
 		.then(() => server.log(['start'], `${plugins.length} plugins registered, assigning routes...`))
 		.then(() => server.route(routes))
