@@ -36,11 +36,17 @@ export default function start(
 	// (process.env.NODE_ENV === 'production')
 	require('source-map-support').install();
 
+	const pingRoute = {
+		path: '/ping',
+		method: 'GET',
+		handler: (request, reply) => reply('pong!'),
+	};
+
 	return config()
 		.then(configureEnv)
 		.then(config => {
 			const baseRoutes = getRoutes(renderRequestMap, config);
-			const finalRoutes = [ ...routes, ...baseRoutes ];
+			const finalRoutes = [ pingRoute, ...routes, ...baseRoutes ];
 
 			const connection = {
 				host: '0.0.0.0',
