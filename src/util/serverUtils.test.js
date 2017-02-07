@@ -48,17 +48,19 @@ describe('onRequestExtension', () => {
 		serverUtils.onRequestExtension({}, reply);
 		expect(reply.continue).toHaveBeenCalled();
 	});
-	it('calls console.log with request headers', () => {
+	it('calls console.log with request headers and id', () => {
 		const reply = {
 			continue: () => {},
 		};
 		const request = {
 			headers: 'foo',
+			id: 'bar',
 		};
 		spyOn(global.console, 'log');
 		serverUtils.onRequestExtension(request, reply);
 		const calledWith = console.log.calls.mostRecent().args[0];
 		expect(JSON.parse(calledWith).headers).toBe(request.headers);
+		expect(JSON.parse(calledWith).id).toBe(request.id);
 	});
 });
 

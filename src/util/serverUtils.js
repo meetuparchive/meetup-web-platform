@@ -24,6 +24,7 @@ export function onRequestExtension(request, reply) {
 	console.log(JSON.stringify({
 		message: 'Request info',
 		headers: request.headers,
+		id: request.id,
 	}));
 	reply.continue();
 }
