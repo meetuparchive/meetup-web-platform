@@ -60,7 +60,15 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 				responses: responses || [],
 				csrf: queryResponse.headers.get('x-csrf-jwt'),
 			};
-		})
+		}),
+		err => {
+			console.error(JSON.stringify({
+				err: err.stack,
+				message: 'App server API fetch error',
+				context: fetchConfig,
+			}));
+			throw err;
+		}
 	);
 };
 
