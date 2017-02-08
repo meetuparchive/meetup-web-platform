@@ -17,7 +17,10 @@ export function apiSuccess({ queries, responses, csrf }) {
 }
 
 export function apiError(err) {
-	console.error('API_ERROR: ', err.stack);
+	console.error(JSON.stringify({
+		message: 'App server API error',
+		err: err.stack
+	}));
 	return {
 		type: 'API_ERROR',
 		payload: err,

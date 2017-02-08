@@ -360,6 +360,19 @@ const externalRequest$ = Rx.Observable.bindNodeCallback(externalRequest);
  */
 export const makeExternalApiRequest = (request, API_TIMEOUT) => requestOpts => {
 	return externalRequest$(requestOpts)
+		.do(  // log errors
+			null,
+			err => {
+				console.error(JSON.stringify({
+					err: err.stack,
+					message: 'REST API request error',
+					request: {
+						id: request.id
+					},
+					context: requestOpts,
+				}));
+			}
+		)
 		.timeout(API_TIMEOUT)
 		.map(([response, body]) => [response, body, requestOpts.jar]);
 };
