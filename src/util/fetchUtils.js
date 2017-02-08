@@ -72,6 +72,13 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 	);
 };
 
+/**
+ * Attempt to JSON parse a Response object from a fetch call
+ *
+ * @param {String} reqUrl the URL that was requested
+ * @param {Response} response the fetch Response object
+ * @return {Promise} a Promise that resolves with the JSON-parsed text
+ */
 export const tryJSON = reqUrl => response => {
 	const { status, statusText } = response;
 	if (status >= 400) {  // status always 200: bugzilla #52128
@@ -82,10 +89,21 @@ export const tryJSON = reqUrl => response => {
 	return response.text().then(text => JSON.parse(text));
 };
 
+/**
+ * Convert an object of cookie name-value pairs into a 'Cookie' header. This
+ * is different than the serialization offered by the 'cookie' and
+ * 'tough-cookie' packages, which write cookie values in the form of a
+ * 'Set-Cookie' header, which contains more info
+ *
+ * @param {Object} cookies a name-value mapping of cookies, e.g. from
+ *   `cookie.parse`
+ * @return {String} a 'Cookie' header string
+ */
 export const stringifyCookies = cookies =>
 	Object.keys(cookies)
-			.map(name => `${name}=${cookies[name]}`)
-			.join('; ');
+		.map(name => `${name}=${cookies[name]}`)
+		.join('; ');
+
 /**
  * @param {String} rawCookieHeader a 'cookie' header string
  * @param {Object} newCookies an object of name-value cookies to inject
@@ -105,6 +123,13 @@ export const BAD_COOKIES = [
 	'click-track'
 ];
 
+/**
+ * Remove cookies that are known to have values that are invalid for `fetch`
+ * calls
+ *
+ * @param {String} cookieHeader a cookie header
+ * @return {String} a cleaned cookie header string
+ */
 export const cleanBadCookies = (cookieHeader) => {
 	const cookies = cookie.parse(cookieHeader);
 	BAD_COOKIES.forEach(badCookie => delete cookies[badCookie]);
