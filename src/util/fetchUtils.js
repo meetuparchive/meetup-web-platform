@@ -82,6 +82,10 @@ export const tryJSON = reqUrl => response => {
 	return response.text().then(text => JSON.parse(text));
 };
 
+export const stringifyCookies = cookies =>
+	Object.keys(cookies)
+			.map(name => `${name}=${cookies[name]}`)
+			.join('; ');
 /**
  * @param {String} rawCookieHeader a 'cookie' header string
  * @param {Object} newCookies an object of name-value cookies to inject
@@ -94,8 +98,17 @@ export const mergeCookies = (rawCookieHeader, newCookies) => {
 		...oldCookies,
 		...newCookies,
 	};
-	return Object.keys(mergedCookies)
-		.map(name => `${name}=${mergedCookies[name]}`)
-		.join('; ');
+	return stringifyCookies(mergedCookies);
+};
+
+export const BAD_COOKIES = [
+	'click-track'
+];
+
+export const cleanBadCookies = (cookieHeader) => {
+	const cookies = cookie.parse(cookieHeader);
+	BAD_COOKIES.forEach(badCookie => delete cookies[badCookie]);
+
+	return stringifyCookies(cookies);
 };
 
