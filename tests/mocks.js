@@ -1,9 +1,15 @@
 import csrf from 'electrode-csrf-jwt/lib/csrf';
-import React from 'react';
 import uuid from 'uuid';
 
 import makeRenderer from '../src/renderers/server-render';
-import makeRootReducer from '../src/reducers/platform';
+
+import {
+	assetPublicPath,
+	clientFilename,
+	routes,
+	reducer,
+	AppContainer,
+} from './MockApp.jsx';
 
 const random32 = 'asdfasdfasdfasdfasdfasdfasdfasdf';
 export const mockConfig = () => Promise.resolve({
@@ -43,23 +49,11 @@ export function getCsrfHeaders() {
 		});
 }
 
-const expectedOutputMessage = 'Looking good';
 export const getMockRenderRequestMap = () => {
-	const clientFilename = 'client.whatever.js';
-	const assetPublicPath = '//whatever';
-
-	const TestRenderComponent = props => <div>{expectedOutputMessage}</div>;
-
-	const routes = {
-		path: '/ny-tech',
-		component: TestRenderComponent,
-		query: () => ({}),
-	};
-	const reducer = makeRootReducer();
-
 	const basename = '/';
 
 	const renderRequest$ = makeRenderer(
+		AppContainer,
 		routes,
 		reducer,
 		clientFilename,
