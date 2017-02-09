@@ -37,6 +37,7 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 		method,
 		headers: {
 			...(headers || {}),
+			cookie: cleanBadCookies((headers || {}).cookie),
 			'content-type': isPost ? 'application/x-www-form-urlencoded' : 'text/plain',
 			'x-csrf-jwt': (isPost || isDelete) ? options.csrf : '',
 		},
@@ -131,6 +132,9 @@ export const BAD_COOKIES = [
  * @return {String} a cleaned cookie header string
  */
 export const cleanBadCookies = (cookieHeader) => {
+	if (!cookieHeader) {
+		return '';
+	}
 	const cookies = cookie.parse(cookieHeader);
 	BAD_COOKIES.forEach(badCookie => delete cookies[badCookie]);
 
