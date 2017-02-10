@@ -2,14 +2,15 @@ import { Observable } from 'rxjs';
 import { useBasename } from 'history';
 import { combineEpics } from 'redux-observable';
 import { browserHistory } from 'react-router';
-import { LOCATION_CHANGE } from 'react-router-redux';
 import {
 	apiRequest,
 	apiSuccess,
 	apiError,
 	apiComplete,
+	LOCATION_CHANGE,
 } from '../actions/syncActionCreators';
-import { activeRouteQueries$ } from '../util/routeUtils';
+import { activeRouteQueries } from '../util/routeUtils';
+
 
 /**
  * Navigation actions will provide the `location` as the payload, which this
@@ -24,7 +25,7 @@ import { activeRouteQueries$ } from '../util/routeUtils';
  * @returns {Function} an Epic function that emits an API_REQUEST action
  */
 export const getNavEpic = routes => {
-	const activeQueries$ = activeRouteQueries$(routes);
+	const findActiveQueries = activeRouteQueries(routes);
 	let currentLocation = {};  // keep track of current route so that apiRequest can get 'referrer'
 	return (action$, store) =>
 		action$.ofType(LOCATION_CHANGE, '@@server/RENDER')
@@ -34,16 +35,18 @@ export const getNavEpic = routes => {
 					referrer: currentLocation.pathname,
 					logout: 'logout' in payload.query,
 				};
+				// now that referrer has been recorded, set new currentLocation
+				currentLocation = payload;
 
-				const apiRequestActions$ = activeQueries$(payload)  // find the queries for the location
-					.map(queries => apiRequest(queries, requestMetadata))
-					.do(() => currentLocation = payload);  // update to new location
+				const activeQueries = findActiveQueries(payload);
+				const actions = [apiRequest(activeQueries, requestMetadata)];
 
 				// emit cache clear _only_ when logout requested
-				const cacheClearAction$ = requestMetadata.logout ?
-					Observable.of({ type: 'CACHE_CLEAR' }) : Observable.empty();
+				if (requestMetadata.logout) {
+					actions.push({ type: 'CACHE_CLEAR' });
+				}
 
-				return Observable.merge(cacheClearAction$, apiRequestActions$);
+				return Observable.from(actions);
 			});
 };
 

@@ -3,12 +3,11 @@ import uuid from 'uuid';
 
 import makeRenderer from '../src/renderers/server-render';
 
-import {
+import MockApp, {
 	assetPublicPath,
 	clientFilename,
 	routes,
 	reducer,
-	AppContainer,
 } from './MockApp.jsx';
 
 const random32 = 'asdfasdfasdfasdfasdfasdfasdfasdf';
@@ -53,7 +52,7 @@ export const getMockRenderRequestMap = () => {
 	const basename = '/';
 
 	const renderRequest$ = makeRenderer(
-		AppContainer,
+		MockApp,
 		routes,
 		reducer,
 		clientFilename,

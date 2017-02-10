@@ -9,7 +9,8 @@ import { fooPathContent } from '../MockApp';
 jest.mock('request', () =>
 	jest.fn(
 		(requestOpts, cb) =>
-			setTimeout(() =>
+			setTimeout(() => {
+				console.log('Made mock request with', JSON.stringify(requestOpts));
 				cb(null, {
 					headers: {},
 					statusCode: 200,
@@ -21,7 +22,8 @@ jest.mock('request', () =>
 						},
 						method: 'get',
 					},
-				}, '{}'), 2)
+				}, '{}');
+			}, 2)
 	)
 );
 
