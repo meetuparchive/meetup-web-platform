@@ -15,11 +15,13 @@ import PlatformApp from '../components/PlatformApp';
  * @param {Function} reducer the root Redux reducer for the app
  * @param {Function} middleware (optional) any app-specific middleware that
  *   should be applied to the store
+ * @param {String} baseUrl an optional baseUrl to serve the site from,
+ * 	_including_ surrounding slashes, e.g. '/en-US/'
  *
  * @returns {Function} a function that results in a ReactDOM.render call - can
  *   use a custom root element ID or default to `'outlet'`
  */
-function makeRenderer(routes, reducer, middleware=[], basename='') {
+function makeRenderer(routes, reducer, middleware=[], baseUrl='') {
 	// the initial state is delivered in the HTML from the server as a plain object
 	// containing the HTML-escaped JSON string in `window.INITIAL_STATE.escapedState`.
 	// unescape the text using native `textarea.textContent` unescaping
@@ -32,7 +34,7 @@ function makeRenderer(routes, reducer, middleware=[], basename='') {
 
 	return (rootElId='outlet') => {
 		ReactDOM.render(
-			<BrowserRouter basename={basename}>
+			<BrowserRouter basename={baseUrl}>
 				<PlatformApp store={store} routes={routes} />
 			</BrowserRouter>,
 			document.getElementById(rootElId)
