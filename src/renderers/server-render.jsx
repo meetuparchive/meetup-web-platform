@@ -150,7 +150,7 @@ const makeRenderer = (
 	clientFilename,
 	assetPublicPath,
 	middleware=[],
-	baseUrl=''
+	baseUrl='/'
 ) => request => {
 
 	middleware = middleware || [];
