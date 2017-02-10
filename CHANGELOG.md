@@ -1,3 +1,7 @@
+## [2.0]
+
+- **Refactor** Upgrade to React Router v4.
+
 ## [1.0]
 
 - **Require Node v7** for require('url').URL
