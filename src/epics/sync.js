@@ -33,7 +33,7 @@ export const getNavEpic = routes => {
 				// inject request metadata from context, including `store.getState()`
 				const requestMetadata = {
 					referrer: currentLocation.pathname,
-					logout: 'logout' in payload.query,
+					logout: /\Wlogout=/.test(payload.search),
 				};
 				// now that referrer has been recorded, set new currentLocation
 				currentLocation = payload;
