@@ -3,12 +3,12 @@ import uuid from 'uuid';
 
 import makeRenderer from '../src/renderers/server-render';
 
-import MockApp, {
+import {
 	assetPublicPath,
 	clientFilename,
 	routes,
 	reducer,
-} from './MockApp.jsx';
+} from './MockApp';
 
 const random32 = 'asdfasdfasdfasdfasdfasdfasdfasdf';
 export const mockConfig = () => Promise.resolve({
@@ -49,10 +49,9 @@ export function getCsrfHeaders() {
 }
 
 export const getMockRenderRequestMap = () => {
-	const basename = '/';
+	const basename = '';
 
 	const renderRequest$ = makeRenderer(
-		MockApp,
 		routes,
 		reducer,
 		clientFilename,

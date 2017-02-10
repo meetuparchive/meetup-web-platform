@@ -19,8 +19,10 @@ export class SyncContainer extends React.Component {
 	 * it should trigger a LOCATION_SYNC action
 	 * @return {undefined} side effect only - dispatch
 	 */
-	componentWillUpdate() {
-		this.props.dispatchLocationChange(this.props.location);
+	componentWillReceiveProps(nextProps) {
+		if (nextProps.location !== this.props.location) {
+			this.props.dispatchLocationChange(this.props.location);
+		}
 	}
 	/**
 	 * @return {Function} React element

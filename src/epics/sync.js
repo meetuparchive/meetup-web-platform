@@ -43,7 +43,7 @@ export const getNavEpic = routes => {
 
 				// emit cache clear _only_ when logout requested
 				if (requestMetadata.logout) {
-					actions.push({ type: 'CACHE_CLEAR' });
+					actions.unshift({ type: 'CACHE_CLEAR' });
 				}
 
 				return Observable.from(actions);
@@ -60,19 +60,8 @@ export const getNavEpic = routes => {
  */
 export const locationSyncEpic = (action$, store) =>
 	action$.ofType('LOGIN_SUCCESS')
-		.map(() => {
-			const location = {
-				...store.getState().routing.locationBeforeTransitions
-			};
-			delete location.query.logout;
-			return location;
-		})
-		.do(location => {
-			useBasename(() => browserHistory)({
-				basename: location.basename
-			}).replace(location);  // this will not trigger a LOCATION_CHANGE
-		})
-		.map(location => ({ type: LOCATION_CHANGE, payload: location }));
+		.ignoreElements()  // TODO: push window.location into history without querystring
+		.map(() => ({ type: LOCATION_CHANGE, payload: window.location }));
 
 /**
  * Listen for actions that provide queries to send to the api - mainly
@@ -95,7 +84,7 @@ export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 export default function getSyncEpic(routes, fetchQueries) {
 	return combineEpics(
 		getNavEpic(routes),
-		locationSyncEpic,
+		// locationSyncEpic,
 		getFetchQueriesEpic(fetchQueries)
 	);
 }

@@ -6,6 +6,8 @@ import {
 import start from '../../src/server';
 import { fooPathContent } from '../MockContainer';
 
+// mock request just to ensure no external calls are made
+// ** Use getMockFetch to mock an API endpoint response **
 jest.mock('request', () =>
 	jest.fn(
 		(requestOpts, cb) =>
@@ -27,7 +29,7 @@ jest.mock('request', () =>
 );
 
 describe('Full dummy app render', () => {
-	it('calls the handler for /{*wild}', () => {
+	it('renders the expected app content for nested path of mock app route config', () => {
 		const fakeApiProxyResponse = 'value from api proxy';
 		spyOn(global, 'fetch').and.returnValue(
 			getMockFetch({ responses: [{ foo: { value: fakeApiProxyResponse } }] })

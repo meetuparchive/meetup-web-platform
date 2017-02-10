@@ -3,12 +3,11 @@ import chalk from 'chalk';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import StaticRouter from 'react-router-dom/StaticRouter';
-import { Provider } from 'react-redux';
 
 import { getServerCreateStore } from '../util/createStore';
 import Dom from '../components/dom';
 import NotFound from '../components/NotFound';
-import SyncContainer from '../components/SyncContainer';
+import PlatformApp from '../components/PlatformApp';
 import { polyfillNodeIntl } from '../util/localizationUtils';
 
 import {
@@ -58,7 +57,7 @@ function getHtml(baseUrl, assetPublicPath, clientFilename, initialState={}, appM
  *   {@link http://hapijs.com/api#replyerr-result}
  */
 const getRouterRenderer = (
-	AppContainer,
+	routes,
 	store,
 	location,
 	baseUrl,
@@ -79,17 +78,13 @@ const getRouterRenderer = (
 
 	try {
 		appMarkup = ReactDOMServer.renderToString(
-			<Provider store={store}>
-				<StaticRouter
-					basename={baseUrl}
-					location={location}
-					context={context}
-				>
-					<SyncContainer>
-						<AppContainer />
-					</SyncContainer>
-				</StaticRouter>
-			</Provider>
+			<StaticRouter
+				basename={baseUrl}
+				location={location}
+				context={context}
+			>
+				<PlatformApp store={store} routes={routes} />
+			</StaticRouter>
 		);
 
 		if (context.url) {
@@ -150,13 +145,12 @@ const dispatchConfig = (store, { apiUrl, log=console.log }) => {
  * @return {Observable}
  */
 const makeRenderer = (
-	AppContainer,
 	routes,
 	reducer,
 	clientFilename,
 	assetPublicPath,
 	middleware=[],
-	baseUrl='/'
+	baseUrl=''
 ) => request => {
 
 	middleware = middleware || [];
@@ -205,7 +199,7 @@ const makeRenderer = (
 		payload: request.url,
 	});
 	return storeIsReady$
-		.map(() => getRouterRenderer(AppContainer, store, appLocation, baseUrl, clientFilename, assetPublicPath));
+		.map(() => getRouterRenderer(routes, store, appLocation, baseUrl, clientFilename, assetPublicPath));
 };
 
 export default makeRenderer;
