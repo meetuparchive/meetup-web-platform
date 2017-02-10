@@ -4,13 +4,12 @@ import {
 	mockConfig,
 } from '../mocks';
 import start from '../../src/server';
-import { fooPathContent } from '../MockApp';
+import { fooPathContent } from '../MockContainer';
 
 jest.mock('request', () =>
 	jest.fn(
 		(requestOpts, cb) =>
 			setTimeout(() => {
-				console.log('Made mock request with', JSON.stringify(requestOpts));
 				cb(null, {
 					headers: {},
 					statusCode: 200,
@@ -29,7 +28,10 @@ jest.mock('request', () =>
 
 describe('Full dummy app render', () => {
 	it('calls the handler for /{*wild}', () => {
-		spyOn(global, 'fetch').and.returnValue(getMockFetch());
+		const fakeApiProxyResponse = 'value from api proxy';
+		spyOn(global, 'fetch').and.returnValue(
+			getMockFetch({ responses: [{ foo: { value: fakeApiProxyResponse } }] })
+		);
 		return start(getMockRenderRequestMap(), {}, mockConfig)
 			.then(server => {
 				const request = {
@@ -37,9 +39,10 @@ describe('Full dummy app render', () => {
 					url: '/foo',
 					credentials: 'whatever',
 				};
-				return server.inject(request).then(
-					response => expect(response.payload).toContain(fooPathContent)
-				)
+				return server.inject(request).then(response => {
+					expect(response.payload).toContain(fooPathContent);
+					expect(response.payload).toContain(fakeApiProxyResponse);
+				})
 				.then(() => server.stop())
 				.catch(err => {
 					server.stop();

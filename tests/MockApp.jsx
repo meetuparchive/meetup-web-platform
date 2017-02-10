@@ -3,17 +3,20 @@ import Route from 'react-router-dom/Route';
 import makeRootReducer from '../src/reducers/platform';
 import withRouter from 'react-router-dom/withRouter';
 
+import MockContainer from './MockContainer';
+
 export const clientFilename = 'client.whatever.js';
 export const assetPublicPath = '//whatever';
 export const reducer = makeRootReducer();
 
-export const fooPathContent = 'Looking good';
-export const FooPathComponent = props => <div>{fooPathContent}</div>;
-
 export const routes = [{
 	path: '/foo',
-	component: FooPathComponent,
-	query: () => ({}),
+	component: MockContainer,
+	query: () => ({
+		type: 'mock',
+		ref: 'foo',
+		params: {},
+	}),
 }];
 
 /**
@@ -27,8 +30,7 @@ export class AppContainer extends React.Component {
 		return (
 			<div>
 				<h1>This be the app</h1>
-				<p>{JSON.stringify(this.props, null, 2)}</p>
-				<Route exact path='foo' component={FooPathComponent} />
+				<Route exact path='foo' component={MockContainer} />
 			</div>
 		);
 	}
