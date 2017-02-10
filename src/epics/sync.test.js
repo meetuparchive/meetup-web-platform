@@ -42,10 +42,7 @@ describe('Sync epic', () => {
 	it('emits CACHE_CLEAR and API_REQUEST for nav-related actions with logout query', function() {
 		const logoutLocation = {
 			...MOCK_RENDERPROPS.location,
-			query: {
-				...MOCK_RENDERPROPS.query,
-				logout: true,
-			}
+			search: '?foo=bar&logout=true',
 		};
 		const locationChange = { type: LOCATION_CHANGE, payload: logoutLocation };
 

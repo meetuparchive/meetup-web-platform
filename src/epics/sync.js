@@ -1,7 +1,5 @@
 import { Observable } from 'rxjs';
-import { useBasename } from 'history';
 import { combineEpics } from 'redux-observable';
-import { browserHistory } from 'react-router';
 import {
 	apiRequest,
 	apiSuccess,
@@ -33,7 +31,7 @@ export const getNavEpic = routes => {
 				// inject request metadata from context, including `store.getState()`
 				const requestMetadata = {
 					referrer: currentLocation.pathname,
-					logout: /\Wlogout=/.test(payload.search),
+					logout: /[?&]logout=/.test(payload.search),
 				};
 				// now that referrer has been recorded, set new currentLocation
 				currentLocation = payload;
