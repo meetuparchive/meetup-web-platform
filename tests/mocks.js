@@ -49,7 +49,7 @@ export function getCsrfHeaders() {
 }
 
 export const getMockRenderRequestMap = () => {
-	const basename = '/';
+	const basename = '';
 
 	const renderRequest$ = makeRenderer(
 		routes,

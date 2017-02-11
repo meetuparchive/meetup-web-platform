@@ -150,7 +150,7 @@ const makeRenderer = (
 	clientFilename,
 	assetPublicPath,
 	middleware=[],
-	baseUrl='/'
+	baseUrl=''
 ) => request => {
 
 	middleware = middleware || [];
@@ -159,12 +159,10 @@ const makeRenderer = (
 		headers,
 		info,
 		log,
-		path,
 		url,
 	} = request;
 	request.log(['info'], chalk.green(`Rendering ${url.href}`));
 
-	const appLocation = path.replace(`${baseUrl}/`, '/');
 	// request protocol might be different from original request that hit proxy
 	// we want to use the proxy's protocol
 	const requestProtocol = headers['x-forwarded-proto'] || connection.info.protocol;
@@ -193,13 +191,13 @@ const makeRenderer = (
 	})
 	.first(state => state.preRenderChecklist.every(isReady => isReady));  // take the first ready state
 
-	request.log(['app', 'info'], `Finding route for path: '${appLocation}'`);
+	request.log(['app', 'info'], `Finding route for path: '${url}'`);
 	store.dispatch({
 		type: '@@server/RENDER',
 		payload: request.url,
 	});
 	return storeIsReady$
-		.map(() => getRouterRenderer(routes, store, appLocation, baseUrl, clientFilename, assetPublicPath));
+		.map(() => getRouterRenderer(routes, store, url, baseUrl, clientFilename, assetPublicPath));
 };
 
 export default makeRenderer;

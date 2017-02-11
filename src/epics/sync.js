@@ -10,6 +10,7 @@ import {
 import { activeRouteQueries } from '../util/routeUtils';
 
 
+const logoutQueryMatch = /[?&]logout(?:[=&]|$)/;
 /**
  * Navigation actions will provide the `location` as the payload, which this
  * epic will use to collect the current Reactive Queries associated with the
@@ -31,7 +32,7 @@ export const getNavEpic = routes => {
 				// inject request metadata from context, including `store.getState()`
 				const requestMetadata = {
 					referrer: currentLocation.pathname,
-					logout: /[?&]logout=/.test(payload.search),
+					logout: logoutQueryMatch.test(payload.search),
 				};
 				// now that referrer has been recorded, set new currentLocation
 				currentLocation = payload;

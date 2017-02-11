@@ -21,7 +21,7 @@ export class SyncContainer extends React.Component {
 	 */
 	componentWillReceiveProps(nextProps) {
 		if (nextProps.location !== this.props.location) {
-			this.props.dispatchLocationChange(this.props.location);
+			this.props.dispatchLocationChange(nextProps.location);
 		}
 	}
 	/**
@@ -38,5 +38,7 @@ SyncContainer.propTypes = {
 	location: React.PropTypes.object.isRequired,
 };
 
-export default withRouter(connect(null, mapDispatchToProps)(SyncContainer));
+export default connect(null, mapDispatchToProps)(
+	withRouter(SyncContainer)
+);
 
