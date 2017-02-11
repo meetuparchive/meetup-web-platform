@@ -19,7 +19,7 @@ export const routes = [{
 		component: MockContainer,
 		query: () => ({
 			type: 'mock',
-			ref: 'root',
+			ref: 'foo',
 			params: {},
 		})
 	}],
