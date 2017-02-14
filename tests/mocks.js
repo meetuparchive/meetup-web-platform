@@ -8,7 +8,7 @@ import {
 	clientFilename,
 	routes,
 	reducer,
-} from './MockApp';
+} from './mockApp';
 
 const random32 = 'asdfasdfasdfasdfasdfasdfasdfasdf';
 export const mockConfig = () => Promise.resolve({
