@@ -12,7 +12,8 @@ const createLink = options => href => {
 	const target = options.target || '';
 	const targetAttr = `target="${target}"`;
 	const relAttr = target === '_blank' ? 'rel="noopener noreferrer"' : '';
-	const link = (href.search('www.') === 0) ? `http://${href}` : href;
+	const hasProtocolRE = /^(?:https?:|ws:|ftp:)?\/\//;
+	const link = hasProtocolRE.test(href) ? href : `http://${href}`;
 
 	return `<a class="link" href="${link}" title="${href}" ${targetAttr} ${relAttr}>${href}</a>`;
 }
