@@ -29,11 +29,12 @@ MOCK_REPLY_FN.continue = () => {};
 const MOCK_REQUEST = {
 	headers: MOCK_HEADERS,
 	state: {},
-	app: {},
 	log: (tags, data) => { console.log(data); },
 	authorize: () => Rx.Observable.of(MOCK_REQUEST),
 	query: {},
-	plugins: {},
+	plugins: {
+		requestAuth: {},
+	},
 	server: {
 		app: {},
 	},
@@ -149,20 +150,6 @@ describe('applyRequestAuthorizer$', () => {
 			...MOCK_REQUEST,
 			state: {
 				oauth_token: 'foo',
-			}
-		})
-		.toPromise()
-		.then(request => {
-			expect(global.fetch).not.toHaveBeenCalled();
-		});
-	});
-	it('does not try to fetch when provided a request with __internal_oauth_token in state', () => {
-		spyOn(global, 'fetch');
-
-		return authorizeRequest$({
-			...MOCK_REQUEST,
-			state: {
-				__internal_oauth_token: 'foo',
 			}
 		})
 		.toPromise()

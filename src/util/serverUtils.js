@@ -69,12 +69,13 @@ export function server(routes, connection, plugins, platform_agent, config) {
 	};
 	server.decorate('reply', 'track', track(platform_agent));
 
+	const appConnection = server.connection(connection);
 	return server.connection(connection)
 		.register(plugins)
 		.then(() => registerExtensionEvents(server))
 		.then(() => server.auth.strategy('default', 'oauth', true, config))
 		.then(() => server.log(['start'], `${plugins.length} plugins registered, assigning routes...`))
-		.then(() => server.route(routes))
+		.then(() => appConnection.route(routes))
 		.then(() => server.log(['start'], `${routes.length} routes assigned, starting server...`))
 		.then(() => server.start())
 		.then(() => server.log(['start'], `Dev server is listening at ${server.info.uri}`))
