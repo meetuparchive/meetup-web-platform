@@ -39,7 +39,7 @@ export default function start(
 	return config()
 		.then(configureEnv)
 		.then(config => {
-			const baseRoutes = getRoutes(renderRequestMap, config);
+			const baseRoutes = getRoutes(renderRequestMap);
 			const finalRoutes = [ ...routes, ...baseRoutes ];
 
 			const connection = {

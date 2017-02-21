@@ -75,10 +75,9 @@ export function getConsoleLogPlugin() {
  * configure and return the plugin that will allow requests to get anonymous
  * oauth tokens to communicate with the API
  */
-export function getRequestAuthPlugin(options) {
+export function getRequestAuthPlugin() {
 	return {
 		register: requestAuthPlugin,
-		options,
 	};
 }
 

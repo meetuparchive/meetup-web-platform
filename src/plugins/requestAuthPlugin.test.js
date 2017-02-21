@@ -223,7 +223,7 @@ describe('register', () => {
 	const spyable = {
 		next() {}
 	};
-	const options = {
+	const app = {
 		OAUTH_AUTH_URL: '',
 		OAUTH_ACCESS_URL: '',
 		oauth: {
@@ -233,13 +233,16 @@ describe('register', () => {
 	};
 	it('calls next', () => {
 		spyOn(spyable, 'next');
-		register(MOCK_SERVER, options, spyable.next);
+		register({
+			...MOCK_SERVER,
+			app
+		}, {}, spyable.next);
 		expect(spyable.next).toHaveBeenCalled();
 	});
 });
 
 describe('oauthScheme', () => {
-	const options = {
+	const app = {
 		OAUTH_AUTH_URL,
 		OAUTH_ACCESS_URL,
 		oauth: {
@@ -247,11 +250,16 @@ describe('oauthScheme', () => {
 			secret: 'abcd',
 		},
 		COOKIE_ENCRYPT_SECRET: 'asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf',
+		duotoneUrls: ['http://example.com'],
 	};
 	it('calls server.ext with an \'onPreAuth\' function', () => {
-		spyOn(MOCK_SERVER, 'ext');
-		oauthScheme(MOCK_SERVER, options);
-		expect(MOCK_SERVER.ext).toHaveBeenCalledWith('onPreAuth', jasmine.any(Function));
+		const server = {
+			...MOCK_SERVER,
+			app
+		};
+		spyOn(server, 'ext');
+		oauthScheme(server);
+		expect(server.ext).toHaveBeenCalledWith('onPreAuth', jasmine.any(Function));
 	});
 });
 

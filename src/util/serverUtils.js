@@ -66,10 +66,12 @@ export function server(routes, connection, plugins, platform_agent, config) {
 	// https://hapijs.com/api#serverapp
 	server.app = {
 		isDevConfig: checkForDevUrl(config),  // indicates dev API or prod API
+		...config
 	};
 	server.decorate('reply', 'track', track(platform_agent));
 
-	return server.connection(connection)
+	const appConnection = server.connection(connection);
+	return appConnection
 		.register(plugins)
 		.then(() => registerExtensionEvents(server))
 		.then(() => server.auth.strategy('default', 'oauth', true, config))
