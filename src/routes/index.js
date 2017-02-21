@@ -11,9 +11,18 @@ export default function getRoutes(renderRequestMap, env, apiProxyFn$ = apiProxy$
 		chalk.green(`Supported languages:\n${Object.keys(renderRequestMap).join('\n')}`)
 	);
 
+	const pingRoute = {
+		path: '/ping',
+		method: 'GET',
+		handler: (request, reply) => reply('pong!'),
+		config: { auth: false }
+	};
+
 	return [
+		pingRoute,
 		...getApiProxyRoutes('/mu_api', env, apiProxyFn$),
 		getApplicationRoute(renderRequestMap),
 	];
+
 }
 
