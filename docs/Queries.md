@@ -17,9 +17,9 @@ A Query is just a plain object with the following shape:
 {
   ref: string,
   type: string,
-	endpoint: string,
+  endpoint: string,
   params: object,
-	flags?: string[],
+  flags?: string[],
 }
 ```
 
