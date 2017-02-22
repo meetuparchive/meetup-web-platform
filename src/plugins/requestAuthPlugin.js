@@ -39,7 +39,7 @@ const handleLogout = request => {
 
 function getAuthType(request) {
 	const memberCookie = getMemberCookieName(request.server);
-	const allowedAuthTypes = [memberCookie, 'oauth_token', '__internal_oauth_token'];
+	const allowedAuthTypes = [memberCookie, 'oauth_token'];
 	// search for a request.state cookie name that matches an allowed auth type
 	return allowedAuthTypes.reduce(
 		(authType, allowedType) => authType || request.state[allowedType] && allowedType,
@@ -215,7 +215,8 @@ export const getAuthenticate = authorizeRequest$ => (request, reply) => {
 		})
 		.subscribe(
 			request => {
-				const credentials = request.state[getAuthType(request)];
+				const credentials = request.state[getAuthType(request)] ||
+					request.plugins.requestAuth.oauth_token;
 				reply.continue({ credentials, artifacts: credentials });
 			},
 			err => reply(err, null, { credentials: null })
@@ -237,10 +238,10 @@ export const getAuthenticate = authorizeRequest$ => (request, reply) => {
  * @param {Object} options the options passed to `server.auth.strategy`for the
  *   auth stategy instance
  */
-export const oauthScheme = (server, options) => {
-	configureAuthCookies(server, options);       // apply default config for auth cookies
+export const oauthScheme = server => {
+	configureAuthCookies(server);       // apply default config for auth cookies
 	server.ext('onPreAuth', setPluginState);     // provide a reference to `reply` on the request
-
+	const options = server.plugins.requestAuth.config;
 	const authorizeRequest$ = applyRequestAuthorizer$(getRequestAuthorizer$(options));
 
 	return {
@@ -259,7 +260,12 @@ export const oauthScheme = (server, options) => {
  * {@link http://hapijs.com/tutorials/plugins}
  */
 export default function register(server, options, next) {
+	// allow plugin to access config at server.plugins.requestAuth.config
+	server.expose('config', options);
+
+	// register the plugin's auth scheme
 	server.auth.scheme('oauth', oauthScheme);
+
 	next();
 }
 register.attributes = {

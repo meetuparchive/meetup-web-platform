@@ -5,7 +5,8 @@ const validConfig = {
 	oauth: {
 		key: '1234',
 		secret: 'asdf',
-	}
+	},
+	duotoneUrls: ['http://example.com'],
 };
 describe('getConfig', function() {
 	it(

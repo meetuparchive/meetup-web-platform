@@ -20,6 +20,11 @@ describe('apiProxy$', () => {
 			state: {
 				oauth_token: 'foo',
 			},
+			server: {
+				app: {
+					API_SERVER_ROOT_URL: 'http://example.com'
+				}
+			},
 			log: () => {},
 		};
 		const requestResult = {
@@ -33,7 +38,7 @@ describe('apiProxy$', () => {
 			requestResult,
 			requestResult,
 		];
-		return apiProxy$({})(getRequest)
+		return apiProxy$(getRequest)
 			.toPromise()
 			.then(results => expect(results).toEqual(expectedResults));
 	});

@@ -47,7 +47,7 @@ export const applyAuthState = (request, reply) => auth => {
 	Object.keys(authState).forEach(name => {
 		const cookieVal = authState[name];
 		// apply to request
-		request.state[`__internal_${name}`] = cookieVal.value;  // this will only be used for generating internal requests
+		request.plugins.requestAuth[name] = cookieVal.value;  // this will only be used for generating internal requests
 		// apply to response - note this special `request.authorize.reply` prop assigned onPreAuth
 		reply.state(name, cookieVal.value, cookieVal.opts);
 	});
@@ -75,8 +75,8 @@ export const getMemberCookieName = server =>
 /**
  * apply default cookie options for auth-related cookies
  */
-export const configureAuthCookies = (server, options) => {
-	const password = validateSecret(options.COOKIE_ENCRYPT_SECRET);
+export const configureAuthCookies = server => {
+	const password = validateSecret(server.plugins.requestAuth.config.COOKIE_ENCRYPT_SECRET);
 	const isSecure = process.env.NODE_ENV === 'production';
 	const authCookieOptions = {
 		encoding: 'iron',
