@@ -16,7 +16,9 @@ export const mockConfig = () => Promise.resolve({
 	oauth: {
 		key: random32,
 		secret: random32,
-	}
+	},
+	duotoneUrls: ['http://example.com/duotone.jpg'],
+	API_SERVER_ROOT_URL: 'http://localhost',
 });
 
 export const getMockFetch = (mockResponseValue=[{}], headers={}) =>
