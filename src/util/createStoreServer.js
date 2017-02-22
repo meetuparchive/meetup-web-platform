@@ -1,17 +1,17 @@
 import { createStore } from 'redux';
 import { parseQueryResponse } from './fetchUtils';
 import { getPlatformMiddlewareEnhancer } from './createStore';
-import { apiProxy$ } from '../apiProxy/api-proxy';
+import apiProxy$ from '../apiProxy/api-proxy';
 
 /**
  * wrap the `fetchQueries` function with a function that injects cookies into
  * the request
  *
- * @param {Object} cookieState { name: value } object of cookies to inject
+ * @param {Object} request Hapi request
  * @return {Function} a fetchQueries function
  */
-export const serverFetchQueries = (request, apiProxyConfig) => () => queries =>
-	apiProxy$(apiProxyConfig)(request, queries)
+export const serverFetchQueries = request => () => queries =>
+	apiProxy$(request, queries)
 		.toPromise()
 		.then(parseQueryResponse(queries));
 
@@ -32,12 +32,11 @@ export function getServerCreateStore(
 	routes,
 	middleware,
 	request,
-	apiProxyConfig
 ) {
 	const middlewareEnhancer = getPlatformMiddlewareEnhancer(
 		routes,
 		middleware,
-		serverFetchQueries(request, apiProxyConfig)
+		serverFetchQueries(request)
 	);
 	return middlewareEnhancer(createStore);
 }
