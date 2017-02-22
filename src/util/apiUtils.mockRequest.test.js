@@ -85,14 +85,14 @@ describe('makeApiRequest$', () => {
 	const endpoint = 'foo';
 	it('makes a GET request', () => {
 		const query = { ...mockQuery(MOCK_RENDERPROPS) };
-		return makeApiRequest$({ server: { app: {} }, log: () => {} }, 5000, {})([{ method: 'get', url: endpoint }, query])
+		return makeApiRequest$({ server: { app: {} }, log: () => {} })([{ method: 'get', url: endpoint }, query])
 			.toPromise()
 			.then(() => require('request').mock.calls.pop()[0])
 			.then(arg => expect(arg.method).toBe('get'));
 	});
 	it('makes a POST request', () => {
 		const query = { ...mockQuery(MOCK_RENDERPROPS) };
-		return makeApiRequest$({ server: { app: {} }, log: () => {} }, 5000, {})([{ method: 'post', url: endpoint }, query])
+		return makeApiRequest$({ server: { app: {} }, log: () => {} })([{ method: 'post', url: endpoint }, query])
 			.toPromise()
 			.then(() => require('request').mock.calls.pop()[0])
 			.then(arg => expect(arg.method).toBe('post'));
@@ -110,7 +110,7 @@ describe('makeApiRequest$', () => {
 				value: mockResponse,
 			}
 		};
-		return makeApiRequest$({ server: { app: {} }, log: () => {} }, 5000, {})([{ url: endpoint }, query])
+		return makeApiRequest$({ server: { app: {} }, log: () => {} })([{ url: endpoint }, query])
 			.toPromise()
 			.then(response => expect(response).toEqual(expectedResponse));
 	});

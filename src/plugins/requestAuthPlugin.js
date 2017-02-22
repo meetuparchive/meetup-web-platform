@@ -240,8 +240,8 @@ export const getAuthenticate = authorizeRequest$ => (request, reply) => {
 export const oauthScheme = server => {
 	configureAuthCookies(server);       // apply default config for auth cookies
 	server.ext('onPreAuth', setPluginState);     // provide a reference to `reply` on the request
-	const pluginConfig = server.plugins.requestAuth.config;
-	const authorizeRequest$ = applyRequestAuthorizer$(getRequestAuthorizer$(pluginConfig));
+	const options = server.plugins.requestAuth.config;
+	const authorizeRequest$ = applyRequestAuthorizer$(getRequestAuthorizer$(options));
 
 	return {
 		authenticate: getAuthenticate(authorizeRequest$),
@@ -259,8 +259,12 @@ export const oauthScheme = server => {
  * {@link http://hapijs.com/tutorials/plugins}
  */
 export default function register(server, options, next) {
+	// allow plugin to access config at server.plugins.requestAuth.config
 	server.expose('config', options);
+
+	// register the plugin's auth scheme
 	server.auth.scheme('oauth', oauthScheme);
+
 	next();
 }
 register.attributes = {
