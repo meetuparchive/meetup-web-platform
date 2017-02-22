@@ -215,7 +215,8 @@ export const getAuthenticate = authorizeRequest$ => (request, reply) => {
 		})
 		.subscribe(
 			request => {
-				const credentials = request.state[getAuthType(request)] || request.plugins.requestAuth.oauth_token;
+				const credentials = request.state[getAuthType(request)] ||
+					request.plugins.requestAuth.oauth_token;
 				reply.continue({ credentials, artifacts: credentials });
 			},
 			err => reply(err, null, { credentials: null })
