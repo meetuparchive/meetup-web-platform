@@ -14,7 +14,7 @@ const createLink = options => href => {
 	const relAttr = target === '_blank' ? 'rel="noopener noreferrer"' : '';
 
 	return `<a class="link" href="${href}" title="${href}" ${targetAttr} ${relAttr}>${href}</a>`;
-}
+};
 
 /**
  * Replaces URLs in a block of text with HTML anchor tags.

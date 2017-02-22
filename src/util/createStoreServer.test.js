@@ -1,38 +1,41 @@
-import url from 'url';
 import * as fetchUtils from './fetchUtils';
 import {
 	testCreateStore
-} from './createStore.test';
+} from './testUtils';
 import {
 	getServerCreateStore,
 	serverFetchQueries,
 } from './createStoreServer';
+
+jest.mock(
+	'../apiProxy/api-proxy',
+	() => jest.fn((request, queries) => require('rxjs').Observable.of('response'))
+);
 
 const MOCK_ROUTES = {};
 const MOCK_HAPI_REQUEST = {
 	state: {}
 };
 
-const serverRequest = {
-	state: {
-		bar: 'baz',
-	},
-	url: url.parse('http://example.com'),
-	raw: {
-		req: {
-			headers: {
-				cookie: 'foo=bar',
-			},
-		},
-	},
-};
-
-
 describe('getServerCreateStore', () => {
 	testCreateStore(getServerCreateStore(MOCK_ROUTES, [], MOCK_HAPI_REQUEST));
 });
 
 describe('serverFetchQueries', () => {
-	// TODO
+// export const serverFetchQueries = request => () => queries =>
+// 	apiProxy$(request, queries)
+	// 	.toPromise()
+	// 	.then(parseQueryResponse(queries));
+	it('calls apiProxy$ with request and queries, passes ', () => {
+		const request = {};
+		const queries = [];
+		const expectedParsedResponse = 'foo';
+		spyOn(fetchUtils, 'parseQueryResponse').and.callFake(() => () => expectedParsedResponse);
+		return serverFetchQueries(request)()(queries)
+			.then(parsedResponse => {
+				expect(require('../apiProxy/api-proxy')).toHaveBeenCalledWith(request, queries);
+				expect(parsedResponse).toEqual(expectedParsedResponse);
+			});
+	});
 });
 

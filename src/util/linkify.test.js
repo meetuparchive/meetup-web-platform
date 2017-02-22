@@ -2,7 +2,7 @@ import linkify from './linkify';
 
 describe('linkify', () => {
 	const httpBase = 'http://www.meetup.com',
-		 expectedLink = '<a class="link" href="http://www.meetup.com" title="http://www.meetup.com" target="" >http://www.meetup.com</a>';
+		expectedLink = '<a class="link" href="http://www.meetup.com" title="http://www.meetup.com" target="" >http://www.meetup.com</a>';
 
 	it('should turn a link text with http into a HTML anchor with http', () => {
 		expect(linkify(httpBase)).toBe(expectedLink);

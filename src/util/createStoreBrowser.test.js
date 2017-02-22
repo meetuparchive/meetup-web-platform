@@ -5,7 +5,7 @@ import {
 } from './createStoreBrowser';
 import {
 	testCreateStore
-} from './createStore.test';
+} from './testUtils';
 
 const MOCK_ROUTES = {};
 const IDENTITY_REDUCER = state => state;

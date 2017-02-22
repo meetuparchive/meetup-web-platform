@@ -1,9 +1,11 @@
-import { createStore, compose } from 'redux';
+import { applyMiddleware, createStore, compose } from 'redux';
 
 import { fetchQueries } from '../util/fetchUtils';
 import getClickTracker from './clickTracking';
-import { getPlatformMiddlewareEnhancer } from './createStore';
+import getPlatformMiddleware from '../middleware/epic';
 
+
+const noopMiddleware = store => next => action => next(action);
 
 export const clickTrackEnhancer = createStore => (reducer, initialState, enhancer) => {
 	const store = createStore(reducer, initialState, enhancer);
@@ -16,13 +18,15 @@ export const clickTrackEnhancer = createStore => (reducer, initialState, enhance
 
 export function getBrowserCreateStore(
 	routes,
-	middleware
+	middleware=[]
 ) {
-	const middlewareEnhancer = getPlatformMiddlewareEnhancer(
-		routes,
-		middleware,
-		fetchQueries
-	);
+	const middlewareToApply = [
+		getPlatformMiddleware(routes, fetchQueries),
+		...middleware,
+		window.mupDevTools ? window.mupDevTools() : noopMiddleware,  // must be last middleware
+	];
+	const middlewareEnhancer = applyMiddleware(...middlewareToApply);
+
 	const enhancer = compose(
 		middlewareEnhancer,
 		clickTrackEnhancer,

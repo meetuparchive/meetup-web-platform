@@ -1,14 +1,15 @@
-import { createStore } from 'redux';
+import { applyMiddleware, createStore } from 'redux';
 import { parseQueryResponse } from './fetchUtils';
-import { getPlatformMiddlewareEnhancer } from './createStore';
+import getPlatformMiddleware from '../middleware/epic';
 import apiProxy$ from '../apiProxy/api-proxy';
 
 /**
- * wrap the `fetchQueries` function with a function that injects cookies into
- * the request
+ * on the server, we can proxy the API requests directly without making a
+ * request to the server's own API proxy endpoint
  *
  * @param {Object} request Hapi request
- * @return {Function} a fetchQueries function
+ * @return {Promise} a promise that resolves with the parsed query responses
+ *   from the REST API
  */
 export const serverFetchQueries = request => () => queries =>
 	apiProxy$(request, queries)
@@ -17,28 +18,34 @@ export const serverFetchQueries = request => () => queries =>
 
 /**
  * the server needs a slightly different store than the browser because the
- * server does not know which cookies to pass along to the `fetch` function
- * inside the sync middleware.
- *
- * This getServerCreateStore function will therefore return a store creator that
- * is specifically tailored to making API requests that correspond to the
- * incoming request from the browser
+ * server doesn't need to make an internal request to the api proxy endpoint
+ * when the store dispatches an API request action
  *
  * @param {Object} routes the React Router routes object
  * @param {Array} middleware additional middleware to inject into store
  * @param {Object} request the Hapi request for this store
  */
+export function getPlatformMiddlewareEnhancer(routes, middleware, fetchQueriesFn) {
+	// **All** middleware gets added here
+	const middlewareToApply = [
+		getPlatformMiddleware(routes, fetchQueriesFn),
+		...middleware,
+	];
+	return applyMiddleware(...middlewareToApply);
+}
+
 export function getServerCreateStore(
 	routes,
 	middleware,
-	request,
+	request
 ) {
-	const middlewareEnhancer = getPlatformMiddlewareEnhancer(
-		routes,
-		middleware,
-		serverFetchQueries(request)
-	);
+	const middlewareToApply = [
+		getPlatformMiddleware(routes, serverFetchQueries(request)),
+		...middleware,
+	];
+
+	const middlewareEnhancer = applyMiddleware(...middlewareToApply);
+
 	return middlewareEnhancer(createStore);
 }
-
 

@@ -1,5 +1,4 @@
 import cookie from 'cookie';
-import url from 'url';
 import {
 	mockQuery,
 } from 'meetup-web-mocks/lib/app';
@@ -7,20 +6,6 @@ import {
 	MOCK_GROUP,
 } from 'meetup-web-mocks/lib/api';
 import * as fetchUtils from './fetchUtils';
-
-const serverRequest = {
-	state: {
-		bar: 'baz',
-	},
-	url: url.parse('http://example.com'),
-	raw: {
-		req: {
-			headers: {
-				cookie: 'foo=bar',
-			},
-		},
-	},
-};
 
 describe('fetchQueries', () => {
 	const API_URL = new URL('http://api.example.com/');
