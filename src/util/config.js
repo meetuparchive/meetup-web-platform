@@ -1,4 +1,8 @@
 import Joi from 'joi';
+import {
+	duotones,
+	getDuotoneUrls
+} from './duotone';
 /**
  * Start the server with a config
  *
@@ -35,6 +39,7 @@ export default function getConfig(overrideConfig) {
 			key: process.env.MUPWEB_OAUTH_KEY,
 		},
 	};
+	config.duotoneUrls = getDuotoneUrls(duotones, config.PHOTO_SCALER_SALT);
 	config.API_SERVER_ROOT_URL = `${config.API_PROTOCOL}://${config.API_HOST}`;
 
 	// currently all config is available syncronously, so resolve immediately
@@ -64,6 +69,7 @@ function validateConfig(config) {
 			secret: Joi.string().min(1).required().error(oauthError),
 			key: Joi.string().min(1).required().error(oauthError),
 		}).required(),
+		duotoneUrls: Joi.array().items(Joi.string().uri()),
 	}).required();
 
 	const result = Joi.validate(config, configSchema);

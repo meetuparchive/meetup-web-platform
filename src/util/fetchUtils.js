@@ -4,6 +4,17 @@ import cookie from 'cookie';
  * @module fetchUtils
  */
 
+
+export const parseQueryResponse = queries => ({ responses, error, message }) => {
+	if (error) {
+		throw new Error(message);  // treat like an API error
+	}
+	return {
+		queries,
+		responses: responses || [],
+	};
+};
+
 /**
  * Wrapper around `fetch` to send an array of queries to the server. It ensures
  * that the request will have the required Oauth access token and constructs
@@ -51,17 +62,11 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 		isPost ? apiUrl : fetchUrl.toString(),
 		fetchConfig
 	)
-	.then(queryResponse =>
-		queryResponse.json().then(({ responses, error, message }) => {
-			if (error) {
-				throw new Error(message);  // treat like an API error
-			}
-			return {
-				queries,
-				responses: responses || [],
-				csrf: queryResponse.headers.get('x-csrf-jwt'),
-			};
-		}),
+	.then(queryResponse => queryResponse.json()
+		.then(queryJSON => ({
+			...parseQueryResponse(queries)(queryJSON),
+			csrf: queryResponse.headers.get('x-csrf-jwt'),
+		})),
 		err => {
 			console.error(JSON.stringify({
 				err: err.stack,
@@ -140,4 +145,15 @@ export const cleanBadCookies = (cookieHeader) => {
 
 	return stringifyCookies(cookies);
 };
+
+export function mergeRawCookies(request) {
+	const injectedCookies = Object.keys(request.state)
+		.filter(name => name.startsWith('__internal_'))
+		.reduce((cookies, name) => ({
+			...cookies,
+			...({ [name]: request.state[name] })
+		}), {});
+
+	return mergeCookies(request.raw.req.headers.cookie || '', injectedCookies);
+}
 

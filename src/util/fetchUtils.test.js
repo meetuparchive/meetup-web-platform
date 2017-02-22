@@ -1,4 +1,5 @@
 import cookie from 'cookie';
+import url from 'url';
 import {
 	mockQuery,
 } from 'meetup-web-mocks/lib/app';
@@ -6,6 +7,21 @@ import {
 	MOCK_GROUP,
 } from 'meetup-web-mocks/lib/api';
 import * as fetchUtils from './fetchUtils';
+
+const serverRequest = {
+	state: {
+		__internal_foo: 'bar',
+		bar: 'baz',  // ignored because it doesn't start with __internal_
+	},
+	url: url.parse('http://example.com'),
+	raw: {
+		req: {
+			headers: {
+				cookie: 'foo=bar',
+			},
+		},
+	},
+};
 
 describe('fetchQueries', () => {
 	const API_URL = new URL('http://api.example.com/');
@@ -204,3 +220,16 @@ describe('cleanBadCookies', () => {
 		expect(fetchUtils.cleanBadCookies(goodHeader)).toEqual(goodHeader);
 	});
 });
+
+describe('mergeRawCookies', () => {
+	it('combines request.state cookies with a `__internal_` prefix with the raw request cookie header string', () => {
+		expect(fetchUtils.mergeRawCookies(serverRequest)).toEqual('foo=bar; __internal_foo=bar');
+	});
+	it('works when request contains no cookies', () => {
+		expect(fetchUtils.mergeRawCookies({
+			...serverRequest,
+			raw: { req: { headers: {} } },
+		})).toEqual('__internal_foo=bar');
+	});
+});
+

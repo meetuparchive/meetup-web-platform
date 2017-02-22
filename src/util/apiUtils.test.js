@@ -50,13 +50,19 @@ describe('errorResponse$', () => {
 describe('getAuthHeaders', () => {
 	it('returns authorization header if no member cookie and oauth_token', () => {
 		const oauth_token = 'foo';
-		const authHeaders = getAuthHeaders({ state: { oauth_token } });
+		const authHeaders = getAuthHeaders({
+			state: { oauth_token },
+			plugins: { requestAuth: {} },
+		});
 		expect(authHeaders.authorization.startsWith('Bearer ')).toBe(true);
 		expect(authHeaders.authorization.endsWith(oauth_token)).toBe(true);
 	});
 	it('sets MEETUP_CSRF', () => {
 		const MEETUP_MEMBER = 'foo';
-		const authHeaders = getAuthHeaders({ state: { MEETUP_MEMBER } });
+		const authHeaders = getAuthHeaders({
+			state: { MEETUP_MEMBER },
+			plugins: { requestAuth: {} },
+		});
 		const cookies = authHeaders.cookie.split('; ').reduce((cookies, pair) => {
 			const [name, ...value] = pair.split('=');
 			return {
@@ -486,6 +492,11 @@ describe('parseRequest', () => {
 			state: {
 				oauth_token: 'foo',
 			},
+			server: {
+				app: {
+					API_SERVER_ROOT_URL: 'http://example.com',
+				},
+			},
 		};
 		expect(parseRequest(getRequest, 'http://dummy.api.meetup.com').queries).toEqual(queries);
 	});
@@ -497,6 +508,11 @@ describe('parseRequest', () => {
 			payload: data,
 			state: {
 				oauth_token: 'foo',
+			},
+			server: {
+				app: {
+					API_SERVER_ROOT_URL: 'http://example.com',
+				},
 			},
 		};
 		expect(parseRequest(postRequest, 'http://dummy.api.meetup.com').queries).toEqual(queries);
@@ -510,6 +526,11 @@ describe('parseRequest', () => {
 			query: data,
 			state: {
 				oauth_token: 'foo',
+			},
+			server: {
+				app: {
+					API_SERVER_ROOT_URL: 'http://example.com',
+				},
 			},
 		};
 		expect(() => parseRequest(getRequest, 'http://dummy.api.meetup.com')).toThrow();
