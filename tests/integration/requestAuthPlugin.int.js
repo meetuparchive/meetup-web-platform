@@ -17,7 +17,7 @@ const makeMockFetchResponse = responseObj => Promise.resolve({
 
 
 const random32 = 'asdfasdfasdfasdfasdfasdfasdfasdf';
-const app = {
+const config = {
 	API_HOST: 'www.api.meetup.com',
 	API_TIMEOUT: 10,
 	CSRF_SECRET: random32,
@@ -39,12 +39,12 @@ const expectedResponse = 'barfoo';
 
 const testAuth = (cookies, test, makeRequest=cookieRequest) => {
 	spyOn(global, 'fetch').and.callFake((url, opts) => {
-		if (url.includes(app.OAUTH_AUTH_URL)) {
+		if (url.includes(config.OAUTH_AUTH_URL)) {
 			return makeMockFetchResponse({
 				code: 'foo',
 			});
 		}
-		if (url.includes(app.OAUTH_ACCESS_URL)) {
+		if (url.includes(config.OAUTH_ACCESS_URL)) {
 			return makeMockFetchResponse({
 				oauth_token: expectedOauthToken,
 				refresh_token: 'whatever',
@@ -58,12 +58,15 @@ const testAuth = (cookies, test, makeRequest=cookieRequest) => {
 		handler: (request, reply) => reply(expectedResponse)
 	};
 	const server = new Hapi.Server();
-	server.app = app;
+	server.app = config;
 	const testConnection = server.connection();
 	return testConnection
-		.register(requestAuthPlugin)
+		.register({
+			register: requestAuthPlugin,
+			options: config
+		})
 		.then(() => testConnection.route(fooRoute))
-		.then(() => server.auth.strategy('default', 'oauth', 'required', server.app))
+		.then(() => server.auth.strategy('default', 'oauth', 'required'))
 		.then(() => server.inject(makeRequest(cookies)))
 		.then(test)
 		.then(() => server.stop());

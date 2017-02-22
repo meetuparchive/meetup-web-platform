@@ -74,7 +74,7 @@ export function server(routes, connection, plugins, platform_agent, config) {
 	return appConnection
 		.register(plugins)
 		.then(() => registerExtensionEvents(server))
-		.then(() => server.auth.strategy('default', 'oauth', true, config))
+		.then(() => server.auth.strategy('default', 'oauth', true))
 		.then(() => server.log(['start'], `${plugins.length} plugins registered, assigning routes...`))
 		.then(() => server.route(routes))
 		.then(() => server.log(['start'], `${routes.length} routes assigned, starting server...`))

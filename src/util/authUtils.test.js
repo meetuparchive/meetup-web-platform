@@ -13,13 +13,14 @@ describe('configureAuthCookies', () => {
 		app: {},
 	};
 	it('calls server.state for each auth cookie name', () => {
-		const app = {
+		const config = {
 			COOKIE_ENCRYPT_SECRET: 'asdklfjahsdflkjasdfhlkajsdfkljasdlkasdjhfalksdjfbalkjsdhfalsdfasdlkfasd',
 		};
+		const plugins = { requestAuth: { config } };
 		spyOn(serverWithState, 'state');
 		configureAuthCookies({
 			...serverWithState,
-			app,
+			plugins,
 		});
 		const callArgs = serverWithState.state.calls.allArgs();
 		expect(callArgs.length).toBeGreaterThan(0);
@@ -29,19 +30,21 @@ describe('configureAuthCookies', () => {
 		});
 	});
 	it('throws an error when secret is missing', () => {
-		const app = {};
+		const config = {};
+		const plugins = { requestAuth: { config } };
 		expect(() => configureAuthCookies({
 			...serverWithState,
-			app,
+			plugins,
 		})).toThrow();
 	});
 	it('throws an error when secret is too short', () => {
-		const app = {
+		const config = {
 			COOKIE_ENCRYPT_SECRET: 'less than 32 characters',
 		};
+		const plugins = { requestAuth: { config } };
 		expect(() => configureAuthCookies({
 			...serverWithState,
-			app,
+			plugins,
 		})).toThrow();
 	});
 });

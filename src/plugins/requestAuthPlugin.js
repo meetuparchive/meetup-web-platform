@@ -237,12 +237,11 @@ export const getAuthenticate = authorizeRequest$ => (request, reply) => {
  * @param {Object} options the options passed to `server.auth.strategy`for the
  *   auth stategy instance
  */
-export const oauthScheme = (server, options) => {
-	server.app = options;
+export const oauthScheme = server => {
 	configureAuthCookies(server);       // apply default config for auth cookies
 	server.ext('onPreAuth', setPluginState);     // provide a reference to `reply` on the request
-
-	const authorizeRequest$ = applyRequestAuthorizer$(getRequestAuthorizer$(server.app));
+	const pluginConfig = server.plugins.requestAuth.config;
+	const authorizeRequest$ = applyRequestAuthorizer$(getRequestAuthorizer$(pluginConfig));
 
 	return {
 		authenticate: getAuthenticate(authorizeRequest$),
@@ -260,6 +259,7 @@ export const oauthScheme = (server, options) => {
  * {@link http://hapijs.com/tutorials/plugins}
  */
 export default function register(server, options, next) {
+	server.expose('config', options);
 	server.auth.scheme('oauth', oauthScheme);
 	next();
 }

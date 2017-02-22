@@ -8,8 +8,6 @@ const validApiPayloadSchema = Joi.object({
 });
 
 const getApiProxyRoutes = (path, apiProxyFn$) => {
-	const proxyApiRequest$ = apiProxyFn$;
-
 	/**
 	 * This handler converts the application-supplied queries into external API
 	 * calls, and converts the API call responses into a standard format that
@@ -20,7 +18,7 @@ const getApiProxyRoutes = (path, apiProxyFn$) => {
 	 */
 	const routeBase = {
 		path,
-		handler: getApiProxyRouteHandler(proxyApiRequest$),
+		handler: getApiProxyRouteHandler(apiProxyFn$),
 		config: {
 			plugins: {
 				'electrode-csrf-jwt': {

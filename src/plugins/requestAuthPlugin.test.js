@@ -20,7 +20,9 @@ const MOCK_SERVER = {
 	},
 	ext: () => {},
 	state: () => {},
-	app: {}
+	app: {},
+	expose: () => {},
+	plugins: { requestAuth: { config: { COOKIE_ENCRYPT_SECRET: 'asdfasdfasdfasdfasdfasdfasdfasdfasdf' } } }
 };
 const MOCK_HEADERS = {};
 const MOCK_REPLY_FN = () => {};
@@ -242,7 +244,7 @@ describe('register', () => {
 });
 
 describe('oauthScheme', () => {
-	const app = {
+	const config = {
 		OAUTH_AUTH_URL,
 		OAUTH_ACCESS_URL,
 		oauth: {
@@ -252,10 +254,11 @@ describe('oauthScheme', () => {
 		COOKIE_ENCRYPT_SECRET: 'asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf',
 		duotoneUrls: ['http://example.com'],
 	};
+	const plugins = { requestAuth: { config } };
 	it('calls server.ext with an \'onPreAuth\' function', () => {
 		const server = {
 			...MOCK_SERVER,
-			app
+			plugins
 		};
 		spyOn(server, 'ext');
 		oauthScheme(server);
