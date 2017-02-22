@@ -15,8 +15,7 @@ const MOCK_HAPI_REQUEST = {
 
 const serverRequest = {
 	state: {
-		__internal_foo: 'bar',
-		bar: 'baz',  // ignored because it doesn't start with __internal_
+		bar: 'baz',
 	},
 	url: url.parse('http://example.com'),
 	raw: {
@@ -34,5 +33,6 @@ describe('getServerCreateStore', () => {
 });
 
 describe('serverFetchQueries', () => {
+	// TODO
 });
 

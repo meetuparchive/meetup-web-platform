@@ -123,6 +123,7 @@ describe('logged-out member state', () => {
 		const test = response => {
 			expect(response.payload).toEqual(expectedResponse);
 			expect(response.headers['set-cookie'][0].startsWith('oauth_token')).toBe(true);
+			expect(response.request.plugins.requestAuth.oauth_token).toBe(expectedOauthToken);
 		};
 		return getEncryptedToken(cookies.refresh_token)
 			.then(refresh_token => testAuth({ refresh_token }, test));

@@ -146,14 +146,3 @@ export const cleanBadCookies = (cookieHeader) => {
 	return stringifyCookies(cookies);
 };
 
-export function mergeRawCookies(request) {
-	const injectedCookies = Object.keys(request.state)
-		.filter(name => name.startsWith('__internal_'))
-		.reduce((cookies, name) => ({
-			...cookies,
-			...({ [name]: request.state[name] })
-		}), {});
-
-	return mergeCookies(request.raw.req.headers.cookie || '', injectedCookies);
-}
-

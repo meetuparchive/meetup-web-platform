@@ -215,9 +215,8 @@ export const apiResponseToQueryResponse = query => ({ value, meta }) => ({
 });
 
 export function getAuthHeaders(request) {
-	// internal server requests may set non-encoded token cookie __internal_oauth_token
-	const oauth_token = request.state.oauth_token ||
-		request.plugins.requestAuth && request.plugins.requestAuth.oauth_token;  // for internal requests
+	const oauth_token = request.state.oauth_token ||  // browser-based requests
+		request.plugins.requestAuth.oauth_token;  // internal server requests
 	if (!request.state.MEETUP_MEMBER && oauth_token) {
 		return {
 			authorization: `Bearer ${oauth_token}`,
