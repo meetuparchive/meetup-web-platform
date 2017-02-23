@@ -8,7 +8,6 @@ const Stream = require('stream');
 
 const internals = {
 	defaults: {
-		// in prod, make a `request` call, otherwise no-op
 		logData: data => console.log(data),
 		// currently the schema is manually copied from
 		// https://github.dev.meetup.com/meetup/meetup/blob/master/modules/base/src/main/versioned_avro/Activity_v3.avsc
