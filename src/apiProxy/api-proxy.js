@@ -39,7 +39,6 @@ import {
 const apiProxy$ = ({ API_TIMEOUT=8000, baseUrl='', duotoneUrls={} }) => {
 
 	return request => {
-		request.log(['api', 'info'], 'Parsing api endpoint request');
 		// 1. get the queries and the 'universal' `externalRequestOpts` from the request
 		const { queries, externalRequestOpts } = parseRequest(request, baseUrl);
 
@@ -47,7 +46,6 @@ const apiProxy$ = ({ API_TIMEOUT=8000, baseUrl='', duotoneUrls={} }) => {
 		// to build the query-specific API request options object
 		const queryToRequestOpts = buildRequestArgs(externalRequestOpts);
 
-		request.log(['api', 'info'], JSON.stringify(queries));
 		// 3. map the queries onto an array of api request observables
 		const apiRequests$ = queries
 			.map(queryToRequestOpts)

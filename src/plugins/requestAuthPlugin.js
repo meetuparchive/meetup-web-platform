@@ -29,7 +29,13 @@ function verifyAuth(auth) {
 }
 
 const handleLogout = request => {
-	request.log(['info', 'auth'], 'Logout received, clearing cookies to re-authenticate');
+	const {
+		id,
+	} = request;
+	console.log(JSON.stringify({
+		message: 'Logout - clearing cookies',
+		info: { id }
+	}));
 	return removeAuthState(
 		[getMemberCookieName(request.server), 'oauth_token', 'refresh_token'],
 		request,
@@ -59,26 +65,33 @@ function getAuthType(request) {
  * @return {Observable} Observable that emits the request with auth applied
  */
 export const applyRequestAuthorizer$ = requestAuthorizer$ => request => {
-	// logout is accomplished exclusively through a `logout` querystring value
-	if ('logout' in request.query) {
+	const {
+		id,
+		query,
+		plugins,
+	} = request;
+
+// logout is accomplished exclusively through a `logout` querystring value
+	if ('logout' in query) {
 		handleLogout(request);
 	}
 
 	// always need oauth_token, even if it's an anonymous (pre-reg) token
 	// This is 'deferred' because we don't want to start fetching the token
 	// before we know that it's needed
-	request.log(['info', 'auth'], 'Checking for oauth_token in request');
 	const authType = getAuthType(request);
 
 	if (authType) {
-		request.log(['info', 'auth'], `Request contains auth token (${authType})`);
-		request.plugins.requestAuth.authType = authType;
+		plugins.requestAuth.authType = authType;
 		return Rx.Observable.of(request);
 	}
 
-	request.log(['info', 'auth'], 'Request does not contain auth token');
+	console.log(JSON.stringify({
+		message: 'Request does not contain auth token',
+		info: { id }
+	}));
 	return requestAuthorizer$(request)  // get anonymous oauth_token
-		.do(applyAuthState(request, request.plugins.requestAuth.reply))
+		.do(applyAuthState(request, plugins.requestAuth.reply))
 		.map(() => request);
 };
 
@@ -208,10 +221,17 @@ export const getRequestAuthorizer$ = config => {
 };
 
 export const getAuthenticate = authorizeRequest$ => (request, reply) => {
-	request.log(['info', 'auth'], 'Authenticating request');
+	const { id } = request;
+	console.log(JSON.stringify({
+		message: 'Authenticating request',
+		info: { id }
+	}));
 	return authorizeRequest$(request)
 		.do(request => {
-			request.log(['info', 'auth'], 'Request authenticated');
+			console.log(JSON.stringify({
+				message: 'Request authenticated',
+				info: { id }
+			}));
 		})
 		.subscribe(
 			request => {
