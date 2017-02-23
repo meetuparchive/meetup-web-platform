@@ -69,7 +69,7 @@ function validateConfig(config) {
 			secret: Joi.string().min(1).required().error(oauthError),
 			key: Joi.string().min(1).required().error(oauthError),
 		}).required(),
-		duotoneUrls: Joi.array().items(Joi.string().uri()),
+		duotoneUrls: Joi.object(),
 	}).required();
 
 	const result = Joi.validate(config, configSchema);

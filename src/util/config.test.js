@@ -6,7 +6,7 @@ const validConfig = {
 		key: '1234',
 		secret: 'asdf',
 	},
-	duotoneUrls: ['http://example.com'],
+	duotoneUrls: { foo: 'http://example.com' },
 };
 describe('getConfig', function() {
 	it(

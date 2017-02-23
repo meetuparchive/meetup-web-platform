@@ -239,7 +239,7 @@ describe('oauthScheme', () => {
 			secret: 'abcd',
 		},
 		COOKIE_ENCRYPT_SECRET: 'asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf',
-		duotoneUrls: ['http://example.com'],
+		duotoneUrls: { foo: 'http://example.com' },
 	};
 	const plugins = { requestAuth: { config } };
 	it('calls server.ext with an \'onPreAuth\' function', () => {
