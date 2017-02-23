@@ -79,8 +79,8 @@ export const getMemberCookieName = server =>
 /**
  * apply default cookie options for auth-related cookies
  */
-export const configureAuthCookies = (server, options) => {
-	const password = validateSecret(options.COOKIE_ENCRYPT_SECRET);
+export const configureAuthCookies = server => {
+	const password = validateSecret(server.plugins.requestAuth.config.COOKIE_ENCRYPT_SECRET);
 	const isSecure = process.env.NODE_ENV === 'production';
 	const authCookieOptions = {
 		encoding: 'iron',

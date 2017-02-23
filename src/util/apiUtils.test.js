@@ -460,6 +460,11 @@ describe('parseRequest', () => {
 			state: {
 				oauth_token: 'foo',
 			},
+			server: {
+				app: {
+					API_SERVER_ROOT_URL: 'http://example.com',
+				},
+			},
 		};
 		expect(parseRequest(getRequest, 'http://dummy.api.meetup.com').queries).toEqual(queries);
 	});
@@ -471,6 +476,11 @@ describe('parseRequest', () => {
 			payload: data,
 			state: {
 				oauth_token: 'foo',
+			},
+			server: {
+				app: {
+					API_SERVER_ROOT_URL: 'http://example.com',
+				},
 			},
 		};
 		expect(parseRequest(postRequest, 'http://dummy.api.meetup.com').queries).toEqual(queries);
@@ -484,6 +494,11 @@ describe('parseRequest', () => {
 			query: data,
 			state: {
 				oauth_token: 'foo',
+			},
+			server: {
+				app: {
+					API_SERVER_ROOT_URL: 'http://example.com',
+				},
 			},
 		};
 		expect(() => parseRequest(getRequest, 'http://dummy.api.meetup.com')).toThrow();

@@ -17,7 +17,9 @@ import {
 import {
 	querySchema
 } from './validation';
-import { duotoneRef } from './duotone';
+import {
+	duotoneRef,
+} from './duotone';
 
 const MOCK_RESPONSE_OK = {  // minimal representation of http.IncomingMessage
 	statusCode: 200,
@@ -275,7 +277,8 @@ export function parseRequestQueries(request) {
  * Parse request for queries and request options
  * @return {Object} { queries, externalRequestOpts }
  */
-export function parseRequest(request, baseUrl) {
+export function parseRequest(request) {
+	const baseUrl = request.server.app.API_SERVER_ROOT_URL;
 	return {
 		externalRequestOpts: {
 			baseUrl,
@@ -360,7 +363,7 @@ const externalRequest$ = Rx.Observable.bindNodeCallback(externalRequest);
 /**
  * Make a real external API request, return response body string
  */
-export const makeExternalApiRequest = (request, API_TIMEOUT) => requestOpts => {
+export const makeExternalApiRequest = request => requestOpts => {
 	return externalRequest$(requestOpts)
 		.do(  // log errors
 			null,
@@ -375,7 +378,7 @@ export const makeExternalApiRequest = (request, API_TIMEOUT) => requestOpts => {
 				}));
 			}
 		)
-		.timeout(API_TIMEOUT)
+		.timeout(request.server.app.API_TIMEOUT)
 		.map(([response, body]) => [response, body, requestOpts.jar]);
 };
 
@@ -462,12 +465,12 @@ export const injectResponseCookies = request => ([response, _, jar]) => {
  * Make an API request and parse the response into the expected `response`
  * object shape
  */
-export const makeApiRequest$ = (request, API_TIMEOUT, duotoneUrls) => {
-	const setApiResponseDuotones = apiResponseDuotoneSetter(duotoneUrls);
+export const makeApiRequest$ = request => {
+	const setApiResponseDuotones = apiResponseDuotoneSetter(request.server.app.duotoneUrls);
 	return ([requestOpts, query]) => {
 		const request$ = query.mockResponse ?
 			makeMockRequest(query.mockResponse) :
-			makeExternalApiRequest(request, API_TIMEOUT);
+			makeExternalApiRequest(request);
 
 		return Rx.Observable.defer(() => {
 			const {
