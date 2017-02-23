@@ -134,7 +134,7 @@ export function getAnonymousCode$({ API_TIMEOUT=5000, OAUTH_AUTH_URL, oauth }, r
 			.timeout(API_TIMEOUT)
 			.do(() => {
 				console.log(JSON.stringify({
-					message: `Incoming response ${OAUTH_AUTH_URL}`,
+					message: `Incoming response GET ${OAUTH_AUTH_URL}`,
 					type: 'response',
 					direction: 'in',
 					info: {
@@ -219,7 +219,7 @@ export const getAccessToken$ = ({ API_TIMEOUT=5000, OAUTH_ACCESS_URL, oauth }, r
 				.timeout(API_TIMEOUT)
 				.do(() => {
 					console.log(JSON.stringify({
-						message: `Incoming response ${OAUTH_ACCESS_URL}?${grant_type}`,
+						message: `Incoming response GET ${OAUTH_ACCESS_URL}?${grant_type}`,
 						type: 'response',
 						direction: 'in',
 						info: {

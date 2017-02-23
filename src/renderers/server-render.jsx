@@ -91,17 +91,14 @@ const getRouterRenderer = (store, baseUrl, clientFilename, assetPublicPath) =>
 			statusCode = NotFound.rewind() ||  // if NotFound is mounted, return 404
 				renderProps.routes.pop().statusCode ||
 				200;
-		} catch(e) {
+		} catch(error) {
 			// log the error stack here because Observable logs not great
-			console.error(JSON.stringify({
-				message: `Internal rendering error ${e.message}`,
-				info: e.stack,
-			}));
 			if (process.env.NODE_ENV === 'production') {
-				throw e;
+				throw error;
 			}
+			console.error(error);  // for dev debugging - global onPreResponse will handle prod
 			const { RedBoxError } = require('redbox-react');
-			appMarkup = ReactDOMServer.renderToString(<RedBoxError error={e} />);
+			appMarkup = ReactDOMServer.renderToString(<RedBoxError error={error} />);
 			result = `${DOCTYPE}<html><body>${appMarkup}</body></html>`;
 			statusCode = 500;
 		}

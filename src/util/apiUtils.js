@@ -479,13 +479,14 @@ export const makeApiRequest$ = request => {
 				headers,
 			} = requestOpts;
 
+			const parsedUrl = url.parse(url);
 			console.log(JSON.stringify({
-				message: `Outgoing request ${requestOpts.method.toUpperCase()} ${requestOpts.url}`,
+				message: `Outgoing request ${requestOpts.method.toUpperCase()} ${parsedUrl.pathname}`,
 				type: 'request',
 				direction: 'out',
 				info: {
 					headers,
-					url,
+					url: parsedUrl,
 					method,
 				},
 			}));

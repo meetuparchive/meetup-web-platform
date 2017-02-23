@@ -46,21 +46,37 @@ function onPreResponseExtension(request, reply) {
 		response,
 		url,
 	} = request;
+
+	if (response.isBoom) {
+		// response is an Error object
+		console.error(JSON.stringify({
+			message: `Internal error ${response.message} ${url}`,
+			info: {
+				error: response.stack,
+				headers,
+				id,
+				method,
+				url,
+			},
+		}));
+		return reply.continue();
+	}
+
 	console.log(JSON.stringify({
-		message: `Outgoing response ${method.toUpperCase()} ${url} ${response.statusCode}`,
+		message: `Outgoing response ${method.toUpperCase()} ${url.pathname} ${response.statusCode}`,
 		type: 'response',
 		direction: 'out',
 		info: {
-			url,
-			method,
 			headers,
 			id,
+			method,
 			referrer: info.referrer,
 			remoteAddress: info.remoteAddress,
-			time: info.responded - info.received
+			time: info.responded - info.received,
+			url,
 		}
 	}));
-	reply.continue();
+	return reply.continue();
 }
 
 /**
