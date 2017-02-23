@@ -119,9 +119,31 @@ export function getAnonymousCode$({ API_TIMEOUT=5000, OAUTH_AUTH_URL, oauth }, r
 	};
 
 	return Rx.Observable.defer(() => {
-		console.log(`Fetching anonymous auth code from ${OAUTH_AUTH_URL}`);
+		console.log(JSON.stringify({
+			message: `Outgoing request GET ${OAUTH_AUTH_URL}`,
+			type: 'request',
+			direction: 'out',
+			info: {
+				url: OAUTH_AUTH_URL,
+				method: 'get',
+			}
+		}));
+
+		const startTime = new Date();
 		return Rx.Observable.fromPromise(fetch(authURL.toString(), requestOpts))
 			.timeout(API_TIMEOUT)
+			.do(() => {
+				console.log(JSON.stringify({
+					message: `Incoming response ${OAUTH_AUTH_URL}`,
+					type: 'response',
+					direction: 'in',
+					info: {
+						url: OAUTH_AUTH_URL,
+						method: 'get',
+						time: new Date() - startTime,
+					}
+				}));
+			})
 			.flatMap(tryJSON(OAUTH_AUTH_URL))
 			.map(({ code }) => ({
 				grant_type: 'anonymous_code',
@@ -176,16 +198,37 @@ export const getAccessToken$ = ({ API_TIMEOUT=5000, OAUTH_ACCESS_URL, oauth }, r
 
 			accessUrl.searchParams.append('grant_type', grant_type);
 			if (grant_type === 'anonymous_code') {
-				console.log(`Fetching anonymous access_token from ${OAUTH_ACCESS_URL}`);
 				accessUrl.searchParams.append('code', token);
 			}
 			if (grant_type === 'refresh_token') {
-				console.log(`Refreshing access_token from ${OAUTH_ACCESS_URL}`);
 				accessUrl.searchParams.append('refresh_token', token);
 			}
 
+			console.log(JSON.stringify({
+				message: `Outgoing request GET ${OAUTH_ACCESS_URL}?${grant_type}`,
+				type: 'request',
+				direction: 'out',
+				info: {
+					url: OAUTH_ACCESS_URL,
+					method: 'get',
+				}
+			}));
+
+			const startTime = new Date();
 			return Rx.Observable.fromPromise(fetch(accessUrl.toString(), requestOpts))
 				.timeout(API_TIMEOUT)
+				.do(() => {
+					console.log(JSON.stringify({
+						message: `Incoming response ${OAUTH_ACCESS_URL}?${grant_type}`,
+						type: 'response',
+						direction: 'in',
+						info: {
+							url: OAUTH_ACCESS_URL,
+							method: 'get',
+							time: new Date() - startTime,
+						}
+					}));
+				})
 				.flatMap(tryJSON(OAUTH_ACCESS_URL));
 		};
 	};
