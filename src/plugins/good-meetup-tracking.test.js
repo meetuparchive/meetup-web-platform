@@ -21,13 +21,13 @@ describe('GoodMeetupTracking', () => {
 	});
 	it('transforms input into base64-encoded avro buffer', () => {
 		const config = {
-			schema: avro.parse({
+			schema: {
 				type: 'record',
 				fields: [
 					{ name: 'requestId', type: 'string' },
 					{ name: 'timestamp', type: 'string' },
 				]
-			}),
+			},
 		};
 		const tracker = new GoodMeetupTracking(config);
 		const trackInfo = { requestId: 'foo', timestamp: new Date().getTime().toString() };
@@ -37,7 +37,7 @@ describe('GoodMeetupTracking', () => {
 			val => {
 				const utf8String = new Buffer(val.record, 'base64').toString('utf-8');
 				const avroBuffer = new Buffer(utf8String);
-				const recordedInfo = tracker._settings.schema.fromBuffer(avroBuffer);
+				const recordedInfo = avro.parse(tracker._settings.schema).fromBuffer(avroBuffer);
 				expect(recordedInfo).toEqual(trackInfo);
 			}
 		);
@@ -67,7 +67,7 @@ describe('Integration with tracking logs', () => {
 			val => {
 				const utf8String = new Buffer(val.record, 'base64').toString();
 				const avroBuffer = new Buffer(utf8String);
-				const trackedInfo = tracker._settings.schema.fromBuffer(avroBuffer);
+				const trackedInfo = avro.parse(tracker._settings.schema).fromBuffer(avroBuffer);
 				const memberId = '';  // memberId integer doesn't survive the decode-encode-decode
 				const expectedTrackInfo = {
 					...trackInfo,

@@ -6,43 +6,41 @@ const avro = require('avsc');
 const Hoek = require('hoek');
 const Stream = require('stream');
 
-// currently the schema is manually copied from
-// https://github.dev.meetup.com/meetup/meetup/blob/master/modules/base/src/main/versioned_avro/Activity_v3.avsc
-const schemaDef = {
-	namespace: 'com.meetup.base.avro',
-	type: 'record',
-	name: 'Activity',
-	doc: 'v3',
-	fields: [
-		{ name: 'requestId', type: 'string'},
-		{ name: 'timestamp', type: 'string'},
-		{ name: 'url', type: 'string'},
-		{ name: 'aggregratedUrl', type: 'string', default: ''},  // it's misspelled in the original spec
-		{ name: 'ip', type: 'string', default: ''},
-		{ name: 'agent', type: 'string', default: ''},
-		{ name: 'memberId', type: 'int'},
-		{ name: 'trackId', type: 'string'},
-		{ name: 'mobileWeb', type: 'boolean'},
-		{ name: 'platform', type: 'string'},
-		{ name: 'referer', type: 'string'},  // it's misspelled in the original spec
-		{ name: 'trax', type: { type: 'map', values: 'string'}},
-		{
-			name: 'platformAgent',
-			type: {
-				type: 'enum',
-				name: 'PlatformAgent',
-				symbols: ['WEB', 'NATIVE', 'NATIVE_APP_WEB_VIEW', 'THIRD_PARTY_UNKNOWN', 'UNKNOWN']
-			},
-			default:'UNKNOWN'
-		}
-	]
-};
-
 const internals = {
 	defaults: {
 		// in prod, make a `request` call, otherwise no-op
 		logData: data => console.log(data),
-		schema: avro.parse(schemaDef),
+		// currently the schema is manually copied from
+		// https://github.dev.meetup.com/meetup/meetup/blob/master/modules/base/src/main/versioned_avro/Activity_v3.avsc
+		schema: {
+			namespace: 'com.meetup.base.avro',
+			type: 'record',
+			name: 'Activity',
+			doc: 'v3',
+			fields: [
+				{ name: 'requestId', type: 'string'},
+				{ name: 'timestamp', type: 'string'},
+				{ name: 'url', type: 'string'},
+				{ name: 'aggregratedUrl', type: 'string', default: ''},  // it's misspelled in the original spec
+				{ name: 'ip', type: 'string', default: ''},
+				{ name: 'agent', type: 'string', default: ''},
+				{ name: 'memberId', type: 'int'},
+				{ name: 'trackId', type: 'string'},
+				{ name: 'mobileWeb', type: 'boolean'},
+				{ name: 'platform', type: 'string'},
+				{ name: 'referer', type: 'string'},  // it's misspelled in the original spec
+				{ name: 'trax', type: { type: 'map', values: 'string'}},
+				{
+					name: 'platformAgent',
+					type: {
+						type: 'enum',
+						name: 'PlatformAgent',
+						symbols: ['WEB', 'NATIVE', 'NATIVE_APP_WEB_VIEW', 'THIRD_PARTY_UNKNOWN', 'UNKNOWN']
+					},
+					default:'UNKNOWN'
+				}
+			]
+		},
 	},
 };
 
@@ -82,12 +80,12 @@ class GoodMeetupTracking extends Stream.Transform {
 
 		const { schema, logData } = this._settings;
 
-		const record = schema.toBuffer(eventData);
+		const record = avro.parse(schema).toBuffer(eventData);
 
 		const eventDate = new Date(parseInt(eventData.timestamp, 10));
 		const analytics = {
 			record: record.toString('base64'),
-			schemaUrl: `gs://meetup-logs/avro_schemas/${schemaDef.name}_${schemaDef.doc}.avsc`,
+			schemaUrl: `gs://meetup-logs/avro_schemas/${schema.name}_${schema.doc}.avsc`,
 			date: eventDate.toISOString().substr(0, 10),  // YYYY-MM-DD
 		};
 
