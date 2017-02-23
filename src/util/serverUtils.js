@@ -22,11 +22,61 @@ export function checkForDevUrl(value) {
 
 export function onRequestExtension(request, reply) {
 	console.log(JSON.stringify({
-		message: 'Request info',
-		headers: request.headers,
-		id: request.id,
+		message: `Incoming request ${request.method.toUpperCase()} ${request.url.href}`,
+		type: 'request',
+		direction: 'in',
+		info: {
+			url: request.url,
+			method: request.method,
+			headers: request.headers,
+			id: request.id,
+			referrer: request.info.referrer,
+			remoteAddress: request.info.remoteAddress,
+		}
 	}));
 	reply.continue();
+}
+
+function onPreResponseExtension(request, reply) {
+	const {
+		headers,
+		id,
+		info,
+		method,
+		response,
+		url,
+	} = request;
+
+	if (response.isBoom) {
+		// response is an Error object
+		console.error(JSON.stringify({
+			message: `Internal error ${response.message} ${url}`,
+			info: {
+				error: response.stack,
+				headers,
+				id,
+				method,
+				url,
+			},
+		}));
+		return reply.continue();
+	}
+
+	console.log(JSON.stringify({
+		message: `Outgoing response ${method.toUpperCase()} ${url.pathname} ${response.statusCode}`,
+		type: 'response',
+		direction: 'out',
+		info: {
+			headers,
+			id,
+			method,
+			referrer: info.referrer,
+			remoteAddress: info.remoteAddress,
+			time: info.responded - info.received,
+			url,
+		}
+	}));
+	return reply.continue();
 }
 
 /**
@@ -35,10 +85,13 @@ export function onRequestExtension(request, reply) {
  * @return {Object} Hapi server
  */
 export function registerExtensionEvents(server) {
-	server.ext({
+	server.ext([{
 		type: 'onRequest',
 		method: onRequestExtension,
-	});
+	}, {
+		type: 'onPreResponse',
+		method: onPreResponseExtension,
+	}]);
 	return server;
 }
 

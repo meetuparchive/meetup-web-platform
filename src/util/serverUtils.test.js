@@ -40,27 +40,30 @@ describe('configureEnv', function() {
 });
 
 describe('onRequestExtension', () => {
+	const request = {
+		headers: 'foo',
+		id: 'bar',
+		method: 'get',
+		info: {},
+		url: {},
+	};
 	it('calls reply.continue', () => {
 		const reply = {
 			continue: () => {},
 		};
 		spyOn(reply, 'continue');
-		serverUtils.onRequestExtension({}, reply);
+		serverUtils.onRequestExtension(request, reply);
 		expect(reply.continue).toHaveBeenCalled();
 	});
 	it('calls console.log with request headers and id', () => {
 		const reply = {
 			continue: () => {},
 		};
-		const request = {
-			headers: 'foo',
-			id: 'bar',
-		};
 		spyOn(global.console, 'log');
 		serverUtils.onRequestExtension(request, reply);
 		const calledWith = console.log.calls.mostRecent().args[0];
-		expect(JSON.parse(calledWith).headers).toBe(request.headers);
-		expect(JSON.parse(calledWith).id).toBe(request.id);
+		expect(JSON.parse(calledWith).info.headers).toBe(request.headers);
+		expect(JSON.parse(calledWith).info.id).toBe(request.id);
 	});
 });
 

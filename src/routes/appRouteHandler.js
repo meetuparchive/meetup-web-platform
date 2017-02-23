@@ -11,7 +11,6 @@ export const getAppRouteHandler = renderRequestMap => (request, reply) => {
 	if (redirect) {
 		return redirect;
 	}
-	request.log(['info'], chalk.green(`Request received for ${request.url.href} (${requestLanguage})`));
 
 	return renderRequestMap[requestLanguage](request)
 		.do(() => request.log(['info'], chalk.green('HTML response ready')))
