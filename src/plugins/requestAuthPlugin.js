@@ -29,7 +29,13 @@ function verifyAuth(auth) {
 }
 
 const handleLogout = request => {
-	request.log(['info', 'auth'], 'Logout received, clearing cookies to re-authenticate');
+	const {
+		id,
+	} = request;
+	console.log(JSON.stringify({
+		message: 'Logout - clearing cookies',
+		info: { id }
+	}));
 	return removeAuthState(
 		[getMemberCookieName(request.server), 'oauth_token', 'refresh_token'],
 		request,
@@ -59,26 +65,33 @@ function getAuthType(request) {
  * @return {Observable} Observable that emits the request with auth applied
  */
 export const applyRequestAuthorizer$ = requestAuthorizer$ => request => {
-	// logout is accomplished exclusively through a `logout` querystring value
-	if ('logout' in request.query) {
+	const {
+		id,
+		query,
+		plugins,
+	} = request;
+
+// logout is accomplished exclusively through a `logout` querystring value
+	if ('logout' in query) {
 		handleLogout(request);
 	}
 
 	// always need oauth_token, even if it's an anonymous (pre-reg) token
 	// This is 'deferred' because we don't want to start fetching the token
 	// before we know that it's needed
-	request.log(['info', 'auth'], 'Checking for oauth_token in request');
 	const authType = getAuthType(request);
 
 	if (authType) {
-		request.log(['info', 'auth'], `Request contains auth token (${authType})`);
-		request.plugins.requestAuth.authType = authType;
+		plugins.requestAuth.authType = authType;
 		return Rx.Observable.of(request);
 	}
 
-	request.log(['info', 'auth'], 'Request does not contain auth token');
+	console.log(JSON.stringify({
+		message: 'Request does not contain auth token',
+		info: { id }
+	}));
 	return requestAuthorizer$(request)  // get anonymous oauth_token
-		.do(applyAuthState(request, request.plugins.requestAuth.reply))
+		.do(applyAuthState(request, plugins.requestAuth.reply))
 		.map(() => request);
 };
 
@@ -106,9 +119,31 @@ export function getAnonymousCode$({ API_TIMEOUT=5000, OAUTH_AUTH_URL, oauth }, r
 	};
 
 	return Rx.Observable.defer(() => {
-		console.log(`Fetching anonymous auth code from ${OAUTH_AUTH_URL}`);
+		console.log(JSON.stringify({
+			message: `Outgoing request GET ${OAUTH_AUTH_URL}`,
+			type: 'request',
+			direction: 'out',
+			info: {
+				url: OAUTH_AUTH_URL,
+				method: 'get',
+			}
+		}));
+
+		const startTime = new Date();
 		return Rx.Observable.fromPromise(fetch(authURL.toString(), requestOpts))
 			.timeout(API_TIMEOUT)
+			.do(() => {
+				console.log(JSON.stringify({
+					message: `Incoming response GET ${OAUTH_AUTH_URL}`,
+					type: 'response',
+					direction: 'in',
+					info: {
+						url: OAUTH_AUTH_URL,
+						method: 'get',
+						time: new Date() - startTime,
+					}
+				}));
+			})
 			.flatMap(tryJSON(OAUTH_AUTH_URL))
 			.map(({ code }) => ({
 				grant_type: 'anonymous_code',
@@ -163,16 +198,37 @@ export const getAccessToken$ = ({ API_TIMEOUT=5000, OAUTH_ACCESS_URL, oauth }, r
 
 			accessUrl.searchParams.append('grant_type', grant_type);
 			if (grant_type === 'anonymous_code') {
-				console.log(`Fetching anonymous access_token from ${OAUTH_ACCESS_URL}`);
 				accessUrl.searchParams.append('code', token);
 			}
 			if (grant_type === 'refresh_token') {
-				console.log(`Refreshing access_token from ${OAUTH_ACCESS_URL}`);
 				accessUrl.searchParams.append('refresh_token', token);
 			}
 
+			console.log(JSON.stringify({
+				message: `Outgoing request GET ${OAUTH_ACCESS_URL}?${grant_type}`,
+				type: 'request',
+				direction: 'out',
+				info: {
+					url: OAUTH_ACCESS_URL,
+					method: 'get',
+				}
+			}));
+
+			const startTime = new Date();
 			return Rx.Observable.fromPromise(fetch(accessUrl.toString(), requestOpts))
 				.timeout(API_TIMEOUT)
+				.do(() => {
+					console.log(JSON.stringify({
+						message: `Incoming response GET ${OAUTH_ACCESS_URL}?${grant_type}`,
+						type: 'response',
+						direction: 'in',
+						info: {
+							url: OAUTH_ACCESS_URL,
+							method: 'get',
+							time: new Date() - startTime,
+						}
+					}));
+				})
 				.flatMap(tryJSON(OAUTH_ACCESS_URL));
 		};
 	};
@@ -208,10 +264,17 @@ export const getRequestAuthorizer$ = config => {
 };
 
 export const getAuthenticate = authorizeRequest$ => (request, reply) => {
-	request.log(['info', 'auth'], 'Authenticating request');
+	const { id } = request;
+	console.log(JSON.stringify({
+		message: 'Authenticating request',
+		info: { id }
+	}));
 	return authorizeRequest$(request)
 		.do(request => {
-			request.log(['info', 'auth'], 'Request authenticated');
+			console.log(JSON.stringify({
+				message: 'Request authenticated',
+				info: { id }
+			}));
 		})
 		.subscribe(
 			request => {

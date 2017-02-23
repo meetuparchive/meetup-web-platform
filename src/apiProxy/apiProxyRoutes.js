@@ -25,20 +25,6 @@ const getApiProxyRoutes = (path, apiProxyFn$) => {
 					enabled: true,
 				}
 			},
-			ext: {
-				onPreResponse: {
-					method: (request, reply) => {
-						const response = request.response;
-						if (response.isBoom) {
-							request.log(
-								['error'],
-								`${request.url.href} responded with:\n ${response.stack}`
-							);
-						}
-						reply.continue();
-					},
-				},
-			},
 			state: {
 				failAction: 'ignore',  // ignore cookie validation, just accept
 			},
