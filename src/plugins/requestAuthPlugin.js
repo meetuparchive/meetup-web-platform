@@ -45,7 +45,7 @@ const handleLogout = request => {
 
 function getAuthType(request) {
 	const memberCookie = getMemberCookieName(request.server);
-	const allowedAuthTypes = [memberCookie, 'oauth_token', '__internal_oauth_token'];
+	const allowedAuthTypes = [memberCookie, 'oauth_token'];
 	// search for a request.state cookie name that matches an allowed auth type
 	return allowedAuthTypes.reduce(
 		(authType, allowedType) => authType || request.state[allowedType] && allowedType,
@@ -278,7 +278,8 @@ export const getAuthenticate = authorizeRequest$ => (request, reply) => {
 		})
 		.subscribe(
 			request => {
-				const credentials = request.state[getAuthType(request)];
+				const credentials = request.state[getAuthType(request)] ||
+					request.plugins.requestAuth.oauth_token;
 				reply.continue({ credentials, artifacts: credentials });
 			},
 			err => reply(err, null, { credentials: null })

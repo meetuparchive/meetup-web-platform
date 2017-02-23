@@ -129,7 +129,7 @@ export function server(routes, connection, plugins, platform_agent, config) {
 		.then(() => registerExtensionEvents(server))
 		.then(() => server.auth.strategy('default', 'oauth', true))
 		.then(() => server.log(['start'], `${plugins.length} plugins registered, assigning routes...`))
-		.then(() => server.route(routes))
+		.then(() => appConnection.route(routes))
 		.then(() => server.log(['start'], `${routes.length} routes assigned, starting server...`))
 		.then(() => server.start())
 		.then(() => server.log(['start'], `Dev server is listening at ${server.info.uri}`))

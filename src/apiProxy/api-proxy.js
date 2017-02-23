@@ -35,18 +35,19 @@ import {
  * @param {Request} request Hapi request object
  * @return Array$ contains all API responses corresponding to the provided queries
  */
-const apiProxy$ = request => {
+const apiProxy$ = (request, queries) => {
 	// 1. get the queries and the 'universal' `externalRequestOpts` from the request
 	const parsedRequest = parseRequest(request);
+	queries = queries || parsedRequest.queries;
 
 	// 2. curry a function that uses `externalRequestOpts` as a base from which
 	// to build the query-specific API request options object
 	const queryToRequestOpts = buildRequestArgs(parsedRequest.externalRequestOpts);
 
 	// 3. map the queries onto an array of api request observables
-	const apiRequests$ = parsedRequest.queries
+	const apiRequests$ = queries
 		.map(queryToRequestOpts)
-		.map((opts, i) => ([opts, parsedRequest.queries[i]]))  // zip the query back into the opts
+		.map((opts, i) => ([opts, queries[i]]))  // zip the query back into the opts
 		.map(makeApiRequest$(request));
 
 	// 4. zip them together to send them parallel and return responses in order

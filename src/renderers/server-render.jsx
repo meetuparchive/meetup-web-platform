@@ -7,7 +7,7 @@ import { useBasename } from 'history';
 import match from 'react-router/lib/match';
 import { Provider } from 'react-redux';
 
-import { getServerCreateStore } from '../util/createStore';
+import { getServerCreateStore } from '../util/createStoreServer';
 import Dom from '../components/dom';
 import NotFound from '../components/NotFound';
 import { polyfillNodeIntl } from '../util/localizationUtils';

@@ -216,15 +216,15 @@ export const apiResponseToQueryResponse = query => ({ value, meta }) => ({
 	}
 });
 
-export function getAuthHeaders({ state }) {
-	// internal server requests may set non-encoded token cookie __internal_oauth_token
-	const oauth_token = state.oauth_token || state.__internal_oauth_token;
-	if (!state.MEETUP_MEMBER && oauth_token) {
+export function getAuthHeaders(request) {
+	const oauth_token = request.state.oauth_token ||  // browser-based requests
+		request.plugins.requestAuth.oauth_token;  // internal server requests
+	if (!request.state.MEETUP_MEMBER && oauth_token) {
 		return {
 			authorization: `Bearer ${oauth_token}`,
 		};
 	}
-	const cookies = { ...state };
+	const cookies = { ...request.state };
 	const csrf = uuid.v4();
 	cookies.MEETUP_CSRF = csrf;
 	cookies.MEETUP_CSRF_DEV = csrf;
@@ -263,6 +263,11 @@ export function parseRequestQueries(request) {
 		query,
 	} = request;
 	const queriesJSON = method === 'post' ? payload.queries : query.queries;
+
+	if (!queriesJSON) {
+		return null;
+	}
+
 	const validatedQueries = Joi.validate(
 		JSON.parse(queriesJSON),
 		Joi.array().items(querySchema)
