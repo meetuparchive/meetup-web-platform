@@ -16,24 +16,6 @@ const testTransform = (tracker, trackInfo, test) =>
 	.then(test);
 
 describe('GoodMeetupTracking', () => {
-	describe('static postDataCallback', () => {
-		it('logs an error when an error occurs', () => {
-			spyOn(global.console, 'error');
-			const expectedError = new Error('nope');
-			GoodMeetupTracking.postDataCallback(expectedError, null, null);
-			expect(global.console.error).toHaveBeenCalledWith(expectedError);
-		});
-		it('logs an error when response status is not 200', () => {
-			spyOn(global.console, 'error');
-			const response = {
-				statusCode: 410,
-			};
-			const body = 'Bad Test Request';
-			GoodMeetupTracking.postDataCallback(null, response, body);
-			expect(global.console.error).toHaveBeenCalled();
-		});
-	});
-
 	it('creates a transform stream', () => {
 		expect(new GoodMeetupTracking()).toEqual(jasmine.any(Stream.Transform));
 	});
@@ -98,24 +80,21 @@ describe('Integration with tracking logs', () => {
 		);
 	});
 
-	it('calls config.postData with an endpoint string and the output of the avro transform', () => {
+	it('calls config.logData with an endpoint string and the output of the avro transform', () => {
 		const config = {
 			endpoint: 'foo',
-			postData() {},
+			logData() {},
 		};
-		spyOn(config, 'postData');
+		spyOn(config, 'logData');
 		const tracker = new GoodMeetupTracking(config);
 
 		return testTransform(
 			tracker,
 			trackInfo,
 			data => {
-				const body = JSON.stringify(data);
-				const headers = {
-					'Content-Type': 'application/json',
-				};
-				expect(config.postData)
-					.toHaveBeenCalledWith(config.endpoint, { headers, body }, jasmine.any(Function));
+				const body = `analytics=${JSON.stringify(data)}`;
+				expect(config.logData)
+					.toHaveBeenCalledWith(body);
 			}
 		);
 	});
