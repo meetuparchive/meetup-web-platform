@@ -22,9 +22,43 @@ export function checkForDevUrl(value) {
 
 export function onRequestExtension(request, reply) {
 	console.log(JSON.stringify({
-		message: 'Request info',
-		headers: request.headers,
-		id: request.id,
+		message: `Incoming request ${request.method.toUpperCase()} ${request.url.href}`,
+		type: 'request',
+		direction: 'in',
+		info: {
+			url: request.url,
+			method: request.method,
+			headers: request.headers,
+			id: request.id,
+			referrer: request.info.referrer,
+			remoteAddress: request.info.remoteAddress,
+		}
+	}));
+	reply.continue();
+}
+
+function onPreResponseExtension(request, reply) {
+	const {
+		headers,
+		id,
+		info,
+		method,
+		response,
+		url,
+	} = request;
+	console.log(JSON.stringify({
+		message: `Outgoing response ${method.toUpperCase()} ${url} ${response.statusCode}`,
+		type: 'response',
+		direction: 'out',
+		info: {
+			url,
+			method,
+			headers,
+			id,
+			referrer: info.referrer,
+			remoteAddress: info.remoteAddress,
+			time: info.responded - info.received
+		}
 	}));
 	reply.continue();
 }
@@ -35,10 +69,13 @@ export function onRequestExtension(request, reply) {
  * @return {Object} Hapi server
  */
 export function registerExtensionEvents(server) {
-	server.ext({
+	server.ext([{
 		type: 'onRequest',
 		method: onRequestExtension,
-	});
+	}, {
+		type: 'onPreResponse',
+		method: onPreResponseExtension,
+	}]);
 	return server;
 }
 

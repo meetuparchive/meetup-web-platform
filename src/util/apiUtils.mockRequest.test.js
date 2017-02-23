@@ -109,7 +109,7 @@ describe('makeApiRequest$', () => {
 				value: mockResponse,
 			}
 		};
-		return makeApiRequest$({ log: () => {} }, 5000, {})([{ url: endpoint }, query])
+		return makeApiRequest$({ log: () => {} }, 5000, {})([{ url: endpoint, method: 'get' }, query])
 			.toPromise()
 			.then(response => expect(response).toEqual(expectedResponse));
 	});
