@@ -50,13 +50,16 @@ describe('configureAuthCookies', () => {
 });
 
 describe('applyAuthState', () => {
-	it('calls reply.state and sets request.state for each auth cookie name', () => {
+	it('calls reply.state and sets request.plugins.requestAuth for each auth cookie name', () => {
 		const reply = {
 			state() {},
 		};
 		const request = {
 			log() {},
 			state: {},
+			plugins: {
+				requestAuth: {},
+			},
 		};
 		spyOn(reply, 'state');
 		const testApply = applyAuthState(request, reply);
@@ -69,10 +72,7 @@ describe('applyAuthState', () => {
 			expect(args[0] in auth).toBe(true);
 			expect(args[1]).toEqual(auth[args[0]]);
 		});
-		expect(request.state).toEqual({
-			__internal_oauth_token: auth.oauth_token,
-			__internal_refresh_token: auth.refresh_token,
-		});
+		expect(request.plugins.requestAuth).toEqual(auth);
 	});
 });
 

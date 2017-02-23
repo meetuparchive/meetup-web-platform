@@ -16,7 +16,7 @@ const createLink = options => href => {
 	const link = hasProtocolRE.test(href) ? href : `http://${href}`;
 
 	return `<a class="link" href="${link}" title="${href}" ${targetAttr} ${relAttr}>${href}</a>`;
-}
+};
 
 /**
  * Replaces URLs in a block of text with HTML anchor tags.
