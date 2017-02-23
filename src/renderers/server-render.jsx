@@ -1,6 +1,5 @@
 import Rx from 'rxjs';
 import Boom from 'boom';
-import chalk from 'chalk';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import RouterContext from 'react-router/lib/RouterContext';
@@ -94,7 +93,10 @@ const getRouterRenderer = (store, baseUrl, clientFilename, assetPublicPath) =>
 				200;
 		} catch(e) {
 			// log the error stack here because Observable logs not great
-			console.error(e.stack);
+			console.error(JSON.stringify({
+				message: `Internal rendering error ${e.message}`,
+				info: e.stack,
+			}));
 			if (process.env.NODE_ENV === 'production') {
 				throw e;
 			}
@@ -109,17 +111,6 @@ const getRouterRenderer = (store, baseUrl, clientFilename, assetPublicPath) =>
 			result
 		};
 	};
-
-/**
- * dispatch the actions necessary to set up the initial state of the app
- *
- * @param {Store} store Redux store for this request
- * @param {Object} config that initializes app (auth tokens, e.g. oauth_token)
- */
-const dispatchConfig = (store, { apiUrl, log=console.log }) => {
-	log(['app', 'info'], chalk.green(`Configuring apiUrl: ${apiUrl}`));
-	store.dispatch(configureApiUrl(apiUrl));
-};
 
 /**
  * Curry a function that takes a Hapi request and returns an observable
@@ -150,12 +141,10 @@ const makeRenderer = (
 ) => request => {
 
 	middleware = middleware || [];
-	request.log(['info'], chalk.green(`Rendering ${request.url.href}`));
 	const {
 		connection,
 		headers,
 		info,
-		log,
 		path,
 	} = request;
 
@@ -170,7 +159,7 @@ const makeRenderer = (
 	const createStore = getServerCreateStore(routes, middleware, request);
 	const store = createStore(reducer, initialState);
 	// load initial config
-	dispatchConfig(store, { apiUrl, log: log.bind(request) });
+	store.dispatch(configureApiUrl(apiUrl));
 
 	// render skeleton if requested - the store is ready
 	if ('skeleton' in request.query) {
@@ -187,7 +176,6 @@ const makeRenderer = (
 	})
 	.first(state => state.preRenderChecklist.every(isReady => isReady));  // take the first ready state
 
-	request.log(['app', 'info'], `Finding route for path: '${appLocation}'`);
 	return Rx.Observable.bindNodeCallback(match)({ location: appLocation, routes })
 		.do(([redirectLocation, renderProps]) => {
 			if (!redirectLocation && !renderProps) {
@@ -195,7 +183,15 @@ const makeRenderer = (
 			}
 		})
 		.do(() => {
-			request.log(['app', 'info'], 'Found app route, dispatching RENDER');
+			console.log(JSON.stringify({
+				message: `Dispatching RENDER for ${request.url.href}`,
+				type: 'dispatch',
+				info: {
+					url: request.url,
+					method: request.method,
+					id: request.id,
+				}
+			}));
 		})
 		.do(([redirectLocation, renderProps]) =>
 			store.dispatch({

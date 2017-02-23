@@ -397,43 +397,17 @@ describe('logApiResponse', () => {
 	};
 	it('emits parsed request and response data for GET request', () => {
 		spyOn(console, 'log');
-		logApiResponse([MOCK_INCOMINGMESSAGE_GET, 'foo']);
+		logApiResponse({})([MOCK_INCOMINGMESSAGE_GET, 'foo']);
 		expect(console.log).toHaveBeenCalled();
 		const loggedObject = JSON.parse(console.log.calls.mostRecent().args[0]);
-		expect(loggedObject).toEqual({
-			type: 'REST API response JSON',
-			payload: {
-				request: {
-					query: { foo: 'bar' },
-					pathname: MOCK_INCOMINGMESSAGE_GET.request.uri.pathname,
-					method: MOCK_INCOMINGMESSAGE_GET.request.method,
-				},
-				response: {
-					elapsedTime: MOCK_INCOMINGMESSAGE_GET.elapsedTime,
-					body: jasmine.any(String),
-				},
-			}
-		});
+		expect(loggedObject).toEqual(jasmine.any(Object));
 	});
 	it('emits parsed request and response data for POST request', () => {
 		spyOn(console, 'log');
-		logApiResponse([MOCK_INCOMINGMESSAGE_POST, 'foo']);
+		logApiResponse({})([MOCK_INCOMINGMESSAGE_POST, 'foo']);
 		expect(console.log).toHaveBeenCalled();
 		const loggedObject = JSON.parse(console.log.calls.mostRecent().args[0]);
-		expect(loggedObject).toEqual({
-			type: 'REST API response JSON',
-			payload: {
-				request: {
-					query: {},
-					pathname: MOCK_INCOMINGMESSAGE_POST.request.uri.pathname,
-					method: MOCK_INCOMINGMESSAGE_POST.request.method,
-				},
-				response: {
-					elapsedTime: MOCK_INCOMINGMESSAGE_POST.elapsedTime,
-					body: jasmine.any(String),
-				},
-			},
-		});
+		expect(loggedObject).toEqual(jasmine.any(Object));
 	});
 	it('handles multiple querystring vals for GET request', () => {
 		spyOn(console, 'log');
@@ -447,10 +421,10 @@ describe('logApiResponse', () => {
 				},
 			},
 		};
-		logApiResponse([response, 'foo']);
+		logApiResponse({})([response, 'foo']);
 		expect(console.log).toHaveBeenCalled();
 		const loggedObject = JSON.parse(console.log.calls.mostRecent().args[0]);
-		expect(loggedObject.payload.request.query).toEqual({
+		expect(loggedObject.info.query).toEqual({
 			foo: 'bar',
 			baz: 'boodle',
 		});
@@ -458,19 +432,19 @@ describe('logApiResponse', () => {
 	it('returns the full body of the response if less than 256 characters', () => {
 		const body = 'foo';
 		spyOn(console, 'log');
-		logApiResponse([MOCK_INCOMINGMESSAGE_GET, body]);
+		logApiResponse({})([MOCK_INCOMINGMESSAGE_GET, body]);
 		expect(console.log).toHaveBeenCalled();
 		const loggedObject = JSON.parse(console.log.calls.mostRecent().args[0]);
-		expect(loggedObject.payload.response.body).toEqual(body);
+		expect(loggedObject.info.body).toEqual(body);
 	});
 	it('returns a truncated response body if more than 256 characters', () => {
 		const body300 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean egestas viverra sem vel congue. Cras vitae malesuada justo. Fusce ut finibus felis, at sagittis leo. Morbi nec velit dignissim, viverra tellus at, pretium nisi. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla turpis duis.';
 		spyOn(console, 'log');
-		logApiResponse([MOCK_INCOMINGMESSAGE_GET, body300]);
+		logApiResponse({})([MOCK_INCOMINGMESSAGE_GET, body300]);
 		expect(console.log).toHaveBeenCalled();
 		const loggedObject = JSON.parse(console.log.calls.mostRecent().args[0]);
-		expect(loggedObject.payload.response.body.startsWith(body300.substr(0, 256))).toBe(true);
-		expect(loggedObject.payload.response.body.startsWith(body300)).toBe(false);
+		expect(loggedObject.info.body.startsWith(body300.substr(0, 256))).toBe(true);
+		expect(loggedObject.info.body.startsWith(body300)).toBe(false);
 	});
 });
 

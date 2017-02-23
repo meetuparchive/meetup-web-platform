@@ -27,10 +27,17 @@ const MOCK_RESPONSE_OK = {  // minimal representation of http.IncomingMessage
 	headers: {
 		'x-meetup-request-id': 'mock request'
 	},
-	request: {
-		uri: {},
-	},
 };
+
+function makeMockResponseOk(requestOpts) {
+	return {
+		...MOCK_RESPONSE_OK,
+		request: {
+			uri: url.parse(requestOpts.url),
+			method: requestOpts.method || 'get',
+		},
+	};
+}
 
 /**
  * In order to receive cookies from `externalRequest` requests, this function
@@ -193,11 +200,6 @@ export const buildRequestArgs = externalRequestOpts =>
 		}
 
 		// production logs will automatically be JSON-parsed in Stackdriver
-		console.log(JSON.stringify({
-			type: 'External request headers',
-			payload: externalRequestOptsQuery.headers
-		}));
-
 		return externalRequestOptsQuery;
 	};
 
@@ -354,7 +356,7 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
  * Fake an API request and directly return the stringified mockResponse
  */
 export const makeMockRequest = mockResponse => requestOpts =>
-	Rx.Observable.of([MOCK_RESPONSE_OK, JSON.stringify(mockResponse)])
+	Rx.Observable.of([makeMockResponseOk(requestOpts), JSON.stringify(mockResponse)])
 		.do(() => console.log(`MOCKING response to ${requestOpts.url}`));
 
 const externalRequest$ = Rx.Observable.bindNodeCallback(externalRequest);
@@ -380,36 +382,36 @@ export const makeExternalApiRequest = request => requestOpts => {
 		.map(([response, body]) => [response, body, requestOpts.jar]);
 };
 
-export const logApiResponse = ([response, body]) => {
+export const logApiResponse = request => ([response, body]) => {
 	const {
+		id,
 		uri: {
 			query,
 			pathname,
+			href,
 		},
 		method,
 	} = response.request;
 
-	const responseLog = {
-		request: {
+	// production logs will automatically be JSON-parsed in Stackdriver
+	console.log(JSON.stringify({
+		message: `Incoming response ${method.toUpperCase()} ${pathname}`,
+		type: 'response',
+		direction: 'in',
+		info: {
+			url: href,
 			query: (query || '').split('&').reduce((acc, keyval) => {
 				const [key, val] = keyval.split('=');
 				acc[key] = val;
 				return acc;
 			}, {}),
-			pathname,
 			method,
-		},
-		response: {
-			elapsedTime: response.elapsedTime,
-			status: response.statusCode,
+			id,
+			originRequestId: request.id,
+			statusCode: response.statusCode,
+			time: response.elapsedTime,
 			body: body.length > 256 ? `${body.substr(0, 256)}...`: body,
-		},
-	};
-
-	// production logs will automatically be JSON-parsed in Stackdriver
-	console.log(JSON.stringify({
-		type: 'REST API response JSON',
-		payload: responseLog
+		}
 	}));
 };
 
@@ -471,9 +473,25 @@ export const makeApiRequest$ = request => {
 			makeExternalApiRequest(request);
 
 		return Rx.Observable.defer(() => {
-			request.log(['api', 'info'], `REST API request: ${requestOpts.url}`);
+			const {
+				method,
+				url,
+				headers,
+			} = requestOpts;
+
+			console.log(JSON.stringify({
+				message: `Outgoing request ${requestOpts.method.toUpperCase()} ${requestOpts.url}`,
+				type: 'request',
+				direction: 'out',
+				info: {
+					headers,
+					url,
+					method,
+				},
+			}));
+
 			return request$(requestOpts)
-				.do(logApiResponse)             // this will leak private info in API response
+				.do(logApiResponse(request))             // this will leak private info in API response
 				.do(injectResponseCookies(request))
 				.map(parseApiResponse(requestOpts.url))  // parse into plain object
 				.catch(errorResponse$(requestOpts.url))

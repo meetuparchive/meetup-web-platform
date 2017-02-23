@@ -36,7 +36,6 @@ import {
  * @return Array$ contains all API responses corresponding to the provided queries
  */
 const apiProxy$ = request => {
-	request.log(['api', 'info'], 'Parsing api endpoint request');
 	// 1. get the queries and the 'universal' `externalRequestOpts` from the request
 	const parsedRequest = parseRequest(request);
 
@@ -44,7 +43,6 @@ const apiProxy$ = request => {
 	// to build the query-specific API request options object
 	const queryToRequestOpts = buildRequestArgs(parsedRequest.externalRequestOpts);
 
-	request.log(['api', 'info'], JSON.stringify(parsedRequest.queries));
 	// 3. map the queries onto an array of api request observables
 	const apiRequests$ = parsedRequest.queries
 		.map(queryToRequestOpts)

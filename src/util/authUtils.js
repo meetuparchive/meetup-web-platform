@@ -43,7 +43,11 @@ export const applyAuthState = (request, reply) => auth => {
 	const authState = configureAuthState(auth);
 	const authCookies = Object.keys(authState);
 
-	request.log(['auth', 'info'], `Setting auth cookies: ${JSON.stringify(authCookies)}`);
+	const { id } = request;
+	console.log(JSON.stringify({
+		message: `Setting auth cookies: ${JSON.stringify(authCookies)}`,
+		info: { id }
+	}));
 	Object.keys(authState).forEach(name => {
 		const cookieVal = authState[name];
 		// apply to request
