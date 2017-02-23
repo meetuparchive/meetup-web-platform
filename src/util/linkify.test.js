@@ -32,4 +32,9 @@ describe('linkify', () => {
 		const expectedParagraphLink = `Did you know ${expectedLink} is a cool site?`;
 		expect(linkify(paragraphTextBase)).toBe(expectedParagraphLink);
 	});
+	it('should prefix a plain link with a protocol', () => {
+		const plainBase = 'www.meetup.com';
+		const expectedLink = '<a class="link" href="http://www.meetup.com" title="www.meetup.com" target="" >www.meetup.com</a>';
+		expect(linkify(plainBase)).toBe(expectedLink);
+	});
 });
