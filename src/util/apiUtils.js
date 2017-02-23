@@ -480,11 +480,10 @@ export const makeApiRequest$ = request => {
 		return Rx.Observable.defer(() => {
 			const {
 				method,
-				url,
 				headers,
 			} = requestOpts;
 
-			const parsedUrl = url.parse(url);
+			const parsedUrl = url.parse(requestOpts.url);
 			console.log(JSON.stringify({
 				message: `Outgoing request ${requestOpts.method.toUpperCase()} ${parsedUrl.pathname}`,
 				type: 'request',
