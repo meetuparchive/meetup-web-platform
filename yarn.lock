@@ -3278,12 +3278,12 @@ react-redux@5.0.2:
     lodash-es "^4.2.0"
     loose-envify "^1.1.0"
 
-react-router-dom@4.0.0-beta.5:
-  version "4.0.0-beta.5"
-  resolved "https://registry.yarnpkg.com/react-router-dom/-/react-router-dom-4.0.0-beta.5.tgz#cb104b789d3a7af159c06ce76e7253978447f9aa"
+react-router-dom@^4.0.0-beta.6:
+  version "4.0.0-beta.6"
+  resolved "https://registry.yarnpkg.com/react-router-dom/-/react-router-dom-4.0.0-beta.6.tgz#bdbd8f2fea3def52970735778db03b24cc082a02"
   dependencies:
     history "^4.5.1"
-    react-router "^4.0.0-beta.5"
+    react-router "^4.0.0-beta.6"
 
 react-router@3.0.2:
   version "3.0.2"
@@ -3295,7 +3295,7 @@ react-router@3.0.2:
     loose-envify "^1.2.0"
     warning "^3.0.0"
 
-react-router@^4.0.0-beta.5:
+react-router@^4.0.0-beta.6:
   version "4.0.0-beta.6"
   resolved "https://registry.yarnpkg.com/react-router/-/react-router-4.0.0-beta.6.tgz#561ac0bf1929960813bf201319ff85d821d5547b"
   dependencies:
