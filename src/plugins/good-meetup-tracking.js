@@ -8,7 +8,6 @@ const Stream = require('stream');
 
 const internals = {
 	defaults: {
-		logData: data => console.log(data),
 		// currently the schema is manually copied from
 		// https://github.dev.meetup.com/meetup/meetup/blob/master/modules/base/src/main/versioned_avro/Activity_v3.avsc
 		schema: {
@@ -77,7 +76,7 @@ class GoodMeetupTracking extends Stream.Transform {
 			payload: eventData,
 		}));
 
-		const { schema, logData } = this._settings;
+		const { schema } = this._settings;
 
 		const record = avro.parse(schema).toBuffer(eventData);
 
@@ -88,10 +87,8 @@ class GoodMeetupTracking extends Stream.Transform {
 			date: eventDate.toISOString().substr(0, 10),  // YYYY-MM-DD
 		};
 
-		// log encoded data that will be picked up by fluentd
-		logData(`analytics=${JSON.stringify(analytics)}`);
-
-		return next(null, analytics);
+		// send the encoded data for logging to stdout
+		return next(null, `analytics=${JSON.stringify(analytics)}`);
 	}
 }
 
