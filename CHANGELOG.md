@@ -1,8 +1,8 @@
 ## [2.0]
 
 - **Refactor** Upgrade to React Router v4. Routes definitions change - the root
-level routes definition is now an array, and each route must have the following
-shape:
+  level routes definition is now an array, and each route must have the following
+  shape:
 
   ```ts
   {
