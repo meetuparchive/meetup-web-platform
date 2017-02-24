@@ -1,6 +1,22 @@
 ## [2.0]
 
-- **Refactor** Upgrade to React Router v4.
+- **Refactor** Upgrade to React Router v4. Routes definitions change - the root
+level routes definition is now an array, and each route must have the following
+shape:
+
+  ```ts
+  {
+    path: string,  // must have leading '/', except for the root '' path
+    component: React.Component,
+    query?: function,
+    routes?: array,  // child routes, with `path` props that append to the parent
+    exact?: boolean,  // forces the component to only render when url is exact
+      match
+  }
+  ```
+
+  Note that async routes are no longer supported - they will return in a new form
+  in a future update
 
 ## [1.0]
 
