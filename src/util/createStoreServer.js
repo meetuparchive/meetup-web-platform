@@ -13,6 +13,7 @@ import apiProxy$ from '../apiProxy/api-proxy';
  */
 export const serverFetchQueries = request => () => queries =>
 	apiProxy$(request, queries)
+		.map(responses => ({ responses }))  // package the responses in object like the API proxy endpoint does
 		.toPromise()
 		.then(parseQueryResponse(queries));
 

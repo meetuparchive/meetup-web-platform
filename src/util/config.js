@@ -24,6 +24,7 @@ export default function getConfig(overrideConfig) {
 	const config = {
 		API_PROTOCOL: process.env.API_PROTOCOL || 'https',
 		API_HOST: process.env.API_HOST || 'api.dev.meetup.com',
+		API_TIMEOUT: process.env.API_TIMEOUT || 8000,
 		COOKIE_ENCRYPT_SECRET: process.env.COOKIE_ENCRYPT_SECRET,
 		CSRF_SECRET: process.env.CSRF_SECRET,
 		DEV_SERVER_PORT: process.env.DEV_SERVER_PORT || 8000,
@@ -53,6 +54,7 @@ function validateConfig(config) {
 		API_PROTOCOL: Joi.any().only(['https', 'http']).required(),
 		API_HOST: Joi.string().hostname().required(),
 		API_SERVER_ROOT_URL: Joi.string().uri(),
+		API_TIMEOUT: Joi.number(),
 		COOKIE_ENCRYPT_SECRET: Joi.string().min(32).required().error(
 			new Error('set COOKIE_ENCRYPT_SECRET env variable to a random 32+ character string')
 		),

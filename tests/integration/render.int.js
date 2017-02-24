@@ -48,4 +48,3 @@ describe('Full dummy app render', () => {
 	});
 });
 
-
