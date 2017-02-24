@@ -62,7 +62,8 @@ export function getConsoleLogPlugin() {
 						}],
 					}, {
 						module: GoodMeetupTracking,
-					}
+					},
+					'stdout'
 				],
 			}
 		}
