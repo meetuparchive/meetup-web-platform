@@ -88,7 +88,7 @@ class GoodMeetupTracking extends Stream.Transform {
 		};
 
 		// send the encoded data for logging to stdout
-		return next(null, `analytics=${JSON.stringify(analytics)}`);
+		return next(null, `analytics=${JSON.stringify(analytics)}\n`);
 	}
 }
 
