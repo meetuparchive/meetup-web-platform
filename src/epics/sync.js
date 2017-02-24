@@ -37,7 +37,7 @@ export const getNavEpic = routes => {
 				// now that referrer has been recorded, set new currentLocation
 				currentLocation = payload;
 
-				const activeQueries = findActiveQueries(payload);
+				const activeQueries = findActiveQueries(payload.path);
 				const actions = [apiRequest(activeQueries, requestMetadata)];
 
 				// emit cache clear _only_ when logout requested

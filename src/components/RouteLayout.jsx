@@ -16,18 +16,21 @@ const RouteWithSubRoutes = route => {
 			strict={route.strict || false}
 			render={props => (
 				<route.component {...props}>
-					{route.routes && <SwitchRoutes routes={route.routes} />}
+					{route.routes &&
+						<SwitchRoutes routes={route.routes} currentPath={props.match.path} />
+					}
 				</route.component>
 			)}
 		/>
 	);
 };
 
-const SwitchRoutes = ({ routes }) => (
+const SwitchRoutes = ({ routes, currentPath }) => (
 	<Switch>
-		{routes.map((route, i) =>
-			<RouteWithSubRoutes key={i} {...route} />
-		)}
+		{routes.map((route, i) => {
+			route.path = `${currentPath || ''}${route.path}`;  // modify path to reflect full match
+			return <RouteWithSubRoutes key={i} {...route} />;
+		})}
 	</Switch>
 );
 

@@ -7,7 +7,7 @@ export const assetPublicPath = '//whatever';
 export const reducer = makeRootReducer();
 
 export const routes = [{
-	path: '/',
+	path: '',
 	component: 'div',
 	query: () => ({
 		type: 'mock',
@@ -16,12 +16,16 @@ export const routes = [{
 	}),
 	routes: [{
 		path: '/foo',
-		component: MockContainer,
-		query: () => ({
-			type: 'mock',
-			ref: 'foo',
-			params: {},
-		})
+		component: 'div',
+		routes: [{
+			path: '/bar',
+			component: MockContainer,
+			query: () => ({
+				type: 'mock',
+				ref: 'foobar',
+				params: {},
+			}),
+		}]
 	}],
 }];
 

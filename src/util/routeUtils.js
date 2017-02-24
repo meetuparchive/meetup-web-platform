@@ -17,8 +17,8 @@ export const getRouteQueries = (route, params) => {
 		.filter(query => query);
 };
 
-export const matchedRouteQueriesReducer = path => (queries, route) => {
-	const match = matchPath(route.path, path);
+export const matchedRouteQueriesReducer = url => (queries, route) => {
+	const match = matchPath(url, route.path);
 	if (!match) {
 		return queries;
 	}
@@ -29,18 +29,19 @@ export const matchedRouteQueriesReducer = path => (queries, route) => {
 		return currentQueries;
 	}
 
+	const unmatchedUrl = route.path ? url.replace(match.url, '') : match.url;
 	return route.routes.reduce(
-		matchedRouteQueriesReducer(path),
+		matchedRouteQueriesReducer(unmatchedUrl),
 		currentQueries
 	);
 };
 
 /**
- * Get the queries from all currently-active routes
+ * Get the queries from all currently-active routes at the requested url path
  * @param {Array} routes an array of route objects
- * @param {String} path the current URL path
+ * @param {String} url the current URL path
  * @return {Array} the queries attached to the active routes
  */
-export const activeRouteQueries = routes => path =>
-	routes.reduce(matchedRouteQueriesReducer(path), []);
+export const activeRouteQueries = routes => url =>
+	routes.reduce(matchedRouteQueriesReducer(url), []);
 
