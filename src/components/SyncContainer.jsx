@@ -15,8 +15,9 @@ function mapDispatchToProps(dispatch) {
  */
 export class SyncContainer extends React.Component {
 	/**
-	 * This container only cares about routing changes. When the route changes,
-	 * it should trigger a LOCATION_SYNC action
+	 * This container connects route changes to Redux actions. When the router
+	 * inject new props, the container determines whether or not to dispatch a
+	 * 'locationChange' action
 	 * @return {undefined} side effect only - dispatch
 	 */
 	componentWillReceiveProps(nextProps) {
