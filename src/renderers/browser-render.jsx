@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { getBrowserCreateStore } from '../util/createStore';
+import { getBrowserCreateStore } from '../util/createStoreBrowser';
 import BrowserRouter from 'react-router-dom/BrowserRouter';
 import PlatformApp from '../components/PlatformApp';
 

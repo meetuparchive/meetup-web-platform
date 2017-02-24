@@ -43,8 +43,6 @@ export function getConsoleLogPlugin() {
 						name: 'Squeeze',
 						args: [{
 							error: logFilter,
-							response: logFilter,
-							request: logFilter,
 							log: logFilter,
 						}]
 					}, {  // format with good-console
@@ -64,7 +62,8 @@ export function getConsoleLogPlugin() {
 						}],
 					}, {
 						module: GoodMeetupTracking,
-					}
+					},
+					'stdout'
 				],
 			}
 		}

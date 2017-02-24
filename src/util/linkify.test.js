@@ -2,7 +2,7 @@ import linkify from './linkify';
 
 describe('linkify', () => {
 	const httpBase = 'http://www.meetup.com',
-		 expectedLink = '<a class="link" href="http://www.meetup.com" title="http://www.meetup.com" target="" >http://www.meetup.com</a>';
+		expectedLink = '<a class="link" href="http://www.meetup.com" title="http://www.meetup.com" target="" >http://www.meetup.com</a>';
 
 	it('should turn a link text with http into a HTML anchor with http', () => {
 		expect(linkify(httpBase)).toBe(expectedLink);
@@ -31,5 +31,10 @@ describe('linkify', () => {
 		const paragraphTextBase = `Did you know ${httpBase} is a cool site?`;
 		const expectedParagraphLink = `Did you know ${expectedLink} is a cool site?`;
 		expect(linkify(paragraphTextBase)).toBe(expectedParagraphLink);
+	});
+	it('should prefix a plain link with a protocol', () => {
+		const plainBase = 'www.meetup.com';
+		const expectedLink = '<a class="link" href="http://www.meetup.com" title="www.meetup.com" target="" >www.meetup.com</a>';
+		expect(linkify(plainBase)).toBe(expectedLink);
 	});
 });

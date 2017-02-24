@@ -1,10 +1,9 @@
 import Rx from 'rxjs';
-import chalk from 'chalk';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import StaticRouter from 'react-router-dom/StaticRouter';
 
-import { getServerCreateStore } from '../util/createStore';
+import { getServerCreateStore } from '../util/createStoreServer';
 import Dom from '../components/dom';
 import NotFound from '../components/NotFound';
 import PlatformApp from '../components/PlatformApp';
@@ -71,6 +70,7 @@ const getRouterRenderer = (
 	// initializes page-specific state that `<Dom />` needs to render, e.g.
 	// `<head>` contents
 	const initialState = store.getState();
+	console.log(JSON.stringify(initialState, null, 2));
 	let appMarkup;
 	let result;
 	let statusCode;
@@ -100,11 +100,16 @@ const getRouterRenderer = (
 			initialState,
 			appMarkup
 		);
+
 		statusCode = NotFound.rewind() ||  // if NotFound is mounted, return 404
 			200;
-	} catch(e) {
-		// log the error stack here because Observable logs not great
-		console.error(e.stack);
+
+	} catch(error) {
+		// log the error stack here in dev to make it a little more legible
+		// - prod will get stackdriver formatting
+		if (process.env.NODE_ENV !== 'production') {
+			console.error(error.stack);
+		}
 		throw e;
 	}
 
@@ -112,17 +117,6 @@ const getRouterRenderer = (
 		statusCode,
 		result
 	};
-};
-
-/**
- * dispatch the actions necessary to set up the initial state of the app
- *
- * @param {Store} store Redux store for this request
- * @param {Object} config that initializes app (auth tokens, e.g. oauth_token)
- */
-const dispatchConfig = (store, { apiUrl, log=console.log }) => {
-	log(['app', 'info'], chalk.green(`Configuring apiUrl: ${apiUrl}`));
-	store.dispatch(configureApiUrl(apiUrl));
 };
 
 /**
@@ -161,7 +155,6 @@ const makeRenderer = (
 		log,
 		url,
 	} = request;
-	request.log(['info'], chalk.green(`Rendering ${url.href}`));
 
 	// request protocol might be different from original request that hit proxy
 	// we want to use the proxy's protocol
@@ -174,7 +167,7 @@ const makeRenderer = (
 	const store = createStore(reducer, initialState);
 
 	// load initial config
-	dispatchConfig(store, { apiUrl, log: log.bind(request) });
+	store.dispatch(configureApiUrl(apiUrl));
 
 	// render skeleton if requested - the store is ready
 	if ('skeleton' in request.query) {
@@ -191,10 +184,18 @@ const makeRenderer = (
 	})
 	.first(state => state.preRenderChecklist.every(isReady => isReady));  // take the first ready state
 
-	request.log(['app', 'info'], `Finding route for path: '${url}'`);
+	console.log(JSON.stringify({
+		message: `Dispatching RENDER for ${request.url.href}`,
+		type: 'dispatch',
+		info: {
+			url: request.url,
+			method: request.method,
+			id: request.id,
+		}
+	}));
 	store.dispatch({
 		type: '@@server/RENDER',
-		payload: request.url,
+		payload: url,
 	});
 	return storeIsReady$
 		.map(() => getRouterRenderer(routes, store, url, baseUrl, clientFilename, assetPublicPath));

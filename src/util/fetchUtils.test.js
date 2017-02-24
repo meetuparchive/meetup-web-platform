@@ -204,3 +204,4 @@ describe('cleanBadCookies', () => {
 		expect(fetchUtils.cleanBadCookies(goodHeader)).toEqual(goodHeader);
 	});
 });
+

@@ -20,7 +20,9 @@ const MOCK_SERVER = {
 	},
 	ext: () => {},
 	state: () => {},
-	app: {}
+	app: {},
+	expose: () => {},
+	plugins: { requestAuth: { config: { COOKIE_ENCRYPT_SECRET: 'asdfasdfasdfasdfasdfasdfasdfasdfasdf' } } }
 };
 const MOCK_HEADERS = {};
 const MOCK_REPLY_FN = () => {};
@@ -29,11 +31,12 @@ MOCK_REPLY_FN.continue = () => {};
 const MOCK_REQUEST = {
 	headers: MOCK_HEADERS,
 	state: {},
-	app: {},
 	log: (tags, data) => { console.log(data); },
 	authorize: () => Rx.Observable.of(MOCK_REQUEST),
 	query: {},
-	plugins: {},
+	plugins: {
+		requestAuth: {},
+	},
 	server: {
 		app: {},
 	},
@@ -156,20 +159,6 @@ describe('applyRequestAuthorizer$', () => {
 			expect(global.fetch).not.toHaveBeenCalled();
 		});
 	});
-	it('does not try to fetch when provided a request with __internal_oauth_token in state', () => {
-		spyOn(global, 'fetch');
-
-		return authorizeRequest$({
-			...MOCK_REQUEST,
-			state: {
-				__internal_oauth_token: 'foo',
-			}
-		})
-		.toPromise()
-		.then(request => {
-			expect(global.fetch).not.toHaveBeenCalled();
-		});
-	});
 	it('does not try to fetch when provided a request with MEETUP_MEMBER in state', () => {
 		spyOn(global, 'fetch');
 
@@ -223,7 +212,7 @@ describe('register', () => {
 	const spyable = {
 		next() {}
 	};
-	const options = {
+	const app = {
 		OAUTH_AUTH_URL: '',
 		OAUTH_ACCESS_URL: '',
 		oauth: {
@@ -233,13 +222,16 @@ describe('register', () => {
 	};
 	it('calls next', () => {
 		spyOn(spyable, 'next');
-		register(MOCK_SERVER, options, spyable.next);
+		register({
+			...MOCK_SERVER,
+			app
+		}, {}, spyable.next);
 		expect(spyable.next).toHaveBeenCalled();
 	});
 });
 
 describe('oauthScheme', () => {
-	const options = {
+	const config = {
 		OAUTH_AUTH_URL,
 		OAUTH_ACCESS_URL,
 		oauth: {
@@ -247,11 +239,17 @@ describe('oauthScheme', () => {
 			secret: 'abcd',
 		},
 		COOKIE_ENCRYPT_SECRET: 'asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf',
+		duotoneUrls: { foo: 'http://example.com' },
 	};
+	const plugins = { requestAuth: { config } };
 	it('calls server.ext with an \'onPreAuth\' function', () => {
-		spyOn(MOCK_SERVER, 'ext');
-		oauthScheme(MOCK_SERVER, options);
-		expect(MOCK_SERVER.ext).toHaveBeenCalledWith('onPreAuth', jasmine.any(Function));
+		const server = {
+			...MOCK_SERVER,
+			plugins
+		};
+		spyOn(server, 'ext');
+		oauthScheme(server);
+		expect(server.ext).toHaveBeenCalledWith('onPreAuth', jasmine.any(Function));
 	});
 });
 

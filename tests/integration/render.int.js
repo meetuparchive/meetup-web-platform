@@ -23,7 +23,7 @@ jest.mock('request', () =>
 						},
 						method: 'get',
 					},
-				}, '{}');
+				}, '{ "foo": "value from api proxy" }');
 			}, 2)
 	)
 );
@@ -31,9 +31,6 @@ jest.mock('request', () =>
 describe('Full dummy app render', () => {
 	it('renders the expected app content for nested path of mock app route config', () => {
 		const fakeApiProxyResponse = 'value from api proxy';
-		spyOn(global, 'fetch').and.returnValue(
-			getMockFetch({ responses: [{ foo: { value: fakeApiProxyResponse } }] })
-		);
 		return start(getMockRenderRequestMap(), {}, mockConfig)
 			.then(server => {
 				const request = {

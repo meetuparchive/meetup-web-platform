@@ -4,20 +4,13 @@
 
 const avro = require('avsc');
 const Hoek = require('hoek');
-const request = require('request');
 const Stream = require('stream');
 
 const internals = {
 	defaults: {
-
-		endpoint: 'http://log.analytics.mup-prod.mup.zone/log',
-		// in prod, make a `request` call, otherwise no-op
-		postData: process.env.NODE_ENV === 'production' ?
-			request.post.bind(request) :
-			() => {},
 		// currently the schema is manually copied from
 		// https://github.dev.meetup.com/meetup/meetup/blob/master/modules/base/src/main/versioned_avro/Activity_v3.avsc
-		schema: avro.parse({
+		schema: {
 			namespace: 'com.meetup.base.avro',
 			type: 'record',
 			name: 'Activity',
@@ -45,7 +38,7 @@ const internals = {
 					default:'UNKNOWN'
 				}
 			]
-		}),
+		},
 	},
 };
 
@@ -66,22 +59,6 @@ class GoodMeetupTracking extends Stream.Transform {
 	}
 
 	/**
-	 * @param {Error|null} err error returned from failed request
-	 * @param {http.IncomingMessage} response the response object
-	 * @param {String} body the body of the response
-	 * @return {undefined} side effects only
-	 */
-	static postDataCallback(err, response, body) {
-		if (err) {
-			console.error(err);
-			return;
-		}
-		if (response && response.statusCode !== 200) {
-			console.error(`Activity track logging error: ${body}`);
-		}
-	}
-
-	/**
 	 * Receive event data and do something with it - package into avro buffer,
 	 * send it
 	 *
@@ -91,37 +68,27 @@ class GoodMeetupTracking extends Stream.Transform {
 	 * @return {Object} the output of calling the next transform in the chain
 	 */
 	_transform(event, enc, next) {
-		// log the data to stdout for Stackdriver
 		const eventData = JSON.parse(event.data);
+
+		// log readable tracking data - non-encoded
 		console.log(JSON.stringify({
-			type: 'Tracking event log',
+			message: 'Tracking log',
 			payload: eventData,
 		}));
 
-		const record = this._settings.schema.toBuffer(eventData);
+		const { schema } = this._settings;
+
+		const record = avro.parse(schema).toBuffer(eventData);
 
 		const eventDate = new Date(parseInt(eventData.timestamp, 10));
-		const data = {
-			name: 'Activity',
+		const analytics = {
 			record: record.toString('base64'),
-			version: 3,
-			schemaUrl: 'gs://meetup-logs/avro_schemas/Activity_v3.avsc',
+			schemaUrl: `gs://meetup-logs/avro_schemas/${schema.name}_${schema.doc}.avsc`,
 			date: eventDate.toISOString().substr(0, 10),  // YYYY-MM-DD
 		};
 
-		const body = JSON.stringify(data);
-		const headers = {
-			'Content-Type': 'application/json',
-		};
-
-		// format data for avro
-		this._settings.postData(
-			this._settings.endpoint,
-			{ headers, body },
-			GoodMeetupTracking.postDataCallback
-		);
-
-		return next(null, data);
+		// send the encoded data for logging to stdout
+		return next(null, `analytics=${JSON.stringify(analytics)}\n`);
 	}
 }
 
