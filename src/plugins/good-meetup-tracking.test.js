@@ -19,7 +19,7 @@ describe('GoodMeetupTracking', () => {
 	it('creates a transform stream', () => {
 		expect(new GoodMeetupTracking()).toEqual(jasmine.any(Stream.Transform));
 	});
-	it('transforms input into base64-encoded avro buffer', () => {
+	it('transforms input into JSON, prepended with `analytics=`, with base64-encoded avro buffer record', () => {
 		const config = {
 			schema: {
 				type: 'record',
@@ -35,7 +35,10 @@ describe('GoodMeetupTracking', () => {
 			tracker,
 			trackInfo,
 			val => {
-				const utf8String = new Buffer(val.record, 'base64').toString('utf-8');
+				expect(val.startsWith('analytics=')).toBe(true);
+				const valJSON = val.replace(/^analytics=/, '');
+				const valObj = JSON.parse(valJSON);
+				const utf8String = new Buffer(valObj.record, 'base64').toString('utf-8');
 				const avroBuffer = new Buffer(utf8String);
 				const recordedInfo = avro.parse(tracker._settings.schema).fromBuffer(avroBuffer);
 				expect(recordedInfo).toEqual(trackInfo);
@@ -65,7 +68,9 @@ describe('Integration with tracking logs', () => {
 			tracker,
 			trackInfo,
 			val => {
-				const utf8String = new Buffer(val.record, 'base64').toString();
+				const valJSON = val.replace(/^analytics=/, '');
+				const valObj = JSON.parse(valJSON);
+				const utf8String = new Buffer(valObj.record, 'base64').toString('utf-8');
 				const avroBuffer = new Buffer(utf8String);
 				const trackedInfo = avro.parse(tracker._settings.schema).fromBuffer(avroBuffer);
 				const memberId = '';  // memberId integer doesn't survive the decode-encode-decode
@@ -79,25 +84,5 @@ describe('Integration with tracking logs', () => {
 			}
 		);
 	});
-
-	it('calls config.logData with an endpoint string and the output of the avro transform', () => {
-		const config = {
-			endpoint: 'foo',
-			logData() {},
-		};
-		spyOn(config, 'logData');
-		const tracker = new GoodMeetupTracking(config);
-
-		return testTransform(
-			tracker,
-			trackInfo,
-			data => {
-				const body = `analytics=${JSON.stringify(data)}`;
-				expect(config.logData)
-					.toHaveBeenCalledWith(body);
-			}
-		);
-	});
-
 });
 
