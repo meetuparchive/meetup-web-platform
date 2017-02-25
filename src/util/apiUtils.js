@@ -96,21 +96,27 @@ export const parseMetaHeaders = headers => {
 /**
  * Accept an Error and return an object that will be used in place of the
  * expected API return value
+ * @param {Error} err the error to populate
+ * @return {Object} { value, error? }
  */
 function formatApiError(err) {
 	return {
+		value: null,
 		error: err.message
 	};
 }
 
 export const errorResponse$ = requestUrl => err =>
 	Rx.Observable.of({
-		value: formatApiError(err),
+		...formatApiError(err),
 		meta: {
 			endpoint: url.parse(requestUrl).pathname,
 		},
 	});
 
+/**
+ * @return {Object} { value, error? }
+ */
 export const parseApiValue = ([response, body]) => {
 	// treat non-success HTTP code as an error
 	if (response.statusCode < 200 || response.statusCode > 299) {
@@ -118,14 +124,14 @@ export const parseApiValue = ([response, body]) => {
 	}
 	try {
 		if (response.statusCode === 204) {  // NoContent response type
-			return null;
+			return { value: null };
 		}
 
 		const value = JSON.parse(body);
 		if (value && value.problem) {
 			return formatApiError(new Error(`API problem: ${value.problem}: ${value.details}`));
 		}
-		return value;
+		return { value };
 	} catch(err) {
 		return formatApiError(err);
 	}
@@ -144,13 +150,16 @@ export const parseApiValue = ([response, body]) => {
  * @return responseObj the JSON-parsed text, possibly with error info
  */
 export const parseApiResponse = requestUrl => ([response, body]) => {
+	const { value, error } = parseApiValue([response, body]);
 	const meta = {
 		...parseMetaHeaders(response.headers),
 		endpoint: url.parse(requestUrl).pathname,
+		statusCode: response.statusCode,
 	};
 
 	return {
-		value: parseApiValue([response, body]),
+		value,
+		error,
 		meta,
 	};
 
@@ -208,10 +217,11 @@ export const buildRequestArgs = externalRequestOpts =>
  *
  * @param {Object} apiResponse JSON-parsed api response data
  */
-export const apiResponseToQueryResponse = query => ({ value, meta }) => ({
+export const apiResponseToQueryResponse = query => ({ value, error, meta }) => ({
 	[query.ref]: {
 		type: query.type,
 		value,
+		error,
 		meta
 	}
 });
@@ -326,7 +336,7 @@ export const groupDuotoneSetter = duotoneUrls => group => {
  * duotoned images (anything containing group or event objects
  *
  * @param {Object} duotoneUrls map of `[duotoneRef]: url template root`
- * @param {Object} queryResponse { type: <type>, value: <API object> }
+ * @param {Object} queryResponse { type: <type>, value: <API object>, error? }
  * @return {Object} the modified queryResponse
  */
 export const apiResponseDuotoneSetter = duotoneUrls => {
@@ -335,8 +345,8 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
 		// inject duotone URLs into any group query response
 		Object.keys(queryResponse)
 			.forEach(key => {
-				const { type, value } = queryResponse[key];
-				if (!value || value.error) {
+				const { type, value, error } = queryResponse[key];
+				if (!value || error) {
 					return;
 				}
 				let groups;
@@ -427,7 +437,7 @@ export const logApiResponse = request => ([response, body]) => {
  * the login response unchanged
  */
 export const parseLoginAuth = (request, query) => response => {
-	if (query.type === 'login' && request.plugins.requestAuth && !response.value.error) {
+	if (query.type === 'login' && request.plugins.requestAuth && !response.error) {
 		// kill the logged-out auth
 		removeAuthState(['oauth_token', 'refresh_token'], request, request.plugins.requestAuth.reply);
 		// only return the member, no oauth data

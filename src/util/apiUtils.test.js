@@ -39,11 +39,11 @@ describe('errorResponse$', () => {
 			.toPromise()
 			.then(response => expect(response.meta.endpoint).toEqual(endpoint));
 	});
-	it('returns the error message as the response.value.error', () => {
+	it('returns the error message as the response.error', () => {
 		const message = 'foo';
 		return errorResponse$('http://example.com')(new Error(message))
 			.toPromise()
-			.then(response => expect(response.value.error).toEqual(message));
+			.then(response => expect(response.error).toEqual(message));
 	});
 });
 
@@ -131,7 +131,7 @@ describe('parseApiValue', () => {
 	it('converts valid JSON into an equivalent object', () => {
 		const validJSON = JSON.stringify(MOCK_GROUP);
 		expect(parseApiValue([MOCK_RESPONSE, validJSON])).toEqual(jasmine.any(Object));
-		expect(parseApiValue([MOCK_RESPONSE, validJSON])).toEqual(MOCK_GROUP);
+		expect(parseApiValue([MOCK_RESPONSE, validJSON])).toEqual({ value: MOCK_GROUP });
 	});
 	it('returns an object with a string "error" value for invalid JSON', () => {
 		const invalidJSON = 'not valid';
@@ -147,7 +147,7 @@ describe('parseApiValue', () => {
 			statusMessage: 'No Content',
 		};
 		const noContentResponse = { ...MOCK_RESPONSE, ...noContentStatus };
-		expect(parseApiValue([noContentResponse, ''])).toBeNull();
+		expect(parseApiValue([noContentResponse, '']).value).toBeNull();
 	});
 	it('returns an object with a string "error" value for a not-ok response', () => {
 		const badStatus = {

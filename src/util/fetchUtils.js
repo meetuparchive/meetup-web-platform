@@ -9,10 +9,16 @@ export const parseQueryResponse = queries => ({ responses, error, message }) => 
 	if (error) {
 		throw new Error(message);  // treat like an API error
 	}
-	return {
-		queries,
-		responses: responses || [],
-	};
+	responses = responses || [];
+	if (queries.length !== responses.length) {
+		throw new Error('Responses do not match requests');
+	}
+
+	return responses.reduce((categorized, response) => {
+		const targetArray = response.error ? categorized.errors : categorized.successes;
+		targetArray.push(response);
+		return categorized;
+	}, { successes: [], errors: [] });
 };
 
 /**
@@ -62,19 +68,20 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 		isPost ? apiUrl : fetchUrl.toString(),
 		fetchConfig
 	)
-	.then(queryResponse => queryResponse.json()
-		.then(queryJSON => ({
-			...parseQueryResponse(queries)(queryJSON),
-			csrf: queryResponse.headers.get('x-csrf-jwt'),
-		})),
-		err => {
-			console.error(JSON.stringify({
-				err: err.stack,
-				message: 'App server API fetch error',
-				context: fetchConfig,
-			}));
-			throw err;
-		}
+	.then(queryResponse =>
+		queryResponse.json()
+			.then(queryResponsePayload => ({
+				...parseQueryResponse(queries)(queryResponsePayload),
+				csrf: queryResponse.headers.get('x-csrf-jwt'),
+			}),
+			err => {
+				console.error(JSON.stringify({
+					err: err.stack,
+					message: 'App server API fetch error',
+					context: fetchConfig,
+				}));
+				throw err;
+			})
 	);
 };
 

@@ -15,7 +15,7 @@ describe('fetchQueries', () => {
 	const csrfJwt = 'encodedstuff';
 	const fakeSuccess = () =>
 		Promise.resolve({
-			json: () => Promise.resolve(responses),
+			json: () => Promise.resolve({ responses }),
 			headers: {
 				get: key => ({
 					'x-csrf-jwt': csrfJwt,
@@ -33,13 +33,13 @@ describe('fetchQueries', () => {
 		});
 
 
-	it('returns an object with queries and responses arrays', () => {
+	it('returns an object with successes and errors arrays', () => {
 		spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
 		return fetchUtils.fetchQueries(API_URL.toString(), { method: 'GET' })(queries)
 			.then(response => {
-				expect(response.queries).toEqual(jasmine.any(Array));
-				expect(response.responses).toEqual(jasmine.any(Array));
+				expect(response.successes).toEqual(responses);
+				expect(response.errors).toEqual([]);
 			});
 	});
 	it('returns an object with csrf prop read from response headers', () => {

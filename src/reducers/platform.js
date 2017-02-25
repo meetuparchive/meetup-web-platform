@@ -21,26 +21,24 @@ export const DEFAULT_APP_STATE = {};
  * @return {Object}
  */
 export function app(state=DEFAULT_APP_STATE, action={}) {
-	let newState;
-
 	switch (action.type) {
+	case 'CACHE_SUCCESS':  // fall through - same effect as API success
+	case 'API_SUCCESS':
+	case 'API_ERROR':
+		// each of these actions provides an API response that should go into app
+		// state - error responses will contain error info
+		delete state.failure;  // if there are any values, the API is not failing
+		return { ...state, ...action.payload.response };
+	case 'API_FAILURE':
+		return {
+			...state,
+			failure: action.payload
+		};
 	case 'API_REQUEST':
 		if (action.meta.logout) {
 			return DEFAULT_APP_STATE;  // clear app state during logout
 		}
-		return state;
-	case 'CACHE_SUCCESS':  // fall through - same effect as API success
-	case 'API_SUCCESS':
-		// API_SUCCESS contains an array of responses, but we just need to build a single
-		// object to update state with
-		newState = action.payload.responses.reduce((s, r) => ({ ...s, ...r }), {});
-		delete state.error;
-		return { ...state, ...newState };
-	case 'API_ERROR':
-		return {
-			...state,
-			error: action.payload
-		};
+		// fall through - no need to change state
 	default:
 		return state;
 	}

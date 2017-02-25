@@ -22,22 +22,33 @@ describe('app reducer', () => {
 		const API_SUCCESS = {
 			type: 'API_SUCCESS',
 			payload: {
-				responses: [{ foo: 'bar'}, { bar: 'baz' }, { baz: 'foo' }],
+				response: { bar: 'baz' },
 			},
 		};
-		expect(app(undefined, API_SUCCESS)).toEqual({
+		expect(app({ foo: 'bar'}, API_SUCCESS)).toEqual({
 			foo: 'bar',
 			bar: 'baz',
-			baz: 'foo',
 		});
 	});
-	it('populates an `error` key on API_ERROR', () => {
+	it('assembles error responses into single state tree', () => {
 		const API_ERROR = {
 			type: 'API_ERROR',
+			payload: {
+				response: { bar: 'baz' },
+			},
+		};
+		expect(app({ foo: 'bar'}, API_ERROR)).toEqual({
+			foo: 'bar',
+			bar: 'baz',
+		});
+	});
+	it('populates an `failure` key on API_FAILURE', () => {
+		const API_FAILURE = {
+			type: 'API_FAILURE',
 			payload: new Error('this is the worst'),
 		};
-		const errorState = app(undefined, API_ERROR);
-		expect(errorState.error).toBe(API_ERROR.payload);
+		const errorState = app(undefined, API_FAILURE);
+		expect(errorState.failure).toBe(API_FAILURE.payload);
 	});
 });
 

@@ -8,6 +8,7 @@ import {
 	apiSuccess,
 	apiError,
 	apiComplete,
+	setCsrf,
 } from '../actions/syncActionCreators';
 import { activeRouteQueries$ } from '../util/routeUtils';
 
@@ -84,9 +85,16 @@ export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 			const fetch = fetchQueriesFn(config.apiUrl, { method: 'GET' });
 			return Observable.fromPromise(fetch(payload, meta))  // call fetch
 				.takeUntil(action$.ofType(LOCATION_CHANGE))  // cancel this fetch when nav happens
-				.map(apiSuccess)                             // dispatch apiSuccess with server response
-				.flatMap(action => Observable.of(action, apiComplete()))  // dispatch apiComplete after resolution
-				.catch(err => Observable.of(apiError(err)));  // ... or apiError
+				.flatMap(({ successes, errors, csrf }) => {
+					const actions = [
+						...successes.map(apiSuccess),  // send the successes to success
+						...errors.map(apiError),     // errors to error
+						setCsrf(csrf),               // set CSRF
+						apiComplete(),               // call complete
+					];
+					return Observable.of(...actions);
+				})
+				.catch(err => Observable.of(apiError(err), apiComplete()));
 		});
 
 export default function getSyncEpic(routes, fetchQueries) {

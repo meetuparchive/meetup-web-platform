@@ -104,10 +104,12 @@ describe('makeApiRequest$', () => {
 			[query.ref]: {
 				meta: {
 					requestId: 'mock request',
-					endpoint
+					endpoint,
+					statusCode: 200,
 				},
 				type: query.type,
 				value: mockResponse,
+				error: undefined,
 			}
 		};
 		return makeApiRequest$({ server: { app: {} }, log: () => {} })([{ url: endpoint, method: 'get' }, query])
