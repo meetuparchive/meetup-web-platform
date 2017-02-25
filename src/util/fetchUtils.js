@@ -14,9 +14,9 @@ export const parseQueryResponse = queries => ({ responses, error, message }) => 
 		throw new Error('Responses do not match requests');
 	}
 
-	return responses.reduce((categorized, response) => {
+	return responses.reduce((categorized, response, i) => {
 		const targetArray = response.error ? categorized.errors : categorized.successes;
-		targetArray.push(response);
+		targetArray.push({ response, query: queries[i] });
 		return categorized;
 	}, { successes: [], errors: [] });
 };

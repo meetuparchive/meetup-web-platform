@@ -84,7 +84,8 @@ alongside the main request.
 ```js
 {
   type: 'API_REQUEST',  // or 'POST_...' or '..._POST'
-  payload: [query]
+  payload: [query],
+  meta: {},  // can be ignored - mainly for navigation info
 }
 ```
 
@@ -106,13 +107,16 @@ structured as individual objects with a single key corresponding to the query
     [ref]: {
       type,
       value: {},
-      flags,
-      meta  // data returned from API separate from `value`
+      error?,
+      flags?,
+      meta?,  // data returned from API separate from `value`
     }
   },
   // ...
 ]
 ```
+
+The fetchQueries function will then
 
 **Redux state after being processed by `API_SUCCESS` action**
 

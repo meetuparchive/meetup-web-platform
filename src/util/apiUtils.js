@@ -218,12 +218,11 @@ export const buildRequestArgs = externalRequestOpts =>
  * @param {Object} apiResponse JSON-parsed api response data
  */
 export const apiResponseToQueryResponse = query => ({ value, error, meta }) => ({
-	[query.ref]: {
-		type: query.type,
-		value,
-		error,
-		meta
-	}
+	type: query.type,
+	ref: query.ref,
+	value,
+	error,
+	meta
 });
 
 export function getAuthHeaders(request) {
@@ -336,33 +335,30 @@ export const groupDuotoneSetter = duotoneUrls => group => {
  * duotoned images (anything containing group or event objects
  *
  * @param {Object} duotoneUrls map of `[duotoneRef]: url template root`
- * @param {Object} queryResponse { type: <type>, value: <API object>, error? }
+ * @param {Object} queryResponse { ref, type: <type>, value: <API object>, error? }
  * @return {Object} the modified queryResponse
  */
 export const apiResponseDuotoneSetter = duotoneUrls => {
 	const setGroupDuotone = groupDuotoneSetter(duotoneUrls);
 	return queryResponse => {
 		// inject duotone URLs into any group query response
-		Object.keys(queryResponse)
-			.forEach(key => {
-				const { type, value, error } = queryResponse[key];
-				if (!value || error) {
-					return;
-				}
-				let groups;
-				switch (type) {
-				case 'group':
-					groups = value instanceof Array ? value : [value];
-					groups.forEach(setGroupDuotone);
-					break;
-				case 'home':
-					(value.rows || []).map(({ items }) => items)
-						.forEach(items => items.filter(({ type }) => type === 'group')
-							.forEach(({ group }) => setGroupDuotone(group))
-						);
-					break;
-				}
-			});
+		const { type, value, error } = queryResponse;
+		if (!value || error) {
+			return;
+		}
+		let groups;
+		switch (type) {
+		case 'group':
+			groups = value instanceof Array ? value : [value];
+			groups.forEach(setGroupDuotone);
+			break;
+		case 'home':
+			(value.rows || []).map(({ items }) => items)
+				.forEach(items => items.filter(({ type }) => type === 'group')
+					.forEach(({ group }) => setGroupDuotone(group))
+				);
+			break;
+		}
 		return queryResponse;
 	};
 };

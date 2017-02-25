@@ -22,24 +22,24 @@ describe('app reducer', () => {
 		const API_SUCCESS = {
 			type: 'API_SUCCESS',
 			payload: {
-				response: { bar: 'baz' },
+				response: { ref: 'bing', bar: 'baz' },
 			},
 		};
 		expect(app({ foo: 'bar'}, API_SUCCESS)).toEqual({
 			foo: 'bar',
-			bar: 'baz',
+			bing: { bar: 'baz' },
 		});
 	});
 	it('assembles error responses into single state tree', () => {
 		const API_ERROR = {
 			type: 'API_ERROR',
 			payload: {
-				response: { bar: 'baz' },
+				response: { ref: 'bing', bar: 'baz' },
 			},
 		};
 		expect(app({ foo: 'bar'}, API_ERROR)).toEqual({
 			foo: 'bar',
-			bar: 'baz',
+			bing: { bar: 'baz' },
 		});
 	});
 	it('populates an `failure` key on API_FAILURE', () => {

@@ -24,11 +24,13 @@ export function app(state=DEFAULT_APP_STATE, action={}) {
 	switch (action.type) {
 	case 'CACHE_SUCCESS':  // fall through - same effect as API success
 	case 'API_SUCCESS':
-	case 'API_ERROR':
+	case 'API_ERROR': {
 		// each of these actions provides an API response that should go into app
 		// state - error responses will contain error info
 		delete state.failure;  // if there are any values, the API is not failing
-		return { ...state, ...action.payload.response };
+		const { ref, ...response } = action.payload.response;
+		return { ...state, [ref]: response };
+	}
 	case 'API_FAILURE':
 		return {
 			...state,
@@ -70,23 +72,13 @@ export function clickTracking(state=DEFAULT_CLICK_TRACK, action) {
 }
 
 export function config(state={}, action) {
-	let csrf,
-		apiUrl,
-		trackId;
-
-	if ((action.meta || {}).csrf) {
-		// any CSRF-bearing action should update state
-		csrf = action.meta.csrf;
-		// create a copy of state with updated csrf
-		state = { ...state, csrf };
-	}
 	switch(action.type) {
 	case 'CONFIGURE_API_URL':
-		apiUrl = action.payload;
-		return { ...state, apiUrl };
+		return { ...state, apiUrl: action.payload };
 	case 'CONFIGURE_TRACKING_ID':
-		trackId = action.payload;
-		return { ...state, trackId };
+		return { ...state, trackId: action.payload };
+	case 'SET_CSRF':
+		return { ...state, csrf: action.meta.csrf };
 	default:
 		return state;
 	}
@@ -102,7 +94,7 @@ export function config(state={}, action) {
  */
 export function preRenderChecklist([apiDataLoaded] = [false], action) {
 	return [
-		apiDataLoaded || Boolean(['API_COMPLETE', 'API_ERROR'].find(type => type === action.type)),
+		apiDataLoaded || action.type === 'API_COMPLETE',
 	];
 }
 

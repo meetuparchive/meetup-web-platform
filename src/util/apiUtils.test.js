@@ -301,7 +301,7 @@ describe('apiResponseToQueryResponse', () => {
 			.map((apiResponse, i) => apiResponseToQueryResponse(this.queries[i])(apiResponse))
 			.forEach((queryResponse, i)=> {
 				expect(queryResponse).toEqual(jasmine.any(Object));
-				expect(queryResponse[this.refs[i]]).toEqual(jasmine.any(Object));
+				expect(queryResponse.ref).toEqual(this.refs[i]);
 			});
 	});
 });
@@ -322,13 +322,12 @@ describe('apiResponseDuotoneSetter', () => {
 		const { ref, type } = mockQuery({});
 		expect(group.duotoneUrl).toBeUndefined();
 		const groupApiResponse = {
-			[ref]: {
-				type,
-				value: group
-			}
+			ref,
+			type,
+			value: group
 		};
 		const modifiedResponse = apiResponseDuotoneSetter(MOCK_DUOTONE_URLS)(groupApiResponse);
-		const { duotoneUrl } = modifiedResponse[ref].value;
+		const { duotoneUrl } = modifiedResponse.value;
 		const expectedUrl = MOCK_DUOTONE_URLS.dtaxb;
 		expect(duotoneUrl.startsWith(expectedUrl)).toBe(true);
 	});
@@ -338,16 +337,15 @@ describe('apiResponseDuotoneSetter', () => {
 		const group = { ...MOCK_GROUP };
 		expect(group.duotoneUrl).toBeUndefined();
 		const homeApiResponse = {
-			memberHome: {
-				type: 'home',
-				value: {
-					rows: [{
-						items: [{
-							type: 'group',
-							group
-						}],
-					}]
-				}
+			ref: 'memberHome',
+			type: 'home',
+			value: {
+				rows: [{
+					items: [{
+						type: 'group',
+						group
+					}],
+				}]
 			}
 		};
 		// run the function - rely on side effect in group
@@ -358,10 +356,9 @@ describe('apiResponseDuotoneSetter', () => {
 	it('returns object unmodified when it doesn\'t need duotones', () => {
 		const member = { ...MOCK_MEMBER };
 		const memberResponse = {
-			self: {
-				type: 'member',
-				value: member,
-			}
+			ref: 'self',
+			type: 'member',
+			value: member,
 		};
 		apiResponseDuotoneSetter(MOCK_DUOTONE_URLS)(memberResponse);
 		expect(member).toEqual(MOCK_MEMBER);

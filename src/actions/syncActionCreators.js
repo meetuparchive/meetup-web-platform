@@ -33,9 +33,11 @@ export function apiComplete() {
 	};
 }
 
-export function apiFailure() {
+export function apiFailure(error) {
+	console.error(error);
 	return {
 		type: 'API_FAILURE',
+		payload: error,
 	};
 }
 
