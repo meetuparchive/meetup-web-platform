@@ -130,7 +130,7 @@ describe('Sync epic', () => {
 			});
 	});
 
-	it('emits API_ERROR on failed API_REQUEST', function() {
+	it('emits API_FAILURE on failed API_REQUEST', function() {
 		const mockFetchQueries = () => () => Promise.reject(new Error());
 
 		const queries = [mockQuery({})];
@@ -140,7 +140,7 @@ describe('Sync epic', () => {
 		return getSyncEpic(routes, mockFetchQueries)(action$, fakeStore)
 			.toArray()
 			.toPromise()
-			.then(actions => expect(actions.map(a => a.type)).toEqual(['API_ERROR', 'API_COMPLETE']));
+			.then(actions => expect(actions.map(a => a.type)).toEqual(['API_FAILURE', 'API_COMPLETE']));
 	});
 
 });
