@@ -101,14 +101,15 @@ describe('makeApiRequest$', () => {
 		const mockResponse = { foo: 'bar' };
 		const query = { ...mockQuery(MOCK_RENDERPROPS), mockResponse };
 		const expectedResponse = {
-			[query.ref]: {
-				meta: {
-					requestId: 'mock request',
-					endpoint
-				},
-				type: query.type,
-				value: mockResponse,
-			}
+			ref: query.ref,
+			meta: {
+				requestId: 'mock request',
+				endpoint,
+				statusCode: 200,
+			},
+			type: query.type,
+			value: mockResponse,
+			error: undefined,
 		};
 		return makeApiRequest$({ server: { app: {} }, log: () => {} })([{ url: endpoint, method: 'get' }, query])
 			.toPromise()

@@ -6,13 +6,17 @@ export function apiRequest(queries, meta) {
 	};
 }
 
-export function apiSuccess({ queries, responses, csrf }) {
+export function setCsrf(csrf) {
+	return {
+		type: 'SET_CSRF',
+		meta: { csrf },
+	};
+}
+
+export function apiSuccess({ query, response }) {
 	return {
 		type: 'API_SUCCESS',
-		payload: { queries, responses },
-		meta: {
-			csrf,
-		},
+		payload: { query, response },
 	};
 }
 
@@ -26,6 +30,14 @@ export function apiError(err) {
 export function apiComplete() {
 	return {
 		type: 'API_COMPLETE'
+	};
+}
+
+export function apiFailure(error) {
+	console.error(error);
+	return {
+		type: 'API_FAILURE',
+		payload: error,
 	};
 }
 

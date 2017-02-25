@@ -21,7 +21,7 @@ export const mockConfig = () => Promise.resolve({
 	API_SERVER_ROOT_URL: 'http://localhost',
 });
 
-export const getMockFetch = (mockResponseValue=[{}], headers={}) =>
+export const getMockFetch = (mockResponseValue={ responses: [{}] }, headers={}) =>
 	Promise.resolve({
 		text: () => Promise.resolve(JSON.stringify(mockResponseValue)),
 		json: () => Promise.resolve(mockResponseValue),
@@ -55,7 +55,11 @@ export const getMockRenderRequestMap = () => {
 	const routes = {
 		path: '/ny-tech',
 		component: TestRenderComponent,
-		query: () => ({}),
+		query: () => ({
+			ref: 'foo',
+			type: 'bar',
+			params: {},
+		}),
 	};
 	const reducer = makeRootReducer();
 

@@ -21,26 +21,26 @@ export const DEFAULT_APP_STATE = {};
  * @return {Object}
  */
 export function app(state=DEFAULT_APP_STATE, action={}) {
-	let newState;
-
 	switch (action.type) {
+	case 'CACHE_SUCCESS':  // fall through - same effect as API success
+	case 'API_SUCCESS':
+	case 'API_ERROR': {
+		// each of these actions provides an API response that should go into app
+		// state - error responses will contain error info
+		delete state.failure;  // if there are any values, the API is not failing
+		const { ref, ...response } = action.payload.response;
+		return { ...state, [ref]: response };
+	}
+	case 'API_FAILURE':
+		return {
+			...state,
+			failure: action.payload
+		};
 	case 'API_REQUEST':
 		if (action.meta.logout) {
 			return DEFAULT_APP_STATE;  // clear app state during logout
 		}
-		return state;
-	case 'CACHE_SUCCESS':  // fall through - same effect as API success
-	case 'API_SUCCESS':
-		// API_SUCCESS contains an array of responses, but we just need to build a single
-		// object to update state with
-		newState = action.payload.responses.reduce((s, r) => ({ ...s, ...r }), {});
-		delete state.error;
-		return { ...state, ...newState };
-	case 'API_ERROR':
-		return {
-			...state,
-			error: action.payload
-		};
+		// fall through - no need to change state
 	default:
 		return state;
 	}
@@ -72,23 +72,13 @@ export function clickTracking(state=DEFAULT_CLICK_TRACK, action) {
 }
 
 export function config(state={}, action) {
-	let csrf,
-		apiUrl,
-		trackId;
-
-	if ((action.meta || {}).csrf) {
-		// any CSRF-bearing action should update state
-		csrf = action.meta.csrf;
-		// create a copy of state with updated csrf
-		state = { ...state, csrf };
-	}
 	switch(action.type) {
 	case 'CONFIGURE_API_URL':
-		apiUrl = action.payload;
-		return { ...state, apiUrl };
+		return { ...state, apiUrl: action.payload };
 	case 'CONFIGURE_TRACKING_ID':
-		trackId = action.payload;
-		return { ...state, trackId };
+		return { ...state, trackId: action.payload };
+	case 'SET_CSRF':
+		return { ...state, csrf: action.meta.csrf };
 	default:
 		return state;
 	}
@@ -104,7 +94,7 @@ export function config(state={}, action) {
  */
 export function preRenderChecklist([apiDataLoaded] = [false], action) {
 	return [
-		apiDataLoaded || Boolean(['API_COMPLETE', 'API_ERROR'].find(type => type === action.type)),
+		apiDataLoaded || action.type === 'API_COMPLETE',
 	];
 }
 

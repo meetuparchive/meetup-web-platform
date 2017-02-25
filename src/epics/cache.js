@@ -47,10 +47,7 @@ export const cacheClearEpic = cache => action$ =>
  */
 export const cacheSetEpic = cache => action$ =>
 	action$.ofType('API_SUCCESS', 'CACHE_SET')
-		.flatMap(({ payload: { queries, responses } }) =>
-			Rx.Observable.from(queries).zip(Rx.Observable.from(responses))
-		)
-		.flatMap(([ query, response ]) => cacheWriter(cache)(query, response))
+		.flatMap(({ payload: { query, response } }) => cacheWriter(cache)(query, response))
 		.ignoreElements();
 
 /**
