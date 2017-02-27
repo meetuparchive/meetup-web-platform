@@ -41,7 +41,10 @@ function setCsrf(csrfHeader) {
  * @return {Promise} resolves with a `{queries, responses}` object
  */
 export const fetchQueries = (apiUrl, options) => (queries, meta) => {
-	if (typeof window === 'undefined' && typeof test === 'undefined') {
+	if (
+		typeof window === 'undefined' &&  // not in browser
+		typeof test === 'undefined'  // not in testing env
+	) {
 		throw new Error('fetchQueries was called on server - cannot continue');
 	}
 	options.method = options.method || 'GET';
