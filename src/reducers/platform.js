@@ -4,7 +4,6 @@
  **/
 
 import { combineReducers } from 'redux';
-import { routerReducer } from 'react-router-redux';
 import {
 	CLICK_TRACK_ACTION,
 	CLICK_TRACK_CLEAR_ACTION
@@ -108,14 +107,11 @@ export function preRenderChecklist([apiDataLoaded] = [false], action) {
 	];
 }
 
-const routing = routerReducer;
-
 const platformReducers = {
 	app,
 	clickTracking,
 	config,
 	preRenderChecklist,
-	routing,
 };
 
 /**
