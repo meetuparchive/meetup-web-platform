@@ -1,13 +1,16 @@
+import BrowserCookies from 'js-cookie';
 import cookie from 'cookie';
 /**
  * A module for middleware that would like to make external calls through `fetch`
  * @module fetchUtils
  */
 
+const CSRF_HEADER = 'x-csrf-jwt';
+const CSRF_HEADER_COOKIE = 'x-csrf-header';
 
 export const parseQueryResponse = queries => ({ responses, error, message }) => {
 	if (error) {
-		throw new Error(message);  // treat like an API error
+		throw new Error(JSON.stringify({ error, message }));  // treat like an API error
 	}
 	return {
 		queries,
@@ -15,10 +18,21 @@ export const parseQueryResponse = queries => ({ responses, error, message }) => 
 	};
 };
 
+function setCsrf(csrfHeader) {
+	if (csrfHeader) {
+		// set cookie with header value - this ensures all open tabs share the CSRF
+		BrowserCookies.set(CSRF_HEADER_COOKIE, csrfHeader);
+	}
+}
+
 /**
  * Wrapper around `fetch` to send an array of queries to the server. It ensures
- * that the request will have the required Oauth access token and constructs
+ * that the request will have the required OAuth and CSRF credentials and constructs
  * the `fetch` call arguments based on the request method
+ *
+ * **IMPORTANT**: This function should _only_ be called from the browser. The
+ * server should never need to call itself over HTTP
+ *
  * @param {String} apiUrl the general-purpose endpoint for API calls to the
  *   application server
  * @param {Object} options {
@@ -27,6 +41,12 @@ export const parseQueryResponse = queries => ({ responses, error, message }) => 
  * @return {Promise} resolves with a `{queries, responses}` object
  */
 export const fetchQueries = (apiUrl, options) => (queries, meta) => {
+	if (
+		typeof window === 'undefined' &&  // not in browser
+		typeof test === 'undefined'  // not in testing env
+	) {
+		throw new Error('fetchQueries was called on server - cannot continue');
+	}
 	options.method = options.method || 'GET';
 	const {
 		method,
@@ -50,32 +70,32 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 			...(headers || {}),
 			cookie: cleanBadCookies((headers || {}).cookie),
 			'content-type': isPost ? 'application/x-www-form-urlencoded' : 'text/plain',
-			'x-csrf-jwt': (isPost || isDelete) ? options.csrf : '',
+			[CSRF_HEADER]: (isPost || isDelete) ? BrowserCookies.get(CSRF_HEADER_COOKIE) : '',
 		},
 		credentials: 'same-origin'  // allow response to set-cookies
 	};
 	if (isPost) {
-		// assume client side
 		fetchConfig.body = fetchUrl.searchParams.toString();
 	}
 	return fetch(
 		isPost ? apiUrl : fetchUrl.toString(),
 		fetchConfig
 	)
-	.then(queryResponse => queryResponse.json()
-		.then(queryJSON => ({
-			...parseQueryResponse(queries)(queryJSON),
-			csrf: queryResponse.headers.get('x-csrf-jwt'),
-		})),
-		err => {
-			console.error(JSON.stringify({
-				err: err.stack,
-				message: 'App server API fetch error',
-				context: fetchConfig,
-			}));
-			throw err;
-		}
-	);
+	.then(queryResponse => {
+		setCsrf(queryResponse.headers.get(CSRF_HEADER));
+		return queryResponse.json();
+	})
+	.then(queryJSON => ({
+		...parseQueryResponse(queries)(queryJSON),
+	}))
+	.catch(err => {
+		console.error(JSON.stringify({
+			err: err.stack,
+			message: 'App server API fetch error',
+			context: fetchConfig,
+		}));
+		throw err;  // handle the error upstream
+	});
 };
 
 /**
