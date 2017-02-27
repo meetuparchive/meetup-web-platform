@@ -83,7 +83,7 @@ class GoodMeetupTracking extends Stream.Transform {
 		const eventDate = new Date(parseInt(eventData.timestamp, 10));
 		const analytics = {
 			record: record.toString('base64'),
-			schemaUrl: `gs://meetup-logs/avro_schemas/${schema.name}_${schema.doc}.avsc`,
+			schema: `gs://meetup-logs/avro_schemas/${schema.name}_${schema.doc}.avsc`,
 			date: eventDate.toISOString().substr(0, 10),  // YYYY-MM-DD
 		};
 
