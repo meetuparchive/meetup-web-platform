@@ -12,6 +12,17 @@ import {
 import { activeRouteQueries$ } from '../util/routeUtils';
 
 /**
+ * Any operations that keep the browser application in sync with the
+ * server should be implemented here.
+ *
+ * - Navigation-generated API request handling
+ * - Arbitrary API request handling (syncActionCreators.apiSuccess)
+ * - CSRF handling
+ *
+ * @module syncEpic
+ */
+
+/**
  * Navigation actions will provide the `location` as the payload, which this
  * epic will use to collect the current Reactive Queries associated with the
  * active routes.

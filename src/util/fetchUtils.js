@@ -1,9 +1,11 @@
+import BrowserCookies from 'js-cookie';
 import cookie from 'cookie';
 /**
  * A module for middleware that would like to make external calls through `fetch`
  * @module fetchUtils
  */
 
+const csrfHeader = 'x-csrf-jwt';
 
 export const parseQueryResponse = queries => ({ responses, error, message }) => {
 	if (error) {
@@ -50,7 +52,7 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 			...(headers || {}),
 			cookie: cleanBadCookies((headers || {}).cookie),
 			'content-type': isPost ? 'application/x-www-form-urlencoded' : 'text/plain',
-			'x-csrf-jwt': (isPost || isDelete) ? options.csrf : '',
+			[csrfHeader]: (isPost || isDelete) ? BrowserCookies.get('x-csrf-header') : '',
 		},
 		credentials: 'same-origin'  // allow response to set-cookies
 	};
@@ -62,20 +64,25 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 		isPost ? apiUrl : fetchUrl.toString(),
 		fetchConfig
 	)
-	.then(queryResponse => queryResponse.json()
-		.then(queryJSON => ({
-			...parseQueryResponse(queries)(queryJSON),
-			csrf: queryResponse.headers.get('x-csrf-jwt'),
-		})),
-		err => {
-			console.error(JSON.stringify({
-				err: err.stack,
-				message: 'App server API fetch error',
-				context: fetchConfig,
-			}));
-			throw err;
+	.then(queryResponse => {
+		const csrf = queryResponse.headers.get(csrfHeader);
+		if (csrf && typeof window !== 'undefined') {
+			// set cookie with header value
+			BrowserCookies.set('x-csrf-header', csrf);
 		}
-	);
+		return queryResponse.json()
+			.then(queryJSON => ({
+				...parseQueryResponse(queries)(queryJSON),
+			})),
+			err => {
+				console.error(JSON.stringify({
+					err: err.stack,
+					message: 'App server API fetch error',
+					context: fetchConfig,
+				}));
+				throw err;
+			};
+	});
 };
 
 /**
