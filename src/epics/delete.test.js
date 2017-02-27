@@ -23,7 +23,6 @@ import * as syncActionCreators from '../actions/syncActionCreators';
  */
 MOCK_APP_STATE.config = {
 	apiUrl: 'http://fake.api.meetup.com',
-	csrf: '1234_fake_csrf',
 };
 const store = createFakeStore(MOCK_APP_STATE);
 describe('getDeleteEpic', () => {
@@ -37,7 +36,6 @@ describe('getDeleteEpic', () => {
 				expect(fetchUtils.fetchQueries.calls.count()).toBe(1);
 				const fetchArgs = fetchUtils.fetchQueries.calls.argsFor(0);
 				expect(fetchArgs[1].method).toEqual('DELETE');
-				expect(fetchArgs[1].csrf).toEqual(MOCK_APP_STATE.config.csrf);
 				expect(fetchArgs[0]).toEqual(MOCK_APP_STATE.config.apiUrl);
 			})
 			.toPromise();
