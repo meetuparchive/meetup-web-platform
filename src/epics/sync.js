@@ -17,7 +17,6 @@ import { activeRouteQueries$ } from '../util/routeUtils';
  *
  * - Navigation-generated API request handling
  * - Arbitrary API request handling (syncActionCreators.apiSuccess)
- * - CSRF handling
  *
  * @module syncEpic
  */
