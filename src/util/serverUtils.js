@@ -62,7 +62,11 @@ function onPreResponseExtension(request, reply) {
 		return reply.continue();
 	}
 
-	console.log(JSON.stringify({
+	const log = response.statusCode >= 400 && console.error ||
+		response.statusCode >= 300 && console.warn ||
+		console.log;
+
+	log(JSON.stringify({
 		message: `Outgoing response ${method.toUpperCase()} ${url.pathname} ${response.statusCode}`,
 		type: 'response',
 		direction: 'out',
