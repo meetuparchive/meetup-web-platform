@@ -28,7 +28,8 @@ function setCsrf(csrfHeader) {
 /**
  * Wrapper around `fetch` to send an array of queries to the server. It ensures
  * that the request will have the required OAuth and CSRF credentials and constructs
- * the `fetch` call arguments based on the request method
+ * the `fetch` call arguments based on the request method. It also records the
+ * CSRF header value in a cookie for use as a CSRF header in future fetches.
  *
  * **IMPORTANT**: This function should _only_ be called from the browser. The
  * server should never need to call itself over HTTP
