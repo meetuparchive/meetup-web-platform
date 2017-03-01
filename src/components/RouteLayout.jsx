@@ -17,7 +17,7 @@ const RouteWithSubRoutes = route => {
 			render={props => (
 				<route.component {...props}>
 					{route.routes &&
-						<SwitchRoutes routes={route.routes} currentPath={props.match.path} />
+						<RouteLayout routes={route.routes} currentPath={props.match.path} />
 					}
 				</route.component>
 			)}
@@ -25,23 +25,24 @@ const RouteWithSubRoutes = route => {
 	);
 };
 
-const SwitchRoutes = ({ routes, currentPath }) => (
-	<Switch>
-		{routes.map((route, i) => {
-			route.path = `${currentPath || ''}${route.path}`;  // modify path to reflect full match
-			return <RouteWithSubRoutes key={i} {...route} />;
-		})}
-	</Switch>
-);
-
-
 /**
  * @module RouteLayout
  */
 class RouteLayout extends React.Component {
 	render() {
-		const { routes } = this.props;
-		return <SwitchRoutes routes={routes} />;
+		const {
+			routes,
+			currentPath=''
+		} = this.props;
+
+		return (
+			<Switch>
+				{routes.map((route, i) => {
+					route.path = `${currentPath}${route.path}`;  // modify path to reflect full match
+					return <RouteWithSubRoutes key={i} {...route} />;
+				})}
+			</Switch>
+		);
 	}
 }
 

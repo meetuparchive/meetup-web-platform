@@ -1,7 +1,7 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-import SyncContainer from '../components/SyncContainer';
-import RouteLayout from '../components/RouteLayout';
+import SyncContainer from './SyncContainer';
+import RouteLayout from './RouteLayout';
 
 /**
  * @module PlatformApp
