@@ -34,14 +34,14 @@ import {
  * The wrapping function needs current app state in order to apply correct
  * config
  *
- * @param {Object} { apiUrl, csrf } from state.config
+ * @param {Object} { apiUrl } from state.config
  * @param {Object} deleteAction, providing query, onSuccess, and onError
  * @return {Promise} results of the fetch, either onSuccess or onError
  */
 const getDeleteQueryFetch = (fetchQueries, store) =>
 	query => {
-		const { config: { apiUrl, csrf } } = store.getState();
-		return fetchQueries(apiUrl, { method: 'DELETE', csrf })([query]);
+		const { config: { apiUrl } } = store.getState();
+		return fetchQueries(apiUrl, { method: 'DELETE' })([query]);
 	};
 
 /**

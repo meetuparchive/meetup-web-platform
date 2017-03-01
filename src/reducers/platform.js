@@ -71,16 +71,9 @@ export function clickTracking(state=DEFAULT_CLICK_TRACK, action) {
 }
 
 export function config(state={}, action) {
-	let csrf,
-		apiUrl,
+	let apiUrl,
 		trackId;
 
-	if ((action.meta || {}).csrf) {
-		// any CSRF-bearing action should update state
-		csrf = action.meta.csrf;
-		// create a copy of state with updated csrf
-		state = { ...state, csrf };
-	}
 	switch(action.type) {
 	case 'CONFIGURE_API_URL':
 		apiUrl = action.payload;
