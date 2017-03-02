@@ -2,7 +2,8 @@ import { applyMiddleware, createStore, compose } from 'redux';
 
 import { fetchQueries } from '../util/fetchUtils';
 import getClickTracker from './clickTracking';
-import getPlatformMiddleware from '../middleware/epic';
+import getEpicMiddleware from '../middleware/epic';
+import catchMiddleware from '../middleware/catch';
 
 
 const noopMiddleware = store => next => action => next(action);
@@ -21,7 +22,8 @@ export function getBrowserCreateStore(
 	middleware=[]
 ) {
 	const middlewareToApply = [
-		getPlatformMiddleware(routes, fetchQueries),
+		catchMiddleware,
+		getEpicMiddleware(routes, fetchQueries),
 		...middleware,
 		window.mupDevTools ? window.mupDevTools() : noopMiddleware,  // must be last middleware
 	];
