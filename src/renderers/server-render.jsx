@@ -70,7 +70,6 @@ const getRouterRenderer = (
 	// initializes page-specific state that `<Dom />` needs to render, e.g.
 	// `<head>` contents
 	const initialState = store.getState();
-	console.log(JSON.stringify(initialState, null, 2));
 	let appMarkup;
 	let result;
 	let statusCode;

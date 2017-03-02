@@ -46,5 +46,10 @@ class RouteLayout extends React.Component {
 	}
 }
 
+RouteLayout.propTypes = {
+	routes: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
+	currentPath: React.PropTypes.string,
+};
+
 export default RouteLayout;
 
