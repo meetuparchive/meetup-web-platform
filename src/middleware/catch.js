@@ -5,7 +5,7 @@
  */
 const catchMiddleware = store => next => action => {
 	try {
-		next(action);
+		return next(action);
 	} catch(err) {
 		console.error(JSON.stringify({
 			err: err.stack,

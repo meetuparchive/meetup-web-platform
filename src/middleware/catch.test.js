@@ -10,5 +10,14 @@ describe('catchMiddleware', () => {
 		expect(console.error).toHaveBeenCalled();
 		expect(receivedError).toBe(theError);
 	});
+	it('does nothing when the store operates normally (no errors)', () => {
+		spyOn(console, 'error');
+
+		const action = { foo: 'bar' };
+		const next = x => x;
+		const receivedError = catchMiddleware()(next)(action);
+		expect(console.error).not.toHaveBeenCalled();
+		expect(receivedError).toBe(next(action));
+	});
 });
 
