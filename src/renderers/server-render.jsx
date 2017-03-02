@@ -109,7 +109,7 @@ const getRouterRenderer = (
 		if (process.env.NODE_ENV !== 'production') {
 			console.error(error.stack);
 		}
-		throw e;
+		throw error;
 	}
 
 	return {
@@ -151,7 +151,6 @@ const makeRenderer = (
 		connection,
 		headers,
 		info,
-		log,
 		url,
 	} = request;
 
