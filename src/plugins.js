@@ -9,12 +9,31 @@ import requestAuthPlugin from './plugins/requestAuthPlugin';
  * @module ServerPlugins
  */
 
+export function setCsrfCookies(request, reply) {
+	const csrfHeader = (request.response.headers || {})['x-csrf-jwt'];
+	if (csrfHeader) {
+		reply.state('x-csrf-jwt-header', csrfHeader);
+	}
+	return reply.continue();
+}
+
 export function getCsrfPlugin(secret) {
 	const register = (server, options, next) => {
-		server.state('x-csrf-jwt', {
+		const cookieOptions = {
+			path: '/',
 			isSecure: process.env.NODE_ENV === 'production',
-		});
-		return CsrfPlugin.register(server, options, next);
+		};
+		server.state('x-csrf-jwt', {
+			...cookieOptions,
+			isHttpOnly: true,
+		});  // set by plugin
+		server.state('x-csrf-jwt-header', {
+			...cookieOptions,
+			isHttpOnly: false,
+		});  // set by onPreResponse
+		const registration = CsrfPlugin.register(server, options, next);
+		server.ext('onPreResponse', setCsrfCookies);  // must add this extension _after_ plugin is registered
+		return registration;
 	};
 	register.attributes = CsrfPlugin.register.attributes;
 	return {
