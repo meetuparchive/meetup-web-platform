@@ -3,6 +3,40 @@ import Hapi from 'hapi';
 
 import track from './tracking';
 
+/**
+ * determine whether a nested object of values contains a string that contains
+ * `.dev.meetup.`
+ * @param {String|Object} value string or nested object with
+ * values that could be URL strings
+ * @return {Boolean} whether the `value` contains a 'dev' URL string
+ */
+export function checkForDevUrl(value) {
+	switch(typeof value) {
+	case 'string':
+		return value.indexOf('.dev.meetup.') > -1;
+	case 'object':
+		return Object.keys(value).some(key => checkForDevUrl(value[key]));
+	}
+	return false;
+}
+
+export function onRequestExtension(request, reply) {
+	console.log(JSON.stringify({
+		message: `Incoming request ${request.method.toUpperCase()} ${request.url.href}`,
+		type: 'request',
+		direction: 'in',
+		info: {
+			url: request.url,
+			method: request.method,
+			headers: request.headers,
+			id: request.id,
+			referrer: request.info.referrer,
+			remoteAddress: request.info.remoteAddress,
+		}
+	}));
+	return reply.continue();
+}
+
 export function logResponse(request) {
 	const {
 		headers,
@@ -48,40 +82,6 @@ export function logResponse(request) {
 	}));
 
 	return;
-}
-
-/**
- * determine whether a nested object of values contains a string that contains
- * `.dev.meetup.`
- * @param {String|Object} value string or nested object with
- * values that could be URL strings
- * @return {Boolean} whether the `value` contains a 'dev' URL string
- */
-export function checkForDevUrl(value) {
-	switch(typeof value) {
-	case 'string':
-		return value.indexOf('.dev.meetup.') > -1;
-	case 'object':
-		return Object.keys(value).some(key => checkForDevUrl(value[key]));
-	}
-	return false;
-}
-
-export function onRequestExtension(request, reply) {
-	console.log(JSON.stringify({
-		message: `Incoming request ${request.method.toUpperCase()} ${request.url.href}`,
-		type: 'request',
-		direction: 'in',
-		info: {
-			url: request.url,
-			method: request.method,
-			headers: request.headers,
-			id: request.id,
-			referrer: request.info.referrer,
-			remoteAddress: request.info.remoteAddress,
-		}
-	}));
-	return reply.continue();
 }
 
 /**
