@@ -1,5 +1,4 @@
 import {
-	getMockFetch,
 	getMockRenderRequestMap,
 	mockConfig,
 } from '../mocks';
@@ -41,6 +40,9 @@ describe('Full dummy app render', () => {
 				return server.inject(request).then(response => {
 					expect(response.payload).toContain(fooPathContent);
 					expect(response.payload).toContain(fakeApiProxyResponse);
+					expect(
+						response.headers['set-cookie'].find(h => h.startsWith('x-csrf-jwt-header'))
+					).not.toBeUndefined();
 				})
 				.then(() => server.stop())
 				.catch(err => {
