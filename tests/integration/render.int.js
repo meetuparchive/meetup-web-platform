@@ -1,5 +1,4 @@
 import {
-	getMockFetch,
 	getMockRenderRequestMap,
 	mockConfig,
 } from '../mocks';
@@ -28,7 +27,6 @@ const expectedOutputMessage = 'Looking good';
 
 describe('Full dummy app render', () => {
 	it('calls the handler for /{*wild}', () => {
-		spyOn(global, 'fetch').and.returnValue(getMockFetch());
 		return start(getMockRenderRequestMap(), {}, mockConfig)
 			.then(server => {
 				const request = {
@@ -37,7 +35,12 @@ describe('Full dummy app render', () => {
 					credentials: 'whatever',
 				};
 				return server.inject(request).then(
-					response => expect(response.payload).toContain(expectedOutputMessage)
+					response => {
+						expect(response.payload).toContain(expectedOutputMessage);
+						expect(
+							response.headers['set-cookie'].find(h => h.startsWith('x-csrf-jwt-header'))
+						).not.toBeUndefined();
+					}
 				)
 				.then(() => server.stop())
 				.catch(err => {
