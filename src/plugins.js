@@ -21,11 +21,16 @@ export function getCsrfPlugin(secret) {
 	const register = (server, options, next) => {
 		const cookieOptions = {
 			path: '/',
-			isHttpOnly: true,
 			isSecure: process.env.NODE_ENV === 'production',
 		};
-		server.state('x-csrf-jwt', cookieOptions);  // set by plugin
-		server.state('x-csrf-jwt-header', cookieOptions);  // set by onPreResponse
+		server.state('x-csrf-jwt', {
+			...cookieOptions,
+			isHttpOnly: true,
+		});  // set by plugin
+		server.state('x-csrf-jwt-header', {
+			...cookieOptions,
+			isHttpOnly: false,
+		});  // set by onPreResponse
 		const registration = CsrfPlugin.register(server, options, next);
 		server.ext('onPreResponse', setCsrfCookies);  // must add this extension _after_ plugin is registered
 		return registration;
