@@ -38,8 +38,8 @@ class RouteLayout extends React.Component {
 		return (
 			<Switch>
 				{routes.map((route, i) => {
-					route.path = `${currentPath}${route.path || ''}`;  // modify path to reflect full match
-					return <RouteWithSubRoutes key={i} {...route} />;
+					const path = `${currentPath}${route.path || ''}`;
+					return <RouteWithSubRoutes key={i} {...route} path={path} />;
 				})}
 			</Switch>
 		);
