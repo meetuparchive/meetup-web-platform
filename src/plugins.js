@@ -26,8 +26,9 @@ export function getCsrfPlugin(secret) {
 		};
 		server.state('x-csrf-jwt', cookieOptions);  // set by plugin
 		server.state('x-csrf-jwt-header', cookieOptions);  // set by onPreResponse
-		server.ext('onPreResponse', setCsrfCookies);
-		return CsrfPlugin.register(server, options, next);
+		const registration = CsrfPlugin.register(server, options, next);
+		server.ext('onPreResponse', setCsrfCookies);  // must add this extension _after_ plugin is registered
+		return registration;
 	};
 	register.attributes = CsrfPlugin.register.attributes;
 	return {
