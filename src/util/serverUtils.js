@@ -3,6 +3,53 @@ import Hapi from 'hapi';
 
 import track from './tracking';
 
+export function logResponse(request) {
+	const {
+		headers,
+		id,
+		info,
+		method,
+		response,
+		url,
+	} = request;
+
+	if (response.isBoom) {
+		// response is an Error object
+		console.error(JSON.stringify({
+			message: `Internal error ${response.message} ${url.pathname}`,
+			info: {
+				error: response.stack,
+				headers,
+				id,
+				method,
+				url,
+			},
+		}));
+		return;
+	}
+
+	const log = response.statusCode >= 400 && console.error ||
+		response.statusCode >= 300 && console.warn ||
+		console.log;
+
+	log(JSON.stringify({
+		message: `Outgoing response ${method.toUpperCase()} ${url.pathname} ${response.statusCode}`,
+		type: 'response',
+		direction: 'out',
+		info: {
+			headers: response.headers,
+			id,
+			method,
+			referrer: info.referrer,
+			remoteAddress: info.remoteAddress,
+			time: info.responded - info.received,
+			url,
+		}
+	}));
+
+	return;
+}
+
 /**
  * determine whether a nested object of values contains a string that contains
  * `.dev.meetup.`
@@ -34,52 +81,6 @@ export function onRequestExtension(request, reply) {
 			remoteAddress: request.info.remoteAddress,
 		}
 	}));
-	reply.continue();
-}
-
-function onPreResponseExtension(request, reply) {
-	const {
-		headers,
-		id,
-		info,
-		method,
-		response,
-		url,
-	} = request;
-
-	if (response.isBoom) {
-		// response is an Error object
-		console.error(JSON.stringify({
-			message: `Internal error ${response.message} ${url}`,
-			info: {
-				error: response.stack,
-				headers,
-				id,
-				method,
-				url,
-			},
-		}));
-		return reply.continue();
-	}
-
-	const log = response.statusCode >= 400 && console.error ||
-		response.statusCode >= 300 && console.warn ||
-		console.log;
-
-	log(JSON.stringify({
-		message: `Outgoing response ${method.toUpperCase()} ${url.pathname} ${response.statusCode}`,
-		type: 'response',
-		direction: 'out',
-		info: {
-			headers,
-			id,
-			method,
-			referrer: info.referrer,
-			remoteAddress: info.remoteAddress,
-			time: info.responded - info.received,
-			url,
-		}
-	}));
 	return reply.continue();
 }
 
@@ -92,10 +93,8 @@ export function registerExtensionEvents(server) {
 	server.ext([{
 		type: 'onRequest',
 		method: onRequestExtension,
-	}, {
-		type: 'onPreResponse',
-		method: onPreResponseExtension,
 	}]);
+	server.on('response', logResponse);
 	return server;
 }
 
