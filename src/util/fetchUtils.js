@@ -5,8 +5,8 @@ import cookie from 'cookie';
  * @module fetchUtils
  */
 
-const CSRF_HEADER = 'x-csrf-jwt';
-const CSRF_HEADER_COOKIE = 'x-csrf-header';
+export const CSRF_HEADER = 'x-csrf-jwt';
+export const CSRF_HEADER_COOKIE = 'x-csrf-jwt-header';
 
 export const parseQueryResponse = queries => ({ responses, error, message }) => {
 	if (error) {
@@ -17,13 +17,6 @@ export const parseQueryResponse = queries => ({ responses, error, message }) => 
 		responses: responses || [],
 	};
 };
-
-function setCsrf(csrfHeader) {
-	if (csrfHeader) {
-		// set cookie with header value - this ensures all open tabs share the CSRF
-		BrowserCookies.set(CSRF_HEADER_COOKIE, csrfHeader);
-	}
-}
 
 /**
  * Wrapper around `fetch` to send an array of queries to the server. It ensures
@@ -82,10 +75,7 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 		isPost ? apiUrl : fetchUrl.toString(),
 		fetchConfig
 	)
-	.then(queryResponse => {
-		setCsrf(queryResponse.headers.get(CSRF_HEADER));
-		return queryResponse.json();
-	})
+	.then(queryResponse => queryResponse.json())
 	.then(queryJSON => ({
 		...parseQueryResponse(queries)(queryJSON),
 	}))

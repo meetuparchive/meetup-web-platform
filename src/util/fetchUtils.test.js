@@ -17,7 +17,7 @@ describe('fetchQueries', () => {
 	const queries = [mockQuery({})];
 	const meta = { foo: 'bar' };
 	const responses = [MOCK_GROUP];
-	const csrfJwt = 'x-csrf-header value';
+	const csrfJwt = `${fetchUtils.CSRF_HEADER_COOKIE} value`;
 	const fakeSuccess = () =>
 		Promise.resolve({
 			json: () => Promise.resolve(responses),

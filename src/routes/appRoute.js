@@ -51,6 +51,11 @@ const getApplicationRoute = renderRequestMap => ({
 		ext: {
 			onPreResponse,
 		},
+		plugins: {
+			'electrode-csrf-jwt': {
+				enabled: true,  // need to generate tokens on page request
+			}
+		},
 		state: {
 			failAction: 'ignore',  // ignore cookie validation, just accept
 		}
