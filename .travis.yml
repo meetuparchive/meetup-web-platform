@@ -24,9 +24,11 @@ addons:
 before_install:
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
 
+before_script:
+  - git diff --exit-code
+
 after_success:
   - npm run coveralls
-  - git diff-files --quiet
   - git config --global user.email "builds@travis-ci.com"
   - git config --global user.name "Travis CI"
   - >
