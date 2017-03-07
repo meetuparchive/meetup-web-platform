@@ -4,7 +4,7 @@ import Route from 'react-router-dom/Route';
 
 const RouteWithSubRoutes = route => {
 	if (!route.component) {
-		throw new Error(`route for ${route.path} must have a 'component' property`);
+		throw new Error(`route for path ${JSON.stringify(route.path)} must have a 'component' property`);
 	}
 	if (route.render || route.children) {
 		console.warn('route.render and route.children function not supported');
