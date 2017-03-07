@@ -16,7 +16,7 @@ const RouteWithSubRoutes = route => {
 			strict={route.strict || false}
 			render={props => (
 				<route.component {...props}>
-					{route.routes && !props.match.isExact &&
+					{route.routes && (!props.match.isExact || !route.path) &&
 						<RouteLayout routes={route.routes} currentPath={props.match.path} />
 					}
 				</route.component>
