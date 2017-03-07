@@ -26,6 +26,7 @@ before_install:
 
 after_success:
   - npm run coveralls
+  - git diff-index --quiet --cached HEAD
   - git config --global user.email "builds@travis-ci.com"
   - git config --global user.name "Travis CI"
   - >
