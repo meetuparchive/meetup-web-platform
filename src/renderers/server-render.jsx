@@ -142,10 +142,10 @@ const makeRenderer = (
 		connection,
 		headers,
 		info,
-		path,
+		url,
 	} = request;
 
-	const appLocation = path.replace(`${baseUrl}/`, '/');
+	const appLocation = url.path.replace(`${baseUrl}/`, '/');
 	// request protocol might be different from original request that hit proxy
 	// we want to use the proxy's protocol
 	const requestProtocol = headers['x-forwarded-proto'] || connection.info.protocol;
@@ -181,10 +181,10 @@ const makeRenderer = (
 		})
 		.do(() => {
 			console.log(JSON.stringify({
-				message: `Dispatching RENDER for ${request.url.href}`,
+				message: `Dispatching RENDER for ${url.path}`,
 				type: 'dispatch',
 				info: {
-					url: request.url,
+					url,
 					method: request.method,
 					id: request.id,
 				}
