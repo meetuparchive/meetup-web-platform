@@ -14,13 +14,18 @@ const RouteWithSubRoutes = route => {
 			path={route.path}
 			exact={route.exact || false}
 			strict={route.strict || false}
-			render={props => (
-				<route.component {...props}>
-					{route.routes &&
-						<RouteLayout routes={route.routes} currentPath={props.match.path} />
-					}
-				</route.component>
-			)}
+			render={props => {
+				const nestedRoutes = props.match.isExact && route.indexRoute ?
+					[route.indexRoute] :   // only render index route
+					route.routes;          // pass along any defined nested routes
+				return (
+					<route.component {...props}>
+						{nestedRoutes &&
+							<RouteLayout routes={nestedRoutes} currentPath={props.match.path} />
+						}
+					</route.component>
+				);
+			}}
 		/>
 	);
 };
@@ -32,13 +37,16 @@ class RouteLayout extends React.Component {
 	render() {
 		const {
 			routes,
-			currentPath=''
+			currentPath='/'
 		} = this.props;
 
 		return (
 			<Switch>
 				{routes.map((route, i) => {
-					const path = `${currentPath}${route.path || ''}`;
+					const path = currentPath === '/' ?  // root path, no need to prepend
+						route.path :
+						`${currentPath}${route.path || ''}`;
+
 					return <RouteWithSubRoutes key={i} {...route} path={path} />;
 				})}
 			</Switch>

@@ -17,8 +17,10 @@ export const getRouteQueries = (route, params) => {
 		.filter(query => query);
 };
 
-export const matchedRouteQueriesReducer = url => (queries, route) => {
-	const match = matchPath(url, route.path);
+export const matchedRouteQueriesReducer = (url, matchedUrl='') => (queries, route) => {
+	const pathToMatch = `${matchedUrl}${route.path || ''}`;
+	console.log(url, pathToMatch);
+	const match = matchPath(url, pathToMatch);
 	if (!match) {
 		return queries;
 	}
@@ -29,9 +31,12 @@ export const matchedRouteQueriesReducer = url => (queries, route) => {
 		return currentQueries;
 	}
 
-	const unmatchedUrl = route.path ? url.replace(match.url, '') : match.url;
-	return route.routes.reduce(
-		matchedRouteQueriesReducer(unmatchedUrl),
+	const nestedRoutes = match.isExact && route.indexRoute ?
+		[route.indexRoute] :   // only render index route
+		route.routes;          // pass along any defined nested routes
+
+	return nestedRoutes.reduce(
+		matchedRouteQueriesReducer(url, match.url),
 		currentQueries
 	);
 };

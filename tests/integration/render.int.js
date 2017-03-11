@@ -1,4 +1,8 @@
 import {
+	ROOT_INDEX_CONTENT,
+	FOO_INDEX_CONTENT,
+} from '../mockApp';
+import {
 	getMockRenderRequestMap,
 	mockConfig,
 } from '../mocks';
@@ -26,10 +30,10 @@ jest.mock('request', () =>
 			}, 2)
 	)
 );
+const fakeApiProxyResponse = 'value from api proxy';
 
 describe('Full dummy app render', () => {
 	it('renders the expected app content for nested path of mock app route config', () => {
-		const fakeApiProxyResponse = 'value from api proxy';
 		return start(getMockRenderRequestMap(), {}, mockConfig)
 			.then(server => {
 				const request = {
@@ -38,11 +42,49 @@ describe('Full dummy app render', () => {
 					credentials: 'whatever',
 				};
 				return server.inject(request).then(response => {
-					expect(response.payload).toContain(fooPathContent);
+					expect(response.payload).not.toContain(ROOT_INDEX_CONTENT);
 					expect(response.payload).toContain(fakeApiProxyResponse);
 					expect(
 						response.headers['set-cookie'].find(h => h.startsWith('x-csrf-jwt-header'))
 					).not.toBeUndefined();
+				})
+				.then(() => server.stop())
+				.catch(err => {
+					server.stop();
+					throw err;
+				});
+			});
+	});
+	it('renders the expected root index route app content at `/`', () => {
+		return start(getMockRenderRequestMap(), {}, mockConfig)
+			.then(server => {
+				const request = {
+					method: 'get',
+					url: '/',
+					credentials: 'whatever',
+				};
+				return server.inject(request).then(response => {
+					expect(response.payload).not.toContain(fooPathContent);
+					expect(response.payload).toContain(ROOT_INDEX_CONTENT);
+				})
+				.then(() => server.stop())
+				.catch(err => {
+					server.stop();
+					throw err;
+				});
+			});
+	});
+	it('renders the expected child index route app content at `/foo`', () => {
+		return start(getMockRenderRequestMap(), {}, mockConfig)
+			.then(server => {
+				const request = {
+					method: 'get',
+					url: '/foo',
+					credentials: 'whatever',
+				};
+				return server.inject(request).then(response => {
+					expect(response.payload).not.toContain(fooPathContent);
+					expect(response.payload).toContain(FOO_INDEX_CONTENT);
 				})
 				.then(() => server.stop())
 				.catch(err => {
