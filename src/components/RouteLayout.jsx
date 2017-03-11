@@ -2,6 +2,8 @@ import React from 'react';
 import Switch from 'react-router-dom/Switch';
 import Route from 'react-router-dom/Route';
 
+import { getNestedRoutes } from '../util/routeUtils';
+
 const RouteWithSubRoutes = route => {
 	if (!route.component) {
 		throw new Error(`route for path ${JSON.stringify(route.path)} must have a 'component' property`);
@@ -15,13 +17,12 @@ const RouteWithSubRoutes = route => {
 			exact={route.exact || false}
 			strict={route.strict || false}
 			render={props => {
-				const nestedRoutes = props.match.isExact && route.indexRoute ?
-					[route.indexRoute] :   // only render index route
-					route.routes;          // pass along any defined nested routes
+				const { match } = props;
+				const nestedRoutes = getNestedRoutes({ route, match });
 				return (
 					<route.component {...props}>
 						{nestedRoutes &&
-							<RouteLayout routes={nestedRoutes} currentPath={props.match.path} />
+							<RouteLayout routes={nestedRoutes} matchedPath={match.path} />
 						}
 					</route.component>
 				);
@@ -37,15 +38,15 @@ class RouteLayout extends React.Component {
 	render() {
 		const {
 			routes,
-			currentPath='/'
+			matchedPath='/'
 		} = this.props;
 
 		return (
 			<Switch>
 				{routes.map((route, i) => {
-					const path = currentPath === '/' ?  // root path, no need to prepend
+					const path = matchedPath === '/' ?  // root path, no need to prepend
 						route.path :
-						`${currentPath}${route.path || ''}`;
+						`${matchedPath}${route.path || ''}`;
 
 					return <RouteWithSubRoutes key={i} {...route} path={path} />;
 				})}
@@ -56,7 +57,7 @@ class RouteLayout extends React.Component {
 
 RouteLayout.propTypes = {
 	routes: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
-	currentPath: React.PropTypes.string,
+	matchedPath: React.PropTypes.string,
 };
 
 export default RouteLayout;
