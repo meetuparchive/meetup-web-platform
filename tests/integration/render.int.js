@@ -7,7 +7,7 @@ import start from '../../src/server';
 jest.mock('request', () =>
 	jest.fn(
 		(requestOpts, cb) =>
-			setTimeout(() =>
+			setTimeout(() => {
 				cb(null, {
 					headers: {},
 					statusCode: 200,
@@ -19,7 +19,8 @@ jest.mock('request', () =>
 						},
 						method: 'get',
 					},
-				}, '{}'), 2)
+				}, JSON.stringify({ foo: 'bar' }));
+			}, 2)
 	)
 );
 

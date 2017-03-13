@@ -7,7 +7,9 @@ import {
 	apiRequest,
 	apiSuccess,
 	apiError,
+	apiFailure,
 	apiComplete,
+	setCsrf,
 } from '../actions/syncActionCreators';
 import { activeRouteQueries$ } from '../util/routeUtils';
 
@@ -91,12 +93,21 @@ export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 	action$.ofType('API_REQUEST')
 		.flatMap(({ payload, meta }) => {           // set up the fetch call to the app server
 			const { config } = store.getState();
-			const fetch = fetchQueriesFn(config.apiUrl, { method: 'GET' });
-			return Observable.fromPromise(fetch(payload, meta))  // call fetch
+			const fetchQueries = fetchQueriesFn(config.apiUrl, { method: 'GET' });
+			return Observable.fromPromise(fetchQueries(payload, meta))  // call fetch
 				.takeUntil(action$.ofType(LOCATION_CHANGE))  // cancel this fetch when nav happens
-				.map(apiSuccess)                             // dispatch apiSuccess with server response
-				.flatMap(action => Observable.of(action, apiComplete()))  // dispatch apiComplete after resolution
-				.catch(err => Observable.of(apiError(err)));  // ... or apiError
+				.flatMap(({ successes=[], errors=[], csrf }) => {
+					const actions = [
+						...successes.map(apiSuccess),  // send the successes to success
+						...errors.map(apiError),     // errors to error
+					];
+					if (csrf) {
+						actions.push(setCsrf(csrf));
+					}
+					actions.push(apiComplete());
+					return Observable.of(...actions);
+				})
+				.catch(err => Observable.of(apiFailure(err), apiComplete()));
 		});
 
 export default function getSyncEpic(routes, fetchQueries) {
