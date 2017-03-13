@@ -3635,7 +3635,13 @@ sntp@1.x.x:
   dependencies:
     hoek "2.x.x"
 
-source-map-support@0.4.11, source-map-support@^0.4.2:
+source-map-support@0.4.12:
+  version "0.4.12"
+  resolved "https://registry.yarnpkg.com/source-map-support/-/source-map-support-0.4.12.tgz#f47d02bf01efaf0c160d3a37d038401b92b1867e"
+  dependencies:
+    source-map "^0.5.6"
+
+source-map-support@^0.4.2:
   version "0.4.11"
   resolved "https://registry.yarnpkg.com/source-map-support/-/source-map-support-0.4.11.tgz#647f939978b38535909530885303daf23279f322"
   dependencies:
@@ -3647,7 +3653,7 @@ source-map@^0.4.4:
   dependencies:
     amdefine ">=0.0.4"
 
-source-map@^0.5.0, source-map@^0.5.3, source-map@~0.5.1:
+source-map@^0.5.0, source-map@^0.5.3, source-map@^0.5.6, source-map@~0.5.1:
   version "0.5.6"
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.5.6.tgz#75ce38f52bf0733c5a7f0c118d81334a2bb5f412"
 
