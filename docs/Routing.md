@@ -22,8 +22,11 @@ type PlatformRoute = {
   component: React.PropTypes.element,
   path?: string,
   exact?: boolean,
-  query?: (location: Object) => Query,  // parsed url
-  indexRoute?: { component: React.PropTypes.elememt },
+  query?: (location: Object) => Query,  // query fn
+  indexRoute?: {
+    component: React.PropTypes.elememt
+    query?: (location: Object) => Query, // query fn
+  },
   routes?: Array<PlatformRoute>,
 }
 ```
