@@ -395,18 +395,26 @@ export const makeExternalApiRequest = request => requestOpts => {
 
 export const logApiResponse = request => ([response, body]) => {
 	const {
-		id,
-		uri: {
-			query,
-			pathname,
-			href,
+		elapsedTime,
+		request :{
+			id,
+			uri: {
+				query,
+				pathname,
+				href,
+			},
+			method,
 		},
-		method,
-	} = response.request;
+		statusCode
+	} = response;
 
 	// production logs will automatically be JSON-parsed in Stackdriver
-	console.log(JSON.stringify({
-		message: `Incoming response ${method.toUpperCase()} ${pathname}`,
+	const log = statusCode >= 400 && console.error ||
+		statusCode >= 300 && console.warn ||
+		console.log;
+
+	log(JSON.stringify({
+		message: `Incoming response ${method.toUpperCase()} ${pathname} ${response.statusCode}`,
 		type: 'response',
 		direction: 'in',
 		info: {
@@ -419,8 +427,8 @@ export const logApiResponse = request => ([response, body]) => {
 			method,
 			id,
 			originRequestId: request.id,
-			statusCode: response.statusCode,
-			time: response.elapsedTime,
+			statusCode: statusCode,
+			time: elapsedTime,
 			body: body.length > 256 ? `${body.substr(0, 256)}...`: body,
 		}
 	}));

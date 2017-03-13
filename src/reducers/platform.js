@@ -77,8 +77,6 @@ export function config(state={}, action) {
 		return { ...state, apiUrl: action.payload };
 	case 'CONFIGURE_TRACKING_ID':
 		return { ...state, trackId: action.payload };
-	case 'SET_CSRF':
-		return { ...state, csrf: action.meta.csrf };
 	default:
 		return state;
 	}

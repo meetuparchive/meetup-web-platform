@@ -6,13 +6,6 @@ export function apiRequest(queries, meta) {
 	};
 }
 
-export function setCsrf(csrf) {
-	return {
-		type: 'SET_CSRF',
-		meta: { csrf },
-	};
-}
-
 export function apiSuccess({ query, response }) {
 	return {
 		type: 'API_SUCCESS',
@@ -34,7 +27,6 @@ export function apiComplete() {
 }
 
 export function apiFailure(error) {
-	console.error(error);
 	return {
 		type: 'API_FAILURE',
 		payload: error,

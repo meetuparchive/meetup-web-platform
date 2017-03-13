@@ -7,12 +7,17 @@ import {
 } from 'meetup-web-mocks/lib/api';
 import * as fetchUtils from './fetchUtils';
 
+jest.mock('js-cookie', () => ({
+	get: jest.fn(name => `${name} value`),
+	set: jest.fn((name, value) => `${name} set to ${value}`),
+}));
+
 describe('fetchQueries', () => {
 	const API_URL = new URL('http://api.example.com/');
 	const queries = [mockQuery({})];
 	const meta = { foo: 'bar' };
 	const responses = [MOCK_GROUP];
-	const csrfJwt = 'encodedstuff';
+	const csrfJwt = `${fetchUtils.CSRF_HEADER_COOKIE} value`;
 	const fakeSuccess = () =>
 		Promise.resolve({
 			json: () => Promise.resolve({ responses }),
@@ -24,7 +29,7 @@ describe('fetchQueries', () => {
 		});
 	const fakeSuccessError = () =>
 		Promise.resolve({
-			json: () => Promise.resolve({ error: 'you lose' }),
+			json: () => Promise.resolve({ error: 'you lose', message: 'fakeSuccessError'}),
 			headers: {
 				get: key => ({
 					'x-csrf-jwt': csrfJwt,
@@ -41,12 +46,6 @@ describe('fetchQueries', () => {
 				expect(response.successes).toEqual([{ query: queries[0], response: responses[0] }]);
 				expect(response.errors).toEqual([]);
 			});
-	});
-	it('returns an object with csrf prop read from response headers', () => {
-		spyOn(global, 'fetch').and.callFake(fakeSuccess);
-
-		return fetchUtils.fetchQueries(API_URL.toString(), { method: 'GET' })(queries)
-			.then(response => expect(response.csrf).toEqual(csrfJwt));
 	});
 	it('returns a promise that will reject when response contains error prop', () => {
 		spyOn(global, 'fetch').and.callFake(fakeSuccessError);

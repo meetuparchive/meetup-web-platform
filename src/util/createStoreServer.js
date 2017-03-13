@@ -1,6 +1,7 @@
 import { applyMiddleware, createStore } from 'redux';
 import { parseQueryResponse } from './fetchUtils';
-import getPlatformMiddleware from '../middleware/epic';
+import getEpicMiddleware from '../middleware/epic';
+import catchMiddleware from '../middleware/catch';
 import apiProxy$ from '../apiProxy/api-proxy';
 
 /**
@@ -26,22 +27,14 @@ export const serverFetchQueries = request => () => queries =>
  * @param {Array} middleware additional middleware to inject into store
  * @param {Object} request the Hapi request for this store
  */
-export function getPlatformMiddlewareEnhancer(routes, middleware, fetchQueriesFn) {
-	// **All** middleware gets added here
-	const middlewareToApply = [
-		getPlatformMiddleware(routes, fetchQueriesFn),
-		...middleware,
-	];
-	return applyMiddleware(...middlewareToApply);
-}
-
 export function getServerCreateStore(
 	routes,
 	middleware,
 	request
 ) {
 	const middlewareToApply = [
-		getPlatformMiddleware(routes, serverFetchQueries(request)),
+		catchMiddleware,
+		getEpicMiddleware(routes, serverFetchQueries(request)),
 		...middleware,
 	];
 

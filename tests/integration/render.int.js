@@ -32,11 +32,16 @@ describe('Full dummy app render', () => {
 			.then(server => {
 				const request = {
 					method: 'get',
-					url: '/ny-tech',
+					url: '/ny-tech?heyhey=true',
 					credentials: 'whatever',
 				};
 				return server.inject(request).then(
-					response => expect(response.payload).toContain(expectedOutputMessage)
+					response => {
+						expect(response.payload).toContain(expectedOutputMessage);
+						expect(
+							response.headers['set-cookie'].find(h => h.startsWith('x-csrf-jwt-header'))
+						).not.toBeUndefined();
+					}
 				)
 				.then(() => server.stop())
 				.catch(err => {
