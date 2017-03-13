@@ -63,12 +63,11 @@ export const cacheQueryEpic = cache => action$ =>
 		.flatMap(({ payload }) =>
 			Rx.Observable.from(payload)  // fan out
 				.flatMap(cacheReader(cache))               // look for a cache hit
-				.filter(([ query, response ]) => response) // ignore misses
-				.reduce((acc, [ query, response ]) => ({   // fan-in to create response
-					queries: [ ...acc.queries, query ],
-					responses: [ ...acc.responses, response ],
-				}), { queries: [], responses: [] })        // empty response structure
-				.filter(cacheResponse => cacheResponse.responses.length)
+				.filter(({ query, response }) => response) // ignore misses
+				.reduce((acc, { query, response }) => ({   // fan-in to create response
+					successes: [ ...acc.successes, { query, response }],
+				}), { successes: [] })        // empty response structure
+				.filter(({ successes }) => successes.length)
 		)
 		.map(cacheSuccess);
 

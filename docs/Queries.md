@@ -104,19 +104,33 @@ structured as individual objects with a single key corresponding to the query
 ```js
 [
   {
-    [ref]: {
-      type,
-      value: {},
-      error?,
-      flags?,
-      meta?,  // data returned from API separate from `value`
-    }
+    type: string,
+    ref: string,
+    value: {},
+    error?: {},
+    flags?: [],
+    meta?: {},  // data returned from API separate from `value`
   },
   // ...
 ]
 ```
 
-The fetchQueries function will then
+The fetchQueries function will then filter these Query Response objects into
+separate `successes` and `errors` arrays, where each array element is an object
+containing the original `query` object and its corresponding `response`:
+
+```js
+{
+  successes: [{ query, response }, ...],
+  errors: [{ query, response }, ...],
+}
+```
+
+The Sync middleware will read these two arrays and generate a separate
+`API_SUCCESS` or `API_ERROR` action for each response object.
+
+The platform reducer will then read the values into `state.app[ref]` for each
+response.
 
 **Redux state after being processed by `API_SUCCESS` action**
 
