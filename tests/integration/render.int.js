@@ -31,7 +31,7 @@ describe('Full dummy app render', () => {
 			.then(server => {
 				const request = {
 					method: 'get',
-					url: '/ny-tech',
+					url: '/ny-tech?heyhey=true',
 					credentials: 'whatever',
 				};
 				return server.inject(request).then(
