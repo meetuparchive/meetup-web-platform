@@ -136,8 +136,9 @@ function getTrackClick(store) {
 			data: data
 		});
 
-		// 3. dispatch the action
-		store.dispatch(clickTrackAction);
+		// 3. dispatch the action - must be deferred until after click event has
+		//    been processed by all other listeners
+		setTimeout(() => store.dispatch(clickTrackAction), 0);
 
 		return clickTrackAction;
 	}
