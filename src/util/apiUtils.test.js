@@ -224,15 +224,30 @@ describe('parseLoginAuth', () => {
 describe('parseMetaHeaders', () => {
 	it('returns x-meetup-flags as flags object with real booleans camelcased', () => {
 		expect(parseMetaHeaders({ 'x-meetup-foo-bar': 'whatwhat' }))
-			.toEqual({ fooBar: 'whatwhat' });
+			.toMatchObject({ fooBar: 'whatwhat' });
 	});
 	it('returns x-meetup-flags as flags object with real booleans', () => {
 		expect(parseMetaHeaders({ 'x-meetup-flags': 'foo=true,bar=false' }))
-			.toEqual({ flags: { foo: true, bar: false } });
+			.toMatchObject({ flags: { foo: true, bar: false } });
 	});
 	it('parses specified x- headers', () => {
 		expect(parseMetaHeaders({ 'x-total-count': 'whatwhat' }))
-			.toEqual({ totalCount: 'whatwhat' });
+			.toMatchObject({ totalCount: 'whatwhat' });
+	});
+	it('parses Link header', () => {
+		const next = 'http://example.com/next';
+		const prev = 'http://example.com/prev';
+
+		// both 'next' and 'prev'
+		expect(parseMetaHeaders({ link: `<${next}>; rel="next", <${prev}>; rel="prev"` }))
+			.toMatchObject({ link: { next, prev } });
+		// just 'next'
+		expect(parseMetaHeaders({ link: `<${next}>; rel="next"` }))
+			.toMatchObject({ link: { next } });
+	});
+	it('returns empty object for empty headers', () => {
+		expect(parseMetaHeaders({}))
+			.toEqual({});
 	});
 });
 

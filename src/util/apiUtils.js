@@ -87,9 +87,19 @@ export const parseMetaHeaders = headers => {
 		return meta;
 	}, {});
 
+	const linkHeader = headers.link && headers.link.split(',')
+		.reduce((links, link) => {
+			const [urlString, relString] = link.split(';');
+			const url = urlString.replace(/<|>/g, '').trim();
+			var rel = relString.replace(/rel="([^"]+)"/, '$1').trim();
+			links[rel] = url;
+			return links;
+		}, {});
+
 	return {
 		...meetupHeaders,
 		...xHeaders,
+		link: linkHeader || undefined,
 	};
 };
 
