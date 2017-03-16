@@ -51,6 +51,24 @@ export const routes = [{
 				params: {},
 			}),
 		}]
+	}, {
+		// param-based route
+		path: '/:param1',
+		component: 'div',
+		query: ({ params }) => ({
+			type: 'mock',
+			ref: 'param1',
+			params,
+		}),
+		routes: [{
+			path: '/:param2',
+			component: 'div',
+			query: ({ params }) => ({
+				type: 'mock',
+				ref: 'param2',
+				params,
+			}),
+		}],
 	}],
 }];
 

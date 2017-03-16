@@ -26,4 +26,21 @@ describe('activeRouteQueries', () => {
 		const receivedQueries = activeRouteQueries(routes)('/foo');
 		expect(receivedQueries).toEqual(expectedQueries);
 	});
+	it('matches nested wildcard urls', () => {
+		const receivedQueries = activeRouteQueries(routes)('/param1value/param2value');
+		expect(receivedQueries).toHaveLength(3);  // root, param1, param2
+	});
+	it('passes all parsed url params into query', () => {
+		const param1 = 'param1value';
+		const param2 = 'param2value';
+		const expectedParams = [ {}, { param1 }, { param1, param2 } ];
+		const receivedQueries = activeRouteQueries(routes)(`/${param1}/${param2}`);
+		expect(receivedQueries.map(({ params }) => params)).toEqual(expectedParams);
+	});
+	it('matches utf-8 urls', () => {
+		const param1 = '驚くばかり';
+		const expectedParams = [ {}, { param1 } ];
+		const receivedQueries = activeRouteQueries(routes)(`/${param1}`);
+		expect(receivedQueries.map(({ params }) => params)).toEqual(expectedParams);
+	});
 });

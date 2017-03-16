@@ -10,49 +10,35 @@ export const getNestedRoutes = ({ route, match }) =>
 		route.routes;          // pass along any defined nested routes
 
 /**
- * A recursive reducer that finds all the routes that match a given url. Route
- * `path` keys are interpreted as being extensions of their parent route's `path`
- * @param {String} url a URL path (no host) starting with `/`
- * @param {String} matchedUrl the part of the `url` that has been previously matched
- * @param {Array} matchedRoutes an array of [ route, match ] tuples
- * @param {Object} route the current route being matched
- * @return {Array} an array of { route, match } objects
- */
-export const matchRoutesReducer = (url, matchedUrl='') => (matchedRoutes, route) => {
-	const pathToMatch = `${matchedUrl}${route.path || ''}`;
-	const match = matchPath(url, pathToMatch);
-	if (!match) {
-		return matchedRoutes;
-	}
-
-	const matchedRoute = { route, match };
-	// we have a match, add it and its `match` object to the array of matched routes
-	const currentMatchedRoutes = [ ...matchedRoutes, matchedRoute ];
-	if (!route.routes || !route.routes.length) {
-		return currentMatchedRoutes;
-	}
-
-	return getNestedRoutes(matchedRoute).reduce(
-		matchRoutesReducer(url, match.url),
-		currentMatchedRoutes
-	);
-};
-
-/**
- * find all routes from a given route config object that match the supplied
- * `url`
+ * find all routes from a given array of route config objects that match the
+ * supplied `url`
  *
  * this function matches the signature of `react-router-config`'s `matchRoutes`
  * function, but interprets all `route.path` settings as nested
  *
  * @see {@link https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config#matchroutesroutes-pathname}
  *
- * @param {Array} routes an array of route configs
+ * @param {Array} routes the routes to match
  * @param {String} url a URL path (no host) starting with `/`
+ * @param {Array} matchedRoutes an array of [ route, match ] tuples
+ * @param {String} matchedPath the part of the total path matched so far
  * @return {Array} an array of { route, match } objects
  */
-export const matchRoutes = (routes, url) =>
-	routes.reduce(matchRoutesReducer(url), []);
+export const matchRoutes = (routes=[], url='', matchedRoutes=[], matchedPath='') => {
+	const route = routes.find(r => matchPath(url, `${matchedPath}${r.path || ''}`));  // take the first match
+	if (!route) {
+		return matchedRoutes;
+	}
+
+	// add the route and its `match` object to the array of matched routes
+	const currentMatchedPath = `${matchedPath}${route.path || ''}`;
+	const match = matchPath(url, currentMatchedPath);
+	const currentMatchedRoutes = [ ...matchedRoutes, { route, match } ];
+
+	// add any nested route matches
+	const nestedRoutes = getNestedRoutes({ route, match }) || [];
+	return matchRoutes(nestedRoutes, url, currentMatchedRoutes, currentMatchedPath);
+};
 
 /**
  * @param {Array} queries an array of query function results
