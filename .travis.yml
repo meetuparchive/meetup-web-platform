@@ -28,7 +28,7 @@ before_script:
   - git diff --exit-code
 
 after_success:
-  - npm run coveralls
+  - yarn run coveralls
   - git config --global user.email "builds@travis-ci.com"
   - git config --global user.name "Travis CI"
   - >
@@ -43,9 +43,9 @@ after_success:
   - echo "NPM_TAG=$NPM_TAG"
   - >
     [ "${TRAVIS_BRANCH}" = "master" ] &&
-    npm version $GIT_TAG -m "Version $GIT_TAG built by Travis CI - https://travis-ci.com/$TRAVIS_REPO_SLUG/builds/$TRAVIS_JOB_ID" &&
+    yarn version --no-git-tag-version --new-version $GIT_TAG &&
     git push -q https://$GITHUB_USER:$GITHUB_TOKEN@github.com/$TRAVIS_REPO_SLUG --tags &&
-    npm publish --tag $NPM_TAG ||
+    yarn publish --tag $NPM_TAG ||
     echo "skipping versioning"
 
 notifications:
