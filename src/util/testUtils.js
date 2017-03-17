@@ -5,13 +5,17 @@ import { Observable } from 'rxjs';
 import { ActionsObservable } from 'redux-observable';
 
 import {
-	createFakeStore
-} from 'meetup-web-mocks/lib/testUtils';
-
-import {
 	MOCK_MEANINGLESS_ACTION,
 	MOCK_APP_STATE
 } from 'meetup-web-mocks/lib/app';
+
+export const createFakeStore = fakeData => ({
+	getState() {
+		return fakeData;
+	},
+	dispatch() {},
+	subscribe() {},
+});
 
 export const middlewareDispatcher = middleware => (storeData, action) => {
 	let dispatched = null;
