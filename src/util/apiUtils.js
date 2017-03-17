@@ -178,7 +178,7 @@ export const buildRequestArgs = externalRequestOpts =>
 		// cheap, brute-force object clone, acceptable for serializable object
 		const externalRequestOptsQuery = JSON.parse(JSON.stringify(externalRequestOpts));
 
-		externalRequestOptsQuery.url = encodeURI(`/${endpoint}`);
+		externalRequestOptsQuery.url = `/${endpoint}`;
 		externalRequestOptsQuery.jar = createCookieJar(externalRequestOptsQuery.url);
 
 		if (flags) {

@@ -1,15 +1,12 @@
 import Rx from 'rxjs';
-import Boom from 'boom';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
-import RouterContext from 'react-router/lib/RouterContext';
-import { useBasename } from 'history';
-import match from 'react-router/lib/match';
-import { Provider } from 'react-redux';
+import StaticRouter from 'react-router-dom/StaticRouter';
 
 import { getServerCreateStore } from '../util/createStoreServer';
 import Dom from '../components/dom';
 import NotFound from '../components/NotFound';
+import PlatformApp from '../components/PlatformApp';
 import { polyfillNodeIntl } from '../util/localizationUtils';
 
 import {
@@ -58,56 +55,68 @@ function getHtml(baseUrl, assetPublicPath, clientFilename, initialState={}, appM
  * @return {Object} the statusCode and result used by Hapi's `reply` API
  *   {@link http://hapijs.com/api#replyerr-result}
  */
-const getRouterRenderer = (store, baseUrl, clientFilename, assetPublicPath) =>
-	([ redirectLocation, renderProps ]) => {
-		// pre-render the app-specific markup, this is the string of markup that will
-		// be managed by React on the client.
-		//
-		// **IMPORTANT**: this string is built separately from `<Dom />` because it
-		// initializes page-specific state that `<Dom />` needs to render, e.g.
-		// `<head>` contents
-		const initialState = store.getState();
-		let appMarkup;
-		let result;
-		let statusCode;
+const getRouterRenderer = (
+	routes,
+	store,
+	location,
+	baseUrl,
+	clientFilename,
+	assetPublicPath
+) => {
+	// pre-render the app-specific markup, this is the string of markup that will
+	// be managed by React on the client.
+	//
+	// **IMPORTANT**: this string is built separately from `<Dom />` because it
+	// initializes page-specific state that `<Dom />` needs to render, e.g.
+	// `<head>` contents
+	const initialState = store.getState();
+	let appMarkup;
+	let result;
+	let statusCode;
+	const context = {};
 
-		try {
-			renderProps.router.history = useBasename(() => renderProps.router.history)({ basename: baseUrl });
-			appMarkup = ReactDOMServer.renderToString(
-				<Provider store={store}>
-					<RouterContext {...renderProps} />
-				</Provider>
-			);
+	try {
+		appMarkup = ReactDOMServer.renderToString(
+			<StaticRouter
+				basename={baseUrl}
+				location={location}
+				context={context}
+			>
+				<PlatformApp store={store} routes={routes} />
+			</StaticRouter>
+		);
 
-			// all the data for the full `<html>` element has been initialized by the app
-			// so go ahead and assemble the full response body
-			result = getHtml(
-				baseUrl,
-				assetPublicPath,
-				clientFilename,
-				initialState,
-				appMarkup
-			);
-			statusCode = NotFound.rewind() ||  // if NotFound is mounted, return 404
-				renderProps.routes.pop().statusCode ||
-				200;
-		} catch(error) {
-			// log the error stack here because Observable logs not great
-			if (process.env.NODE_ENV === 'production') {
-				throw error;
-			}
-			console.error(error);  // for dev debugging - global onPreResponse will handle prod
-			const { RedBoxError } = require('redbox-react');
-			appMarkup = ReactDOMServer.renderToString(<RedBoxError error={error} />);
-			result = `${DOCTYPE}<html><body>${appMarkup}</body></html>`;
-			statusCode = 500;
+		if (context.url) {
+			// redirect
 		}
 
-		return {
-			statusCode,
-			result
-		};
+		// all the data for the full `<html>` element has been initialized by the app
+		// so go ahead and assemble the full response body
+		result = getHtml(
+			baseUrl,
+			assetPublicPath,
+			clientFilename,
+			initialState,
+			appMarkup
+		);
+
+		statusCode = NotFound.rewind() ||  // if NotFound is mounted, return 404
+			200;
+
+	} catch(error) {
+		// log the error stack here in dev to make it a little more legible
+		// - prod will get stackdriver formatting
+		if (process.env.NODE_ENV !== 'production') {
+			console.error(error.stack);
+		}
+		throw error;
+	}
+
+	return {
+		statusCode,
+		result
 	};
+};
 
 /**
  * Curry a function that takes a Hapi request and returns an observable
@@ -134,7 +143,7 @@ const makeRenderer = (
 	clientFilename,
 	assetPublicPath,
 	middleware=[],
-	baseUrl='/'
+	baseUrl=''
 ) => request => {
 
 	middleware = middleware || [];
@@ -145,7 +154,6 @@ const makeRenderer = (
 		url,
 	} = request;
 
-	const appLocation = url.path.replace(`${baseUrl}/`, '/');
 	// request protocol might be different from original request that hit proxy
 	// we want to use the proxy's protocol
 	const requestProtocol = headers['x-forwarded-proto'] || connection.info.protocol;
@@ -155,6 +163,7 @@ const makeRenderer = (
 	const initialState = {};
 	const createStore = getServerCreateStore(routes, middleware, request);
 	const store = createStore(reducer, initialState);
+
 	// load initial config
 	store.dispatch(configureApiUrl(apiUrl));
 
@@ -173,31 +182,21 @@ const makeRenderer = (
 	})
 	.first(state => state.preRenderChecklist.every(isReady => isReady));  // take the first ready state
 
-	return Rx.Observable.bindNodeCallback(match)({ location: appLocation, routes })
-		.do(([redirectLocation, renderProps]) => {
-			if (!redirectLocation && !renderProps) {
-				throw Boom.notFound();
-			}
-		})
-		.do(() => {
-			console.log(JSON.stringify({
-				message: `Dispatching RENDER for ${url.path}`,
-				type: 'dispatch',
-				info: {
-					url,
-					method: request.method,
-					id: request.id,
-				}
-			}));
-		})
-		.do(([redirectLocation, renderProps]) =>
-			store.dispatch({
-				type: '@@server/RENDER',
-				payload: renderProps.location
-			})
-		)
-		.flatMap(args => storeIsReady$.map(() => args))  // `sample` appears not to work - this is equivalent
-		.map(getRouterRenderer(store, baseUrl, clientFilename, assetPublicPath));
+	console.log(JSON.stringify({
+		message: `Dispatching RENDER for ${request.url.href}`,
+		type: 'dispatch',
+		info: {
+			url: request.url,
+			method: request.method,
+			id: request.id,
+		}
+	}));
+	store.dispatch({
+		type: '@@server/RENDER',
+		payload: url,
+	});
+	return storeIsReady$
+		.map(() => getRouterRenderer(routes, store, url, baseUrl, clientFilename, assetPublicPath));
 };
 
 export default makeRenderer;
