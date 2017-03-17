@@ -93,5 +93,37 @@ describe('Full dummy app render', () => {
 				});
 			});
 	});
+	it('calls request with url-encoded params', () => {
+		require('request').mockReset();
+		return start(getMockRenderRequestMap(), {}, mockConfig)
+			.then(server => {
+				const urlname = '驚くばかり';
+				const encodedUrlname = encodeURI(urlname);
+				const url = `/${urlname}`;
+				const request = {
+					method: 'get',
+					url,
+					credentials: 'whatever',
+				};
+
+				return server.inject(request).then(response => {
+					// request will be called twice - once for self, once for param1 route
+					const { calls } = require('request').mock;
+					expect(calls).toContainEqual(
+						expect.arrayContaining([
+							expect.objectContaining({
+								url: expect.stringContaining(encodedUrlname)
+							})
+						])
+					);
+				})
+				.then(() => server.stop())
+				.catch(err => {
+					server.stop();
+					throw err;
+				});
+			});
+	});
+
 });
 
