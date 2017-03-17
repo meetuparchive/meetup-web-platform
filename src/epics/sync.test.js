@@ -113,7 +113,7 @@ describe('Sync epic', () => {
 	});
 
 	it('emits API_SUCCESS and API_COMPLETE on successful API_REQUEST', function() {
-		const mockFetchQueries = () => () => Promise.resolve({});
+		const mockFetchQueries = () => () => Promise.resolve({ successes: [{}] });
 
 		const queries = [mockQuery({})];
 		const apiRequest = syncActionCreators.apiRequest(queries);
@@ -122,12 +122,12 @@ describe('Sync epic', () => {
 		return getSyncEpic(routes, mockFetchQueries)(action$, fakeStore)
 			.toArray()
 			.toPromise()
-			.then(actions =>
-				expect(actions.map(({ type }) => type)).toEqual(['API_SUCCESS', 'API_COMPLETE'])
-			);
+			.then(actions => {
+				expect(actions.map(({ type }) => type)).toEqual(['API_SUCCESS', 'API_COMPLETE']);
+			});
 	});
 
-	it('emits API_ERROR on failed API_REQUEST', function() {
+	it('emits API_FAILURE on failed API_REQUEST', function() {
 		const mockFetchQueries = () => () => Promise.reject(new Error());
 
 		const queries = [mockQuery({})];
@@ -135,8 +135,9 @@ describe('Sync epic', () => {
 		const action$ = ActionsObservable.of(apiRequest);
 		const fakeStore = createFakeStore(MOCK_APP_STATE);
 		return getSyncEpic(routes, mockFetchQueries)(action$, fakeStore)
+			.toArray()
 			.toPromise()
-			.then(action => expect(action.type).toEqual('API_ERROR'));
+			.then(actions => expect(actions.map(a => a.type)).toEqual(['API_FAILURE', 'API_COMPLETE']));
 	});
 
 });

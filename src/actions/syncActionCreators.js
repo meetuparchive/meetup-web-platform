@@ -6,10 +6,10 @@ export function apiRequest(queries, meta) {
 	};
 }
 
-export function apiSuccess({ queries, responses }) {
+export function apiSuccess({ query, response }) {
 	return {
 		type: 'API_SUCCESS',
-		payload: { queries, responses },
+		payload: { query, response },
 	};
 }
 
@@ -23,6 +23,13 @@ export function apiError(err) {
 export function apiComplete() {
 	return {
 		type: 'API_COMPLETE'
+	};
+}
+
+export function apiFailure(error) {
+	return {
+		type: 'API_FAILURE',
+		payload: error,
 	};
 }
 

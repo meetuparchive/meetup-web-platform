@@ -19,8 +19,8 @@ import * as syncActionCreators from '../actions/syncActionCreators';
 
 const MOCK_QUERY = mockQuery(MOCK_RENDERPROPS);
 const MOCK_SUCCESS_ACTION = syncActionCreators.apiSuccess({
-	queries: [MOCK_QUERY],
-	responses: MOCK_API_RESULT
+	query: MOCK_QUERY,
+	response: MOCK_API_RESULT[0],
 });
 const apiRequestAction = syncActionCreators.apiRequest([MOCK_QUERY]);
 
