@@ -2,15 +2,12 @@ import 'rxjs/Observable';
 import { ActionsObservable } from 'redux-observable';
 
 import {
-	createFakeStore,
-} from 'meetup-web-mocks/lib/testUtils';
-
-import {
 	MOCK_DELETE_ACTION,
 	MOCK_APP_STATE,
 } from 'meetup-web-mocks/lib/app';
 
 import {
+	createFakeStore,
 	epicIgnoreAction,
 } from '../util/testUtils';
 
