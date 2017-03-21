@@ -35,7 +35,7 @@ export default function getConfig(overrideConfig = {}) {
 		},
 		API_HOST: {
 			env: 'API_HOST',
-			default: 'api.dev.meetup.com', // not as nice as Joi.string().hostname().required(). there is a 'url' format, but it is not customizable, so it will fail if there's no protocol
+			default: 'api.dev.meetup.com',
 			format: String
 		},
 		API_TIMEOUT: {
@@ -114,5 +114,5 @@ export default function getConfig(overrideConfig = {}) {
 
 	config.validate();
 
-	return Promise.resolve(config);
+	return Promise.resolve({...config.getProperties(), ...overrideConfig});
 }
