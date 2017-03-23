@@ -9,6 +9,9 @@ export const getNestedRoutes = ({ route, match }) =>
 		[route.indexRoute] :   // only render index route
 		route.routes;          // pass along any defined nested routes
 
+const routePath = (route, matchedPath) =>
+	`${matchedPath}${route.path || ''}`.replace('//', '/');
+
 /**
  * find all routes from a given array of route config objects that match the
  * supplied `url`
@@ -25,13 +28,13 @@ export const getNestedRoutes = ({ route, match }) =>
  * @return {Array} an array of { route, match } objects
  */
 export const matchRoutes = (routes=[], url='', matchedRoutes=[], matchedPath='') => {
-	const route = routes.find(r => matchPath(url, `${matchedPath}${r.path || ''}`));  // take the first match
+	const route = routes.find(r => matchPath(url, routePath(r, matchedPath)));  // take the first match
 	if (!route) {
 		return matchedRoutes;
 	}
 
 	// add the route and its `match` object to the array of matched routes
-	const currentMatchedPath = `${matchedPath}${route.path || ''}`;
+	const currentMatchedPath = routePath(route, matchedPath);
 	const match = matchPath(url, currentMatchedPath);
 	const currentMatchedRoutes = [ ...matchedRoutes, { route, match } ];
 

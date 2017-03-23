@@ -17,6 +17,7 @@ const MockFooIndex = props => (
 );
 
 export const routes = [{
+	path: '/',
 	component: 'div',
 	query: () => ({
 		type: 'mock',
