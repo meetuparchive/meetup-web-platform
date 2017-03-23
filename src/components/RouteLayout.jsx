@@ -4,6 +4,12 @@ import Route from 'react-router-dom/Route';
 
 import { getNestedRoutes } from '../util/routeUtils';
 
+const decodeParams = params =>
+	Object.keys(params).reduce((decodedParams, key) => {
+		decodedParams[key] = decodeURI(params[key]);
+		return decodedParams;
+	}, {});
+
 const RouteWithSubRoutes = route => {
 	if (!route.component) {
 		throw new Error(`route for path ${JSON.stringify(route.path)} must have a 'component' property`);
@@ -18,6 +24,9 @@ const RouteWithSubRoutes = route => {
 			strict={route.strict || false}
 			render={props => {
 				const { match } = props;
+				// React Router will automatically encode the URL params - we want the
+				// decoded values in the component
+				match.params = decodeParams(match.params);
 				const nestedRoutes = getNestedRoutes({ route, match });
 				return (
 					<route.component {...props}>

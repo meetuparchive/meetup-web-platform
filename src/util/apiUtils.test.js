@@ -5,6 +5,7 @@ import {
 	MOCK_API_PROBLEM,
 	MOCK_AUTH_HEADER,
 	MOCK_RENDERPROPS,
+	MOCK_RENDERPROPS_UTF8,
 } from 'meetup-web-mocks/lib/app';
 
 import {
@@ -275,6 +276,16 @@ describe('buildRequestArgs', () => {
 		const postArgs = buildRequestArgs({ ...options, method: 'post' })(query);
 		expect(postArgs.headers['X-Meetup-Request-Flags']).not.toBeUndefined();
 	});
+
+	const testQueryResults_utf8 = mockQuery(MOCK_RENDERPROPS_UTF8);
+
+	it('Properly encodes the URL', () => {
+		const method = 'get';
+		const getArgs = buildRequestArgs({ ...options, method })(testQueryResults_utf8);
+		const { pathname } = require('url').parse(getArgs.url);
+		expect(/^[\x00-\xFF]*$/.test(pathname)).toBe(true);  // eslint-disable-line no-control-regex
+	});
+
 });
 
 describe('apiResponseToQueryResponse', () => {
