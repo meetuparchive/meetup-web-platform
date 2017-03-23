@@ -4,6 +4,12 @@
  */
 import matchPath from 'react-router-dom/matchPath';
 
+export const decodeParams = params =>
+	Object.keys(params).reduce((decodedParams, key) => {
+		decodedParams[key] = decodeURI(params[key]);
+		return decodedParams;
+	}, {});
+
 export const getNestedRoutes = ({ route, match }) =>
 	match.isExact && route.indexRoute ?
 		[route.indexRoute] :   // only render index route
@@ -56,8 +62,10 @@ export const matchedRouteQueriesReducer = (queries, { route, match }) => {
 		route.query :
 		[route.query];
 
+	// call the query functions with non-url-encoded params
+	const params = decodeParams(match.params);
 	const routeQueries = routeQueryFns
-		.map(queryFn => queryFn(match))
+		.map(queryFn => queryFn({ params }))
 		.filter(query => query);
 
 	return [
