@@ -2,13 +2,7 @@ import React from 'react';
 import Switch from 'react-router-dom/Switch';
 import Route from 'react-router-dom/Route';
 
-import { getNestedRoutes } from '../util/routeUtils';
-
-const decodeParams = params =>
-	Object.keys(params).reduce((decodedParams, key) => {
-		decodedParams[key] = decodeURI(params[key]);
-		return decodedParams;
-	}, {});
+import { decodeParams, getNestedRoutes } from '../util/routeUtils';
 
 const RouteWithSubRoutes = route => {
 	if (!route.component) {
