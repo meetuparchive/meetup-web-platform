@@ -308,7 +308,7 @@ export function parseRequest(request) {
  * @return {Object} the mutated group object
  */
 export const groupDuotoneSetter = duotoneUrls => group => {
-	const photo = group.key_photo || group.group_photo || {};
+	const photo = group.key_photo || {};
 	const duotoneKey = group.photo_gradient && duotoneRef(
 			group.photo_gradient.light_color,
 			group.photo_gradient.dark_color
