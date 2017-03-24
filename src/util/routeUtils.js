@@ -2,34 +2,84 @@
  * Utilities for interacting with the Router and getting location data
  * @module routeUtils
  */
-import Rx from 'rxjs';
-import match from 'react-router/lib/match';
+import matchPath from 'react-router-dom/matchPath';
 
-// Create observable from callback-based `match`
-const match$ = Rx.Observable.bindNodeCallback(match);
+export const decodeParams = params =>
+	Object.keys(params).reduce((decodedParams, key) => {
+		decodedParams[key] = params[key] && decodeURI(params[key]);
+		return decodedParams;
+	}, {});
+
+export const getNestedRoutes = ({ route, match }) =>
+	match.isExact && route.indexRoute ?
+		[route.indexRoute] :   // only render index route
+		route.routes;          // pass along any defined nested routes
+
+const routePath = (route, matchedPath) =>
+	`${matchedPath}${route.path || ''}`.replace('//', '/');
 
 /**
- * From the renderProps provided by React Router's `match`, collect the results
- * of the query properties associated with currently-active routes
+ * find all routes from a given array of route config objects that match the
+ * supplied `url`
  *
- * @param matchCallbackArgs {Array} redirectLocation(ignored) and renderProps
- * @return {Array} The return values of each active route's query function
+ * this function matches the signature of `react-router-config`'s `matchRoutes`
+ * function, but interprets all `route.path` settings as nested
+ *
+ * @see {@link https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config#matchroutesroutes-pathname}
+ *
+ * @param {Array} routes the routes to match
+ * @param {String} url a URL path (no host) starting with `/`
+ * @param {Array} matchedRoutes an array of [ route, match ] tuples
+ * @param {String} matchedPath the part of the total path matched so far
+ * @return {Array} an array of { route, match } objects
  */
-function getActiveRouteQueries([ , { routes, location, params }]) {
-	const queries = routes
-		.filter(({ query }) => query)  // only get routes with queries
-		.reduce((queries, { query }) => {  // assemble into one array of queries
-			const routeQueries = query instanceof Array ? query : [query];
-			return queries.concat(routeQueries);
-		}, [])
-		.map(queryFn => queryFn({ location, params }))  // call the query function
-		.filter(query => query);  // empty return values should not be sent
+export const matchRoutes = (routes=[], url='', matchedRoutes=[], matchedPath='') => {
+	const route = routes.find(r => matchPath(url, routePath(r, matchedPath)));  // take the first match
+	if (!route) {
+		return matchedRoutes;
+	}
 
-	return queries;
-}
+	// add the route and its `match` object to the array of matched routes
+	const currentMatchedPath = routePath(route, matchedPath);
+	const match = matchPath(url, currentMatchedPath);
+	const currentMatchedRoutes = [ ...matchedRoutes, { route, match } ];
 
-export const activeRouteQueries$ = routes => location =>
-	match$({ routes, location })
-		.map(getActiveRouteQueries)
-		.filter(queries => queries.length);
+	// add any nested route matches
+	const nestedRoutes = getNestedRoutes({ route, match }) || [];
+	return matchRoutes(nestedRoutes, url, currentMatchedRoutes, currentMatchedPath);
+};
+
+/**
+ * @param {Array} queries an array of query function results
+ * @param {Object} matchedRoute a { route, match } object to inspect for query functions
+ * @return {Array} an array of returned query objects
+ */
+export const matchedRouteQueriesReducer = (queries, { route, match }) => {
+	if (!route.query) {
+		return queries;
+	}
+	const routeQueryFns = route.query instanceof Array ?
+		route.query :
+		[route.query];
+
+	// call the query functions with non-url-encoded params
+	const params = decodeParams(match.params);
+	const routeQueries = routeQueryFns
+		.map(queryFn => queryFn({ params }))
+		.filter(query => query);
+
+	return [
+		...queries,
+		...routeQueries,
+	];
+};
+
+/**
+ * Get the queries from all currently-active routes at the requested url path
+ * @param {Array} routes an array of route objects
+ * @param {String} url the current URL path
+ * @return {Array} the queries attached to the active routes
+ */
+export const activeRouteQueries = routes => url =>
+	matchRoutes(routes, url).reduce(matchedRouteQueriesReducer, []);
 
