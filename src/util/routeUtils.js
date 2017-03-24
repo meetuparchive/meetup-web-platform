@@ -6,7 +6,7 @@ import matchPath from 'react-router-dom/matchPath';
 
 export const decodeParams = params =>
 	Object.keys(params).reduce((decodedParams, key) => {
-		decodedParams[key] = decodeURI(params[key]);
+		decodedParams[key] = params[key] && decodeURI(params[key]);
 		return decodedParams;
 	}, {});
 
