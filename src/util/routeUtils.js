@@ -50,11 +50,12 @@ export const matchRoutes = (routes=[], url='', matchedRoutes=[], matchedPath='')
 };
 
 /**
+ * @param {String} url the original request URL
  * @param {Array} queries an array of query function results
  * @param {Object} matchedRoute a { route, match } object to inspect for query functions
  * @return {Array} an array of returned query objects
  */
-export const matchedRouteQueriesReducer = (queries, { route, match }) => {
+export const matchedRouteQueriesReducer = location => (queries, { route, match }) => {
 	if (!route.query) {
 		return queries;
 	}
@@ -65,7 +66,7 @@ export const matchedRouteQueriesReducer = (queries, { route, match }) => {
 	// call the query functions with non-url-encoded params
 	const params = decodeParams(match.params);
 	const routeQueries = routeQueryFns
-		.map(queryFn => queryFn({ params }))
+		.map(queryFn => queryFn({ location, params }))
 		.filter(query => query);
 
 	return [
@@ -80,6 +81,7 @@ export const matchedRouteQueriesReducer = (queries, { route, match }) => {
  * @param {String} url the current URL path
  * @return {Array} the queries attached to the active routes
  */
-export const activeRouteQueries = routes => url =>
-	matchRoutes(routes, url).reduce(matchedRouteQueriesReducer, []);
+export const activeRouteQueries = routes => location =>
+	matchRoutes(routes, location.pathname)
+		.reduce(matchedRouteQueriesReducer(location), []);
 
