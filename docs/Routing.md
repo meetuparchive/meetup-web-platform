@@ -43,6 +43,11 @@ configuration object passed to the app renderers.
 The `path` for a route is defined _relative_ to whatever route it is nested
 in. It should always start with a slash `/`. It should _never_ end with a slash.
 
+**Note**: The standard implementation of React Router v4 does not directly
+support relative `path` strings - we use the route configuration as a base for
+calculating the full path that is passed to the underlying rendered `<Route>`
+components.
+
 ### `exact`
 
 Only render the current route when the URL matches exactly
