@@ -52,7 +52,7 @@
     "request": "2.81.0",
     "source-map-support": "0.4.12",
     "tough-cookie": "2.3.2",
-    "url-regex": "4.0.0",
+    "url-regex": "3.2.0",
     "uuid": "3.0.1"
   },
   "peerDependencies": {
