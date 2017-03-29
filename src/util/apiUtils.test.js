@@ -1,4 +1,5 @@
 import externalRequest from 'request';
+import rison from 'rison';
 
 import {
 	mockQuery,
@@ -473,7 +474,7 @@ describe('parseRequest', () => {
 	const headers = { authorization: MOCK_AUTH_HEADER };
 	const queries = [mockQuery(MOCK_RENDERPROPS)];
 	it('extracts the queries provided in GET requests', () => {
-		const data = { queries: JSON.stringify(queries) };
+		const data = { queries: rison.encode_array(queries) };
 		const getRequest = {
 			headers,
 			method: 'get',
@@ -490,7 +491,7 @@ describe('parseRequest', () => {
 		expect(parseRequest(getRequest, 'http://dummy.api.meetup.com').queries).toEqual(queries);
 	});
 	it('extracts the queries provided in POST requests', () => {
-		const data = { queries: JSON.stringify(queries) };
+		const data = { queries: rison.encode_array(queries) };
 		const postRequest = {
 			headers,
 			method: 'post',
@@ -508,7 +509,7 @@ describe('parseRequest', () => {
 	});
 	it('throws an error for mal-formed queries', () => {
 		const notAQuery = { foo: 'bar' };
-		const data = { queries: JSON.stringify([notAQuery]) };
+		const data = { queries: rison.encode_array([notAQuery]) };
 		const getRequest = {
 			headers,
 			method: 'get',

@@ -66,7 +66,7 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 	const isDelete = method.toLowerCase() === 'delete';
 
 	const fetchUrl = new URL(apiUrl);
-	fetchUrl.searchParams.append('queries', rison.encode_object(queries));
+	fetchUrl.searchParams.append('queries', rison.encode_array(queries));
 	if (meta) {
 		const {
 			clickTracking,

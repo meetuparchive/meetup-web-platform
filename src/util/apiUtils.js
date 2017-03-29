@@ -280,7 +280,7 @@ export function parseRequestQueries(request) {
 	}
 
 	const validatedQueries = Joi.validate(
-		rison.decode_object(queriesRison),
+		rison.decode_array(queriesRison),
 		Joi.array().items(querySchema)
 	);
 	if (validatedQueries.error) {
