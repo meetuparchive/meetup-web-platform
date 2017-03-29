@@ -77,12 +77,6 @@ describe('fetchQueries', () => {
 				expect(response.responses).toEqual(jasmine.any(Array));
 			});
 	});
-	it('returns an object with csrf prop read from response headers', () => {
-		spyOn(global, 'fetch').and.callFake(fakeSuccess);
-
-		return fetchUtils.fetchQueries(API_URL.toString(), getRequest)(queries)
-			.then(response => expect(response.csrf).toEqual(csrfJwt));
-	});
 	it('returns a promise that will reject when response contains error prop', () => {
 		spyOn(global, 'fetch').and.callFake(fakeSuccessError);
 
