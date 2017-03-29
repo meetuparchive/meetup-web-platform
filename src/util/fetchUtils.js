@@ -1,5 +1,7 @@
 import BrowserCookies from 'js-cookie';
 import cookie from 'cookie';
+import rison from 'rison';
+
 /**
  * A module for middleware that would like to make external calls through `fetch`
  * @module fetchUtils
@@ -7,6 +9,19 @@ import cookie from 'cookie';
 
 export const CSRF_HEADER = 'x-csrf-jwt';
 export const CSRF_HEADER_COOKIE = 'x-csrf-jwt-header';
+
+export const mergeClickCookie = (cookieHeader, clickTracking={ clicks: [] }) => {
+	if (clickTracking.clicks.length) {
+		const clickCookie = {
+			clickTracking: JSON.stringify(clickTracking)
+		};
+		return mergeCookies(
+			cookieHeader || '',
+			clickCookie
+		);
+	}
+	return cookieHeader;
+};
 
 export const parseQueryResponse = queries => ({ responses, error, message }) => {
 	if (error) {
@@ -51,12 +66,24 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 	const isDelete = method.toLowerCase() === 'delete';
 
 	const fetchUrl = new URL(apiUrl);
-	fetchUrl.searchParams.append('queries', JSON.stringify(queries));
+	fetchUrl.searchParams.append('queries', rison.encode_array(queries));
 	if (meta) {
-		fetchUrl.searchParams.append('metadata', JSON.stringify(meta));
-		if (meta.logout) {
+		const {
+			clickTracking,
+			logout,
+			...metadata
+		} = meta;
+		// inject click tracking cookie
+		headers.cookie = mergeClickCookie(headers.cookie, clickTracking);
+
+		// special logout param
+		if (logout) {
 			fetchUrl.searchParams.append('logout', true);
 		}
+
+		// send other metadata in querystring
+		fetchUrl.searchParams.append('metadata', rison.encode_object(metadata));
+
 	}
 	const fetchConfig = {
 		method,
