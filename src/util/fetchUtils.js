@@ -1,5 +1,6 @@
 import BrowserCookies from 'js-cookie';
 import cookie from 'cookie';
+import rison from 'rison';
 
 /**
  * A module for middleware that would like to make external calls through `fetch`
@@ -65,7 +66,7 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 	const isDelete = method.toLowerCase() === 'delete';
 
 	const fetchUrl = new URL(apiUrl);
-	fetchUrl.searchParams.append('queries', JSON.stringify(queries));
+	fetchUrl.searchParams.append('queries', rison.encode_object(queries));
 	if (meta) {
 		const {
 			clickTracking,
@@ -81,7 +82,7 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 		}
 
 		// send other metadata in querystring
-		fetchUrl.searchParams.append('metadata', JSON.stringify(metadata));
+		fetchUrl.searchParams.append('metadata', rison.encode_object(metadata));
 
 	}
 	const fetchConfig = {
