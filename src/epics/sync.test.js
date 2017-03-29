@@ -23,12 +23,6 @@ import {
 	CLICK_TRACK_CLEAR_ACTION,
 } from '../actions/clickActionCreators';
 
-jest.mock('react-router', () => ({
-	browserHistory: {
-		replace: jest.fn(() => {}),
-	},
-}));
-
 /**
  * @module SyncEpicTest
  */
