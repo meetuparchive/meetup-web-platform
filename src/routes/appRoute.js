@@ -2,13 +2,21 @@ import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import { getAppRouteHandler } from './appRouteHandler';
 
-/**
- * This function provides global error handling when there is a 500 error
- */
 export const onPreResponse = {
+	/**
+	 * This function processes the route response before it is sent to the client.
+	 *
+	 * - In dev, it transforms the generic 500 error response JSON into a full dev-
+	 *   friendly rendering of the stack trace.
+	 *
+	 * @param {Object} request the Hapi request, _after_ a response has been
+	 *   generated
+	 * @param {Function} reply the Hapi reply interface
+	 * @return {Object} a Hapi response
+	 */
 	method: (request, reply) => {
 		const response = request.response;
-		if (!response.isBoom) {
+		if (!response.isBoom || process.env.NODE_ENV === 'production') {
 			return reply.continue();
 		}
 		const error = response;
@@ -23,8 +31,18 @@ export const onPreResponse = {
 };
 
 /**
- * Only one wildcard route for all application GET requests - exceptions are
- * described in the routes above
+ * Wildcard route for all application GET requests
+ *
+ * Route config:
+ *
+ * - `onPreResponse`: process the response before it is sent to client
+ * - `state`: skip cookie validation because cookies can be set by other services
+ *   on the same domain and may not conform to the validation rules that are
+ *   used by Hapi
+ *
+ * @param {Object} renderRequestMap a map of 'localeCode' strings to request-
+ *   rendering functions that return an HTML string
+ * @return {Object} a Hapi route configuration object
  */
 const getApplicationRoute = renderRequestMap => ({
 	method: 'GET',
@@ -33,6 +51,14 @@ const getApplicationRoute = renderRequestMap => ({
 		ext: {
 			onPreResponse,
 		},
+		plugins: {
+			'electrode-csrf-jwt': {
+				enabled: true,  // need to generate tokens on page request
+			}
+		},
+		state: {
+			failAction: 'ignore',  // ignore cookie validation, just accept
+		}
 	},
 	handler: getAppRouteHandler(renderRequestMap),
 });

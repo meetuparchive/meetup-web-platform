@@ -17,8 +17,9 @@ const makeMockFetchResponse = responseObj => Promise.resolve({
 
 
 const random32 = 'asdfasdfasdfasdfasdfasdfasdfasdf';
-const options = {
+const config = {
 	API_HOST: 'www.api.meetup.com',
+	API_TIMEOUT: 10,
 	CSRF_SECRET: random32,
 	COOKIE_ENCRYPT_SECRET: random32,
 	OAUTH_AUTH_URL: 'https://secure.dev.meetup.com/oauth2/authorize',
@@ -26,7 +27,8 @@ const options = {
 	oauth: {
 		key: random32,
 		secret: random32,
-	}
+	},
+	duotoneUrls: ['http://example.com/duotone.jpg']
 };
 const getEncryptedToken = token => new Promise((resolve, reject) =>
 	Iron.seal(token, random32, Iron.defaults, (err, sealed) => resolve(sealed))
@@ -37,12 +39,12 @@ const expectedResponse = 'barfoo';
 
 const testAuth = (cookies, test, makeRequest=cookieRequest) => {
 	spyOn(global, 'fetch').and.callFake((url, opts) => {
-		if (url.includes(options.OAUTH_AUTH_URL)) {
+		if (url.includes(config.OAUTH_AUTH_URL)) {
 			return makeMockFetchResponse({
 				code: 'foo',
 			});
 		}
-		if (url.includes(options.OAUTH_ACCESS_URL)) {
+		if (url.includes(config.OAUTH_ACCESS_URL)) {
 			return makeMockFetchResponse({
 				oauth_token: expectedOauthToken,
 				refresh_token: 'whatever',
@@ -56,11 +58,15 @@ const testAuth = (cookies, test, makeRequest=cookieRequest) => {
 		handler: (request, reply) => reply(expectedResponse)
 	};
 	const server = new Hapi.Server();
-	return server
-		.connection()
-		.register(requestAuthPlugin)
-		.then(() => server.route(fooRoute))
-		.then(() => server.auth.strategy('default', 'oauth', true, options))
+	server.app = config;
+	const testConnection = server.connection();
+	return testConnection
+		.register({
+			register: requestAuthPlugin,
+			options: config
+		})
+		.then(() => testConnection.route(fooRoute))
+		.then(() => server.auth.strategy('default', 'oauth', 'required'))
 		.then(() => server.inject(makeRequest(cookies)))
 		.then(test)
 		.then(() => server.stop());
@@ -117,7 +123,7 @@ describe('logged-out member state', () => {
 		const test = response => {
 			expect(response.payload).toEqual(expectedResponse);
 			expect(response.headers['set-cookie'][0].startsWith('oauth_token')).toBe(true);
-			expect(response.request.state.__internal_oauth_token).toBe(expectedOauthToken);
+			expect(response.request.plugins.requestAuth.oauth_token).toBe(expectedOauthToken);
 		};
 		return getEncryptedToken(cookies.refresh_token)
 			.then(refresh_token => testAuth({ refresh_token }, test));

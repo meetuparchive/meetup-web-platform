@@ -1,4 +1,8 @@
 import Joi from 'joi';
+import {
+	duotones,
+	getDuotoneUrls
+} from './duotone';
 /**
  * Start the server with a config
  *
@@ -20,6 +24,7 @@ export default function getConfig(overrideConfig) {
 	const config = {
 		API_PROTOCOL: process.env.API_PROTOCOL || 'https',
 		API_HOST: process.env.API_HOST || 'api.dev.meetup.com',
+		API_TIMEOUT: process.env.API_TIMEOUT || 8000,
 		COOKIE_ENCRYPT_SECRET: process.env.COOKIE_ENCRYPT_SECRET,
 		CSRF_SECRET: process.env.CSRF_SECRET,
 		DEV_SERVER_PORT: process.env.DEV_SERVER_PORT || 8000,
@@ -35,6 +40,7 @@ export default function getConfig(overrideConfig) {
 			key: process.env.MUPWEB_OAUTH_KEY,
 		},
 	};
+	config.duotoneUrls = getDuotoneUrls(duotones, config.PHOTO_SCALER_SALT);
 	config.API_SERVER_ROOT_URL = `${config.API_PROTOCOL}://${config.API_HOST}`;
 
 	// currently all config is available syncronously, so resolve immediately
@@ -48,6 +54,7 @@ function validateConfig(config) {
 		API_PROTOCOL: Joi.any().only(['https', 'http']).required(),
 		API_HOST: Joi.string().hostname().required(),
 		API_SERVER_ROOT_URL: Joi.string().uri(),
+		API_TIMEOUT: Joi.number(),
 		COOKIE_ENCRYPT_SECRET: Joi.string().min(32).required().error(
 			new Error('set COOKIE_ENCRYPT_SECRET env variable to a random 32+ character string')
 		),
@@ -64,6 +71,7 @@ function validateConfig(config) {
 			secret: Joi.string().min(1).required().error(oauthError),
 			key: Joi.string().min(1).required().error(oauthError),
 		}).required(),
+		duotoneUrls: Joi.object(),
 	}).required();
 
 	const result = Joi.validate(config, configSchema);

@@ -5,13 +5,17 @@ import { Observable } from 'rxjs';
 import { ActionsObservable } from 'redux-observable';
 
 import {
-	createFakeStore
-} from 'meetup-web-mocks/lib/testUtils';
-
-import {
 	MOCK_MEANINGLESS_ACTION,
 	MOCK_APP_STATE
 } from 'meetup-web-mocks/lib/app';
+
+export const createFakeStore = fakeData => ({
+	getState() {
+		return fakeData;
+	},
+	dispatch() {},
+	subscribe() {},
+});
 
 export const middlewareDispatcher = middleware => (storeData, action) => {
 	let dispatched = null;
@@ -56,4 +60,22 @@ export const epicIgnoreAction = (epic, action=MOCK_MEANINGLESS_ACTION, store=cre
 		.do(spyable.notCalled, null, expect(spyable.notCalled).not.toHaveBeenCalled())
 		.toPromise();
 };
+
+const IDENTITY_REDUCER = state => state;
+export function testCreateStore(createStoreFn) {
+	it('creates a store with store functions', () => {
+		const basicStore = createStoreFn(IDENTITY_REDUCER);
+		expect(basicStore.getState).toEqual(jasmine.any(Function));
+		expect(basicStore.dispatch).toEqual(jasmine.any(Function));
+	});
+	it('creates a store with supplied initialState', (done) => {
+		const initialState = { foo: 'bar' };
+		const basicStore = createStoreFn(IDENTITY_REDUCER, initialState);
+		basicStore.subscribe(() => {
+			expect(basicStore.getState()).toEqual(initialState);
+			done();
+		});
+		basicStore.dispatch({ type: 'dummy' });
+	});
+}
 

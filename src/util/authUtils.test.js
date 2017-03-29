@@ -10,13 +10,18 @@ import {
 describe('configureAuthCookies', () => {
 	const serverWithState = {
 		state: () => {},
+		app: {},
 	};
 	it('calls server.state for each auth cookie name', () => {
-		const goodOptions = {
+		const config = {
 			COOKIE_ENCRYPT_SECRET: 'asdklfjahsdflkjasdfhlkajsdfkljasdlkasdjhfalksdjfbalkjsdhfalsdfasdlkfasd',
 		};
+		const plugins = { requestAuth: { config } };
 		spyOn(serverWithState, 'state');
-		configureAuthCookies(serverWithState, goodOptions);
+		configureAuthCookies({
+			...serverWithState,
+			plugins,
+		});
 		const callArgs = serverWithState.state.calls.allArgs();
 		expect(callArgs.length).toBeGreaterThan(0);
 		callArgs.forEach(args => {
@@ -25,25 +30,36 @@ describe('configureAuthCookies', () => {
 		});
 	});
 	it('throws an error when secret is missing', () => {
-		const missingSecretOpts = {};
-		expect(() => configureAuthCookies(serverWithState, missingSecretOpts)).toThrow();
+		const config = {};
+		const plugins = { requestAuth: { config } };
+		expect(() => configureAuthCookies({
+			...serverWithState,
+			plugins,
+		})).toThrow();
 	});
 	it('throws an error when secret is too short', () => {
-		const shortSecretOpts = {
+		const config = {
 			COOKIE_ENCRYPT_SECRET: 'less than 32 characters',
 		};
-		expect(() => configureAuthCookies(serverWithState, shortSecretOpts)).toThrow();
+		const plugins = { requestAuth: { config } };
+		expect(() => configureAuthCookies({
+			...serverWithState,
+			plugins,
+		})).toThrow();
 	});
 });
 
 describe('applyAuthState', () => {
-	it('calls reply.state and sets request.state for each auth cookie name', () => {
+	it('calls reply.state and sets request.plugins.requestAuth for each auth cookie name', () => {
 		const reply = {
 			state() {},
 		};
 		const request = {
 			log() {},
 			state: {},
+			plugins: {
+				requestAuth: {},
+			},
 		};
 		spyOn(reply, 'state');
 		const testApply = applyAuthState(request, reply);
@@ -56,10 +72,7 @@ describe('applyAuthState', () => {
 			expect(args[0] in auth).toBe(true);
 			expect(args[1]).toEqual(auth[args[0]]);
 		});
-		expect(request.state).toEqual({
-			__internal_oauth_token: auth.oauth_token,
-			__internal_refresh_token: auth.refresh_token,
-		});
+		expect(request.plugins.requestAuth).toEqual(auth);
 	});
 });
 

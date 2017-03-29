@@ -1,8 +1,4 @@
 import Joi from 'joi';
-import {
-	duotones,
-	getDuotoneUrls
-} from '../util/duotone';
 import { getApiProxyRouteHandler } from './apiProxyHandler';
 
 const validApiPayloadSchema = Joi.object({
@@ -11,13 +7,7 @@ const validApiPayloadSchema = Joi.object({
 	logout: Joi.any(),
 });
 
-const getApiProxyRoutes = (path, env, apiProxyFn$) => {
-	const proxyApiRequest$ = apiProxyFn$({
-		API_TIMEOUT: env.API_TIMEOUT,
-		baseUrl: env.API_SERVER_ROOT_URL,
-		duotoneUrls: getDuotoneUrls(duotones, env.PHOTO_SCALER_SALT),
-	});
-
+const getApiProxyRoutes = (path, apiProxyFn$) => {
 	/**
 	 * This handler converts the application-supplied queries into external API
 	 * calls, and converts the API call responses into a standard format that
@@ -28,26 +18,15 @@ const getApiProxyRoutes = (path, env, apiProxyFn$) => {
 	 */
 	const routeBase = {
 		path,
-		handler: getApiProxyRouteHandler(proxyApiRequest$),
+		handler: getApiProxyRouteHandler(apiProxyFn$),
 		config: {
 			plugins: {
 				'electrode-csrf-jwt': {
 					enabled: true,
 				}
 			},
-			ext: {
-				onPreResponse: {
-					method: (request, reply) => {
-						const response = request.response;
-						if (response.isBoom) {
-							request.log(
-								['error'],
-								`${request.url.href} responded with:\n ${response.stack}`
-							);
-						}
-						reply.continue();
-					},
-				},
+			state: {
+				failAction: 'ignore',  // ignore cookie validation, just accept
 			},
 		},
 	};

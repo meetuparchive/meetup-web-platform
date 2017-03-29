@@ -13,7 +13,6 @@
  */
 export function makeCache() {
 	if (typeof window === 'undefined' || !window.indexedDB) {
-		console.log('no IndexedDB caching available - fallback to plain object');
 		const _data = {};
 		return {
 			get(key) {

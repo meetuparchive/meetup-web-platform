@@ -12,13 +12,14 @@ import {
 import {
 	coerceBool,
 	toCamelCase,
-	cleanRawCookies
 } from './stringUtils';
 
 import {
 	querySchema
 } from './validation';
-import { duotoneRef } from './duotone';
+import {
+	duotoneRef,
+} from './duotone';
 
 const MOCK_RESPONSE_OK = {  // minimal representation of http.IncomingMessage
 	statusCode: 200,
@@ -26,10 +27,17 @@ const MOCK_RESPONSE_OK = {  // minimal representation of http.IncomingMessage
 	headers: {
 		'x-meetup-request-id': 'mock request'
 	},
-	request: {
-		uri: {},
-	},
 };
+
+function makeMockResponseOk(requestOpts) {
+	return {
+		...MOCK_RESPONSE_OK,
+		request: {
+			uri: url.parse(requestOpts.url),
+			method: requestOpts.method || 'get',
+		},
+	};
+}
 
 /**
  * In order to receive cookies from `externalRequest` requests, this function
@@ -79,9 +87,19 @@ export const parseMetaHeaders = headers => {
 		return meta;
 	}, {});
 
+	const linkHeader = headers.link && headers.link.split(',')
+		.reduce((links, link) => {
+			const [urlString, relString] = link.split(';');
+			const url = urlString.replace(/<|>/g, '').trim();
+			var rel = relString.replace(/rel="([^"]+)"/, '$1').trim();
+			links[rel] = url;
+			return links;
+		}, {});
+
 	return {
 		...meetupHeaders,
 		...xHeaders,
+		link: linkHeader || undefined,
 	};
 };
 
@@ -192,11 +210,6 @@ export const buildRequestArgs = externalRequestOpts =>
 		}
 
 		// production logs will automatically be JSON-parsed in Stackdriver
-		console.log(JSON.stringify({
-			type: 'External request headers',
-			payload: externalRequestOptsQuery.headers
-		}));
-
 		return externalRequestOptsQuery;
 	};
 
@@ -213,15 +226,15 @@ export const apiResponseToQueryResponse = query => ({ value, meta }) => ({
 	}
 });
 
-export function getAuthHeaders({ state }) {
-	// internal server requests may set non-encoded token cookie __internal_oauth_token
-	const oauth_token = state.oauth_token || state.__internal_oauth_token;
-	if (!state.MEETUP_MEMBER && oauth_token) {
+export function getAuthHeaders(request) {
+	const oauth_token = request.state.oauth_token ||  // browser-based requests
+		request.plugins.requestAuth.oauth_token;  // internal server requests
+	if (!request.state.MEETUP_MEMBER && oauth_token) {
 		return {
 			authorization: `Bearer ${oauth_token}`,
 		};
 	}
-	const cookies = { ...state };
+	const cookies = { ...request.state };
 	const csrf = uuid.v4();
 	cookies.MEETUP_CSRF = csrf;
 	cookies.MEETUP_CSRF_DEV = csrf;
@@ -260,6 +273,11 @@ export function parseRequestQueries(request) {
 		query,
 	} = request;
 	const queriesJSON = method === 'post' ? payload.queries : query.queries;
+
+	if (!queriesJSON) {
+		return null;
+	}
+
 	const validatedQueries = Joi.validate(
 		JSON.parse(queriesJSON),
 		Joi.array().items(querySchema)
@@ -274,7 +292,8 @@ export function parseRequestQueries(request) {
  * Parse request for queries and request options
  * @return {Object} { queries, externalRequestOpts }
  */
-export function parseRequest(request, baseUrl) {
+export function parseRequest(request) {
+	const baseUrl = request.server.app.API_SERVER_ROOT_URL;
 	return {
 		externalRequestOpts: {
 			baseUrl,
@@ -299,7 +318,7 @@ export function parseRequest(request, baseUrl) {
  * @return {Object} the mutated group object
  */
 export const groupDuotoneSetter = duotoneUrls => group => {
-	const photo = group.key_photo || group.group_photo || {};
+	const photo = group.key_photo || {};
 	const duotoneKey = group.photo_gradient && duotoneRef(
 			group.photo_gradient.light_color,
 			group.photo_gradient.dark_color
@@ -352,49 +371,70 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
  * Fake an API request and directly return the stringified mockResponse
  */
 export const makeMockRequest = mockResponse => requestOpts =>
-	Rx.Observable.of([MOCK_RESPONSE_OK, JSON.stringify(mockResponse)])
+	Rx.Observable.of([makeMockResponseOk(requestOpts), JSON.stringify(mockResponse)])
 		.do(() => console.log(`MOCKING response to ${requestOpts.url}`));
 
 const externalRequest$ = Rx.Observable.bindNodeCallback(externalRequest);
 /**
  * Make a real external API request, return response body string
  */
-export const makeExternalApiRequest = (request, API_TIMEOUT) => requestOpts => {
+export const makeExternalApiRequest = request => requestOpts => {
 	return externalRequest$(requestOpts)
-		.timeout(API_TIMEOUT)
+		.do(  // log errors
+			null,
+			err => {
+				console.error(JSON.stringify({
+					err: err.stack,
+					message: 'REST API request error',
+					request: {
+						id: request.id
+					},
+					context: requestOpts,
+				}));
+			}
+		)
+		.timeout(request.server.app.API_TIMEOUT)
 		.map(([response, body]) => [response, body, requestOpts.jar]);
 };
 
-export const logApiResponse = ([response, body]) => {
+export const logApiResponse = request => ([response, body]) => {
 	const {
-		uri: {
-			query,
-			pathname,
+		elapsedTime,
+		request :{
+			id,
+			uri: {
+				query,
+				pathname,
+				href,
+			},
+			method,
 		},
-		method,
-	} = response.request;
+		statusCode
+	} = response;
 
-	const responseLog = {
-		request: {
+	// production logs will automatically be JSON-parsed in Stackdriver
+	const log = statusCode >= 400 && console.error ||
+		statusCode >= 300 && console.warn ||
+		console.log;
+
+	log(JSON.stringify({
+		message: `Incoming response ${method.toUpperCase()} ${pathname} ${response.statusCode}`,
+		type: 'response',
+		direction: 'in',
+		info: {
+			url: href,
 			query: (query || '').split('&').reduce((acc, keyval) => {
 				const [key, val] = keyval.split('=');
 				acc[key] = val;
 				return acc;
 			}, {}),
-			pathname,
 			method,
-		},
-		response: {
-			elapsedTime: response.elapsedTime,
-			status: response.statusCode,
+			id,
+			originRequestId: request.id,
+			statusCode: statusCode,
+			time: elapsedTime,
 			body: body.length > 256 ? `${body.substr(0, 256)}...`: body,
-		},
-	};
-
-	// production logs will automatically be JSON-parsed in Stackdriver
-	console.log(JSON.stringify({
-		type: 'REST API response JSON',
-		payload: responseLog
+		}
 	}));
 };
 
@@ -433,11 +473,12 @@ export const injectResponseCookies = request => ([response, _, jar]) => {
 			isHttpOnly: cookie.httpOnly,
 			isSameSite: false,
 			isSecure: process.env.NODE_ENV === 'production',
+			strictHeader: false,  // Can't enforce RFC 6265 cookie validation on external services
 		};
 
 		request.plugins.requestAuth.reply.state(
 			cookie.key,
-			cleanRawCookies(cookie.value),
+			cookie.value,
 			cookieOptions
 		);
 	});
@@ -447,17 +488,33 @@ export const injectResponseCookies = request => ([response, _, jar]) => {
  * Make an API request and parse the response into the expected `response`
  * object shape
  */
-export const makeApiRequest$ = (request, API_TIMEOUT, duotoneUrls) => {
-	const setApiResponseDuotones = apiResponseDuotoneSetter(duotoneUrls);
+export const makeApiRequest$ = request => {
+	const setApiResponseDuotones = apiResponseDuotoneSetter(request.server.app.duotoneUrls);
 	return ([requestOpts, query]) => {
 		const request$ = query.mockResponse ?
 			makeMockRequest(query.mockResponse) :
-			makeExternalApiRequest(request, API_TIMEOUT);
+			makeExternalApiRequest(request);
 
 		return Rx.Observable.defer(() => {
-			request.log(['api', 'info'], `REST API request: ${requestOpts.url}`);
+			const {
+				method,
+				headers,
+			} = requestOpts;
+
+			const parsedUrl = url.parse(requestOpts.url);
+			console.log(JSON.stringify({
+				message: `Outgoing request ${requestOpts.method.toUpperCase()} ${parsedUrl.pathname}`,
+				type: 'request',
+				direction: 'out',
+				info: {
+					headers,
+					url: parsedUrl,
+					method,
+				},
+			}));
+
 			return request$(requestOpts)
-				.do(logApiResponse)             // this will leak private info in API response
+				.do(logApiResponse(request))             // this will leak private info in API response
 				.do(injectResponseCookies(request))
 				.map(parseApiResponse(requestOpts.url))  // parse into plain object
 				.catch(errorResponse$(requestOpts.url))

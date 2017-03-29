@@ -20,6 +20,84 @@ export function checkForDevUrl(value) {
 	return false;
 }
 
+export function onRequestExtension(request, reply) {
+	console.log(JSON.stringify({
+		message: `Incoming request ${request.method.toUpperCase()} ${request.url.href}`,
+		type: 'request',
+		direction: 'in',
+		info: {
+			url: request.url,
+			method: request.method,
+			headers: request.headers,
+			id: request.id,
+			referrer: request.info.referrer,
+			remoteAddress: request.info.remoteAddress,
+		}
+	}));
+	return reply.continue();
+}
+
+export function logResponse(request) {
+	const {
+		headers,
+		id,
+		info,
+		method,
+		response,
+		url,
+	} = request;
+
+	if (response.isBoom) {
+		// response is an Error object
+		console.error(JSON.stringify({
+			message: `Internal error ${response.message} ${url.pathname}`,
+			info: {
+				error: response.stack,
+				headers,
+				id,
+				method,
+				url,
+			},
+		}));
+		return;
+	}
+
+	const log = response.statusCode >= 400 && console.error ||
+		response.statusCode >= 300 && console.warn ||
+		console.log;
+
+	log(JSON.stringify({
+		message: `Outgoing response ${method.toUpperCase()} ${url.pathname} ${response.statusCode}`,
+		type: 'response',
+		direction: 'out',
+		info: {
+			headers: response.headers,
+			id,
+			method,
+			referrer: info.referrer,
+			remoteAddress: info.remoteAddress,
+			time: info.responded - info.received,
+			url,
+		}
+	}));
+
+	return;
+}
+
+/**
+ * Use server.ext to add functions to request/server extension points
+ * @param {Object} server Hapi server
+ * @return {Object} Hapi server
+ */
+export function registerExtensionEvents(server) {
+	server.ext([{
+		type: 'onRequest',
+		method: onRequestExtension,
+	}]);
+	server.on('response', logResponse);
+	return server;
+}
+
 /**
  * Make any environment changes that need to be made in response to the provided
  * config
@@ -44,14 +122,17 @@ export function server(routes, connection, plugins, platform_agent, config) {
 	// https://hapijs.com/api#serverapp
 	server.app = {
 		isDevConfig: checkForDevUrl(config),  // indicates dev API or prod API
+		...config
 	};
 	server.decorate('reply', 'track', track(platform_agent));
 
-	return server.connection(connection)
+	const appConnection = server.connection(connection);
+	return appConnection
 		.register(plugins)
-		.then(() => server.auth.strategy('default', 'oauth', true, config))
+		.then(() => registerExtensionEvents(server))
+		.then(() => server.auth.strategy('default', 'oauth', true))
 		.then(() => server.log(['start'], `${plugins.length} plugins registered, assigning routes...`))
-		.then(() => server.route(routes))
+		.then(() => appConnection.route(routes))
 		.then(() => server.log(['start'], `${routes.length} routes assigned, starting server...`))
 		.then(() => server.start())
 		.then(() => server.log(['start'], `Dev server is listening at ${server.info.uri}`))

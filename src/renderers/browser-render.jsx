@@ -6,7 +6,7 @@ import { useBasename } from 'history';
 import match from 'react-router/lib/match';
 import { Provider } from 'react-redux';
 import { syncHistoryWithStore } from 'react-router-redux';
-import { getBrowserCreateStore } from '../util/createStore';
+import { getBrowserCreateStore } from '../util/createStoreBrowser';
 
 /**
  * This function creates a 'renderer', which is just a function that, when

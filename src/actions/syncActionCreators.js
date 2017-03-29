@@ -6,18 +6,14 @@ export function apiRequest(queries, meta) {
 	};
 }
 
-export function apiSuccess({ queries, responses, csrf }) {
+export function apiSuccess({ queries, responses }) {
 	return {
 		type: 'API_SUCCESS',
 		payload: { queries, responses },
-		meta: {
-			csrf,
-		},
 	};
 }
 
 export function apiError(err) {
-	console.error('API_ERROR: ', err.stack);
 	return {
 		type: 'API_ERROR',
 		payload: err,

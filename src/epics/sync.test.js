@@ -6,10 +6,6 @@ import fetch from 'node-fetch';
 global.fetch = fetch;
 
 import {
-	createFakeStore,
-} from 'meetup-web-mocks/lib/testUtils';
-
-import {
 	mockQuery,
 	MOCK_APP_STATE,
 	MOCK_RENDERPROPS,
@@ -17,6 +13,7 @@ import {
 } from 'meetup-web-mocks/lib/app';
 
 import {
+	createFakeStore,
 	epicIgnoreAction,
 } from '../util/testUtils';
 

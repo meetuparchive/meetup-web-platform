@@ -1,3 +1,4 @@
+import cookie from 'cookie';
 import {
 	mockQuery,
 } from 'meetup-web-mocks/lib/app';
@@ -5,6 +6,11 @@ import {
 	MOCK_GROUP,
 } from 'meetup-web-mocks/lib/api';
 import * as fetchUtils from './fetchUtils';
+
+jest.mock('js-cookie', () => ({
+	get: jest.fn(name => `${name} value`),
+	set: jest.fn((name, value) => `${name} set to ${value}`),
+}));
 
 describe('mergeClickCookie', () => {
 	it('merges stringified clicktracking data into "clickTracking" cookie header string', () => {
@@ -36,10 +42,10 @@ describe('mergeClickCookie', () => {
 
 describe('fetchQueries', () => {
 	const API_URL = new URL('http://api.example.com/');
+	const csrfJwt = `${fetchUtils.CSRF_HEADER_COOKIE} value`;
 	const queries = [mockQuery({})];
 	const meta = { foo: 'bar', clickTracking: { clicks: [] } };
 	const responses = [MOCK_GROUP];
-	const csrfJwt = 'encodedstuff';
 	const getRequest = { method: 'GET', headers: {} };
 	const postRequest = { method: 'POST', csrf: csrfJwt, headers: {} };
 	const fakeSuccess = () =>
@@ -53,7 +59,7 @@ describe('fetchQueries', () => {
 		});
 	const fakeSuccessError = () =>
 		Promise.resolve({
-			json: () => Promise.resolve({ error: 'you lose' }),
+			json: () => Promise.resolve({ error: 'you lose', message: 'fakeSuccessError'}),
 			headers: {
 				get: key => ({
 					'x-csrf-jwt': csrfJwt,
@@ -97,7 +103,6 @@ describe('fetchQueries', () => {
 				.then(() => {
 					const calledWith = global.fetch.calls.mostRecent().args;
 					const url = new URL(calledWith[0]);
-					console.warn(calledWith[0]);
 					expect(url.origin).toBe(API_URL.origin);
 					expect(url.searchParams.has('queries')).toBe(true);
 					expect(url.searchParams.has('metadata')).toBe(true);
@@ -229,6 +234,27 @@ describe('mergeCookies', () => {
 	it('overwrites existing cookies with new cookies', () => {
 		expect(fetchUtils.mergeCookies('foo=meetup', { foo: 'foo', bar: 'bar' }))
 			.toEqual('foo=foo; bar=bar');
+	});
+});
+
+describe('cleanBadCookies', () => {
+	const goodHeader = 'foo=bar; baz=boom';
+	it('removes bad cookies from the cookie header', () => {
+		const badHeader = fetchUtils.BAD_COOKIES.reduce(
+			(badHeader, badCookie) => `${badHeader}; ${badCookie}=whatever`,
+			goodHeader
+		);
+
+		const cleanedHeader = fetchUtils.cleanBadCookies(badHeader);
+		fetchUtils.BAD_COOKIES.forEach(badCookie => {
+			// bad header _has_ bad cookie
+			expect(cookie.parse(badHeader)[badCookie]).toBeDefined();
+			// clean header does _not_ have bad cookie
+			expect(cookie.parse(cleanedHeader)[badCookie]).toBeUndefined();
+		});
+	});
+	it('leaves a clean cookie header intact', () => {
+		expect(fetchUtils.cleanBadCookies(goodHeader)).toEqual(goodHeader);
 	});
 });
 

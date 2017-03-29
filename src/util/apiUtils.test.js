@@ -50,13 +50,19 @@ describe('errorResponse$', () => {
 describe('getAuthHeaders', () => {
 	it('returns authorization header if no member cookie and oauth_token', () => {
 		const oauth_token = 'foo';
-		const authHeaders = getAuthHeaders({ state: { oauth_token } });
+		const authHeaders = getAuthHeaders({
+			state: { oauth_token },
+			plugins: { requestAuth: {} },
+		});
 		expect(authHeaders.authorization.startsWith('Bearer ')).toBe(true);
 		expect(authHeaders.authorization.endsWith(oauth_token)).toBe(true);
 	});
 	it('sets MEETUP_CSRF', () => {
 		const MEETUP_MEMBER = 'foo';
-		const authHeaders = getAuthHeaders({ state: { MEETUP_MEMBER } });
+		const authHeaders = getAuthHeaders({
+			state: { MEETUP_MEMBER },
+			plugins: { requestAuth: {} },
+		});
 		const cookies = authHeaders.cookie.split('; ').reduce((cookies, pair) => {
 			const [name, ...value] = pair.split('=');
 			return {
@@ -218,15 +224,30 @@ describe('parseLoginAuth', () => {
 describe('parseMetaHeaders', () => {
 	it('returns x-meetup-flags as flags object with real booleans camelcased', () => {
 		expect(parseMetaHeaders({ 'x-meetup-foo-bar': 'whatwhat' }))
-			.toEqual({ fooBar: 'whatwhat' });
+			.toMatchObject({ fooBar: 'whatwhat' });
 	});
 	it('returns x-meetup-flags as flags object with real booleans', () => {
 		expect(parseMetaHeaders({ 'x-meetup-flags': 'foo=true,bar=false' }))
-			.toEqual({ flags: { foo: true, bar: false } });
+			.toMatchObject({ flags: { foo: true, bar: false } });
 	});
 	it('parses specified x- headers', () => {
 		expect(parseMetaHeaders({ 'x-total-count': 'whatwhat' }))
-			.toEqual({ totalCount: 'whatwhat' });
+			.toMatchObject({ totalCount: 'whatwhat' });
+	});
+	it('parses Link header', () => {
+		const next = 'http://example.com/next';
+		const prev = 'http://example.com/prev';
+
+		// both 'next' and 'prev'
+		expect(parseMetaHeaders({ link: `<${next}>; rel="next", <${prev}>; rel="prev"` }))
+			.toMatchObject({ link: { next, prev } });
+		// just 'next'
+		expect(parseMetaHeaders({ link: `<${next}>; rel="next"` }))
+			.toMatchObject({ link: { next } });
+	});
+	it('returns empty object for empty headers', () => {
+		expect(parseMetaHeaders({}))
+			.toEqual({});
 	});
 });
 
@@ -397,43 +418,17 @@ describe('logApiResponse', () => {
 	};
 	it('emits parsed request and response data for GET request', () => {
 		spyOn(console, 'log');
-		logApiResponse([MOCK_INCOMINGMESSAGE_GET, 'foo']);
+		logApiResponse({})([MOCK_INCOMINGMESSAGE_GET, 'foo']);
 		expect(console.log).toHaveBeenCalled();
 		const loggedObject = JSON.parse(console.log.calls.mostRecent().args[0]);
-		expect(loggedObject).toEqual({
-			type: 'REST API response JSON',
-			payload: {
-				request: {
-					query: { foo: 'bar' },
-					pathname: MOCK_INCOMINGMESSAGE_GET.request.uri.pathname,
-					method: MOCK_INCOMINGMESSAGE_GET.request.method,
-				},
-				response: {
-					elapsedTime: MOCK_INCOMINGMESSAGE_GET.elapsedTime,
-					body: jasmine.any(String),
-				},
-			}
-		});
+		expect(loggedObject).toEqual(jasmine.any(Object));
 	});
 	it('emits parsed request and response data for POST request', () => {
 		spyOn(console, 'log');
-		logApiResponse([MOCK_INCOMINGMESSAGE_POST, 'foo']);
+		logApiResponse({})([MOCK_INCOMINGMESSAGE_POST, 'foo']);
 		expect(console.log).toHaveBeenCalled();
 		const loggedObject = JSON.parse(console.log.calls.mostRecent().args[0]);
-		expect(loggedObject).toEqual({
-			type: 'REST API response JSON',
-			payload: {
-				request: {
-					query: {},
-					pathname: MOCK_INCOMINGMESSAGE_POST.request.uri.pathname,
-					method: MOCK_INCOMINGMESSAGE_POST.request.method,
-				},
-				response: {
-					elapsedTime: MOCK_INCOMINGMESSAGE_POST.elapsedTime,
-					body: jasmine.any(String),
-				},
-			},
-		});
+		expect(loggedObject).toEqual(jasmine.any(Object));
 	});
 	it('handles multiple querystring vals for GET request', () => {
 		spyOn(console, 'log');
@@ -447,10 +442,10 @@ describe('logApiResponse', () => {
 				},
 			},
 		};
-		logApiResponse([response, 'foo']);
+		logApiResponse({})([response, 'foo']);
 		expect(console.log).toHaveBeenCalled();
 		const loggedObject = JSON.parse(console.log.calls.mostRecent().args[0]);
-		expect(loggedObject.payload.request.query).toEqual({
+		expect(loggedObject.info.query).toEqual({
 			foo: 'bar',
 			baz: 'boodle',
 		});
@@ -458,19 +453,19 @@ describe('logApiResponse', () => {
 	it('returns the full body of the response if less than 256 characters', () => {
 		const body = 'foo';
 		spyOn(console, 'log');
-		logApiResponse([MOCK_INCOMINGMESSAGE_GET, body]);
+		logApiResponse({})([MOCK_INCOMINGMESSAGE_GET, body]);
 		expect(console.log).toHaveBeenCalled();
 		const loggedObject = JSON.parse(console.log.calls.mostRecent().args[0]);
-		expect(loggedObject.payload.response.body).toEqual(body);
+		expect(loggedObject.info.body).toEqual(body);
 	});
 	it('returns a truncated response body if more than 256 characters', () => {
 		const body300 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean egestas viverra sem vel congue. Cras vitae malesuada justo. Fusce ut finibus felis, at sagittis leo. Morbi nec velit dignissim, viverra tellus at, pretium nisi. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla turpis duis.';
 		spyOn(console, 'log');
-		logApiResponse([MOCK_INCOMINGMESSAGE_GET, body300]);
+		logApiResponse({})([MOCK_INCOMINGMESSAGE_GET, body300]);
 		expect(console.log).toHaveBeenCalled();
 		const loggedObject = JSON.parse(console.log.calls.mostRecent().args[0]);
-		expect(loggedObject.payload.response.body.startsWith(body300.substr(0, 256))).toBe(true);
-		expect(loggedObject.payload.response.body.startsWith(body300)).toBe(false);
+		expect(loggedObject.info.body.startsWith(body300.substr(0, 256))).toBe(true);
+		expect(loggedObject.info.body.startsWith(body300)).toBe(false);
 	});
 });
 
@@ -486,6 +481,11 @@ describe('parseRequest', () => {
 			state: {
 				oauth_token: 'foo',
 			},
+			server: {
+				app: {
+					API_SERVER_ROOT_URL: 'http://example.com',
+				},
+			},
 		};
 		expect(parseRequest(getRequest, 'http://dummy.api.meetup.com').queries).toEqual(queries);
 	});
@@ -497,6 +497,11 @@ describe('parseRequest', () => {
 			payload: data,
 			state: {
 				oauth_token: 'foo',
+			},
+			server: {
+				app: {
+					API_SERVER_ROOT_URL: 'http://example.com',
+				},
 			},
 		};
 		expect(parseRequest(postRequest, 'http://dummy.api.meetup.com').queries).toEqual(queries);
@@ -510,6 +515,11 @@ describe('parseRequest', () => {
 			query: data,
 			state: {
 				oauth_token: 'foo',
+			},
+			server: {
+				app: {
+					API_SERVER_ROOT_URL: 'http://example.com',
+				},
 			},
 		};
 		expect(() => parseRequest(getRequest, 'http://dummy.api.meetup.com')).toThrow();

@@ -15,6 +15,16 @@ import {
 import { activeRouteQueries$ } from '../util/routeUtils';
 
 /**
+ * Any operations that keep the browser application in sync with the
+ * server should be implemented here.
+ *
+ * - Navigation-generated API request handling
+ * - Arbitrary API request handling (syncActionCreators.apiSuccess)
+ *
+ * @module syncEpic
+ */
+
+/**
  * Navigation actions will provide the `location` as the payload, which this
  * epic will use to collect the current Reactive Queries associated with the
  * active routes.
@@ -63,16 +73,19 @@ export const getNavEpic = routes => {
  */
 export const locationSyncEpic = (action$, store) =>
 	action$.ofType('LOGIN_SUCCESS')
-		.do(() => {
+		.map(() => {
 			const location = {
 				...store.getState().routing.locationBeforeTransitions
 			};
 			delete location.query.logout;
+			return location;
+		})
+		.do(location => {
 			useBasename(() => browserHistory)({
 				basename: location.basename
-			}).replace(location);  // this will trigger a LOCATION_CHANGE
+			}).replace(location);  // this will not trigger a LOCATION_CHANGE
 		})
-		.ignoreElements();
+		.map(location => ({ type: LOCATION_CHANGE, payload: location }));
 
 /**
  * Listen for actions that provide queries to send to the api - mainly
