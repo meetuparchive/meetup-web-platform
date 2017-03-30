@@ -114,7 +114,10 @@ function getTrackClick(store) {
 			return;
 		}
 
-		const linkText = el.textContent.trim().replace(/\s{2,}/g, ' ');
+		const linkText = el.textContent
+			.trim()
+			.substring(0, 16)  // truncate if text is long
+			.replace(/\s{2,}/g, ' ');
 		const clickLineage = [];
 		const targetPosition = el.getBoundingClientRect();
 		const docMidlineOffset = document.body.clientWidth / 2;
