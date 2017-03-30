@@ -4,6 +4,7 @@ import uuid from 'uuid';
 
 import externalRequest from 'request';
 import Joi from 'joi';
+import rison from 'rison';
 import Rx from 'rxjs';
 
 import {
@@ -272,14 +273,14 @@ export function parseRequestQueries(request) {
 		payload,
 		query,
 	} = request;
-	const queriesJSON = method === 'post' ? payload.queries : query.queries;
+	const queriesRison = method === 'post' ? payload.queries : query.queries;
 
-	if (!queriesJSON) {
+	if (!queriesRison) {
 		return null;
 	}
 
 	const validatedQueries = Joi.validate(
-		JSON.parse(queriesJSON),
+		rison.decode_array(queriesRison),
 		Joi.array().items(querySchema)
 	);
 	if (validatedQueries.error) {

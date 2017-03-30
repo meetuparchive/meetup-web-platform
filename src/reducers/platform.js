@@ -45,23 +45,23 @@ export function app(state=DEFAULT_APP_STATE, action={}) {
 	}
 }
 
-export const DEFAULT_CLICK_TRACK = { clicks: [] };
+export const DEFAULT_CLICK_TRACK = { history: [] };
 /**
  * @param {Object} data extensible object to store click data {
- *   clicks: array
+ *   history: array
  * }
  * @param {Object} action the dispatched action
  * @return {Object} new state
  */
 export function clickTracking(state=DEFAULT_CLICK_TRACK, action) {
 	if (action.type === CLICK_TRACK_ACTION) {
-		const clicks = [
-			...state.clicks,
+		const history = [
+			...state.history,
 			action.payload,
 		];
 		return {
 			...state,
-			clicks,
+			history,
 		};
 	}
 	if (action.type === CLICK_TRACK_CLEAR_ACTION) {

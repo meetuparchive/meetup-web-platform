@@ -1,5 +1,14 @@
-import BrowserCookies from 'js-cookie';
+import Cookies from 'js-cookie';
 import cookie from 'cookie';
+import rison from 'rison';
+
+
+const BrowserCookies = Cookies.withConverter({
+	write: (value, name) =>
+		encodeURIComponent(value)
+			.replace(/[!'()*]/g, c => `%${c.charCodeAt(0).toString(16)}`)
+});
+
 /**
  * A module for middleware that would like to make external calls through `fetch`
  * @module fetchUtils
@@ -7,6 +16,28 @@ import cookie from 'cookie';
 
 export const CSRF_HEADER = 'x-csrf-jwt';
 export const CSRF_HEADER_COOKIE = 'x-csrf-jwt-header';
+
+/**
+ * Merge the click tracking data into the existing cookie header string. This
+ * data needs to be formatted exactly like its Meetup Classic counterpart -
+ * i.e. the data needs to be generated in an identical way so that either
+ * platform can consume the data from the other.
+ *
+ * @param {String} cookieHeader the existing cookie header string
+ * @param {Object} clickTracking the click tracking data object
+ */
+export const mergeClickCookie = (cookieHeader='', clickTracking={ clicks: [] }) => {
+	if (!clickTracking.clicks.length) {
+		return cookieHeader;
+	}
+
+	return mergeCookies(
+		cookieHeader || '',
+		{
+			clickTracking: JSON.stringify(clickTracking)
+		}
+	);
+};
 
 export const parseQueryResponse = queries => ({ responses, error, message }) => {
 	if (error) {
@@ -44,25 +75,40 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 	options.method = options.method || 'GET';
 	const {
 		method,
-		headers,
+		headers={},
 	} = options;
 
 	const isPost = method.toLowerCase() === 'post';
 	const isDelete = method.toLowerCase() === 'delete';
 
 	const fetchUrl = new URL(apiUrl);
-	fetchUrl.searchParams.append('queries', JSON.stringify(queries));
+	fetchUrl.searchParams.append('queries', rison.encode_array(queries));
+
 	if (meta) {
-		fetchUrl.searchParams.append('metadata', JSON.stringify(meta));
-		if (meta.logout) {
+		const {
+			clickTracking,
+			logout,
+			...metadata
+		} = meta;
+		BrowserCookies.set(
+			'click-track',
+			JSON.stringify(clickTracking),
+			{ domain: '.meetup.com' }
+		);
+
+		// special logout param
+		if (logout) {
 			fetchUrl.searchParams.append('logout', true);
 		}
+
+		// send other metadata in searchParams
+		fetchUrl.searchParams.append('metadata', rison.encode_object(metadata));
+
 	}
 	const fetchConfig = {
 		method,
 		headers: {
-			...(headers || {}),
-			cookie: cleanBadCookies((headers || {}).cookie),
+			...headers,
 			'content-type': isPost ? 'application/x-www-form-urlencoded' : 'text/plain',
 			[CSRF_HEADER]: (isPost || isDelete) ? BrowserCookies.get(CSRF_HEADER_COOKIE) : '',
 		},
@@ -134,26 +180,5 @@ export const mergeCookies = (rawCookieHeader, newCookies) => {
 		...newCookies,
 	};
 	return stringifyCookies(mergedCookies);
-};
-
-export const BAD_COOKIES = [
-	'click-track'
-];
-
-/**
- * Remove cookies that are known to have values that are invalid for `fetch`
- * calls
- *
- * @param {String} cookieHeader a cookie header
- * @return {String} a cleaned cookie header string
- */
-export const cleanBadCookies = (cookieHeader) => {
-	if (!cookieHeader) {
-		return '';
-	}
-	const cookies = cookie.parse(cookieHeader);
-	BAD_COOKIES.forEach(badCookie => delete cookies[badCookie]);
-
-	return stringifyCookies(cookies);
 };
 

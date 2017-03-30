@@ -7,6 +7,9 @@ import {
 	apiComplete,
 	LOCATION_CHANGE,
 } from '../actions/syncActionCreators';
+import {
+	clearClick,
+} from '../actions/clickActionCreators';
 import { activeRouteQueries } from '../util/routeUtils';
 
 
@@ -41,8 +44,9 @@ export const getNavEpic = routes => {
 			.flatMap(({ payload }) => {
 				// inject request metadata from context, including `store.getState()`
 				const requestMetadata = {
-					referrer: currentLocation.pathname,
+					referrer: currentLocation.pathname || '',
 					logout: logoutQueryMatch.test(payload.search),
+					clickTracking: store.getState().clickTracking,
 				};
 				// now that referrer has been recorded, set new currentLocation
 				currentLocation = payload;
@@ -54,6 +58,8 @@ export const getNavEpic = routes => {
 				if (requestMetadata.logout) {
 					actions.unshift({ type: 'CACHE_CLEAR' });
 				}
+
+				actions.push(clearClick());
 
 				return Observable.from(actions);
 			});

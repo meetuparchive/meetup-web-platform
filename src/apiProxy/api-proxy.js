@@ -33,6 +33,9 @@ import {
  * query-specific options.
  *
  * @param {Request} request Hapi request object
+ * @param {Array} queries (optional) queries to make requests for - used when
+ *   the queries are not part of the original request, e.g. for initial render
+ *   requests.
  * @return Array$ contains all API responses corresponding to the provided queries
  */
 const apiProxy$ = (request, queries) => {
