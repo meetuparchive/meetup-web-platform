@@ -1,6 +1,13 @@
-import BrowserCookies from 'js-cookie';
+import Cookies from 'js-cookie';
 import cookie from 'cookie';
 import rison from 'rison';
+
+
+const BrowserCookies = Cookies.withConverter({
+	write: (value, name) =>
+		encodeURIComponent(value)
+			.replace(/[!'()*]/g, c => `%${c.charCodeAt(0).toString(16)}`)
+});
 
 /**
  * A module for middleware that would like to make external calls through `fetch`
@@ -9,10 +16,6 @@ import rison from 'rison';
 
 export const CSRF_HEADER = 'x-csrf-jwt';
 export const CSRF_HEADER_COOKIE = 'x-csrf-jwt-header';
-
-const _fixedEncodeURIComponent = str =>
-	encodeURIComponent(str)
-		.replace(/[!'()*]/g, c => `%${c.charCodeAt(0).toString(16)}`);
 
 /**
  * Merge the click tracking data into the existing cookie header string. This
@@ -87,7 +90,11 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 			logout,
 			...metadata
 		} = meta;
-		BrowserCookies.set('click-tracking', _fixedEncodeURIComponent(clickTracking));
+		BrowserCookies.set(
+			'click-track',
+			JSON.stringify(clickTracking),
+			{ domain: '.meetup.com' }
+		);
 
 		// special logout param
 		if (logout) {
