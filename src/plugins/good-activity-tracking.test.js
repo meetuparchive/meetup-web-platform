@@ -1,5 +1,5 @@
 import avro from 'avsc';
-import GoodMeetupTracking from './good-meetup-tracking';
+import GoodMeetupTracking from './good-activity-tracking';
 import Stream from 'stream';
 
 import { logTrack } from '../util/tracking';

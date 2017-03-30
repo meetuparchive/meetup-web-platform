@@ -1,6 +1,6 @@
 import CsrfPlugin from 'electrode-csrf-jwt';
 import Good from 'good';
-import GoodMeetupTracking from './plugins/good-meetup-tracking';
+import GoodActivityTracking from './plugins/good-activity-tracking';
 import requestAuthPlugin from './plugins/requestAuthPlugin';
 
 /**
@@ -94,10 +94,10 @@ export function getConsoleLogPlugin() {
 						module: 'good-squeeze',
 						name: 'Squeeze',
 						args: [{
-							request: 'tracking'
+							request: 'activity'
 						}],
 					}, {
-						module: GoodMeetupTracking,
+						module: GoodActivityTracking,
 					},
 					'stdout'
 				],

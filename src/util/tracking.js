@@ -183,7 +183,7 @@ export const logTrack = platformAgent => (response, trackInfo) => {
 		...trackInfo,
 	};
 
-	response.request.log(['tracking'], JSON.stringify(record));
+	response.request.log(['activity'], JSON.stringify(record));
 	return record;
 };
 
