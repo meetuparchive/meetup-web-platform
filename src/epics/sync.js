@@ -44,7 +44,7 @@ export const getNavEpic = routes => {
 			.flatMap(({ payload }) => {
 				// inject request metadata from context, including `store.getState()`
 				const requestMetadata = {
-					referrer: currentLocation.pathname,
+					referrer: currentLocation.pathname || '',
 					logout: logoutQueryMatch.test(payload.search),
 					clickTracking: store.getState().clickTracking,
 				};

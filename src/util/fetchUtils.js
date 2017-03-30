@@ -10,17 +10,26 @@ import rison from 'rison';
 export const CSRF_HEADER = 'x-csrf-jwt';
 export const CSRF_HEADER_COOKIE = 'x-csrf-jwt-header';
 
-export const mergeClickCookie = (cookieHeader, clickTracking={ clicks: [] }) => {
-	if (clickTracking.clicks.length) {
-		const clickCookie = {
-			clickTracking: JSON.stringify(clickTracking)
-		};
-		return mergeCookies(
-			cookieHeader || '',
-			clickCookie
-		);
+/**
+ * Merge the click tracking data into the existing cookie header string. This
+ * data needs to be formatted exactly like its Meetup Classic counterpart -
+ * i.e. the data needs to be generated in an identical way so that either
+ * platform can consume the data from the other.
+ *
+ * @param {String} cookieHeader the existing cookie header string
+ * @param {Object} clickTracking the click tracking data object
+ */
+export const mergeClickCookie = (cookieHeader='', clickTracking={ clicks: [] }) => {
+	if (!clickTracking.clicks.length) {
+		return cookieHeader;
 	}
-	return cookieHeader;
+
+	return mergeCookies(
+		cookieHeader || '',
+		{
+			clickTracking: JSON.stringify(clickTracking)
+		}
+	);
 };
 
 export const parseQueryResponse = queries => ({ responses, error, message }) => {
@@ -59,7 +68,7 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 	options.method = options.method || 'GET';
 	const {
 		method,
-		headers,
+		headers={},
 	} = options;
 
 	const isPost = method.toLowerCase() === 'post';
@@ -88,7 +97,7 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 	const fetchConfig = {
 		method,
 		headers: {
-			...(headers || {}),
+			...headers,
 			cookie: cleanBadCookies((headers || {}).cookie),
 			'content-type': isPost ? 'application/x-www-form-urlencoded' : 'text/plain',
 			[CSRF_HEADER]: (isPost || isDelete) ? BrowserCookies.get(CSRF_HEADER_COOKIE) : '',
