@@ -10,6 +10,10 @@ import rison from 'rison';
 export const CSRF_HEADER = 'x-csrf-jwt';
 export const CSRF_HEADER_COOKIE = 'x-csrf-jwt-header';
 
+const _fixedEncodeURIComponent = str =>
+	encodeURIComponent(str)
+		.replace(/[!'()*]/g, c => `%${c.charCodeAt(0).toString(16)}`);
+
 /**
  * Merge the click tracking data into the existing cookie header string. This
  * data needs to be formatted exactly like its Meetup Classic counterpart -
@@ -76,21 +80,21 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 
 	const fetchUrl = new URL(apiUrl);
 	fetchUrl.searchParams.append('queries', rison.encode_array(queries));
+
 	if (meta) {
 		const {
 			clickTracking,
 			logout,
 			...metadata
 		} = meta;
-		// inject click tracking cookie
-		headers.cookie = mergeClickCookie(headers.cookie, clickTracking);
+		BrowserCookies.set('click-tracking', _fixedEncodeURIComponent(clickTracking));
 
 		// special logout param
 		if (logout) {
 			fetchUrl.searchParams.append('logout', true);
 		}
 
-		// send other metadata in querystring
+		// send other metadata in searchParams
 		fetchUrl.searchParams.append('metadata', rison.encode_object(metadata));
 
 	}
@@ -98,7 +102,6 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 		method,
 		headers: {
 			...headers,
-			cookie: cleanBadCookies((headers || {}).cookie),
 			'content-type': isPost ? 'application/x-www-form-urlencoded' : 'text/plain',
 			[CSRF_HEADER]: (isPost || isDelete) ? BrowserCookies.get(CSRF_HEADER_COOKIE) : '',
 		},
@@ -170,26 +173,5 @@ export const mergeCookies = (rawCookieHeader, newCookies) => {
 		...newCookies,
 	};
 	return stringifyCookies(mergedCookies);
-};
-
-export const BAD_COOKIES = [
-	'click-track'
-];
-
-/**
- * Remove cookies that are known to have values that are invalid for `fetch`
- * calls
- *
- * @param {String} cookieHeader a cookie header
- * @return {String} a cleaned cookie header string
- */
-export const cleanBadCookies = (cookieHeader) => {
-	if (!cookieHeader) {
-		return '';
-	}
-	const cookies = cookie.parse(cookieHeader);
-	BAD_COOKIES.forEach(badCookie => delete cookies[badCookie]);
-
-	return stringifyCookies(cookies);
 };
 

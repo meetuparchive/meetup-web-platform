@@ -1,4 +1,3 @@
-import cookie from 'cookie';
 import {
 	mockQuery,
 } from 'meetup-web-mocks/lib/app';
@@ -228,27 +227,6 @@ describe('mergeCookies', () => {
 	it('overwrites existing cookies with new cookies', () => {
 		expect(fetchUtils.mergeCookies('foo=meetup', { foo: 'foo', bar: 'bar' }))
 			.toEqual('foo=foo; bar=bar');
-	});
-});
-
-describe('cleanBadCookies', () => {
-	const goodHeader = 'foo=bar; baz=boom';
-	it('removes bad cookies from the cookie header', () => {
-		const badHeader = fetchUtils.BAD_COOKIES.reduce(
-			(badHeader, badCookie) => `${badHeader}; ${badCookie}=whatever`,
-			goodHeader
-		);
-
-		const cleanedHeader = fetchUtils.cleanBadCookies(badHeader);
-		fetchUtils.BAD_COOKIES.forEach(badCookie => {
-			// bad header _has_ bad cookie
-			expect(cookie.parse(badHeader)[badCookie]).toBeDefined();
-			// clean header does _not_ have bad cookie
-			expect(cookie.parse(cleanedHeader)[badCookie]).toBeUndefined();
-		});
-	});
-	it('leaves a clean cookie header intact', () => {
-		expect(fetchUtils.cleanBadCookies(goodHeader)).toEqual(goodHeader);
 	});
 });
 
