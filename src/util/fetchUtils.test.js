@@ -160,6 +160,34 @@ describe('fetchQueries', () => {
 				});
 		});
 	});
+	describe('form data', () => {
+		it('sends form data as multipart/form-data', () => {
+			global.FormData = class FormData {
+				append() {}
+				has() {
+					return true;
+				}
+			};
+			FormData.prototype.append = jest.fn();
+			const formQueries = [mockQuery({ params: new FormData() })];
+			spyOn(global, 'fetch').and.callFake(fakeSuccess);
+
+			return fetchUtils.fetchQueries(
+				API_URL.toString(),
+				postRequest
+			)(formQueries)
+				.then(() => {
+					const calledWith = global.fetch.calls.mostRecent().args;
+					const url = new URL(calledWith[0]);
+					const options = calledWith[1];
+					expect(options.method).toEqual('POST');
+					expect(url.searchParams.has('queries')).toBe(true);
+					expect(url.searchParams.has('metadata')).toBe(false);
+					expect(options.headers['x-csrf-jwt']).toEqual(csrfJwt);
+				});
+		});
+
+	});
 });
 
 describe('tryJSON', () => {
