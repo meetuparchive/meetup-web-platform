@@ -100,7 +100,7 @@ export const getFetchArgs = (apiUrl, options, queries, meta) => {
  *   }
  * @return {Promise} resolves with a `{queries, responses}` object
  */
-export const fetchQueries = (apiUrl, options) => (queries, meta) => {
+export const fetchQueries = (apiUrl, options={}) => (queries, meta) => {
 	if (
 		typeof window === 'undefined' &&  // not in browser
 		typeof test === 'undefined'  // not in testing env
