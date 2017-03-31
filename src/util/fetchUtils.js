@@ -4,9 +4,10 @@ import rison from 'rison';
 
 
 const BrowserCookies = JSCookie.withConverter({
+	read: (value, name) => value,
 	write: (value, name) =>
 		encodeURIComponent(value)
-			.replace(/[!'()*]/g, c => `%${c.charCodeAt(0).toString(16)}`)
+			.replace(/[!'()*]/g, c => `%${c.charCodeAt(0).toString(16)}`),
 });
 
 /**
