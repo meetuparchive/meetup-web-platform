@@ -26,8 +26,8 @@ describe('fetchQueries', () => {
 	const queries = [mockQuery({ params: {} })];
 	const meta = { foo: 'bar', clickTracking: { history: [] } };
 	const responses = [MOCK_GROUP];
-	const getRequest = { method: 'GET', headers: {} };
-	const postRequest = { method: 'POST', csrf: csrfJwt, headers: {} };
+	const getRequest = { method: 'get', headers: {} };
+	const postRequest = { method: 'post', csrf: csrfJwt, headers: {} };
 	const fakeSuccess = () =>
 		Promise.resolve({
 			json: () => Promise.resolve(responses),
@@ -66,15 +66,22 @@ describe('fetchQueries', () => {
 				err => expect(err).toEqual(jasmine.any(Error))
 			);
 	});
-	it('returns a promise that will reject when response contains error prop', () => {
+	it('calls fetch with method supplied by query', () => {
 		spyOn(global, 'fetch').and.callFake(fakeSuccess);
-		const queries = [mockQuery({ meta: { method: 'post' } })];
+		const query = mockQuery({ params: {} });
+		const queries = [query];
 
-		return fetchUtils.fetchQueries(API_URL.toString(), getRequest)(queries)
-			.then(
-				response => expect(true).toBe(false),
-				err => expect(err).toEqual(jasmine.any(Error))
-			);
+		const methodTest = method => () => {
+			query.meta = { method };
+			return fetchUtils.fetchQueries(API_URL.toString(), getRequest)(queries)
+				.then(response => {
+					const [, config] = global.fetch.calls.mostRecent().args;
+					expect(config.method).toEqual(method);
+				});
+		};
+		return methodTest('post')()
+			.then(methodTest('patch'))
+			.then(methodTest('delete'));
 	});
 	describe('GET', () => {
 		it('GET calls fetch with API url and queries, metadata, logout querystring params', () => {
@@ -91,7 +98,7 @@ describe('fetchQueries', () => {
 					expect(url.searchParams.has('queries')).toBe(true);
 					expect(url.searchParams.has('metadata')).toBe(true);
 					expect(url.searchParams.has('logout')).toBe(true);
-					expect(calledWith[1].method).toEqual('GET');
+					expect(calledWith[1].method).toEqual('get');
 				});
 		});
 
@@ -125,7 +132,7 @@ describe('fetchQueries', () => {
 				expect(url.origin).toBe(API_URL.origin);
 				expect(url.searchParams.has('queries')).toBe(true);
 				expect(url.searchParams.has('metadata')).toBe(false);
-				expect(calledWith[1].method).toEqual('GET');
+				expect(calledWith[1].method).toEqual('get');
 			});
 		});
 	});
@@ -142,7 +149,7 @@ describe('fetchQueries', () => {
 					const url = new URL(calledWith[0]);
 					const options = calledWith[1];
 					expect(url.toString()).toBe(API_URL.toString());
-					expect(options.method).toEqual('POST');
+					expect(options.method).toEqual('post');
 					// build a dummy url to hold the url-encoded body as searchstring
 					const dummyUrl = new URL(`http://example.com?${options.body}`);
 					expect(dummyUrl.searchParams.has('queries')).toBe(true);
@@ -162,7 +169,7 @@ describe('fetchQueries', () => {
 					const url = new URL(calledWith[0]);
 					const options = calledWith[1];
 					expect(url.toString()).toBe(API_URL.toString());
-					expect(options.method).toEqual('POST');
+					expect(options.method).toEqual('post');
 					const dummyUrl = new URL(`http://example.com?${options.body}`);
 					expect(dummyUrl.searchParams.has('queries')).toBe(true);
 					expect(dummyUrl.searchParams.has('metadata')).toBe(false);

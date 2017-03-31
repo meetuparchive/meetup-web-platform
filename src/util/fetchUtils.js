@@ -27,29 +27,7 @@ export const parseQueryResponse = queries => ({ responses, error, message }) => 
 	};
 };
 
-/**
- * Wrapper around `fetch` to send an array of queries to the server. It ensures
- * that the request will have the required OAuth and CSRF credentials and constructs
- * the `fetch` call arguments based on the request method. It also records the
- * CSRF header value in a cookie for use as a CSRF header in future fetches.
- *
- * **IMPORTANT**: This function should _only_ be called from the browser. The
- * server should never need to call itself over HTTP
- *
- * @param {String} apiUrl the general-purpose endpoint for API calls to the
- *   application server
- * @param {Object} options {
- *     method: "get", "post", "delete", or "patch",
- *   }
- * @return {Promise} resolves with a `{queries, responses}` object
- */
-export const fetchQueries = (apiUrl, options) => (queries, meta) => {
-	if (
-		typeof window === 'undefined' &&  // not in browser
-		typeof test === 'undefined'  // not in testing env
-	) {
-		throw new Error('fetchQueries was called on server - cannot continue');
-	}
+export const getFetchArgs = (apiUrl, options, queries, meta) => {
 	const {
 		headers={},
 	} = options;
@@ -86,7 +64,7 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 		fetchUrl.searchParams.append('metadata', rison.encode_object(metadata));
 
 	}
-	const fetchConfig = {
+	const config = {
 		method,
 		headers: {
 			...headers,
@@ -96,24 +74,58 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 		credentials: 'same-origin'  // allow response to set-cookies
 	};
 	if (isPost) {
-		fetchConfig.body = fetchUrl.searchParams.toString();
+		config.body = fetchUrl.searchParams.toString();
 	}
-	return fetch(
-		isPost ? apiUrl : fetchUrl.toString(),
-		fetchConfig
-	)
-	.then(queryResponse => queryResponse.json())
-	.then(queryJSON => ({
-		...parseQueryResponse(queries)(queryJSON),
-	}))
-	.catch(err => {
-		console.error(JSON.stringify({
-			err: err.stack,
-			message: 'App server API fetch error',
-			context: fetchConfig,
-		}));
-		throw err;  // handle the error upstream
-	});
+
+	const url = isPost ? apiUrl : fetchUrl.toString();
+	return {
+		url,
+		config,
+	};
+};
+
+/**
+ * Wrapper around `fetch` to send an array of queries to the server. It ensures
+ * that the request will have the required OAuth and CSRF credentials and constructs
+ * the `fetch` call arguments based on the request method. It also records the
+ * CSRF header value in a cookie for use as a CSRF header in future fetches.
+ *
+ * **IMPORTANT**: This function should _only_ be called from the browser. The
+ * server should never need to call itself over HTTP
+ *
+ * @param {String} apiUrl the general-purpose endpoint for API calls to the
+ *   application server
+ * @param {Object} options {
+ *     method: "get", "post", "delete", or "patch",
+ *   }
+ * @return {Promise} resolves with a `{queries, responses}` object
+ */
+export const fetchQueries = (apiUrl, options) => (queries, meta) => {
+	if (
+		typeof window === 'undefined' &&  // not in browser
+		typeof test === 'undefined'  // not in testing env
+	) {
+		throw new Error('fetchQueries was called on server - cannot continue');
+	}
+
+	const {
+		url,
+		config,
+	} = getFetchArgs(apiUrl, options, queries, meta);
+
+	return fetch(url, config)
+		.then(queryResponse => queryResponse.json())
+		.then(queryJSON => ({
+			...parseQueryResponse(queries)(queryJSON),
+		}))
+		.catch(err => {
+			console.error(JSON.stringify({
+				err: err.stack,
+				message: 'App server API fetch error',
+				context: config,
+			}));
+			throw err;  // handle the error upstream
+		});
 };
 
 /**
