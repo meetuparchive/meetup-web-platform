@@ -27,6 +27,63 @@ export const parseQueryResponse = queries => ({ responses, error, message }) => 
 	};
 };
 
+export const getFetchArgs = (apiUrl, options, queries, meta) => {
+	const {
+		headers={},
+	} = options;
+
+	const method = (queries[0].meta || {}).method ||  // allow query to set method
+		options.method.toLowerCase() ||  // fallback to options
+		'get';  // fallback to 'get'
+
+	const isPost = method.toLowerCase() === 'post';
+	const isDelete = method.toLowerCase() === 'delete';
+
+	const fetchUrl = new URL(apiUrl);
+	fetchUrl.searchParams.append('queries', rison.encode_array(queries));
+
+	if (meta) {
+		const {
+			clickTracking,
+			logout,
+			...metadata
+		} = meta;
+
+		BrowserCookies.set(
+			'click-track',
+			JSON.stringify(clickTracking),
+			{ domain: '.meetup.com' }
+		);
+
+		// special logout param
+		if (logout) {
+			fetchUrl.searchParams.append('logout', true);
+		}
+
+		// send other metadata in searchParams
+		fetchUrl.searchParams.append('metadata', rison.encode_object(metadata));
+
+	}
+	const config = {
+		method,
+		headers: {
+			...headers,
+			'content-type': isPost ? 'application/x-www-form-urlencoded' : 'text/plain',
+			[CSRF_HEADER]: (isPost || isDelete) ? BrowserCookies.get(CSRF_HEADER_COOKIE) : '',
+		},
+		credentials: 'same-origin'  // allow response to set-cookies
+	};
+	if (isPost) {
+		config.body = fetchUrl.searchParams.toString();
+	}
+
+	const url = isPost ? apiUrl : fetchUrl.toString();
+	return {
+		url,
+		config,
+	};
+};
+
 /**
  * Wrapper around `fetch` to send an array of queries to the server. It ensures
  * that the request will have the required OAuth and CSRF credentials and constructs
@@ -50,67 +107,25 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 	) {
 		throw new Error('fetchQueries was called on server - cannot continue');
 	}
-	options.method = options.method || 'GET';
+
 	const {
-		method,
-		headers={},
-	} = options;
+		url,
+		config,
+	} = getFetchArgs(apiUrl, options, queries, meta);
 
-	const isPost = method.toLowerCase() === 'post';
-	const isDelete = method.toLowerCase() === 'delete';
-
-	const fetchUrl = new URL(apiUrl);
-	fetchUrl.searchParams.append('queries', rison.encode_array(queries));
-
-	if (meta) {
-		const {
-			clickTracking,
-			logout,
-			...metadata
-		} = meta;
-		BrowserCookies.set(
-			'click-track',
-			JSON.stringify(clickTracking),
-			{ domain: '.meetup.com' }
-		);
-
-		// special logout param
-		if (logout) {
-			fetchUrl.searchParams.append('logout', true);
-		}
-
-		// send other metadata in searchParams
-		fetchUrl.searchParams.append('metadata', rison.encode_object(metadata));
-
-	}
-	const fetchConfig = {
-		method,
-		headers: {
-			...headers,
-			'content-type': isPost ? 'application/x-www-form-urlencoded' : 'text/plain',
-			[CSRF_HEADER]: (isPost || isDelete) ? BrowserCookies.get(CSRF_HEADER_COOKIE) : '',
-		},
-		credentials: 'same-origin'  // allow response to set-cookies
-	};
-	if (isPost) {
-		fetchConfig.body = fetchUrl.searchParams.toString();
-	}
-	return fetch(
-		isPost ? apiUrl : fetchUrl.toString(),
-		fetchConfig
-	)
-	.then(queryResponse => queryResponse.json())
-	.then(queryJSON => ({
-		...parseQueryResponse(queries)(queryJSON),
-	}))
-	.catch(err => {
-		console.error(JSON.stringify({
-			err: err.stack,
-			message: 'App server API fetch error',
-			context: fetchConfig,
-		}));
-		throw err;  // handle the error upstream
-	});
+	return fetch(url, config)
+		.then(queryResponse => queryResponse.json())
+		.then(queryJSON => ({
+			...parseQueryResponse(queries)(queryJSON),
+		}))
+		.catch(err => {
+			console.error(JSON.stringify({
+				err: err.stack,
+				message: 'App server API fetch error',
+				context: config,
+			}));
+			throw err;  // handle the error upstream
+		});
 };
 
 /**
