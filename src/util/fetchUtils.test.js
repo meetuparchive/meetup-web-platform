@@ -1,3 +1,4 @@
+import JSCookie from 'js-cookie';
 import {
 	mockQuery,
 } from 'meetup-web-mocks/lib/app';
@@ -6,44 +7,24 @@ import {
 } from 'meetup-web-mocks/lib/api';
 import * as fetchUtils from './fetchUtils';
 
-jest.mock('js-cookie', () => ({
-	get: jest.fn(name => `${name} value`),
-	set: jest.fn((name, value) => `${name} set to ${value}`),
-}));
-
-describe('mergeClickCookie', () => {
-	it('merges stringified clicktracking data into "clickTracking" cookie header string', () => {
-		const initHeader = 'foo=bar';
-		const clickTracking = {
-			clicks: [{ bar: 'foo' }],
-		};
-		expect(fetchUtils.mergeClickCookie(initHeader, clickTracking))
-			.toEqual(`foo=bar; clickTracking=${JSON.stringify(clickTracking)}`);
-	});
-	it('creates stringified clicktracking cookie header string when no header string provided', () => {
-		const initHeader = undefined;
-		const clickTracking = {
-			clicks: [{ bar: 'foo' }],
-		};
-		expect(fetchUtils.mergeClickCookie(initHeader, clickTracking))
-			.toEqual(`clickTracking=${JSON.stringify(clickTracking)}`);
-	});
-	it('returns unmodified header when no clicks', () => {
-		const clickTracking = { clicks: [] };
-		const undefinedHeader = undefined;
-		const stringHeader = 'foo=bar';
-		expect(fetchUtils.mergeClickCookie(undefinedHeader, clickTracking))
-			.toBe(undefinedHeader);
-		expect(fetchUtils.mergeClickCookie(stringHeader, clickTracking))
-			.toBe(stringHeader);
-	});
+jest.mock('js-cookie', () => {
+	const get = jest.fn(name => `${name} value`);
+	const set = jest.fn((name, value) => `${name} set to ${value}`);
+	return {
+		get,
+		set,
+		withConverter: jest.fn(() => ({
+			get,
+			set,
+		})),
+	};
 });
 
 describe('fetchQueries', () => {
 	const API_URL = new URL('http://api.example.com/');
 	const csrfJwt = `${fetchUtils.CSRF_HEADER_COOKIE} value`;
 	const queries = [mockQuery({ params: {} })];
-	const meta = { foo: 'bar', clickTracking: { clicks: [] } };
+	const meta = { foo: 'bar', clickTracking: { history: [] } };
 	const responses = [MOCK_GROUP];
 	const getRequest = { method: 'GET', headers: {} };
 	const postRequest = { method: 'POST', csrf: csrfJwt, headers: {} };
@@ -104,20 +85,21 @@ describe('fetchQueries', () => {
 				});
 		});
 
-		it('GET calls fetch with cookie header containing clicktracking', () => {
+		it('GET calls js-cookie "set" with click-track', () => {
 			const clickTracking = {
-				clicks: [{ bar: 'foo' }],
+				history: [{ bar: 'foo' }],
 			};
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
+			JSCookie.set.mockClear();
 
 			return fetchUtils.fetchQueries(
 				API_URL.toString(),
 				getRequest
 			)(queries, { ...meta, clickTracking, logout: true })
 				.then(() => {
-					const calledWith = global.fetch.calls.mostRecent().args;
-					expect(calledWith[1].headers.cookie)
-						.toEqual(`clickTracking=${JSON.stringify(clickTracking)}`);
+					const calledWith = JSCookie.set.mock.calls[0];
+					expect(calledWith[0])
+						.toEqual('click-track');
 				});
 		});
 
