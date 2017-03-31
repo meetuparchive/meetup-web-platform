@@ -7,6 +7,8 @@ export const querySchema = Joi.object({
 	mockResponse: Joi.object(),
 	params: Joi.object(),  // can be FormData
 	type: Joi.string(),
-	meta: Joi.object(),
+	meta: Joi.object({
+		method: Joi.string().only('get', 'post', 'delete', 'patch'),
+	}),
 });
 

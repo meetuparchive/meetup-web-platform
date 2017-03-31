@@ -28,12 +28,14 @@ export const parseQueryResponse = queries => ({ responses, error, message }) => 
 	};
 };
 
-export const getFetchConfig = (apiUrl, options, queries, meta) => {
-	options.method = (queries[0].meta || {}).method || options.method || 'GET';
+export const getFetchArgs = (apiUrl, options, queries, meta) => {
 	const {
-		method,
 		headers={},
 	} = options;
+
+	const method = (queries[0].meta || {}).method ||  // allow query to set method
+		options.method.toLowerCase() ||  // fallback to options
+		'get';  // fallback to 'get'
 
 	const isPost = method.toLowerCase() === 'post';
 	const isFormData = queries[0].params instanceof FormData;
@@ -68,7 +70,7 @@ export const getFetchConfig = (apiUrl, options, queries, meta) => {
 		isPost && 'application/x-www-form-urlencoded' ||
 		'text/plain';
 
-	const fetchConfig = {
+	const config = {
 		method,
 		headers: {
 			...headers,
@@ -78,13 +80,14 @@ export const getFetchConfig = (apiUrl, options, queries, meta) => {
 		credentials: 'same-origin'  // allow response to set-cookies
 	};
 	if (isPost) {
-		fetchConfig.body = isFormData ?
+		config.body = isFormData ?
 			queries[0].params :
 			fetchUrl.searchParams.toString();
 	}
+	const url = isFormData || !isPost ? fetchUrl.toString() : apiUrl;
 	return {
-		url: isFormData || !isPost ? fetchUrl.toString() : apiUrl,
-		config: fetchConfig,
+		url,
+		config,
 	};
 };
 
@@ -114,8 +117,8 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 
 	const {
 		url,
-		config
-	} = getFetchConfig(apiUrl, options, queries, meta);
+		config,
+	} = getFetchArgs(apiUrl, options, queries, meta);
 
 	return fetch(url, config)
 		.then(queryResponse => queryResponse.json())
