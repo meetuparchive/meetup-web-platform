@@ -1,9 +1,9 @@
-import Cookies from 'js-cookie';
+import JSCookie from 'js-cookie';
 import cookie from 'cookie';
 import rison from 'rison';
 
 
-const BrowserCookies = Cookies.withConverter({
+const BrowserCookies = JSCookie.withConverter({
 	write: (value, name) =>
 		encodeURIComponent(value)
 			.replace(/[!'()*]/g, c => `%${c.charCodeAt(0).toString(16)}`)

@@ -172,7 +172,7 @@ export const logTrack = platformAgent => (response, trackInfo) => {
 	const eventDate = new Date();
 	const record = {
 		timestamp: eventDate.getTime().toString(),
-		requestId: uuid.v4(),
+		requestId: response.request.id,
 		ip: requestHeaders['remote-addr'] || '',
 		agent: requestHeaders['user-agent'] || '',
 		platform: 'meetup-web-platform',
