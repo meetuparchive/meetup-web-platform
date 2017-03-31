@@ -6,7 +6,8 @@ import rison from 'rison';
 const BrowserCookies = Cookies.withConverter({
 	write: (value, name) =>
 		encodeURIComponent(value)
-			.replace(/[!'()*]/g, c => `%${c.charCodeAt(0).toString(16)}`)
+			.replace(/[!'()*]/g, c => `%${c.charCodeAt(0).toString(16)}`),
+	read: (value, name) => value,
 });
 
 /**
@@ -28,7 +29,7 @@ export const parseQueryResponse = queries => ({ responses, error, message }) => 
 };
 
 export const getFetchConfig = (apiUrl, options, queries, meta) => {
-	options.method = options.method || 'GET';
+	options.method = (queries[0].meta || {}).method || options.method || 'GET';
 	const {
 		method,
 		headers={},
