@@ -1,5 +1,5 @@
-import querystring from 'qs';
 import Rx from 'rxjs';
+import rison from 'rison';
 import {
 	MOCK_API_RESULT,
 	MOCK_renderRequestMap,
@@ -28,8 +28,8 @@ describe('routes', () => {
 	);
 	it('serves the api route', () => {
 		const validQuery = { type: 'a', ref: 'b', params: {} };
-		const qs = querystring.stringify({ queries: JSON.stringify([validQuery]) });
-		return getResponse({ url: `/mu_api?${qs}` })
+		const queriesRison = rison.encode_array([validQuery]);
+		return getResponse({ url: `/mu_api?queries=${queriesRison}` })
 			.then(response => expect(JSON.parse(response.payload)).toEqual({
 				responses: MOCK_API_RESULT
 			}));

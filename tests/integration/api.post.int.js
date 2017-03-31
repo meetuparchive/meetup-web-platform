@@ -1,4 +1,5 @@
 import Boom from 'boom';
+import rison from 'rison';
 import {
 	getCsrfHeaders,
 	mockConfig,
@@ -28,7 +29,7 @@ jest.mock('request', () => {
 
 const mockQuery = { type: 'foo', params: {}, ref: 'foo', endpoint: 'foo' };
 const mockPostPayload = {
-	queries: JSON.stringify([mockQuery])
+	queries: rison.encode_array([mockQuery])
 };
 
 const runTest = (test, payload=mockPostPayload, csrfHeaders=getCsrfHeaders) => server =>

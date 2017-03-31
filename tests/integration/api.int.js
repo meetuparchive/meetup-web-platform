@@ -1,3 +1,4 @@
+import rison from 'rison';
 import start from '../../src/server';
 import {
 	mockConfig,
@@ -39,7 +40,7 @@ describe('API proxy endpoint integration tests', () => {
 			.then(server => {
 				const request = {
 					method: 'get',
-					url: '/mu_api?queries=[]',
+					url: `/mu_api?queries=${rison.encode_array([{}])}`,
 					credentials: 'whatever',
 				};
 				return server.inject(request).then(
@@ -60,11 +61,14 @@ describe('API proxy endpoint integration tests', () => {
 				}
 			}],
 		});
+		const queries = rison.encode_array([{
+			type: 'foo', params: {}, ref: 'foo', endpoint: 'foo'
+		}]);
 		return start({}, {}, mockConfig)
 			.then(server => {
 				const request = {
 					method: 'get',
-					url: '/mu_api?queries=[{ "type": "foo", "params": {}, "ref": "foo", "endpoint": "foo" }]',
+					url: `/mu_api?queries=${queries}`,
 					credentials: 'whatever',
 				};
 				return server.inject(request).then(
