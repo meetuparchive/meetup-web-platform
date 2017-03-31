@@ -50,11 +50,13 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 	) {
 		throw new Error('fetchQueries was called on server - cannot continue');
 	}
-	options.method = options.method || 'GET';
 	const {
-		method,
 		headers={},
 	} = options;
+
+	const method = (queries[0].meta || {}).method ||  // allow query to set method
+		options.method.toLowerCase() ||  // fallback to options
+		'get';  // fallback to 'get'
 
 	const isPost = method.toLowerCase() === 'post';
 	const isDelete = method.toLowerCase() === 'delete';
@@ -68,6 +70,7 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 			logout,
 			...metadata
 		} = meta;
+
 		BrowserCookies.set(
 			'click-track',
 			JSON.stringify(clickTracking),

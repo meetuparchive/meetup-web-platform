@@ -66,6 +66,16 @@ describe('fetchQueries', () => {
 				err => expect(err).toEqual(jasmine.any(Error))
 			);
 	});
+	it('returns a promise that will reject when response contains error prop', () => {
+		spyOn(global, 'fetch').and.callFake(fakeSuccess);
+		const queries = [mockQuery({ meta: { method: 'post' } })];
+
+		return fetchUtils.fetchQueries(API_URL.toString(), getRequest)(queries)
+			.then(
+				response => expect(true).toBe(false),
+				err => expect(err).toEqual(jasmine.any(Error))
+			);
+	});
 	describe('GET', () => {
 		it('GET calls fetch with API url and queries, metadata, logout querystring params', () => {
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
