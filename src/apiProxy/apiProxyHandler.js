@@ -1,5 +1,6 @@
 import url from 'url';
 import Boom from 'boom';
+import rison from 'rison';
 
 const handleQueryResponses = (request, reply) => queryResponses => {
 	const response = reply(JSON.stringify({
@@ -10,7 +11,8 @@ const handleQueryResponses = (request, reply) => queryResponses => {
 		request.payload :
 		request.query;
 
-	const metadata = JSON.parse(payload.metadata || '{}');
+	const metadataRison = payload.metadata || rison.encode_object({});
+	const metadata = rison.decode_object(metadataRison);
 	const originUrl = response.request.info.referrer;
 	metadata.url = url.parse(originUrl).pathname;
 	metadata.method = response.request.method;

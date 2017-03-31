@@ -1,4 +1,5 @@
 import Rx from 'rxjs';
+import rison from 'rison';
 import * as apiUtils from '../util/apiUtils';
 import {
 	mockQuery,
@@ -12,7 +13,7 @@ describe('apiProxy$', () => {
 		mockQuery(MOCK_RENDERPROPS),
 	];
 	it('returns an observable that emits an array of results', () => {
-		const data = { queries: JSON.stringify(queries) };
+		const data = { queries: rison.encode_array(queries) };
 		const getRequest = {
 			headers: {},
 			method: 'get',
