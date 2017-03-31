@@ -17,28 +17,6 @@ const BrowserCookies = JSCookie.withConverter({
 export const CSRF_HEADER = 'x-csrf-jwt';
 export const CSRF_HEADER_COOKIE = 'x-csrf-jwt-header';
 
-/**
- * Merge the click tracking data into the existing cookie header string. This
- * data needs to be formatted exactly like its Meetup Classic counterpart -
- * i.e. the data needs to be generated in an identical way so that either
- * platform can consume the data from the other.
- *
- * @param {String} cookieHeader the existing cookie header string
- * @param {Object} clickTracking the click tracking data object
- */
-export const mergeClickCookie = (cookieHeader='', clickTracking={ clicks: [] }) => {
-	if (!clickTracking.clicks.length) {
-		return cookieHeader;
-	}
-
-	return mergeCookies(
-		cookieHeader || '',
-		{
-			clickTracking: JSON.stringify(clickTracking)
-		}
-	);
-};
-
 export const parseQueryResponse = queries => ({ responses, error, message }) => {
 	if (error) {
 		throw new Error(JSON.stringify({ error, message }));  // treat like an API error

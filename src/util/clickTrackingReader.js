@@ -15,7 +15,7 @@ const clickToClickRecord = request => click => {
 };
 
 export default function processClickTracking(request, reply) {
-	const cookieValue = request.state['click-track'];
+	const cookieValue = (request.state || {})['click-track'];
 	if (!cookieValue) {
 		return;
 	}
