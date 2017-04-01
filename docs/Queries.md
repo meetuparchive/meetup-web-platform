@@ -20,6 +20,9 @@ A Query is just a plain object with the following shape:
 	endpoint: string,
   params: object,
 	flags?: string[],
+  meta?: {
+    method: string
+  },
 }
 ```
 
@@ -62,6 +65,15 @@ GET requests) or the request body (for POST requests).
 
 An array of feature flag (Runtime Flag) names that should be returned
 alongside the main request.
+
+### `meta`
+
+#### `method`
+
+You can force the query to be sent with a particular HTTP method by specifying
+it here as a _lowercase_ string: `get`, `post`, `delete`, or `patch`. Note that
+you should never try to make a request that contains multiple queries with
+different `method`s.
 
 ## Usage
 
