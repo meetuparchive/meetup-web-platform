@@ -66,15 +66,15 @@ export const getFetchArgs = (apiUrl, options, queries, meta) => {
 		fetchUrl.searchParams.append('metadata', rison.encode_object(metadata));
 	}
 
-	const contentType = isFormData && 'multipart/form-data' ||
-		isPost && 'application/x-www-form-urlencoded' ||
-		'text/plain';
+	if (!isFormData) {
+		headers['content-type'] = isPost && 'application/x-www-form-urlencoded' ||
+		'application/json';
+	}
 
 	const config = {
 		method,
 		headers: {
 			...headers,
-			'content-type': contentType,
 			[CSRF_HEADER]: (isPost || isDelete) ? BrowserCookies.get(CSRF_HEADER_COOKIE) : '',
 		},
 		credentials: 'same-origin'  // allow response to set-cookies

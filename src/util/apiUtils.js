@@ -205,6 +205,9 @@ export const buildRequestArgs = externalRequestOpts =>
 			externalRequestOptsQuery.headers['X-Meta-Photo-Host'] = 'secure';
 			break;
 		case 'post':
+			if (externalRequestOpts.headers['content-type'].startsWith('multipart')) {
+				break;
+			}
 			externalRequestOptsQuery.body = dataParams;
 			externalRequestOptsQuery.headers['content-type'] = 'application/x-www-form-urlencoded';
 			break;
@@ -270,10 +273,13 @@ export function parseRequestHeaders(request) {
 export function parseRequestQueries(request) {
 	const {
 		method,
+		mime,
 		payload,
 		query,
 	} = request;
-	const queriesRison = method === 'post' ? payload.queries : query.queries;
+	const queriesRison = method === 'post' && mime !== 'multipart/form-data' ?
+		payload.queries :
+		query.queries;
 
 	if (!queriesRison) {
 		return null;
@@ -295,17 +301,21 @@ export function parseRequestQueries(request) {
  */
 export function parseRequest(request) {
 	const baseUrl = request.server.app.API_SERVER_ROOT_URL;
-	return {
-		externalRequestOpts: {
-			baseUrl,
-			method: request.method,
-			headers: parseRequestHeaders(request),  // make a copy to be immutable
-			mode: 'no-cors',
-			time: true,  // time the request for logging
-			agentOptions: {
-				rejectUnauthorized: baseUrl.indexOf('.dev') === -1
-			},
+	const externalRequestOpts = {
+		baseUrl,
+		method: request.method,
+		headers: parseRequestHeaders(request),  // make a copy to be immutable
+		mode: 'no-cors',
+		time: true,  // time the request for logging
+		agentOptions: {
+			rejectUnauthorized: baseUrl.indexOf('.dev') === -1
 		},
+	};
+	if (request.mime === 'multipart/form-data') {
+		externalRequestOpts.formData = request.payload;
+	}
+	return {
+		externalRequestOpts,
 		queries: parseRequestQueries(request),
 	};
 }

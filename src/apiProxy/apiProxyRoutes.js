@@ -45,8 +45,13 @@ const getApiProxyRoutes = (path, apiProxyFn$) => {
 		method: 'POST',
 		config: {
 			...routeBase.config,
-			validate: {
-				payload: validApiPayloadSchema
+			payload: {
+				output: 'stream',  // parse file uploads into streams
+				allow: [
+					'multipart/form-data',
+					'application/x-www-form-urlencoded',
+				],
+				maxBytes: 1024 * 1024 * 10  // 10 MB max upload
 			},
 		},
 	};
