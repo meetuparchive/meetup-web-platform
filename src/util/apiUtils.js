@@ -202,10 +202,11 @@ export const buildRequestArgs = externalRequestOpts =>
 		case 'get':
 		case 'delete':
 			externalRequestOptsQuery.url += `?${dataParams}`;
+			externalRequestOptsQuery.headers['content-type'] = 'application/json';
 			externalRequestOptsQuery.headers['X-Meta-Photo-Host'] = 'secure';
 			break;
 		case 'post':
-			if (externalRequestOpts.headers['content-type'].startsWith('multipart')) {
+			if (externalRequestOpts.formData) {
 				break;
 			}
 			externalRequestOptsQuery.body = dataParams;
@@ -260,6 +261,7 @@ export function parseRequestHeaders(request) {
 	delete externalRequestHeaders['host'];  // let app server set 'host'
 	delete externalRequestHeaders['accept-encoding'];  // let app server set 'accept'
 	delete externalRequestHeaders['content-length'];  // original request content-length is irrelevant
+	delete externalRequestHeaders['content-type'];  // the content type will be set in buildRequestArgs
 
 	// cloudflare headers we don't want to pass on
 	delete externalRequestHeaders['cf-ray'];
