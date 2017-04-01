@@ -32,7 +32,7 @@ const getApiProxyRoutes = (path, apiProxyFn$) => {
 	};
 	const apiGetRoute = {
 		...routeBase,
-		method: ['GET', 'DELETE', 'PATCH'],
+		method: ['GET', 'DELETE',],
 		config: {
 			...routeBase.config,
 			validate: {
@@ -42,7 +42,7 @@ const getApiProxyRoutes = (path, apiProxyFn$) => {
 	};
 	const apiPostRoute = {
 		...routeBase,
-		method: 'POST',
+		method: ['POST', 'PATCH'],
 		config: {
 			...routeBase.config,
 			payload: {
