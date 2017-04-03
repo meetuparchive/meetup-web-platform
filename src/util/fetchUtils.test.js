@@ -218,14 +218,3 @@ describe('tryJSON', () => {
 	});
 });
 
-describe('mergeCookies', () => {
-	it('makes a cookie header string from a { key<string> : value<string> } object', () => {
-		expect(fetchUtils.mergeCookies('bim=bam', { foo: 'foo', bar: 'bar' }))
-			.toEqual('bim=bam; foo=foo; bar=bar');
-	});
-	it('overwrites existing cookies with new cookies', () => {
-		expect(fetchUtils.mergeCookies('foo=meetup', { foo: 'foo', bar: 'bar' }))
-			.toEqual('foo=foo; bar=bar');
-	});
-});
-
