@@ -8,7 +8,7 @@ export const querySchema = Joi.object({
 	params: Joi.object(),
 	type: Joi.string(),
 	meta: Joi.object({
-		method: Joi.string().only('get', 'post', 'delete', 'patch'),
+		method: Joi.string().valid('get', 'post', 'delete', 'patch').insensitive(),
 	}),
 });
 

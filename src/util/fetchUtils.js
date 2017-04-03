@@ -46,12 +46,12 @@ export const getFetchArgs = (apiUrl, options, queries, meta) => {
 		headers={},
 	} = options;
 
-	const method = (queries[0].meta || {}).method ||  // allow query to set method
+	const method = (queries[0].meta || {}).method.toLowerCase() ||  // allow query to set method
 		options.method.toLowerCase() ||  // fallback to options
 		'get';  // fallback to 'get'
 
-	const isPost = method.toLowerCase() === 'post';
-	const isDelete = method.toLowerCase() === 'delete';
+	const isPost = method === 'post';
+	const isDelete = method === 'delete';
 
 	const fetchUrl = new URL(apiUrl);
 	fetchUrl.searchParams.append('queries', rison.encode_array(queries));
