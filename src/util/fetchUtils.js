@@ -51,7 +51,8 @@ export const getFetchArgs = (apiUrl, options, queries, meta) => {
 		options.method.toLowerCase() ||  // fallback to options
 		'get';  // fallback to 'get'
 
-	const isPost = method === 'post';
+	const hasBody = method === 'post' ||
+		method === 'patch';
 	const isFormData = queries[0].params instanceof FormData;
 	const isDelete = method === 'delete';
 
@@ -80,8 +81,8 @@ export const getFetchArgs = (apiUrl, options, queries, meta) => {
 		fetchUrl.searchParams.append('metadata', rison.encode_object(metadata));
 	}
 
-	if (!isFormData) {
-		headers['content-type'] = isPost && 'application/x-www-form-urlencoded' ||
+	if (!isFormData) {  // form data 'content-type' will be set automatically
+		headers['content-type'] = hasBody && 'application/x-www-form-urlencoded' ||
 		'application/json';
 	}
 
@@ -89,16 +90,16 @@ export const getFetchArgs = (apiUrl, options, queries, meta) => {
 		method,
 		headers: {
 			...headers,
-			[CSRF_HEADER]: (isPost || isDelete) ? BrowserCookies.get(CSRF_HEADER_COOKIE) : '',
+			[CSRF_HEADER]: (hasBody || isDelete) ? BrowserCookies.get(CSRF_HEADER_COOKIE) : '',
 		},
 		credentials: 'same-origin'  // allow response to set-cookies
 	};
-	if (isPost) {
+	if (hasBody) {
 		config.body = isFormData ?
 			queries[0].params :
 			fetchUrl.searchParams.toString();
 	}
-	const url = isFormData || !isPost ? fetchUrl.toString() : apiUrl;
+	const url = isFormData || !hasBody ? fetchUrl.toString() : apiUrl;
 	return {
 		url,
 		config,
