@@ -46,6 +46,7 @@ describe('onRequestExtension', () => {
 		method: 'get',
 		info: {},
 		url: {},
+		state: {},
 	};
 	it('calls reply.continue', () => {
 		const reply = {
