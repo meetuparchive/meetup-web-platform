@@ -46,7 +46,7 @@ export const getFetchArgs = (apiUrl, options, queries, meta) => {
 		headers={},
 	} = options;
 
-	const method = (queries[0].meta || {}).method.toLowerCase() ||  // allow query to set method
+	const method = ((queries[0].meta || {}).method || '').toLowerCase() ||  // allow query to set method
 		options.method.toLowerCase() ||  // fallback to options
 		'get';  // fallback to 'get'
 
