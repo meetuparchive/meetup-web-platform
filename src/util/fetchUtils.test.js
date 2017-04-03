@@ -7,6 +7,8 @@ import {
 } from 'meetup-web-mocks/lib/api';
 import * as fetchUtils from './fetchUtils';
 
+global.FormData = function() {};
+
 jest.mock('js-cookie', () => {
 	const get = jest.fn(name => `${name} value`);
 	const set = jest.fn((name, value) => `${name} set to ${value}`);
@@ -197,7 +199,7 @@ describe('fetchQueries', () => {
 					const calledWith = global.fetch.calls.mostRecent().args;
 					const url = new URL(calledWith[0]);
 					const options = calledWith[1];
-					expect(options.method).toEqual('POST');
+					expect(options.method).toEqual('post');
 					expect(url.searchParams.has('queries')).toBe(true);
 					expect(url.searchParams.has('metadata')).toBe(false);
 					expect(options.headers['x-csrf-jwt']).toEqual(csrfJwt);
@@ -243,17 +245,6 @@ describe('tryJSON', () => {
 			response => expect(true).toBe(false),  // should not run - promise should be rejected
 			err => expect(err).toEqual(jasmine.any(Error))
 		);
-	});
-});
-
-describe('mergeCookies', () => {
-	it('makes a cookie header string from a { key<string> : value<string> } object', () => {
-		expect(fetchUtils.mergeCookies('bim=bam', { foo: 'foo', bar: 'bar' }))
-			.toEqual('bim=bam; foo=foo; bar=bar');
-	});
-	it('overwrites existing cookies with new cookies', () => {
-		expect(fetchUtils.mergeCookies('foo=meetup', { foo: 'foo', bar: 'bar' }))
-			.toEqual('foo=foo; bar=bar');
 	});
 });
 
