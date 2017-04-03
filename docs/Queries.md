@@ -75,6 +75,35 @@ it here as a string: `get`, `post`, `delete`, or `patch`. Note that
 you should never try to make a request that contains multiple queries with
 different `method`s.
 
+**Example**
+
+```js
+import { apiRequest } from 'meetup-web-platform/lib/actions/syncActionCreators';
+
+// POST request
+const postQuery = {
+  endpoint: 'ny-tech/members',
+  ref: 'newMember',
+  params: { name, bio },
+  meta: {
+    method: 'post',
+  },
+};
+// dispatch it - this might be from a 'bound' action creator rather than from `store.dispatch` directly
+store.dispatch(apiRequest([postQuery]));  // note that `apiRequest` takes an _array_ arg
+
+// DELETE request
+const deleteQuery = {
+  endpoint: 'ny-tech/members/123456',
+  ref: 'deletedMember',
+  params: { id },
+  meta: {
+    method: 'delete',
+  },
+};
+store.dispatch(apiRequest([deleteQuery]));  // note that `apiRequest` takes an _array_ arg
+```
+
 ## Usage
 
 ### Query lifecycle.
