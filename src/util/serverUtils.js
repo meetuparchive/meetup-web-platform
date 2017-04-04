@@ -1,7 +1,9 @@
 import https from 'https';
 import Hapi from 'hapi';
+import uuid from 'uuid';
 
 import track from './tracking';
+import clickTrackingReader from './clickTrackingReader';
 
 /**
  * determine whether a nested object of values contains a string that contains
@@ -21,6 +23,8 @@ export function checkForDevUrl(value) {
 }
 
 export function onRequestExtension(request, reply) {
+	request.id = uuid.v4();
+
 	console.log(JSON.stringify({
 		message: `Incoming request ${request.method.toUpperCase()} ${request.url.href}`,
 		type: 'request',
@@ -34,6 +38,8 @@ export function onRequestExtension(request, reply) {
 			remoteAddress: request.info.remoteAddress,
 		}
 	}));
+
+	clickTrackingReader(request, reply);
 	return reply.continue();
 }
 

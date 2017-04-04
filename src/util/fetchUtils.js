@@ -1,11 +1,12 @@
-import Cookies from 'js-cookie';
+import JSCookie from 'js-cookie';
 import rison from 'rison';
 
 
-const BrowserCookies = Cookies.withConverter({
+const BrowserCookies = JSCookie.withConverter({
+	read: (value, name) => value,
 	write: (value, name) =>
 		encodeURIComponent(value)
-			.replace(/[!'()*]/g, c => `%${c.charCodeAt(0).toString(16)}`)
+			.replace(/[!'()*]/g, c => `%${c.charCodeAt(0).toString(16)}`),
 });
 
 /**
