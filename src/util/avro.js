@@ -1,5 +1,7 @@
 const avro = require('avsc');
 
+// currently the schema is manually copied from
+// https://github.dev.meetup.com/meetup/meetup/blob/master/modules/base/src/main/versioned_avro/Click_v2.avsc
 const click = {
 	namespace: 'com.meetup.base.avro',
 	type: 'record',

@@ -26,8 +26,10 @@ class GoodMeetupTracking extends Stream.Transform {
 	 * @return {Object} the output of calling the next transform in the chain
 	 */
 	_transform(event, enc, next) {
-		const eventData = JSON.parse(event.data);
-		const log = this.serializer(eventData);
+		const log = this.serializer ?
+			this.serializer(JSON.parse(event.data)) :
+			event.data;
+
 		return next(null, `analytics=${log}\n`);
 	}
 }
