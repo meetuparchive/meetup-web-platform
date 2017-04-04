@@ -32,7 +32,7 @@ const getApiProxyRoutes = (path, apiProxyFn$) => {
 	};
 	const apiGetRoute = {
 		...routeBase,
-		method: ['GET', 'DELETE',],
+		method: ['GET', 'DELETE'],
 		config: {
 			...routeBase.config,
 			validate: {
