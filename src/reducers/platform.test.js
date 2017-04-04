@@ -54,19 +54,19 @@ describe('app reducer', () => {
 
 describe('clickTracking reducer', () => {
 	it('appends a click action to state.clicks', () => {
-		const initialState = { clicks: [{ bar: 'baz' }] };
+		const initialState = { history: [{ bar: 'baz' }] };
 		const click = { foo: 'bar' };
 		const action = clickActionCreators.click(click);
-		expect(clickTracking(initialState, action).clicks.length).toBe(2);
-		expect(clickTracking(initialState, action).clicks[1]).toEqual(click);
+		expect(clickTracking(initialState, action).history.length).toBe(2);
+		expect(clickTracking(initialState, action).history[1]).toEqual(click);
 	});
 	it('clears click data on clear clicks', () => {
-		const initialState = { clicks: [{ bar: 'baz' }] };
+		const initialState = { history: [{ bar: 'baz' }] };
 		const action = clickActionCreators.clearClick();
 		expect(clickTracking(initialState, action)).toBe(DEFAULT_CLICK_TRACK);
 	});
 	it('returns unmodified state for non-click actions', () => {
-		const initialState = { clicks: [{ bar: 'baz' }] };
+		const initialState = { history: [{ bar: 'baz' }] };
 		expect(clickTracking(initialState, { type: 'FOO' })).toBe(initialState);
 	});
 });

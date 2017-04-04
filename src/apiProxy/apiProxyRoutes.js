@@ -2,7 +2,7 @@ import Joi from 'joi';
 import { getApiProxyRouteHandler } from './apiProxyHandler';
 
 const validApiPayloadSchema = Joi.object({
-	queries: Joi.string().required(),
+	queries: Joi.string().required(), // should be rison.encode_array-encoded
 	metadata: Joi.string(),
 	logout: Joi.any(),
 });

@@ -1,3 +1,5 @@
+export const LOCATION_CHANGE = '@@router/LOCATION_CHANGE';
+
 export function apiRequest(queries, meta) {
 	return {
 		type: 'API_REQUEST',
@@ -30,6 +32,13 @@ export function apiFailure(error) {
 	return {
 		type: 'API_FAILURE',
 		payload: error,
+	};
+}
+
+export function locationChange(location) {
+	return {
+		type: LOCATION_CHANGE,
+		payload: location
 	};
 }
 
