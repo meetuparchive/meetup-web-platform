@@ -29,14 +29,14 @@ import {
 export default function start(
 	renderRequestMap,
 	{ routes=[], plugins=[], platform_agent='consumer_name' },
-	config=getConfig
+	envConfigOverridePath
 ) {
 	// source maps make for better stack traces - we might not want this in
 	// production if it makes anything slower, though
 	// (process.env.NODE_ENV === 'production')
 	require('source-map-support').install();
 
-	return config()
+	return getConfig(envConfigOverridePath)
 		.then(configureEnv)
 		.then(config => {
 			const baseRoutes = getRoutes(renderRequestMap);

@@ -1,8 +1,10 @@
+import fs from 'fs';
 import convict from 'convict';
 import {
 	duotones,
 	getDuotoneUrls
 } from './duotone';
+
 /**
  * Start the server with a config
  *
@@ -11,7 +13,7 @@ import {
  * @module config
  */
 
-export default function getConfig(overrideConfig = {}) {
+export default function getConfig(envConfigOverridePath) {
 	/**
 	 * Read all config from environment variables here once on startup
 	 */
@@ -107,12 +109,17 @@ export default function getConfig(overrideConfig = {}) {
 		}
 	});
 
-	config.load(overrideConfig);
+	/**
+	 * Optionally override these properties with a JSON file located at envConfigOverridePath
+	 */
+	if (fs.existsSync(envConfigOverridePath)) {
+		config.loadFile(envConfigOverridePath);
+	}
 
 	config.set('duotoneUrls', getDuotoneUrls(duotones, config.get('PHOTO_SCALER_SALT')));
 	config.set('API_SERVER_ROOT_URL', `${config.get('API_PROTOCOL')}://${config.get('API_HOST')}`);
 
 	config.validate();
 
-	return Promise.resolve({...config.getProperties(), ...overrideConfig});
+	return Promise.resolve(config.getProperties());
 }

@@ -8,7 +8,8 @@
   },
   "main": "./lib/index.js",
   "scripts": {
-    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps",
+    "build:clean": "rm -rf lib/",
+    "build": "yarn run build:clean && babel src --out-dir lib --ignore test.js,test.jsx --source-maps",
     "coveralls": "cat coverage/lcov.info | coveralls",
     "lint": "eslint . --ext .js,.jsx --fix",
     "prepublish": "yarn run build",
