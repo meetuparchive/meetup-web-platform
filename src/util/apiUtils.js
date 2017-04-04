@@ -4,6 +4,7 @@ import uuid from 'uuid';
 
 import externalRequest from 'request';
 import Joi from 'joi';
+import rison from 'rison';
 import Rx from 'rxjs';
 
 import {
@@ -87,9 +88,19 @@ export const parseMetaHeaders = headers => {
 		return meta;
 	}, {});
 
+	const linkHeader = headers.link && headers.link.split(',')
+		.reduce((links, link) => {
+			const [urlString, relString] = link.split(';');
+			const url = urlString.replace(/<|>/g, '').trim();
+			var rel = relString.replace(/rel="([^"]+)"/, '$1').trim();
+			links[rel] = url;
+			return links;
+		}, {});
+
 	return {
 		...meetupHeaders,
 		...xHeaders,
+		link: linkHeader || undefined,
 	};
 };
 
@@ -262,14 +273,14 @@ export function parseRequestQueries(request) {
 		payload,
 		query,
 	} = request;
-	const queriesJSON = method === 'post' ? payload.queries : query.queries;
+	const queriesRison = method === 'post' ? payload.queries : query.queries;
 
-	if (!queriesJSON) {
+	if (!queriesRison) {
 		return null;
 	}
 
 	const validatedQueries = Joi.validate(
-		JSON.parse(queriesJSON),
+		rison.decode_array(queriesRison),
 		Joi.array().items(querySchema)
 	);
 	if (validatedQueries.error) {
@@ -308,7 +319,7 @@ export function parseRequest(request) {
  * @return {Object} the mutated group object
  */
 export const groupDuotoneSetter = duotoneUrls => group => {
-	const photo = group.key_photo || group.group_photo || {};
+	const photo = group.key_photo || {};
 	const duotoneKey = group.photo_gradient && duotoneRef(
 			group.photo_gradient.light_color,
 			group.photo_gradient.dark_color

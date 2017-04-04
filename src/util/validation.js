@@ -7,5 +7,8 @@ export const querySchema = Joi.object({
 	mockResponse: Joi.object(),
 	params: Joi.object(),
 	type: Joi.string(),
+	meta: Joi.object({
+		method: Joi.string().valid('get', 'post', 'delete', 'patch').insensitive(),
+	}),
 });
 

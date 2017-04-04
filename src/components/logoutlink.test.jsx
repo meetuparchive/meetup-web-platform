@@ -1,5 +1,5 @@
 import React from 'react';
-import Link from 'react-router/lib/Link';
+import Link from 'react-router-dom/Link';
 import TestUtils from 'react-addons-test-utils';
 import LogoutLink from './LogoutLink';
 

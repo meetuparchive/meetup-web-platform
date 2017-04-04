@@ -1,4 +1,4 @@
-import cookie from 'cookie';
+import JSCookie from 'js-cookie';
 import {
 	mockQuery,
 } from 'meetup-web-mocks/lib/app';
@@ -7,17 +7,27 @@ import {
 } from 'meetup-web-mocks/lib/api';
 import * as fetchUtils from './fetchUtils';
 
-jest.mock('js-cookie', () => ({
-	get: jest.fn(name => `${name} value`),
-	set: jest.fn((name, value) => `${name} set to ${value}`),
-}));
+jest.mock('js-cookie', () => {
+	const get = jest.fn(name => `${name} value`);
+	const set = jest.fn((name, value) => `${name} set to ${value}`);
+	return {
+		get,
+		set,
+		withConverter: jest.fn(() => ({
+			get,
+			set,
+		})),
+	};
+});
 
 describe('fetchQueries', () => {
 	const API_URL = new URL('http://api.example.com/');
-	const queries = [mockQuery({})];
-	const meta = { foo: 'bar' };
-	const responses = [MOCK_GROUP];
 	const csrfJwt = `${fetchUtils.CSRF_HEADER_COOKIE} value`;
+	const queries = [mockQuery({ params: {} })];
+	const meta = { foo: 'bar', clickTracking: { history: [] } };
+	const responses = [MOCK_GROUP];
+	const getRequest = { method: 'get', headers: {} };
+	const postRequest = { method: 'post', csrf: csrfJwt, headers: {} };
 	const fakeSuccess = () =>
 		Promise.resolve({
 			json: () => Promise.resolve(responses),
@@ -41,7 +51,7 @@ describe('fetchQueries', () => {
 	it('returns an object with queries and responses arrays', () => {
 		spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
-		return fetchUtils.fetchQueries(API_URL.toString(), { method: 'GET' })(queries)
+		return fetchUtils.fetchQueries(API_URL.toString(), getRequest)(queries)
 			.then(response => {
 				expect(response.queries).toEqual(jasmine.any(Array));
 				expect(response.responses).toEqual(jasmine.any(Array));
@@ -50,11 +60,28 @@ describe('fetchQueries', () => {
 	it('returns a promise that will reject when response contains error prop', () => {
 		spyOn(global, 'fetch').and.callFake(fakeSuccessError);
 
-		return fetchUtils.fetchQueries(API_URL.toString(), { method: 'GET' })(queries)
+		return fetchUtils.fetchQueries(API_URL.toString(), getRequest)(queries)
 			.then(
 				response => expect(true).toBe(false),
 				err => expect(err).toEqual(jasmine.any(Error))
 			);
+	});
+	it('calls fetch with method supplied by query', () => {
+		spyOn(global, 'fetch').and.callFake(fakeSuccess);
+		const query = mockQuery({ params: {} });
+		const queries = [query];
+
+		const methodTest = method => () => {
+			query.meta = { method };
+			return fetchUtils.fetchQueries(API_URL.toString(), getRequest)(queries)
+				.then(response => {
+					const [, config] = global.fetch.calls.mostRecent().args;
+					expect(config.method).toEqual(method);
+				});
+		};
+		return methodTest('post')()
+			.then(methodTest('patch'))
+			.then(methodTest('delete'));
 	});
 	describe('GET', () => {
 		it('GET calls fetch with API url and queries, metadata, logout querystring params', () => {
@@ -62,7 +89,7 @@ describe('fetchQueries', () => {
 
 			return fetchUtils.fetchQueries(
 				API_URL.toString(),
-				{ method: 'GET' }
+				getRequest
 			)(queries, { ...meta, logout: true })
 				.then(() => {
 					const calledWith = global.fetch.calls.mostRecent().args;
@@ -71,22 +98,41 @@ describe('fetchQueries', () => {
 					expect(url.searchParams.has('queries')).toBe(true);
 					expect(url.searchParams.has('metadata')).toBe(true);
 					expect(url.searchParams.has('logout')).toBe(true);
-					expect(calledWith[1].method).toEqual('GET');
+					expect(calledWith[1].method).toEqual('get');
 				});
 		});
+
+		it('GET calls js-cookie "set" with click-track', () => {
+			const clickTracking = {
+				history: [{ bar: 'foo' }],
+			};
+			spyOn(global, 'fetch').and.callFake(fakeSuccess);
+			JSCookie.set.mockClear();
+
+			return fetchUtils.fetchQueries(
+				API_URL.toString(),
+				getRequest
+			)(queries, { ...meta, clickTracking, logout: true })
+				.then(() => {
+					const calledWith = JSCookie.set.mock.calls[0];
+					expect(calledWith[0])
+						.toEqual('click-track');
+				});
+		});
+
 		it('GET without meta calls fetch without metadata querystring params', () => {
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
 			return fetchUtils.fetchQueries(
 				API_URL.toString(),
-				{ method: 'GET' }
+				getRequest
 			)(queries).then(() => {
 				const calledWith = global.fetch.calls.mostRecent().args;
 				const url = new URL(calledWith[0]);
 				expect(url.origin).toBe(API_URL.origin);
 				expect(url.searchParams.has('queries')).toBe(true);
 				expect(url.searchParams.has('metadata')).toBe(false);
-				expect(calledWith[1].method).toEqual('GET');
+				expect(calledWith[1].method).toEqual('get');
 			});
 		});
 	});
@@ -96,14 +142,14 @@ describe('fetchQueries', () => {
 
 			return fetchUtils.fetchQueries(
 				API_URL.toString(),
-				{ method: 'POST', csrf: csrfJwt }
+				postRequest
 			)(queries, meta)
 				.then(() => {
 					const calledWith = global.fetch.calls.mostRecent().args;
 					const url = new URL(calledWith[0]);
 					const options = calledWith[1];
 					expect(url.toString()).toBe(API_URL.toString());
-					expect(options.method).toEqual('POST');
+					expect(options.method).toEqual('post');
 					// build a dummy url to hold the url-encoded body as searchstring
 					const dummyUrl = new URL(`http://example.com?${options.body}`);
 					expect(dummyUrl.searchParams.has('queries')).toBe(true);
@@ -116,14 +162,14 @@ describe('fetchQueries', () => {
 
 			return fetchUtils.fetchQueries(
 				API_URL.toString(),
-				{ method: 'POST', csrf: csrfJwt }
+				postRequest
 			)(queries)
 				.then(() => {
 					const calledWith = global.fetch.calls.mostRecent().args;
 					const url = new URL(calledWith[0]);
 					const options = calledWith[1];
 					expect(url.toString()).toBe(API_URL.toString());
-					expect(options.method).toEqual('POST');
+					expect(options.method).toEqual('post');
 					const dummyUrl = new URL(`http://example.com?${options.body}`);
 					expect(dummyUrl.searchParams.has('queries')).toBe(true);
 					expect(dummyUrl.searchParams.has('metadata')).toBe(false);
@@ -169,38 +215,6 @@ describe('tryJSON', () => {
 			response => expect(true).toBe(false),  // should not run - promise should be rejected
 			err => expect(err).toEqual(jasmine.any(Error))
 		);
-	});
-});
-
-describe('mergeCookies', () => {
-	it('makes a cookie header string from a { key<string> : value<string> } object', () => {
-		expect(fetchUtils.mergeCookies('bim=bam', { foo: 'foo', bar: 'bar' }))
-			.toEqual('bim=bam; foo=foo; bar=bar');
-	});
-	it('overwrites existing cookies with new cookies', () => {
-		expect(fetchUtils.mergeCookies('foo=meetup', { foo: 'foo', bar: 'bar' }))
-			.toEqual('foo=foo; bar=bar');
-	});
-});
-
-describe('cleanBadCookies', () => {
-	const goodHeader = 'foo=bar; baz=boom';
-	it('removes bad cookies from the cookie header', () => {
-		const badHeader = fetchUtils.BAD_COOKIES.reduce(
-			(badHeader, badCookie) => `${badHeader}; ${badCookie}=whatever`,
-			goodHeader
-		);
-
-		const cleanedHeader = fetchUtils.cleanBadCookies(badHeader);
-		fetchUtils.BAD_COOKIES.forEach(badCookie => {
-			// bad header _has_ bad cookie
-			expect(cookie.parse(badHeader)[badCookie]).toBeDefined();
-			// clean header does _not_ have bad cookie
-			expect(cookie.parse(cleanedHeader)[badCookie]).toBeUndefined();
-		});
-	});
-	it('leaves a clean cookie header intact', () => {
-		expect(fetchUtils.cleanBadCookies(goodHeader)).toEqual(goodHeader);
 	});
 });
 

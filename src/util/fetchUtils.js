@@ -1,5 +1,14 @@
-import BrowserCookies from 'js-cookie';
-import cookie from 'cookie';
+import JSCookie from 'js-cookie';
+import rison from 'rison';
+
+
+const BrowserCookies = JSCookie.withConverter({
+	read: (value, name) => value,
+	write: (value, name) =>
+		encodeURIComponent(value)
+			.replace(/[!'()*]/g, c => `%${c.charCodeAt(0).toString(16)}`),
+});
+
 /**
  * A module for middleware that would like to make external calls through `fetch`
  * @module fetchUtils
@@ -19,11 +28,81 @@ export const parseQueryResponse = queries => ({ responses, error, message }) => 
 };
 
 /**
- * Wrapper around `fetch` to send an array of queries to the server. It ensures
  * that the request will have the required OAuth and CSRF credentials and constructs
  * the `fetch` call arguments based on the request method. It also records the
  * CSRF header value in a cookie for use as a CSRF header in future fetches.
  *
+ * @param {String} apiUrl the general-purpose endpoint for API calls to the
+ *   application server
+ * @param {Object} options {
+ *     method: "get", "post", "delete", or "patch",
+ *   }
+ * @param {Array} queries the queries to send - must all use the same `method`
+ * @param {Object} meta additional characteristics of the request, e.g. logout,
+ *   click tracking data
+ * @return {Object} { url, config } arguments for a fetch call
+ */
+export const getFetchArgs = (apiUrl, options, queries, meta) => {
+	const {
+		headers={},
+	} = options;
+
+	const method = ((queries[0].meta || {}).method || '').toLowerCase() ||  // allow query to set method
+		options.method.toLowerCase() ||  // fallback to options
+		'get';  // fallback to 'get'
+
+	const isPost = method === 'post';
+	const isDelete = method === 'delete';
+
+	const fetchUrl = new URL(apiUrl);
+	fetchUrl.searchParams.append('queries', rison.encode_array(queries));
+
+	if (meta) {
+		const {
+			clickTracking,
+			logout,
+			...metadata
+		} = meta;
+
+		BrowserCookies.set(
+			'click-track',
+			JSON.stringify(clickTracking),
+			{ domain: '.meetup.com' }
+		);
+
+		// special logout param
+		if (logout) {
+			fetchUrl.searchParams.append('logout', true);
+		}
+
+		// send other metadata in searchParams
+		fetchUrl.searchParams.append('metadata', rison.encode_object(metadata));
+
+	}
+	const config = {
+		method,
+		headers: {
+			...headers,
+			'content-type': isPost ? 'application/x-www-form-urlencoded' : 'text/plain',
+			[CSRF_HEADER]: (isPost || isDelete) ? BrowserCookies.get(CSRF_HEADER_COOKIE) : '',
+		},
+		credentials: 'same-origin'  // allow response to set-cookies
+	};
+	if (isPost) {
+		config.body = fetchUrl.searchParams.toString();
+	}
+
+	const url = isPost ? apiUrl : fetchUrl.toString();
+	return {
+		url,
+		config,
+	};
+};
+
+/**
+ * Wrapper around `fetch` to send an array of queries to the server and organize
+ * the responses.
+*
  * **IMPORTANT**: This function should _only_ be called from the browser. The
  * server should never need to call itself over HTTP
  *
@@ -32,61 +111,37 @@ export const parseQueryResponse = queries => ({ responses, error, message }) => 
  * @param {Object} options {
  *     method: "get", "post", "delete", or "patch",
  *   }
+ * @param {Array} queries the queries to send - must all use the same `method`
+ * @param {Object} meta additional characteristics of the request, e.g. logout,
+ *   click tracking data
  * @return {Promise} resolves with a `{queries, responses}` object
  */
-export const fetchQueries = (apiUrl, options) => (queries, meta) => {
+export const fetchQueries = (apiUrl, options={}) => (queries, meta) => {
 	if (
 		typeof window === 'undefined' &&  // not in browser
-		typeof test === 'undefined'  // not in testing env
+		typeof test === 'undefined'  // not in testing env (global set by Jest)
 	) {
 		throw new Error('fetchQueries was called on server - cannot continue');
 	}
-	options.method = options.method || 'GET';
+
 	const {
-		method,
-		headers,
-	} = options;
+		url,
+		config,
+	} = getFetchArgs(apiUrl, options, queries, meta);
 
-	const isPost = method.toLowerCase() === 'post';
-	const isDelete = method.toLowerCase() === 'delete';
-
-	const fetchUrl = new URL(apiUrl);
-	fetchUrl.searchParams.append('queries', JSON.stringify(queries));
-	if (meta) {
-		fetchUrl.searchParams.append('metadata', JSON.stringify(meta));
-		if (meta.logout) {
-			fetchUrl.searchParams.append('logout', true);
-		}
-	}
-	const fetchConfig = {
-		method,
-		headers: {
-			...(headers || {}),
-			cookie: cleanBadCookies((headers || {}).cookie),
-			'content-type': isPost ? 'application/x-www-form-urlencoded' : 'text/plain',
-			[CSRF_HEADER]: (isPost || isDelete) ? BrowserCookies.get(CSRF_HEADER_COOKIE) : '',
-		},
-		credentials: 'same-origin'  // allow response to set-cookies
-	};
-	if (isPost) {
-		fetchConfig.body = fetchUrl.searchParams.toString();
-	}
-	return fetch(
-		isPost ? apiUrl : fetchUrl.toString(),
-		fetchConfig
-	)
-	.then(queryResponse => queryResponse.json())
-	.then(queryJSON => ({
-		...parseQueryResponse(queries)(queryJSON),
-	}))
-	.catch(err => {
-		console.error(JSON.stringify({
-			err: err.stack,
-			message: 'App server API fetch error',
-			context: fetchConfig,
-		}));
-		throw err;  // handle the error upstream
-	});
+	return fetch(url, config)
+		.then(queryResponse => queryResponse.json())
+		.then(queryJSON => ({
+			...parseQueryResponse(queries)(queryJSON),
+		}))
+		.catch(err => {
+			console.error(JSON.stringify({
+				err: err.stack,
+				message: 'App server API fetch error',
+				context: config,
+			}));
+			throw err;  // handle the error upstream
+		});
 };
 
 /**
@@ -104,56 +159,5 @@ export const tryJSON = reqUrl => response => {
 		);
 	}
 	return response.text().then(text => JSON.parse(text));
-};
-
-/**
- * Convert an object of cookie name-value pairs into a 'Cookie' header. This
- * is different than the serialization offered by the 'cookie' and
- * 'tough-cookie' packages, which write cookie values in the form of a
- * 'Set-Cookie' header, which contains more info
- *
- * @param {Object} cookies a name-value mapping of cookies, e.g. from
- *   `cookie.parse`
- * @return {String} a 'Cookie' header string
- */
-export const stringifyCookies = cookies =>
-	Object.keys(cookies)
-		.map(name => `${name}=${cookies[name]}`)
-		.join('; ');
-
-/**
- * @param {String} rawCookieHeader a 'cookie' header string
- * @param {Object} newCookies an object of name-value cookies to inject
- */
-export const mergeCookies = (rawCookieHeader, newCookies) => {
-	// request.state has _parsed_ cookies, but we need to send raw cookies
-	// _except_ when the incoming request has been back-populated with new 'raw' cookies
-	const oldCookies = cookie.parse(rawCookieHeader);
-	const mergedCookies = {
-		...oldCookies,
-		...newCookies,
-	};
-	return stringifyCookies(mergedCookies);
-};
-
-export const BAD_COOKIES = [
-	'click-track'
-];
-
-/**
- * Remove cookies that are known to have values that are invalid for `fetch`
- * calls
- *
- * @param {String} cookieHeader a cookie header
- * @return {String} a cleaned cookie header string
- */
-export const cleanBadCookies = (cookieHeader) => {
-	if (!cookieHeader) {
-		return '';
-	}
-	const cookies = cookie.parse(cookieHeader);
-	BAD_COOKIES.forEach(badCookie => delete cookies[badCookie]);
-
-	return stringifyCookies(cookies);
 };
 
