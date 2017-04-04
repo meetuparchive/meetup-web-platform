@@ -88,7 +88,7 @@ export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 	action$.ofType('API_REQUEST')
 		.flatMap(({ payload, meta }) => {           // set up the fetch call to the app server
 			const { config } = store.getState();
-			const fetch = fetchQueriesFn(config.apiUrl, { method: 'GET' });
+			const fetch = fetchQueriesFn(config.apiUrl);
 			return Observable.fromPromise(fetch(payload, meta))  // call fetch
 				.takeUntil(action$.ofType(LOCATION_CHANGE))  // cancel this fetch when nav happens
 				.map(apiSuccess)                             // dispatch apiSuccess with server response
