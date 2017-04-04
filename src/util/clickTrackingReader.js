@@ -1,7 +1,7 @@
 const isProd = process.env.NODE_ENV === 'production';
 export const MEMBER_ID_COOKIE = isProd ? 'MEETUP_MEMBER_ID' : 'MEETUP_MEMBER_ID_DEV';
 
-const clickToClickRecord = request => click => {
+export const clickToClickRecord = request => click => {
 	const eventDate = new Date();
 	return {
 		timestamp: eventDate.getTime().toString(),
