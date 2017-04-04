@@ -81,6 +81,7 @@ export const getFetchArgs = (apiUrl, options, queries, meta) => {
 	}
 
 	if (!isFormData) {
+		// need to manually specify content-type for any non-multipart request
 		headers['content-type'] = isPost && 'application/x-www-form-urlencoded' ||
 		'application/json';
 	}
