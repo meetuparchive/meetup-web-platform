@@ -19,7 +19,7 @@ describe('GoodTracking', () => {
 	it('prepends event.data string with `analytics=`', () => {
 		const tracker = new GoodTracking();  // default to JSON.stringify
 		const data = { requestId: 'foo', timestamp: new Date().getTime().toString() };
-		const trackInfo = JSON.stringify(data);
+		const trackInfo = data;
 		return testTransform(
 			tracker,
 			trackInfo,
@@ -42,7 +42,8 @@ describe('GoodTracking', () => {
 			val => {
 				expect(val.startsWith('analytics=')).toBe(true);
 				const valString = val.replace(/^analytics=/, '');
-				expect(valString).toEqual(serializer(data));
+				const serialized = serializer(JSON.stringify(data));
+				expect(valString).toEqual(`${serialized}\n`);
 			}
 		);
 	});
