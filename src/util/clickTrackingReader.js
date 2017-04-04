@@ -20,7 +20,7 @@ export default function processClickTracking(request, reply) {
 		return;
 	}
 
-	const cookieJSON = decodeURIComponent(event.data);
+	const cookieJSON = decodeURIComponent(cookieValue);
 	const { history } = JSON.parse(cookieJSON);
 
 	// avro-encode value
