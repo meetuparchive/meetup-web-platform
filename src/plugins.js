@@ -1,6 +1,11 @@
 import CsrfPlugin from 'electrode-csrf-jwt';
 import Good from 'good';
-import GoodMeetupTracking from './plugins/good-meetup-tracking';
+
+import {
+	activitySerializer,
+	clickSerializer,
+} from './util/avro';
+import GoodTracking from './plugins/good-tracking';
 import requestAuthPlugin from './plugins/requestAuthPlugin';
 
 /**
@@ -89,15 +94,29 @@ export function getConsoleLogPlugin() {
 					},
 					'stdout'  // pipe to stdout
 				],
-				tracking: [
+				activity: [
 					{
 						module: 'good-squeeze',
 						name: 'Squeeze',
 						args: [{
-							request: 'tracking'
+							request: 'activity'
 						}],
 					}, {
-						module: GoodMeetupTracking,
+						module: GoodTracking,
+						args: [ activitySerializer ],
+					},
+					'stdout'
+				],
+				click: [
+					{
+						module: 'good-squeeze',
+						name: 'Squeeze',
+						args: [{
+							request: 'click'
+						}],
+					}, {
+						module: GoodTracking,
+						args: [ clickSerializer ],
 					},
 					'stdout'
 				],
