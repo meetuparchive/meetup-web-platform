@@ -54,8 +54,10 @@ describe('app reducer', () => {
 			type: 'API_SUCCESS',
 			payload: { queries: [], responses: [] },
 		};
-		const appState = app(undefined, API_SUCCESS);
-		expect(appState.isFetching).toBe(false);
+		[true, false, 'monkey'].forEach(isFetching => {
+			const appState = app({ isFetching }, API_SUCCESS);
+			expect(appState.isFetching).toBe(false);
+		});
 	});
 	it('does not change isFetching on CACHE_SUCCESS', () => {
 		const CACHE_SUCCESS = {
