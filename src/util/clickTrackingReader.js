@@ -31,7 +31,11 @@ export default function processClickTracking(request, reply) {
 			request.log(['click'], JSON.stringify(clickRecord))
 		);
 
-	reply.unstate('click-track', { isSecure: process.env.NODE_ENV === 'production' });
+	reply.unstate('click-track', {
+		isSecure: process.env.NODE_ENV === 'production',
+		isHttpOnly: false,
+		domain: '.meetup.com',
+	});
 	return;
 }
 
