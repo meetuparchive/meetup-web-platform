@@ -20,7 +20,7 @@ export default function processClickTracking(request, reply) {
 		return;
 	}
 
-	const cookieJSON = decodeURIComponent(event.data);
+	const cookieJSON = decodeURIComponent(cookieValue);
 	const { history } = JSON.parse(cookieJSON);
 
 	// avro-encode value
@@ -31,7 +31,7 @@ export default function processClickTracking(request, reply) {
 			request.log(['click'], JSON.stringify(clickRecord))
 		);
 
-	reply.unstate('click-track');
+	reply.unstate('click-track', { isSecure: process.env.NODE_ENV === 'production' });
 	return;
 }
 
