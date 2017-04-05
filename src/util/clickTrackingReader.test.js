@@ -22,7 +22,11 @@ describe('processClickTracking', () => {
 	it('calls reply.unstate for click-track cookie', () => {
 		reply.unstate.mockClear();
 		processClickTracking(request, reply);
-		expect(reply.unstate).toHaveBeenCalledWith('click-track');
+		expect(reply.unstate)
+			.toHaveBeenCalledWith(
+				'click-track',
+				{ isSecure: process.env.NODE_ENV === 'production' }
+			);
 	});
 });
 
