@@ -79,7 +79,9 @@ export const getFetchArgs = (apiUrl, options, queries, meta) => {
 		}
 
 		// send other metadata in searchParams
-		fetchUrl.searchParams.append('metadata', rison.encode_object(metadata));
+		if (metadata) {
+			fetchUrl.searchParams.append('metadata', rison.encode_object(metadata));
+		}
 	}
 
 	if (!isFormData) {
