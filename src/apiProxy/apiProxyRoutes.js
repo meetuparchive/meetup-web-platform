@@ -3,7 +3,6 @@ import { getApiProxyRouteHandler } from './apiProxyHandler';
 
 const validApiPayloadSchema = Joi.object({
 	queries: Joi.string().required(), // should be rison.encode_array-encoded
-	metadata: Joi.string(),
 	logout: Joi.any(),
 });
 
@@ -32,7 +31,7 @@ const getApiProxyRoutes = (path, apiProxyFn$) => {
 	};
 	const apiGetRoute = {
 		...routeBase,
-		method: ['GET', 'DELETE', 'PATCH'],
+		method: ['GET', 'DELETE'],
 		config: {
 			...routeBase.config,
 			validate: {
@@ -42,11 +41,18 @@ const getApiProxyRoutes = (path, apiProxyFn$) => {
 	};
 	const apiPostRoute = {
 		...routeBase,
-		method: 'POST',
+		method: ['POST', 'PATCH'],
 		config: {
 			...routeBase.config,
-			validate: {
-				payload: validApiPayloadSchema
+			payload: {
+				allow: [
+					'application/x-www-form-urlencoded',
+					'multipart/form-data',
+				],
+				multipart: {
+					output: 'stream',  // parse file uploads into streams
+				},
+				maxBytes: 1024 * 1024 * 10  // 10 MB max upload
 			},
 		},
 	};
