@@ -2,6 +2,8 @@ import { mockConfig } from '../mocks';
 import start from '../../src/server';
 import * as appRouteHandler from '../../src/routes/appRouteHandler';
 
+jest.mock('../../src/util/avro');  // will spy on calls to this
+
 describe('General server startup tests', () => {
 	it('starts the server', () => {
 		const fooRoute = {
@@ -84,6 +86,50 @@ describe('General server startup tests', () => {
 				};
 				return server.inject(request).then(
 					response => expect(spyable.handler).toHaveBeenCalled()
+				)
+				.then(() => server.stop())
+				.catch(err => {
+					server.stop();
+					throw err;
+				});
+			});
+	});
+});
+
+describe('Cookie setting', () => {
+	const click = {
+		lineage: 'div#foo',
+		linkText: 'hello world',
+		coords: [23, 45],
+	};
+	const clickData = {
+		history: [click, click],
+	};
+	it('calls clickSerializer for each click and un-sets the click-track cookie', () => {
+		const cookie = `click-track=${encodeURIComponent(JSON.stringify(clickData))}`;
+		const fooRoute = {
+			method: 'get',
+			path: '/ny-tech',
+			handler: (request, reply) => reply('okay')
+		};
+		const routes = [fooRoute];
+		// spyOn(config, 'default').and.returnValue(Promise.resolve({}));
+		return start({}, { routes }, mockConfig)
+			.then(server => {
+				const request = {
+					method: 'get',
+					url: '/ny-tech',
+					credentials: 'whatever',
+					headers: { cookie }
+				};
+				return server.inject(request).then(
+					response => {
+						const cookieUnsetString = 'click-track=;';
+						expect(require('../../src/util/avro').clickSerializer)
+							.toHaveBeenCalledTimes(clickData.history.length);
+						expect(response.headers['set-cookie'])
+							.toContainEqual(expect.stringContaining(cookieUnsetString));
+					}
 				)
 				.then(() => server.stop())
 				.catch(err => {
