@@ -1,4 +1,4 @@
-import processClickTracking from './clickTrackingReader';
+import processClickTracking, { clickCookieOptions } from './clickTrackingReader';
 
 describe('processClickTracking', () => {
 	const clickData = {
@@ -23,11 +23,7 @@ describe('processClickTracking', () => {
 		reply.unstate.mockClear();
 		processClickTracking(request, reply);
 		expect(reply.unstate)
-			.toHaveBeenCalledWith('click-track', {
-				isSecure: process.env.NODE_ENV === 'production',
-				isHttpOnly: false,
-				domain: '.meetup.com',
-			});
+			.toHaveBeenCalledWith('click-track', clickCookieOptions);
 	});
 	it('does nothing with no click data', () => {
 		request.log.mockClear();
