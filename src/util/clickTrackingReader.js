@@ -1,5 +1,10 @@
 const isProd = process.env.NODE_ENV === 'production';
 export const MEMBER_ID_COOKIE = isProd ? 'MEETUP_MEMBER_ID' : 'MEETUP_MEMBER_ID_DEV';
+export const clickCookieOptions = {
+	isSecure: isProd,
+	isHttpOnly: false,
+	domain: `${isProd ? '' : '.dev'}.meetup.com`,
+};
 
 export const clickToClickRecord = request => click => {
 	const eventDate = new Date();
@@ -36,12 +41,7 @@ export default function processClickTracking(request, reply) {
 		return;
 	}
 
-
-	reply.unstate('click-track', {
-		isSecure: process.env.NODE_ENV === 'production',
-		isHttpOnly: false,
-		domain: '.meetup.com',
-	});
+	reply.unstate('click-track', clickCookieOptions);
 	return;
 }
 
