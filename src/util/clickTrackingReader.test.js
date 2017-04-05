@@ -29,5 +29,14 @@ describe('processClickTracking', () => {
 				domain: '.meetup.com',
 			});
 	});
+	it('does nothing with no click data', () => {
+		request.log.mockClear();
+		const emptyRequest = {
+			...request,
+			state: {},
+		};
+		processClickTracking(emptyRequest, reply);
+		expect(request.log).not.toHaveBeenCalled();
+	});
 });
 
