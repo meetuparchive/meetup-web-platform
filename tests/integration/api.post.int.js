@@ -1,3 +1,4 @@
+import querystring from 'querystring';
 import Boom from 'boom';
 import rison from 'rison';
 import {
@@ -37,12 +38,13 @@ const runTest = (test, payload=mockPostPayload, csrfHeaders=getCsrfHeaders) => s
 		.then(([headerToken, cookieToken]) => {
 			const headers = {
 				'x-csrf-jwt': headerToken,
+				'content-type': 'application/x-www-form-urlencoded',
 				cookie: `x-csrf-jwt=${cookieToken}`,
 			};
 			const request = {
 				method: 'post',
 				url: '/mu_api',
-				payload,
+				payload: querystring.stringify(payload),
 				credentials: 'whatever',
 				headers,
 			};
