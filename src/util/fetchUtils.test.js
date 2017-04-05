@@ -7,6 +7,8 @@ import {
 } from 'meetup-web-mocks/lib/api';
 import * as fetchUtils from './fetchUtils';
 
+global.FormData = function() {};
+
 jest.mock('js-cookie', () => {
 	const get = jest.fn(name => `${name} value`);
 	const set = jest.fn((name, value) => `${name} set to ${value}`);
@@ -176,6 +178,34 @@ describe('fetchQueries', () => {
 					expect(options.headers['x-csrf-jwt']).toEqual(csrfJwt);
 				});
 		});
+	});
+	describe('form data', () => {
+		it('sends form data as multipart/form-data', () => {
+			global.FormData = class FormData {
+				append() {}
+				has() {
+					return true;
+				}
+			};
+			FormData.prototype.append = jest.fn();
+			const formQueries = [mockQuery({ params: new FormData() })];
+			spyOn(global, 'fetch').and.callFake(fakeSuccess);
+
+			return fetchUtils.fetchQueries(
+				API_URL.toString(),
+				postRequest
+			)(formQueries)
+				.then(() => {
+					const calledWith = global.fetch.calls.mostRecent().args;
+					const url = new URL(calledWith[0]);
+					const options = calledWith[1];
+					expect(options.method).toEqual('post');
+					expect(url.searchParams.has('queries')).toBe(true);
+					expect(url.searchParams.has('metadata')).toBe(false);
+					expect(options.headers['x-csrf-jwt']).toEqual(csrfJwt);
+				});
+		});
+
 	});
 });
 
