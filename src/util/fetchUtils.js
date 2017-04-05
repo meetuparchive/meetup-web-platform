@@ -47,9 +47,11 @@ export const getFetchArgs = (apiUrl, options, queries, meta) => {
 		headers={},
 	} = options;
 
-	const method = ((queries[0].meta || {}).method || '').toLowerCase() ||  // allow query to set method
-		options.method.toLowerCase() ||  // fallback to options
-		'get';  // fallback to 'get'
+	const method = (
+		(queries[0].meta || {}).method ||
+			options.method ||  // fallback to options
+			'get'  // fallback to 'get'
+	).toLowerCase();
 
 	const isPost = method === 'post';
 	const isFormData = queries[0].params instanceof FormData;
