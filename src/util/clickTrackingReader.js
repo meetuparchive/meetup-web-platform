@@ -36,11 +36,12 @@ export default function processClickTracking(request, reply) {
 		return;
 	}
 
+	const isProd = process.env.NODE_ENV === 'production';
 
 	reply.unstate('click-track', {
-		isSecure: process.env.NODE_ENV === 'production',
+		isSecure: isProd,
 		isHttpOnly: false,
-		domain: '.meetup.com',
+		domain: `${isProd ? '' : '.dev'}.meetup.com`,
 	});
 	return;
 }
