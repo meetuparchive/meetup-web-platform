@@ -77,9 +77,10 @@ export const getFetchArgs = (apiUrl, options, queries, meta) => {
 			fetchUrl.searchParams.append('logout', true);
 		}
 
-		// send other metadata in searchParams
-		fetchUrl.searchParams.append('metadata', rison.encode_object(metadata));
-
+		if (Object.keys(metadata).length) {
+			// send other metadata in searchParams
+			fetchUrl.searchParams.append('metadata', rison.encode_object(metadata));
+		}
 	}
 	const config = {
 		method,
