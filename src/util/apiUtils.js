@@ -324,11 +324,21 @@ export function parseRequest(request) {
 		},
 	};
 	if (request.mime === 'multipart/form-data') {
+		// the parsed payload includes string key-value pairs for regular inputs,
+		// and file descriptors for file upload inputs { filename, path, headers }
+		// The file descriptors can be converted to readable streams for the API
+		// request.
 		externalRequestOpts.formData = Object.keys(request.payload)
 			.reduce((formData, key) => {
 				const value = request.payload[key];
 				if (value.filename) {
-					formData[key] = fs.createReadStream(value.path);
+					formData[key] = {
+						value: fs.createReadStream(value.path),
+						options: {
+							filename: value.filename,
+							contentType: value.headers['content-type'],
+						},
+					};
 					request.app.upload = value.path;
 				} else {
 					formData[key] = value;
