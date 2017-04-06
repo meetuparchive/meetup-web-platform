@@ -1,5 +1,4 @@
 import Stream from 'stream';
-import FormData from 'form-data';
 import querystring from 'qs';
 import url from 'url';
 import uuid from 'uuid';
@@ -270,7 +269,9 @@ export function parseRequestHeaders(request) {
 
 	delete externalRequestHeaders['host'];  // let app server set 'host'
 	delete externalRequestHeaders['accept-encoding'];  // let app server set 'accept'
-	delete externalRequestHeaders['content-length'];  // original request content-length is irrelevant
+	if (request.mime !== 'multipart/form-data') {
+		delete externalRequestHeaders['content-length'];  // original request content-length is irrelevant
+	}
 	delete externalRequestHeaders['content-type'];  // the content type will be set in buildRequestArgs
 
 	// cloudflare headers we don't want to pass on
@@ -324,20 +325,18 @@ export function parseRequest(request) {
 		},
 	};
 	if (request.mime === 'multipart/form-data') {
-		externalRequestOpts.formData = Object.keys(request.payload)
-			.reduce((formData, key) => {
+		externalRequestOpts._formData = Object.keys(request.payload)
+			.map(key => {
 				const value = request.payload[key];
 				const args = [key, value];
 				if (value instanceof Stream.Readable) {
 					args.push({
 						filename: value.hapi.filename,
-						contentType: value.hapi.headers['content-type'],
-						knownLength: value._data.length
+						headers: value.hapi.headers,
 					});
 				}
-				formData.append.apply(formData, args);
-				return formData;
-			}, new FormData());
+				return args;
+			});
 	}
 	return {
 		externalRequestOpts,
@@ -410,12 +409,26 @@ export const makeMockRequest = mockResponse => requestOpts =>
 	Rx.Observable.of([makeMockResponseOk(requestOpts), JSON.stringify(mockResponse)])
 		.do(() => console.log(`MOCKING response to ${requestOpts.url}`));
 
-const externalRequest$ = Rx.Observable.bindNodeCallback(externalRequest);
+const externalRequest$ = requestOpts =>
+	Rx.Observable.create(obs => {
+		const r = externalRequest(requestOpts, (err, response, body) => {
+			if (err) {
+				obs.error(err);
+			}
+			obs.next([response, body]);
+			obs.complete();
+		});
+		if (requestOpts._formData) {
+			const form = r.form();
+			requestOpts._formData.forEach(args => form.append.apply(form, args));
+		}
+	});
+
 /**
  * Make a real external API request, return response body string
  */
-export const makeExternalApiRequest = request => requestOpts => {
-	return externalRequest$(requestOpts)
+export const makeExternalApiRequest = request => requestOpts =>
+	externalRequest$(requestOpts)
 		.do(  // log errors
 			null,
 			err => {
@@ -431,7 +444,6 @@ export const makeExternalApiRequest = request => requestOpts => {
 		)
 		.timeout(request.server.app.API_TIMEOUT)
 		.map(([response, body]) => [response, body, requestOpts.jar]);
-};
 
 export const logApiResponse = request => ([response, body]) => {
 	const {
