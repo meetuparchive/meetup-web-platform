@@ -1,4 +1,3 @@
-import Stream from 'stream';
 import querystring from 'qs';
 import url from 'url';
 import uuid from 'uuid';
@@ -325,18 +324,7 @@ export function parseRequest(request) {
 		},
 	};
 	if (request.mime === 'multipart/form-data') {
-		externalRequestOpts._formData = Object.keys(request.payload)
-			.map(key => {
-				const value = request.payload[key];
-				const args = [key, value];
-				if (value instanceof Stream.Readable) {
-					args.push({
-						filename: value.hapi.filename,
-						headers: value.hapi.headers,
-					});
-				}
-				return args;
-			});
+		externalRequestOpts.formData = request.payload;
 	}
 	return {
 		externalRequestOpts,
@@ -409,26 +397,12 @@ export const makeMockRequest = mockResponse => requestOpts =>
 	Rx.Observable.of([makeMockResponseOk(requestOpts), JSON.stringify(mockResponse)])
 		.do(() => console.log(`MOCKING response to ${requestOpts.url}`));
 
-const externalRequest$ = requestOpts =>
-	Rx.Observable.create(obs => {
-		const r = externalRequest(requestOpts, (err, response, body) => {
-			if (err) {
-				obs.error(err);
-			}
-			obs.next([response, body]);
-			obs.complete();
-		});
-		if (requestOpts._formData) {
-			const form = r.form();
-			requestOpts._formData.forEach(args => form.append.apply(form, args));
-		}
-	});
-
+const externalRequest$ = Rx.Observable.bindNodeCallback(externalRequest);
 /**
  * Make a real external API request, return response body string
  */
-export const makeExternalApiRequest = request => requestOpts =>
-	externalRequest$(requestOpts)
+export const makeExternalApiRequest = request => requestOpts => {
+	return externalRequest$(requestOpts)
 		.do(  // log errors
 			null,
 			err => {
@@ -444,6 +418,7 @@ export const makeExternalApiRequest = request => requestOpts =>
 		)
 		.timeout(request.server.app.API_TIMEOUT)
 		.map(([response, body]) => [response, body, requestOpts.jar]);
+};
 
 export const logApiResponse = request => ([response, body]) => {
 	const {
