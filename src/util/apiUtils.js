@@ -1,3 +1,5 @@
+import Stream from 'stream';
+import FormData from 'form-data';
 import querystring from 'qs';
 import url from 'url';
 import uuid from 'uuid';
@@ -322,7 +324,20 @@ export function parseRequest(request) {
 		},
 	};
 	if (request.mime === 'multipart/form-data') {
-		externalRequestOpts.formData = request.payload;
+		externalRequestOpts.formData = Object.keys(request.payload)
+			.reduce((formData, key) => {
+				const value = request.payload[key];
+				const args = [key, value];
+				if (value instanceof Stream.Readable) {
+					args.push({
+						filename: value.hapi.filename,
+						contentType: value.hapi.headers['content-type'],
+						knownLength: value._data.length
+					});
+				}
+				formData.append.apply(formData, args);
+				return formData;
+			}, new FormData());
 	}
 	return {
 		externalRequestOpts,
