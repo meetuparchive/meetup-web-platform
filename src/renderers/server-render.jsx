@@ -10,7 +10,8 @@ import PlatformApp from '../components/PlatformApp';
 import { polyfillNodeIntl } from '../util/localizationUtils';
 
 import {
-	configureUrls,
+	configureApiUrl,
+	configureBaseUrl,
 } from '../actions/configActionCreators';
 
 // Ensure global Intl for use with FormatJS
@@ -166,7 +167,8 @@ const makeRenderer = (
 	const store = createStore(reducer, initialState);
 
 	// load initial config
-	store.dispatch(configureUrls({ baseUrl: host, apiUrl }));
+	store.dispatch(configureApiUrl(apiUrl));
+	store.dispatch(configureBaseUrl(host));
 
 	// render skeleton if requested - the store is ready
 	if ('skeleton' in request.query) {

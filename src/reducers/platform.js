@@ -71,17 +71,17 @@ export function clickTracking(state=DEFAULT_CLICK_TRACK, action) {
 }
 
 export function config(state={}, action) {
-	let urls,
+	let apiUrl,
+		baseUrl,
 		trackId;
 
 	switch(action.type) {
-	case 'CONFIGURE_URLS':
-		urls = action.payload;
-		return { ...state, ...urls };
-	// case 'CONFIGURE_BASE_URL':
-	// 	baseUrl = action.payload;
-	// 	console.log('------------------ baseUrl', baseUrl);
-	// 	return { ...state, baseUrl };
+	case 'CONFIGURE_API_URL':
+		apiUrl = action.payload;
+		return { ...state, apiUrl };
+	case 'CONFIGURE_BASE_URL':
+		baseUrl = action.payload;
+		return { ...state, baseUrl };
 	case 'CONFIGURE_TRACKING_ID':
 		trackId = action.payload;
 		return { ...state, trackId };
