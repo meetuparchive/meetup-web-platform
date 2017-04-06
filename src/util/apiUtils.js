@@ -1,3 +1,5 @@
+import fs from 'fs';
+
 import querystring from 'qs';
 import url from 'url';
 import uuid from 'uuid';
@@ -268,9 +270,7 @@ export function parseRequestHeaders(request) {
 
 	delete externalRequestHeaders['host'];  // let app server set 'host'
 	delete externalRequestHeaders['accept-encoding'];  // let app server set 'accept'
-	if (request.mime !== 'multipart/form-data') {
-		delete externalRequestHeaders['content-length'];  // original request content-length is irrelevant
-	}
+	delete externalRequestHeaders['content-length'];  // original request content-length is irrelevant
 	delete externalRequestHeaders['content-type'];  // the content type will be set in buildRequestArgs
 
 	// cloudflare headers we don't want to pass on
@@ -324,7 +324,17 @@ export function parseRequest(request) {
 		},
 	};
 	if (request.mime === 'multipart/form-data') {
-		externalRequestOpts.formData = request.payload;
+		externalRequestOpts.formData = Object.keys(request.payload)
+			.reduce((formData, key) => {
+				const value = request.payload[key];
+				if (value.filename) {
+					formData[key] = fs.createReadStream(value.path);
+					request.app.upload = value.path;
+				} else {
+					formData[key] = value;
+				}
+				return formData;
+			}, {});
 	}
 	return {
 		externalRequestOpts,
