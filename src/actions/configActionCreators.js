@@ -1,14 +1,15 @@
-export function configureApiUrl(url) {
+export function configureUrls({ baseUrl, apiUrl }) {
 	return {
-		type: 'CONFIGURE_API_URL',
-		payload: url
+		type: 'CONFIGURE_URLS',
+		payload: { baseUrl, apiUrl }
 	};
 }
 
-export function configureBaseUrl(url) {
-	return {
-		type: 'CONFIGURE_BASE_URL',
-		payload: url
-	};
-}
+// export function configureBaseUrl(url) {
+// 	console.log('-----------',url,'----------');
+// 	return {
+// 		type: 'CONFIGURE_BASE_URL',
+// 		payload: url
+// 	};
+// }
 

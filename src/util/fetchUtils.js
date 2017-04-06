@@ -58,7 +58,7 @@ export const fetchQueries = (apiUrl, options) => (queries, meta) => {
 
 	const isPost = method.toLowerCase() === 'post';
 	const isDelete = method.toLowerCase() === 'delete';
-
+console.log('apiUrl', apiUrl);
 	const fetchUrl = new URL(apiUrl);
 	fetchUrl.searchParams.append('queries', rison.encode_array(queries));
 
