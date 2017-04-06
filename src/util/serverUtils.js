@@ -1,3 +1,4 @@
+import fs from 'fs';
 import https from 'https';
 import Hapi from 'hapi';
 import uuid from 'uuid';
@@ -45,6 +46,20 @@ export function onRequestExtension(request, reply) {
 export function onPreHandlerExtension(request, reply) {
 	clickTrackingReader(request, reply);
 	return reply.continue();
+}
+
+export function onResponse(request) {
+	logResponse(request);
+	if (request.app.upload) {
+		fs.unlink(request.app.upload, err => {
+			if (err) {
+				console.error(JSON.stringify({
+					message: 'Could not delete uploaded file',
+					info: request.app.upload,
+				}));
+			}
+		});
+	}
 }
 
 export function logResponse(request) {
@@ -108,7 +123,7 @@ export function registerExtensionEvents(server) {
 		type: 'onPreHandler',
 		method: onPreHandlerExtension,
 	}]);
-	server.on('response', logResponse);
+	server.on('response', onResponse);
 	return server;
 }
 

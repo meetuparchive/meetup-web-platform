@@ -32,7 +32,7 @@ const getApiProxyRoutes = (path, apiProxyFn$) => {
 	};
 	const apiGetRoute = {
 		...routeBase,
-		method: ['GET', 'DELETE', 'PATCH'],
+		method: ['GET', 'DELETE'],
 		config: {
 			...routeBase.config,
 			validate: {
@@ -42,11 +42,18 @@ const getApiProxyRoutes = (path, apiProxyFn$) => {
 	};
 	const apiPostRoute = {
 		...routeBase,
-		method: 'POST',
+		method: ['POST', 'PATCH'],
 		config: {
 			...routeBase.config,
-			validate: {
-				payload: validApiPayloadSchema
+			payload: {
+				allow: [
+					'application/x-www-form-urlencoded',
+					'multipart/form-data',
+				],
+				multipart: {
+					output: 'file',  // parse file uploads into streams
+				},
+				maxBytes: 1024 * 1024 * 10  // 10 MB max upload
 			},
 		},
 	};
