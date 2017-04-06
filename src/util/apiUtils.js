@@ -185,36 +185,44 @@ export const parseApiResponse = requestUrl => ([response, body]) => {
  */
 export const buildRequestArgs = externalRequestOpts =>
 	({ endpoint, params, flags }) => {
-
-		// cheap, brute-force object clone, acceptable for serializable object
-		const externalRequestOptsQuery = JSON.parse(JSON.stringify(externalRequestOpts));
-
-		externalRequestOptsQuery.url = encodeURI(`/${endpoint}`);
-		externalRequestOptsQuery.jar = createCookieJar(externalRequestOptsQuery.url);
+		const dataParams = querystring.stringify(params);
+		const headers = { ...externalRequestOpts.headers };
+		let url = encodeURI(`/${endpoint}`);
+		let body;
+		const jar = createCookieJar(url);
 
 		if (flags) {
-			externalRequestOptsQuery.headers['X-Meetup-Request-Flags'] = flags.join(',');
+			headers['X-Meetup-Request-Flags'] = flags.join(',');
 		}
 
-		const dataParams = querystring.stringify(params);
-
-		switch (externalRequestOptsQuery.method) {
-		case 'get':
-		case 'delete':
-			externalRequestOptsQuery.url += `?${dataParams}`;
-			externalRequestOptsQuery.headers['content-type'] = 'application/json';
-			externalRequestOptsQuery.headers['X-Meta-Photo-Host'] = 'secure';
-			break;
+		switch (externalRequestOpts.method) {
 		case 'post':
 			if (externalRequestOpts.formData) {
 				break;
 			}
-			externalRequestOptsQuery.body = dataParams;
-			externalRequestOptsQuery.headers['content-type'] = 'application/x-www-form-urlencoded';
+			body = dataParams;
+			headers['content-type'] = 'application/x-www-form-urlencoded';
 			break;
+		case 'delete':
+		case 'get':
+		default:
+			url += `?${dataParams}`;
+			headers['content-type'] = 'application/json';
+			headers['X-Meta-Photo-Host'] = 'secure';
 		}
 
-		// production logs will automatically be JSON-parsed in Stackdriver
+		const externalRequestOptsQuery = {
+			...externalRequestOpts,
+			headers,
+			jar,
+			url,
+		};
+
+		// only add body if defined
+		if (body) {
+			externalRequestOptsQuery.body = body;
+		}
+
 		return externalRequestOptsQuery;
 	};
 
