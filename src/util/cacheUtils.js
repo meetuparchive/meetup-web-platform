@@ -56,6 +56,11 @@ export const cacheReader = cache => query =>
  * @param {Object} response plain object API response for the query
  * @return {Promise}
  */
-export const cacheWriter = cache => (query, response) =>
-	cache.set(JSON.stringify(query), response);
+export const cacheWriter = cache => (query, response) => {
+	const method = (query.meta || {}).method || 'get';
+	if (method.toLowerCase() !== 'get') {
+		return Promise.resolve(true);
+	}
+	return cache.set(JSON.stringify(query), response);
+};
 
