@@ -41,6 +41,8 @@ import {
  */
 const getPostQueryFetch = (fetchQueries, store) =>
 	query => {
+		// force presence of 'post' method
+		query.meta = { ...(query.meta || {}), method: 'post' };
 		const { config: { apiUrl } } = store.getState();
 		return fetchQueries(apiUrl, { method: 'POST' })([query]);
 	};

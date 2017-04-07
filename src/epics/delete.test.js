@@ -24,16 +24,15 @@ MOCK_APP_STATE.config = {
 const store = createFakeStore(MOCK_APP_STATE);
 describe('getDeleteEpic', () => {
 	it('does not pass through arbitrary actions', epicIgnoreAction(getDeleteEpic(fetchUtils.fetchQueries)));
-	it('calls fetchQueries with `method: "DELETE"`', function() {
-		const response = 'success';
-		spyOn(fetchUtils, 'fetchQueries').and.callFake(() => () => Promise.resolve(response));
+	it('sets query.meta.method = "delete"', function() {
+		const innerFetchQueries = jest.fn();
+		fetchUtils.fetchQueries = jest.fn(() => innerFetchQueries);
 		const action$ = ActionsObservable.of(MOCK_DELETE_ACTION);
 		return getDeleteEpic(fetchUtils.fetchQueries)(action$, store)
 			.do(() => {
-				expect(fetchUtils.fetchQueries.calls.count()).toBe(1);
-				const fetchArgs = fetchUtils.fetchQueries.calls.argsFor(0);
-				expect(fetchArgs[1].method).toEqual('DELETE');
-				expect(fetchArgs[0]).toEqual(MOCK_APP_STATE.config.apiUrl);
+				const fetchedQueries = innerFetchQueries.mock.calls[0][0];
+				expect(fetchedQueries[0].meta)
+					.toEqual(expect.objectContaining({ method: 'delete' }));
 			})
 			.toPromise();
 	});
