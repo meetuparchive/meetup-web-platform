@@ -9,7 +9,7 @@ import {
 	CLICK_TRACK_CLEAR_ACTION
 } from '../actions/clickActionCreators';
 
-export const DEFAULT_APP_STATE = {};
+export const DEFAULT_APP_STATE = { isFetching: false };
 
 /**
  * The primary reducer for data provided by the API
@@ -21,8 +21,14 @@ export const DEFAULT_APP_STATE = {};
  */
 export function app(state=DEFAULT_APP_STATE, action={}) {
 	switch (action.type) {
-	case 'CACHE_SUCCESS':  // fall through - same effect as API success
-	case 'API_SUCCESS':
+	case 'API_REQUEST':
+		if (action.meta.logout) {
+			// clear app state during logout
+			return { ...DEFAULT_APP_STATE, isFetching: true };
+		}
+		return { ...state, isFetching: true };
+	case 'API_SUCCESS':  // fall though
+	case 'CACHE_SUCCESS':  // fall through
 	case 'API_ERROR': {
 		// each of these actions provides an API response that should go into app
 		// state - error responses will contain error info
@@ -31,15 +37,10 @@ export function app(state=DEFAULT_APP_STATE, action={}) {
 		return { ...state, [ref]: response };
 	}
 	case 'API_FAILURE':
-		return {
-			...state,
-			failure: action.payload
-		};
-	case 'API_REQUEST':
-		if (action.meta.logout) {
-			return DEFAULT_APP_STATE;  // clear app state during logout
-		}
-		// fall through - no need to change state
+		state.failure = action.payload;
+		// fall through - fetch is complete
+	case 'API_COMPLETE':
+		return { ...state, isFetching: false };
 	default:
 		return state;
 	}
@@ -74,8 +75,8 @@ export function config(state={}, action) {
 	switch(action.type) {
 	case 'CONFIGURE_API_URL':
 		return { ...state, apiUrl: action.payload };
-	case 'CONFIGURE_TRACKING_ID':
-		return { ...state, trackId: action.payload };
+	case 'CONFIGURE_BASE_URL':
+		return { ...state, baseUrl: action.payload };
 	default:
 		return state;
 	}

@@ -37,8 +37,8 @@ const logoutQueryMatch = /[?&]logout(?:[=&]|$)/;
  * @param {Object} routes The application's React Router routes
  * @returns {Function} an Epic function that emits an API_REQUEST action
  */
-export const getNavEpic = routes => {
-	const findActiveQueries = activeRouteQueries(routes);
+export const getNavEpic = (routes, baseUrl) => {
+	const findActiveQueries = activeRouteQueries(routes, baseUrl);
 	let currentLocation = {};  // keep track of current route so that apiRequest can get 'referrer'
 	return (action$, store) =>
 		action$.ofType(LOCATION_CHANGE, '@@server/RENDER')
@@ -89,7 +89,7 @@ export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 	action$.ofType('API_REQUEST')
 		.flatMap(({ payload, meta }) => {           // set up the fetch call to the app server
 			const { config } = store.getState();
-			const fetchQueries = fetchQueriesFn(config.apiUrl, { method: 'GET' });
+			const fetchQueries = fetchQueriesFn(config.apiUrl);
 			return Observable.fromPromise(fetchQueries(payload, meta))  // call fetch
 				.takeUntil(action$.ofType(LOCATION_CHANGE))  // cancel this fetch when nav happens
 				.flatMap(({ successes=[], errors=[] }) => {
@@ -103,9 +103,9 @@ export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 				.catch(err => Observable.of(apiFailure(err), apiComplete()));
 		});
 
-export default function getSyncEpic(routes, fetchQueries) {
+export default function getSyncEpic(routes, fetchQueries, baseUrl) {
 	return combineEpics(
-		getNavEpic(routes),
+		getNavEpic(routes, baseUrl),
 		// locationSyncEpic,
 		getFetchQueriesEpic(fetchQueries)
 	);

@@ -20,6 +20,9 @@ A Query is just a plain object with the following shape:
 	endpoint: string,
   params: object,
 	flags?: string[],
+  meta?: {
+    method: string
+  },
 }
 ```
 
@@ -62,6 +65,44 @@ GET requests) or the request body (for POST requests).
 
 An array of feature flag (Runtime Flag) names that should be returned
 alongside the main request.
+
+### `meta`
+
+#### `method`
+
+You can force the query to be sent with a particular HTTP method by specifying
+it here as a string: `get`, `post`, `delete`, or `patch`. Note that
+you should never try to make a request that contains multiple queries with
+different `method`s.
+
+**Example**
+
+```js
+import { apiRequest } from 'meetup-web-platform/lib/actions/syncActionCreators';
+
+// POST request
+const postQuery = {
+  endpoint: 'ny-tech/members',
+  ref: 'newMember',
+  params: { name, bio },
+  meta: {
+    method: 'post',
+  },
+};
+// dispatch it - this might be from a 'bound' action creator rather than from `store.dispatch` directly
+store.dispatch(apiRequest([postQuery]));  // note that `apiRequest` takes an _array_ arg
+
+// DELETE request
+const deleteQuery = {
+  endpoint: 'ny-tech/members/123456',
+  ref: 'deletedMember',
+  params: { id },
+  meta: {
+    method: 'delete',
+  },
+};
+store.dispatch(apiRequest([deleteQuery]));  // note that `apiRequest` takes an _array_ arg
+```
 
 ## Usage
 

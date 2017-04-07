@@ -14,23 +14,26 @@ describe('app reducer', () => {
 	it('returns default state for empty action', () => {
 		expect(app(undefined, {})).toEqual(DEFAULT_APP_STATE);
 	});
-	it('re-sets app state on logout API_REQUEST', function() {
+	it('re-sets app state on logout API_REQUEST, with isFetching:true', function() {
 		const logoutRequest = syncActionCreators.apiRequest([], { logout: true });
-		expect(app(this.MOCK_STATE, logoutRequest)).toEqual(DEFAULT_APP_STATE);
+		expect(app(this.MOCK_STATE, logoutRequest)).toEqual({
+			...DEFAULT_APP_STATE,
+			isFetching: true,
+		});
 	});
-	it('assembles success responses into single state tree', () => {
+	it('adds success response to state tree', () => {
 		const API_SUCCESS = {
 			type: 'API_SUCCESS',
 			payload: {
-				response: { ref: 'bing', bar: 'baz' },
+				response: { ref: 'bing', value: 'baz' },
 			},
 		};
 		expect(app({ foo: 'bar'}, API_SUCCESS)).toEqual({
 			foo: 'bar',
-			bing: { bar: 'baz' },
+			bing: { value: 'baz' }
 		});
 	});
-	it('assembles error responses into single state tree', () => {
+	it('adds error response to state tree', () => {
 		const API_ERROR = {
 			type: 'API_ERROR',
 			payload: {
@@ -49,6 +52,34 @@ describe('app reducer', () => {
 		};
 		const errorState = app(undefined, API_FAILURE);
 		expect(errorState.failure).toBe(API_FAILURE.payload);
+	});
+	it('sets isFetching:true on API_REQUEST', () => {
+		const API_REQUEST = {
+			type: 'API_REQUEST',
+			payload: [],
+			meta: {},
+		};
+		const appState = app(undefined, API_REQUEST);
+		expect(appState.isFetching).toBe(true);
+	});
+	it('sets isFetching:false on API_COMPLETE', () => {
+		const API_COMPLETE = {
+			type: 'API_COMPLETE',
+		};
+		[true, false, 'monkey'].forEach(isFetching => {
+			const appState = app({ isFetching }, API_COMPLETE);
+			expect(appState.isFetching).toBe(false);
+		});
+	});
+	it('does not change isFetching on CACHE_SUCCESS', () => {
+		const CACHE_SUCCESS = {
+			type: 'CACHE_SUCCESS',
+			payload: { query: {}, response: {} },
+		};
+		[true, false, 'monkey'].forEach(isFetching => {
+			const appState = app({ isFetching }, CACHE_SUCCESS);
+			expect(appState.isFetching).toBe(isFetching);
+		});
 	});
 });
 
