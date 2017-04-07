@@ -225,11 +225,14 @@ http://localhost:8000/ny-tech/?__nocache
 `POST` API requests are handled by `PostMiddleware`, which provides a generalized
 interface for sending data to the API and handling return values. The middleware
 only responds to actions that have a `POST_` prefix or a `_POST` suffix in the
-action `type`. Furthermore, the `action.payload` must have a Query object (with
-a `type`, `ref`, and `params`) as well as `onSuccess` and `onError` actionCreators
-to receive the data response from the API - they _must_ be actionCreators because
-their return values will be `dispatch`ed by the middleware in the API success/error
-case.
+action `type`.
+
+The `action.payload` must have a `query` property containing a Query object (with
+a `type`, `ref`, and `params`). Optionally, it may supply `onSuccess` and/or
+`onError` properties, which must be actionCreator functions that will be called
+in addition to `apiSuccess` and `apiError`, respectively. The `onSuccess` and
+`onError` action creators will receive the same arguments as `apiSuccess`
+(`{ queries, responses }`) and `apiError` (`err`). 
 
 Use reducers to parse the response and update application state.
 
