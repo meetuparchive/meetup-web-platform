@@ -47,9 +47,11 @@ export const getFetchArgs = (apiUrl, options, queries, meta) => {
 		headers={},
 	} = options;
 
-	const method = ((queries[0].meta || {}).method || '').toLowerCase() ||  // allow query to set method
-		options.method.toLowerCase() ||  // fallback to options
-		'get';  // fallback to 'get'
+	const method = (
+		(queries[0].meta || {}).method ||
+			options.method ||  // fallback to options
+			'get'  // fallback to 'get'
+	).toLowerCase();
 
 	const hasBody = method === 'post' ||
 		method === 'patch';
@@ -78,10 +80,14 @@ export const getFetchArgs = (apiUrl, options, queries, meta) => {
 		}
 
 		// send other metadata in searchParams
-		fetchUrl.searchParams.append('metadata', rison.encode_object(metadata));
+		if (Object.keys(metadata).length) {
+			// send other metadata in searchParams
+			fetchUrl.searchParams.append('metadata', rison.encode_object(metadata));
+		}
 	}
 
-	if (!isFormData) {  // form data 'content-type' will be set automatically
+	if (!isFormData) {
+		// need to manually specify content-type for any non-multipart request
 		headers['content-type'] = hasBody && 'application/x-www-form-urlencoded' ||
 		'application/json';
 	}

@@ -1,3 +1,4 @@
+import fs from 'fs';
 import https from 'https';
 import Hapi from 'hapi';
 import uuid from 'uuid';
@@ -39,8 +40,26 @@ export function onRequestExtension(request, reply) {
 		}
 	}));
 
+	return reply.continue();
+}
+
+export function onPreHandlerExtension(request, reply) {
 	clickTrackingReader(request, reply);
 	return reply.continue();
+}
+
+export function onResponse(request) {
+	logResponse(request);
+	if (request.app.upload) {
+		fs.unlink(request.app.upload, err => {
+			if (err) {
+				console.error(JSON.stringify({
+					message: 'Could not delete uploaded file',
+					info: request.app.upload,
+				}));
+			}
+		});
+	}
 }
 
 export function logResponse(request) {
@@ -92,6 +111,7 @@ export function logResponse(request) {
 
 /**
  * Use server.ext to add functions to request/server extension points
+ * @see {@link https://hapijs.com/api#request-lifecycle}
  * @param {Object} server Hapi server
  * @return {Object} Hapi server
  */
@@ -99,8 +119,11 @@ export function registerExtensionEvents(server) {
 	server.ext([{
 		type: 'onRequest',
 		method: onRequestExtension,
+	}, {
+		type: 'onPreHandler',
+		method: onPreHandlerExtension,
 	}]);
-	server.on('response', logResponse);
+	server.on('response', onResponse);
 	return server;
 }
 

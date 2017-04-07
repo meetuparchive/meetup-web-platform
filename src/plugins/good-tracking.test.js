@@ -1,14 +1,5 @@
-import avro from 'avsc';
-import {
-	avroSerializer,
-	activitySerializer,
-	schemas,
-	// clickSerializer,
-} from '../util/avro';
 import GoodTracking from './good-tracking';
 import Stream from 'stream';
-
-import { logTrack } from '../util/tracking';
 
 const testTransform = (tracker, trackInfo, test) =>
 	new Promise((resolve, reject) => {
@@ -25,16 +16,10 @@ describe('GoodTracking', () => {
 	it('creates a transform stream', () => {
 		expect(new GoodTracking()).toEqual(jasmine.any(Stream.Transform));
 	});
-	it('transforms input into JSON, prepended with `analytics=`, with base64-encoded avro buffer record', () => {
-		const schema = {
-			type: 'record',
-			fields: [
-				{ name: 'requestId', type: 'string' },
-				{ name: 'timestamp', type: 'string' },
-			]
-		};
-		const tracker = new GoodTracking(avroSerializer(schema));
-		const trackInfo = { requestId: 'foo', timestamp: new Date().getTime().toString() };
+	it('prepends event.data string with `analytics=`', () => {
+		const tracker = new GoodTracking();  // default to JSON.stringify
+		const data = { requestId: 'foo', timestamp: new Date().getTime().toString() };
+		const trackInfo = data;
 		return testTransform(
 			tracker,
 			trackInfo,
@@ -42,50 +27,23 @@ describe('GoodTracking', () => {
 				expect(val.startsWith('analytics=')).toBe(true);
 				const valJSON = val.replace(/^analytics=/, '');
 				const valObj = JSON.parse(valJSON);
-				const utf8String = new Buffer(valObj.record, 'base64').toString('utf-8');
-				const avroBuffer = new Buffer(utf8String);
-				const recordedInfo = avro.parse(schema).fromBuffer(avroBuffer);
-				expect(recordedInfo).toEqual(trackInfo);
+				expect(valObj).toEqual(data);
 			}
 		);
 	});
-});
-
-describe('Integration with tracking logs', () => {
-	const response = {
-		request: {
-			id: 'foo',
-			headers: {},
-			log() {}
-		}
-	};
-	const trackInfo = logTrack('WEB')(response, {
-		memberId: 1234,
-		trackId: 'foo',
-		sessionId: 'bar',  // not part of v3 spec
-		url: 'asdf',
-	});
-
-	it('encodes standard output from logTrack', () => {
-		const tracker = new GoodTracking(activitySerializer);
-
+	it('uses supplied serializer to encode data', () => {
+		const serializer = str => new Buffer(str).toString('base64');
+		const tracker = new GoodTracking(serializer);
+		const data = { requestId: 'foo', timestamp: new Date().getTime().toString() };
+		const trackInfo = JSON.stringify(data);
 		return testTransform(
 			tracker,
 			trackInfo,
 			val => {
-				const valJSON = val.replace(/^analytics=/, '');
-				const valObj = JSON.parse(valJSON);
-				const utf8String = new Buffer(valObj.record, 'base64').toString('utf-8');
-				const avroBuffer = new Buffer(utf8String);
-				const trackedInfo = avro.parse(schemas.activity).fromBuffer(avroBuffer);
-				const memberId = '';  // memberId integer doesn't survive the decode-encode-decode
-				const expectedTrackInfo = {
-					...trackInfo,
-					aggregratedUrl: '',  // misspelled, unused field in v3 spec
-					memberId,
-				};
-				delete expectedTrackInfo.sessionId;  // not part of v3 spec
-				expect({ ...trackedInfo, memberId }).toEqual(expectedTrackInfo);
+				expect(val.startsWith('analytics=')).toBe(true);
+				const valString = val.replace(/^analytics=/, '');
+				const serialized = serializer(JSON.stringify(data));
+				expect(valString).toEqual(`${serialized}\n`);
 			}
 		);
 	});

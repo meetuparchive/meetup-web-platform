@@ -32,7 +32,7 @@ const getApiProxyRoutes = (path, apiProxyFn$) => {
 	};
 	const apiGetRoute = {
 		...routeBase,
-		method: ['GET', 'DELETE',],
+		method: ['GET', 'DELETE'],
 		config: {
 			...routeBase.config,
 			validate: {
@@ -51,7 +51,7 @@ const getApiProxyRoutes = (path, apiProxyFn$) => {
 					'multipart/form-data',
 				],
 				multipart: {
-					output: 'stream',  // parse file uploads into streams
+					output: 'file',  // parse file uploads into streams
 				},
 				maxBytes: 1024 * 1024 * 10  // 10 MB max upload
 			},
