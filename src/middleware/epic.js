@@ -15,9 +15,9 @@ import getDeleteEpic from '../epics/delete';
  * order to render the application. We may want to write a server-specific
  * middleware that doesn't include the other epics if performance is an issue
  */
-const getPlatformMiddleware = (routes, fetchQueries) => createEpicMiddleware(
+const getPlatformMiddleware = (routes, fetchQueries, baseUrl) => createEpicMiddleware(
 	combineEpics(
-		getSyncEpic(routes, fetchQueries),
+		getSyncEpic(routes, fetchQueries, baseUrl),
 		getCacheEpic(),
 		getPostEpic(fetchQueries),
 		getDeleteEpic(fetchQueries)

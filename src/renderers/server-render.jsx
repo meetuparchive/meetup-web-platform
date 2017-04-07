@@ -163,7 +163,7 @@ const makeRenderer = (
 
 	// create the store
 	const initialState = {};
-	const createStore = getServerCreateStore(routes, middleware, request);
+	const createStore = getServerCreateStore(routes, middleware, request, baseUrl);
 	const store = createStore(reducer, initialState);
 
 	// load initial config
