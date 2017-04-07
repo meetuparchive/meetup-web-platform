@@ -1,6 +1,7 @@
 import Rx from 'rxjs';
 import {
-	apiSuccess
+	apiSuccess,
+	apiError,
 } from '../actions/syncActionCreators';
 /**
  * PostEpic provides a generic interface for triggering POST requests and
@@ -55,14 +56,21 @@ const getPostQueryFetch = (fetchQueries, store) =>
  */
 const doPost$ = fetchPostQuery => ({ query, onSuccess, onError }) =>
 	Rx.Observable.fromPromise(fetchPostQuery(query))  // make the fetch call
-		.flatMap(responses =>
+		.flatMap(responses => {
 			// success! return API_SUCCESS and whatever the POST action wants to do onSuccess
-			Rx.Observable.of(
-				apiSuccess(responses),
-				onSuccess && onSuccess(responses)
-			)
-		)
-		.catch(err => Rx.Observable.of(onError(err)));
+			const actions = [apiSuccess(responses)];
+			if (onSuccess) {
+				actions.push(onSuccess(responses));
+			}
+			return Rx.Observable.from(actions);
+		})
+		.catch(err => {
+			const actions = [apiError(err)];
+			if (onError) {
+				actions.push(onError(err));
+			}
+			return Rx.Observable.from(actions);
+		});
 
 const getPostEpic = fetchQueries => (action$, store) =>
 	action$.filter(({ type }) => type.endsWith('_POST') || type.startsWith('POST_'))
