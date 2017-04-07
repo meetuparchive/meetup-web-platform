@@ -43,6 +43,15 @@ describe('activeRouteQueries', () => {
 		const receivedQueries = activeRouteQueries(routes)(location);
 		expect(receivedQueries.map(({ params }) => params)).toEqual(expectedParams);
 	});
+	it('passes all parsed url params into query when provided baseUrl', () => {
+		const baseUrl = '/fr-FR';
+		const param1 = 'param1value';
+		const param2 = 'param2value';
+		const location = url.parse(`${baseUrl}/${param1}/${param2}`);
+		const expectedParams = [ {}, { param1 }, { param1, param2 } ];
+		const receivedQueries = activeRouteQueries(routes, baseUrl)(location);
+		expect(receivedQueries.map(({ params }) => params)).toEqual(expectedParams);
+	});
 	it('matches utf-8 urls', () => {
 		const param1 = '驚くばかり';
 		const location = url.parse(`/${param1}`);

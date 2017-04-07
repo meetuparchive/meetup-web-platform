@@ -51,6 +51,17 @@ describe('getPostEpic', () => {
 				expect(syncActionCreators.apiSuccess).toHaveBeenCalledWith(response);
 			});
 	});
+	it('Returns error from fetchQueries as argument to API_ERROR', function() {
+		const err = new Error('boo');
+		spyOn(fetchUtils, 'fetchQueries').and.callFake(() => () => Promise.reject(err));
+		spyOn(syncActionCreators, 'apiError');
+		// The promises resolve async, but resolution is not accessible to test, so
+		// we use a setTimeout to make sure execution has completed
+		const action$ = ActionsObservable.of(MOCK_POST_ACTION);
+		return getPostEpic(fetchUtils.fetchQueries)(action$, store)
+			.do(() => expect(syncActionCreators.apiError).toHaveBeenCalledWith(err))
+			.toPromise();
+	});
 	it('Returns response from fetchqueries as argument to API_SUCCESS and action\'s onSuccess', function() {
 		const response = 'success';
 		fetchUtils.fetchQueries = jest.fn(() => () => Promise.resolve(response));

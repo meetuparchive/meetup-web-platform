@@ -5,3 +5,9 @@ export function configureApiUrl(url) {
 	};
 }
 
+export function configureBaseUrl(url) {
+	return {
+		type: 'CONFIGURE_BASE_URL',
+		payload: url
+	};
+}

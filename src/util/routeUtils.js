@@ -81,7 +81,7 @@ export const matchedRouteQueriesReducer = location => (queries, { route, match }
  * @param {String} url the current URL path
  * @return {Array} the queries attached to the active routes
  */
-export const activeRouteQueries = routes => location =>
-	matchRoutes(routes, location.pathname)
+export const activeRouteQueries = (routes, baseUrl) => location =>
+	matchRoutes(routes, location.pathname.replace(baseUrl, ''))
 		.reduce(matchedRouteQueriesReducer(location), []);
 

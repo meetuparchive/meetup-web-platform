@@ -29,7 +29,7 @@ function makeRenderer(routes, reducer, middleware=[], baseUrl='') {
 	escape.innerHTML = window.APP_RUNTIME.escapedState;
 	const unescapedStateJSON = escape.textContent;
 	const initialState = JSON.parse(unescapedStateJSON);
-	const createStore = getBrowserCreateStore(routes, middleware);
+	const createStore = getBrowserCreateStore(routes, middleware, baseUrl);
 	const store = createStore(reducer, initialState);
 
 	return (rootElId='outlet') => {

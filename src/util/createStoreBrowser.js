@@ -19,11 +19,12 @@ export const clickTrackEnhancer = createStore => (reducer, initialState, enhance
 
 export function getBrowserCreateStore(
 	routes,
-	middleware=[]
+	middleware=[],
+	baseUrl
 ) {
 	const middlewareToApply = [
 		catchMiddleware,
-		getEpicMiddleware(routes, fetchQueries),
+		getEpicMiddleware(routes, fetchQueries, baseUrl),
 		...middleware,
 		window.mupDevTools ? window.mupDevTools() : noopMiddleware,  // must be last middleware
 	];

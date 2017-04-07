@@ -39,6 +39,10 @@ export function onRequestExtension(request, reply) {
 		}
 	}));
 
+	return reply.continue();
+}
+
+export function onPreHandlerExtension(request, reply) {
 	clickTrackingReader(request, reply);
 	return reply.continue();
 }
@@ -92,6 +96,7 @@ export function logResponse(request) {
 
 /**
  * Use server.ext to add functions to request/server extension points
+ * @see {@link https://hapijs.com/api#request-lifecycle}
  * @param {Object} server Hapi server
  * @return {Object} Hapi server
  */
@@ -99,6 +104,9 @@ export function registerExtensionEvents(server) {
 	server.ext([{
 		type: 'onRequest',
 		method: onRequestExtension,
+	}, {
+		type: 'onPreHandler',
+		method: onPreHandlerExtension,
 	}]);
 	server.on('response', logResponse);
 	return server;

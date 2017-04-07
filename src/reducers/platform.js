@@ -76,6 +76,8 @@ export function config(state={}, action) {
 	switch(action.type) {
 	case 'CONFIGURE_API_URL':
 		return { ...state, apiUrl: action.payload };
+	case 'CONFIGURE_BASE_URL':
+		return { ...state, baseUrl: action.payload };
 	default:
 		return state;
 	}
