@@ -11,6 +11,7 @@ import { polyfillNodeIntl } from '../util/localizationUtils';
 
 import {
 	configureApiUrl,
+	configureBaseUrl,
 } from '../actions/configActionCreators';
 
 // Ensure global Intl for use with FormatJS
@@ -157,15 +158,17 @@ const makeRenderer = (
 	// request protocol might be different from original request that hit proxy
 	// we want to use the proxy's protocol
 	const requestProtocol = headers['x-forwarded-proto'] || connection.info.protocol;
-	const apiUrl = `${requestProtocol}://${info.host}/mu_api`;
+	const host = `${requestProtocol}://${info.host}`;
+	const apiUrl = `${host}/mu_api`;
 
 	// create the store
 	const initialState = {};
-	const createStore = getServerCreateStore(routes, middleware, request);
+	const createStore = getServerCreateStore(routes, middleware, request, baseUrl);
 	const store = createStore(reducer, initialState);
 
 	// load initial config
 	store.dispatch(configureApiUrl(apiUrl));
+	store.dispatch(configureBaseUrl(host));
 
 	// render skeleton if requested - the store is ready
 	if ('skeleton' in request.query) {

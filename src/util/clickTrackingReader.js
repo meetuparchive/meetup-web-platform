@@ -1,5 +1,10 @@
 const isProd = process.env.NODE_ENV === 'production';
 export const MEMBER_ID_COOKIE = isProd ? 'MEETUP_MEMBER_ID' : 'MEETUP_MEMBER_ID_DEV';
+export const clickCookieOptions = {
+	isSecure: isProd,
+	isHttpOnly: false,
+	domain: `${isProd ? '' : '.dev'}.meetup.com`,
+};
 
 export const clickToClickRecord = request => click => {
 	const eventDate = new Date();
@@ -20,18 +25,23 @@ export default function processClickTracking(request, reply) {
 		return;
 	}
 
-	const cookieJSON = decodeURIComponent(event.data);
-	const { history } = JSON.parse(cookieJSON);
+	try {
+		const cookieJSON = decodeURIComponent(cookieValue);
+		const { history } = JSON.parse(cookieJSON);
+		history
+			.map(clickToClickRecord(request))
+			.forEach(clickRecord =>
+				request.log(['click'], JSON.stringify(clickRecord))
+			);
+	} catch(err) {
+		console.error(JSON.stringify({
+			message: 'Could not parse click-track cookie',
+			cookieValue
+		}));
+		return;
+	}
 
-	// avro-encode value
-	// log to stdout with analytics= prefix
-	history
-		.map(clickToClickRecord(request))
-		.forEach(clickRecord =>
-			request.log(['click'], JSON.stringify(clickRecord))
-		);
-
-	reply.unstate('click-track');
+	reply.unstate('click-track', clickCookieOptions);
 	return;
 }
 

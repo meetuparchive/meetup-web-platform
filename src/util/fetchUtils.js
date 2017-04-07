@@ -47,9 +47,11 @@ export const getFetchArgs = (apiUrl, options, queries, meta) => {
 		headers={},
 	} = options;
 
-	const method = ((queries[0].meta || {}).method || '').toLowerCase() ||  // allow query to set method
-		options.method.toLowerCase() ||  // fallback to options
-		'get';  // fallback to 'get'
+	const method = (
+		(queries[0].meta || {}).method ||
+			options.method ||  // fallback to options
+			'get'  // fallback to 'get'
+	).toLowerCase();
 
 	const isPost = method === 'post';
 	const isDelete = method === 'delete';
@@ -75,9 +77,10 @@ export const getFetchArgs = (apiUrl, options, queries, meta) => {
 			fetchUrl.searchParams.append('logout', true);
 		}
 
-		// send other metadata in searchParams
-		fetchUrl.searchParams.append('metadata', rison.encode_object(metadata));
-
+		if (Object.keys(metadata).length) {
+			// send other metadata in searchParams
+			fetchUrl.searchParams.append('metadata', rison.encode_object(metadata));
+		}
 	}
 	const config = {
 		method,
