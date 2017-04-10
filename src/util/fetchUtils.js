@@ -54,6 +54,7 @@ export const getFetchArgs = (apiUrl, options, queries, meta) => {
 	).toLowerCase();
 
 	const isPost = method === 'post';
+	const isFormData = queries[0].params instanceof FormData;
 	const isDelete = method === 'delete';
 
 	const fetchUrl = new URL(apiUrl);
@@ -77,25 +78,33 @@ export const getFetchArgs = (apiUrl, options, queries, meta) => {
 			fetchUrl.searchParams.append('logout', true);
 		}
 
+		// send other metadata in searchParams
 		if (Object.keys(metadata).length) {
 			// send other metadata in searchParams
 			fetchUrl.searchParams.append('metadata', rison.encode_object(metadata));
 		}
 	}
+
+	if (!isFormData) {
+		// need to manually specify content-type for any non-multipart request
+		headers['content-type'] = isPost && 'application/x-www-form-urlencoded' ||
+		'application/json';
+	}
+
 	const config = {
 		method,
 		headers: {
 			...headers,
-			'content-type': isPost ? 'application/x-www-form-urlencoded' : 'text/plain',
 			[CSRF_HEADER]: (isPost || isDelete) ? BrowserCookies.get(CSRF_HEADER_COOKIE) : '',
 		},
 		credentials: 'same-origin'  // allow response to set-cookies
 	};
 	if (isPost) {
-		config.body = fetchUrl.searchParams.toString();
+		config.body = isFormData ?
+			queries[0].params :
+			fetchUrl.searchParams.toString();
 	}
-
-	const url = isPost ? apiUrl : fetchUrl.toString();
+	const url = isFormData || !isPost ? fetchUrl.toString() : apiUrl;
 	return {
 		url,
 		config,

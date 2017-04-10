@@ -29,6 +29,7 @@ describe('app reducer', () => {
 			foo: 'bar',
 			bar: 'baz',
 			baz: 'foo',
+			isFetching: false,
 		});
 	});
 	it('populates an `error` key on API_ERROR', () => {
@@ -38,6 +39,35 @@ describe('app reducer', () => {
 		};
 		const errorState = app(undefined, API_ERROR);
 		expect(errorState.error).toBe(API_ERROR.payload);
+	});
+	it('sets isFetching:true on API_REQUEST', () => {
+		const API_REQUEST = {
+			type: 'API_REQUEST',
+			payload: [],
+			meta: {},
+		};
+		const appState = app(undefined, API_REQUEST);
+		expect(appState.isFetching).toBe(true);
+	});
+	it('sets isFetching:false on API_SUCCESS', () => {
+		const API_SUCCESS = {
+			type: 'API_SUCCESS',
+			payload: { queries: [], responses: [] },
+		};
+		[true, false, 'monkey'].forEach(isFetching => {
+			const appState = app({ isFetching }, API_SUCCESS);
+			expect(appState.isFetching).toBe(false);
+		});
+	});
+	it('does not change isFetching on CACHE_SUCCESS', () => {
+		const CACHE_SUCCESS = {
+			type: 'CACHE_SUCCESS',
+			payload: { queries: [], responses: [] },
+		};
+		[true, false, 'monkey'].forEach(isFetching => {
+			const appState = app({ isFetching }, CACHE_SUCCESS);
+			expect(appState.isFetching).toBe(isFetching);
+		});
 	});
 });
 
