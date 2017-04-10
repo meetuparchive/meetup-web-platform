@@ -34,26 +34,20 @@ export const parseQueryResponse = queries => ({ responses, error, message }) => 
  *
  * @param {String} apiUrl the general-purpose endpoint for API calls to the
  *   application server
- * @param {Object} options {
- *     method: "get", "post", "delete", or "patch",
- *   }
  * @param {Array} queries the queries to send - must all use the same `method`
  * @param {Object} meta additional characteristics of the request, e.g. logout,
  *   click tracking data
  * @return {Object} { url, config } arguments for a fetch call
  */
-export const getFetchArgs = (apiUrl, options, queries, meta) => {
-	const {
-		headers={},
-	} = options;
-
+export const getFetchArgs = (apiUrl, queries, meta) => {
+	const headers = {};
 	const method = (
 		(queries[0].meta || {}).method ||
-			options.method ||  // fallback to options
 			'get'  // fallback to 'get'
 	).toLowerCase();
 
 	const isPost = method === 'post';
+	const isFormData = queries[0].params instanceof FormData;
 	const isDelete = method === 'delete';
 
 	const fetchUrl = new URL(apiUrl);
@@ -77,25 +71,33 @@ export const getFetchArgs = (apiUrl, options, queries, meta) => {
 			fetchUrl.searchParams.append('logout', true);
 		}
 
+		// send other metadata in searchParams
 		if (Object.keys(metadata).length) {
 			// send other metadata in searchParams
 			fetchUrl.searchParams.append('metadata', rison.encode_object(metadata));
 		}
 	}
+
+	if (!isFormData) {
+		// need to manually specify content-type for any non-multipart request
+		headers['content-type'] = isPost && 'application/x-www-form-urlencoded' ||
+		'application/json';
+	}
+
 	const config = {
 		method,
 		headers: {
 			...headers,
-			'content-type': isPost ? 'application/x-www-form-urlencoded' : 'text/plain',
 			[CSRF_HEADER]: (isPost || isDelete) ? BrowserCookies.get(CSRF_HEADER_COOKIE) : '',
 		},
 		credentials: 'same-origin'  // allow response to set-cookies
 	};
 	if (isPost) {
-		config.body = fetchUrl.searchParams.toString();
+		config.body = isFormData ?
+			queries[0].params :
+			fetchUrl.searchParams.toString();
 	}
-
-	const url = isPost ? apiUrl : fetchUrl.toString();
+	const url = isFormData || !isPost ? fetchUrl.toString() : apiUrl;
 	return {
 		url,
 		config,
@@ -111,15 +113,12 @@ export const getFetchArgs = (apiUrl, options, queries, meta) => {
  *
  * @param {String} apiUrl the general-purpose endpoint for API calls to the
  *   application server
- * @param {Object} options {
- *     method: "get", "post", "delete", or "patch",
- *   }
  * @param {Array} queries the queries to send - must all use the same `method`
  * @param {Object} meta additional characteristics of the request, e.g. logout,
  *   click tracking data
  * @return {Promise} resolves with a `{queries, responses}` object
  */
-export const fetchQueries = (apiUrl, options={}) => (queries, meta) => {
+export const fetchQueries = (apiUrl) => (queries, meta) => {
 	if (
 		typeof window === 'undefined' &&  // not in browser
 		typeof test === 'undefined'  // not in testing env (global set by Jest)
@@ -130,7 +129,7 @@ export const fetchQueries = (apiUrl, options={}) => (queries, meta) => {
 	const {
 		url,
 		config,
-	} = getFetchArgs(apiUrl, options, queries, meta);
+	} = getFetchArgs(apiUrl, queries, meta);
 
 	return fetch(url, config)
 		.then(queryResponse => queryResponse.json())

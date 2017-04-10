@@ -1,6 +1,7 @@
 import Rx from 'rxjs';
 import {
-	apiSuccess
+	apiSuccess,
+	apiError,
 } from '../actions/syncActionCreators';
 /**
  * DeleteEpic provides a generic interface for triggering DELETE requests and
@@ -40,8 +41,10 @@ import {
  */
 const getDeleteQueryFetch = (fetchQueries, store) =>
 	query => {
+		// force presence of 'delete' method
+		query.meta = { ...(query.meta || {}), method: 'delete' };
 		const { config: { apiUrl } } = store.getState();
-		return fetchQueries(apiUrl, { method: 'DELETE' })([query]);
+		return fetchQueries(apiUrl)([query]);
 	};
 
 /**
@@ -55,14 +58,21 @@ const getDeleteQueryFetch = (fetchQueries, store) =>
  */
 const doDelete$ = fetchDeleteQuery => ({ query, onSuccess, onError }) =>
 	Rx.Observable.fromPromise(fetchDeleteQuery(query))  // make the fetch call
-		.flatMap(responses =>
-			// success! return API_SUCCESS and whatever the DELETE action wants to do onSuccess
-			Rx.Observable.of(
-				apiSuccess(responses),
-				onSuccess && onSuccess(responses)
-			)
-		)
-		.catch(err => Rx.Observable.of(onError(err)));
+		.flatMap(responses => {
+			// success! return API_SUCCESS and whatever the POST action wants to do onSuccess
+			const actions = [apiSuccess(responses)];
+			if (onSuccess) {
+				actions.push(onSuccess(responses));
+			}
+			return Rx.Observable.from(actions);
+		})
+		.catch(err => {
+			const actions = [apiError(err)];
+			if (onError) {
+				actions.push(onError(err));
+			}
+			return Rx.Observable.from(actions);
+		});
 
 const getDeleteEpic = fetchQueries => (action$, store) =>
 	action$.filter(({ type }) => type.endsWith('_DELETE') || type.startsWith('DELETE_'))
