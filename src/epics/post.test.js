@@ -24,19 +24,19 @@ MOCK_APP_STATE.config = {
 const store = createFakeStore(MOCK_APP_STATE);
 describe('getPostEpic', () => {
 	it('does not pass through arbitrary actions', epicIgnoreAction(getPostEpic(fetchUtils.fetchQueries)));
-	it('calls fetchQueries with `method: "POST"`', function() {
-		const response = 'success';
-		spyOn(fetchUtils, 'fetchQueries').and.callFake(() => () => Promise.resolve(response));
+	it('sets query.meta.method = "post"', function() {
+		const innerFetchQueries = jest.fn();
+		fetchUtils.fetchQueries = jest.fn(() => innerFetchQueries);
 		const action$ = ActionsObservable.of(MOCK_POST_ACTION);
 		return getPostEpic(fetchUtils.fetchQueries)(action$, store)
 			.do(() => {
-				expect(fetchUtils.fetchQueries.calls.count()).toBe(1);
-				const fetchArgs = fetchUtils.fetchQueries.calls.argsFor(0);
-				expect(fetchArgs[1].method).toEqual('POST');
-				expect(fetchArgs[0]).toEqual(MOCK_APP_STATE.config.apiUrl);
+				const fetchedQueries = innerFetchQueries.mock.calls[0][0];
+				expect(fetchedQueries[0].meta)
+					.toEqual(expect.objectContaining({ method: 'post' }));
 			})
 			.toPromise();
 	});
+
 	it('Returns response from fetchqueries as argument to API_SUCCESS', function() {
 		const response = 'success';
 		fetchUtils.fetchQueries = jest.fn(() => () => Promise.resolve(response));

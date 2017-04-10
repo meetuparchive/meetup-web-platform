@@ -34,22 +34,15 @@ export const parseQueryResponse = queries => ({ responses, error, message }) => 
  *
  * @param {String} apiUrl the general-purpose endpoint for API calls to the
  *   application server
- * @param {Object} options {
- *     method: "get", "post", "delete", or "patch",
- *   }
  * @param {Array} queries the queries to send - must all use the same `method`
  * @param {Object} meta additional characteristics of the request, e.g. logout,
  *   click tracking data
  * @return {Object} { url, config } arguments for a fetch call
  */
-export const getFetchArgs = (apiUrl, options, queries, meta) => {
-	const {
-		headers={},
-	} = options;
-
+export const getFetchArgs = (apiUrl, queries, meta) => {
+	const headers = {};
 	const method = (
 		(queries[0].meta || {}).method ||
-			options.method ||  // fallback to options
 			'get'  // fallback to 'get'
 	).toLowerCase();
 
@@ -120,15 +113,12 @@ export const getFetchArgs = (apiUrl, options, queries, meta) => {
  *
  * @param {String} apiUrl the general-purpose endpoint for API calls to the
  *   application server
- * @param {Object} options {
- *     method: "get", "post", "delete", or "patch",
- *   }
  * @param {Array} queries the queries to send - must all use the same `method`
  * @param {Object} meta additional characteristics of the request, e.g. logout,
  *   click tracking data
  * @return {Promise} resolves with a `{queries, responses}` object
  */
-export const fetchQueries = (apiUrl, options={}) => (queries, meta) => {
+export const fetchQueries = (apiUrl) => (queries, meta) => {
 	if (
 		typeof window === 'undefined' &&  // not in browser
 		typeof test === 'undefined'  // not in testing env (global set by Jest)
@@ -139,7 +129,7 @@ export const fetchQueries = (apiUrl, options={}) => (queries, meta) => {
 	const {
 		url,
 		config,
-	} = getFetchArgs(apiUrl, options, queries, meta);
+	} = getFetchArgs(apiUrl, queries, meta);
 
 	return fetch(url, config)
 		.then(queryResponse => queryResponse.json())

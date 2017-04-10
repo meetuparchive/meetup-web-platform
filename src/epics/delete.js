@@ -41,8 +41,10 @@ import {
  */
 const getDeleteQueryFetch = (fetchQueries, store) =>
 	query => {
+		// force presence of 'delete' method
+		query.meta = { ...(query.meta || {}), method: 'delete' };
 		const { config: { apiUrl } } = store.getState();
-		return fetchQueries(apiUrl, { method: 'DELETE' })([query]);
+		return fetchQueries(apiUrl)([query]);
 	};
 
 /**
