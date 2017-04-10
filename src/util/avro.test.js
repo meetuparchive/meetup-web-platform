@@ -65,13 +65,14 @@ describe('Click tracking', () => {
 		state: {},
 	};
 	const click = {
+		timestamp: new Date(0).toISOString(),
 		lineage: 'div#foo',
 		linkText: 'hello world',
 		coords: [23, 45],
 	};
-	const trackInfo = clickToClickRecord(request)(click);
 
-	it('encodes standard output from logTrack', () => {
+	it('encodes standard output from clickToClickRecord', () => {
+		const trackInfo = clickToClickRecord(request)(click);
 		const serialized = avro.clickSerializer(trackInfo);
 
 		// parse stringified object

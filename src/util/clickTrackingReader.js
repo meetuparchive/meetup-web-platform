@@ -7,9 +7,8 @@ export const clickCookieOptions = {
 };
 
 export const clickToClickRecord = request => click => {
-	const eventDate = new Date();
 	return {
-		timestamp: eventDate.getTime().toString(),
+		timestamp: click.timestamp,
 		requestId: request.id,
 		memberId: parseInt(request.state[MEMBER_ID_COOKIE], 10) || 0,
 		lineage: click.lineage,

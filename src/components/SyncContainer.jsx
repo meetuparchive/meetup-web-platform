@@ -23,6 +23,12 @@ export class SyncContainer extends React.Component {
 	componentWillReceiveProps(nextProps) {
 		if (nextProps.location !== this.props.location) {
 			this.props.dispatchLocationChange(nextProps.location);
+			if (nextProps.history.action === 'PUSH') {
+				// new navigation - scroll to top
+				window.scrollTo(0, 0);
+			}
+			// eventually we might want to try setting up some scroll logic for 'POP'
+			// events (back button) to re-set the previous scroll position
 		}
 	}
 	/**
@@ -37,6 +43,7 @@ SyncContainer.propTypes = {
 	children: React.PropTypes.element.isRequired,
 	dispatchLocationChange: React.PropTypes.func.isRequired,
 	location: React.PropTypes.object.isRequired,
+	history: React.PropTypes.object.isRequired,
 };
 
 export default connect(null, mapDispatchToProps)(
