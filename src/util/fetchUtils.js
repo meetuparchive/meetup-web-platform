@@ -46,7 +46,8 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 			'get'  // fallback to 'get'
 	).toLowerCase();
 
-	const isPost = method === 'post';
+	const hasBody = method === 'post' ||
+		method === 'patch';
 	const isFormData = queries[0].params instanceof FormData;
 	const isDelete = method === 'delete';
 
@@ -80,11 +81,12 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 
 	if (!isFormData) {
 		// need to manually specify content-type for any non-multipart request
-		headers['content-type'] = isPost && 'application/x-www-form-urlencoded' ||
-		'application/json';
+		headers['content-type'] = hasBody ?
+			'application/x-www-form-urlencoded' :
+			'application/json';
 	}
 
-	if (isPost || isDelete) {
+	if (hasBody || isDelete) {
 		headers[CSRF_HEADER] = BrowserCookies.get(CSRF_HEADER_COOKIE);
 	}
 
@@ -93,12 +95,12 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 		headers,
 		credentials: 'same-origin'  // allow response to set-cookies
 	};
-	if (isPost) {
+	if (hasBody) {
 		config.body = isFormData ?
 			queries[0].params :
 			fetchUrl.searchParams.toString();
 	}
-	const url = isFormData || !isPost ? fetchUrl.toString() : apiUrl;
+	const url = isFormData || !hasBody ? fetchUrl.toString() : apiUrl;
 	return {
 		url,
 		config,
