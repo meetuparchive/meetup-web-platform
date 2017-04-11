@@ -20,13 +20,13 @@ export const DEFAULT_APP_STATE = { isFetching: false };
 
 /**
  * The primary reducer for data provided by the API
- * `state.app` sub-tree
+ * `state.api` sub-tree
  *
  * @param {Object} state
  * @param {ReduxAction} action
  * @return {Object}
  */
-export function app(state=DEFAULT_APP_STATE, action={}) {
+export function api(state=DEFAULT_APP_STATE, action={}) {
 	switch (action.type) {
 	case API_REQ:
 		if (action.meta.logout) {
@@ -104,7 +104,7 @@ export function preRenderChecklist([apiDataLoaded] = [false], action) {
 }
 
 const platformReducers = {
-	app,
+	api,
 	clickTracking,
 	config,
 	preRenderChecklist,
