@@ -14,10 +14,10 @@ export function apiRequest(queries, meta) {
 /**
  * @deprecated
  */
-export function apiSuccess({ query, response }) {
+export function apiSuccess({ queries, responses }) {
 	return {
 		type: 'API_SUCCESS',
-		payload: { query, response },
+		payload: { queries, responses },
 	};
 }
 
