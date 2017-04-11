@@ -41,6 +41,15 @@ describe('cache utils', () => {
 			.then(cachedResponse => expect(cachedResponse).toEqual(response));
 	});
 
+	it('cacheWriter does not write non-GET queries to cache', function() {
+		const cache = makeCache();
+		const query = { foo: 'baz', meta: { method: 'post' } };
+		const response = 'bar';
+		return cacheWriter(cache)(query, response)
+			.then(() => cache.get(JSON.stringify(query)))
+			.then(cachedResponse => expect(cachedResponse).toEqual(undefined));
+	});
+
 	it('cacheReader reads from cache and returns result with query', function() {
 		const cache = makeCache();
 		const requestCache = cacheReader(cache);

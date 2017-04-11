@@ -1,3 +1,5 @@
+import fs from 'fs';
+
 import querystring from 'qs';
 import url from 'url';
 import uuid from 'uuid';
@@ -194,32 +196,44 @@ export const parseApiResponse = requestUrl => ([response, body]) => {
  */
 export const buildRequestArgs = externalRequestOpts =>
 	({ endpoint, params, flags }) => {
-
-		// cheap, brute-force object clone, acceptable for serializable object
-		const externalRequestOptsQuery = JSON.parse(JSON.stringify(externalRequestOpts));
-
-		externalRequestOptsQuery.url = encodeURI(`/${endpoint}`);
-		externalRequestOptsQuery.jar = createCookieJar(externalRequestOptsQuery.url);
+		const dataParams = querystring.stringify(params);
+		const headers = { ...externalRequestOpts.headers };
+		let url = encodeURI(`/${endpoint}`);
+		let body;
+		const jar = createCookieJar(url);
 
 		if (flags) {
-			externalRequestOptsQuery.headers['X-Meetup-Request-Flags'] = flags.join(',');
+			headers['X-Meetup-Request-Flags'] = flags.join(',');
 		}
 
-		const dataParams = querystring.stringify(params);
-
-		switch (externalRequestOptsQuery.method) {
-		case 'get':
-		case 'delete':
-			externalRequestOptsQuery.url += `?${dataParams}`;
-			externalRequestOptsQuery.headers['X-Meta-Photo-Host'] = 'secure';
-			break;
+		switch (externalRequestOpts.method) {
 		case 'post':
-			externalRequestOptsQuery.body = dataParams;
-			externalRequestOptsQuery.headers['content-type'] = 'application/x-www-form-urlencoded';
+			if (externalRequestOpts.formData) {
+				break;
+			}
+			body = dataParams;
+			headers['content-type'] = 'application/x-www-form-urlencoded';
 			break;
+		case 'delete':
+		case 'get':
+		default:
+			url += `?${dataParams}`;
+			headers['content-type'] = 'application/json';
+			headers['X-Meta-Photo-Host'] = 'secure';
 		}
 
-		// production logs will automatically be JSON-parsed in Stackdriver
+		const externalRequestOptsQuery = {
+			...externalRequestOpts,
+			headers,
+			jar,
+			url,
+		};
+
+		// only add body if defined
+		if (body) {
+			externalRequestOptsQuery.body = body;
+		}
+
 		return externalRequestOptsQuery;
 	};
 
@@ -266,6 +280,7 @@ export function parseRequestHeaders(request) {
 	delete externalRequestHeaders['host'];  // let app server set 'host'
 	delete externalRequestHeaders['accept-encoding'];  // let app server set 'accept'
 	delete externalRequestHeaders['content-length'];  // original request content-length is irrelevant
+	delete externalRequestHeaders['content-type'];  // the content type will be set in buildRequestArgs
 
 	// cloudflare headers we don't want to pass on
 	delete externalRequestHeaders['cf-ray'];
@@ -279,10 +294,13 @@ export function parseRequestHeaders(request) {
 export function parseRequestQueries(request) {
 	const {
 		method,
+		mime,
 		payload,
 		query,
 	} = request;
-	const queriesRison = method === 'post' ? payload.queries : query.queries;
+	const queriesRison = method === 'post' && mime !== 'multipart/form-data' ?
+		payload.queries :
+		query.queries;
 
 	if (!queriesRison) {
 		return null;
@@ -304,17 +322,41 @@ export function parseRequestQueries(request) {
  */
 export function parseRequest(request) {
 	const baseUrl = request.server.app.API_SERVER_ROOT_URL;
-	return {
-		externalRequestOpts: {
-			baseUrl,
-			method: request.method,
-			headers: parseRequestHeaders(request),  // make a copy to be immutable
-			mode: 'no-cors',
-			time: true,  // time the request for logging
-			agentOptions: {
-				rejectUnauthorized: baseUrl.indexOf('.dev') === -1
-			},
+	const externalRequestOpts = {
+		baseUrl,
+		method: request.method,
+		headers: parseRequestHeaders(request),  // make a copy to be immutable
+		mode: 'no-cors',
+		time: true,  // time the request for logging
+		agentOptions: {
+			rejectUnauthorized: baseUrl.indexOf('.dev') === -1
 		},
+	};
+	if (request.mime === 'multipart/form-data') {
+		// the parsed payload includes string key-value pairs for regular inputs,
+		// and file descriptors for file upload inputs { filename, path, headers }
+		// The file descriptors can be converted to readable streams for the API
+		// request.
+		externalRequestOpts.formData = Object.keys(request.payload)
+			.reduce((formData, key) => {
+				const value = request.payload[key];
+				if (value.filename) {
+					formData[key] = {
+						value: fs.createReadStream(value.path),
+						options: {
+							filename: value.filename,
+							contentType: value.headers['content-type'],
+						},
+					};
+					request.app.upload = value.path;
+				} else {
+					formData[key] = value;
+				}
+				return formData;
+			}, {});
+	}
+	return {
+		externalRequestOpts,
 		queries: parseRequestQueries(request),
 	};
 }

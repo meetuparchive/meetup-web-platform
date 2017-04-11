@@ -7,6 +7,8 @@ import {
 } from 'meetup-web-mocks/lib/api';
 import * as fetchUtils from './fetchUtils';
 
+global.FormData = function() {};
+
 jest.mock('js-cookie', () => {
 	const get = jest.fn(name => `${name} value`);
 	const set = jest.fn((name, value) => `${name} set to ${value}`);
@@ -23,11 +25,10 @@ jest.mock('js-cookie', () => {
 describe('fetchQueries', () => {
 	const API_URL = new URL('http://api.example.com/');
 	const csrfJwt = `${fetchUtils.CSRF_HEADER_COOKIE} value`;
-	const queries = [mockQuery({ params: {} })];
+	const getQueries = [mockQuery({ params: {} })];
+	const postQueries = [{ ...mockQuery({ params: {} }), meta: { method: 'post' }}];
 	const meta = { foo: 'bar', clickTracking: { history: [] } };
 	const responses = [MOCK_GROUP];
-	const getRequest = { method: 'get', headers: {} };
-	const postRequest = { method: 'post', csrf: csrfJwt, headers: {} };
 	const fakeSuccess = () =>
 		Promise.resolve({
 			json: () => Promise.resolve({ responses }),
@@ -51,7 +52,7 @@ describe('fetchQueries', () => {
 	it('returns an object with successes and errors arrays', () => {
 		spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
-		return fetchUtils.fetchQueries(API_URL.toString(), getRequest)(queries)
+		return fetchUtils.fetchQueries(API_URL.toString())(getQueries)
 			.then(response => {
 				expect(response.successes).toEqual([{ query: queries[0], response: responses[0] }]);
 				expect(response.errors).toEqual([]);
@@ -60,7 +61,7 @@ describe('fetchQueries', () => {
 	it('returns a promise that will reject when response contains error prop', () => {
 		spyOn(global, 'fetch').and.callFake(fakeSuccessError);
 
-		return fetchUtils.fetchQueries(API_URL.toString(), getRequest)(queries)
+		return fetchUtils.fetchQueries(API_URL.toString())(getQueries)
 			.then(
 				response => expect(true).toBe(false),
 				err => expect(err).toEqual(jasmine.any(Error))
@@ -73,7 +74,7 @@ describe('fetchQueries', () => {
 
 		const methodTest = method => () => {
 			query.meta = { method };
-			return fetchUtils.fetchQueries(API_URL.toString(), getRequest)(queries)
+			return fetchUtils.fetchQueries(API_URL.toString())(queries)
 				.then(response => {
 					const [, config] = global.fetch.calls.mostRecent().args;
 					expect(config.method).toEqual(method);
@@ -87,10 +88,8 @@ describe('fetchQueries', () => {
 		it('GET calls fetch with API url and queries, metadata, logout querystring params', () => {
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
-			return fetchUtils.fetchQueries(
-				API_URL.toString(),
-				getRequest
-			)(queries, { ...meta, logout: true })
+			return fetchUtils
+				.fetchQueries(API_URL.toString())(getQueries, { ...meta, logout: true })
 				.then(() => {
 					const calledWith = global.fetch.calls.mostRecent().args;
 					const url = new URL(calledWith[0]);
@@ -109,10 +108,8 @@ describe('fetchQueries', () => {
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
 			JSCookie.set.mockClear();
 
-			return fetchUtils.fetchQueries(
-				API_URL.toString(),
-				getRequest
-			)(queries, { ...meta, clickTracking, logout: true })
+			return fetchUtils
+				.fetchQueries(API_URL.toString())(getQueries, { ...meta, clickTracking, logout: true })
 				.then(() => {
 					const calledWith = JSCookie.set.mock.calls[0];
 					expect(calledWith[0])
@@ -123,27 +120,24 @@ describe('fetchQueries', () => {
 		it('GET without meta calls fetch without metadata querystring params', () => {
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
-			return fetchUtils.fetchQueries(
-				API_URL.toString(),
-				getRequest
-			)(queries).then(() => {
-				const calledWith = global.fetch.calls.mostRecent().args;
-				const url = new URL(calledWith[0]);
-				expect(url.origin).toBe(API_URL.origin);
-				expect(url.searchParams.has('queries')).toBe(true);
-				expect(url.searchParams.has('metadata')).toBe(false);
-				expect(calledWith[1].method).toEqual('get');
-			});
+			return fetchUtils
+				.fetchQueries(API_URL.toString())(getQueries)
+				.then(() => {
+					const calledWith = global.fetch.calls.mostRecent().args;
+					const url = new URL(calledWith[0]);
+					expect(url.origin).toBe(API_URL.origin);
+					expect(url.searchParams.has('queries')).toBe(true);
+					expect(url.searchParams.has('metadata')).toBe(false);
+					expect(calledWith[1].method).toEqual('get');
+				});
 		});
 	});
 	describe('POST', () => {
 		it('POST calls fetch with API url; csrf header; queries and metadata body params', () => {
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
-			return fetchUtils.fetchQueries(
-				API_URL.toString(),
-				postRequest
-			)(queries, meta)
+			return fetchUtils
+				.fetchQueries(API_URL.toString())(postQueries, meta)
 				.then(() => {
 					const calledWith = global.fetch.calls.mostRecent().args;
 					const url = new URL(calledWith[0]);
@@ -160,10 +154,7 @@ describe('fetchQueries', () => {
 		it('POST without meta calls fetch without metadata body params', () => {
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
-			return fetchUtils.fetchQueries(
-				API_URL.toString(),
-				postRequest
-			)(queries)
+			return fetchUtils.fetchQueries(API_URL.toString())(postQueries)
 				.then(() => {
 					const calledWith = global.fetch.calls.mostRecent().args;
 					const url = new URL(calledWith[0]);
@@ -176,6 +167,31 @@ describe('fetchQueries', () => {
 					expect(options.headers['x-csrf-jwt']).toEqual(csrfJwt);
 				});
 		});
+	});
+	describe('form data', () => {
+		it('sends form data as multipart/form-data', () => {
+			global.FormData = class FormData {
+				append() {}
+				has() {
+					return true;
+				}
+			};
+			FormData.prototype.append = jest.fn();
+			const formQueries = [{ ...mockQuery({ params: new FormData() }), meta: { method: 'post' }}];
+			spyOn(global, 'fetch').and.callFake(fakeSuccess);
+
+			return fetchUtils.fetchQueries(API_URL.toString())(formQueries)
+				.then(() => {
+					const calledWith = global.fetch.calls.mostRecent().args;
+					const url = new URL(calledWith[0]);
+					const options = calledWith[1];
+					expect(options.method).toEqual('post');
+					expect(url.searchParams.has('queries')).toBe(true);
+					expect(url.searchParams.has('metadata')).toBe(false);
+					expect(options.headers['x-csrf-jwt']).toEqual(csrfJwt);
+				});
+		});
+
 	});
 });
 

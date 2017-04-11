@@ -165,13 +165,13 @@ export const trackSession = log => response => {
 
 export const logTrack = platformAgent => (response, trackInfo) => {
 	const requestHeaders = response.request.headers;
-	const eventDate = new Date();
+	const now = new Date();
 	const record = {
-		timestamp: eventDate.getTime().toString(),
+		timestamp: now.toISOString(),
 		requestId: response.request.id,
 		ip: requestHeaders['remote-addr'] || '',
 		agent: requestHeaders['user-agent'] || '',
-		platform: 'meetup-web-platform',
+		platform: 'mup-web',
 		platformAgent: 'WEB',  // TODO: set this more accurately, using allowed values from avro schema
 		mobileWeb: false,
 		referer: '',  // misspelled to align with schema
