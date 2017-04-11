@@ -1316,9 +1316,9 @@ ecdsa-sig-formatter@1.0.9:
     base64url "^2.0.0"
     safe-buffer "^5.0.1"
 
-electrode-csrf-jwt@1.2.1:
+"electrode-csrf-jwt@git+https://github.com/meetup/electrode-csrf-jwt.git#master":
   version "1.2.1"
-  resolved "https://registry.yarnpkg.com/electrode-csrf-jwt/-/electrode-csrf-jwt-1.2.1.tgz#1006eb06bced930c82b7002fcd4be5b53cced807"
+  resolved "git+https://github.com/meetup/electrode-csrf-jwt.git#c6899c2d2f5e2a2237c08fec8a9824c208d9204e"
   dependencies:
     bluebird "^3.4.6"
     boom "^4.0.0"
