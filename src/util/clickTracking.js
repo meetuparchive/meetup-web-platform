@@ -133,7 +133,9 @@ function getTrackClick(store) {
 		}
 
 		// 2. Create click action with metadata
+		const now = new Date();
 		const clickTrackAction = click({
+			timestamp: now.toISOString(),
 			lineage: clickLineage.join('<'),
 			linkText: linkText,
 			coords: [x, y],

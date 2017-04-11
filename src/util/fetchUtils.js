@@ -84,12 +84,13 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 		'application/json';
 	}
 
+	if (isPost || isDelete) {
+		headers[CSRF_HEADER] = BrowserCookies.get(CSRF_HEADER_COOKIE);
+	}
+
 	const config = {
 		method,
-		headers: {
-			...headers,
-			[CSRF_HEADER]: (isPost || isDelete) ? BrowserCookies.get(CSRF_HEADER_COOKIE) : '',
-		},
+		headers,
 		credentials: 'same-origin'  // allow response to set-cookies
 	};
 	if (isPost) {
