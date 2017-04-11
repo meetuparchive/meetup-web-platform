@@ -8,6 +8,13 @@ import {
 	CLICK_TRACK_ACTION,
 	CLICK_TRACK_CLEAR_ACTION
 } from '../actions/clickActionCreators';
+import {
+	API_REQ,
+	API_RESP_SUCCESS,
+	API_RESP_ERROR,
+	API_RESP_FAIL,
+	API_RESP_COMPLETE,
+} from '../actions/apiActionCreators';
 
 export const DEFAULT_APP_STATE = { isFetching: false };
 
@@ -21,25 +28,25 @@ export const DEFAULT_APP_STATE = { isFetching: false };
  */
 export function app(state=DEFAULT_APP_STATE, action={}) {
 	switch (action.type) {
-	case 'API_REQUEST':
+	case API_REQ:
 		if (action.meta.logout) {
 			// clear app state during logout
 			return { ...DEFAULT_APP_STATE, isFetching: true };
 		}
 		return { ...state, isFetching: true };
-	case 'API_SUCCESS':  // fall though
+	case API_RESP_SUCCESS:  // fall though
 	case 'CACHE_SUCCESS':  // fall through
-	case 'API_ERROR': {
+	case API_RESP_ERROR: {
 		// each of these actions provides an API response that should go into app
 		// state - error responses will contain error info
 		delete state.failure;  // if there are any values, the API is not failing
 		const { ref, ...response } = action.payload.response;
 		return { ...state, [ref]: response };
 	}
-	case 'API_FAILURE':
-		state.failure = action.payload;
+	case API_RESP_FAIL:
+		state.fail = action.payload;
 		// fall through - fetch is complete
-	case 'API_COMPLETE':
+	case API_RESP_COMPLETE:
 		return { ...state, isFetching: false };
 	default:
 		return state;
@@ -92,7 +99,7 @@ export function config(state={}, action) {
  */
 export function preRenderChecklist([apiDataLoaded] = [false], action) {
 	return [
-		apiDataLoaded || action.type === 'API_COMPLETE',
+		apiDataLoaded || action.type === API_RESP_COMPLETE,
 	];
 }
 

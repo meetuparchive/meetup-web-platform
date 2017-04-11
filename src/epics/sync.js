@@ -1,16 +1,8 @@
 import { Observable } from 'rxjs';
 import { combineEpics } from 'redux-observable';
-import {
-	apiRequest,
-	apiSuccess,
-	apiError,
-	apiFailure,
-	apiComplete,
-	LOCATION_CHANGE,
-} from '../actions/syncActionCreators';
-import {
-	clearClick,
-} from '../actions/clickActionCreators';
+import * as api from '../actions/apiActionCreators';
+import { LOCATION_CHANGE } from '../actions/syncActionCreators';
+import { clearClick } from '../actions/clickActionCreators';
 import { activeRouteQueries } from '../util/routeUtils';
 
 
@@ -53,7 +45,7 @@ export const getNavEpic = (routes, baseUrl) => {
 				currentLocation = payload;
 
 				const activeQueries = findActiveQueries(payload);
-				const actions = [apiRequest(activeQueries, requestMetadata)];
+				const actions = [api.requestAll(activeQueries, requestMetadata)];
 
 				// emit cache clear _only_ when logout requested
 				if (requestMetadata.logout) {
@@ -86,7 +78,7 @@ export const locationSyncEpic = (action$, store) =>
  * emits (API_SUCCESS || API_ERROR) then API_COMPLETE
  */
 export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
-	action$.ofType('API_REQUEST')
+	action$.ofType('API_REQUEST', api.API_REQ)
 		.flatMap(({ payload, meta }) => {           // set up the fetch call to the app server
 			const { config } = store.getState();
 			const fetchQueries = fetchQueriesFn(config.apiUrl);
@@ -94,13 +86,13 @@ export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 				.takeUntil(action$.ofType(LOCATION_CHANGE))  // cancel this fetch when nav happens
 				.flatMap(({ successes=[], errors=[] }) => {
 					const actions = [
-						...successes.map(apiSuccess),  // send the successes to success
-						...errors.map(apiError),     // errors to error
+						...successes.map(api.success),  // send the successes to success
+						...errors.map(api.error),     // errors to error
 					];
-					actions.push(apiComplete());
+					actions.push(api.complete());
 					return Observable.of(...actions);
 				})
-				.catch(err => Observable.of(apiFailure(err), apiComplete()));
+				.catch(err => Observable.of(api.fail(err), api.complete()));
 		});
 
 export default function getSyncEpic(routes, fetchQueries, baseUrl) {

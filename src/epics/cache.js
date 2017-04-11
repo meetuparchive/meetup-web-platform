@@ -7,6 +7,10 @@
 import Rx from 'rxjs';
 import { combineEpics } from 'redux-observable';
 import {
+	API_REQ,
+	API_RESP_SUCCESS,
+} from '../actions/apiActionCreators';
+import {
 	cacheSuccess,
 } from '../actions/cacheActionCreators';
 
@@ -46,7 +50,7 @@ export const cacheClearEpic = cache => action$ =>
  * Not that this will set the cache without emitting an action
  */
 export const cacheSetEpic = cache => action$ =>
-	action$.ofType('API_SUCCESS', 'CACHE_SET')
+	action$.ofType(API_RESP_SUCCESS, 'CACHE_SET')
 		.flatMap(({ payload: { query, response } }) => cacheWriter(cache)(query, response))
 		.ignoreElements();
 
@@ -59,7 +63,7 @@ export const cacheSetEpic = cache => action$ =>
  * hits.
  */
 export const cacheQueryEpic = cache => action$ =>
-	action$.ofType('API_REQUEST')
+	action$.ofType(API_REQ)
 		.flatMap(({ payload }) =>
 			Rx.Observable.from(payload)  // fan out
 				.flatMap(cacheReader(cache))               // look for a cache hit

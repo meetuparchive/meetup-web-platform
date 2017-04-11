@@ -207,7 +207,7 @@ response.
 
 If the `fetch` fails entirely, no responses will be delivered to the
 application - `state.app` will not receive new data. Instead, an `API_RESP_FAIL`
-action will be dispatched, which will populate `state.app.error`.
+action will be dispatched, which will populate `state.app.fail`.
 
 **Redux state after being processed by `API_RESP_FAIL` action**
 
