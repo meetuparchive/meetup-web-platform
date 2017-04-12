@@ -60,6 +60,7 @@ const doPost$ = fetchPostQuery => ({ query, onSuccess, onError }) =>
 	Rx.Observable.fromPromise(fetchPostQuery(query))  // make the fetch call
 		.flatMap(responses => {
 			// success! return API_SUCCESS and whatever the POST action wants to do onSuccess
+			// TODO: convert the ACTUAL FETCH responses into something that apiSuccess can handle
 			const actions = [apiSuccess(responses)];
 			if (onSuccess) {
 				actions.push(onSuccess(responses));

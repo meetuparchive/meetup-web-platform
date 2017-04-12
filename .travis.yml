@@ -9,7 +9,7 @@ cache:
 
 branches:  # exclude tags
   exclude:
-    - /^v\d+\.\d+.\d+(-\S*)?$/
+    - /^v\d+\.\d+\.\d+(-\S*)?$/
 
 env:
   global:
