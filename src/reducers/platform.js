@@ -54,11 +54,6 @@ export function app(state=DEFAULT_APP_STATE, action={}) {
 	case API_RESP_COMPLETE:
 		return { ...state, isFetching: false };
 
-	/* BEGIN DEPRECATED SYNC ACTION REDUCER ///// */
-	case 'API_REQUEST':
-		return { ...state, isFetching: true };
-	/* ///// END DEPRECATED SYNC ACTION REDUCER */
-
 	default:
 		return state;
 	}
