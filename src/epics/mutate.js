@@ -76,7 +76,7 @@ const doFetch$ = fetchQuery => ({ query, onSuccess, onError }) =>
 			return Rx.Observable.from(actions);
 		});
 
-const getMethodEpic = (method, getQueryFetch) => fetchQueries => (action$, store) =>
+const getMethodEpic = method => fetchQueries => (action$, store) =>
 	action$.filter(({ type }) =>
 		type.endsWith(`_${method.toUpperCase()}`) || type.startsWith(`${method.toUpperCase()}_`))
 		.map(({ payload }) => payload)

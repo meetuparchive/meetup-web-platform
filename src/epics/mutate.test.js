@@ -16,9 +16,6 @@ import { getPostEpic, getDeleteEpic } from './mutate';
 import * as fetchUtils from '../util/fetchUtils';  // used for mocking
 import * as syncActionCreators from '../actions/syncActionCreators';
 
-/**
- * @module PostEpicTest
- */
 MOCK_APP_STATE.config = {
 	apiUrl: 'http://fake.api.meetup.com',
 };
