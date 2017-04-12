@@ -3,6 +3,7 @@ import { combineEpics } from 'redux-observable';
 import * as api from '../actions/apiActionCreators';
 import {
 	apiSuccess,
+	apiError,
 	LOCATION_CHANGE
 } from '../actions/syncActionCreators';
 import { clearClick } from '../actions/clickActionCreators';
@@ -97,6 +98,11 @@ function getDeprecatedSuccessPayload(successes, errors) {
  * - 1 or more API_RESP_ERROR
  * - API_SUCCESS
  * - API_COMPLETE
+ *
+ * or
+ * - API_RESP_FAIL
+ * - API_ERROR
+ * - API_COMPLETE
  */
 export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 	action$.ofType('API_REQUEST', api.API_REQ)
@@ -116,7 +122,7 @@ export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 					actions.push(api.complete());
 					return Observable.of(...actions);
 				})
-				.catch(err => Observable.of(api.fail(err), api.complete()));
+				.catch(err => Observable.of(api.fail(err), apiError(err), api.complete()));
 		});
 
 export default function getSyncEpic(routes, fetchQueries, baseUrl) {
