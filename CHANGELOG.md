@@ -1,3 +1,10 @@
+## [2.1]
+
+- **Deprecated** all of the Sync action creators (API\_...) have been deprecated.
+You should instead use the new `apiActionCreators` to manually trigger API
+requests - see the [Queries docs](./docs/Queries.md#usage) for more info. The
+Sync action creators will be removed in version 3.
+
 ## [2.0]
 
 - **Refactor** Upgrade to React Router v4. Routes definitions change - the root
