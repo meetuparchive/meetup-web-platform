@@ -1,15 +1,12 @@
 import { Observable } from 'rxjs';
 import { combineEpics } from 'redux-observable';
+import * as api from '../actions/apiActionCreators';
 import {
-	apiRequest,
 	apiSuccess,
 	apiError,
-	apiComplete,
-	LOCATION_CHANGE,
+	LOCATION_CHANGE
 } from '../actions/syncActionCreators';
-import {
-	clearClick,
-} from '../actions/clickActionCreators';
+import { clearClick } from '../actions/clickActionCreators';
 import { activeRouteQueries } from '../util/routeUtils';
 
 
@@ -52,7 +49,7 @@ export const getNavEpic = (routes, baseUrl) => {
 				currentLocation = payload;
 
 				const activeQueries = findActiveQueries(payload);
-				const actions = [apiRequest(activeQueries, requestMetadata)];
+				const actions = [api.requestAll(activeQueries, requestMetadata)];
 
 				// emit cache clear _only_ when logout requested
 				if (requestMetadata.logout) {
@@ -79,21 +76,54 @@ export const locationSyncEpic = (action$, store) =>
 		.map(() => ({ type: LOCATION_CHANGE, payload: window.location }));
 
 /**
+ * @deprecated
+ */
+function getDeprecatedSuccessPayload(successes, errors) {
+	const allQueryResponses = [ ...successes, ...errors ];
+	return allQueryResponses.reduce((payload, { query, response }) => {
+		if (!response) {
+			return payload;
+		}
+		const { ref, ...responseBody } = response;
+		payload.queries.push(query);
+		payload.responses.push({ [ref]: responseBody });
+		return payload;
+	}, { queries: [], responses: [] });
+}
+/**
  * Listen for actions that provide queries to send to the api - mainly
- * API_REQUEST
+ * API_REQ
  *
- * emits (API_SUCCESS || API_ERROR) then API_COMPLETE
+ * emits
+ * - 1 or more API_RESP_SUCCESS
+ * - 1 or more API_RESP_ERROR
+ * - API_SUCCESS
+ * - API_COMPLETE
+ *
+ * or
+ * - API_RESP_FAIL
+ * - API_ERROR
+ * - API_COMPLETE
  */
 export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
-	action$.ofType('API_REQUEST')
+	action$.ofType('API_REQUEST', api.API_REQ)
 		.flatMap(({ payload, meta }) => {           // set up the fetch call to the app server
 			const { config } = store.getState();
-			const fetch = fetchQueriesFn(config.apiUrl);
-			return Observable.fromPromise(fetch(payload, meta))  // call fetch
+			const fetchQueries = fetchQueriesFn(config.apiUrl);
+			return Observable.fromPromise(fetchQueries(payload, meta))  // call fetch
 				.takeUntil(action$.ofType(LOCATION_CHANGE))  // cancel this fetch when nav happens
-				.map(apiSuccess)                             // dispatch apiSuccess with server response
-				.flatMap(action => Observable.of(action, apiComplete()))  // dispatch apiComplete after resolution
-				.catch(err => Observable.of(apiError(err)));  // ... or apiError
+				.flatMap(({ successes=[], errors=[] }) => {
+					const actions = [
+						...successes.map(api.success),  // send the successes to success
+						...errors.map(api.error),     // errors to error
+					];
+					/* BEGIN SUPPORT FOR DEPRECATED API_SUCCESS ACTION ///// */
+					actions.push(apiSuccess(getDeprecatedSuccessPayload(successes, errors)));
+					/* ////// END SUPPORT FOR DEPRECATED API_SUCCESS ACTION */
+					actions.push(api.complete());
+					return Observable.of(...actions);
+				})
+				.catch(err => Observable.of(api.fail(err), apiError(err), api.complete()));
 		});
 
 export default function getSyncEpic(routes, fetchQueries, baseUrl) {
