@@ -1,7 +1,6 @@
 import * as api from '../actions/apiActionCreators';
 import * as cacheActionCreators from '../actions/cacheActionCreators';
 import * as clickActionCreators from '../actions/clickActionCreators';
-import * as syncActionCreators from '../actions/syncActionCreators';
 import {
 	DEFAULT_APP_STATE,
 	DEFAULT_CLICK_TRACK,
@@ -82,12 +81,3 @@ describe('clickTracking reducer', () => {
 	});
 });
 
-describe('DEPRECATED sync action reducer', () => {
-	it('sets isFetching:true for API_REQUEST', function() {
-		const logoutRequest = syncActionCreators.apiRequest([]);
-		expect(app(DEFAULT_APP_STATE, logoutRequest)).toEqual({
-			...DEFAULT_APP_STATE,
-			isFetching: true,
-		});
-	});
-});
