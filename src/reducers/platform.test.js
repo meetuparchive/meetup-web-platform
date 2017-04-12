@@ -85,7 +85,10 @@ describe('clickTracking reducer', () => {
 describe('DEPRECATED sync action reducer', () => {
 	it('re-sets app state on logout API_REQUEST', function() {
 		const logoutRequest = syncActionCreators.apiRequest([], { logout: true });
-		expect(app(this.MOCK_STATE, logoutRequest)).toEqual(DEFAULT_APP_STATE);
+		expect(app(this.MOCK_STATE, logoutRequest)).toEqual({
+			...DEFAULT_APP_STATE,
+			isFetching: true,
+		});
 	});
 	it('assembles success responses into single state tree', () => {
 		const API_SUCCESS = {
