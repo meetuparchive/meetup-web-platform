@@ -54,7 +54,7 @@ describe('fetchQueries', () => {
 
 		return fetchUtils.fetchQueries(API_URL.toString())(getQueries)
 			.then(response => {
-				expect(response.successes).toEqual([{ query: queries[0], response: responses[0] }]);
+				expect(response.successes).toEqual([{ query: getQueries[0], response: responses[0] }]);
 				expect(response.errors).toEqual([]);
 			});
 	});

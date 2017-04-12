@@ -26,7 +26,7 @@ export const DEFAULT_APP_STATE = { isFetching: false };
  * @param {ReduxAction} action
  * @return {Object}
  */
-export function api(state=DEFAULT_APP_STATE, action={}) {
+export function app(state=DEFAULT_APP_STATE, action={}) {
 	switch (action.type) {
 	case API_REQ:
 		if (action.meta.logout) {
@@ -48,6 +48,27 @@ export function api(state=DEFAULT_APP_STATE, action={}) {
 		// fall through - fetch is complete
 	case API_RESP_COMPLETE:
 		return { ...state, isFetching: false };
+
+	/* BEGIN DEPRECATED SYNC ACTION REDUCER ///// */
+	case 'API_REQUEST':
+		if ((action.meta || {}).logout) {
+			return DEFAULT_APP_STATE;  // clear app state during logout
+		}
+		return { ...state, isFetching: true };
+	case 'API_SUCCESS':
+		// API_SUCCESS contains an array of responses that can be reduced into a new
+		// state object
+		state.isFetching = false;
+		delete state.error;
+		return action.payload.responses.reduce((s, r) => ({ ...s, ...r }), { ...state });
+	case 'API_ERROR':
+		return {
+			...state,
+			error: action.payload,
+			isFetching: false,
+		};
+	/* ///// END DEPRECATED SYNC ACTION REDUCER */
+
 	default:
 		return state;
 	}
@@ -104,7 +125,7 @@ export function preRenderChecklist([apiDataLoaded] = [false], action) {
 }
 
 const platformReducers = {
-	api,
+	app,
 	clickTracking,
 	config,
 	preRenderChecklist,
