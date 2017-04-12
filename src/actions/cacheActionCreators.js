@@ -1,7 +1,7 @@
-export function cacheSet({ queries, responses }) {
+export function cacheSet({ query, response }) {
 	return {
 		type: 'CACHE_SET',
-		payload: { queries, responses },
+		payload: { query, response },
 	};
 }
 
@@ -12,10 +12,10 @@ export function cacheRequest(queries) {
 	};
 }
 
-export function cacheSuccess({ queries, responses }) {
+export function cacheSuccess({ query, response }) {
 	return {
 		type: 'CACHE_SUCCESS',
-		payload: { queries, responses }
+		payload: { query, response }
 	};
 }
 
