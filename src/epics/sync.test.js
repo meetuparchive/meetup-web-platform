@@ -157,43 +157,17 @@ describe('Sync epic', () => {
 });
 
 describe('DEPRECATED support for API_REQUEST', () => {
-	it('emits API_RESP_SUCCESS and API_RESP_COMPLETE on successful API_REQUEST', function() {
-		const mockFetchQueries = () => () => Promise.resolve({ successes: [{}] });
-
+	it('emits API_REQ for API_REQUEST', function() {
 		const queries = [mockQuery({})];
 		const apiRequest = syncActionCreators.apiRequest(queries);
 		const action$ = ActionsObservable.of(apiRequest);
-		const fakeStore = createFakeStore(MOCK_APP_STATE);
-		return getSyncEpic(EMPTY_ROUTES, mockFetchQueries)(action$, fakeStore)
+		return getSyncEpic(EMPTY_ROUTES, queries)(action$)
 			.toArray()
 			.toPromise()
 			.then(actions => {
-				expect(actions.map(({ type }) => type)).toEqual([
-					api.API_RESP_SUCCESS,
-					'API_SUCCESS',
-					api.API_RESP_COMPLETE,
-				]);
+				expect(actions).toHaveLength(1);
+				expect(actions[0].type).toBe(api.API_REQ);
 			});
 	});
-
-	it('emits API_RESP_FAIL on failed API_REQUEST', function() {
-		const mockFetchQueries = () => () => Promise.reject(new Error());
-
-		const queries = [mockQuery({})];
-		const apiRequest = syncActionCreators.apiRequest(queries);
-		const action$ = ActionsObservable.of(apiRequest);
-		const fakeStore = createFakeStore(MOCK_APP_STATE);
-		return getSyncEpic(EMPTY_ROUTES, mockFetchQueries)(action$, fakeStore)
-			.toArray()
-			.toPromise()
-			.then(actions =>
-				expect(actions.map(a => a.type)).toEqual([
-					api.API_RESP_FAIL,
-					'API_ERROR',
-					api.API_RESP_COMPLETE
-				])
-			);
-	});
-
 });
 

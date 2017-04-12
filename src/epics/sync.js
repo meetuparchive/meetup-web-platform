@@ -90,23 +90,31 @@ function getDeprecatedSuccessPayload(successes, errors) {
 		return payload;
 	}, { queries: [], responses: [] });
 }
+
+export const apiRequestToApiReq = action$ =>
+	action$.ofType('API_REQUEST')
+		.map(action => ({
+			...action,
+			type: api.API_REQ,
+		}));
+
 /**
- * Listen for actions that provide queries to send to the api - mainly
- * API_REQ
+ * Listen for API_REQ and generate response actions from fetch results
  *
  * emits
  * - 1 or more API_RESP_SUCCESS
  * - 1 or more API_RESP_ERROR
- * - API_SUCCESS
+ * - API_SUCCESS  // deprecated
  * - API_COMPLETE
  *
  * or
+ *
  * - API_RESP_FAIL
- * - API_ERROR
+ * - API_ERROR  // deprecated
  * - API_COMPLETE
  */
 export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
-	action$.ofType('API_REQUEST', api.API_REQ)
+	action$.ofType(api.API_REQ)
 		.flatMap(({ payload, meta }) => {           // set up the fetch call to the app server
 			const { config } = store.getState();
 			const fetchQueries = fetchQueriesFn(config.apiUrl);
@@ -115,22 +123,25 @@ export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 				.flatMap(({ successes=[], errors=[] }) => {
 					const actions = [
 						...successes.map(api.success),  // send the successes to success
-						...errors.map(api.error),     // errors to error
+						...errors.map(api.error),     // send errors to error
+						apiSuccess(getDeprecatedSuccessPayload(successes, errors)),  // DEPRECATED
+						api.complete()
 					];
-					/* BEGIN SUPPORT FOR DEPRECATED API_SUCCESS ACTION ///// */
-					actions.push(apiSuccess(getDeprecatedSuccessPayload(successes, errors)));
-					/* ////// END SUPPORT FOR DEPRECATED API_SUCCESS ACTION */
-					actions.push(api.complete());
 					return Observable.of(...actions);
 				})
-				.catch(err => Observable.of(api.fail(err), apiError(err), api.complete()));
+				.catch(err => Observable.of(
+					api.fail(err),
+					apiError(err),  // DEPRECATED
+					api.complete()
+				));
 		});
 
 export default function getSyncEpic(routes, fetchQueries, baseUrl) {
 	return combineEpics(
 		getNavEpic(routes, baseUrl),
 		// locationSyncEpic,
-		getFetchQueriesEpic(fetchQueries)
+		getFetchQueriesEpic(fetchQueries),
+		apiRequestToApiReq  // TODO: remove in v3 - apiRequest is deprecated
 	);
 }
 
