@@ -127,7 +127,11 @@ describe('Sync epic', () => {
 			.toArray()
 			.toPromise()
 			.then(actions => {
-				expect(actions.map(({ type }) => type)).toEqual([api.API_RESP_SUCCESS, api.API_RESP_COMPLETE]);
+				expect(actions.map(({ type }) => type)).toEqual([
+					api.API_RESP_SUCCESS,
+					'API_SUCCESS',
+					api.API_RESP_COMPLETE,
+				]);
 			});
 	});
 
@@ -158,7 +162,11 @@ describe('DEPRECATED support for API_REQUEST', () => {
 			.toArray()
 			.toPromise()
 			.then(actions => {
-				expect(actions.map(({ type }) => type)).toEqual([api.API_RESP_SUCCESS, api.API_RESP_COMPLETE]);
+				expect(actions.map(({ type }) => type)).toEqual([
+					api.API_RESP_SUCCESS,
+					'API_SUCCESS',
+					api.API_RESP_COMPLETE,
+				]);
 			});
 	});
 

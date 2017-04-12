@@ -1,7 +1,10 @@
 import { Observable } from 'rxjs';
 import { combineEpics } from 'redux-observable';
 import * as api from '../actions/apiActionCreators';
-import { LOCATION_CHANGE } from '../actions/syncActionCreators';
+import {
+	apiSuccess,
+	LOCATION_CHANGE
+} from '../actions/syncActionCreators';
 import { clearClick } from '../actions/clickActionCreators';
 import { activeRouteQueries } from '../util/routeUtils';
 
@@ -72,10 +75,28 @@ export const locationSyncEpic = (action$, store) =>
 		.map(() => ({ type: LOCATION_CHANGE, payload: window.location }));
 
 /**
+ * @deprecated
+ */
+function getDeprecatedSuccessPayload(successes, errors) {
+	const allQueryResponses = [ ...successes, ...errors ];
+	const queries = allQueryResponses.map(({ query }) => query);
+	const responses = allQueryResponses.map(({ response }) => response);
+	return queries.reduce((payload, query, i) => {
+		const { ref, ...responseBody } = responses[i];
+		payload.queries.push(query);
+		payload.responses.push({ [ref]: responseBody });
+		return payload;
+	}, { queries: [], responses: [] });
+}
+/**
  * Listen for actions that provide queries to send to the api - mainly
- * API_REQUEST
+ * API_REQ
  *
- * emits (API_SUCCESS || API_ERROR) then API_COMPLETE
+ * emits
+ * - 1 or more API_RESP_SUCCESS
+ * - 1 or more API_RESP_ERROR
+ * - API_SUCCESS
+ * - API_COMPLETE
  */
 export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 	action$.ofType('API_REQUEST', api.API_REQ)
@@ -89,6 +110,9 @@ export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 						...successes.map(api.success),  // send the successes to success
 						...errors.map(api.error),     // errors to error
 					];
+					/* BEGIN SUPPORT FOR DEPRECATED API_SUCCESS ACTION ///// */
+					actions.push(apiSuccess(getDeprecatedSuccessPayload(successes, errors)));
+					/* ////// END SUPPORT FOR DEPRECATED API_SUCCESS ACTION */
 					actions.push(api.complete());
 					return Observable.of(...actions);
 				})
