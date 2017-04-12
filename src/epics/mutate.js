@@ -3,6 +3,9 @@ import {
 	apiSuccess,
 	apiError,
 } from '../actions/syncActionCreators';
+import * as api from '../actions/apiActionCreators';
+import { getDeprecatedSuccessPayload } from '../util/fetchUtils';
+
 /**
  * PostEpic provides a generic interface for triggering POST requests and
  * dispatching particular actions with the API response. The POST action must
@@ -29,23 +32,27 @@ import {
  */
 
 /**
- * get a function that receives a post action and returns the corresponding
- * fetch Promise
+ * get a function that receives a mutation-specific action and returns the
+ * corresponding fetch Promise
  *
  * The wrapping function needs current app state in order to apply correct
  * config
  *
+ * @param {String} method the desirect HTTP method ('post', 'delete', 'patch')
  * @param {Object} { apiUrl } from state.config
  * @param {Object} postAction, providing query, onSuccess, and onError
  * @return {Promise} results of the fetch, either onSuccess or onError
  */
-const getPostQueryFetch = (fetchQueries, store) =>
+const getMethodQueryFetch = method => (fetchQueries, store) =>
 	query => {
-		// force presence of 'post' method
-		query.meta = { ...(query.meta || {}), method: 'post' };
+		// force presence of meta.method
+		query.meta = { ...(query.meta || {}), method };
 		const { config: { apiUrl } } = store.getState();
-		return fetchQueries(apiUrl, { method: 'POST' })([query]);
+		return fetchQueries(apiUrl)([query]);
 	};
+
+const getPostQueryFetch = getMethodQueryFetch('post');
+const getDeleteQueryFetch = getMethodQueryFetch('delete');
 
 /**
  * Make the POST call to the API and send the responses to the appropriate
@@ -56,32 +63,43 @@ const getPostQueryFetch = (fetchQueries, store) =>
  *    responses there as well
  * 3. Failed POST responses will be sent to the POST action's `onError`
  */
-const doPost$ = fetchPostQuery => ({ query, onSuccess, onError }) =>
-	Rx.Observable.fromPromise(fetchPostQuery(query))  // make the fetch call
-		.flatMap(responses => {
-			// success! return API_SUCCESS and whatever the POST action wants to do onSuccess
-			// TODO: convert the ACTUAL FETCH responses into something that apiSuccess can handle
-			const actions = [apiSuccess(responses)];
+const doFetch$ = fetchQuery => ({ query, onSuccess, onError }) =>
+	Rx.Observable.fromPromise(fetchQuery(query))  // make the fetch call
+		.flatMap(({ successes, errors }) => {
+			const responses = getDeprecatedSuccessPayload(successes, errors);
+			const actions = [
+				...successes.map(api.success),  // send the successes to success
+				...errors.map(api.error),     // send errors to error
+				apiSuccess(responses)
+			];
 			if (onSuccess) {
 				actions.push(onSuccess(responses));
 			}
 			return Rx.Observable.from(actions);
 		})
 		.catch(err => {
-			const actions = [apiError(err)];
+			const actions = [api.fail(err), apiError(err)];
 			if (onError) {
 				actions.push(onError(err));
 			}
 			return Rx.Observable.from(actions);
 		});
 
-const getPostEpic = fetchQueries => (action$, store) =>
+export const getPostEpic = fetchQueries => (action$, store) =>
 	action$.filter(({ type }) => type.endsWith('_POST') || type.startsWith('POST_'))
 		.map(({ payload }) => payload)
 		.flatMap(
-			doPost$(
+			doFetch$(
 				getPostQueryFetch(fetchQueries, store)
 			)
 		);
 
-export default getPostEpic;
+export const getDeleteEpic = fetchQueries => (action$, store) =>
+	action$.filter(({ type }) => type.endsWith('_DELETE') || type.startsWith('DELETE_'))
+		.map(({ payload }) => payload)
+		.flatMap(
+			doFetch$(
+				getDeleteQueryFetch(fetchQueries, store)
+			)
+		);
+

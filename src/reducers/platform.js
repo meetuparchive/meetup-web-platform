@@ -29,7 +29,7 @@ export const DEFAULT_APP_STATE = { isFetching: false };
  * @param {ReduxAction} action
  * @return {Object}
  */
-export function app(state=DEFAULT_APP_STATE, action={}) {
+export function api(state=DEFAULT_APP_STATE, action={}) {
 	switch (action.type) {
 	case API_REQ:
 		if (action.meta.logout) {
@@ -54,6 +54,38 @@ export function app(state=DEFAULT_APP_STATE, action={}) {
 	case API_RESP_COMPLETE:
 		return { ...state, isFetching: false };
 
+	default:
+		return state;
+	}
+}
+
+/**
+ * The old API results store
+ * @deprecated
+ */
+export function app(state=DEFAULT_APP_STATE, action={}) {
+	let newState;
+
+	switch (action.type) {
+	case 'API_REQUEST':
+		if ((action.meta || {}).logout) {
+			return DEFAULT_APP_STATE;  // clear app state during logout
+		}
+		return { ...state, isFetching: true };
+	case 'API_SUCCESS':
+		state.isFetching = false;  // fall through - everything else is the same as CACHE_SUCCCESS
+	case 'CACHE_SUCCESS':
+		// {API|CACHE}_SUCCESS contains an array of responses, but we just need to build a single
+		// object to update state with
+		newState = action.payload.responses.reduce((s, r) => ({ ...s, ...r }), {});
+		delete state.error;
+		return { ...state, ...newState };
+	case 'API_ERROR':
+		return {
+			...state,
+			error: action.payload,
+			isFetching: false,
+		};
 	default:
 		return state;
 	}
@@ -110,6 +142,7 @@ export function preRenderChecklist([apiDataLoaded] = [false], action) {
 }
 
 const platformReducers = {
+	api,
 	app,
 	clickTracking,
 	config,

@@ -17,6 +17,22 @@ const BrowserCookies = JSCookie.withConverter({
 export const CSRF_HEADER = 'x-csrf-jwt';
 export const CSRF_HEADER_COOKIE = 'x-csrf-jwt-header';
 
+/**
+ * @deprecated
+ */
+export function getDeprecatedSuccessPayload(successes, errors) {
+	const allQueryResponses = [ ...successes, ...errors ];
+	return allQueryResponses.reduce((payload, { query, response }) => {
+		if (!response) {
+			return payload;
+		}
+		const { ref, ...responseBody } = response;
+		payload.queries.push(query);
+		payload.responses.push({ [ref]: responseBody });
+		return payload;
+	}, { queries: [], responses: [] });
+}
+
 export const parseQueryResponse = queries => ({ responses, error, message }) => {
 	if (error) {
 		throw new Error(JSON.stringify({ error, message }));  // treat like an API error

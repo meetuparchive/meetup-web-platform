@@ -8,6 +8,7 @@ import {
 } from '../actions/syncActionCreators';
 import { clearClick } from '../actions/clickActionCreators';
 import { activeRouteQueries } from '../util/routeUtils';
+import { getDeprecatedSuccessPayload } from '../util/fetchUtils';
 
 
 const logoutQueryMatch = /[?&]logout(?:[=&]|$)/;
@@ -76,27 +77,12 @@ export const locationSyncEpic = (action$, store) =>
 		.map(() => ({ type: LOCATION_CHANGE, payload: window.location }));
 
 /**
+ * Old apiRequest maps directly onto new api.requestAll
  * @deprecated
  */
-function getDeprecatedSuccessPayload(successes, errors) {
-	const allQueryResponses = [ ...successes, ...errors ];
-	return allQueryResponses.reduce((payload, { query, response }) => {
-		if (!response) {
-			return payload;
-		}
-		const { ref, ...responseBody } = response;
-		payload.queries.push(query);
-		payload.responses.push({ [ref]: responseBody });
-		return payload;
-	}, { queries: [], responses: [] });
-}
-
 export const apiRequestToApiReq = action$ =>
 	action$.ofType('API_REQUEST')
-		.map(action => ({
-			...action,
-			type: api.API_REQ,
-		}));
+		.map(action => api.requestAll(action.payload, action.meta));
 
 /**
  * Listen for API_REQ and generate response actions from fetch results
