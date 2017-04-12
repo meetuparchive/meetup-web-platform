@@ -57,18 +57,6 @@ export function app(state=DEFAULT_APP_STATE, action={}) {
 	/* BEGIN DEPRECATED SYNC ACTION REDUCER ///// */
 	case 'API_REQUEST':
 		return { ...state, isFetching: true };
-	case 'API_SUCCESS':
-		// API_SUCCESS contains an array of responses that can be reduced into a new
-		// state object
-		state.isFetching = false;
-		delete state.error;
-		return action.payload.responses.reduce((s, r) => ({ ...s, ...r }), { ...state });
-	case 'API_ERROR':
-		return {
-			...state,
-			error: action.payload,
-			isFetching: false,
-		};
 	/* ///// END DEPRECATED SYNC ACTION REDUCER */
 
 	default:

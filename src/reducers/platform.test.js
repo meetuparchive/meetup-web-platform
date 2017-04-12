@@ -83,51 +83,11 @@ describe('clickTracking reducer', () => {
 });
 
 describe('DEPRECATED sync action reducer', () => {
-	it('re-sets app state on logout API_REQUEST', function() {
-		const logoutRequest = syncActionCreators.apiRequest([], { logout: true });
-		expect(app(this.MOCK_STATE, logoutRequest)).toEqual({
+	it('sets isFetching:true for API_REQUEST', function() {
+		const logoutRequest = syncActionCreators.apiRequest([]);
+		expect(app(DEFAULT_APP_STATE, logoutRequest)).toEqual({
 			...DEFAULT_APP_STATE,
 			isFetching: true,
 		});
 	});
-	it('assembles success responses into single state tree', () => {
-		const API_SUCCESS = {
-			type: 'API_SUCCESS',
-			payload: {
-				responses: [{ foo: 'bar'}, { bar: 'baz' }, { baz: 'foo' }],
-			},
-		};
-		expect(app({ ...DEFAULT_APP_STATE }, API_SUCCESS)).toEqual({
-			foo: 'bar',
-			bar: 'baz',
-			baz: 'foo',
-			isFetching: false,
-		});
-	});
-	it('populates an `error` key on API_ERROR', () => {
-		const API_ERROR = {
-			type: 'API_ERROR',
-			payload: new Error('this is the worst'),
-		};
-		const errorState = app({ ...DEFAULT_APP_STATE }, API_ERROR);
-		expect(errorState.error).toBe(API_ERROR.payload);
-	});
-	it('sets isFetching:true on API_REQUEST', () => {
-		const API_REQUEST = {
-			type: 'API_REQUEST',
-			payload: [],
-			meta: {},
-		};
-		const appState = app({ ...DEFAULT_APP_STATE }, API_REQUEST);
-		expect(appState.isFetching).toBe(true);
-	});
-	it('sets isFetching:false on API_SUCCESS', () => {
-		const API_SUCCESS = {
-			type: 'API_SUCCESS',
-			payload: { queries: [], responses: [] },
-		};
-		[true, false, 'monkey'].forEach(isFetching => {
-			const appState = app({ isFetching }, API_SUCCESS);
-			expect(appState.isFetching).toBe(false);
-		});
-	});});
+});

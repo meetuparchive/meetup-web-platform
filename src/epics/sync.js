@@ -80,10 +80,11 @@ export const locationSyncEpic = (action$, store) =>
  */
 function getDeprecatedSuccessPayload(successes, errors) {
 	const allQueryResponses = [ ...successes, ...errors ];
-	const queries = allQueryResponses.map(({ query }) => query);
-	const responses = allQueryResponses.map(({ response }) => response);
-	return queries.reduce((payload, query, i) => {
-		const { ref, ...responseBody } = responses[i];
+	return allQueryResponses.reduce((payload, { query, response }) => {
+		if (!response) {
+			return payload;
+		}
+		const { ref, ...responseBody } = response;
 		payload.queries.push(query);
 		payload.responses.push({ [ref]: responseBody });
 		return payload;

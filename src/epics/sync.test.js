@@ -145,7 +145,13 @@ describe('Sync epic', () => {
 		return getSyncEpic(EMPTY_ROUTES, mockFetchQueries)(action$, fakeStore)
 			.toArray()
 			.toPromise()
-			.then(actions => expect(actions.map(a => a.type)).toEqual([api.API_RESP_FAIL, api.API_RESP_COMPLETE]));
+			.then(actions =>
+				expect(actions.map(a => a.type)).toEqual([
+					api.API_RESP_FAIL,
+					'API_ERROR',
+					api.API_RESP_COMPLETE
+				])
+			);
 	});
 
 });
@@ -180,7 +186,13 @@ describe('DEPRECATED support for API_REQUEST', () => {
 		return getSyncEpic(EMPTY_ROUTES, mockFetchQueries)(action$, fakeStore)
 			.toArray()
 			.toPromise()
-			.then(actions => expect(actions.map(a => a.type)).toEqual([api.API_RESP_FAIL, api.API_RESP_COMPLETE]));
+			.then(actions =>
+				expect(actions.map(a => a.type)).toEqual([
+					api.API_RESP_FAIL,
+					'API_ERROR',
+					api.API_RESP_COMPLETE
+				])
+			);
 	});
 
 });
