@@ -11,7 +11,6 @@
     "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps",
     "coveralls": "cat coverage/lcov.info | coveralls",
     "lint": "eslint . --ext .js,.jsx --fix",
-    "prepublish": "yarn run build",
     "test": "yarn run test:unit && yarn run test:integration",
     "test:unit": "jest --silent --config jest.config.json --coverage",
     "test:integration": "jest --silent --config jest.int.config.json"
@@ -77,7 +76,7 @@
     "intl-relativeformat": "1.3.0",
     "iron": "4.0.4",
     "jest-cli": "19.0.2",
-    "meetup-web-mocks": "1.0.138",
+    "meetup-web-mocks": "1.0.161",
     "react": "15.5.3",
     "react-addons-test-utils": "15.5.1",
     "react-helmet": "5.0.3",
