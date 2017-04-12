@@ -26,7 +26,7 @@ jest.mock('request', () =>
 						},
 						method: 'get',
 					},
-				}, '{ "foo": "value from api proxy" }');
+				}, JSON.stringify({ foo: 'value from api proxy' }));
 			}, 2)
 	)
 );
