@@ -19,7 +19,10 @@ export const clickToClickRecord = request => click => {
 };
 
 export default function processClickTracking(request, reply) {
-	const cookieValue = (request.state || {})['click-track'];
+	const rawCookieValue = (request.state || {})['click-track'];
+	// It's possible that multiple cookies with the same value were sent, e.g.
+	// one value for .dev.meetup.com and another for .meetup.com - parse only the first
+	const cookieValue = rawCookieValue instanceof Array ? rawCookieValue[0] : rawCookieValue;
 	if (!cookieValue) {
 		return;
 	}
@@ -35,7 +38,8 @@ export default function processClickTracking(request, reply) {
 	} catch(err) {
 		console.error(JSON.stringify({
 			message: 'Could not parse click-track cookie',
-			cookieValue
+			cookieValue,
+			error: err.stack,
 		}));
 		return;
 	}
