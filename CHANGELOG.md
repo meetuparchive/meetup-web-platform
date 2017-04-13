@@ -1,9 +1,18 @@
-## [2.1]
+## [2.2]
 
 - **Deprecated** all of the Sync action creators (API\_...) have been deprecated.
 You should instead use the new `apiActionCreators` to manually trigger API
 requests - see the [Queries docs](./docs/Queries.md#usage) for more info. The
 Sync action creators will be removed in version 3.
+
+## [2.1]
+
+- **Deprecated** POSTing and DELETEing through custom `POST_...` or `DELETE_...`
+  actions has been deprecated - a warning will be printed in the server logs.
+  Use the `meta.method` field in your Query objects to determine the request
+  method, and use `componentWillReceiveProps` to process the API result [as
+  described in the
+  docs](https://github.com/meetup/meetup-web-platform/blob/master/docs/Queries.md#recipes)
 
 ## [2.0]
 
