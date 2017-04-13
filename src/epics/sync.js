@@ -110,7 +110,7 @@ export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 					const actions = [
 						...successes.map(api.success),  // send the successes to success
 						...errors.map(api.error),     // send errors to error
-						apiSuccess(getDeprecatedSuccessPayload(successes, errors)),  // DEPRECATED
+						apiSuccess(getDeprecatedSuccessPayload(successes, errors)),  // DEPRECATED - necessary to continue populating old state
 						api.complete()
 					];
 					return Observable.of(...actions);
