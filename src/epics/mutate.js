@@ -65,7 +65,6 @@ const doFetch$ = fetchQuery => ({ query, onSuccess, onError }) =>
 	Rx.Observable.fromPromise(fetchQuery(query))  // make the fetch call
 		.flatMap(({ successes, errors }) => {
 			const responses = getDeprecatedSuccessPayload(successes, errors);
-			console.log(responses);
 			const actions = [
 				...successes.map(api.success),  // send the successes to success
 				...errors.map(api.error),     // send errors to error
