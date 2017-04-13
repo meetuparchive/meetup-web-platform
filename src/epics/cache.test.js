@@ -15,14 +15,14 @@ import {
 } from '../util/cacheUtils';
 
 import getCacheEpic from './cache';
-import * as api from '../actions/apiActionCreators';
+import * as syncActionCreators from '../actions/syncActionCreators';
 
 const MOCK_QUERY = mockQuery(MOCK_RENDERPROPS);
-const MOCK_SUCCESS_ACTION = api.success({
-	query: MOCK_QUERY,
-	response: MOCK_API_RESULT[0],
+const MOCK_SUCCESS_ACTION = syncActionCreators.apiSuccess({
+	queries: [MOCK_QUERY],
+	responses: MOCK_API_RESULT
 });
-const apiRequestAction = api.get(MOCK_QUERY);
+const apiRequestAction = syncActionCreators.apiRequest([MOCK_QUERY]);
 
 function makeCacheEpic() {
 	return Promise.resolve(getCacheEpic(makeCache()));
@@ -55,11 +55,11 @@ const testForPopulatedCache = (action=apiRequestAction) => CacheEpic => {
 
 describe('getCacheEpic', () => {
 	it('does not pass through arbitrary actions', epicIgnoreAction(getCacheEpic()));
-	it('does not emit CACHE_SUCCESS when no cache hit from API_REQ', () =>
+	it('does not emit CACHE_SUCCESS when no cache hit from API_REQUEST', () =>
 		makeCacheEpic().then(testForEmptyCache())
 	);
 
-	it('emits CACHE_SUCCESS when there is a cache hit for API_REQ', () =>
+	it('emits CACHE_SUCCESS when there is a cache hit for API_REQUEST', () =>
 		makeCacheEpic()
 			.then(populateCacheEpic)  // also indirectly testing for successful cache set on API_SUCCESS
 			.then(testForPopulatedCache())

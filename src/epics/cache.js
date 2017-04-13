@@ -7,10 +7,6 @@
 import Rx from 'rxjs';
 import { combineEpics } from 'redux-observable';
 import {
-	API_REQ,
-	API_RESP_SUCCESS,
-} from '../actions/apiActionCreators';
-import {
 	cacheSuccess,
 } from '../actions/cacheActionCreators';
 
@@ -50,8 +46,11 @@ export const cacheClearEpic = cache => action$ =>
  * Not that this will set the cache without emitting an action
  */
 export const cacheSetEpic = cache => action$ =>
-	action$.ofType(API_RESP_SUCCESS, 'CACHE_SET')
-		.flatMap(({ payload: { query, response } }) => cacheWriter(cache)(query, response))
+	action$.ofType('API_SUCCESS', 'CACHE_SET')
+		.flatMap(({ payload: { queries, responses } }) =>
+			Rx.Observable.from(queries).zip(Rx.Observable.from(responses))
+		)
+		.flatMap(([ query, response ]) => cacheWriter(cache)(query, response))
 		.ignoreElements();
 
 /**
@@ -63,11 +62,17 @@ export const cacheSetEpic = cache => action$ =>
  * hits.
  */
 export const cacheQueryEpic = cache => action$ =>
-	action$.ofType(API_REQ)
+	action$.ofType('API_REQUEST')
 		.flatMap(({ payload }) =>
 			Rx.Observable.from(payload)  // fan out
 				.flatMap(cacheReader(cache))               // look for a cache hit
-				.filter(({ query, response }) => response) // ignore misses
+				.do(x => console.log('x', x))
+				.filter(([ query, response ]) => response) // ignore misses
+				.reduce((acc, [ query, response ]) => ({   // fan-in to create response
+					queries: [ ...acc.queries, query ],
+					responses: [ ...acc.responses, response ],
+				}), { queries: [], responses: [] })        // empty response structure
+				.filter(cacheResponse => cacheResponse.responses.length)
 		)
 		.map(cacheSuccess);
 

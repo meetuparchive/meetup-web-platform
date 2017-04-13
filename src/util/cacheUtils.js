@@ -45,8 +45,8 @@ export function makeCache() {
  */
 export const cacheReader = cache => query =>
 	cache.get(JSON.stringify(query))
-		.then(response => ({ query, response }))
-		.catch(err => ({ query, response: null }));  // errors don't matter - just return null
+		.then(response => ([ query, response ]))
+		.catch(err => ([ query, null ]));  // errors don't matter - just return null
 
 /**
  * Generates a function that can write query-response values into cache
