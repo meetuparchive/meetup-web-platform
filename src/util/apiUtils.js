@@ -98,12 +98,15 @@ export const parseMetaHeaders = headers => {
 			links[rel] = url;
 			return links;
 		}, {});
-
-	return {
+	const meta = {
 		...meetupHeaders,
 		...xHeaders,
-		link: linkHeader || undefined,
 	};
+
+	if (linkHeader) {
+		meta.link = linkHeader;
+	}
+	return meta;
 };
 
 /**
