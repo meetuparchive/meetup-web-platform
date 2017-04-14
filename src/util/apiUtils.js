@@ -98,12 +98,15 @@ export const parseMetaHeaders = headers => {
 			links[rel] = url;
 			return links;
 		}, {});
-
-	return {
+	const meta = {
 		...meetupHeaders,
 		...xHeaders,
-		link: linkHeader || undefined,
 	};
+
+	if (linkHeader) {
+		meta.link = linkHeader;
+	}
+	return meta;
 };
 
 /**
@@ -160,6 +163,7 @@ export const parseApiResponse = requestUrl => ([response, body]) => {
 	const meta = {
 		...parseMetaHeaders(response.headers),
 		endpoint: url.parse(requestUrl).pathname,
+		statusCode: response.statusCode,
 	};
 
 	return {
