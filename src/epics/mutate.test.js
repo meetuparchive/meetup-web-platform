@@ -1,6 +1,8 @@
 import 'rxjs/Observable';
 import { ActionsObservable } from 'redux-observable';
 
+import { getDeprecatedSuccessPayload } from '../util/fetchUtils';
+
 import {
 	MOCK_POST_ACTION,
 	MOCK_DELETE_ACTION,
@@ -36,7 +38,8 @@ describe('getPostEpic', () => {
 	});
 
 	it('Returns response from fetchqueries as argument to API_SUCCESS', function() {
-		const response = 'success';
+		const response = { successes: [{ query: {}, response: { ref: 'asdf', foo: 'bar' } }], errors: [] };
+		const deprecatedResponse = getDeprecatedSuccessPayload(response.successes, response.errors);
 		fetchUtils.fetchQueries = jest.fn(() => () => Promise.resolve(response));
 		const noSuccessPayload = { ...MOCK_POST_ACTION.payload };
 		delete noSuccessPayload.onSuccess;
@@ -44,9 +47,11 @@ describe('getPostEpic', () => {
 		spyOn(syncActionCreators, 'apiSuccess');
 		const action$ = ActionsObservable.of(postWithoutOnSuccess);
 		return getPostEpic(fetchUtils.fetchQueries)(action$, store)
+			.toArray()
 			.toPromise()
-			.then(() => {
-				expect(syncActionCreators.apiSuccess).toHaveBeenCalledWith(response);
+			.then(actions => {
+				expect(syncActionCreators.apiSuccess)
+					.toHaveBeenCalledWith(deprecatedResponse);
 			});
 	});
 	it('Returns error from fetchQueries as argument to API_ERROR', function() {
@@ -61,7 +66,8 @@ describe('getPostEpic', () => {
 			.toPromise();
 	});
 	it('Returns response from fetchqueries as argument to API_SUCCESS and action\'s onSuccess', function() {
-		const response = 'success';
+		const response = { successes: [{ query: {}, response: { ref: 'asdf', foo: 'bar' } }], errors: [] };
+		const deprecatedResponse = getDeprecatedSuccessPayload(response.successes, response.errors);
 		fetchUtils.fetchQueries = jest.fn(() => () => Promise.resolve(response));
 		spyOn(MOCK_POST_ACTION.payload, 'onSuccess');
 		spyOn(syncActionCreators, 'apiSuccess');
@@ -69,8 +75,10 @@ describe('getPostEpic', () => {
 		return getPostEpic(fetchUtils.fetchQueries)(action$, store)
 			.toPromise()
 			.then(() => {
-				expect(syncActionCreators.apiSuccess).toHaveBeenCalledWith(response);
-				expect(MOCK_POST_ACTION.payload.onSuccess).toHaveBeenCalledWith(response);
+				expect(syncActionCreators.apiSuccess)
+					.toHaveBeenCalledWith(deprecatedResponse);
+				expect(syncActionCreators.apiSuccess).toHaveBeenCalledWith(deprecatedResponse);
+				expect(MOCK_POST_ACTION.payload.onSuccess).toHaveBeenCalledWith(deprecatedResponse);
 			});
 	});
 	it('Returns error from fetchQueries as argument to action\'s onError', function() {
@@ -101,7 +109,8 @@ describe('getDeleteEpic', () => {
 			.toPromise();
 	});
 	it('Returns response from fetchqueries as argument to API_SUCCESS', function() {
-		const response = 'success';
+		const response = { successes: [{ query: {}, response: { ref: 'asdf', foo: 'bar' } }], errors: [] };
+		const deprecatedResponse = getDeprecatedSuccessPayload(response.successes, response.errors);
 		fetchUtils.fetchQueries = jest.fn(() => () => Promise.resolve(response));
 		const noSuccessPayload = { ...MOCK_DELETE_ACTION.payload };
 		delete noSuccessPayload.onSuccess;
@@ -111,7 +120,7 @@ describe('getDeleteEpic', () => {
 		return getDeleteEpic(fetchUtils.fetchQueries)(action$, store)
 			.toPromise()
 			.then(() => {
-				expect(syncActionCreators.apiSuccess).toHaveBeenCalledWith(response);
+				expect(syncActionCreators.apiSuccess).toHaveBeenCalledWith(deprecatedResponse);
 			});
 	});
 	it('Returns error from fetchQueries as argument to API_ERROR', function() {
@@ -126,7 +135,8 @@ describe('getDeleteEpic', () => {
 			.toPromise();
 	});
 	it('Returns response from fetchqueries as argument to API_SUCCESS and action\'s onSuccess', function() {
-		const response = 'success';
+		const response = { successes: [{ query: {}, response: { ref: 'asdf', foo: 'bar' } }], errors: [] };
+		const deprecatedResponse = getDeprecatedSuccessPayload(response.successes, response.errors);
 		fetchUtils.fetchQueries = jest.fn(() => () => Promise.resolve(response));
 		spyOn(MOCK_DELETE_ACTION.payload, 'onSuccess');
 		spyOn(syncActionCreators, 'apiSuccess');
@@ -134,8 +144,8 @@ describe('getDeleteEpic', () => {
 		return getDeleteEpic(fetchUtils.fetchQueries)(action$, store)
 			.toPromise()
 			.then(() => {
-				expect(syncActionCreators.apiSuccess).toHaveBeenCalledWith(response);
-				expect(MOCK_DELETE_ACTION.payload.onSuccess).toHaveBeenCalledWith(response);
+				expect(syncActionCreators.apiSuccess).toHaveBeenCalledWith(deprecatedResponse);
+				expect(MOCK_DELETE_ACTION.payload.onSuccess).toHaveBeenCalledWith(deprecatedResponse);
 			});
 	});
 	it('Returns error from fetchQueries as argument to action\'s onError', function() {
