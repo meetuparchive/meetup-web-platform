@@ -1,4 +1,5 @@
 import uuid from 'uuid';
+import { parseMemberCookie } from './cookieUtils';
 
 const isProd = process.env.NODE_ENV === 'production';
 
@@ -10,7 +11,6 @@ const COOKIE_OPTS = {
 	isSecure: isProd,
 };
 
-export const MEMBER_ID_COOKIE = isProd ? 'MEETUP_MEMBER_ID' : 'MEETUP_MEMBER_ID_DEV';
 export const TRACK_ID_COOKIE = isProd ? 'TRACK_ID' : 'TRACK_ID_DEV';
 export const SESSION_ID_COOKIE = isProd ? 'SESSION_ID' : 'SESSION_ID_DEV';
 
@@ -29,26 +29,6 @@ export const newSessionId = response => {
 		COOKIE_OPTS
 	);
 	return sessionId;
-};
-
-/**
- * getter/setter for memberId cookie: if memberId is not passed, the cookie
- * will be unset
- */
-export const updateMemberId = (response, memberId) => {
-	if (!memberId) {
-		response.unstate(MEMBER_ID_COOKIE);
-		return response.request.state[MEMBER_ID_COOKIE];
-	}
-	response.state(
-		MEMBER_ID_COOKIE,
-		memberId,
-		{
-			...COOKIE_OPTS,
-			ttl: YEAR_IN_MS * 20,
-		}
-	);
-	return memberId;
 };
 
 /**
@@ -86,7 +66,7 @@ export const trackLogout = log => response =>
 		response,
 		{
 			description: 'logout',
-			memberId: parseInt(updateMemberId(response), 10) || 0,
+			memberId: parseMemberCookie(response.request.state).id,
 			trackIdFrom: response.request.state[TRACK_ID_COOKIE] || '',
 			trackId: updateTrackId(response, true),
 			sessionId: response.request.state[SESSION_ID_COOKIE],
@@ -107,7 +87,7 @@ export const trackNav = log => (response, queryResponses, url, referrer) => {
 		response,
 		{
 			description: 'nav',
-			memberId: parseInt(response.request.state[MEMBER_ID_COOKIE], 10) || 0,
+			memberId: parseMemberCookie(response.request.state).id,
 			trackId: response.request.state[TRACK_ID_COOKIE] || '',
 			sessionId: response.request.state[SESSION_ID_COOKIE] || '',
 			url: url || '',
@@ -142,7 +122,7 @@ export const trackLogin = log => (response, memberId) =>
 		response,
 		{
 			description: 'login',
-			memberId: parseInt(updateMemberId(response, memberId), 10) || 0,
+			memberId: parseMemberCookie(response.request.state).id,
 			trackIdFrom: response.request.state[TRACK_ID_COOKIE] || '',
 			trackId: updateTrackId(response, true),
 			sessionId: response.request.state[SESSION_ID_COOKIE],
@@ -159,7 +139,7 @@ export const trackSession = log => response => {
 		response,
 		{
 			description: 'session',
-			memberId: parseInt(response.request.state[MEMBER_ID_COOKIE], 10) || 0,
+			memberId: parseMemberCookie(response.request.state).id,
 			trackId: updateTrackId(response),
 			sessionId: newSessionId(response),
 			url: response.request.url.path,
