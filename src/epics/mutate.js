@@ -80,7 +80,7 @@ const doFetch$ = fetchQuery => ({ query, onSuccess, onError }) =>
 const getMethodEpic = method => fetchQueries => (action$, store) =>
 	action$.filter(({ type }) =>
 		type.endsWith(`_${method.toUpperCase()}`) || type.startsWith(`${method.toUpperCase()}_`))
-		.do(({ type, query: { endpoint } }) => {
+		.do(({ type, payload: { query: { endpoint } } }) => {
 			if (endpoint.indexOf('.dev.') > -1) {
 				// using a dev endpoint, render a deprecation warning
 				console.warn(`This application is using Post/Delete middleware through ${type}.
