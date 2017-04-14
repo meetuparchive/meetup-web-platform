@@ -1,3 +1,45 @@
+## [2.2]
+
+- **Deprecated** all of the Sync action creators (e.g. `syncActionCreators.apiRequest`)
+  have been deprecated. You should instead use the new `apiActionCreators` to
+  manually trigger API requests - see the [Queries docs](./docs/Queries.md#usage)
+  for more info. The Sync action creators will be removed in version 3.
+
+  There are four things that consumer apps need to update:
+
+  1. `syncActionCreators.apiRequest` query dispatches must be converted to
+     `apiActionCreators.requestAll` (or the method-specific equivalents
+     [described in the Queries
+     docs](https://github.com/meetup/meetup-web-platform/blob/30a220c9a5cb3b9339c4fbccd6e9ff1efbf5a49a/docs/Queries.md#action-creation)).
+  
+  2. All reads from `state.app` should be converted to `state.api` - the child
+     properties will be the same `ref`s used in `state.app`, except for
+     `state.app.error` which is now `state.api.fail`.
+  
+  3. Any reducers listening for `API_SUCCESS` (which has a `payload` containing
+     an object with a `queries` array and corresponding `responses` array) must
+     be refactored to listen for `API_RESP_SUCCESS` and `API_RESP_ERROR`
+     actions, which will each contain a `{ query, response }` object
+     corresponding to a single query and its response.
+     
+     The shape of each `response` object has also changed - instead of a single
+     root-level key corresponding to the original query's `ref`, the response
+     is now a flat object with a `ref` property.
+     
+     Instead of parsing the `API_SUCCESS` payload for errors, reducers will now
+     be able to specifically identify responses that correspond to
+     failed/invalid responses from the REST API by listening for
+     `API_RESP_ERROR` - `API_RESP_SUCCESS` will always correspond to a valid
+     REST API response.
+     
+  4. Any reducers listening for `API_ERROR` must be refactored to listen for
+     `API_RESP_FAIL`. Both actions have the same `Error` object payload
+     corresponding to a general API request failure, unrelated to a specific
+     query.
+  
+  These changes must by made simultaneously, and this list assumes that the
+  refactor described in the `v2.1` changelog has been completed first.
+
 ## [2.1]
 
 - **Deprecated** POSTing and DELETEing through custom `POST_...` or `DELETE_...`
