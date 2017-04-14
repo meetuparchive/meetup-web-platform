@@ -2,7 +2,6 @@ import { parseMemberCookie } from './cookieUtils';
 
 const isProd = process.env.NODE_ENV === 'production';
 
-export const MEMBER_ID_COOKIE = isProd ? 'MEETUP_MEMBER' : 'MEETUP_MEMBER_DEV';
 export const clickCookieOptions = {
 	isSecure: isProd,
 	isHttpOnly: false,
