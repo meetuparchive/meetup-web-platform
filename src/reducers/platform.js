@@ -8,16 +8,61 @@ import {
 	CLICK_TRACK_ACTION,
 	CLICK_TRACK_CLEAR_ACTION
 } from '../actions/clickActionCreators';
+import {
+	API_REQ,
+	API_RESP_SUCCESS,
+	API_RESP_ERROR,
+	API_RESP_FAIL,
+	API_RESP_COMPLETE,
+} from '../actions/apiActionCreators';
+import {
+	CACHE_SUCCESS
+} from '../actions/cacheActionCreators';
 
 export const DEFAULT_APP_STATE = { isFetching: false };
 
+export const responseToState = response => {
+	const { ref, ...data } = response;
+	return { [ref]: data };
+};
+
 /**
  * The primary reducer for data provided by the API
- * `state.app` sub-tree
+ * `state.api` sub-tree
  *
  * @param {Object} state
  * @param {ReduxAction} action
  * @return {Object}
+ */
+export function api(state=DEFAULT_APP_STATE, action={}) {
+	switch (action.type) {
+	case API_REQ:
+		if (action.meta.logout) {
+			// clear app state during logout
+			return { ...DEFAULT_APP_STATE, isFetching: true };
+		}
+		return { ...state, isFetching: true };
+	case API_RESP_SUCCESS:  // fall though
+	case CACHE_SUCCESS:  // fall through
+	case API_RESP_ERROR:
+		// each of these actions provides an API response that should go into app
+		// state - error responses will contain error info
+		delete state.fail;  // if there are any values, the API is not failing
+		return { ...state, ...responseToState(action.payload.response) };
+	case API_RESP_FAIL:
+		state.fail = action.payload;
+		// fall through - fetch is complete
+	case API_RESP_COMPLETE:
+		return { ...state, isFetching: false };
+
+	default:
+		return state;
+	}
+}
+
+/**
+ * The old API results store
+ * @deprecated
  */
 export function app(state=DEFAULT_APP_STATE, action={}) {
 	let newState;
@@ -30,8 +75,7 @@ export function app(state=DEFAULT_APP_STATE, action={}) {
 		return { ...state, isFetching: true };
 	case 'API_SUCCESS':
 		state.isFetching = false;  // fall through - everything else is the same as CACHE_SUCCCESS
-	case 'CACHE_SUCCESS':
-		// {API|CACHE}_SUCCESS contains an array of responses, but we just need to build a single
+		// API_SUCCESS contains an array of responses, but we just need to build a single
 		// object to update state with
 		newState = action.payload.responses.reduce((s, r) => ({ ...s, ...r }), {});
 		delete state.error;
@@ -93,11 +137,12 @@ export function config(state={}, action) {
  */
 export function preRenderChecklist([apiDataLoaded] = [false], action) {
 	return [
-		apiDataLoaded || Boolean(['API_COMPLETE', 'API_ERROR'].find(type => type === action.type)),
+		apiDataLoaded || action.type === API_RESP_COMPLETE,
 	];
 }
 
 const platformReducers = {
+	api,
 	app,
 	clickTracking,
 	config,
