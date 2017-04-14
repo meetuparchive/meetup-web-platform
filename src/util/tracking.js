@@ -66,7 +66,7 @@ export const trackLogout = log => response =>
 		response,
 		{
 			description: 'logout',
-			memberId: parseInt(parseMemberCookie(response.request.state).id, 10) || 0,
+			memberId: parseMemberCookie(response.request.state).id,
 			trackIdFrom: response.request.state[TRACK_ID_COOKIE] || '',
 			trackId: updateTrackId(response, true),
 			sessionId: response.request.state[SESSION_ID_COOKIE],
@@ -87,7 +87,7 @@ export const trackNav = log => (response, queryResponses, url, referrer) => {
 		response,
 		{
 			description: 'nav',
-			memberId: parseInt(parseMemberCookie(response.request.state).id, 10) || 0,
+			memberId: parseMemberCookie(response.request.state).id,
 			trackId: response.request.state[TRACK_ID_COOKIE] || '',
 			sessionId: response.request.state[SESSION_ID_COOKIE] || '',
 			url: url || '',
@@ -122,7 +122,7 @@ export const trackLogin = log => (response, memberId) =>
 		response,
 		{
 			description: 'login',
-			memberId: parseInt(parseMemberCookie(response.request.state).id, 10) || 0,
+			memberId: parseMemberCookie(response.request.state).id,
 			trackIdFrom: response.request.state[TRACK_ID_COOKIE] || '',
 			trackId: updateTrackId(response, true),
 			sessionId: response.request.state[SESSION_ID_COOKIE],
@@ -139,7 +139,7 @@ export const trackSession = log => response => {
 		response,
 		{
 			description: 'session',
-			memberId: parseInt(parseMemberCookie(response.request.state).id, 10) || 0,
+			memberId: parseMemberCookie(response.request.state).id,
 			trackId: updateTrackId(response),
 			sessionId: newSessionId(response),
 			url: response.request.url.path,

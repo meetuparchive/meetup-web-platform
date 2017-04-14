@@ -12,7 +12,7 @@ export const clickToClickRecord = request => click => {
 	return {
 		timestamp: click.timestamp,
 		requestId: request.id,
-		memberId: parseInt(parseMemberCookie(request.state).id, 10) || 0,
+		memberId: parseMemberCookie(request.state).id,
 		lineage: click.lineage,
 		linkText: click.linkText || '',
 		coordX: click.coords[0],
