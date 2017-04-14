@@ -2,10 +2,10 @@ import { Observable } from 'rxjs';
 import { combineEpics } from 'redux-observable';
 import * as api from '../actions/apiActionCreators';
 import {
-	apiSuccess,
-	apiError,
+	apiSuccess, // DEPRECATED
+	apiError, // DEPRECATED
+	LOCATION_CHANGE,
 	SERVER_RENDER,
-	LOCATION_CHANGE
 } from '../actions/syncActionCreators';
 import { clearClick } from '../actions/clickActionCreators';
 import { activeRouteQueries } from '../util/routeUtils';
