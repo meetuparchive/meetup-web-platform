@@ -38,13 +38,11 @@ export function api(state=DEFAULT_APP_STATE, action={}) {
 	case API_RESP_ERROR: {
 		// each of these actions provides an API response that should go into app
 		// state - error responses will contain error info
-		delete state.error;  // DEPRECATED
 		delete state.fail;  // if there are any values, the API is not failing
 		const { ref, ...response } = action.payload.response;
 		return { ...state, [ref]: response };
 	}
 	case API_RESP_FAIL:
-		state.error = action.payload;  // DEPRECATED
 		state.fail = action.payload;
 		// fall through - fetch is complete
 	case API_RESP_COMPLETE:
