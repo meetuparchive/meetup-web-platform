@@ -58,12 +58,12 @@ describe('cache utils', () => {
 		const response = 'bar';
 		return cacheWriter(cache)(query, response)
 			.then(() => requestCache(query))
-			.then(([ cachedQuery, cachedResponse ]) => {  // expecting two-element array response
+			.then(({ query: cachedQuery, response: cachedResponse }) => {  // expecting two-element array response
 				expect(cachedQuery).toEqual(query);
 				expect(cachedResponse).toEqual(response);
 			})
 			.then(() => requestCache(nonCachedQuery))  // test with un-cached query
-			.then(([ cachedQuery, cachedResponse ]) => {
+			.then(({ query: cachedQuery, response: cachedResponse }) => {
 				expect(cachedQuery).toEqual(nonCachedQuery);
 				expect(cachedResponse).toBeUndefined();
 			});
