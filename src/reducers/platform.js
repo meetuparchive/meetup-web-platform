@@ -15,6 +15,9 @@ import {
 	API_RESP_FAIL,
 	API_RESP_COMPLETE,
 } from '../actions/apiActionCreators';
+import {
+	CACHE_SUCCESS
+} from '../actions/cacheActionCreators';
 
 export const DEFAULT_APP_STATE = { isFetching: false };
 
@@ -35,6 +38,7 @@ export function api(state=DEFAULT_APP_STATE, action={}) {
 		}
 		return { ...state, isFetching: true };
 	case API_RESP_SUCCESS:  // fall though
+	case CACHE_SUCCESS:  // fall through
 	case API_RESP_ERROR: {
 		// each of these actions provides an API response that should go into app
 		// state - error responses will contain error info
@@ -60,8 +64,6 @@ export function api(state=DEFAULT_APP_STATE, action={}) {
  * @deprecated
  */
 export function app(state=DEFAULT_APP_STATE, action={}) {
-	let newState;
-
 	switch (action.type) {
 	case 'API_REQUEST':
 		if ((action.meta || {}).logout) {
@@ -70,12 +72,6 @@ export function app(state=DEFAULT_APP_STATE, action={}) {
 		return { ...state, isFetching: true };
 	case 'API_SUCCESS':
 		state.isFetching = false;  // fall through - everything else is the same as CACHE_SUCCCESS
-	case 'CACHE_SUCCESS':
-		// {API|CACHE}_SUCCESS contains an array of responses, but we just need to build a single
-		// object to update state with
-		newState = action.payload.responses.reduce((s, r) => ({ ...s, ...r }), {});
-		delete state.error;
-		return { ...state, ...newState };
 	case 'API_ERROR':
 		return {
 			...state,
