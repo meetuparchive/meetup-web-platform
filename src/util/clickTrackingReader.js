@@ -1,5 +1,8 @@
+import { parseMemberCookie } from './cookieUtils';
+
 const isProd = process.env.NODE_ENV === 'production';
-export const MEMBER_ID_COOKIE = isProd ? 'MEETUP_MEMBER_ID' : 'MEETUP_MEMBER_ID_DEV';
+
+export const MEMBER_ID_COOKIE = isProd ? 'MEETUP_MEMBER' : 'MEETUP_MEMBER_DEV';
 export const clickCookieOptions = {
 	isSecure: isProd,
 	isHttpOnly: false,
@@ -10,7 +13,7 @@ export const clickToClickRecord = request => click => {
 	return {
 		timestamp: click.timestamp,
 		requestId: request.id,
-		memberId: parseInt(request.state[MEMBER_ID_COOKIE], 10) || 0,
+		memberId: parseInt(parseMemberCookie(request.state).id, 10) || 0,
 		lineage: click.lineage,
 		linkText: click.linkText || '',
 		coordX: click.coords[0],
