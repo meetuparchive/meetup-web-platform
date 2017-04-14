@@ -26,6 +26,7 @@ import {
  * alongside the POST/DELETE action creator, with the expectation that all response
  * processing can be done there
  *
+ * @deprecated
  * @module MutateEpic
  */
 
@@ -79,6 +80,14 @@ const doFetch$ = fetchQuery => ({ query, onSuccess, onError }) =>
 const getMethodEpic = method => fetchQueries => (action$, store) =>
 	action$.filter(({ type }) =>
 		type.endsWith(`_${method.toUpperCase()}`) || type.startsWith(`${method.toUpperCase()}_`))
+		.do(({ type, payload: { query: { endpoint } } }) => {
+			if (endpoint.indexOf('.dev.') > -1) {
+				// using a dev endpoint, render a deprecation warning
+				console.warn(`This application is using Post/Delete middleware through ${type}.
+See the platform Queries Recipes docs for refactoring options:
+https://github.com/meetup/meetup-web-platform/blob/master/docs/Queries.md#recipes`);
+			}
+		})
 		.map(({ payload }) => payload)
 		.flatMap(
 			doFetch$(
