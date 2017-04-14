@@ -15,9 +15,6 @@ import {
 	API_RESP_FAIL,
 	API_RESP_COMPLETE,
 } from '../actions/apiActionCreators';
-import {
-	CACHE_SUCCESS
-} from '../actions/cacheActionCreators';
 
 export const DEFAULT_APP_STATE = { isFetching: false };
 
@@ -38,7 +35,6 @@ export function api(state=DEFAULT_APP_STATE, action={}) {
 		}
 		return { ...state, isFetching: true };
 	case API_RESP_SUCCESS:  // fall though
-	case CACHE_SUCCESS:  // fall through
 	case API_RESP_ERROR: {
 		// each of these actions provides an API response that should go into app
 		// state - error responses will contain error info
