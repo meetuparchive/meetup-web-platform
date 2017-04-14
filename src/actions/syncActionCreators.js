@@ -1,5 +1,9 @@
 export const LOCATION_CHANGE = '@@router/LOCATION_CHANGE';
+export const SERVER_RENDER = '@@server/RENDER';
 
+/**
+ * @deprecated
+ */
 export function apiRequest(queries, meta) {
 	return {
 		type: 'API_REQUEST',
@@ -8,6 +12,9 @@ export function apiRequest(queries, meta) {
 	};
 }
 
+/**
+ * @deprecated
+ */
 export function apiSuccess({ queries, responses }) {
 	return {
 		type: 'API_SUCCESS',
@@ -15,6 +22,9 @@ export function apiSuccess({ queries, responses }) {
 	};
 }
 
+/**
+ * @deprecated
+ */
 export function apiError(err) {
 	return {
 		type: 'API_ERROR',
@@ -22,6 +32,9 @@ export function apiError(err) {
 	};
 }
 
+/**
+ * @deprecated
+ */
 export function apiComplete() {
 	return {
 		type: 'API_COMPLETE'

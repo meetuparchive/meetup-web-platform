@@ -1,16 +1,15 @@
 import { Observable } from 'rxjs';
 import { combineEpics } from 'redux-observable';
+import * as api from '../actions/apiActionCreators';
 import {
-	apiRequest,
 	apiSuccess,
 	apiError,
-	apiComplete,
-	LOCATION_CHANGE,
+	SERVER_RENDER,
+	LOCATION_CHANGE
 } from '../actions/syncActionCreators';
-import {
-	clearClick,
-} from '../actions/clickActionCreators';
+import { clearClick } from '../actions/clickActionCreators';
 import { activeRouteQueries } from '../util/routeUtils';
+import { getDeprecatedSuccessPayload } from '../util/fetchUtils';
 
 
 const logoutQueryMatch = /[?&]logout(?:[=&]|$)/;
@@ -40,7 +39,7 @@ export const getNavEpic = (routes, baseUrl) => {
 	const findActiveQueries = activeRouteQueries(routes, baseUrl);
 	let currentLocation = {};  // keep track of current route so that apiRequest can get 'referrer'
 	return (action$, store) =>
-		action$.ofType(LOCATION_CHANGE, '@@server/RENDER')
+		action$.ofType(LOCATION_CHANGE, SERVER_RENDER)
 			.flatMap(({ payload }) => {
 				// inject request metadata from context, including `store.getState()`
 				const requestMetadata = {
@@ -52,7 +51,7 @@ export const getNavEpic = (routes, baseUrl) => {
 				currentLocation = payload;
 
 				const activeQueries = findActiveQueries(payload);
-				const actions = [apiRequest(activeQueries, requestMetadata)];
+				const actions = [api.requestAll(activeQueries, requestMetadata)];
 
 				// emit cache clear _only_ when logout requested
 				if (requestMetadata.logout) {
@@ -79,28 +78,57 @@ export const locationSyncEpic = (action$, store) =>
 		.map(() => ({ type: LOCATION_CHANGE, payload: window.location }));
 
 /**
- * Listen for actions that provide queries to send to the api - mainly
- * API_REQUEST
+ * Old apiRequest maps directly onto new api.requestAll
+ * @deprecated
+ */
+export const apiRequestToApiReq = action$ =>
+	action$.ofType('API_REQUEST')
+		.map(action => api.requestAll(action.payload, action.meta));
+
+/**
+ * Listen for API_REQ and generate response actions from fetch results
  *
- * emits (API_SUCCESS || API_ERROR) then API_COMPLETE
+ * emits
+ * - 1 or more API_RESP_SUCCESS
+ * - 1 or more API_RESP_ERROR
+ * - API_SUCCESS  // deprecated
+ * - API_COMPLETE
+ *
+ * or
+ *
+ * - API_RESP_FAIL
+ * - API_ERROR  // deprecated
+ * - API_COMPLETE
  */
 export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
-	action$.ofType('API_REQUEST')
+	action$.ofType(api.API_REQ)
 		.flatMap(({ payload, meta }) => {           // set up the fetch call to the app server
 			const { config } = store.getState();
-			const fetch = fetchQueriesFn(config.apiUrl);
-			return Observable.fromPromise(fetch(payload, meta))  // call fetch
+			const fetchQueries = fetchQueriesFn(config.apiUrl);
+			return Observable.fromPromise(fetchQueries(payload, meta))  // call fetch
 				.takeUntil(action$.ofType(LOCATION_CHANGE))  // cancel this fetch when nav happens
-				.map(apiSuccess)                             // dispatch apiSuccess with server response
-				.flatMap(action => Observable.of(action, apiComplete()))  // dispatch apiComplete after resolution
-				.catch(err => Observable.of(apiError(err)));  // ... or apiError
+				.flatMap(({ successes=[], errors=[] }) => {
+					const actions = [
+						...successes.map(api.success),  // send the successes to success
+						...errors.map(api.error),     // send errors to error
+						apiSuccess(getDeprecatedSuccessPayload(successes, errors)),  // DEPRECATED - necessary to continue populating old state
+						api.complete()
+					];
+					return Observable.of(...actions);
+				})
+				.catch(err => Observable.of(
+					api.fail(err),
+					apiError(err),  // DEPRECATED
+					api.complete()
+				));
 		});
 
 export default function getSyncEpic(routes, fetchQueries, baseUrl) {
 	return combineEpics(
 		getNavEpic(routes, baseUrl),
 		// locationSyncEpic,
-		getFetchQueriesEpic(fetchQueries)
+		getFetchQueriesEpic(fetchQueries),
+		apiRequestToApiReq  // TODO: remove in v3 - apiRequest is deprecated
 	);
 }
 
