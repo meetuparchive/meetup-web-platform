@@ -12,6 +12,8 @@ custom headers
 
 ## Spec
 
+### Query object
+
 A Query is just a plain object with the following shape:
 
 ```js
@@ -27,24 +29,24 @@ A Query is just a plain object with the following shape:
 }
 ```
 
-### `ref`
+#### `ref`
 
 A unique string reference to the query. The `ref` is used to uniquely identify
 the query _and_ uniquely assign the resulting API data to Redux state at
 `state.app[ref]`.
 
-### `endpoint`
+#### `endpoint`
 
 The Meetup API endpoint as a URL pathname, e.g. `/members/123456`. Note that
 this URL should not include any parameter placeholders like `/:urlname` - the
 values should be filled in as needed.
 
-### `params`
+#### `params`
 
 The parameters that should be passed to the API either in the querystring (for
 GET requests) or the request body (for POST requests).
 
-### `type`
+#### `type`
 
 A one-word description of the 'data type' expected to be returned by the API
 for this query. This information is used on the server to further process the
@@ -62,14 +64,14 @@ array or a singleton.
 - `comment`
 - feature-specific objects like `home`, `conversations`
 
-### `meta`
-
 #### `flags`
 
 An array of feature flag (Runtime Flag) names that should be returned
 alongside the main request.
 
-#### `method`
+#### `meta`
+
+##### `method`
 
 You can force the query to be sent with a particular HTTP method by specifying
 it here as a string: `get`, `post`, `delete`, or `patch`. Note that
@@ -78,6 +80,20 @@ different `method`s.
 
 Alternatively, you can use method-specific action creators to automatically
 assingn the method and make the request for individual requests.
+
+### Query Response
+
+A query response is also a plain object
+
+```js
+{
+  ref: string,
+  value: any,
+  type?: string,
+  flags?: array,
+  meta?: object,
+}
+```
 
 ## Usage
 
@@ -143,9 +159,7 @@ GET /mu_api?queries=[query, ...]
 
 **API response array returned as JSON from app server**
 
-The app server API proxy endpoint will respond with an array of API responses
-structured as individual objects with a single key corresponding to the query
-`ref`.
+The app server API proxy endpoint will respond with an array of Query responses.
 
 ```js
 [
