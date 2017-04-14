@@ -6,7 +6,7 @@ import getCacheEpic from '../epics/cache';
 import {
 	getPostEpic,
 	getDeleteEpic
-} from '../epics/mutate';
+} from '../epics/mutate';  // DEPRECATED
 
 /**
  * The middleware is exported as a getter because it needs the application's
@@ -21,8 +21,8 @@ const getPlatformMiddleware = (routes, fetchQueries, baseUrl) => createEpicMiddl
 	combineEpics(
 		getSyncEpic(routes, fetchQueries, baseUrl),
 		getCacheEpic(),
-		getPostEpic(fetchQueries),
-		getDeleteEpic(fetchQueries)
+		getPostEpic(fetchQueries),  // DEPRECATED
+		getDeleteEpic(fetchQueries)  // DEPRECATED
 	)
 );
 
