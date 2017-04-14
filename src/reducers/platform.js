@@ -21,6 +21,11 @@ import {
 
 export const DEFAULT_APP_STATE = { isFetching: false };
 
+export const responseToState = response => {
+	const { ref, ...data } = response;
+	return { [ref]: data };
+};
+
 /**
  * The primary reducer for data provided by the API
  * `state.api` sub-tree
@@ -39,14 +44,12 @@ export function api(state=DEFAULT_APP_STATE, action={}) {
 		return { ...state, isFetching: true };
 	case API_RESP_SUCCESS:  // fall though
 	case CACHE_SUCCESS:  // fall through
-	case API_RESP_ERROR: {
+	case API_RESP_ERROR:
 		// each of these actions provides an API response that should go into app
 		// state - error responses will contain error info
 		delete state.error;  // DEPRECATED
 		delete state.fail;  // if there are any values, the API is not failing
-		const { ref, ...response } = action.payload.response;
-		return { ...state, [ref]: response };
-	}
+		return { ...state, ...responseToState(action.payload.response) };
 	case API_RESP_FAIL:
 		state.error = action.payload;  // DEPRECATED
 		state.fail = action.payload;
@@ -64,6 +67,8 @@ export function api(state=DEFAULT_APP_STATE, action={}) {
  * @deprecated
  */
 export function app(state=DEFAULT_APP_STATE, action={}) {
+	let newState;
+
 	switch (action.type) {
 	case 'API_REQUEST':
 		if ((action.meta || {}).logout) {
@@ -72,6 +77,11 @@ export function app(state=DEFAULT_APP_STATE, action={}) {
 		return { ...state, isFetching: true };
 	case 'API_SUCCESS':
 		state.isFetching = false;  // fall through - everything else is the same as CACHE_SUCCCESS
+		// API_SUCCESS contains an array of responses, but we just need to build a single
+		// object to update state with
+		newState = action.payload.responses.reduce((s, r) => ({ ...s, ...r }), {});
+		delete state.error;
+		return { ...state, ...newState };
 	case 'API_ERROR':
 		return {
 			...state,
