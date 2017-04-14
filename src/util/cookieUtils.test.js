@@ -28,4 +28,7 @@ describe('parseMemberCookie', () => {
 
 		expect(resultIds).toEqual(ids.map(id => parseInt(id.toString(), 10) || 0));
 	});
+	it('returns {id:0} for no-cookie case', () => {
+		expect(parseMemberCookie({})).toEqual({ id: 0 });
+	});
 });
