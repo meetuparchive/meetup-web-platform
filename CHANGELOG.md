@@ -13,7 +13,8 @@
      docs](https://github.com/meetup/meetup-web-platform/blob/30a220c9a5cb3b9339c4fbccd6e9ff1efbf5a49a/docs/Queries.md#action-creation)).
   
   2. All reads from `state.app` should be converted to `state.api` - the child
-     properties will be the same `ref`s used in `state.app`.
+     properties will be the same `ref`s used in `state.app`, except for
+     `state.app.error` which is now `state.api.fail`.
   
   3. Any reducers listening for `API_SUCCESS` (which has a `payload` containing
      an object with a `queries` array and corresponding `responses` array) must
