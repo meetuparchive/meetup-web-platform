@@ -86,9 +86,9 @@ const doFetch$ = fetchQuery => ({ query, onSuccess, onError }) =>
 const getMethodEpic = method => fetchQueries => (action$, store) =>
 	action$.filter(({ type }) =>
 		type.endsWith(`_${method.toUpperCase()}`) || type.startsWith(`${method.toUpperCase()}_`))
-		.do(({ type }) => {
-			if (process && process.pid) {
-				// on the server, render a deprecation warning
+		.do(({ type, payload: { query: { endpoint } } }) => {
+			if (endpoint.indexOf('.dev.') > -1) {
+				// using a dev endpoint, render a deprecation warning
 				console.warn(`This application is using Post/Delete middleware through ${type}.
 See the platform Queries Recipes docs for refactoring options:
 https://github.com/meetup/meetup-web-platform/blob/master/docs/Queries.md#recipes`);
