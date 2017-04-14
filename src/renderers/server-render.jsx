@@ -9,6 +9,7 @@ import NotFound from '../components/NotFound';
 import PlatformApp from '../components/PlatformApp';
 import { polyfillNodeIntl } from '../util/localizationUtils';
 
+import { SERVER_RENDER } from '../actions/syncActionCreators';
 import {
 	configureApiUrl,
 	configureBaseUrl,
@@ -195,7 +196,7 @@ const makeRenderer = (
 		}
 	}));
 	store.dispatch({
-		type: '@@server/RENDER',
+		type: SERVER_RENDER,
 		payload: url,
 	});
 	return storeIsReady$

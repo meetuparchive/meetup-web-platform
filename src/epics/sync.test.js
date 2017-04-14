@@ -71,7 +71,7 @@ describe('Sync epic', () => {
 		const pathname = '/noQuery';
 		const noMatchLocation = { ...MOCK_RENDERPROPS.location, pathname };
 		const locationChange = { type: syncActionCreators.LOCATION_CHANGE, payload: noMatchLocation };
-		const serverRender = { type: '@@server/RENDER', payload: noMatchLocation };
+		const serverRender = { type: syncActionCreators.SERVER_RENDER, payload: noMatchLocation };
 
 		return epicIgnoreAction(SyncEpic, locationChange)()
 			.then(epicIgnoreAction(SyncEpic, serverRender));
@@ -82,7 +82,7 @@ describe('Sync epic', () => {
 		const pathname = '/nullQuery';
 		const noMatchLocation = { ...MOCK_RENDERPROPS.location, pathname };
 		const locationChange = { type: syncActionCreators.LOCATION_CHANGE, payload: noMatchLocation };
-		const serverRender = { type: '@@server/RENDER', payload: noMatchLocation };
+		const serverRender = { type: syncActionCreators.SERVER_RENDER, payload: noMatchLocation };
 
 		return epicIgnoreAction(SyncEpic, locationChange)()
 			.then(epicIgnoreAction(SyncEpic, serverRender));
