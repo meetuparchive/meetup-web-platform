@@ -1,4 +1,5 @@
 export const LOCATION_CHANGE = '@@router/LOCATION_CHANGE';
+export const SERVER_RENDER = '@@server/RENDER';
 
 /**
  * @deprecated

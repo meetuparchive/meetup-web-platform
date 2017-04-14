@@ -4,6 +4,7 @@ import * as api from '../actions/apiActionCreators';
 import {
 	apiSuccess,
 	apiError,
+	SERVER_RENDER,
 	LOCATION_CHANGE
 } from '../actions/syncActionCreators';
 import { clearClick } from '../actions/clickActionCreators';
@@ -38,7 +39,7 @@ export const getNavEpic = (routes, baseUrl) => {
 	const findActiveQueries = activeRouteQueries(routes, baseUrl);
 	let currentLocation = {};  // keep track of current route so that apiRequest can get 'referrer'
 	return (action$, store) =>
-		action$.ofType(LOCATION_CHANGE, '@@server/RENDER')
+		action$.ofType(LOCATION_CHANGE, SERVER_RENDER)
 			.flatMap(({ payload }) => {
 				// inject request metadata from context, including `store.getState()`
 				const requestMetadata = {
