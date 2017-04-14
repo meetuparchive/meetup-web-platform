@@ -11,6 +11,8 @@ import {
 	API_RESP_SUCCESS,
 } from '../actions/apiActionCreators';
 import {
+	CACHE_CLEAR,
+	CACHE_SET,
 	cacheSuccess,
 } from '../actions/cacheActionCreators';
 
@@ -35,7 +37,7 @@ export function checkEnable() {
  * Note that this will clear the cache without emitting an action
  */
 export const cacheClearEpic = cache => action$ =>
-	action$.ofType('CACHE_CLEAR')
+	action$.ofType(CACHE_CLEAR)
 		.flatMap(() => cache.clear())  // wait for cache to clear before continuing
 		.ignoreElements();
 
@@ -50,7 +52,7 @@ export const cacheClearEpic = cache => action$ =>
  * Not that this will set the cache without emitting an action
  */
 export const cacheSetEpic = cache => action$ =>
-	action$.ofType(API_RESP_SUCCESS, 'CACHE_SET')
+	action$.ofType(API_RESP_SUCCESS, CACHE_SET)
 		.flatMap(({ payload: { query, response } }) => cacheWriter(cache)(query, response))
 		.ignoreElements();
 
