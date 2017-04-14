@@ -51,13 +51,19 @@ const activity = {
 	]
 };
 
+/**
+ * @param {Object} schema an avro JSON schema (.avsc)
+ * @param {Object} data the data matching the schema.
+ * @return {String} JSON string of the avro-encoded record wrapped with metadata
+ */
 const avroSerializer = schema => data => {
 	const record = avro.parse(schema).toBuffer(data);
-	const eventDate = new Date(parseInt(data.timestamp, 10));
+	// data.timestamp _must_ be ISOString if it exists
+	const timestamp = data.timestamp || new Date().toISOString();
 	const analytics = {
 		record: record.toString('base64'),
 		schema: `gs://meetup-logs/avro_schemas/${schema.name}_${schema.doc}.avsc`,
-		date: eventDate.toISOString().substr(0, 10),  // YYYY-MM-DD
+		date: timestamp.substr(0, 10),  // YYYY-MM-DD
 	};
 	return JSON.stringify(analytics);
 };
