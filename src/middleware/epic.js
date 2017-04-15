@@ -1,4 +1,3 @@
-import 'rxjs';  // required to enable all Observable operators
 import { combineEpics, createEpicMiddleware } from 'redux-observable';
 
 import getSyncEpic from '../epics/sync';

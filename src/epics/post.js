@@ -1,4 +1,4 @@
-import Rx from 'rxjs';
+import { Observable } from 'rxjs';
 import {
 	apiSuccess,
 	apiError,
@@ -57,21 +57,21 @@ const getPostQueryFetch = (fetchQueries, store) =>
  * 3. Failed POST responses will be sent to the POST action's `onError`
  */
 const doPost$ = fetchPostQuery => ({ query, onSuccess, onError }) =>
-	Rx.Observable.fromPromise(fetchPostQuery(query))  // make the fetch call
+	Observable.fromPromise(fetchPostQuery(query))  // make the fetch call
 		.flatMap(responses => {
 			// success! return API_SUCCESS and whatever the POST action wants to do onSuccess
 			const actions = [apiSuccess(responses)];
 			if (onSuccess) {
 				actions.push(onSuccess(responses));
 			}
-			return Rx.Observable.from(actions);
+			return Observable.from(actions);
 		})
 		.catch(err => {
 			const actions = [apiError(err)];
 			if (onError) {
 				actions.push(onError(err));
 			}
-			return Rx.Observable.from(actions);
+			return Observable.from(actions);
 		});
 
 const getPostEpic = fetchQueries => (action$, store) =>

@@ -1,4 +1,4 @@
-import Rx from 'rxjs';
+import { Observable } from 'rxjs';
 import {
 	apiSuccess,
 	apiError,
@@ -57,21 +57,21 @@ const getDeleteQueryFetch = (fetchQueries, store) =>
  * 3. Failed DELETE responses will be sent to the DELETE action's `onError`
  */
 const doDelete$ = fetchDeleteQuery => ({ query, onSuccess, onError }) =>
-	Rx.Observable.fromPromise(fetchDeleteQuery(query))  // make the fetch call
+	Observable.fromPromise(fetchDeleteQuery(query))  // make the fetch call
 		.flatMap(responses => {
 			// success! return API_SUCCESS and whatever the POST action wants to do onSuccess
 			const actions = [apiSuccess(responses)];
 			if (onSuccess) {
 				actions.push(onSuccess(responses));
 			}
-			return Rx.Observable.from(actions);
+			return Observable.from(actions);
 		})
 		.catch(err => {
 			const actions = [apiError(err)];
 			if (onError) {
 				actions.push(onError(err));
 			}
-			return Rx.Observable.from(actions);
+			return Observable.from(actions);
 		});
 
 const getDeleteEpic = fetchQueries => (action$, store) =>

@@ -1,4 +1,4 @@
-import Rx from 'rxjs';
+import { Observable } from 'rxjs';
 import register, {
 	getAuthenticate,
 	oauthScheme,
@@ -32,7 +32,7 @@ const MOCK_REQUEST = {
 	headers: MOCK_HEADERS,
 	state: {},
 	log: (tags, data) => { console.log(data); },
-	authorize: () => Rx.Observable.of(MOCK_REQUEST),
+	authorize: () => Observable.of(MOCK_REQUEST),
 	query: {},
 	plugins: {
 		requestAuth: {},
@@ -49,7 +49,7 @@ const MOCK_AUTHED_REQUEST = {
 	...MOCK_REQUEST,
 	state: { oauth_token: 'good_token' },
 	log: (tags, data) => { console.log(data); },
-	authorize: () => Rx.Observable.of(MOCK_AUTHED_REQUEST),
+	authorize: () => Observable.of(MOCK_AUTHED_REQUEST),
 };
 
 const GOOD_MOCK_FETCH_RESULT = Promise.resolve({
@@ -114,7 +114,7 @@ describe('getAccessToken$', () => {
 		getToken$(MOCK_HEADERS)(MOCK_CODE)
 			.catch(err => {
 				expect(err).toEqual(jasmine.any(Error));
-				return Rx.Observable.of(null);
+				return Observable.of(null);
 			})
 			.subscribe(done);
 	});
@@ -256,7 +256,7 @@ describe('oauthScheme', () => {
 describe('getAuthenticate', () => {
 	it('calls request.authorize', () => {
 		const spyable = {
-			authorizeRequest$: x => Rx.Observable.of(x),
+			authorizeRequest$: x => Observable.of(x),
 		};
 		spyOn(spyable, 'authorizeRequest$').and.callThrough();
 		return new Promise((resolve, reject) =>
@@ -274,7 +274,7 @@ describe('getAuthenticate', () => {
 			plugins: { requestAuth: { authType: 'oauth_token' } }
 		};
 		return new Promise((resolve, reject) =>
-			getAuthenticate(x => Rx.Observable.of(x))(request, MOCK_REPLY_FN)
+			getAuthenticate(x => Observable.of(x))(request, MOCK_REPLY_FN)
 				.add(() => {
 					expect(MOCK_REPLY_FN.continue)
 						.toHaveBeenCalledWith({
@@ -287,7 +287,7 @@ describe('getAuthenticate', () => {
 	});
 	it('calls reply(err...) when auth throws an error', () => {
 		const theError = new Error('badness');
-		const authorizeRequest$ = x => Rx.Observable.throw(theError);
+		const authorizeRequest$ = x => Observable.throw(theError);
 		const spyable = { MOCK_REPLY_FN };
 		spyOn(spyable, 'MOCK_REPLY_FN');
 		return new Promise((resolve, reject) =>
