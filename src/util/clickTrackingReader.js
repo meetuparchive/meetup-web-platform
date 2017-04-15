@@ -23,7 +23,7 @@ export default function processClickTracking(request, reply) {
 	// It's possible that multiple cookies with the same value were sent, e.g.
 	// one value for .dev.meetup.com and another for .meetup.com - parse only the first
 	const cookieValue = rawCookieValue instanceof Array ? rawCookieValue[0] : rawCookieValue;
-	if (!cookieValue) {
+	if (!cookieValue || cookieValue === 'undefined') {
 		return;
 	}
 

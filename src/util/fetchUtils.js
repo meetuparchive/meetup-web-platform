@@ -61,11 +61,13 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 			...metadata
 		} = meta;
 
-		BrowserCookies.set(
-			'click-track',
-			JSON.stringify(clickTracking),
-			{ domain: '.meetup.com' }
-		);
+		if (clickTracking) {
+			BrowserCookies.set(
+				'click-track',
+				JSON.stringify(clickTracking),
+				{ domain: apiUrl.indexOf('.dev.') > -1 ? '.dev.meetup.com' : '.meetup.com' }
+			);
+		}
 
 		// special logout param
 		if (logout) {
