@@ -401,7 +401,7 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
 		// inject duotone URLs into any group query response
 		const { type, value, error } = queryResponse;
 		if (!value || error) {
-			return;
+			return queryResponse;
 		}
 		let groups;
 		switch (type) {
