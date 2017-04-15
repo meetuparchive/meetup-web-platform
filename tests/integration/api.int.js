@@ -57,6 +57,7 @@ describe('API proxy endpoint integration tests', () => {
 					value: {},  // from the mocked `request` module
 					meta: {
 						endpoint: '/foo',
+						statusCode: 200,
 					},
 				}
 			}],

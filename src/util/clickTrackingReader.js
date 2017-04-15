@@ -1,5 +1,7 @@
+import { parseMemberCookie } from './cookieUtils';
+
 const isProd = process.env.NODE_ENV === 'production';
-export const MEMBER_ID_COOKIE = isProd ? 'MEETUP_MEMBER_ID' : 'MEETUP_MEMBER_ID_DEV';
+
 export const clickCookieOptions = {
 	isSecure: isProd,
 	isHttpOnly: false,
@@ -10,7 +12,7 @@ export const clickToClickRecord = request => click => {
 	return {
 		timestamp: click.timestamp,
 		requestId: request.id,
-		memberId: parseInt(request.state[MEMBER_ID_COOKIE], 10) || 0,
+		memberId: parseMemberCookie(request.state).id,
 		lineage: click.lineage,
 		linkText: click.linkText || '',
 		coordX: click.coords[0],
@@ -23,7 +25,7 @@ export default function processClickTracking(request, reply) {
 	// It's possible that multiple cookies with the same value were sent, e.g.
 	// one value for .dev.meetup.com and another for .meetup.com - parse only the first
 	const cookieValue = rawCookieValue instanceof Array ? rawCookieValue[0] : rawCookieValue;
-	if (!cookieValue) {
+	if (!cookieValue || cookieValue === 'undefined') {
 		return;
 	}
 
