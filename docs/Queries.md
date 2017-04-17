@@ -33,7 +33,7 @@ A Query is just a plain object with the following shape:
 
 A unique string reference to the query. The `ref` is used to uniquely identify
 the query _and_ uniquely assign the resulting API data to Redux state at
-`state.app[ref]`.
+`state.api[ref]`.
 
 #### `endpoint`
 
@@ -188,7 +188,7 @@ containing the original `query` object and its corresponding `response`:
 The sync middleware will read these two arrays and generate a separate
 `API_RESP_SUCCESS` or `API_RESP_ERROR` action for each response object.
 
-The platform reducer will then read the values into `state.app[ref]` for each
+The platform reducer will then read the values into `state.api[ref]` for each
 response.
 
 **Redux state after being processed by `API_RESP_SUCCESS` action**
@@ -220,8 +220,8 @@ response.
 #### request failure - `API_RESP_FAIL`
 
 If the `fetch` fails entirely, no responses will be delivered to the
-application - `state.app` will not receive new data. Instead, an `API_RESP_FAIL`
-action will be dispatched, which will populate `state.app.fail`.
+application - `state.api` will not receive new data. Instead, an `API_RESP_FAIL`
+action will be dispatched, which will populate `state.api.fail`.
 
 **Redux state after being processed by `API_RESP_FAIL` action**
 
@@ -314,7 +314,7 @@ function mapStateToProps(state) {
   // when the POST returns, the response will be accessible in Redux state,
   // populated by an `API_RESP_SUCCESS` or `API_RESP_ERROR` action
   return {
-    NEW_STUFF_REF: state.app[NEW_STUFF_REF],  
+    NEW_STUFF_REF: state.api[NEW_STUFF_REF],  
   };
 }
 
@@ -373,7 +373,7 @@ function mapStateToProps(state) {
   // when the POST returns, the response will be accessible in Redux state,
   // populated by an `API_RESP_SUCCESS` or `API_RESP_ERROR` action
   return {
-    NEW_FILE_STUFF: state.app[NEW_FILE_STUFF],  
+    NEW_FILE_STUFF: state.api[NEW_FILE_STUFF],  
   };
 }
 
