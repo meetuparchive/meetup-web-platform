@@ -26,7 +26,11 @@ export function getDeprecatedSuccessPayload(successes, errors) {
 		if (!response) {
 			return payload;
 		}
-		const { ref, ...responseBody } = response;
+		const { ref, error, ...responseBody } = response;
+		if (error) {
+			// old payload expects error as a property of `value`
+			responseBody.value = { error };
+		}
 		payload.queries.push(query);
 		payload.responses.push({ [ref]: responseBody });
 		return payload;
@@ -83,11 +87,13 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 			...metadata
 		} = meta;
 
-		BrowserCookies.set(
-			'click-track',
-			JSON.stringify(clickTracking),
-			{ domain: '.meetup.com' }
-		);
+		if (clickTracking) {
+			BrowserCookies.set(
+				'click-track',
+				JSON.stringify(clickTracking),
+				{ domain: apiUrl.indexOf('.dev.') > -1 ? '.dev.meetup.com' : '.meetup.com' }
+			);
+		}
 
 		// special logout param
 		if (logout) {
