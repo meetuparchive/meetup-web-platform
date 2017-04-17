@@ -26,7 +26,11 @@ export function getDeprecatedSuccessPayload(successes, errors) {
 		if (!response) {
 			return payload;
 		}
-		const { ref, ...responseBody } = response;
+		const { ref, error, ...responseBody } = response;
+		if (error) {
+			// old payload expects error as a property of `value`
+			responseBody.value = { error };
+		}
 		payload.queries.push(query);
 		payload.responses.push({ [ref]: responseBody });
 		return payload;
