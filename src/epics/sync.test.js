@@ -90,6 +90,7 @@ describe('Sync epic', () => {
 
 
 	xit('strips logout query and calls browserHistory.replace on LOGIN_SUCCESS', function() {
+		const history = { replace: jest.fn() };
 		const mockFetchQueries = () => () => Promise.resolve({});
 		const locationWithLogout = {
 			...MOCK_APP_STATE.routing.locationBeforeTransitions,
@@ -112,7 +113,7 @@ describe('Sync epic', () => {
 		return getSyncEpic(EMPTY_ROUTES, mockFetchQueries)(action$, fakeStore)
 			.toPromise()
 			.then(() => {
-				expect(require('react-router').browserHistory.replace).toHaveBeenCalledWith(locationWithoutLogout);
+				expect(history.replace).toHaveBeenCalledWith(locationWithoutLogout);
 			});
 	});
 
