@@ -1,8 +1,10 @@
-import Joi from 'joi';
+import fs from 'fs';
+import convict from 'convict';
 import {
 	duotones,
 	getDuotoneUrls
 } from './duotone';
+
 /**
  * Start the server with a config
  *
@@ -11,73 +13,113 @@ import {
  * @module config
  */
 
-export default function getConfig(overrideConfig) {
+export default function getConfig(envConfigOverridePath) {
 	/**
 	 * Read all config from environment variables here once on startup
 	 */
 	if (!process.env.OAUTH_ACCESS_URL && process.env.ANONYMOUS_ACCESS_URL) {
-		console.warn('The ANONYMOUS_ACCESS_URL env variable is deprecated - please rename to OAUTH_ACCESS_URL');
+		console.error('The ANONYMOUS_ACCESS_URL env variable is no longer supported - please rename to OAUTH_ACCESS_URL');
 	}
 	if (!process.env.OAUTH_AUTH_URL && process.env.ANONYMOUS_AUTH_URL) {
-		console.warn('The ANONYMOUS_AUTH_URL env variable is deprecated - please rename to OAUTH_AUTH_URL');
+		console.error('The ANONYMOUS_AUTH_URL env variable is no longer supported - please rename to OAUTH_AUTH_URL');
 	}
-	const config = {
-		API_PROTOCOL: process.env.API_PROTOCOL || 'https',
-		API_HOST: process.env.API_HOST || 'api.dev.meetup.com',
-		API_TIMEOUT: process.env.API_TIMEOUT || 8000,
-		COOKIE_ENCRYPT_SECRET: process.env.COOKIE_ENCRYPT_SECRET,
-		CSRF_SECRET: process.env.CSRF_SECRET,
-		DEV_SERVER_PORT: process.env.DEV_SERVER_PORT || 8000,
-		OAUTH_AUTH_URL: process.env.OAUTH_AUTH_URL ||
-			process.env.ANONYMOUS_AUTH_URL ||
-			'https://secure.dev.meetup.com/oauth2/authorize',
-		OAUTH_ACCESS_URL: process.env.OAUTH_ACCESS_URL ||
-			process.env.ANONYMOUS_ACCESS_URL ||
-			'https://secure.dev.meetup.com/oauth2/access',
-		PHOTO_SCALER_SALT: process.env.PHOTO_SCALER_SALT,
-		oauth: {
-			secret: process.env.MUPWEB_OAUTH_SECRET,
-			key: process.env.MUPWEB_OAUTH_KEY,
+	const oauthError = new Error('get oauth secrets from #web-platform team');
+
+	const config = convict({
+		API_PROTOCOL: {
+			env: 'API_PROTOCOL',
+			default: 'https',
+			format: function(protocol) {
+				if (!['http', 'https'].includes(protocol)) {
+					throw new Error('must be http or https');
+				}
+			}
 		},
-	};
-	config.duotoneUrls = getDuotoneUrls(duotones, config.PHOTO_SCALER_SALT);
-	config.API_SERVER_ROOT_URL = `${config.API_PROTOCOL}://${config.API_HOST}`;
+		API_HOST: {
+			env: 'API_HOST',
+			default: 'api.dev.meetup.com',
+			format: String
+		},
+		API_TIMEOUT: {
+			env: 'API_TIMEOUT',
+			default: 8000,
+			format: 'int'
+		},
+		COOKIE_ENCRYPT_SECRET: {
+			env: 'COOKIE_ENCRYPT_SECRET',
+			default: null,
+			format: function (secret) {
+				if (secret.toString().length < 32) {
+					throw new Error('set COOKIE_ENCRYPT_SECRET env variable to a random 32+ character string')
+				}
+			}
+		},
+		CSRF_SECRET: {
+			env: 'CSRF_SECRET',
+			default: null,
+			format: function (secret) {
+				if (secret.toString().length < 32) {
+					throw new Error('set CSRF_SECRET env variable to a random 32+ character string')
+				}
+			}
+		},
+		DEV_SERVER_PORT: {
+			env: 'DEV_SERVER_PORT',
+			default: 8000,
+			format: 'port'
+		},
+		OAUTH_AUTH_URL: {
+			env: 'OAUTH_AUTH_URL',
+			default: 'https://secure.dev.meetup.com/oauth2/authorize',
+			format: 'url'
+		},
+		OAUTH_ACCESS_URL: {
+			env: 'OAUTH_ACCESS_URL',
+			default: 'https://secure.dev.meetup.com/oauth2/access',
+			format: 'url'
+		},
+		PHOTO_SCALER_SALT: {
+			env: 'PHOTO_SCALER_SALT',
+			default: null,
+			format: function (salt) {
+				if (salt.toString().length < 1) {
+					throw new Error('get PHOTO_SCALER_SALT from #web-platform team');
+				}
+			}
+		},
+		oauth: {
+			secret: {
+				env: 'MUPWEB_OAUTH_SECRET',
+				default: null,
+				format: function (secret) {
+					if (secret.toString().length < 1) {
+						throw oauthError;
+					}
+				}
+			},
+			key: {
+				env: 'MUPWEB_OAUTH_KEY',
+				default: null,
+				format: function (key) {
+					if (key.toString().length < 1) {
+						throw oauthError;
+					}
+				}
+			}
+		}
+	});
 
-	// currently all config is available syncronously, so resolve immediately
-	return Promise.resolve({ ...config, ...overrideConfig })
-		.then(validateConfig);
-}
-
-function validateConfig(config) {
-	const oauthError = new Error('get oauth secrets from web platform team');
-	const configSchema = Joi.object().keys({
-		API_PROTOCOL: Joi.any().only(['https', 'http']).required(),
-		API_HOST: Joi.string().hostname().required(),
-		API_SERVER_ROOT_URL: Joi.string().uri(),
-		API_TIMEOUT: Joi.number(),
-		COOKIE_ENCRYPT_SECRET: Joi.string().min(32).required().error(
-			new Error('set COOKIE_ENCRYPT_SECRET env variable to a random 32+ character string')
-		),
-		CSRF_SECRET: Joi.string().min(32).required().error(
-			new Error('set CSRF_SECRET env variable to a random 32+ character string')
-		),
-		DEV_SERVER_PORT: Joi.number().integer().max(65535),
-		OAUTH_AUTH_URL: Joi.string().uri().required(),
-		OAUTH_ACCESS_URL: Joi.string().uri().required(),
-		PHOTO_SCALER_SALT: Joi.string().min(1).required().error(
-			new Error('get PHOTO_SCALER_SALT from web platform team')
-		),
-		oauth: Joi.object().keys({
-			secret: Joi.string().min(1).required().error(oauthError),
-			key: Joi.string().min(1).required().error(oauthError),
-		}).required(),
-		duotoneUrls: Joi.object(),
-	}).required();
-
-	const result = Joi.validate(config, configSchema);
-	if (result.error) {
-		throw result.error;
+	/**
+	 * Optionally override these properties with a JSON file located at envConfigOverridePath
+	 */
+	if (fs.existsSync(envConfigOverridePath)) {
+		config.loadFile(envConfigOverridePath);
 	}
-	return result.value;
-}
 
+	config.set('duotoneUrls', getDuotoneUrls(duotones, config.get('PHOTO_SCALER_SALT')));
+	config.set('API_SERVER_ROOT_URL', `${config.get('API_PROTOCOL')}://${config.get('API_HOST')}`);
+
+	config.validate();
+
+	return Promise.resolve(config.getProperties());
+}
