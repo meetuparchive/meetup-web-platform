@@ -46,7 +46,7 @@ let config = convict({
 			env: 'ASSET_SERVER_HOST'
 		},
 		port: {
-			format: 'int',
+			format: 'port',
 			default: 8001,
 			env: 'ASSET_SERVER_PORT'
 		}
@@ -69,10 +69,17 @@ let config = convict({
 		default: null,
 		env: 'CSRF_SECRET'
 	},
-	dev_server_port: {
-		format: 'port',
-		default: 8000,
-		env: 'DEV_SERVER_PORT'
+	dev_server: {
+		host: {
+			format: String,
+			default: '0.0.0.0',
+			env: 'DEV_SERVER_HOST'
+		},
+		port: {
+			format: 'port',
+			default: 8000,
+			env: 'DEV_SERVER_PORT'
+		}
 	},
 	oauth: {
 		auth_url: {
@@ -81,6 +88,7 @@ let config = convict({
 			env: 'OAUTH_AUTH_URL'
 		},
 		access_url: {
+
 			format: 'url',
 			default: 'https://secure.dev.meetup.com/oauth2/access',
 			env: 'OAUTH_ACCESS_URL'
