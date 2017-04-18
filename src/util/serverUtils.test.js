@@ -1,4 +1,3 @@
-import https from 'https';
 import * as serverUtils from './serverUtils';
 
 describe('onRequestExtension', () => {
