@@ -1,4 +1,7 @@
 import Rx from 'rxjs';
+
+import config from '../util/config';
+
 import register, {
 	getAuthenticate,
 	oauthScheme,
@@ -12,6 +15,7 @@ const oauth = {
 	key: '1234',
 	secret: 'asdf',
 };
+
 const MOCK_SERVER = {
 	decorate() {},
 	route() {},
@@ -22,12 +26,15 @@ const MOCK_SERVER = {
 	state: () => {},
 	app: {},
 	expose: () => {},
-	plugins: { requestAuth: { config: { COOKIE_ENCRYPT_SECRET: 'asdfasdfasdfasdfasdfasdfasdfasdfasdf' } } }
+	plugins: { requestAuth: { config } }
 };
+
 const MOCK_HEADERS = {};
 const MOCK_REPLY_FN = () => {};
+
 MOCK_REPLY_FN.state = () => {};
 MOCK_REPLY_FN.continue = () => {};
+
 const MOCK_REQUEST = {
 	headers: MOCK_HEADERS,
 	state: {},
@@ -41,6 +48,7 @@ const MOCK_REQUEST = {
 		app: {},
 	},
 };
+
 MOCK_REQUEST.plugins.requestAuth = {
 	reply: MOCK_REPLY_FN
 };
@@ -79,7 +87,6 @@ describe('getAnonymousCode$', () => {
 				expect(err).toEqual(jasmine.any(Error));
 			});
 	});
-
 });
 
 describe('getAccessToken$', () => {
@@ -142,6 +149,7 @@ describe('getRequestAuthorizer$', () => {
 		});
 	});
 });
+
 describe('applyRequestAuthorizer$', () => {
 	const requestAuthorizer$ = getRequestAuthorizer$({ oauth, OAUTH_AUTH_URL, OAUTH_ACCESS_URL }, null);
 	const authorizeRequest$ = applyRequestAuthorizer$(requestAuthorizer$);

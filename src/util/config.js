@@ -25,30 +25,25 @@ let config = convict({
 					throw new Error('must be http or https');
 				}
 			},
-			default: 'https',
-			env: 'API_PROTOCOL',
+			default: 'https'
 		},
 		host: {
 			format: String,
-			default: 'api.dev.meetup.com',
-			env: 'API_HOST'
+			default: 'api.meetup.com'
 		},
 		timeout: {
 			format: 'int',
-			default: 8000,
-			env: 'API_TIMEOUT'
+			default: 8000
 		}
 	},
 	asset_server: {
 		host: {
 			format: String,
-			default: '0.0.0.0',
-			env: 'ASSET_SERVER_HOST'
+			default: '0.0.0.0'
 		},
 		port: {
 			format: 'port',
-			default: 8001,
-			env: 'ASSET_SERVER_PORT'
+			default: 8001
 		}
 	},
 	cookie_encrypt_secret: {
@@ -57,8 +52,7 @@ let config = convict({
 				throw new Error('set COOKIE_ENCRYPT_SECRET env variable to a random 32+ character string');
 			}
 		},
-		default: null,
-		env: 'COOKIE_ENCRYPT_SECRET'
+		default: ''
 	},
 	csrf_secret: {
 		format: function (secret) {
@@ -66,32 +60,26 @@ let config = convict({
 				throw new Error('set CSRF_SECRET env variable to a random 32+ character string');
 			}
 		},
-		default: null,
-		env: 'CSRF_SECRET'
+		default: ''
 	},
 	dev_server: {
 		host: {
 			format: String,
-			default: '0.0.0.0',
-			env: 'DEV_SERVER_HOST'
+			default: '0.0.0.0'
 		},
 		port: {
 			format: 'port',
-			default: 8000,
-			env: 'DEV_SERVER_PORT'
+			default: 8000
 		}
 	},
 	oauth: {
 		auth_url: {
 			format: 'url',
-			default: 'https://secure.dev.meetup.com/oauth2/authorize',
-			env: 'OAUTH_AUTH_URL'
+			default: 'https://secure.meetup.com/oauth2/authorize'
 		},
 		access_url: {
-
 			format: 'url',
-			default: 'https://secure.dev.meetup.com/oauth2/access',
-			env: 'OAUTH_ACCESS_URL'
+			default: 'https://secure.meetup.com/oauth2/access'
 		},
 		secret: {
 			format: function (secret) {
@@ -99,8 +87,7 @@ let config = convict({
 					throw oauthError;
 				}
 			},
-			default: null,
-			env: 'MUPWEB_OAUTH_SECRET'
+			default: ''
 		},
 		key: {
 			format: function (key) {
@@ -108,8 +95,7 @@ let config = convict({
 					throw oauthError;
 				}
 			},
-			default: null,
-			env: 'MUPWEB_OAUTH_KEY'
+			default: ''
 		}
 	},
 	photo_scaler_salt: {
@@ -118,15 +104,14 @@ let config = convict({
 				throw new Error('get PHOTO_SCALER_SALT from #web-platform team');
 			}
 		},
-		default: null,
-		env: 'PHOTO_SCALER_SALT',
+		default: ''
 	}
 });
 
 
 // Optionally override these properties with a JSON file
 const env = config.get('env');
-const configFile = `../config.${env}.json`;
+const configFile = `./config.${env}.json`;
 if (fs.existsSync(configFile)) {
 	config.loadFile(configFile);
 }
