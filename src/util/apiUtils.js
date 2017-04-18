@@ -302,9 +302,10 @@ export function parseRequestQueries(request) {
 		payload,
 		query,
 	} = request;
-	const queriesRison = method === 'post' && mime !== 'multipart/form-data' ?
-		payload.queries :
-		query.queries;
+	const queriesRison = (method === 'post' || method === 'patch') &&
+		mime !== 'multipart/form-data' ?
+			payload.queries :
+			query.queries;
 
 	if (!queriesRison) {
 		return null;
