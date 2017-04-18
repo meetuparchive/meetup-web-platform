@@ -65,8 +65,8 @@ const GOOD_MOCK_FETCH_RESULT = Promise.resolve({
 });
 const BAD_MOCK_FETCH_RESULT = Promise.resolve({ text: () => Promise.resolve(undefined) });
 
-const OAUTH_AUTH_URL = 'http://example.com/auth_fakeout';
-const OAUTH_ACCESS_URL = 'http://example.com/access_fakeout';
+const OAUTH_AUTH_URL = config.get('oauth.auth_url');
+const OAUTH_ACCESS_URL = config.get('oauth.access_url');
 const MOCK_CODE = { grant_type: 'anonymous_code', token: 'mock_anon_code' };
 
 describe('getAnonymousCode$', () => {
@@ -76,12 +76,12 @@ describe('getAnonymousCode$', () => {
 			expect(url.startsWith(OAUTH_AUTH_URL)).toBe(true);
 			return GOOD_MOCK_FETCH_RESULT;
 		});
-		getAnonymousCode$({ oauth, OAUTH_AUTH_URL }).subscribe(done);
+		getAnonymousCode$(null).subscribe(done);
 	});
 	it('throws error when response cannot be JSON parsed', function() {
 		spyOn(global, 'fetch').and.callFake((url, opts) => BAD_MOCK_FETCH_RESULT);
 
-		return getAnonymousCode$({ oauth, OAUTH_AUTH_URL })
+		return getAnonymousCode$(null)
 			.toPromise()
 			.catch(err => {
 				expect(err).toEqual(jasmine.any(Error));
@@ -95,29 +95,31 @@ describe('getAccessToken$', () => {
 			expect(url.startsWith(OAUTH_ACCESS_URL)).toBe(true);
 			return GOOD_MOCK_FETCH_RESULT;
 		});
-		const getToken$ = getAccessToken$({ oauth, OAUTH_ACCESS_URL }, null);
+		const getToken$ = getAccessToken$(null);
 		getToken$(MOCK_HEADERS)(MOCK_CODE).subscribe(done);
 	});
 	it('throws an error when no oauth.key is supplied', function() {
-		const oauthNoKey = { ...oauth };
-		delete oauthNoKey.key;
-		expect(() => getAccessToken$({ oauth: oauthNoKey, OAUTH_ACCESS_URL }, null))
+		const keyValue = config.get('oauth.key');
+		config.set('oauth.key', null);
+		expect(() => getAccessToken$(null))
 			.toThrowError(ReferenceError);
+		config.set('oauth.key', keyValue);
 	});
 	it('throws an error when no oauth.secret is supplied', function() {
-		const oauthNoSecret = { ...oauth };
-		delete oauthNoSecret.secret;
-		expect(() => getAccessToken$({ oauth: oauthNoSecret, OAUTH_ACCESS_URL }, null))
+		const secretValue = config.get('oauth.secret');
+		config.set('oauth.secret', null);
+		expect(() => getAccessToken$(null))
 			.toThrowError(ReferenceError);
+		config.set('oauth.secret', secretValue);
 	});
 	it('throws an error when no access code is supplied to the final curried function', function() {
 		const token = null;
-		const getToken$ = getAccessToken$({ oauth, OAUTH_ACCESS_URL }, null);
+		const getToken$ = getAccessToken$(null);
 		expect(() => getToken$(MOCK_HEADERS)({ ...MOCK_CODE, token })).toThrowError(ReferenceError);
 	});
 	it('throws an error when response cannot be JSON parsed', function(done) {
 		spyOn(global, 'fetch').and.callFake((url, opts) => BAD_MOCK_FETCH_RESULT);
-		const getToken$ = getAccessToken$({ oauth, OAUTH_ACCESS_URL }, null);
+		const getToken$ = getAccessToken$(null);
 		getToken$(MOCK_HEADERS)(MOCK_CODE)
 			.catch(err => {
 				expect(err).toEqual(jasmine.any(Error));
@@ -141,7 +143,7 @@ describe('getRequestAuthorizer$', () => {
 				});
 			}
 		});
-		const requestAuthorizer$ = getRequestAuthorizer$({ oauth, OAUTH_AUTH_URL, OAUTH_ACCESS_URL }, null);
+		const requestAuthorizer$ = getRequestAuthorizer$();
 
 		requestAuthorizer$({ ...MOCK_REQUEST }).subscribe(auth => {
 			expect(auth.oauth_token).toBe('good_token');
@@ -151,7 +153,7 @@ describe('getRequestAuthorizer$', () => {
 });
 
 describe('applyRequestAuthorizer$', () => {
-	const requestAuthorizer$ = getRequestAuthorizer$({ oauth, OAUTH_AUTH_URL, OAUTH_ACCESS_URL }, null);
+	const requestAuthorizer$ = getRequestAuthorizer$();
 	const authorizeRequest$ = applyRequestAuthorizer$(requestAuthorizer$);
 	it('does not try to fetch when provided a request with oauth_token in state', () => {
 		spyOn(global, 'fetch');
