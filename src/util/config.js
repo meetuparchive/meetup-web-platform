@@ -106,8 +106,14 @@ let config = convict({
 /**
  * Optionally override these properties with a JSON file located at envConfigOverridePath
  */
-if (fs.existsSync(envConfigOverridePath)) {
 	config.loadFile(envConfigOverridePath);
+}
+
+// Load environment dependent configuration
+const env = config.get('env');
+const configFile = `../config.${env}.json`;
+if (fs.existsSync(configFile)) {
+	config.loadFile(configFile);
 }
 
 config.set(
