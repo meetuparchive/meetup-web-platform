@@ -1,6 +1,6 @@
-import chalk from 'chalk';
 import Rx from 'rxjs';
 
+import logger from '../util/logger';
 import { tryJSON } from '../util/fetchUtils';
 import {
 	applyAuthState,
@@ -18,8 +18,8 @@ function verifyAuth(auth) {
 	const keys = Object.keys(auth);
 	if (!keys.length) {
 		const errorMessage = 'No auth token(s) provided';
-		console.error(
-			chalk.red(errorMessage),
+		logger.fatal(
+			errorMessage,
 			': application can not fetch data.',
 			'You might be able to recover by clearing cookies and refreshing'
 		);
@@ -30,12 +30,10 @@ function verifyAuth(auth) {
 
 const handleLogout = request => {
 	const {
-		id,
+		raw: { req },
+		server: { logger },
 	} = request;
-	console.log(JSON.stringify({
-		message: 'Logout - clearing cookies',
-		info: { id }
-	}));
+	logger().info({ req }, 'Logout - clearing cookies');
 	return removeAuthState(
 		[getMemberCookieName(request.server), 'oauth_token', 'refresh_token'],
 		request,
@@ -66,9 +64,10 @@ function getAuthType(request) {
  */
 export const applyRequestAuthorizer$ = requestAuthorizer$ => request => {
 	const {
-		id,
 		query,
 		plugins,
+		server: { logger },
+		raw: { req },
 	} = request;
 
 // logout is accomplished exclusively through a `logout` querystring value
@@ -86,10 +85,7 @@ export const applyRequestAuthorizer$ = requestAuthorizer$ => request => {
 		return Rx.Observable.of(request);
 	}
 
-	console.log(JSON.stringify({
-		message: 'Request does not contain auth token',
-		info: { id }
-	}));
+	logger().warn({ req }, 'Request does not contain auth token');
 	return requestAuthorizer$(request)  // get anonymous oauth_token
 		.do(applyAuthState(request, plugins.requestAuth.reply))
 		.map(() => request);
@@ -119,30 +115,34 @@ export function getAnonymousCode$({ API_TIMEOUT=5000, OAUTH_AUTH_URL, oauth }, r
 	};
 
 	return Rx.Observable.defer(() => {
-		console.log(JSON.stringify({
-			message: `Outgoing request GET ${OAUTH_AUTH_URL}`,
-			type: 'request',
-			direction: 'out',
-			info: {
-				url: OAUTH_AUTH_URL,
-				method: 'get',
-			}
-		}));
+		logger.info(
+			{
+				type: 'request',
+				direction: 'out',
+				info: {
+					url: OAUTH_AUTH_URL,
+					method: 'get',
+				}
+			},
+			`Outgoing request GET ${OAUTH_AUTH_URL}`
+		);
 
 		const startTime = new Date();
 		return Rx.Observable.fromPromise(fetch(authURL.toString(), requestOpts))
 			.timeout(API_TIMEOUT)
 			.do(() => {
-				console.log(JSON.stringify({
-					message: `Incoming response GET ${OAUTH_AUTH_URL}`,
-					type: 'response',
-					direction: 'in',
-					info: {
-						url: OAUTH_AUTH_URL,
-						method: 'get',
-						time: new Date() - startTime,
-					}
-				}));
+				logger.info(
+					{
+						type: 'response',
+						direction: 'in',
+						info: {
+							url: OAUTH_AUTH_URL,
+							method: 'get',
+							responseTime: new Date() - startTime,
+						}
+					},
+					`Incoming response GET ${OAUTH_AUTH_URL}`
+				);
 			})
 			.flatMap(tryJSON(OAUTH_AUTH_URL))
 			.map(({ code }) => ({
@@ -204,30 +204,34 @@ export const getAccessToken$ = ({ API_TIMEOUT=5000, OAUTH_ACCESS_URL, oauth }, r
 				accessUrl.searchParams.append('refresh_token', token);
 			}
 
-			console.log(JSON.stringify({
-				message: `Outgoing request GET ${OAUTH_ACCESS_URL}?${grant_type}`,
-				type: 'request',
-				direction: 'out',
-				info: {
-					url: OAUTH_ACCESS_URL,
-					method: 'get',
-				}
-			}));
+			logger.info(
+				{
+					type: 'request',
+					direction: 'out',
+					info: {
+						url: OAUTH_ACCESS_URL,
+						method: 'get',
+					}
+				},
+				`Outgoing request GET ${OAUTH_ACCESS_URL}?${grant_type}`
+			);
 
 			const startTime = new Date();
 			return Rx.Observable.fromPromise(fetch(accessUrl.toString(), requestOpts))
 				.timeout(API_TIMEOUT)
 				.do(() => {
-					console.log(JSON.stringify({
-						message: `Incoming response GET ${OAUTH_ACCESS_URL}?${grant_type}`,
-						type: 'response',
-						direction: 'in',
-						info: {
-							url: OAUTH_ACCESS_URL,
-							method: 'get',
-							time: new Date() - startTime,
-						}
-					}));
+					logger.info(
+						{
+							type: 'response',
+							direction: 'in',
+							info: {
+								url: OAUTH_ACCESS_URL,
+								method: 'get',
+								responseTime: new Date() - startTime,
+							}
+						},
+						`Incoming response GET ${OAUTH_ACCESS_URL}?${grant_type}`
+					);
 				})
 				.flatMap(tryJSON(OAUTH_ACCESS_URL));
 		};
@@ -264,17 +268,11 @@ export const getRequestAuthorizer$ = config => {
 };
 
 export const getAuthenticate = authorizeRequest$ => (request, reply) => {
-	const { id } = request;
-	console.log(JSON.stringify({
-		message: 'Authenticating request',
-		info: { id }
-	}));
+	const { raw: { req } } = request;
+	logger.debug({ req }, 'Authenticating request');
 	return authorizeRequest$(request)
 		.do(request => {
-			console.log(JSON.stringify({
-				message: 'Request authenticated',
-				info: { id }
-			}));
+			logger.debug({ req }, 'Request authenticated');
 		})
 		.subscribe(
 			request => {

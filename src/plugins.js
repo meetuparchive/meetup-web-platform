@@ -1,4 +1,3 @@
-import pino from 'pino';
 import HapiPino from 'hapi-pino';
 import CsrfPlugin from 'electrode-csrf-jwt';
 import Good from 'good';
@@ -7,6 +6,7 @@ import {
 	activitySerializer,
 	clickSerializer,
 } from './util/avro';
+import logger from './util/logger';
 import GoodTracking from './plugins/good-tracking';
 import requestAuthPlugin from './plugins/requestAuthPlugin';
 
@@ -122,9 +122,7 @@ export function getRequestAuthPlugin(options) {
 }
 
 export function getLogger(options={}) {
-	options.instance = pino({
-		prettyPrint: process.env.NODE_ENV !== 'production',
-	});
+	options.instance = logger;
 	return {
 		register: HapiPino,
 		options
@@ -135,7 +133,7 @@ export default function getPlugins(config) {
 	return [
 		getLogger(),
 		getCsrfPlugin(config.CSRF_SECRET),
-		getConsoleLogPlugin(),
+		getConsoleLogPlugin(config),
 		getRequestAuthPlugin(config),
 	];
 }

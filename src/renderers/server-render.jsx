@@ -154,6 +154,8 @@ const makeRenderer = (
 		headers,
 		info,
 		url,
+		server,
+		raw: { req },
 	} = request;
 
 	// request protocol might be different from original request that hit proxy
@@ -186,19 +188,15 @@ const makeRenderer = (
 	})
 	.first(state => state.preRenderChecklist.every(isReady => isReady));  // take the first ready state
 
-	console.log(JSON.stringify({
-		message: `Dispatching RENDER for ${request.url.href}`,
-		type: 'dispatch',
-		info: {
-			url: request.url,
-			method: request.method,
-			id: request.id,
-		}
-	}));
-	store.dispatch({
+	const action = {
 		type: SERVER_RENDER,
 		payload: url,
-	});
+	};
+	server.logger().debug(
+		{ type: 'dispatch', action, req },
+		`Dispatching RENDER for ${request.url.href}`
+	);
+	store.dispatch();
 	return storeIsReady$
 		.map(() => getRouterRenderer(routes, store, url, baseUrl, clientFilename, assetPublicPath));
 };

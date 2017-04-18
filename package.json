@@ -12,8 +12,10 @@
     "coveralls": "cat coverage/lcov.info | coveralls",
     "lint": "eslint . --ext .js,.jsx --fix",
     "test": "yarn run test:unit && yarn run test:integration",
-    "test:unit": "jest --silent --config jest.config.json --coverage",
-    "test:integration": "jest --silent --config jest.int.config.json"
+    "test:base": "jest --config jest.config.json",
+    "test:unit": "yarn test:base -- --silent --coverage",
+    "test:integration": "jest --config jest.int.config.json",
+    "test:watch": "yarn test:base -- --watch"
   },
   "repository": {
     "type": "git",
@@ -43,7 +45,7 @@
     "joi": "10.4.1",
     "js-cookie": "2.1.4",
     "node-fetch": "1.6.3",
-    "pino": "4.2.4",
+    "pino": "4.3.0",
     "qs": "6.4.0",
     "react-dom": "15.5.4",
     "react-side-effect": "1.1.0",

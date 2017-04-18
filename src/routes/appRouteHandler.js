@@ -1,4 +1,3 @@
-import chalk from 'chalk';
 import {
 	getLanguage,
 	checkLanguageRedirect,
@@ -13,7 +12,7 @@ export const getAppRouteHandler = renderRequestMap => (request, reply) => {
 	}
 
 	return renderRequestMap[requestLanguage](request)
-		.do(() => request.log(['info'], chalk.green('HTML response ready')))
+		.do(() => request.server.logger().debug('HTML response ready'))
 		.subscribe(({ result, statusCode }) => {
 			// response is sent when this function returns (`nextTick`)
 			const response = reply(result)

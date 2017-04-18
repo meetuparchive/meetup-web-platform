@@ -1,6 +1,13 @@
 import Boom from 'boom';
 import { onPreResponse } from './appRoute';
 
+const MOCK_LOGGER = {
+	debug: () => {},
+	info: () => {},
+	warn: () => {},
+	error: () => {},
+};
+
 describe('onPreResponse.method', () => {
 	it('returns html containing error message', () => {
 		const errorMessage = 'foobar';
@@ -8,6 +15,7 @@ describe('onPreResponse.method', () => {
 		const request = {
 			response: Boom.create(errorCode, errorMessage),
 			route: {},
+			server: { logger: () => MOCK_LOGGER }
 		};
 		const replyObj = {
 			code() {}

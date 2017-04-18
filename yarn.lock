@@ -3180,7 +3180,19 @@ pinkie@^2.0.0:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/pinkie/-/pinkie-2.0.4.tgz#72556b80cfa0d48a974e80e77248e80ed4f7f870"
 
-pino@4.2.4, pino@^4.2.4:
+pino@4.3.0:
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/pino/-/pino-4.3.0.tgz#67c5ef9ef9d39db1d28aa46c535262153574205a"
+  dependencies:
+    chalk "^1.1.1"
+    fast-json-parse "^1.0.0"
+    fast-safe-stringify "^1.1.11"
+    flatstr "^1.0.4"
+    pump "^1.0.2"
+    quick-format-unescaped "^1.1.1"
+    split2 "^2.0.1"
+
+pino@^4.2.4:
   version "4.2.4"
   resolved "https://registry.yarnpkg.com/pino/-/pino-4.2.4.tgz#e893cc31446402574aa976816e5c373e869106fa"
   dependencies:

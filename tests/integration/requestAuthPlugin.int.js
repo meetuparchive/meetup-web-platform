@@ -2,6 +2,13 @@ import Hapi from 'hapi';
 import Iron from 'iron';
 import requestAuthPlugin from '../../src/plugins/requestAuthPlugin';
 
+const MOCK_LOGGER = {
+	debug: () => {},
+	info: () => {},
+	warn: () => {},
+	error: () => {},
+};
+
 const cookieRequest = cookies => ({
 	method: 'get',
 	url: '/foo',
@@ -59,6 +66,7 @@ const testAuth = (cookies, test, makeRequest=cookieRequest) => {
 	};
 	const server = new Hapi.Server();
 	server.app = config;
+	server.logger = () => MOCK_LOGGER;
 	const testConnection = server.connection();
 	return testConnection
 		.register({
