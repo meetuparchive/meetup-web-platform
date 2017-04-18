@@ -150,4 +150,4 @@ config.set(
 
 config.validate();
 
-module.exports = config;
+export default config;

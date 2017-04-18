@@ -5,10 +5,7 @@ import config from './util/config';
 import getPlugins from './plugins';
 import getRoutes from './routes';
 
-import {
-	isDev,
-	server,
-} from './util/serverUtils';
+import { server } from './util/serverUtils';
 
 /**
  * @module server
@@ -35,7 +32,7 @@ export default function start(
 	require('source-map-support').install();
 
 	// When using .dev.meetup endpoints, ignore self-signed SSL cert
-	https.globalAgent.options.rejectUnauthorized = !isDev;
+	https.globalAgent.options.rejectUnauthorized = config.get('isProd');
 
 	const baseRoutes = getRoutes(renderRequestMap);
 	const finalRoutes = [ ...routes, ...baseRoutes ];
