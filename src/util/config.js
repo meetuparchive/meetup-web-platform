@@ -39,10 +39,22 @@ let config = convict({
 			env: 'API_TIMEOUT'
 		}
 	},
+	asset_server: {
+		host: {
+			format: String,
+			default: '0.0.0.0',
+			env: 'ASSET_SERVER_HOST'
+		},
+		port: {
+			format: 'int',
+			default: 8001,
+			env: 'ASSET_SERVER_PORT'
+		}
+	},
 	cookie_encrypt_secret: {
 		format: function (secret) {
 			if (secret.toString().length < 32) {
-				throw new Error('set COOKIE_ENCRYPT_SECRET env variable to a random 32+ character string')
+				throw new Error('set COOKIE_ENCRYPT_SECRET env variable to a random 32+ character string');
 			}
 		},
 		default: null,
@@ -51,7 +63,7 @@ let config = convict({
 	csrf_secret: {
 		format: function (secret) {
 			if (secret.toString().length < 32) {
-				throw new Error('set CSRF_SECRET env variable to a random 32+ character string')
+				throw new Error('set CSRF_SECRET env variable to a random 32+ character string');
 			}
 		},
 		default: null,
@@ -103,18 +115,15 @@ let config = convict({
 	}
 });
 
-/**
- * Optionally override these properties with a JSON file located at envConfigOverridePath
- */
-	config.loadFile(envConfigOverridePath);
-}
 
-// Load environment dependent configuration
+// Optionally override these properties with a JSON file
 const env = config.get('env');
 const configFile = `../config.${env}.json`;
 if (fs.existsSync(configFile)) {
 	config.loadFile(configFile);
 }
+
+// Load environment dependent configuration
 
 config.set(
 	'duotone_urls',
@@ -127,6 +136,16 @@ config.set(
 config.set(
 	'api_server_root_url',
 	`${config.get('api.protocol')}://${config.get('api.host')}`
+);
+
+config.set(
+	'isProd',
+	config.get('env') === 'production'
+);
+
+config.get(
+	'isDev',
+	config.get('env') === 'development'
 );
 
 config.validate();

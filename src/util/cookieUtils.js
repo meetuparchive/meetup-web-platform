@@ -1,7 +1,8 @@
 import querystring from 'qs';
 
-const isProd = process.env.NODE_ENV === 'production';
-export const MEMBER_COOKIE = isProd ? 'MEETUP_MEMBER' : 'MEETUP_MEMBER_DEV';
+import config from './config';
+
+export const MEMBER_COOKIE = config.get('isProd') ? 'MEETUP_MEMBER' : 'MEETUP_MEMBER_DEV';
 
 export const parseMemberCookie = state => {
 	if (!state[MEMBER_COOKIE]) {

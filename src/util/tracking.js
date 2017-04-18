@@ -1,7 +1,8 @@
 import uuid from 'uuid';
+import config from './config';
 import { parseMemberCookie } from './cookieUtils';
 
-const isProd = process.env.NODE_ENV === 'production';
+const isProd = config.get('env') === 'production';
 
 const YEAR_IN_MS = 1000 * 60 * 60 * 24 * 365;
 const COOKIE_OPTS = {

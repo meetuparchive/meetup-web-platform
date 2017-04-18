@@ -1,10 +1,10 @@
 import fs from 'fs';
-import https from 'https';
 import Hapi from 'hapi';
 import uuid from 'uuid';
 
 import track from './tracking';
 import clickTrackingReader from './clickTrackingReader';
+import config from './util/config';
 
 /**
  * determine whether a nested object of values contains a string that contains
@@ -13,15 +13,7 @@ import clickTrackingReader from './clickTrackingReader';
  * values that could be URL strings
  * @return {Boolean} whether the `value` contains a 'dev' URL string
  */
-export function checkForDevUrl(value) {
-	switch(typeof value) {
-	case 'string':
-		return value.indexOf('.dev.meetup.') > -1;
-	case 'object':
-		return Object.keys(value).some(key => checkForDevUrl(value[key]));
-	}
-	return false;
-}
+export const isDev = config.get('env') === 'development';
 
 export function onRequestExtension(request, reply) {
 	request.id = uuid.v4();
@@ -128,30 +120,17 @@ export function registerExtensionEvents(server) {
 }
 
 /**
- * Make any environment changes that need to be made in response to the provided
- * config
- * @param {Object} config
- * @return {Object} the original config object
- */
-export function configureEnv(config) {
-	// When using .dev.meetup endpoints, ignore self-signed SSL cert
-	const USING_DEV_ENDPOINTS = checkForDevUrl(config);
-	https.globalAgent.options.rejectUnauthorized = !USING_DEV_ENDPOINTS;
-
-	return config;
-}
-
-/**
  * server-starting function
  */
-export function server(routes, connection, plugins, platform_agent, config) {
+export function server(routes, connection, plugins, platform_agent) {
 	const server = new Hapi.Server();
+
 
 	// store runtime state
 	// https://hapijs.com/api#serverapp
 	server.app = {
-		isDevConfig: checkForDevUrl(config),  // indicates dev API or prod API
-		...config
+		isDevConfig: isDev,  // indicates dev API or prod API
+		...config.getProperties()
 	};
 	server.decorate('reply', 'track', track(platform_agent));
 

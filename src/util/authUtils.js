@@ -1,5 +1,7 @@
 import Joi from 'joi';
 
+import config from './config';
+
 /**
  * @module authUtils
  */
@@ -81,7 +83,7 @@ export const getMemberCookieName = server =>
  */
 export const configureAuthCookies = server => {
 	const password = validateSecret(server.plugins.requestAuth.config.COOKIE_ENCRYPT_SECRET);
-	const isSecure = process.env.NODE_ENV === 'production';
+	const isSecure = config.get('isProd');
 	const authCookieOptions = {
 		encoding: 'iron',
 		password,

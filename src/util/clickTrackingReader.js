@@ -1,11 +1,11 @@
+import config from './config';
+
 import { parseMemberCookie } from './cookieUtils';
 
-const isProd = process.env.NODE_ENV === 'production';
-
 export const clickCookieOptions = {
-	isSecure: isProd,
+	isSecure: config.get('isProd'),
 	isHttpOnly: false,
-	domain: `${isProd ? '' : '.dev'}.meetup.com`,
+	domain: `${config.get('isProd') ? '' : '.dev'}.meetup.com`,
 };
 
 export const clickToClickRecord = request => click => {
