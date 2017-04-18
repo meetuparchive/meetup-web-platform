@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import config from './config';
 import {
 	applyAuthState,
 	setPluginState,
@@ -30,7 +31,7 @@ describe('configureAuthCookies', () => {
 		});
 	});
 	it('throws an error when secret is missing', () => {
-		const config = {};
+		config.set('cookie_encrypt_secret', null);
 		const plugins = { requestAuth: { config } };
 		expect(() => configureAuthCookies({
 			...serverWithState,
@@ -38,9 +39,7 @@ describe('configureAuthCookies', () => {
 		})).toThrow();
 	});
 	it('throws an error when secret is too short', () => {
-		const config = {
-			COOKIE_ENCRYPT_SECRET: 'less than 32 characters',
-		};
+		config.set('cookie_encrypt_secret', 'less than 32 characters');
 		const plugins = { requestAuth: { config } };
 		expect(() => configureAuthCookies({
 			...serverWithState,

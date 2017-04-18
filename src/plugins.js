@@ -142,7 +142,7 @@ export function getRequestAuthPlugin() {
 
 export default function getPlugins() {
 	return [
-		getCsrfPlugin(config.get('csrf_token')),
+		getCsrfPlugin(config.get('csrf_secret')),
 		getConsoleLogPlugin(),
 		getRequestAuthPlugin(),
 	];

@@ -1,5 +1,7 @@
 import Hapi from 'hapi';
 import Iron from 'iron';
+
+import config from '../../src/util/config';
 import requestAuthPlugin from '../../src/plugins/requestAuthPlugin';
 
 const cookieRequest = cookies => ({
@@ -15,23 +17,8 @@ const makeMockFetchResponse = responseObj => Promise.resolve({
 	json: () => Promise.resolve(responseObj),
 });
 
-
-const random32 = 'asdfasdfasdfasdfasdfasdfasdfasdf';
-const config = {
-	API_HOST: 'www.api.meetup.com',
-	API_TIMEOUT: 10,
-	CSRF_SECRET: random32,
-	COOKIE_ENCRYPT_SECRET: random32,
-	OAUTH_AUTH_URL: 'https://secure.dev.meetup.com/oauth2/authorize',
-	OAUTH_ACCESS_URL: 'https://secure.dev.meetup.com/oauth2/access',
-	oauth: {
-		key: random32,
-		secret: random32,
-	},
-	duotoneUrls: ['http://example.com/duotone.jpg']
-};
 const getEncryptedToken = token => new Promise((resolve, reject) =>
-	Iron.seal(token, random32, Iron.defaults, (err, sealed) => resolve(sealed))
+	Iron.seal(token, config.get('oauth.secret'), Iron.defaults, (err, sealed) => resolve(sealed))
 );
 
 const expectedOauthToken = 'foobar';
@@ -39,12 +26,12 @@ const expectedResponse = 'barfoo';
 
 const testAuth = (cookies, test, makeRequest=cookieRequest) => {
 	spyOn(global, 'fetch').and.callFake((url, opts) => {
-		if (url.includes(config.OAUTH_AUTH_URL)) {
+		if (url.includes(config.get('oauth.auth_url'))) {
 			return makeMockFetchResponse({
 				code: 'foo',
 			});
 		}
-		if (url.includes(config.OAUTH_ACCESS_URL)) {
+		if (url.includes(config.get('oauth.access_url'))) {
 			return makeMockFetchResponse({
 				oauth_token: expectedOauthToken,
 				refresh_token: 'whatever',
@@ -58,12 +45,12 @@ const testAuth = (cookies, test, makeRequest=cookieRequest) => {
 		handler: (request, reply) => reply(expectedResponse)
 	};
 	const server = new Hapi.Server();
-	server.app = config;
+	server.app = config.getProperties();
 	const testConnection = server.connection();
 	return testConnection
 		.register({
 			register: requestAuthPlugin,
-			options: config
+			options: config.getProperties()
 		})
 		.then(() => testConnection.route(fooRoute))
 		.then(() => server.auth.strategy('default', 'oauth', 'required'))

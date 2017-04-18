@@ -82,7 +82,7 @@ export const getMemberCookieName = server =>
  * apply default cookie options for auth-related cookies
  */
 export const configureAuthCookies = server => {
-	const password = validateSecret(server.plugins.requestAuth.config.COOKIE_ENCRYPT_SECRET);
+	const password = validateSecret(config.get('cookie_encrypt_secret'));
 	const isSecure = config.get('isProd');
 	const authCookieOptions = {
 		encoding: 'iron',
