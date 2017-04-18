@@ -108,7 +108,7 @@ describe('api reducer', () => {
 		expect(errorState).toEqual(expect.objectContaining({ fail: API_RESP_FAIL.payload }));
 	});
 	it('sets isFetching:true on API_REQ', () => {
-		const API_REQ = apiActions.requestAll([], {});
+		const API_REQ = apiActions.requestAll([]);
 		const appState = api({ ...DEFAULT_APP_STATE }, API_REQ);
 		expect(appState.isFetching).toBe(true);
 	});
