@@ -14,7 +14,7 @@ const oauthError = new Error('get oauth secrets from #web-platform team');
 
 let config = convict({
 	env: {
-		format: ['production', 'development'],
+		format: ['production', 'development', 'test'],
 		default: 'development',
 		env: 'NODE_ENV'
 	},
@@ -143,7 +143,7 @@ config.set(
 	config.get('env') === 'production'
 );
 
-config.get(
+config.set(
 	'isDev',
 	config.get('env') === 'development'
 );

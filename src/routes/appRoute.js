@@ -18,7 +18,7 @@ export const onPreResponse = {
 	 */
 	method: (request, reply) => {
 		const response = request.response;
-		if (!response.isBoom || config.get('env') === 'production') {
+		if (!response.isBoom || config.get('isProd')) {
 			return reply.continue();
 		}
 		const error = response;

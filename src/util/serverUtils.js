@@ -4,7 +4,7 @@ import uuid from 'uuid';
 
 import track from './tracking';
 import clickTrackingReader from './clickTrackingReader';
-import config from './util/config';
+import config from './config';
 
 /**
  * determine whether a nested object of values contains a string that contains
@@ -13,7 +13,6 @@ import config from './util/config';
  * values that could be URL strings
  * @return {Boolean} whether the `value` contains a 'dev' URL string
  */
-export const isDev = config.get('env') === 'development';
 
 export function onRequestExtension(request, reply) {
 	request.id = uuid.v4();
@@ -129,7 +128,7 @@ export function server(routes, connection, plugins, platform_agent) {
 	// store runtime state
 	// https://hapijs.com/api#serverapp
 	server.app = {
-		isDevConfig: isDev,  // indicates dev API or prod API
+		isDevConfig: config.get('isDev'),  // indicates dev API or prod API
 		...config.getProperties()
 	};
 	server.decorate('reply', 'track', track(platform_agent));
