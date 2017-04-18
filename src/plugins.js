@@ -1,3 +1,5 @@
+import pino from 'pino';
+import HapiPino from 'hapi-pino';
 import CsrfPlugin from 'electrode-csrf-jwt';
 import Good from 'good';
 
@@ -72,28 +74,11 @@ export function getCsrfPlugin(secret) {
  * @see {@link https://github.com/hapijs/good}
  */
 export function getConsoleLogPlugin() {
-	const logFilter = process.env.LOG_FILTER || { include: [], exclude: ['tracking'] };
 	return {
 		register: Good,
 		options: {
 			ops: false,  // no ops reporting (for now)
 			reporters: {
-				console: [
-					{  // filter events with good-squeeze
-						module: 'good-squeeze',
-						name: 'Squeeze',
-						args: [{
-							error: logFilter,
-							log: logFilter,
-						}]
-					}, {  // format with good-console
-						module: 'good-console',
-						args: [{
-							format: 'YYYY-MM-DD HH:mm:ss.SSS',
-						}]
-					},
-					'stdout'  // pipe to stdout
-				],
 				activity: [
 					{
 						module: 'good-squeeze',
@@ -136,8 +121,19 @@ export function getRequestAuthPlugin(options) {
 	};
 }
 
+export function getLogger(options={}) {
+	options.instance = pino({
+		prettyPrint: process.env.NODE_ENV !== 'production',
+	});
+	return {
+		register: HapiPino,
+		options
+	};
+}
+
 export default function getPlugins(config) {
 	return [
+		getLogger(),
 		getCsrfPlugin(config.CSRF_SECRET),
 		getConsoleLogPlugin(),
 		getRequestAuthPlugin(config),
