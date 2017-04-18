@@ -69,13 +69,13 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 	const headers = {};
 	const method = (
 		(queries[0].meta || {}).method ||
-			'get'  // fallback to 'get'
-	).toLowerCase();
+			'GET'  // fallback to 'get'
+	).toUpperCase();  // must be upper case - requests can fail silently otherwise
 
-	const hasBody = method === 'post' ||
-		method === 'patch';
+	const hasBody = method === 'POST' ||
+		method === 'PATCH';
 	const isFormData = queries[0].params instanceof FormData;
-	const isDelete = method === 'delete';
+	const isDelete = method === 'DELETE';
 
 	const fetchUrl = new URL(apiUrl);
 	fetchUrl.searchParams.append('queries', rison.encode_array(queries));

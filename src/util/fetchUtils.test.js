@@ -26,7 +26,7 @@ describe('fetchQueries', () => {
 	const API_URL = new URL('http://api.example.com/');
 	const csrfJwt = `${fetchUtils.CSRF_HEADER_COOKIE} value`;
 	const getQueries = [mockQuery({ params: {} })];
-	const postQueries = [{ ...mockQuery({ params: {} }), meta: { method: 'post' }}];
+	const POSTQueries = [{ ...mockQuery({ params: {} }), meta: { method: 'POST' }}];
 	const meta = { foo: 'bar', clickTracking: { history: [] } };
 	const responses = [MOCK_GROUP];
 	const fakeSuccess = () =>
@@ -80,9 +80,9 @@ describe('fetchQueries', () => {
 					expect(config.method).toEqual(method);
 				});
 		};
-		return methodTest('post')()
-			.then(methodTest('patch'))
-			.then(methodTest('delete'));
+		return methodTest('POST')()
+			.then(methodTest('PATCH'))
+			.then(methodTest('DELETE'));
 	});
 	describe('GET', () => {
 		it('GET calls fetch with API url and queries, metadata, logout querystring params', () => {
@@ -97,7 +97,7 @@ describe('fetchQueries', () => {
 					expect(url.searchParams.has('queries')).toBe(true);
 					expect(url.searchParams.has('metadata')).toBe(true);
 					expect(url.searchParams.has('logout')).toBe(true);
-					expect(calledWith[1].method).toEqual('get');
+					expect(calledWith[1].method).toEqual('GET');
 				});
 		});
 
@@ -128,7 +128,7 @@ describe('fetchQueries', () => {
 					expect(url.origin).toBe(API_URL.origin);
 					expect(url.searchParams.has('queries')).toBe(true);
 					expect(url.searchParams.has('metadata')).toBe(false);
-					expect(calledWith[1].method).toEqual('get');
+					expect(calledWith[1].method).toEqual('GET');
 				});
 		});
 	});
@@ -137,13 +137,13 @@ describe('fetchQueries', () => {
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
 			return fetchUtils
-				.fetchQueries(API_URL.toString())(postQueries, meta)
+				.fetchQueries(API_URL.toString())(POSTQueries, meta)
 				.then(() => {
 					const calledWith = global.fetch.calls.mostRecent().args;
 					const url = new URL(calledWith[0]);
 					const options = calledWith[1];
 					expect(url.toString()).toBe(API_URL.toString());
-					expect(options.method).toEqual('post');
+					expect(options.method).toEqual('POST');
 					// build a dummy url to hold the url-encoded body as searchstring
 					const dummyUrl = new URL(`http://example.com?${options.body}`);
 					expect(dummyUrl.searchParams.has('queries')).toBe(true);
@@ -154,13 +154,13 @@ describe('fetchQueries', () => {
 		it('POST without meta calls fetch without metadata body params', () => {
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
-			return fetchUtils.fetchQueries(API_URL.toString())(postQueries)
+			return fetchUtils.fetchQueries(API_URL.toString())(POSTQueries)
 				.then(() => {
 					const calledWith = global.fetch.calls.mostRecent().args;
 					const url = new URL(calledWith[0]);
 					const options = calledWith[1];
 					expect(url.toString()).toBe(API_URL.toString());
-					expect(options.method).toEqual('post');
+					expect(options.method).toEqual('POST');
 					const dummyUrl = new URL(`http://example.com?${options.body}`);
 					expect(dummyUrl.searchParams.has('queries')).toBe(true);
 					expect(dummyUrl.searchParams.has('metadata')).toBe(false);
@@ -177,7 +177,7 @@ describe('fetchQueries', () => {
 				}
 			};
 			FormData.prototype.append = jest.fn();
-			const formQueries = [{ ...mockQuery({ params: new FormData() }), meta: { method: 'post' }}];
+			const formQueries = [{ ...mockQuery({ params: new FormData() }), meta: { method: 'POST' }}];
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
 			return fetchUtils.fetchQueries(API_URL.toString())(formQueries)
@@ -185,7 +185,7 @@ describe('fetchQueries', () => {
 					const calledWith = global.fetch.calls.mostRecent().args;
 					const url = new URL(calledWith[0]);
 					const options = calledWith[1];
-					expect(options.method).toEqual('post');
+					expect(options.method).toEqual('POST');
 					expect(url.searchParams.has('queries')).toBe(true);
 					expect(url.searchParams.has('metadata')).toBe(false);
 					expect(options.headers['x-csrf-jwt']).toEqual(csrfJwt);
