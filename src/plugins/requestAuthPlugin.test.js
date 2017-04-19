@@ -1,4 +1,5 @@
 import Rx from 'rxjs';
+import { MOCK_LOGGER } from '../util/testUtils';
 import register, {
 	getAuthenticate,
 	oauthScheme,
@@ -12,12 +13,6 @@ const oauth = {
 	key: '1234',
 	secret: 'asdf',
 };
-const MOCK_LOGGER = {
-	debug: () => {},
-	info: () => {},
-	warn: () => {},
-	error: () => {},
-};
 const MOCK_SERVER = {
 	decorate() {},
 	route() {},
@@ -26,7 +21,8 @@ const MOCK_SERVER = {
 	},
 	ext: () => {},
 	state: () => {},
-	app: { logger: () => MOCK_LOGGER },
+	logger: () => MOCK_LOGGER,
+	app: {},
 	expose: () => {},
 	plugins: { requestAuth: { config: { COOKIE_ENCRYPT_SECRET: 'asdfasdfasdfasdfasdfasdfasdfasdfasdf' } } }
 };
@@ -44,6 +40,10 @@ const MOCK_REQUEST = {
 		requestAuth: {},
 	},
 	server: MOCK_SERVER,
+	raw: {
+		req: {},
+		res: {},
+	},
 };
 MOCK_REQUEST.plugins.requestAuth = {
 	reply: MOCK_REPLY_FN

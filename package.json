@@ -13,8 +13,8 @@
     "lint": "eslint . --ext .js,.jsx --fix",
     "test": "yarn run test:unit && yarn run test:integration",
     "test:base": "jest --config jest.config.json",
-    "test:unit": "yarn test:base -- --silent --coverage",
-    "test:integration": "jest --config jest.int.config.json",
+    "test:unit": "NODE_ENV=test yarn test:base -- --silent --coverage",
+    "test:integration": "NODE_ENV=test jest --config jest.int.config.json",
     "test:watch": "yarn test:base -- --watch"
   },
   "repository": {

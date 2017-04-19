@@ -1,13 +1,6 @@
-import Hapi from 'hapi';
 import Iron from 'iron';
+import { getServer } from '../../src/util/testUtils';
 import requestAuthPlugin from '../../src/plugins/requestAuthPlugin';
-
-const MOCK_LOGGER = {
-	debug: () => {},
-	info: () => {},
-	warn: () => {},
-	error: () => {},
-};
 
 const cookieRequest = cookies => ({
 	method: 'get',
@@ -64,16 +57,13 @@ const testAuth = (cookies, test, makeRequest=cookieRequest) => {
 		path: '/foo',
 		handler: (request, reply) => reply(expectedResponse)
 	};
-	const server = new Hapi.Server();
-	server.app = config;
-	server.logger = () => MOCK_LOGGER;
-	const testConnection = server.connection();
-	return testConnection
+	const server = getServer({}, config);
+	return server
 		.register({
 			register: requestAuthPlugin,
 			options: config
 		})
-		.then(() => testConnection.route(fooRoute))
+		.then(() => server.route(fooRoute))
 		.then(() => server.auth.strategy('default', 'oauth', 'required'))
 		.then(() => server.inject(makeRequest(cookies)))
 		.then(test)

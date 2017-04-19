@@ -15,6 +15,7 @@ import {
 	MOCK_MEMBER,
 } from 'meetup-web-mocks/lib/api';
 
+import { getServer } from '../util/testUtils';
 import * as authUtils from '../util/authUtils';
 
 import {
@@ -479,11 +480,7 @@ describe('parseRequest', () => {
 			state: {
 				oauth_token: 'foo',
 			},
-			server: {
-				app: {
-					API_SERVER_ROOT_URL: 'http://example.com',
-				},
-			},
+			server: getServer({}, { API_SERVER_ROOT_URL: 'http://example.com' }),
 		};
 		expect(parseRequest(getRequest, 'http://dummy.api.meetup.com').queries).toEqual(queries);
 	});
@@ -496,11 +493,7 @@ describe('parseRequest', () => {
 			state: {
 				oauth_token: 'foo',
 			},
-			server: {
-				app: {
-					API_SERVER_ROOT_URL: 'http://example.com',
-				},
-			},
+			server: getServer({}, { API_SERVER_ROOT_URL: 'http://example.com' }),
 		};
 		expect(parseRequest(postRequest, 'http://dummy.api.meetup.com').queries).toEqual(queries);
 	});
@@ -513,11 +506,7 @@ describe('parseRequest', () => {
 			state: {
 				oauth_token: 'foo',
 			},
-			server: {
-				app: {
-					API_SERVER_ROOT_URL: 'http://example.com',
-				},
-			},
+			server: getServer({}, { API_SERVER_ROOT_URL: 'http://example.com' }),
 		};
 		expect(parseRequest(patchRequest, 'http://dummy.api.meetup.com').queries).toEqual(queries);
 	});
@@ -531,11 +520,7 @@ describe('parseRequest', () => {
 			state: {
 				oauth_token: 'foo',
 			},
-			server: {
-				app: {
-					API_SERVER_ROOT_URL: 'http://example.com',
-				},
-			},
+			server: getServer({}, { API_SERVER_ROOT_URL: 'http://example.com' }),
 		};
 		expect(() => parseRequest(getRequest, 'http://dummy.api.meetup.com')).toThrow();
 	});
