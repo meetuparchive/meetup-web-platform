@@ -1,5 +1,9 @@
 import chalk from 'chalk';
-import { Observable } from 'rxjs';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/of';
+import 'rxjs/add/observable/if';
+import 'rxjs/add/observable/defer';
+import 'rxjs/add/observable/fromPromise';
 
 import { tryJSON } from '../util/fetchUtils';
 import {

@@ -7,7 +7,10 @@ import uuid from 'uuid';
 import externalRequest from 'request';
 import Joi from 'joi';
 import rison from 'rison';
-import { Observable } from 'rxjs';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/of';
+import 'rxjs/add/observable/bindNodeCallback';
+import 'rxjs/add/observable/defer';
 
 import {
 	removeAuthState,

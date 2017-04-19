@@ -4,7 +4,9 @@
  *
  * @module CacheMiddleware
  */
-import { Observable }  from 'rxjs';
+import { Observable }  from 'rxjs/Observable';
+import 'rxjs/add/observable/from';
+import 'rxjs/add/operator/zip';
 import { combineEpics } from 'redux-observable';
 import {
 	cacheSuccess,

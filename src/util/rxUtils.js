@@ -1,4 +1,5 @@
-import { Observable } from 'rxjs';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/of';
 /**
  * Utilities to help with Observable sequences
  *
