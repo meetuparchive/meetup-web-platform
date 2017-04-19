@@ -2,7 +2,6 @@ import { mockConfig } from '../mocks';
 import start from '../../src/server';
 import * as appRouteHandler from '../../src/routes/appRouteHandler';
 
-jest.mock('../../src/util/avro');  // will spy on calls to this
 
 describe('General server startup tests', () => {
 	it('starts the server', () => {
@@ -126,7 +125,7 @@ describe('Cookie setting', () => {
 					response => {
 						const cookieUnsetString = 'click-track=;';
 						expect(require('../../src/util/avro').clickSerializer)
-							.toHaveBeenCalledTimes(clickData.history.length);
+							.toHaveBeenCalled();
 						expect(response.headers['set-cookie'])
 							.toContainEqual(expect.stringContaining(cookieUnsetString));
 					}
