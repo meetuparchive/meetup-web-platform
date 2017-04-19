@@ -22,7 +22,7 @@ const MOCK_SERVER = {
 	ext: () => {},
 	state: () => {},
 	logger: () => MOCK_LOGGER,
-	app: {},
+	app: { logger: MOCK_LOGGER },
 	expose: () => {},
 	plugins: { requestAuth: { config: { COOKIE_ENCRYPT_SECRET: 'asdfasdfasdfasdfasdfasdfasdfasdfasdf' } } }
 };

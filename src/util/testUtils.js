@@ -45,7 +45,10 @@ export const parseCookieHeader = cookieHeader => {
 export const getServer = (connection, app) => {
 	const server = new Hapi.Server();
 	server.connection(connection);
-	server.app = app;
+	server.app = {
+		...app,
+		logger: MOCK_LOGGER,
+	};
 
 	// mock the anonAuthPlugin
 	server.decorate(

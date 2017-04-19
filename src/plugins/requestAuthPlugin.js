@@ -29,9 +29,9 @@ const verifyAuth = logger => auth => {
 const handleLogout = request => {
 	const {
 		raw: { req },
-		server: { logger },
+		server: { app: { logger } },
 	} = request;
-	logger().info({ req }, 'Logout - clearing cookies');
+	logger.info({ req }, 'Logout - clearing cookies');
 	return removeAuthState(
 		[getMemberCookieName(request.server), 'oauth_token', 'refresh_token'],
 		request,
@@ -64,7 +64,7 @@ export const applyRequestAuthorizer$ = requestAuthorizer$ => request => {
 	const {
 		query,
 		plugins,
-		server: { logger },
+		server: { app: { logger } },
 		raw: { req },
 	} = request;
 
@@ -83,7 +83,7 @@ export const applyRequestAuthorizer$ = requestAuthorizer$ => request => {
 		return Rx.Observable.of(request);
 	}
 
-	logger().warn({ req }, 'Request does not contain auth token');
+	logger.warn({ req }, 'Request does not contain auth token');
 	return requestAuthorizer$(request)  // get anonymous oauth_token
 		.do(applyAuthState(request, plugins.requestAuth.reply))
 		.map(() => request);
@@ -255,22 +255,22 @@ export const getRequestAuthorizer$ = config => {
 	const accessToken$ = getAccessToken$(config, redirect_uri);
 
 	// if the request has a refresh_token, use it. Otherwise, get a new anonymous access token
-	return ({ headers, state: { refresh_token}, server: { logger} }) =>
+	return ({ headers, state: { refresh_token}, server: { app: { logger } } }) =>
 		Rx.Observable.if(
 			() => refresh_token,
 			refreshToken$(refresh_token),
 			anonymousCode$
 		)
 		.flatMap(accessToken$(headers))
-		.do(verifyAuth(logger()));
+		.do(verifyAuth(logger));
 };
 
 export const getAuthenticate = authorizeRequest$ => (request, reply) => {
-	const { server: { logger }, raw: { req } } = request;
-	logger().debug({ req }, 'Authenticating request');
+	const { server: { app: { logger } }, raw: { req } } = request;
+	logger.debug({ req }, 'Authenticating request');
 	return authorizeRequest$(request)
 		.do(request => {
-			logger().debug({ req }, 'Request authenticated');
+			logger.debug({ req }, 'Request authenticated');
 		})
 		.subscribe(
 			request => {

@@ -136,6 +136,7 @@ export function server(routes, connection, plugins, platform_agent, config) {
 	// store runtime state
 	// https://hapijs.com/api#serverapp
 	server.app = {
+		...server.app,
 		isDevConfig: checkForDevUrl(config),  // indicates dev API or prod API
 		...config
 	};
