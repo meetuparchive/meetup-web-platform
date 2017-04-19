@@ -196,7 +196,7 @@ const makeRenderer = (
 		{ type: 'dispatch', action, req },
 		`Dispatching RENDER for ${request.url.href}`
 	);
-	store.dispatch();
+	store.dispatch(action);
 	return storeIsReady$
 		.map(() => getRouterRenderer(routes, store, url, baseUrl, clientFilename, assetPublicPath));
 };
