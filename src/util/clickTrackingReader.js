@@ -34,11 +34,9 @@ export default function processClickTracking(request, reply) {
 	const { history } = JSON.parse(cookieJSON);
 	history
 		.map(clickToClickRecord(request))
-		.forEach(clickRecord => {
-			const outString = clickSerializer(clickRecord);
-			console.log(clickRecord, outString);
-			process.stdout.write(outString);
-		});
+		.forEach(clickRecord =>
+			process.stdout.write(clickSerializer(clickRecord))
+		);
 
 	reply.unstate('click-track', clickCookieOptions);
 	return;
