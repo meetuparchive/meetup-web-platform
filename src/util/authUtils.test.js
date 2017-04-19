@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import { getServer } from './testUtils';
 import {
 	applyAuthState,
 	setPluginState,
@@ -8,10 +9,7 @@ import {
 } from './authUtils';
 
 describe('configureAuthCookies', () => {
-	const serverWithState = {
-		state: () => {},
-		app: {},
-	};
+	const serverWithState = getServer(undefined, {});
 	it('calls server.state for each auth cookie name', () => {
 		const config = {
 			COOKIE_ENCRYPT_SECRET: 'asdklfjahsdflkjasdfhlkajsdfkljasdlkasdjhfalksdjfbalkjsdhfalsdfasdlkfasd',
@@ -60,6 +58,8 @@ describe('applyAuthState', () => {
 			plugins: {
 				requestAuth: {},
 			},
+			raw: { req: {}, res: {} },
+			server: getServer(),
 		};
 		spyOn(reply, 'state');
 		const testApply = applyAuthState(request, reply);
