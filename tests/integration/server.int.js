@@ -103,7 +103,7 @@ describe('Cookie setting', () => {
 		coords: [23, 45],
 	};
 	const clickData = {
-		history: [click, click],
+		history: [click, { ...click }],
 	};
 	it('calls clickSerializer for each click and un-sets the click-track cookie', () => {
 		const cookie = `click-track=${encodeURIComponent(JSON.stringify(clickData))}`;
