@@ -1,4 +1,5 @@
 import https from 'https';
+import { MOCK_LOGGER, getServer } from './testUtils';
 import * as serverUtils from './serverUtils';
 
 describe('checkForDevUrl', () => {
@@ -45,8 +46,9 @@ describe('onRequestExtension', () => {
 		id: 'bar',
 		method: 'get',
 		info: {},
-		url: {},
+		url: { href: 'http://example.com' },
 		state: {},
+		server: getServer(),
 	};
 	it('calls reply.continue', () => {
 		const reply = {
@@ -60,11 +62,10 @@ describe('onRequestExtension', () => {
 		const reply = {
 			continue: () => {},
 		};
-		spyOn(global.console, 'log');
+		MOCK_LOGGER.info.mockClear();
 		serverUtils.onRequestExtension(request, reply);
-		const calledWith = console.log.calls.mostRecent().args[0];
-		expect(JSON.parse(calledWith).info.headers).toEqual(request.headers);
-		expect(JSON.parse(calledWith).info.id).toBe(request.id);
+		const calledWith = MOCK_LOGGER.info.mock.calls[0][0];
+		expect(calledWith).toEqual(expect.stringContaining(request.url.href));
 	});
 });
 
@@ -78,13 +79,13 @@ describe('logResponse', () => {
 		response: {
 			headers: { foo: 'bar' },
 		},
+		server: getServer(),
 	};
 	it('calls console.log with response headers and request id', () => {
-		spyOn(global.console, 'log');
+		MOCK_LOGGER.info.mockClear();
 		serverUtils.logResponse(request);
-		const calledWith = console.log.calls.mostRecent().args[0];
-		expect(JSON.parse(calledWith).info.headers).toEqual(request.response.headers);
-		expect(JSON.parse(calledWith).info.id).toBe(request.id);
+		const [data,] = MOCK_LOGGER.info.mock.calls[0];
+		expect(data).toEqual(expect.any(Object));
 	});
 });
 
