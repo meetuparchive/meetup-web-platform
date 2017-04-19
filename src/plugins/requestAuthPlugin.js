@@ -14,9 +14,8 @@ import {
  * @module requestAuthPlugin
  */
 
-function verifyAuth(auth) {
-	const keys = Object.keys(auth);
-	if (!keys.length) {
+const verifyAuth = logger => auth => {
+	if (!Object.keys(auth).length) {
 		const errorMessage = 'No auth token(s) provided';
 		logger.fatal(
 			errorMessage,
@@ -25,8 +24,7 @@ function verifyAuth(auth) {
 		);
 		throw new Error(errorMessage);
 	}
-	return auth;
-}
+};
 
 const handleLogout = request => {
 	const {
@@ -263,16 +261,15 @@ export const getRequestAuthorizer$ = config => {
 			refreshToken$(refresh_token),
 			anonymousCode$
 		)
-		.flatMap(accessToken$(headers))
-		.do(verifyAuth);
+		.flatMap(accessToken$(headers));
 };
 
 export const getAuthenticate = authorizeRequest$ => (request, reply) => {
-	const { raw: { req } } = request;
-	logger.debug({ req }, 'Authenticating request');
+	const { server: { logger }, raw: { req } } = request;
+	logger().debug({ req }, 'Authenticating request');
 	return authorizeRequest$(request)
 		.do(request => {
-			logger.debug({ req }, 'Request authenticated');
+			logger().debug({ req }, 'Request authenticated');
 		})
 		.subscribe(
 			request => {
@@ -303,7 +300,9 @@ export const oauthScheme = server => {
 	configureAuthCookies(server);       // apply default config for auth cookies
 	server.ext('onPreAuth', setPluginState);     // provide a reference to `reply` on the request
 	const options = server.plugins.requestAuth.config;
-	const authorizeRequest$ = applyRequestAuthorizer$(getRequestAuthorizer$(options));
+	const authorizeRequest$ = applyRequestAuthorizer$(
+		getRequestAuthorizer$(options).do(verifyAuth(server.logger()))
+	);
 
 	return {
 		authenticate: getAuthenticate(authorizeRequest$),
