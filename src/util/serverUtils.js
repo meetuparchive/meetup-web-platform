@@ -33,7 +33,12 @@ export function onRequestExtension(request, reply) {
 }
 
 export function onPreHandlerExtension(request, reply) {
-	clickTrackingReader(request, reply);
+	try {
+		clickTrackingReader(request, reply);
+	} catch(err) {
+		console.error(err);
+		request.server.logger().error(err);
+	}
 	return reply.continue();
 }
 

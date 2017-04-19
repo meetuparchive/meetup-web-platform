@@ -1,4 +1,3 @@
-import logger from './logger';
 import { clickSerializer } from './avro';
 import { parseMemberCookie } from './cookieUtils';
 
@@ -31,21 +30,13 @@ export default function processClickTracking(request, reply) {
 		return;
 	}
 
-	try {
-		const cookieJSON = decodeURIComponent(cookieValue);
-		const { history } = JSON.parse(cookieJSON);
-		history
-			.map(clickToClickRecord(request))
-			.forEach(clickRecord =>
-				process.stdout.write(clickSerializer(clickRecord))
-			);
-	} catch(err) {
-		logger.error(
-			err,
-			'Could not parse click-track cookie'
+	const cookieJSON = decodeURIComponent(cookieValue);
+	const { history } = JSON.parse(cookieJSON);
+	history
+		.map(clickToClickRecord(request))
+		.forEach(clickRecord =>
+			process.stdout.write(clickSerializer(clickRecord))
 		);
-		return;
-	}
 
 	reply.unstate('click-track', clickCookieOptions);
 	return;

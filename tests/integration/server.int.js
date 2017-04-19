@@ -126,7 +126,7 @@ describe('Cookie setting', () => {
 					response => {
 						const cookieUnsetString = 'click-track=;';
 						expect(require('../../src/util/avro').clickSerializer)
-							.toHaveBeenCalled();
+							.toHaveBeenCalledTimes(clickData.history.length);
 						expect(response.headers['set-cookie'])
 							.toContainEqual(expect.stringContaining(cookieUnsetString));
 					}
