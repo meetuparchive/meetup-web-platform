@@ -255,13 +255,14 @@ export const getRequestAuthorizer$ = config => {
 	const accessToken$ = getAccessToken$(config, redirect_uri);
 
 	// if the request has a refresh_token, use it. Otherwise, get a new anonymous access token
-	return ({ headers, state: { refresh_token} }) =>
+	return ({ headers, state: { refresh_token}, server: { logger} }) =>
 		Rx.Observable.if(
 			() => refresh_token,
 			refreshToken$(refresh_token),
 			anonymousCode$
 		)
-		.flatMap(accessToken$(headers));
+		.flatMap(accessToken$(headers))
+		.do(verifyAuth(logger()));
 };
 
 export const getAuthenticate = authorizeRequest$ => (request, reply) => {
@@ -300,9 +301,7 @@ export const oauthScheme = server => {
 	configureAuthCookies(server);       // apply default config for auth cookies
 	server.ext('onPreAuth', setPluginState);     // provide a reference to `reply` on the request
 	const options = server.plugins.requestAuth.config;
-	const authorizeRequest$ = applyRequestAuthorizer$(
-		getRequestAuthorizer$(options).do(verifyAuth(server.logger()))
-	);
+	const authorizeRequest$ = applyRequestAuthorizer$(getRequestAuthorizer$(options));
 
 	return {
 		authenticate: getAuthenticate(authorizeRequest$),
