@@ -1,13 +1,7 @@
 import HapiPino from 'hapi-pino';
 import CsrfPlugin from 'electrode-csrf-jwt';
-import Good from 'good';
 
-import {
-	activitySerializer,
-	clickSerializer,
-} from './util/avro';
 import logger from './util/logger';
-import GoodTracking from './plugins/good-tracking';
 import requestAuthPlugin from './plugins/requestAuthPlugin';
 
 /**
@@ -69,48 +63,6 @@ export function getCsrfPlugin(secret) {
 }
 
 /**
- * Provides Hapi process monitoring and console logging
- *
- * @see {@link https://github.com/hapijs/good}
- */
-export function getConsoleLogPlugin() {
-	return {
-		register: Good,
-		options: {
-			ops: false,  // no ops reporting (for now)
-			reporters: {
-				activity: [
-					{
-						module: 'good-squeeze',
-						name: 'Squeeze',
-						args: [{
-							request: 'activity'
-						}],
-					}, {
-						module: GoodTracking,
-						args: [ activitySerializer ],
-					},
-					'stdout'
-				],
-				click: [
-					{
-						module: 'good-squeeze',
-						name: 'Squeeze',
-						args: [{
-							request: 'click'
-						}],
-					}, {
-						module: GoodTracking,
-						args: [ clickSerializer ],
-					},
-					'stdout'
-				],
-			}
-		}
-	};
-}
-
-/**
  * configure and return the plugin that will allow requests to get anonymous
  * oauth tokens to communicate with the API
  */
@@ -133,7 +85,6 @@ export default function getPlugins(config) {
 	return [
 		getLogger(),
 		getCsrfPlugin(config.CSRF_SECRET),
-		getConsoleLogPlugin(config),
 		getRequestAuthPlugin(config),
 	];
 }

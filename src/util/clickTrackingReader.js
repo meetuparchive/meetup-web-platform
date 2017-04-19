@@ -1,3 +1,5 @@
+import logger from './logger';
+import { clickSerializer } from './avro';
 import { parseMemberCookie } from './cookieUtils';
 
 const isProd = process.env.NODE_ENV === 'production';
@@ -35,14 +37,13 @@ export default function processClickTracking(request, reply) {
 		history
 			.map(clickToClickRecord(request))
 			.forEach(clickRecord =>
-				request.log(['click'], JSON.stringify(clickRecord))
+				process.stdout.write(clickSerializer(clickRecord))
 			);
 	} catch(err) {
-		console.error(JSON.stringify({
-			message: 'Could not parse click-track cookie',
-			cookieValue,
-			error: err.stack,
-		}));
+		logger.error(
+			err,
+			'Could not parse click-track cookie'
+		);
 		return;
 	}
 
