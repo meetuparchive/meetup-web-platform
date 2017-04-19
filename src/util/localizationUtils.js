@@ -12,6 +12,8 @@ import LocaleDataPT from 'react-intl/locale-data/pt';
 
 import { addLocaleData } from 'react-intl';
 
+import 'intl' as IntlPolyfill
+
 
 const localeMap = {
 	'en-US': {
@@ -50,7 +52,6 @@ const localeMap = {
  * @method polyfillNodeIntl
  */
 export function polyfillNodeIntl() {
-	const IntlPolyfill = require('intl');
 	Intl.NumberFormat = IntlPolyfill.NumberFormat;
 	Intl.DateTimeFormat = IntlPolyfill.DateTimeFormat;
 }
