@@ -182,7 +182,7 @@ const makeRenderer = (
 		type: SERVER_RENDER,
 		payload: url,
 	};
-	server.logger().debug(
+	server.app.logger.debug(
 		{ type: 'dispatch', action, req },
 		`Dispatching RENDER for ${request.url.href}`
 	);

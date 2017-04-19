@@ -12,7 +12,7 @@ export const getAppRouteHandler = renderRequestMap => (request, reply) => {
 	}
 
 	return renderRequestMap[requestLanguage](request)
-		.do(() => request.server.logger().debug('HTML response ready'))
+		.do(() => request.server.app.logger.debug('HTML response ready'))
 		.subscribe(({ result, statusCode }) => {
 			// response is sent when this function returns (`nextTick`)
 			const response = reply(result)

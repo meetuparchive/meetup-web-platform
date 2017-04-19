@@ -466,7 +466,7 @@ export const logApiResponse = request => ([response, body]) => {
 		statusCode
 	} = response;
 
-	const logger = request.server.logger();
+	const logger = request.server.app.logger;
 	// production logs will automatically be JSON-parsed in Stackdriver
 	const log = (statusCode >= 400 && logger.error ||
 		statusCode >= 300 && logger.warn ||
@@ -558,7 +558,7 @@ export const makeApiRequest$ = request => {
 			} = requestOpts;
 
 			const parsedUrl = url.parse(requestOpts.url);
-			request.server.logger().info(
+			request.server.app.logger.info(
 				{
 					type: 'request',
 					direction: 'out',

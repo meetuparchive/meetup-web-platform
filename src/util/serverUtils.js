@@ -26,7 +26,7 @@ export function checkForDevUrl(value) {
 export function onRequestExtension(request, reply) {
 	request.id = uuid.v4();
 
-	request.server.logger()
+	request.server.app.logger
 		.info(`Incoming request ${request.method.toUpperCase()} ${request.url.href}`);
 
 	return reply.continue();
@@ -37,7 +37,7 @@ export function onPreHandlerExtension(request, reply) {
 		clickTrackingReader(request, reply);
 	} catch(err) {
 		console.error(err);
-		request.server.logger().error(err);
+		request.server.app.logger.error(err);
 	}
 	return reply.continue();
 }
@@ -47,7 +47,7 @@ export function onResponse(request) {
 	if (request.app.upload) {
 		fs.unlink(request.app.upload, err => {
 			if (err) {
-				request.server.logger().error(
+				request.server.app.logger.error(
 					{ info: request.app.upload },
 					'Could not delete uploaded file'
 				);
@@ -62,17 +62,15 @@ export function logResponse(request) {
 		response,
 		id,
 		info,
-		server,
+		server: { app: { logger } },
 		url,
 	} = request;
 
-	const logger = server.logger();
 	if (response.isBoom) {
 		// response is an Error object
 		logger.error(`Internal error ${response.message} ${url.pathname}`,
 			{ error: response.stack }
 		);
-		return;
 	}
 
 	const log = (response.statusCode >= 400 && logger.error ||
@@ -133,13 +131,15 @@ export function configureEnv(config) {
 export function server(routes, connection, plugins, platform_agent, config) {
 	const server = new Hapi.Server();
 
-	// store runtime state
+	// store runtime state - must modify existing server.app in order to keep
+	// previously-defined properties
 	// https://hapijs.com/api#serverapp
-	server.app = {
-		...server.app,
-		isDevConfig: checkForDevUrl(config),  // indicates dev API or prod API
-		...config
-	};
+	Object.assign(
+		server.app,
+		{ isDevConfig: checkForDevUrl(config) },  // indicates dev API or prod API
+		config
+	);
+
 	server.decorate('reply', 'track', track(platform_agent));
 
 	const appConnection = server.connection(connection);
