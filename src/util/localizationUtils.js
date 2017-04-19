@@ -12,7 +12,7 @@ import LocaleDataPT from 'react-intl/locale-data/pt';
 
 import { addLocaleData } from 'react-intl';
 
-import 'intl' as IntlPolyfill
+import * as IntlPolyfill from 'intl'
 
 
 const localeMap = {
