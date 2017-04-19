@@ -10,7 +10,7 @@ export const clickCookieOptions = {
 
 export const clickToClickRecord = request => click => {
 	return {
-		timestamp: click.timestamp,
+		timestamp: click.timestamp || new Date().toISOString(),
 		requestId: request.id,
 		memberId: parseMemberCookie(request.state).id,
 		lineage: click.lineage,

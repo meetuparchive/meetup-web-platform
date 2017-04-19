@@ -7,15 +7,17 @@ import { getServerCreateStore } from '../util/createStoreServer';
 import Dom from '../components/dom';
 import NotFound from '../components/NotFound';
 import PlatformApp from '../components/PlatformApp';
-import { polyfillNodeIntl } from '../util/localizationUtils';
+import * as polyfillNodeIntl from 'intl';
 
+import { SERVER_RENDER } from '../actions/syncActionCreators';
 import {
 	configureApiUrl,
 	configureBaseUrl,
 } from '../actions/configActionCreators';
 
 // Ensure global Intl for use with FormatJS
-polyfillNodeIntl();
+Intl.NumberFormat = IntlPolyfill.NumberFormat;
+Intl.DateTimeFormat = IntlPolyfill.DateTimeFormat;
 
 const DOCTYPE = '<!DOCTYPE html>';
 
@@ -195,7 +197,7 @@ const makeRenderer = (
 		}
 	}));
 	store.dispatch({
-		type: '@@server/RENDER',
+		type: SERVER_RENDER,
 		payload: url,
 	});
 	return storeIsReady$

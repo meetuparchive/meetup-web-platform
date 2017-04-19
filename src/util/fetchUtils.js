@@ -17,14 +17,40 @@ const BrowserCookies = JSCookie.withConverter({
 export const CSRF_HEADER = 'x-csrf-jwt';
 export const CSRF_HEADER_COOKIE = 'x-csrf-jwt-header';
 
+/**
+ * @deprecated
+ */
+export function getDeprecatedSuccessPayload(successes, errors) {
+	const allQueryResponses = [ ...successes, ...errors ];
+	return allQueryResponses.reduce((payload, { query, response }) => {
+		if (!response) {
+			return payload;
+		}
+		const { ref, error, ...responseBody } = response;
+		if (error) {
+			// old payload expects error as a property of `value`
+			responseBody.value = { error };
+		}
+		payload.queries.push(query);
+		payload.responses.push({ [ref]: responseBody });
+		return payload;
+	}, { queries: [], responses: [] });
+}
+
 export const parseQueryResponse = queries => ({ responses, error, message }) => {
 	if (error) {
 		throw new Error(JSON.stringify({ error, message }));  // treat like an API error
 	}
-	return {
-		queries,
-		responses: responses || [],
-	};
+	responses = responses || [];
+	if (queries.length !== responses.length) {
+		throw new Error('Responses do not match requests');
+	}
+
+	return responses.reduce((categorized, response, i) => {
+		const targetArray = response.error ? categorized.errors : categorized.successes;
+		targetArray.push({ response, query: queries[i] });
+		return categorized;
+	}, { successes: [], errors: [] });
 };
 
 /**
@@ -43,13 +69,13 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 	const headers = {};
 	const method = (
 		(queries[0].meta || {}).method ||
-			'get'  // fallback to 'get'
-	).toLowerCase();
+			'GET'  // fallback to 'get'
+	).toUpperCase();  // must be upper case - requests can fail silently otherwise
 
-	const hasBody = method === 'post' ||
-		method === 'patch';
+	const hasBody = method === 'POST' ||
+		method === 'PATCH';
 	const isFormData = queries[0].params instanceof FormData;
-	const isDelete = method === 'delete';
+	const isDelete = method === 'DELETE';
 
 	const fetchUrl = new URL(apiUrl);
 	fetchUrl.searchParams.append('queries', rison.encode_array(queries));
