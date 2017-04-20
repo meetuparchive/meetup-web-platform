@@ -191,7 +191,8 @@ The sync middleware will read these two arrays and generate a separate
 #### Request failure - `API_RESP_FAIL`
 
 If the `fetch` fails entirely, no responses will be delivered to the
-application. Instead, an `API_RESP_FAIL` action will be dispatched.
+application. Instead, an `API_RESP_FAIL` action will be dispatched with an
+`Error` payload.
 
 #### Request complete - `API_RESP_COMPLETE`
 
