@@ -1,3 +1,5 @@
+import 'rxjs/add/operator/toPromise';
+
 import externalRequest from 'request';
 import rison from 'rison';
 
