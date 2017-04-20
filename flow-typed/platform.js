@@ -3,7 +3,7 @@ declare var Intl: Object;
 
 declare type FluxStandardAction = {
 	type: string,
-	payload?: any,
+	payload: Object | Array<any>,
 	meta?: any,
 	error?: boolean
 };

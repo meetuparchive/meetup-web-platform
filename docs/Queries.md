@@ -188,14 +188,40 @@ containing the original `query` object and its corresponding `response`:
 The sync middleware will read these two arrays and generate a separate
 `API_RESP_SUCCESS` or `API_RESP_ERROR` action for each response object.
 
-The platform reducer will then read the values into `state.api[ref]` for each
-response.
+#### Request failure - `API_RESP_FAIL`
+
+If the `fetch` fails entirely, no responses will be delivered to the
+application. Instead, an `API_RESP_FAIL` action will be dispatched.
+
+#### Request complete - `API_RESP_COMPLETE`
+
+After all Query Responses have been dispatched, the sync middleware will
+dispatch a final `API_RESP_COMPLETE` action.
+
+### Platform `api` reducer - `state.api`
+
+When `API_REQ` is first dispatched, the platform `api` reducer will add each
+Query's `ref` to an `inFlight` array. This property can be inspected to
+determine whether a particular ref is 'in-flight', e.g.
+
+```js
+mapStateToProps(state) {
+  return {
+    isLoading: state.api.inFlight.includes(myRef),
+  };
+}
+```
+
+When the API responds, the platform reducer will read the `API_RESP_SUCCESS`
+and `API_RESP_ERROR` values into `state.api[ref]` for each response and clear
+the corresponding `ref` from `state.api.inFlight`.
 
 **Redux state after being processed by `API_RESP_SUCCESS` action**
 
 ```js
 {
   [ref]: {
+    ref,
     type,
     value: {},
     meta?: {}
@@ -209,25 +235,24 @@ response.
 ```js
 {
   [ref]: {
-    type,
-    error: [],
+    ref,
+    type?,
+    error?: [],
     meta?: {}
   },
   // ...
 }
 ```
 
-#### request failure - `API_RESP_FAIL`
-
-If the `fetch` fails entirely, no responses will be delivered to the
-application - `state.api` will not receive new data. Instead, an `API_RESP_FAIL`
-action will be dispatched, which will populate `state.api.fail`.
+If `API_RESP_FAIL` is dispatched, `state.api` will not receive new data,
+but will instead populate `state.fail` with an `Error` object describing the
+the failed call.
 
 **Redux state after being processed by `API_RESP_FAIL` action**
 
 ```js
 {
-  error: Error,
+  fail: Error,
   // ...  all other data is stale but technically still valid
 }
 ```
