@@ -1,4 +1,5 @@
-import 'rxjs/Observable';
+import 'rxjs/add/operator/toArray';
+import 'rxjs/add/operator/toPromise';
 import { ActionsObservable } from 'redux-observable';
 
 import fetch from 'node-fetch';
