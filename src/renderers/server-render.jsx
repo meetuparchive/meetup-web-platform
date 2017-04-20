@@ -1,4 +1,6 @@
-import Rx from 'rxjs';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/of';
+import 'rxjs/add/operator/first';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import StaticRouter from 'react-router-dom/StaticRouter';
@@ -174,14 +176,14 @@ const makeRenderer = (
 
 	// render skeleton if requested - the store is ready
 	if ('skeleton' in request.query) {
-		return Rx.Observable.of({
+		return Observable.of({
 			result: getHtml(baseUrl, assetPublicPath, clientFilename, store.getState()),
 			statusCode: 200
 		});
 	}
 
 	// otherwise render using the API and React router
-	const storeIsReady$ = Rx.Observable.create(obs => {
+	const storeIsReady$ = Observable.create(obs => {
 		obs.next(store.getState());
 		return store.subscribe(() => obs.next(store.getState()));
 	})
