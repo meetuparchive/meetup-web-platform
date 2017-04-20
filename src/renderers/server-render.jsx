@@ -9,7 +9,7 @@ import { getServerCreateStore } from '../util/createStoreServer';
 import Dom from '../components/dom';
 import NotFound from '../components/NotFound';
 import PlatformApp from '../components/PlatformApp';
-import * as polyfillNodeIntl from 'intl';
+import IntlPolyfill from 'intl';
 
 import { SERVER_RENDER } from '../actions/syncActionCreators';
 import {
