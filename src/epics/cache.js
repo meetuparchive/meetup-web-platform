@@ -7,6 +7,10 @@
 import { Observable }  from 'rxjs/Observable';
 import 'rxjs/add/observable/from';
 import 'rxjs/add/operator/zip';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/filter';
+import 'rxjs/add/operator/reduce';
+import 'rxjs/add/operator/ignoreElements';
 import { combineEpics } from 'redux-observable';
 import {
 	cacheSuccess,

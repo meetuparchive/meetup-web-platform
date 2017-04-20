@@ -1,4 +1,8 @@
-import { Observable } from 'rxjs';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/from';
+import 'rxjs/add/observable/fromPromise';
+import 'rxjs/add/observable/of';
+
 import { combineEpics } from 'redux-observable';
 import * as api from '../actions/apiActionCreators';
 import {

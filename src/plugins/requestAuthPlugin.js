@@ -4,6 +4,10 @@ import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/if';
 import 'rxjs/add/observable/defer';
 import 'rxjs/add/observable/fromPromise';
+import 'rxjs/add/operator/do';
+import 'rxjs/add/operator/timeout';
+import 'rxjs/add/operator/mergeMap';
+import 'rxjs/add/operator/map';
 
 import { tryJSON } from '../util/fetchUtils';
 import {
@@ -148,7 +152,7 @@ export function getAnonymousCode$({ API_TIMEOUT=5000, OAUTH_AUTH_URL, oauth }, r
 					}
 				}));
 			})
-			.flatMap(tryJSON(OAUTH_AUTH_URL))
+			.mergeMap(tryJSON(OAUTH_AUTH_URL))
 			.map(({ code }) => ({
 				grant_type: 'anonymous_code',
 				token: code
@@ -233,7 +237,7 @@ export const getAccessToken$ = ({ API_TIMEOUT=5000, OAUTH_ACCESS_URL, oauth }, r
 						}
 					}));
 				})
-				.flatMap(tryJSON(OAUTH_ACCESS_URL));
+				.mergeMap(tryJSON(OAUTH_ACCESS_URL));
 		};
 	};
 };
@@ -263,7 +267,7 @@ export const getRequestAuthorizer$ = config => {
 			refreshToken$(refresh_token),
 			anonymousCode$
 		)
-		.flatMap(accessToken$(headers))
+		.mergeMap(accessToken$(headers))
 		.do(verifyAuth);
 };
 

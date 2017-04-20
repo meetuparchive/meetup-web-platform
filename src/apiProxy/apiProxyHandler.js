@@ -2,6 +2,8 @@ import url from 'url';
 import Boom from 'boom';
 import rison from 'rison';
 
+import 'rxjs/add/operator/catch';
+
 const handleQueryResponses = (request, reply) => queryResponses => {
 	const response = reply(JSON.stringify({
 		responses: queryResponses,
