@@ -1,4 +1,3 @@
-//import { Observable } from 'rxjs/Observable';
 import { ActionsObservable } from 'redux-observable';
 
 import { getDeprecatedSuccessPayload } from '../util/fetchUtils';
