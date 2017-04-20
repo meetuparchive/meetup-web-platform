@@ -1,6 +1,10 @@
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/fromPromise';
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/filter';
+import 'rxjs/add/operator/mergeMap';
 import {
 	apiSuccess,
 	apiError,
@@ -65,7 +69,7 @@ const getMethodQueryFetch = (method, fetchQueries, store) =>
  */
 const doFetch$ = fetchQuery => ({ query, onSuccess, onError }) =>
 	Observable.fromPromise(fetchQuery(query))  // make the fetch call
-		.flatMap(({ successes, errors }) => {
+		.mergeMap(({ successes, errors }) => {
 			const responses = getDeprecatedSuccessPayload(successes, errors);
 			const actions = [
 				...successes.map(api.success),  // send the successes to success
@@ -97,7 +101,7 @@ https://github.com/meetup/meetup-web-platform/blob/master/docs/Queries.md#recipe
 			}
 		})
 		.map(({ payload }) => payload)
-		.flatMap(
+		.mergeMap(
 			doFetch$(
 				getMethodQueryFetch(method, fetchQueries, store)
 			)
