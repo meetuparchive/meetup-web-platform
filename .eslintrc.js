@@ -1,5 +1,9 @@
 const config = {
-	"extends": "eslint:recommended",
+	"extends": [
+		"eslint:recommended",
+		"plugin:flowtype/recommended",
+	],
+	"parser": "babel-eslint",
 	"parserOptions": {
 		"ecmaVersion": 6,
 		"ecmaFeatures": {
@@ -16,7 +20,8 @@ const config = {
 		"es6": true
 	},
 	"plugins": [
-		"react"
+		"react",
+		"flowtype",
 	],
 	"rules": {
 		"array-callback-return": 2,
