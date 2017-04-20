@@ -34,7 +34,7 @@ jest.mock('request', () => {
 });
 
 const API_TIMEOUT = 10;
-const MOCK_HAPI_REQUEST = { server: getServer(undefined, { API_TIMEOUT }) };
+const MOCK_HAPI_REQUEST = { server: getServer({ API_TIMEOUT }) };
 
 describe('createCookieJar', () => {
 	it('returns a cookie jar for /sessions endpoint', () => {

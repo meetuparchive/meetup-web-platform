@@ -9,7 +9,7 @@ import {
 } from './authUtils';
 
 describe('configureAuthCookies', () => {
-	const serverWithState = getServer(undefined, {});
+	const serverWithState = getServer();
 	it('calls server.state for each auth cookie name', () => {
 		const config = {
 			COOKIE_ENCRYPT_SECRET: 'asdklfjahsdflkjasdfhlkajsdfkljasdlkasdjhfalksdjfbalkjsdhfalsdfasdlkfasd',
