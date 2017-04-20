@@ -34,10 +34,10 @@ export const responseToState = (response: QueryResponse): { [string]: QueryRespo
 /*
  * The primary reducer for data provided by the API
  */
-export function api(state: ApiState = DEFAULT_APP_STATE, action={}) {
+export function api(state: ApiState = DEFAULT_APP_STATE, action: FluxStandardAction) {
 	switch (action.type) {
 	case API_REQ: {
-		const requestRefs = action.payload.map(({ ref }) => ref);
+		const requestRefs = (action.payload || []).map(({ ref }) => ref);
 		const inFlight = state.inFlight
 			.filter(ref => !requestRefs.includes[ref]) // clean out current duplicates
 			.concat(requestRefs); // add new requested refs
@@ -57,8 +57,8 @@ export function api(state: ApiState = DEFAULT_APP_STATE, action={}) {
 		delete state.fail;  // if there are any values, the API is not failing
 		return {
 			...state,
-			...responseToState(action.payload.response),
-			inFlight: state.inFlight.filter(ref => ref !== action.payload.response.ref),
+			...responseToState((action.payload || {}).response),
+			inFlight: state.inFlight.filter(ref => ref !== (action.payload || {}).response.ref),
 		};
 	case API_RESP_FAIL:
 		return { ...state, fail: action.payload };
