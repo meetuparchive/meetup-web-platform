@@ -1,4 +1,5 @@
 import Boom from 'boom';
+import { getServer } from '../util/testUtils';
 import { onPreResponse } from './appRoute';
 
 describe('onPreResponse.method', () => {
@@ -8,6 +9,7 @@ describe('onPreResponse.method', () => {
 		const request = {
 			response: Boom.create(errorCode, errorMessage),
 			route: {},
+			server: getServer(),
 		};
 		const replyObj = {
 			code() {}
