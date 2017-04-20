@@ -1,4 +1,10 @@
-import Rx from 'rxjs';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/of';
+import 'rxjs/add/observable/fromPromise';
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/filter';
+import 'rxjs/add/operator/mergeMap';
 import {
 	apiSuccess,
 	apiError,
@@ -62,8 +68,8 @@ const getMethodQueryFetch = (method, fetchQueries, store) =>
  * 3. Failed mutation responses will be sent to the mutation action's `onError`
  */
 const doFetch$ = fetchQuery => ({ query, onSuccess, onError }) =>
-	Rx.Observable.fromPromise(fetchQuery(query))  // make the fetch call
-		.flatMap(({ successes, errors }) => {
+	Observable.fromPromise(fetchQuery(query))  // make the fetch call
+		.mergeMap(({ successes, errors }) => {
 			const responses = getDeprecatedSuccessPayload(successes, errors);
 			const actions = [
 				...successes.map(api.success),  // send the successes to success
@@ -73,14 +79,14 @@ const doFetch$ = fetchQuery => ({ query, onSuccess, onError }) =>
 			if (onSuccess) {
 				actions.push(onSuccess(responses));
 			}
-			return Rx.Observable.from(actions);
+			return Observable.from(actions);
 		})
 		.catch(err => {
 			const actions = [api.fail(err), apiError(err)];
 			if (onError) {
 				actions.push(onError(err));
 			}
-			return Rx.Observable.from(actions);
+			return Observable.from(actions);
 		});
 
 const getMethodEpic = method => fetchQueries => (action$, store) =>
@@ -95,7 +101,7 @@ https://github.com/meetup/meetup-web-platform/blob/master/docs/Queries.md#recipe
 			}
 		})
 		.map(({ payload }) => payload)
-		.flatMap(
+		.mergeMap(
 			doFetch$(
 				getMethodQueryFetch(method, fetchQueries, store)
 			)

@@ -4,7 +4,14 @@
  *
  * @module CacheMiddleware
  */
-import Rx from 'rxjs';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/from';
+import 'rxjs/add/operator/zip';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/filter';
+import 'rxjs/add/operator/reduce';
+import 'rxjs/add/operator/ignoreElements';
+import 'rxjs/add/operator/mergeMap';
 import { combineEpics } from 'redux-observable';
 import {
 	API_REQ,
@@ -38,7 +45,7 @@ export function checkEnable() {
  */
 export const cacheClearEpic = cache => action$ =>
 	action$.ofType(CACHE_CLEAR)
-		.flatMap(() => cache.clear())  // wait for cache to clear before continuing
+		.mergeMap(() => cache.clear())  // wait for cache to clear before continuing
 		.ignoreElements();
 
 /**
@@ -53,7 +60,7 @@ export const cacheClearEpic = cache => action$ =>
  */
 export const cacheSetEpic = cache => action$ =>
 	action$.ofType(API_RESP_SUCCESS, CACHE_SET)
-		.flatMap(({ payload: { query, response } }) => cacheWriter(cache)(query, response))
+		.mergeMap(({ payload: { query, response } }) => cacheWriter(cache)(query, response))
 		.ignoreElements();
 
 /**
@@ -66,9 +73,9 @@ export const cacheSetEpic = cache => action$ =>
  */
 export const cacheQueryEpic = cache => action$ =>
 	action$.ofType(API_REQ)
-		.flatMap(({ payload }) =>
-			Rx.Observable.from(payload)  // fan out
-				.flatMap(cacheReader(cache))               // look for a cache hit
+		.mergeMap(({ payload }) =>
+			Observable.from(payload)  // fan out
+				.mergeMap(cacheReader(cache))               // look for a cache hit
 				.filter(({ query, response }) => response) // ignore misses
 		)
 		.map(cacheSuccess);

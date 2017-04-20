@@ -504,6 +504,23 @@ describe('parseRequest', () => {
 		};
 		expect(parseRequest(postRequest, 'http://dummy.api.meetup.com').queries).toEqual(queries);
 	});
+	it('extracts the queries provided in PATCH requests', () => {
+		const data = { queries: rison.encode_array(queries) };
+		const patchRequest = {
+			headers,
+			method: 'patch',
+			payload: data,
+			state: {
+				oauth_token: 'foo',
+			},
+			server: {
+				app: {
+					API_SERVER_ROOT_URL: 'http://example.com',
+				},
+			},
+		};
+		expect(parseRequest(patchRequest, 'http://dummy.api.meetup.com').queries).toEqual(queries);
+	});
 	it('throws an error for mal-formed queries', () => {
 		const notAQuery = { foo: 'bar' };
 		const data = { queries: rison.encode_array([notAQuery]) };

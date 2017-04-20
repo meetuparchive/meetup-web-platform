@@ -7,7 +7,11 @@ import uuid from 'uuid';
 import externalRequest from 'request';
 import Joi from 'joi';
 import rison from 'rison';
-import Rx from 'rxjs';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/of';
+import 'rxjs/add/observable/bindNodeCallback';
+import 'rxjs/add/observable/defer';
+import 'rxjs/add/operator/do';
 
 import {
 	removeAuthState,
@@ -123,7 +127,7 @@ function formatApiError(err) {
 }
 
 export const errorResponse$ = requestUrl => err =>
-	Rx.Observable.of({
+	Observable.of({
 		...formatApiError(err),
 		meta: {
 			endpoint: url.parse(requestUrl).pathname,
@@ -302,9 +306,10 @@ export function parseRequestQueries(request) {
 		payload,
 		query,
 	} = request;
-	const queriesRison = method === 'post' && mime !== 'multipart/form-data' ?
-		payload.queries :
-		query.queries;
+	const queriesRison = (method === 'post' || method === 'patch') &&
+		mime !== 'multipart/form-data' ?
+			payload.queries :
+			query.queries;
 
 	if (!queriesRison) {
 		return null;
@@ -424,10 +429,10 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
  * Fake an API request and directly return the stringified mockResponse
  */
 export const makeMockRequest = mockResponse => requestOpts =>
-	Rx.Observable.of([makeMockResponseOk(requestOpts), JSON.stringify(mockResponse)])
+	Observable.of([makeMockResponseOk(requestOpts), JSON.stringify(mockResponse)])
 		.do(() => console.log(`MOCKING response to ${requestOpts.url}`));
 
-const externalRequest$ = Rx.Observable.bindNodeCallback(externalRequest);
+const externalRequest$ = Observable.bindNodeCallback(externalRequest);
 /**
  * Make a real external API request, return response body string
  */
@@ -548,7 +553,7 @@ export const makeApiRequest$ = request => {
 			makeMockRequest(query.mockResponse) :
 			makeExternalApiRequest(request);
 
-		return Rx.Observable.defer(() => {
+		return Observable.defer(() => {
 			const {
 				method,
 				headers,

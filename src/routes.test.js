@@ -1,4 +1,5 @@
-import Rx from 'rxjs';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/of';
 import rison from 'rison';
 import {
 	MOCK_API_RESULT,
@@ -10,7 +11,7 @@ import getRoutes from './routes';
 import { getServer } from './util/testUtils';
 
 function getResponse(injectRequest, server=getServer()) {
-	const MOCK_API_PROXY$ = () => Rx.Observable.of(MOCK_API_RESULT);
+	const MOCK_API_PROXY$ = () => Observable.of(MOCK_API_RESULT);
 	// a Promise that returns the server instance after it has been
 	// configured with the routes being tested
 	const routes = getRoutes(

@@ -140,7 +140,7 @@ const deleteQuery = {
   ref: 'deletedMember',
   params: { id },
 };
-const deleteAction = api.delete(deleteQuery);
+const deleteAction = api.del(deleteQuery);  // note `api.del` not `api.delete` because `delete` is a keywork
 ```
 
 ### Query dispatch
@@ -417,7 +417,7 @@ action creator from `apiActionCreators`.
 
 ### DELETE
 
-In practice, a DELETE request is just a GET by another name - use the `delete`
+In practice, a DELETE request is just a GET by another name - use the `del`
 action creator from `apiActionCreators`.
 
 The response will generally be a '204 - No Content',

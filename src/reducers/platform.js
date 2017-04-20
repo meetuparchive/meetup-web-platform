@@ -37,7 +37,7 @@ export const responseToState = response => {
 export function api(state=DEFAULT_APP_STATE, action={}) {
 	switch (action.type) {
 	case API_REQ:
-		if (action.meta.logout) {
+		if ((action.meta || {}).logout) {
 			// clear app state during logout
 			return { ...DEFAULT_APP_STATE, isFetching: true };
 		}
