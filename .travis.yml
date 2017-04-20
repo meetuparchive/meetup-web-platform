@@ -24,6 +24,7 @@ before_script:
   - git diff --exit-code
 
 after_success:
+  - echo "TRAVIS_BRANCH=$TRAVIS_PULL_REQUEST_BRANCH"
   - npm run coveralls
   - git config --global user.email "builds@travis-ci.com"
   - git config --global user.name "Travis CI"
