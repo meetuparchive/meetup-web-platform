@@ -27,10 +27,10 @@ const createLink = (options: Object) => (href: string): string => {
  * @param {Object} options optional modifiers
  * @return {String} The modified text.
  */
-export default function linkify(text: string, options?: Object): string {
+export default function linkify(text: string, options?: Object = {}): string {
 	if (!text) {
 		return '';
 	}
 
-	return text.replace(urlRegex(), createLink(options || {}));
+	return text.replace(urlRegex(), createLink(options));
 }
