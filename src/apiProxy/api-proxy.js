@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs/Observable';
-import { zip } from 'rxjs/add/observable/zip';
+import 'rxjs/add/observable/zip';
 
 import {
 	buildRequestArgs,
