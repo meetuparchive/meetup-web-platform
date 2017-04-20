@@ -44,18 +44,6 @@ const localeMap = {
 };
 
 /**
- * Polyfill Node Intl APIs
- * `Intl` exists, but it doesn't have the locale data we need
- *
- * @method polyfillNodeIntl
- */
-export function polyfillNodeIntl() {
-	const IntlPolyfill = require('intl');
-	Intl.NumberFormat = IntlPolyfill.NumberFormat;
-	Intl.DateTimeFormat = IntlPolyfill.DateTimeFormat;
-}
-
-/**
  * Load data for given localeCode into ReactIntl
  *
  * @method loadLocale

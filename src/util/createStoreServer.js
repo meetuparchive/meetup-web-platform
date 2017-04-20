@@ -3,6 +3,7 @@ import { parseQueryResponse } from './fetchUtils';
 import getEpicMiddleware from '../middleware/epic';
 import catchMiddleware from '../middleware/catch';
 import apiProxy$ from '../apiProxy/api-proxy';
+import 'rxjs/add/operator/toPromise';
 
 /**
  * on the server, we can proxy the API requests directly without making a

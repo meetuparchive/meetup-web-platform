@@ -1,4 +1,12 @@
-import Rx from 'rxjs';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/of';
+import 'rxjs/add/observable/if';
+import 'rxjs/add/observable/defer';
+import 'rxjs/add/observable/fromPromise';
+import 'rxjs/add/operator/do';
+import 'rxjs/add/operator/timeout';
+import 'rxjs/add/operator/mergeMap';
+import 'rxjs/add/operator/map';
 
 import logger from '../util/logger';
 import { tryJSON } from '../util/fetchUtils';
@@ -80,7 +88,7 @@ export const applyRequestAuthorizer$ = requestAuthorizer$ => request => {
 
 	if (authType) {
 		plugins.requestAuth.authType = authType;
-		return Rx.Observable.of(request);
+		return Observable.of(request);
 	}
 
 	logger.warn({ req }, 'Request does not contain auth token');
@@ -112,7 +120,7 @@ export function getAnonymousCode$({ API_TIMEOUT=5000, OAUTH_AUTH_URL, oauth }, r
 		},
 	};
 
-	return Rx.Observable.defer(() => {
+	return Observable.defer(() => {
 		logger.info(
 			{
 				type: 'request',
@@ -126,7 +134,7 @@ export function getAnonymousCode$({ API_TIMEOUT=5000, OAUTH_AUTH_URL, oauth }, r
 		);
 
 		const startTime = new Date();
-		return Rx.Observable.fromPromise(fetch(authURL.toString(), requestOpts))
+		return Observable.fromPromise(fetch(authURL.toString(), requestOpts))
 			.timeout(API_TIMEOUT)
 			.do(() => {
 				logger.info(
@@ -142,7 +150,7 @@ export function getAnonymousCode$({ API_TIMEOUT=5000, OAUTH_AUTH_URL, oauth }, r
 					`Incoming response GET ${OAUTH_AUTH_URL}`
 				);
 			})
-			.flatMap(tryJSON(OAUTH_AUTH_URL))
+			.mergeMap(tryJSON(OAUTH_AUTH_URL))
 			.map(({ code }) => ({
 				grant_type: 'anonymous_code',
 				token: code
@@ -215,7 +223,7 @@ export const getAccessToken$ = ({ API_TIMEOUT=5000, OAUTH_ACCESS_URL, oauth }, r
 			);
 
 			const startTime = new Date();
-			return Rx.Observable.fromPromise(fetch(accessUrl.toString(), requestOpts))
+			return Observable.fromPromise(fetch(accessUrl.toString(), requestOpts))
 				.timeout(API_TIMEOUT)
 				.do(() => {
 					logger.info(
@@ -231,12 +239,12 @@ export const getAccessToken$ = ({ API_TIMEOUT=5000, OAUTH_ACCESS_URL, oauth }, r
 						`Incoming response GET ${OAUTH_ACCESS_URL}?${grant_type}`
 					);
 				})
-				.flatMap(tryJSON(OAUTH_ACCESS_URL));
+				.mergeMap(tryJSON(OAUTH_ACCESS_URL));
 		};
 	};
 };
 
-const refreshToken$ = refresh_token => Rx.Observable.of({
+const refreshToken$ = refresh_token => Observable.of({
 	grant_type: 'refresh_token',
 	token: refresh_token
 });
@@ -256,12 +264,12 @@ export const getRequestAuthorizer$ = config => {
 
 	// if the request has a refresh_token, use it. Otherwise, get a new anonymous access token
 	return ({ headers, state: { refresh_token}, server: { app: { logger } } }) =>
-		Rx.Observable.if(
+		Observable.if(
 			() => refresh_token,
 			refreshToken$(refresh_token),
 			anonymousCode$
 		)
-		.flatMap(accessToken$(headers))
+		.mergeMap(accessToken$(headers))
 		.do(verifyAuth(logger));
 };
 

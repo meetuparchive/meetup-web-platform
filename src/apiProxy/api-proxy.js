@@ -1,4 +1,5 @@
-import Rx from 'rxjs';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/zip';
 
 import {
 	buildRequestArgs,
@@ -54,7 +55,7 @@ const apiProxy$ = (request, queries) => {
 		.map(makeApiRequest$(request));
 
 	// 4. zip them together to send them parallel and return responses in order
-	return Rx.Observable.zip(...apiRequests$);
+	return Observable.zip(...apiRequests$);
 };
 
 export default apiProxy$;
