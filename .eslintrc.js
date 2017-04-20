@@ -1,6 +1,7 @@
 const config = {
 	"extends": [
 		"eslint:recommended",
+		"plugin:flowtype/recommended",
 	],
 	"parser": "babel-eslint",
 	"parserOptions": {
@@ -19,7 +20,8 @@ const config = {
 		"es6": true
 	},
 	"plugins": [
-		"react"
+		"react",
+		"flowtype",
 	],
 	"rules": {
 		"array-callback-return": 2,
