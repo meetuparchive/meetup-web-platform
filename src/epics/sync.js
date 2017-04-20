@@ -2,6 +2,9 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/from';
 import 'rxjs/add/observable/fromPromise';
 import 'rxjs/add/observable/of';
+import 'rxjs/add/operator/takeUntil';
+import 'rxjs/add/operator/mergeMap';
+import 'rxjs/add/operator/catch';
 
 import { combineEpics } from 'redux-observable';
 import * as api from '../actions/apiActionCreators';
@@ -44,7 +47,7 @@ export const getNavEpic = (routes, baseUrl) => {
 	let currentLocation = {};  // keep track of current route so that apiRequest can get 'referrer'
 	return (action$, store) =>
 		action$.ofType(LOCATION_CHANGE, SERVER_RENDER)
-			.flatMap(({ payload }) => {
+			.mergeMap(({ payload }) => {
 				// inject request metadata from context, including `store.getState()`
 				const requestMetadata = {
 					referrer: currentLocation.pathname || '',
@@ -106,12 +109,12 @@ export const apiRequestToApiReq = action$ =>
  */
 export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 	action$.ofType(api.API_REQ)
-		.flatMap(({ payload, meta }) => {           // set up the fetch call to the app server
+		.mergeMap(({ payload, meta }) => {           // set up the fetch call to the app server
 			const { config } = store.getState();
 			const fetchQueries = fetchQueriesFn(config.apiUrl);
 			return Observable.fromPromise(fetchQueries(payload, meta))  // call fetch
 				.takeUntil(action$.ofType(LOCATION_CHANGE))  // cancel this fetch when nav happens
-				.flatMap(({ successes=[], errors=[] }) => {
+				.mergeMap(({ successes=[], errors=[] }) => {
 					const actions = [
 						...successes.map(api.success),  // send the successes to success
 						...errors.map(api.error),     // send errors to error
