@@ -10,6 +10,13 @@ import {
 	MOCK_APP_STATE
 } from 'meetup-web-mocks/lib/app';
 
+export const MOCK_LOGGER = {
+	debug: jest.fn(),
+	info: jest.fn(),
+	warn: jest.fn(),
+	error: jest.fn(),
+};
+
 export const createFakeStore = fakeData => ({
 	getState() {
 		return fakeData;
@@ -36,9 +43,13 @@ export const parseCookieHeader = cookieHeader => {
 	);
 };
 
-export const getServer = connection => {
+export const getServer = app => {
 	const server = new Hapi.Server();
-	server.connection(connection);
+	server.connection();
+	server.app = {
+		...app,
+		logger: MOCK_LOGGER,
+	};
 
 	// mock the anonAuthPlugin
 	server.decorate(
@@ -48,6 +59,7 @@ export const getServer = connection => {
 		{ apply: true }
 	);
 	server.decorate('reply', 'track', () => ({}));
+	server.logger = () => MOCK_LOGGER;
 	return server;
 };
 

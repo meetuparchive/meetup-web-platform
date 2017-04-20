@@ -3,6 +3,7 @@ import {
 	MOCK_RENDERPROPS,
 } from 'meetup-web-mocks/lib/app';
 
+import { getServer } from './testUtils';
 import {
 	createCookieJar,
 	makeApiRequest$,
@@ -33,7 +34,7 @@ jest.mock('request', () => {
 });
 
 const API_TIMEOUT = 10;
-const MOCK_HAPI_REQUEST = { server: { app: { API_TIMEOUT } } };
+const MOCK_HAPI_REQUEST = { server: getServer({ API_TIMEOUT }) };
 
 describe('createCookieJar', () => {
 	it('returns a cookie jar for /sessions endpoint', () => {

@@ -80,42 +80,32 @@ const getRouterRenderer = (
 	let statusCode;
 	const context = {};
 
-	try {
-		appMarkup = ReactDOMServer.renderToString(
-			<StaticRouter
-				basename={baseUrl}
-				location={location}
-				context={context}
-			>
-				<PlatformApp store={store} routes={routes} />
-			</StaticRouter>
-		);
+	appMarkup = ReactDOMServer.renderToString(
+		<StaticRouter
+			basename={baseUrl}
+			location={location}
+			context={context}
+		>
+			<PlatformApp store={store} routes={routes} />
+		</StaticRouter>
+	);
 
-		if (context.url) {
-			// redirect
-		}
-
-		// all the data for the full `<html>` element has been initialized by the app
-		// so go ahead and assemble the full response body
-		result = getHtml(
-			baseUrl,
-			assetPublicPath,
-			clientFilename,
-			initialState,
-			appMarkup
-		);
-
-		statusCode = NotFound.rewind() ||  // if NotFound is mounted, return 404
-			200;
-
-	} catch(error) {
-		// log the error stack here in dev to make it a little more legible
-		// - prod will get stackdriver formatting
-		if (process.env.NODE_ENV !== 'production') {
-			console.error(error.stack);
-		}
-		throw error;
+	if (context.url) {
+		// redirect
 	}
+
+	// all the data for the full `<html>` element has been initialized by the app
+	// so go ahead and assemble the full response body
+	result = getHtml(
+		baseUrl,
+		assetPublicPath,
+		clientFilename,
+		initialState,
+		appMarkup
+	);
+
+	statusCode = NotFound.rewind() ||  // if NotFound is mounted, return 404
+		200;
 
 	return {
 		statusCode,
@@ -157,6 +147,8 @@ const makeRenderer = (
 		headers,
 		info,
 		url,
+		server,
+		raw: { req },
 	} = request;
 
 	// request protocol might be different from original request that hit proxy
@@ -189,19 +181,15 @@ const makeRenderer = (
 	})
 	.first(state => state.preRenderChecklist.every(isReady => isReady));  // take the first ready state
 
-	console.log(JSON.stringify({
-		message: `Dispatching RENDER for ${request.url.href}`,
-		type: 'dispatch',
-		info: {
-			url: request.url,
-			method: request.method,
-			id: request.id,
-		}
-	}));
-	store.dispatch({
+	const action = {
 		type: SERVER_RENDER,
 		payload: url,
-	});
+	};
+	server.app.logger.debug(
+		{ type: 'dispatch', action, req },
+		`Dispatching RENDER for ${request.url.href}`
+	);
+	store.dispatch(action);
 	return storeIsReady$
 		.map(() => getRouterRenderer(routes, store, url, baseUrl, clientFilename, assetPublicPath));
 };

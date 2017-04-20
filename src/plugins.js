@@ -1,11 +1,7 @@
+import HapiPino from 'hapi-pino';
 import CsrfPlugin from 'electrode-csrf-jwt';
-import Good from 'good';
 
-import {
-	activitySerializer,
-	clickSerializer,
-} from './util/avro';
-import GoodTracking from './plugins/good-tracking';
+import logger from './util/logger';
 import requestAuthPlugin from './plugins/requestAuthPlugin';
 
 /**
@@ -67,65 +63,6 @@ export function getCsrfPlugin(secret) {
 }
 
 /**
- * Provides Hapi process monitoring and console logging
- *
- * @see {@link https://github.com/hapijs/good}
- */
-export function getConsoleLogPlugin() {
-	const logFilter = process.env.LOG_FILTER || { include: [], exclude: ['tracking'] };
-	return {
-		register: Good,
-		options: {
-			ops: false,  // no ops reporting (for now)
-			reporters: {
-				console: [
-					{  // filter events with good-squeeze
-						module: 'good-squeeze',
-						name: 'Squeeze',
-						args: [{
-							error: logFilter,
-							log: logFilter,
-						}]
-					}, {  // format with good-console
-						module: 'good-console',
-						args: [{
-							format: 'YYYY-MM-DD HH:mm:ss.SSS',
-						}]
-					},
-					'stdout'  // pipe to stdout
-				],
-				activity: [
-					{
-						module: 'good-squeeze',
-						name: 'Squeeze',
-						args: [{
-							request: 'activity'
-						}],
-					}, {
-						module: GoodTracking,
-						args: [ activitySerializer ],
-					},
-					'stdout'
-				],
-				click: [
-					{
-						module: 'good-squeeze',
-						name: 'Squeeze',
-						args: [{
-							request: 'click'
-						}],
-					}, {
-						module: GoodTracking,
-						args: [ clickSerializer ],
-					},
-					'stdout'
-				],
-			}
-		}
-	};
-}
-
-/**
  * configure and return the plugin that will allow requests to get anonymous
  * oauth tokens to communicate with the API
  */
@@ -136,10 +73,18 @@ export function getRequestAuthPlugin(options) {
 	};
 }
 
+export function getLogger(options={}) {
+	options.instance = logger;
+	return {
+		register: HapiPino,
+		options
+	};
+}
+
 export default function getPlugins(config) {
 	return [
+		getLogger(),
 		getCsrfPlugin(config.CSRF_SECRET),
-		getConsoleLogPlugin(),
 		getRequestAuthPlugin(config),
 	];
 }
