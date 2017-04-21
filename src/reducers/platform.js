@@ -35,7 +35,7 @@ export const responseToState = (response: QueryResponse): { [string]: QueryRespo
 /*
  * The primary reducer for data provided by the API
  */
-export function api(state: ApiState = DEFAULT_API_STATE, action: FluxStandardAction) {
+export function api(state: ApiState = DEFAULT_API_STATE, action: FluxStandardAction): ApiState {
 	switch (action.type) {
 	case API_REQ: {
 		const requestRefs = (action.payload || []).map(({ ref }) => ref);
