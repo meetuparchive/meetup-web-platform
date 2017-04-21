@@ -25,6 +25,30 @@ A Query is just a plain object with the following shape:
   meta?: {
     flags?: string[],
     method?: string
+    variants: {
+      [string]: string | string[],  // e.g. { experiment1: chapterId }
+    },
+  },
+}
+```
+
+**Example**
+
+```js
+{
+  ref: 'foobar',
+  endpoint: 'foo/bar',
+  params: {
+    memberId: 1234,
+  },
+  type: 'foo',  // generally not needed
+  meta: {
+    flags: ['thisflag', 'thatflag'],
+    method: 'get',  // generally not needed
+    variants: {
+      'my-member-experiment': 1234,  // memberId
+      'my-group-experiment': 5678,    // chapterId
+    },
   },
 }
 ```
@@ -64,12 +88,12 @@ array or a singleton.
 - `comment`
 - feature-specific objects like `home`, `conversations`
 
-#### `flags`
+#### `meta`
+
+##### `flags`
 
 An array of feature flag (Runtime Flag) names that should be returned
 alongside the main request.
-
-#### `meta`
 
 ##### `method`
 
@@ -81,6 +105,13 @@ different `method`s.
 Alternatively, you can use method-specific action creators to automatically
 assingn the method and make the request for individual requests.
 
+##### `variants`
+
+You can request variant names for particular experiments with particular
+contexts by populating `meta.variants` with an object containing keys that are
+experiment names and values that are string IDs (member ID or chapter ID
+depending on the experiment)
+
 ### Query Response
 
 A query response is also a plain object
@@ -90,8 +121,14 @@ A query response is also a plain object
   ref: string,
   value: any,
   type?: string,
-  flags?: array,
-  meta?: object,
+  meta?: {
+    flags?: string[],
+    variants?: {
+      [string]: {  // experiment
+        [string]: string  // context: variant
+      },
+    },
+  },
 }
 ```
 
