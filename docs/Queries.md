@@ -32,6 +32,27 @@ A Query is just a plain object with the following shape:
 }
 ```
 
+**Example**
+
+```js
+{
+  ref: 'foobar',
+  endpoint: 'foo/bar',
+  params: {
+    memberId: 1234,
+  },
+  type: 'foo',  // generally not needed
+  meta: {
+    flags: ['thisflag', 'thatflag'],
+    method: 'get',  // generally not needed
+    variants: {
+      'my-member-experiment': 1234,  // memberId
+      'my-group-experiment: 5678,    // chapterId
+    },
+  },
+}
+```
+
 #### `ref`
 
 A unique string reference to the query. The `ref` is used to uniquely identify
