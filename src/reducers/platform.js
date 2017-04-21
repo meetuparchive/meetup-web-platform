@@ -1,3 +1,4 @@
+// @flow weak
 /**
  * The root level reducer for the app.
  * @module reducer
@@ -19,45 +20,52 @@ import {
 	CACHE_SUCCESS
 } from '../actions/cacheActionCreators';
 
-export const DEFAULT_APP_STATE = { isFetching: false };
-
-export const responseToState = response => {
-	const { ref, ...data } = response;
-	return { [ref]: data };
+type ApiState = {
+	inFlight: Array<string>,
+	fail?: boolean,
+	[string]: QueryResponse,
 };
 
-/**
+export const DEFAULT_API_STATE: ApiState = { inFlight: [] };
+export const DEFAULT_APP_STATE = {};
+
+export const responseToState = (response: QueryResponse): { [string]: QueryResponse } =>
+	({ [response.ref]: response });
+
+/*
  * The primary reducer for data provided by the API
- * `state.api` sub-tree
- *
- * @param {Object} state
- * @param {ReduxAction} action
- * @return {Object}
  */
-export function api(state=DEFAULT_APP_STATE, action={}) {
+export function api(state: ApiState = DEFAULT_API_STATE, action: FluxStandardAction): ApiState {
 	switch (action.type) {
-	case API_REQ:
+	case API_REQ: {
+		const requestRefs = (action.payload || []).map(({ ref }) => ref);
+		const inFlight = state.inFlight
+			.filter(ref => !requestRefs.includes[ref]) // clean out current duplicates
+			.concat(requestRefs); // add new requested refs
+
 		if ((action.meta || {}).logout) {
 			// clear app state during logout
-			return { ...DEFAULT_APP_STATE, isFetching: true };
+			return { ...DEFAULT_API_STATE, inFlight };
 		}
-		return { ...state, isFetching: true };
+
+		return { ...state, inFlight };
+	}
 	case API_RESP_SUCCESS:  // fall though
-	case CACHE_SUCCESS:  // fall through
 	case API_RESP_ERROR:
+	case CACHE_SUCCESS:  // fall through
 		// each of these actions provides an API response that should go into app
 		// state - error responses will contain error info
 		delete state.fail;  // if there are any values, the API is not failing
-		return { ...state, ...responseToState(action.payload.response) };
+		return {
+			...state,
+			...responseToState((action.payload || {}).response),
+			inFlight: state.inFlight.filter(ref => ref !== (action.payload || {}).response.ref),
+		};
 	case API_RESP_FAIL:
-		state.fail = action.payload;
-		// fall through - fetch is complete
-	case API_RESP_COMPLETE:
-		return { ...state, isFetching: false };
-
-	default:
-		return state;
+		return { ...state, fail: action.payload };
 	}
+
+	return state;
 }
 
 /**
@@ -72,9 +80,8 @@ export function app(state=DEFAULT_APP_STATE, action={}) {
 		if ((action.meta || {}).logout) {
 			return DEFAULT_APP_STATE;  // clear app state during logout
 		}
-		return { ...state, isFetching: true };
+		return state;
 	case 'API_SUCCESS':
-		state.isFetching = false;  // fall through - everything else is the same as CACHE_SUCCCESS
 		// API_SUCCESS contains an array of responses, but we just need to build a single
 		// object to update state with
 		newState = action.payload.responses.reduce((s, r) => ({ ...s, ...r }), {});
@@ -84,7 +91,6 @@ export function app(state=DEFAULT_APP_STATE, action={}) {
 		return {
 			...state,
 			error: action.payload,
-			isFetching: false,
 		};
 	default:
 		return state;
