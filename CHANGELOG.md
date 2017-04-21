@@ -1,3 +1,10 @@
+## [2.3]
+
+- **Replaced** `state.api.isFetching` has been replaced with
+  `state.api.inFlight`, which is an array of `ref`s corresponding to query
+  requests that have not yet returned. Use `state.api.inFlight.includes(fooRef)`
+  to determine whether a particular query has returned.
+
 ## [2.2]
 
 - **Deprecated** all of the Sync action creators (e.g. `syncActionCreators.apiRequest`)
