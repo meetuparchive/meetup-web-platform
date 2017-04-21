@@ -65,7 +65,7 @@ export const parseVariantsHeader = variantsHeader =>
 			const [experiment, val] = keyval.split('=');
 			variants[experiment] = variants[experiment] || {};
 			const [context, variant] = val.split('|');
-			variants[experiment][context] = variant;
+			variants[experiment][context] = variant || null;
 			return variants;
 		}, {});
 

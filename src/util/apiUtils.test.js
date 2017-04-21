@@ -269,6 +269,15 @@ describe('parseVariantsHeader', () => {
 		};
 		expect(parseVariantsHeader(header)).toEqual(expectedObj);
 	});
+	it('sets `null` variant for missing variant', () => {
+		const header = 'binge-pilot=123|';
+		const expectedObj = {
+			'binge-pilot': {
+				123: null,
+			},
+		};
+		expect(parseVariantsHeader(header)).toEqual(expectedObj);
+	});
 });
 
 describe('buildRequestArgs', () => {

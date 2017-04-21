@@ -26,7 +26,7 @@ A Query is just a plain object with the following shape:
     flags?: string[],
     method?: string
     variants: {
-      [string]: string | string[],  // e.g. { experiment1: chapterId }
+      [string]: string | number | string[] | number[],  // e.g. { experiment1: chapterId }
     },
   },
 }
@@ -110,7 +110,7 @@ assingn the method and make the request for individual requests.
 You can request variant names for particular experiments with particular
 contexts by populating `meta.variants` with an object containing keys that are
 experiment names and values that are string IDs (member ID or chapter ID
-depending on the experiment)
+depending on the experiment).
 
 ### Query Response
 
@@ -131,6 +131,14 @@ A query response is also a plain object
   },
 }
 ```
+
+#### `meta`
+
+#### `variants`
+
+If a query contains a `meta.variants` request, the query response _might not
+contain a corresponding `variants` response_ if the variants service fails -
+you must test for the existence of `meta.variants` before reading from it.
 
 ## Usage
 
