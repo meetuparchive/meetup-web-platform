@@ -26,7 +26,8 @@ type ApiState = {
 	[string]: QueryResponse,
 };
 
-export const DEFAULT_APP_STATE: ApiState = { inFlight: [] };
+export const DEFAULT_API_STATE: ApiState = { inFlight: [] };
+export const DEFAULT_APP_STATE = { isFetching: false };
 
 export const responseToState = (response: QueryResponse): { [string]: QueryResponse } =>
 	({ [response.ref]: response });
@@ -34,7 +35,7 @@ export const responseToState = (response: QueryResponse): { [string]: QueryRespo
 /*
  * The primary reducer for data provided by the API
  */
-export function api(state: ApiState = DEFAULT_APP_STATE, action: FluxStandardAction) {
+export function api(state: ApiState = DEFAULT_API_STATE, action: FluxStandardAction) {
 	switch (action.type) {
 	case API_REQ: {
 		const requestRefs = (action.payload || []).map(({ ref }) => ref);
@@ -44,7 +45,7 @@ export function api(state: ApiState = DEFAULT_APP_STATE, action: FluxStandardAct
 
 		if ((action.meta || {}).logout) {
 			// clear app state during logout
-			return { ...DEFAULT_APP_STATE, inFlight };
+			return { ...DEFAULT_API_STATE, inFlight };
 		}
 
 		return { ...state, inFlight };
