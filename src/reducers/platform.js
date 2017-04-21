@@ -27,7 +27,7 @@ type ApiState = {
 };
 
 export const DEFAULT_API_STATE: ApiState = { inFlight: [] };
-export const DEFAULT_APP_STATE = { isFetching: false };
+export const DEFAULT_APP_STATE = {};
 
 export const responseToState = (response: QueryResponse): { [string]: QueryResponse } =>
 	({ [response.ref]: response });
@@ -80,9 +80,8 @@ export function app(state=DEFAULT_APP_STATE, action={}) {
 		if ((action.meta || {}).logout) {
 			return DEFAULT_APP_STATE;  // clear app state during logout
 		}
-		return { ...state, isFetching: true };
+		return state;
 	case 'API_SUCCESS':
-		state.isFetching = false;  // fall through - everything else is the same as CACHE_SUCCCESS
 		// API_SUCCESS contains an array of responses, but we just need to build a single
 		// object to update state with
 		newState = action.payload.responses.reduce((s, r) => ({ ...s, ...r }), {});
@@ -92,7 +91,6 @@ export function app(state=DEFAULT_APP_STATE, action={}) {
 		return {
 			...state,
 			error: action.payload,
-			isFetching: false,
 		};
 	default:
 		return state;
