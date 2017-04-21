@@ -1,3 +1,5 @@
+import 'rxjs/add/operator/toPromise';
+
 import {
 	mockQuery,
 	MOCK_RENDERPROPS,

@@ -1,4 +1,6 @@
 import { ActionsObservable } from 'redux-observable';
+import 'rxjs/add/operator/toArray';
+import 'rxjs/add/operator/toPromise';
 
 import { getDeprecatedSuccessPayload } from '../util/fetchUtils';
 

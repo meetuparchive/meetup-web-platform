@@ -1,4 +1,5 @@
 import { ActionsObservable } from 'redux-observable';
+import 'rxjs/add/operator/toPromise';
 
 import {
 	mockQuery,

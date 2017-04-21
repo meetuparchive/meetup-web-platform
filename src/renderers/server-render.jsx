@@ -1,3 +1,4 @@
+// @flow
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/first';
@@ -133,13 +134,13 @@ const getRouterRenderer = (
  * @return {Observable}
  */
 const makeRenderer = (
-	routes,
-	reducer,
-	clientFilename,
-	assetPublicPath,
-	middleware=[],
-	baseUrl=''
-) => request => {
+	routes: Array<Object>,
+	reducer: Reducer<?Object, FluxStandardAction>,
+	clientFilename: string,
+	assetPublicPath: string,
+	middleware: Array<Function> = [],
+	baseUrl: string = ''
+) => (request: Object) => {
 
 	middleware = middleware || [];
 	const {

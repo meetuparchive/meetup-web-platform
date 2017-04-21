@@ -1,4 +1,5 @@
-import 'rxjs/Observable';
+import 'rxjs/add/operator/toArray';
+import 'rxjs/add/operator/toPromise';
 import { ActionsObservable } from 'redux-observable';
 
 import fetch from 'node-fetch';
@@ -150,7 +151,7 @@ describe('Sync epic', () => {
 				expect(actions.map(a => a.type)).toEqual([
 					api.API_RESP_FAIL,
 					'API_ERROR',
-					api.API_RESP_COMPLETE
+					api.API_RESP_COMPLETE // DO NOT REMOVE - must _ALWAYS_ be called in order to clean up inFlight state
 				])
 			);
 	});

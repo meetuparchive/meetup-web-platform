@@ -55,9 +55,10 @@ export function fail(err) {
 	};
 }
 
-export function complete() {
+export function complete(queries) {
 	return {
 		type: API_RESP_COMPLETE,
+		payload: queries,
 	};
 }
 
