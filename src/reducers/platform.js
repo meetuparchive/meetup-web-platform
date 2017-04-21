@@ -59,13 +59,22 @@ export function api(state: ApiState = DEFAULT_API_STATE, action: FluxStandardAct
 		return {
 			...state,
 			...responseToState((action.payload || {}).response),
-			inFlight: state.inFlight.filter(ref => ref !== (action.payload || {}).response.ref),
 		};
 	case API_RESP_FAIL:
 		return { ...state, fail: action.payload };
+	case API_RESP_COMPLETE: {
+		// allways called - clean up inFlight
+		const refs = (action.payload || []).map(({ ref }) => ref);
+		const inFlight = state.inFlight.filter(ref => !refs.includes(ref));
+		return {
+			...state,
+			inFlight,
+		};
+	}
+	default:
+		return state;
 	}
 
-	return state;
 }
 
 /**

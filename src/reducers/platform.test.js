@@ -1,5 +1,4 @@
 import * as apiActions from '../actions/apiActionCreators';
-import * as cacheActionCreators from '../actions/cacheActionCreators';
 import * as clickActionCreators from '../actions/clickActionCreators';
 import * as syncActionCreators from '../actions/syncActionCreators';
 import {
@@ -81,22 +80,21 @@ describe('api reducer', () => {
 	it('adds query ref to inFlight array on API_REQ', () => {
 		const ref = 'foobar';
 		const API_REQ = apiActions.requestAll([{ ref }]);
-		const appState = api({ ...DEFAULT_API_STATE }, API_REQ);
-		expect(appState).toMatchObject({ inFlight: [ref] });
+		const apiState = api({ ...DEFAULT_API_STATE }, API_REQ);
+		expect(apiState).toMatchObject({ inFlight: [ref] });
 	});
-	it('removes query ref from inFlight array on {API_RESP|CACHE}_{SUCCESS|ERROR}', () => {
-		const ref = 'foobar';
-		const query = { ref };
-		const response = { ref };
-		const actions = [
-			apiActions.success({ query, response }),
-			apiActions.error({ query, response }),
-			cacheActionCreators.cacheSuccess({ query, response }),
-		];
-		actions.forEach(action => {
-			const appState = api({ ...DEFAULT_API_STATE, inFlight: [ref] }, action);
-			expect(appState).toMatchObject({ inFlight: [] });
-		});
+	it('removes query refs from inFlight array on API_RESP_COMPLETE', () => {
+		const ref1 = 'foobar';
+		const ref2 = 'barfoo';
+		const query1 = { ref: ref1 };
+		const query2 = { ref: ref2 };
+
+		const inFlightState = [ref1, ref2, 'asdf'];
+		const expectedInFlightState = ['asdf'];
+		const completeAction = apiActions.complete([query1, query2]);
+
+		const apiState = api({ ...DEFAULT_API_STATE, inFlight: inFlightState }, completeAction);
+		expect(apiState).toMatchObject({ inFlight: expectedInFlightState });
 	});
 });
 
