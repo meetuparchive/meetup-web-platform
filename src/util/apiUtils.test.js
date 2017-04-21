@@ -17,6 +17,7 @@ import {
 	MOCK_MEMBER,
 } from 'meetup-web-mocks/lib/api';
 
+import { getServer, MOCK_LOGGER } from '../util/testUtils';
 import * as authUtils from '../util/authUtils';
 
 import {
@@ -397,6 +398,7 @@ describe('apiResponseDuotoneSetter', () => {
 });
 
 describe('logApiResponse', () => {
+	const request = { server: getServer() };
 	const MOCK_INCOMINGMESSAGE_GET = {
 		elapsedTime: 1234,
 		request: {
@@ -417,21 +419,21 @@ describe('logApiResponse', () => {
 		},
 	};
 	it('emits parsed request and response data for GET request', () => {
-		spyOn(console, 'log');
-		logApiResponse({})([MOCK_INCOMINGMESSAGE_GET, 'foo']);
-		expect(console.log).toHaveBeenCalled();
-		const loggedObject = JSON.parse(console.log.calls.mostRecent().args[0]);
+		MOCK_LOGGER.info.mockClear();
+		logApiResponse(request)([MOCK_INCOMINGMESSAGE_GET, 'foo']);
+		expect(MOCK_LOGGER.info).toHaveBeenCalled();
+		const loggedObject = MOCK_LOGGER.info.mock.calls[0][0];
 		expect(loggedObject).toEqual(jasmine.any(Object));
 	});
 	it('emits parsed request and response data for POST request', () => {
-		spyOn(console, 'log');
-		logApiResponse({})([MOCK_INCOMINGMESSAGE_POST, 'foo']);
-		expect(console.log).toHaveBeenCalled();
-		const loggedObject = JSON.parse(console.log.calls.mostRecent().args[0]);
+		MOCK_LOGGER.info.mockClear();
+		logApiResponse(request)([MOCK_INCOMINGMESSAGE_POST, 'foo']);
+		expect(MOCK_LOGGER.info).toHaveBeenCalled();
+		const loggedObject = MOCK_LOGGER.info.mock.calls[0][0];
 		expect(loggedObject).toEqual(jasmine.any(Object));
 	});
 	it('handles multiple querystring vals for GET request', () => {
-		spyOn(console, 'log');
+		MOCK_LOGGER.info.mockClear();
 		const response = {
 			...MOCK_INCOMINGMESSAGE_GET,
 			request: {
@@ -442,9 +444,8 @@ describe('logApiResponse', () => {
 				},
 			},
 		};
-		logApiResponse({})([response, 'foo']);
-		expect(console.log).toHaveBeenCalled();
-		const loggedObject = JSON.parse(console.log.calls.mostRecent().args[0]);
+		logApiResponse(request)([response, 'foo']);
+		const loggedObject = MOCK_LOGGER.info.mock.calls[0][0];
 		expect(loggedObject.info.query).toEqual({
 			foo: 'bar',
 			baz: 'boodle',
@@ -452,18 +453,18 @@ describe('logApiResponse', () => {
 	});
 	it('returns the full body of the response if less than 256 characters', () => {
 		const body = 'foo';
-		spyOn(console, 'log');
-		logApiResponse({})([MOCK_INCOMINGMESSAGE_GET, body]);
-		expect(console.log).toHaveBeenCalled();
-		const loggedObject = JSON.parse(console.log.calls.mostRecent().args[0]);
+		MOCK_LOGGER.info.mockClear();
+		logApiResponse(request)([MOCK_INCOMINGMESSAGE_GET, body]);
+		expect(MOCK_LOGGER.info).toHaveBeenCalled();
+		const loggedObject = MOCK_LOGGER.info.mock.calls[0][0];
 		expect(loggedObject.info.body).toEqual(body);
 	});
 	it('returns a truncated response body if more than 256 characters', () => {
 		const body300 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean egestas viverra sem vel congue. Cras vitae malesuada justo. Fusce ut finibus felis, at sagittis leo. Morbi nec velit dignissim, viverra tellus at, pretium nisi. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla turpis duis.';
-		spyOn(console, 'log');
-		logApiResponse({})([MOCK_INCOMINGMESSAGE_GET, body300]);
-		expect(console.log).toHaveBeenCalled();
-		const loggedObject = JSON.parse(console.log.calls.mostRecent().args[0]);
+		MOCK_LOGGER.info.mockClear();
+		logApiResponse(request)([MOCK_INCOMINGMESSAGE_GET, body300]);
+		expect(MOCK_LOGGER.info).toHaveBeenCalled();
+		const loggedObject = MOCK_LOGGER.info.mock.calls[0][0];
 		expect(loggedObject.info.body.startsWith(body300.substr(0, 256))).toBe(true);
 		expect(loggedObject.info.body.startsWith(body300)).toBe(false);
 	});
@@ -481,11 +482,7 @@ describe('parseRequest', () => {
 			state: {
 				oauth_token: 'foo',
 			},
-			server: {
-				app: {
-					API_SERVER_ROOT_URL: 'http://example.com',
-				},
-			},
+			server: getServer({ API_SERVER_ROOT_URL: 'http://example.com' }),
 		};
 		expect(parseRequest(getRequest, 'http://dummy.api.meetup.com').queries).toEqual(queries);
 	});
@@ -498,11 +495,7 @@ describe('parseRequest', () => {
 			state: {
 				oauth_token: 'foo',
 			},
-			server: {
-				app: {
-					API_SERVER_ROOT_URL: 'http://example.com',
-				},
-			},
+			server: getServer({ API_SERVER_ROOT_URL: 'http://example.com' }),
 		};
 		expect(parseRequest(postRequest, 'http://dummy.api.meetup.com').queries).toEqual(queries);
 	});
@@ -515,11 +508,7 @@ describe('parseRequest', () => {
 			state: {
 				oauth_token: 'foo',
 			},
-			server: {
-				app: {
-					API_SERVER_ROOT_URL: 'http://example.com',
-				},
-			},
+			server: getServer({ API_SERVER_ROOT_URL: 'http://example.com' }),
 		};
 		expect(parseRequest(patchRequest, 'http://dummy.api.meetup.com').queries).toEqual(queries);
 	});
@@ -533,11 +522,7 @@ describe('parseRequest', () => {
 			state: {
 				oauth_token: 'foo',
 			},
-			server: {
-				app: {
-					API_SERVER_ROOT_URL: 'http://example.com',
-				},
-			},
+			server: getServer({ API_SERVER_ROOT_URL: 'http://example.com' }),
 		};
 		expect(() => parseRequest(getRequest, 'http://dummy.api.meetup.com')).toThrow();
 	});
