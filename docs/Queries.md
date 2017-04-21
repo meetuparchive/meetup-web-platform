@@ -47,7 +47,7 @@ A Query is just a plain object with the following shape:
     method: 'get',  // generally not needed
     variants: {
       'my-member-experiment': 1234,  // memberId
-      'my-group-experiment: 5678,    // chapterId
+      'my-group-experiment': 5678,    // chapterId
     },
   },
 }
