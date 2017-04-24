@@ -1,8 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { getBrowserCreateStore } from '../util/createStoreBrowser';
-import BrowserRouter from 'react-router-dom/BrowserRouter';
-import PlatformApp from '../components/PlatformApp';
+import BrowserApp from '../components/BrowserApp';
 
 /**
  * This function creates a 'renderer', which is just a function that, when
@@ -22,24 +20,12 @@ import PlatformApp from '../components/PlatformApp';
  *   use a custom root element ID or default to `'outlet'`
  */
 function makeRenderer(routes, reducer, middleware=[], baseUrl='') {
-	// the initial state is delivered in the HTML from the server as a plain object
-	// containing the HTML-escaped JSON string in `window.INITIAL_STATE.escapedState`.
-	// unescape the text using native `textarea.textContent` unescaping
-	const escape = document.createElement('textarea');
-	escape.innerHTML = window.APP_RUNTIME.escapedState;
-	const unescapedStateJSON = escape.textContent;
-	const initialState = JSON.parse(unescapedStateJSON);
-	const createStore = getBrowserCreateStore(routes, middleware, baseUrl);
-	const store = createStore(reducer, initialState);
-
 	return (rootElId='outlet') => {
-		ReactDOM.render(
-			<BrowserRouter basename={baseUrl}>
-				<PlatformApp store={store} routes={routes} />
-			</BrowserRouter>,
+		const app = ReactDOM.render(
+			<BrowserApp routes={routes} reducer={reducer} middleware={middleware} baseUrl={baseUrl} />,
 			document.getElementById(rootElId)
 		);
-		return store;
+		return app.store;
 	};
 }
 
