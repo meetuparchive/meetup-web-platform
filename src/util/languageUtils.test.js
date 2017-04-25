@@ -1,6 +1,9 @@
 import querystring from 'qs';
 import url from 'url';
 import {
+	LANGUAGE_COOKIE
+} from './cookieUtils';
+import {
 	getCookieLang,
 	getUrlLang,
 	getBrowserLang,
@@ -35,7 +38,7 @@ describe('getCookieLang', () => {
 			country: 'FR',
 			language: 'fr',
 		});
-		const request = { ...MOCK_HAPI_REQUEST, state: { MEETUP_LANGUAGE } };
+		const request = { ...MOCK_HAPI_REQUEST, state: { [LANGUAGE_COOKIE]: MEETUP_LANGUAGE } };
 		const lang = getCookieLang(request, supportedLangs);
 		expect(lang).toEqual(altLang);
 	});
