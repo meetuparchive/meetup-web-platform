@@ -30,9 +30,8 @@ export default function start(
 	renderRequestMap,
 	{ routes=[], plugins=[], platform_agent='consumer_name' }
 ) {
-	// source maps make for better stack traces - we might not want this in
-	// production if it makes anything slower, though
-	// (process.env.NODE_ENV === 'production')
+	// source maps make for better stack traces
+	// we might not want this in production if it makes anything slower
 	require('source-map-support').install();
 
 	configureEnv(config);
@@ -42,7 +41,7 @@ export default function start(
 
 	const connection = {
 		host: '0.0.0.0',
-		port: config.get('dev_server_port'),
+		port: config.get('dev_server.port'),
 		routes: {
 			plugins: {
 				'electrode-csrf-jwt': {

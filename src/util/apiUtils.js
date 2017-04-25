@@ -16,9 +16,12 @@ import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/timeout';
 
+import config from './config';
+
 import {
 	removeAuthState,
 } from './authUtils';
+
 import {
 	coerceBool,
 	toCamelCase,
@@ -27,6 +30,7 @@ import {
 import {
 	querySchema
 } from './validation';
+
 import {
 	duotoneRef,
 } from './duotone';
@@ -568,7 +572,7 @@ export const injectResponseCookies = request => ([response, _, jar]) => {
 			path: cookie.path,
 			isHttpOnly: cookie.httpOnly,
 			isSameSite: false,
-			isSecure: process.env.NODE_ENV === 'production',
+			isSecure: config.get('isProd'),
 			strictHeader: false,  // Can't enforce RFC 6265 cookie validation on external services
 		};
 

@@ -4,6 +4,8 @@ import Good from 'good';
 import GoodTracking from './plugins/good-tracking';
 import requestAuthPlugin from './plugins/requestAuthPlugin';
 
+import config from './util/config';
+
 import {
 	activitySerializer,
 	clickSerializer,
@@ -42,7 +44,7 @@ export function getCsrfPlugin(secret) {
 	const register = (server, options, next) => {
 		const cookieOptions = {
 			path: '/',
-			isSecure: process.env.NODE_ENV === 'production',
+			isSecure: config.get('isProd'),
 		};
 		server.state(
 			'x-csrf-jwt',  // set by plugin

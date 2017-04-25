@@ -1,6 +1,7 @@
+import config from './config';
 import { parseMemberCookie } from './cookieUtils';
 
-const isProd = process.env.NODE_ENV === 'production';
+const isProd = config.get('isProd');;
 
 export const clickCookieOptions = {
 	isSecure: isProd,

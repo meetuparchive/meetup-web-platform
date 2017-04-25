@@ -39,6 +39,18 @@ let config = convict({
 			env: 'API_TIMEOUT'
 		}
 	},
+	asset_server: {
+		host: {
+			format: String,
+			default: '0.0.0.0',
+			env: 'ASSET_SERVER_HOST'
+		},
+		port: {
+			format: 'port',
+			default: 8001,
+			env: 'ASSET_SERVER_PORT'
+		},
+	},
 	cookie_encrypt_secret: {
 		format: function (secret) {
 			if (secret.toString().length < 32) {
@@ -57,10 +69,17 @@ let config = convict({
 		default: null,
 		env: 'CSRF_SECRET'
 	},
-	dev_server_port: {
-		format: 'port',
-		default: 8000,
-		env: 'DEV_SERVER_PORT'
+	dev_server: {
+		host: {
+			format: String,
+			default: '0.0.0.0',
+			env: 'DEV_SERVER_HOST'
+		},
+		port: {
+			format: 'port',
+			default: 8000,
+			env: 'DEV_SERVER_PORT'
+		},
 	},
 	oauth: {
 		auth_url: {
