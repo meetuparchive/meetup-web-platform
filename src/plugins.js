@@ -1,12 +1,13 @@
 import CsrfPlugin from 'electrode-csrf-jwt';
 import Good from 'good';
 
+import GoodTracking from './plugins/good-tracking';
+import requestAuthPlugin from './plugins/requestAuthPlugin';
+
 import {
 	activitySerializer,
 	clickSerializer,
 } from './util/avro';
-import GoodTracking from './plugins/good-tracking';
-import requestAuthPlugin from './plugins/requestAuthPlugin';
 
 /**
  * Hapi plugins for the dev server
@@ -126,21 +127,21 @@ export function getConsoleLogPlugin() {
 }
 
 /**
- * configure and return the plugin that will allow requests to get anonymous
- * oauth tokens to communicate with the API
+ * configure and return the plugin that
+ * allows requests to get anonymous oauth tokens
+ * to communicate with the API
  */
-export function getRequestAuthPlugin(options) {
+export function getRequestAuthPlugin() {
 	return {
-		register: requestAuthPlugin,
-		options,
+		register: requestAuthPlugin
 	};
 }
 
 export default function getPlugins(config) {
 	return [
-		getCsrfPlugin(config.CSRF_SECRET),
+		getCsrfPlugin(config.get('csrf_secret')),
 		getConsoleLogPlugin(),
-		getRequestAuthPlugin(config),
+		getRequestAuthPlugin(),
 	];
 }
 
