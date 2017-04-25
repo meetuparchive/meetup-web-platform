@@ -9,7 +9,11 @@ import {
 
 jest.mock(
 	'../apiProxy/api-proxy',
-	() => jest.fn((request, queries) => require('rxjs').Observable.of('response'))
+	() => jest.fn((request, queries) => {
+		const { Observable } = require('rxjs/Observable');
+		require('rxjs/add/observable/of');
+		return Observable.of('response');
+	})
 );
 
 const MOCK_ROUTES = {};

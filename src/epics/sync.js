@@ -1,11 +1,18 @@
-import { Observable } from 'rxjs';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/from';
+import 'rxjs/add/observable/fromPromise';
+import 'rxjs/add/observable/of';
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/mergeMap';
+import 'rxjs/add/operator/takeUntil';
+
 import { combineEpics } from 'redux-observable';
 import {
-	apiRequest,
-	apiSuccess,
-	apiError,
-	apiComplete,
+	apiSuccess, // DEPRECATED
+	apiError, // DEPRECATED
 	LOCATION_CHANGE,
+	SERVER_RENDER,
 } from '../actions/syncActionCreators';
 import {
 	clearClick,
@@ -40,8 +47,8 @@ export const getNavEpic = (routes, baseUrl) => {
 	const findActiveQueries = activeRouteQueries(routes, baseUrl);
 	let currentLocation = {};  // keep track of current route so that apiRequest can get 'referrer'
 	return (action$, store) =>
-		action$.ofType(LOCATION_CHANGE, '@@server/RENDER')
-			.flatMap(({ payload }) => {
+		action$.ofType(LOCATION_CHANGE, SERVER_RENDER)
+			.mergeMap(({ payload }) => {
 				// inject request metadata from context, including `store.getState()`
 				const requestMetadata = {
 					referrer: currentLocation.pathname || '',
@@ -85,15 +92,26 @@ export const locationSyncEpic = (action$, store) =>
  * emits (API_SUCCESS || API_ERROR) then API_COMPLETE
  */
 export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
-	action$.ofType('API_REQUEST')
-		.flatMap(({ payload, meta }) => {           // set up the fetch call to the app server
+	action$.ofType(api.API_REQ)
+		.mergeMap(({ payload: queries, meta }) => {           // set up the fetch call to the app server
 			const { config } = store.getState();
-			const fetch = fetchQueriesFn(config.apiUrl);
-			return Observable.fromPromise(fetch(payload, meta))  // call fetch
+			const fetchQueries = fetchQueriesFn(config.apiUrl);
+			return Observable.fromPromise(fetchQueries(queries, meta))  // call fetch
 				.takeUntil(action$.ofType(LOCATION_CHANGE))  // cancel this fetch when nav happens
-				.map(apiSuccess)                             // dispatch apiSuccess with server response
-				.flatMap(action => Observable.of(action, apiComplete()))  // dispatch apiComplete after resolution
-				.catch(err => Observable.of(apiError(err)));  // ... or apiError
+				.mergeMap(({ successes=[], errors=[] }) => {
+					const actions = [
+						...successes.map(api.success),  // send the successes to success
+						...errors.map(api.error),     // send errors to error
+						apiSuccess(getDeprecatedSuccessPayload(successes, errors)),  // DEPRECATED - necessary to continue populating old state
+						api.complete(queries)
+					];
+					return Observable.of(...actions);
+				})
+				.catch(err => Observable.of(
+					api.fail(err),
+					apiError(err),  // DEPRECATED
+					api.complete(queries)
+				));
 		});
 
 export default function getSyncEpic(routes, fetchQueries, baseUrl) {

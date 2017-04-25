@@ -24,7 +24,7 @@ export function requestAll(queries, meta) {
 export const _applyMethod = method => query => {
 	query.meta = {
 		...(query.meta || {}),
-		method: 'post',
+		method,
 	};
 	return requestAll([query]);
 };
@@ -55,9 +55,10 @@ export function fail(err) {
 	};
 }
 
-export function complete() {
+export function complete(queries) {
 	return {
 		type: API_RESP_COMPLETE,
+		payload: queries,
 	};
 }
 

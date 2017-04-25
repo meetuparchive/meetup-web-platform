@@ -1,4 +1,7 @@
-import Rx from 'rxjs';
+// @flow
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/of';
+import 'rxjs/add/operator/first';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import StaticRouter from 'react-router-dom/StaticRouter';
@@ -7,7 +10,7 @@ import { getServerCreateStore } from '../util/createStoreServer';
 import Dom from '../components/dom';
 import NotFound from '../components/NotFound';
 import PlatformApp from '../components/PlatformApp';
-import { polyfillNodeIntl } from '../util/localizationUtils';
+import IntlPolyfill from 'intl';
 
 import {
 	configureApiUrl,
@@ -15,7 +18,8 @@ import {
 } from '../actions/configActionCreators';
 
 // Ensure global Intl for use with FormatJS
-polyfillNodeIntl();
+Intl.NumberFormat = IntlPolyfill.NumberFormat;
+Intl.DateTimeFormat = IntlPolyfill.DateTimeFormat;
 
 const DOCTYPE = '<!DOCTYPE html>';
 
@@ -139,13 +143,13 @@ const getRouterRenderer = (
  * @return {Observable}
  */
 const makeRenderer = (
-	routes,
-	reducer,
-	clientFilename,
-	assetPublicPath,
-	middleware=[],
-	baseUrl=''
-) => request => {
+	routes: Array<Object>,
+	reducer: Reducer<?Object, FluxStandardAction>,
+	clientFilename: string,
+	assetPublicPath: string,
+	middleware: Array<Function> = [],
+	baseUrl: string = ''
+) => (request: Object) => {
 
 	middleware = middleware || [];
 	const {
@@ -172,14 +176,14 @@ const makeRenderer = (
 
 	// render skeleton if requested - the store is ready
 	if ('skeleton' in request.query) {
-		return Rx.Observable.of({
+		return Observable.of({
 			result: getHtml(baseUrl, assetPublicPath, clientFilename, store.getState()),
 			statusCode: 200
 		});
 	}
 
 	// otherwise render using the API and React router
-	const storeIsReady$ = Rx.Observable.create(obs => {
+	const storeIsReady$ = Observable.create(obs => {
 		obs.next(store.getState());
 		return store.subscribe(() => obs.next(store.getState()));
 	})

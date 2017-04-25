@@ -1,4 +1,6 @@
-import Rx from 'rxjs';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/of';
+import 'rxjs/add/operator/toPromise';
 import rison from 'rison';
 import * as apiUtils from '../util/apiUtils';
 import {
@@ -33,7 +35,7 @@ describe('apiProxy$', () => {
 			value: { foo: 'bar' },
 		};
 		spyOn(apiUtils, 'makeApiRequest$').and.returnValue(
-			() => Rx.Observable.of(requestResult)
+			() => Observable.of(requestResult)
 		);
 		const expectedResults = [
 			requestResult,

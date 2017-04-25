@@ -1,3 +1,5 @@
+import 'rxjs/add/operator/toPromise';
+
 import externalRequest from 'request';
 import rison from 'rison';
 
@@ -30,6 +32,7 @@ import {
 	parseApiValue,
 	parseLoginAuth,
 	parseMetaHeaders,
+	parseVariantsHeader,
 	groupDuotoneSetter,
 } from './apiUtils';
 
@@ -249,6 +252,31 @@ describe('parseMetaHeaders', () => {
 	it('returns empty object for empty headers', () => {
 		expect(parseMetaHeaders({}))
 			.toEqual({});
+	});
+});
+
+describe('parseVariantsHeader', () => {
+	it('parses a variants header into a nested object', () => {
+		const header = 'binge-pilot=123|variant critical-mass=1|control critical-mass=2|sendemail';
+		const expectedObj = {
+			'binge-pilot': {
+				123: 'variant',
+			},
+			'critical-mass': {
+				1: 'control',
+				2: 'sendemail',
+			},
+		};
+		expect(parseVariantsHeader(header)).toEqual(expectedObj);
+	});
+	it('sets `null` variant for missing variant', () => {
+		const header = 'binge-pilot=123|';
+		const expectedObj = {
+			'binge-pilot': {
+				123: null,
+			},
+		};
+		expect(parseVariantsHeader(header)).toEqual(expectedObj);
 	});
 });
 
@@ -506,6 +534,23 @@ describe('parseRequest', () => {
 			},
 		};
 		expect(parseRequest(postRequest, 'http://dummy.api.meetup.com').queries).toEqual(queries);
+	});
+	it('extracts the queries provided in PATCH requests', () => {
+		const data = { queries: rison.encode_array(queries) };
+		const patchRequest = {
+			headers,
+			method: 'patch',
+			payload: data,
+			state: {
+				oauth_token: 'foo',
+			},
+			server: {
+				app: {
+					API_SERVER_ROOT_URL: 'http://example.com',
+				},
+			},
+		};
+		expect(parseRequest(patchRequest, 'http://dummy.api.meetup.com').queries).toEqual(queries);
 	});
 	it('throws an error for mal-formed queries', () => {
 		const notAQuery = { foo: 'bar' };

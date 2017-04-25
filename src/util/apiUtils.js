@@ -7,7 +7,14 @@ import uuid from 'uuid';
 import externalRequest from 'request';
 import Joi from 'joi';
 import rison from 'rison';
-import Rx from 'rxjs';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/of';
+import 'rxjs/add/observable/bindNodeCallback';
+import 'rxjs/add/observable/defer';
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/operator/do';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/timeout';
 
 import {
 	removeAuthState,
@@ -41,6 +48,26 @@ function makeMockResponseOk(requestOpts) {
 		},
 	};
 }
+
+/**
+ * Convert the X-Meetup-Variants response header into a state-ready object
+ *
+ * @see {@link https://meetup.atlassian.net/wiki/display/MUP/X-Meetup-Variants}
+ * @returns {Object} {
+ *   [experiment]: {
+ *     [context (member/chapter id)]: variantName
+ *   }
+ * }
+ */
+export const parseVariantsHeader = variantsHeader =>
+	variantsHeader.split(' ')
+		.reduce((variants, keyval) => {
+			const [experiment, val] = keyval.split('=');
+			variants[experiment] = variants[experiment] || {};
+			const [context, variant] = val.split('|');
+			variants[experiment][context] = variant || null;
+			return variants;
+		}, {});
 
 /**
  * In order to receive cookies from `externalRequest` requests, this function
@@ -82,6 +109,11 @@ export const parseMetaHeaders = headers => {
 		});
 	}
 
+	// special case handling for variants
+	if (meetupHeaders.variants) {
+		meetupHeaders.variants = parseVariantsHeader(meetupHeaders.variants);
+	}
+
 	const xHeaders = X_HEADERS.reduce((meta, h) => {
 		const key = toCamelCase(h.replace('x-', ''));
 		if (h in headers) {
@@ -120,8 +152,8 @@ function formatApiError(err) {
 }
 
 export const errorResponse$ = requestUrl => err =>
-	Rx.Observable.of({
-		value: formatApiError(err),
+	Observable.of({
+		...formatApiError(err),
 		meta: {
 			endpoint: url.parse(requestUrl).pathname,
 		},
@@ -190,15 +222,25 @@ export const parseApiResponse = requestUrl => ([response, body]) => {
  *   `externalRequest` for the query
  */
 export const buildRequestArgs = externalRequestOpts =>
-	({ endpoint, params, flags }) => {
+	({ endpoint, params, flags, meta={} }) => {
 		const dataParams = querystring.stringify(params);
 		const headers = { ...externalRequestOpts.headers };
 		let url = encodeURI(`/${endpoint}`);
 		let body;
 		const jar = createCookieJar(url);
 
-		if (flags) {
-			headers['X-Meetup-Request-Flags'] = flags.join(',');
+		if (flags || meta.flags) {
+			headers['X-Meetup-Request-Flags'] = (flags || meta.flags).join(',');
+		}
+
+		if (meta.variants) {
+			headers['X-Meetup-Variants'] = Object.keys(meta.variants)
+				.reduce((header, experiment) => {
+					const context = meta.variants[experiment];
+					const contexts = context instanceof Array ? context : [context];
+					header += contexts.map(c => `${experiment}=${c}`).join(' ');
+					return header;
+				});
 		}
 
 		switch (externalRequestOpts.method) {
@@ -294,9 +336,10 @@ export function parseRequestQueries(request) {
 		payload,
 		query,
 	} = request;
-	const queriesRison = method === 'post' && mime !== 'multipart/form-data' ?
-		payload.queries :
-		query.queries;
+	const queriesRison = (method === 'post' || method === 'patch') &&
+		mime !== 'multipart/form-data' ?
+			payload.queries :
+			query.queries;
 
 	if (!queriesRison) {
 		return null;
@@ -419,10 +462,10 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
  * Fake an API request and directly return the stringified mockResponse
  */
 export const makeMockRequest = mockResponse => requestOpts =>
-	Rx.Observable.of([makeMockResponseOk(requestOpts), JSON.stringify(mockResponse)])
+	Observable.of([makeMockResponseOk(requestOpts), JSON.stringify(mockResponse)])
 		.do(() => console.log(`MOCKING response to ${requestOpts.url}`));
 
-const externalRequest$ = Rx.Observable.bindNodeCallback(externalRequest);
+const externalRequest$ = Observable.bindNodeCallback(externalRequest);
 /**
  * Make a real external API request, return response body string
  */
@@ -543,7 +586,7 @@ export const makeApiRequest$ = request => {
 			makeMockRequest(query.mockResponse) :
 			makeExternalApiRequest(request);
 
-		return Rx.Observable.defer(() => {
+		return Observable.defer(() => {
 			const {
 				method,
 				headers,

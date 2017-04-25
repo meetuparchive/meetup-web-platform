@@ -1,9 +1,12 @@
+import * as apiActions from '../actions/apiActionCreators';
 import * as clickActionCreators from '../actions/clickActionCreators';
 import * as syncActionCreators from '../actions/syncActionCreators';
 import {
-	DEFAULT_APP_STATE,
+	DEFAULT_API_STATE,
+	DEFAULT_APP_STATE,  // DEPRECATED
 	DEFAULT_CLICK_TRACK,
-	app,
+	api,
+	app,  // DEPRECATED
 	clickTracking,
 } from './platform';
 
@@ -29,7 +32,6 @@ describe('app reducer', () => {
 			foo: 'bar',
 			bar: 'baz',
 			baz: 'foo',
-			isFetching: false,
 		});
 	});
 	it('populates an `error` key on API_ERROR', () => {
@@ -40,34 +42,59 @@ describe('app reducer', () => {
 		const errorState = app(undefined, API_ERROR);
 		expect(errorState.error).toBe(API_ERROR.payload);
 	});
-	it('sets isFetching:true on API_REQUEST', () => {
-		const API_REQUEST = {
-			type: 'API_REQUEST',
-			payload: [],
-			meta: {},
-		};
-		const appState = app(undefined, API_REQUEST);
-		expect(appState.isFetching).toBe(true);
+});
+
+describe('api reducer', () => {
+	it('returns default state for empty action', () => {
+		expect(api({ ...DEFAULT_API_STATE }, {})).toEqual(DEFAULT_API_STATE);
 	});
-	it('sets isFetching:false on API_SUCCESS', () => {
-		const API_SUCCESS = {
-			type: 'API_SUCCESS',
-			payload: { queries: [], responses: [] },
-		};
-		[true, false, 'monkey'].forEach(isFetching => {
-			const appState = app({ isFetching }, API_SUCCESS);
-			expect(appState.isFetching).toBe(false);
+	it('re-sets api state on logout API_REQ, with inFlight query', function() {
+		const ref = 'foobar';
+		const logoutRequest = apiActions.requestAll([{ ref }], { logout: true });
+		expect(api({ ...DEFAULT_API_STATE }, logoutRequest)).toEqual({
+			...DEFAULT_API_STATE,
+			inFlight: [ref],
 		});
 	});
-	it('does not change isFetching on CACHE_SUCCESS', () => {
-		const CACHE_SUCCESS = {
-			type: 'CACHE_SUCCESS',
-			payload: { queries: [], responses: [] },
-		};
-		[true, false, 'monkey'].forEach(isFetching => {
-			const appState = app({ isFetching }, CACHE_SUCCESS);
-			expect(appState.isFetching).toBe(isFetching);
+	it('adds success response to state tree', () => {
+		const API_RESP_SUCCESS = apiActions.success({ query: {}, response: { ref: 'bing', value: 'baz' } });
+		expect(api({ ...DEFAULT_API_STATE, foo: 'bar'}, API_RESP_SUCCESS)).toEqual({
+			foo: 'bar',
+			bing: { ref: 'bing', value: 'baz' },
+			inFlight: [],
 		});
+	});
+	it('adds error response to state tree', () => {
+		const API_RESP_ERROR = apiActions.error({ response: { ref: 'bing', error: 'baz' } });
+		expect(api({ ...DEFAULT_API_STATE, foo: 'bar'}, API_RESP_ERROR)).toEqual({
+			foo: 'bar',
+			bing: { ref: 'bing', error: 'baz' },
+			inFlight: [],
+		});
+	});
+	it('populates an `fail` key on API_RESP_FAIL', () => {
+		const API_RESP_FAIL = apiActions.fail(new Error('this is the worst'));
+		const errorState = api({ ...DEFAULT_API_STATE }, API_RESP_FAIL);
+		expect(errorState).toEqual(expect.objectContaining({ fail: API_RESP_FAIL.payload }));
+	});
+	it('adds query ref to inFlight array on API_REQ', () => {
+		const ref = 'foobar';
+		const API_REQ = apiActions.requestAll([{ ref }]);
+		const apiState = api({ ...DEFAULT_API_STATE }, API_REQ);
+		expect(apiState).toMatchObject({ inFlight: [ref] });
+	});
+	it('removes query refs from inFlight array on API_RESP_COMPLETE', () => {
+		const ref1 = 'foobar';
+		const ref2 = 'barfoo';
+		const query1 = { ref: ref1 };
+		const query2 = { ref: ref2 };
+
+		const inFlightState = [ref1, ref2, 'asdf'];
+		const expectedInFlightState = ['asdf'];
+		const completeAction = apiActions.complete([query1, query2]);
+
+		const apiState = api({ ...DEFAULT_API_STATE, inFlight: inFlightState }, completeAction);
+		expect(apiState).toMatchObject({ inFlight: expectedInFlightState });
 	});
 });
 

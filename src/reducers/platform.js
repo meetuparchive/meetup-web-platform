@@ -1,3 +1,4 @@
+// @flow weak
 /**
  * The root level reducer for the app.
  * @module reducer
@@ -8,16 +9,77 @@ import {
 	CLICK_TRACK_ACTION,
 	CLICK_TRACK_CLEAR_ACTION
 } from '../actions/clickActionCreators';
+import {
+	API_REQ,
+	API_RESP_SUCCESS,
+	API_RESP_ERROR,
+	API_RESP_FAIL,
+	API_RESP_COMPLETE,
+} from '../actions/apiActionCreators';
+import {
+	CACHE_SUCCESS
+} from '../actions/cacheActionCreators';
 
-export const DEFAULT_APP_STATE = { isFetching: false };
+type ApiState = {
+	inFlight: Array<string>,
+	fail?: boolean,
+	[string]: QueryResponse,
+};
+
+export const DEFAULT_API_STATE: ApiState = { inFlight: [] };
+export const DEFAULT_APP_STATE = {};
+
+export const responseToState = (response: QueryResponse): { [string]: QueryResponse } =>
+	({ [response.ref]: response });
+
+/*
+ * The primary reducer for data provided by the API
+ */
+export function api(state: ApiState = DEFAULT_API_STATE, action: FluxStandardAction): ApiState {
+	switch (action.type) {
+	case API_REQ: {
+		const requestRefs = (action.payload || []).map(({ ref }) => ref);
+		const inFlight = state.inFlight
+			.filter(ref => !requestRefs.includes[ref]) // clean out current duplicates
+			.concat(requestRefs); // add new requested refs
+
+		if ((action.meta || {}).logout) {
+			// clear app state during logout
+			return { ...DEFAULT_API_STATE, inFlight };
+		}
+
+		return { ...state, inFlight };
+	}
+	case API_RESP_SUCCESS:  // fall though
+	case API_RESP_ERROR:
+	case CACHE_SUCCESS:  // fall through
+		// each of these actions provides an API response that should go into app
+		// state - error responses will contain error info
+		delete state.fail;  // if there are any values, the API is not failing
+		return {
+			...state,
+			...responseToState((action.payload || {}).response),
+		};
+	case API_RESP_FAIL:
+		return { ...state, fail: action.payload };
+	case API_RESP_COMPLETE: {
+		// allways called - clean up inFlight
+		const refs = (action.payload || []).map(({ ref }) => ref);
+		const inFlight = state.inFlight.filter(ref => !refs.includes(ref));
+		return {
+			...state,
+			inFlight,
+		};
+	}
+	default:
+		return state;
+	}
+
+}
 
 /**
- * The primary reducer for data provided by the API
- * `state.app` sub-tree
- *
- * @param {Object} state
- * @param {ReduxAction} action
- * @return {Object}
+ * The old API results store
+ * @deprecated
  */
 export function app(state=DEFAULT_APP_STATE, action={}) {
 	let newState;
@@ -27,11 +89,9 @@ export function app(state=DEFAULT_APP_STATE, action={}) {
 		if ((action.meta || {}).logout) {
 			return DEFAULT_APP_STATE;  // clear app state during logout
 		}
-		return { ...state, isFetching: true };
+		return state;
 	case 'API_SUCCESS':
-		state.isFetching = false;  // fall through - everything else is the same as CACHE_SUCCCESS
-	case 'CACHE_SUCCESS':
-		// {API|CACHE}_SUCCESS contains an array of responses, but we just need to build a single
+		// API_SUCCESS contains an array of responses, but we just need to build a single
 		// object to update state with
 		newState = action.payload.responses.reduce((s, r) => ({ ...s, ...r }), {});
 		delete state.error;
@@ -40,7 +100,6 @@ export function app(state=DEFAULT_APP_STATE, action={}) {
 		return {
 			...state,
 			error: action.payload,
-			isFetching: false,
 		};
 	default:
 		return state;

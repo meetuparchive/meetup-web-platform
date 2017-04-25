@@ -1,3 +1,4 @@
+// @flow
 import urlRegex from 'url-regex';
 
 /**
@@ -8,7 +9,7 @@ import urlRegex from 'url-regex';
  * @param {String} href string of link passed through options
  * @return {String} The HTML link tag
  */
-const createLink = options => href => {
+const createLink = (options: Object) => (href: string): string => {
 	const target = options.target || '';
 	const targetAttr = `target="${target}"`;
 	const relAttr = target === '_blank' ? 'rel="noopener noreferrer"' : '';
@@ -26,10 +27,10 @@ const createLink = options => href => {
  * @param {Object} options optional modifiers
  * @return {String} The modified text.
  */
-export default function linkify(text, options) {
+export default function linkify(text: string, options?: Object = {}): string {
 	if (!text) {
 		return '';
 	}
 
-	return text.replace(urlRegex(), createLink(options || {}));
+	return text.replace(urlRegex(), createLink(options));
 }

@@ -1,5 +1,6 @@
-import 'rxjs/Observable';
 import { ActionsObservable } from 'redux-observable';
+import 'rxjs/add/operator/toArray';
+import 'rxjs/add/operator/toPromise';
 
 import {
 	MOCK_POST_ACTION,
