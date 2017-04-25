@@ -17,6 +17,19 @@ export const clickTrackEnhancer = createStore => (reducer, initialState, enhance
 	return store;
 };
 
+export const getInitialState = APP_RUNTIME => {
+	// the initial state is delivered in the HTML from the server as a plain object
+	// containing the HTML-escaped JSON string in `window.INITIAL_STATE.escapedState`.
+	// unescape the text using native `textarea.textContent` unescaping
+	if (!APP_RUNTIME) {
+		return;
+	}
+	const escape = document.createElement('textarea');
+	escape.innerHTML = APP_RUNTIME.escapedState;
+	const unescapedStateJSON = escape.textContent;
+	return JSON.parse(unescapedStateJSON);
+};
+
 export function getBrowserCreateStore(
 	routes,
 	middleware=[],

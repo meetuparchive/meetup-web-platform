@@ -1,3 +1,31 @@
+## [2.4]
+
+- **Deprecated** `renderers/browser-render.jsx` has been deprecated - consumer
+  applications should use vanilla React render methods to render a `<BrowserApp
+  />`, which is the new entry point for a platform-based applications, at
+  `src/components/BrowserApp.jsx`. The browser entry point should contain the
+  following code:
+
+    ```jsx
+    import ReactDOM from 'react-dom';
+    import {
+      getInitialState,
+      getBrowserCreateStore
+    } from '../util/createStoreBrowser';
+
+    const routes = ...;
+    const reducer = ...;
+    const middleware = ... || [];
+    const basename = ... || '';
+
+		const createStore = getBrowserCreateStore(routes, middleware, basename);
+		const store = createStore(reducer, getInitialState(window.APP_RUNTIME));
+		ReactDOM.render(
+			<BrowserApp routes={routes} store={store} basename={basename} />,
+			document.getElementById('outlet')  // this is a hard-coded id
+		);
+    ```
+
 ## [2.3]
 
 - **Replaced** `state.api.isFetching` has been replaced with
