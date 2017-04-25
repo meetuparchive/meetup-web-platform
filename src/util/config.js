@@ -14,7 +14,7 @@ const oauthError = new Error('get oauth secrets from #web-platform team');
 
 let config = convict({
 	env: {
-		format: ['production', 'development'],
+		format: ['production', 'development', 'test'],
 		default: 'development',
 		env: 'NODE_ENV'
 	},
@@ -103,11 +103,11 @@ let config = convict({
 	}
 });
 
-/**
- * Optionally override these properties with a JSON file located at envConfigOverridePath
- */
-if (fs.existsSync(envConfigOverridePath)) {
-	config.loadFile(envConfigOverridePath);
+//Load environment dependent configuration
+const env = config.get('env');
+const configFile = `../config.${env}.json`;
+if (fs.existsSync(configFile)) {
+	config.loadFile(configFile);
 }
 
 config.set(
@@ -123,6 +123,16 @@ config.set(
 	`${config.get('api.protocol')}://${config.get('api.host')}`
 );
 
+config.set(
+	'isProd',
+	config.get('env') === 'production'
+);
+
+config.set(
+	'isDev',
+	config.get('env') === 'development'
+);
+
 config.validate();
 
-module.exports = config;
+export default config;
