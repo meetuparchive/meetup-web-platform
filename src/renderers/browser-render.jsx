@@ -1,8 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { getBrowserCreateStore } from '../util/createStoreBrowser';
-import BrowserRouter from 'react-router-dom/BrowserRouter';
-import PlatformApp from '../components/PlatformApp';
+import { getInitialState, getBrowserCreateStore } from '../util/createStoreBrowser';
+import BrowserApp from '../components/BrowserApp';
+
+/**
+ * @module browser-render
+ * @deprecated see CHANGELOG v2.4
+ */
 
 /**
  * This function creates a 'renderer', which is just a function that, when
@@ -11,6 +15,7 @@ import PlatformApp from '../components/PlatformApp';
  * The routes, reducer, and app-specific middleware are provided by the
  * application - everything else is general to the meetup web platform
  *
+ * @deprecated
  * @param {Object} routes the React Router routes object
  * @param {Function} reducer the root Redux reducer for the app
  * @param {Function} middleware (optional) any app-specific middleware that
@@ -22,21 +27,11 @@ import PlatformApp from '../components/PlatformApp';
  *   use a custom root element ID or default to `'outlet'`
  */
 function makeRenderer(routes, reducer, middleware=[], baseUrl='') {
-	// the initial state is delivered in the HTML from the server as a plain object
-	// containing the HTML-escaped JSON string in `window.INITIAL_STATE.escapedState`.
-	// unescape the text using native `textarea.textContent` unescaping
-	const escape = document.createElement('textarea');
-	escape.innerHTML = window.APP_RUNTIME.escapedState;
-	const unescapedStateJSON = escape.textContent;
-	const initialState = JSON.parse(unescapedStateJSON);
-	const createStore = getBrowserCreateStore(routes, middleware, baseUrl);
-	const store = createStore(reducer, initialState);
-
 	return (rootElId='outlet') => {
+		const createStore = getBrowserCreateStore(routes, middleware, baseUrl);
+		const store = createStore(reducer, getInitialState(window.APP_RUNTIME));
 		ReactDOM.render(
-			<BrowserRouter basename={baseUrl}>
-				<PlatformApp store={store} routes={routes} />
-			</BrowserRouter>,
+			<BrowserApp routes={routes} store={store} basename={baseUrl} />,
 			document.getElementById(rootElId)
 		);
 		return store;
