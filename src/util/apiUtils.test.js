@@ -91,7 +91,7 @@ describe('getLanguageHeader', () => {
 			headers: {},
 			state: { [LANGUAGE_COOKIE]: 'language=fr&country=FR' },
 		};
-		expect(getLanguageHeader(request)).toEqual({ 'accept-language': 'fr-FR' });
+		expect(getLanguageHeader(request)).toEqual('fr-FR');
 	});
 	it('prepends parsed MEMBER_LANGUAGE cookie on existing accepts-langauge', () => {
 		const headerLang = 'foo';
@@ -99,7 +99,7 @@ describe('getLanguageHeader', () => {
 			headers: { 'accept-language': headerLang },
 			state: { [LANGUAGE_COOKIE]: 'language=fr&country=FR' },
 		};
-		expect(getLanguageHeader(request)).toEqual({ 'accept-language': `fr-FR,${headerLang}` });
+		expect(getLanguageHeader(request)).toEqual(`fr-FR,${headerLang}`);
 	});
 	it('returns existing accepts-langauge unmodified when no language cookie', () => {
 		const headerLang = 'foo';
@@ -107,7 +107,7 @@ describe('getLanguageHeader', () => {
 			headers: { 'accept-language': headerLang },
 			state: {},
 		};
-		expect(getLanguageHeader(request)).toEqual({ 'accept-language': headerLang });
+		expect(getLanguageHeader(request)).toEqual(headerLang);
 	});
 });
 

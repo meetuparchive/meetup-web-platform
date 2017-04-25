@@ -326,9 +326,7 @@ export function getLanguageHeader(request) {
 	const acceptLang = cookieLang && headerLang ?
 		`${cookieLang},${headerLang}` :
 		(cookieLang || headerLang);
-	return {
-		'accept-language': acceptLang,
-	};
+	return acceptLang;
 }
 
 export function parseRequestHeaders(request) {
