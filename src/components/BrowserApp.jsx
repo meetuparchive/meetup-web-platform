@@ -20,10 +20,10 @@ class BrowserApp extends React.Component {
 BrowserApp.propTypes = {
 	routes: PropTypes.array.isRequired,
 	store: PropTypes.object.isRequired,
-	baseUrl: PropTypes.string.isRequired,
+	basename: PropTypes.string.isRequired,
 };
 BrowserApp.defaultProps = {
-	baseUrl: '',
+	basename: '',
 };
 
 export default BrowserApp;
