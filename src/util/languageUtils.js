@@ -14,7 +14,10 @@ export const getCookieLang = (request, supportedLangs) => {
 		country,
 	} = querystring.parse(cookie);
 	const cookieLang = `${language}-${country}`;
-	return supportedLangs.includes(cookieLang) && cookieLang;
+	if (supportedLangs) {
+		return supportedLangs.includes(cookieLang) && cookieLang;
+	}
+	return cookieLang;
 };
 
 export const getUrlLang = (request, supportedLangs) => {
