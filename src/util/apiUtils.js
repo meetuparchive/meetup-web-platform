@@ -320,11 +320,22 @@ export function getAuthHeaders(request) {
 	};
 }
 
+export function getLanguageHeader(request) {
+	const cookieLang = getCookieLang(request);
+	const headerLang = request.headers['accept-language'];
+	const acceptLang = cookieLang ?
+		`${cookieLang},${headerLang}` :
+		headerLang;
+	return {
+		'accept-language': acceptLang,
+	};
+}
+
 export function parseRequestHeaders(request) {
 	const externalRequestHeaders = {
 		...request.headers,
 		...getAuthHeaders(request),
-		'accept-language': getCookieLang(request) || request.headers['accept-language'],
+		'accept-language': getCookieLang(request),
 	};
 
 	delete externalRequestHeaders['host'];  // let app server set 'host'
