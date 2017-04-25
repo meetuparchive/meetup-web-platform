@@ -1,3 +1,4 @@
+import convict from 'convict';
 import https from 'https';
 import * as serverUtils from './serverUtils';
 
@@ -13,16 +14,16 @@ describe('configureEnv', function() {
 	});
 
 	it('sets global rejectUnauthorized to false when using dev URLs in config', () => {
-		serverUtils.configureEnv({
+		serverUtils.configureEnv(convict({
 			isProd: false
-		});
+		}));
 		expect(https.globalAgent.options.rejectUnauthorized).toBe(false);
 	});
 
 	it('sets global rejectUnauthorized to true when using prod URLs in config', () => {
-		serverUtils.configureEnv({
+		serverUtils.configureEnv(convict({
 			isProd: true
-		});
+		}));
 		expect(https.globalAgent.options.rejectUnauthorized).toBe(true);
 	});
 });
