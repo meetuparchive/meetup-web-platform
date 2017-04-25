@@ -20,6 +20,9 @@ import {
 	removeAuthState,
 } from './authUtils';
 import {
+	getCookieLang
+} from './languageUtils';
+import {
 	coerceBool,
 	toCamelCase,
 } from './stringUtils';
@@ -321,6 +324,7 @@ export function parseRequestHeaders(request) {
 	const externalRequestHeaders = {
 		...request.headers,
 		...getAuthHeaders(request),
+		'accept-language': getCookieLang(request) || request.headers['accept-language'],
 	};
 
 	delete externalRequestHeaders['host'];  // let app server set 'host'
