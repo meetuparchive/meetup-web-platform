@@ -18,12 +18,12 @@
     const middleware = ... || [];
     const basename = ... || '';
 
-		const createStore = getBrowserCreateStore(routes, middleware, basename);
-		const store = createStore(reducer, getInitialState(window.APP_RUNTIME));
-		ReactDOM.render(
-			<BrowserApp routes={routes} store={store} basename={basename} />,
-			document.getElementById('outlet')  // this is a hard-coded id
-		);
+    const createStore = getBrowserCreateStore(routes, middleware, basename);
+    const store = createStore(reducer, getInitialState(window.APP_RUNTIME));
+    ReactDOM.render(
+      <BrowserApp routes={routes} store={store} basename={basename} />,
+      document.getElementById('outlet')  // this is a hard-coded id
+    );
     ```
 
 ## [2.3]
