@@ -335,7 +335,7 @@ export function parseRequestHeaders(request) {
 	const externalRequestHeaders = {
 		...request.headers,
 		...getAuthHeaders(request),
-		'accept-language': getCookieLang(request),
+		'accept-language': getLanguageHeader(request),
 	};
 
 	delete externalRequestHeaders['host'];  // let app server set 'host'
