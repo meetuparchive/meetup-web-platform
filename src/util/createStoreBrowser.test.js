@@ -1,6 +1,7 @@
 import { createStore } from 'redux';
 import {
 	clickTrackEnhancer,
+	getInitialState,
 	getBrowserCreateStore,
 } from './createStoreBrowser';
 import {
@@ -33,5 +34,22 @@ describe('clickTrackEnhancer', () => {
 
 describe('getBrowserCreateStore', () => {
 	testCreateStore(getBrowserCreateStore(MOCK_ROUTES, []));
+});
+
+describe('getInitialState', () => {
+	const injectedState = { foo: 'bar' };
+	global.document.createElement = jest.fn(() => {
+		return {
+			set innerHTML(stateJSON) {
+				const state = JSON.parse(stateJSON);
+				this.textContent = JSON.stringify({ ...injectedState, ...state });
+			},
+		};
+	});
+	it('returns "unescaped" APP_RUNTIME.escapedState', () => {
+		const state = { baz: 'qux' };
+		const APP_RUNTIME = { escapedState: JSON.stringify(state) };
+		expect(getInitialState(APP_RUNTIME)).toEqual({ ...injectedState, ...state });
+	});
 });
 

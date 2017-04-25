@@ -4,12 +4,18 @@ import { getInitialState, getBrowserCreateStore } from '../util/createStoreBrows
 import BrowserApp from '../components/BrowserApp';
 
 /**
+ * @module browser-render
+ * @deprecated see CHANGELOG v2.4
+ */
+
+/**
  * This function creates a 'renderer', which is just a function that, when
  * called, will call ReactDOM.render() to render the application
  *
  * The routes, reducer, and app-specific middleware are provided by the
  * application - everything else is general to the meetup web platform
  *
+ * @deprecated
  * @param {Object} routes the React Router routes object
  * @param {Function} reducer the root Redux reducer for the app
  * @param {Function} middleware (optional) any app-specific middleware that
