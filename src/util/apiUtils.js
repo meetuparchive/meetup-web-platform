@@ -323,9 +323,9 @@ export function getAuthHeaders(request) {
 export function getLanguageHeader(request) {
 	const cookieLang = getCookieLang(request);
 	const headerLang = request.headers['accept-language'];
-	const acceptLang = cookieLang ?
+	const acceptLang = cookieLang && headerLang ?
 		`${cookieLang},${headerLang}` :
-		headerLang;
+		(cookieLang || headerLang);
 	return {
 		'accept-language': acceptLang,
 	};

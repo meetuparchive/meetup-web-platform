@@ -18,6 +18,9 @@ import {
 } from 'meetup-web-mocks/lib/api';
 
 import * as authUtils from '../util/authUtils';
+import {
+	LANGUAGE_COOKIE
+} from './cookieUtils';
 
 import {
 	apiResponseToQueryResponse,
@@ -25,6 +28,7 @@ import {
 	buildRequestArgs,
 	errorResponse$,
 	getAuthHeaders,
+	getLanguageHeader,
 	injectResponseCookies,
 	logApiResponse,
 	parseRequest,
@@ -78,6 +82,32 @@ describe('getAuthHeaders', () => {
 		expect(cookies['MEETUP_CSRF']).not.toBeUndefined();
 		expect(cookies['MEETUP_CSRF_DEV']).not.toBeUndefined();
 		expect(authHeaders['csrf-token']).toEqual(cookies['MEETUP_CSRF']);
+	});
+});
+
+describe('getLanguageHeader', () => {
+	it('returns accept-language containing parsed MEMBER_LANGUAGE cookie', () => {
+		const request = {
+			headers: {},
+			state: { [LANGUAGE_COOKIE]: 'language=fr&country=FR' },
+		};
+		expect(getLanguageHeader(request)).toEqual({ 'accept-language': 'fr-FR' });
+	});
+	it('prepends parsed MEMBER_LANGUAGE cookie on existing accepts-langauge', () => {
+		const headerLang = 'foo';
+		const request = {
+			headers: { 'accept-language': headerLang },
+			state: { [LANGUAGE_COOKIE]: 'language=fr&country=FR' },
+		};
+		expect(getLanguageHeader(request)).toEqual({ 'accept-language': `fr-FR,${headerLang}` });
+	});
+	it('returns existing accepts-langauge unmodified when no language cookie', () => {
+		const headerLang = 'foo';
+		const request = {
+			headers: { 'accept-language': headerLang },
+			state: {},
+		};
+		expect(getLanguageHeader(request)).toEqual({ 'accept-language': headerLang });
 	});
 });
 
