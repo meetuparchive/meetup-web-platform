@@ -1,6 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { getBrowserCreateStore } from '../util/createStoreBrowser';
 import BrowserApp from '../components/BrowserApp';
+
+const getInitialState = APP_RUNTIME => {
+	// the initial state is delivered in the HTML from the server as a plain object
+	// containing the HTML-escaped JSON string in `window.INITIAL_STATE.escapedState`.
+	// unescape the text using native `textarea.textContent` unescaping
+	const escape = document.createElement('textarea');
+	escape.innerHTML = APP_RUNTIME.escapedState;
+	const unescapedStateJSON = escape.textContent;
+	return JSON.parse(unescapedStateJSON);
+};
 
 /**
  * This function creates a 'renderer', which is just a function that, when
@@ -21,11 +32,14 @@ import BrowserApp from '../components/BrowserApp';
  */
 function makeRenderer(routes, reducer, middleware=[], baseUrl='') {
 	return (rootElId='outlet') => {
-		const app = ReactDOM.render(
-			<BrowserApp routes={routes} reducer={reducer} middleware={middleware} baseUrl={baseUrl} />,
+		const initialState = getInitialState(window.APP_RUNTIME);
+		const createStore = getBrowserCreateStore(routes, middleware, baseUrl);
+		const store = createStore(reducer, initialState);
+		ReactDOM.render(
+			<BrowserApp routes={routes} store={store} basename={baseUrl} />,
 			document.getElementById(rootElId)
 		);
-		return app.store;
+		return store;
 	};
 }
 
