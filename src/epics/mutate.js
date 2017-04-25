@@ -11,8 +11,6 @@ import {
 	apiSuccess,
 	apiError,
 } from '../actions/syncActionCreators';
-import * as api from '../actions/apiActionCreators';
-import { getDeprecatedSuccessPayload } from '../util/fetchUtils';
 
 /**
  * Mutate epic  provides a generic interface for triggering POST and DELETE requests
@@ -84,7 +82,7 @@ const doFetch$ = fetchQuery => ({ query, onSuccess, onError }) =>
 			return Observable.from(actions);
 		})
 		.catch(err => {
-			const actions = [api.fail(err), apiError(err)];
+			const actions = [apiError(err)];
 			if (onError) {
 				actions.push(onError(err));
 			}

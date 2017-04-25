@@ -50,17 +50,18 @@ describe('API proxy endpoint integration tests', () => {
 			});
 	});
 	it('returns a formatted array of responses from GET /mu_api', () => {
-		const expectedResponse = {
+		const expectedResponse = JSON.stringify({
 			responses: [{
-				ref: 'foo',
-				type: 'foo',
-				value: {},  // from the mocked `request` module
-				meta: {
-					endpoint: '/foo',
-					statusCode: 200,
-				},
+				foo: {
+					type: 'foo',
+					value: {},  // from the mocked `request` module
+					meta: {
+						endpoint: '/foo',
+						statusCode: 200,
+					},
+				}
 			}],
-		};
+		});
 		const queries = rison.encode_array([{
 			type: 'foo', params: {}, ref: 'foo', endpoint: 'foo'
 		}]);
@@ -72,7 +73,7 @@ describe('API proxy endpoint integration tests', () => {
 					credentials: 'whatever',
 				};
 				return server.inject(request).then(
-					response => expect(JSON.parse(response.payload)).toEqual(expectedResponse)
+					response => expect(response.payload).toEqual(expectedResponse)
 				)
 				.then(() => server.stop())
 				.catch(err => {

@@ -12,7 +12,6 @@ import NotFound from '../components/NotFound';
 import PlatformApp from '../components/PlatformApp';
 import IntlPolyfill from 'intl';
 
-import { SERVER_RENDER } from '../actions/syncActionCreators';
 import {
 	configureApiUrl,
 	configureBaseUrl,
@@ -200,7 +199,7 @@ const makeRenderer = (
 		}
 	}));
 	store.dispatch({
-		type: SERVER_RENDER,
+		type: '@@server/RENDER',
 		payload: url,
 	});
 	return storeIsReady$

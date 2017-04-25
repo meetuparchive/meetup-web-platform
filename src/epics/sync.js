@@ -8,16 +8,16 @@ import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/takeUntil';
 
 import { combineEpics } from 'redux-observable';
-import * as api from '../actions/apiActionCreators';
 import {
 	apiSuccess, // DEPRECATED
 	apiError, // DEPRECATED
 	LOCATION_CHANGE,
 	SERVER_RENDER,
 } from '../actions/syncActionCreators';
-import { clearClick } from '../actions/clickActionCreators';
+import {
+	clearClick,
+} from '../actions/clickActionCreators';
 import { activeRouteQueries } from '../util/routeUtils';
-import { getDeprecatedSuccessPayload } from '../util/fetchUtils';
 
 
 const logoutQueryMatch = /[?&]logout(?:[=&]|$)/;
@@ -59,7 +59,7 @@ export const getNavEpic = (routes, baseUrl) => {
 				currentLocation = payload;
 
 				const activeQueries = findActiveQueries(payload);
-				const actions = [api.requestAll(activeQueries, requestMetadata)];
+				const actions = [apiRequest(activeQueries, requestMetadata)];
 
 				// emit cache clear _only_ when logout requested
 				if (requestMetadata.logout) {
@@ -86,27 +86,10 @@ export const locationSyncEpic = (action$, store) =>
 		.map(() => ({ type: LOCATION_CHANGE, payload: window.location }));
 
 /**
- * Old apiRequest maps directly onto new api.requestAll
- * @deprecated
- */
-export const apiRequestToApiReq = action$ =>
-	action$.ofType('API_REQUEST')
-		.map(action => api.requestAll(action.payload, action.meta));
-
-/**
- * Listen for API_REQ and generate response actions from fetch results
+ * Listen for actions that provide queries to send to the api - mainly
+ * API_REQUEST
  *
- * emits
- * - 1 or more API_RESP_SUCCESS
- * - 1 or more API_RESP_ERROR
- * - API_SUCCESS  // deprecated
- * - API_COMPLETE
- *
- * or
- *
- * - API_RESP_FAIL
- * - API_ERROR  // deprecated
- * - API_COMPLETE
+ * emits (API_SUCCESS || API_ERROR) then API_COMPLETE
  */
 export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 	action$.ofType(api.API_REQ)
@@ -135,8 +118,7 @@ export default function getSyncEpic(routes, fetchQueries, baseUrl) {
 	return combineEpics(
 		getNavEpic(routes, baseUrl),
 		// locationSyncEpic,
-		getFetchQueriesEpic(fetchQueries),
-		apiRequestToApiReq  // TODO: remove in v3 - apiRequest is deprecated
+		getFetchQueriesEpic(fetchQueries)
 	);
 }
 

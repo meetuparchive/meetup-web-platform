@@ -1,6 +1,6 @@
 import start from './server';
+import config from './util/config';
 import * as serverUtils from './util/serverUtils';
-import * as config from './util/config';
 
 jest.mock('source-map-support');
 
@@ -12,7 +12,6 @@ describe('server', () => {
 		const routes = [fooRoute];
 		const plugins = [fooPlugin];
 		spyOn(serverUtils, 'server').and.returnValue(Promise.resolve(expectedServer));
-		spyOn(config, 'default').and.returnValue(Promise.resolve({}));
 		return start({}, { routes, plugins }).then(returnedServer => {
 			const callArgs = serverUtils.server.calls.mostRecent().args;
 			expect(callArgs).toEqual([

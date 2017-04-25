@@ -7,7 +7,7 @@ export const fooPathContent = 'Looking good';
 function mapStateToProps(state) {
 	console.log(JSON.stringify(state));
 	return {
-		data: (state.api.foo || {}).value
+		data: (state.app.foo || {}).value
 	};
 }
 

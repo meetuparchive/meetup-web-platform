@@ -1,0 +1,15 @@
+{
+    api: {
+        host: 'api.meetup.com'
+    },
+    oauth: {
+        auth_url: 'https://secure.meetup.com/oauth2/authorize',
+        access_url: 'https://secure.meetup.com/oauth2/access',
+        key: 'asdfasdfasdfasdfasdfasdfasdfasdf',
+        secret: 'asdfasdfasdfasdfasdfasdfasdfasdf',
+    },
+    csrf_secret: 'asdfasdfasdfasdfasdfasdfasdfasdf',
+    cookie_encrypt_secret: 'asdfasdfasdfasdfasdfasdfasdfasdf',
+    duotone_urls: ['http://example.come/duotone.jpg'],
+    photo_scaler_salt: '1234'
+}

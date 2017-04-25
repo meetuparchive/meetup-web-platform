@@ -152,12 +152,11 @@ export function config(state={}, action) {
  */
 export function preRenderChecklist([apiDataLoaded] = [false], action) {
 	return [
-		apiDataLoaded || action.type === API_RESP_COMPLETE,
+		apiDataLoaded || Boolean(['API_COMPLETE', 'API_ERROR'].find(type => type === action.type)),
 	];
 }
 
 const platformReducers = {
-	api,
 	app,
 	clickTracking,
 	config,

@@ -75,10 +75,14 @@ export const trackLogout = log => response =>
 	);
 
 export const trackNav = log => (response, queryResponses, url, referrer) => {
-	const apiRequests = queryResponses.map(({ meta }) => ({
-		requestId: meta.requestId,
-		endpoint: meta.endpoint,
-	}));
+	const apiRequests = queryResponses.map(qr => {
+		const ref = Object.keys(qr)[0];
+		const { meta } = { ...qr[ref] };
+		return {
+			requestId: meta.requestId,
+			endpoint: meta.endpoint,
+		};
+	});
 	return log(
 		response,
 		{
