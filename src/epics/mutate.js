@@ -3,8 +3,6 @@ import {
 	apiSuccess,
 	apiError,
 } from '../actions/syncActionCreators';
-import * as api from '../actions/apiActionCreators';
-import { getDeprecatedSuccessPayload } from '../util/fetchUtils';
 
 /**
  * Mutate epic  provides a generic interface for triggering POST and DELETE requests
@@ -63,20 +61,16 @@ const getMethodQueryFetch = (method, fetchQueries, store) =>
  */
 const doFetch$ = fetchQuery => ({ query, onSuccess, onError }) =>
 	Rx.Observable.fromPromise(fetchQuery(query))  // make the fetch call
-		.flatMap(({ successes, errors }) => {
-			const responses = getDeprecatedSuccessPayload(successes, errors);
-			const actions = [
-				...successes.map(api.success),  // send the successes to success
-				...errors.map(api.error),     // send errors to error
-				apiSuccess(responses)
-			];
+		.flatMap(responses => {
+			// success! return API_SUCCESS and whatever the mutation action wants to do onSuccess
+			const actions = [apiSuccess(responses)];
 			if (onSuccess) {
 				actions.push(onSuccess(responses));
 			}
 			return Rx.Observable.from(actions);
 		})
 		.catch(err => {
-			const actions = [api.fail(err), apiError(err)];
+			const actions = [apiError(err)];
 			if (onError) {
 				actions.push(onError(err));
 			}

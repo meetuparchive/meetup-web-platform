@@ -39,6 +39,3 @@ jspm_packages
 lib
 
 github_deploy_key
-
-config.development.json
-config.production.json

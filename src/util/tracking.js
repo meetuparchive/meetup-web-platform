@@ -1,8 +1,7 @@
 import uuid from 'uuid';
-import config from './config';
 import { parseMemberCookie } from './cookieUtils';
 
-const isProd = config.get('isProd');
+const isProd = process.env.NODE_ENV === 'production';
 
 const YEAR_IN_MS = 1000 * 60 * 60 * 24 * 365;
 const COOKIE_OPTS = {
@@ -76,10 +75,14 @@ export const trackLogout = log => response =>
 	);
 
 export const trackNav = log => (response, queryResponses, url, referrer) => {
-	const apiRequests = queryResponses.map(({ meta }) => ({
-		requestId: meta.requestId,
-		endpoint: meta.endpoint,
-	}));
+	const apiRequests = queryResponses.map(qr => {
+		const ref = Object.keys(qr)[0];
+		const { meta } = { ...qr[ref] };
+		return {
+			requestId: meta.requestId,
+			endpoint: meta.endpoint,
+		};
+	});
 	return log(
 		response,
 		{

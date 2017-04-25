@@ -1,7 +1,6 @@
 import chalk from 'chalk';
 import Rx from 'rxjs';
 
-import config from '../util/config';
 import { tryJSON } from '../util/fetchUtils';
 import {
 	applyAuthState,
@@ -100,20 +99,18 @@ export const applyRequestAuthorizer$ = requestAuthorizer$ => request => {
  * Get an anonymous code from the API that can be used to generate an oauth
  * access token
  *
+ * @param {Object} config { OAUTH_AUTH_URL, oauth }
  * @param {String} redirect_uri Return url after anonymous grant
  */
-export function getAnonymousCode$(redirect_uri) {
-	const oauth = config.get('oauth');
-
+export function getAnonymousCode$({ API_TIMEOUT=5000, OAUTH_AUTH_URL, oauth }, redirect_uri) {
 	if (!oauth.key) {
 		throw new ReferenceError('OAuth consumer key is required');
 	}
 
-	const authURL = new URL(oauth.auth_url);
+	const authURL = new URL(OAUTH_AUTH_URL);
 	authURL.searchParams.append('response_type', 'anonymous_code');
 	authURL.searchParams.append('client_id', oauth.key);
 	authURL.searchParams.append('redirect_uri', redirect_uri);
-
 	const requestOpts = {
 		method: 'GET',
 		headers: {
@@ -123,31 +120,31 @@ export function getAnonymousCode$(redirect_uri) {
 
 	return Rx.Observable.defer(() => {
 		console.log(JSON.stringify({
-			message: `Outgoing request GET ${oauth.auth_url}`,
+			message: `Outgoing request GET ${OAUTH_AUTH_URL}`,
 			type: 'request',
 			direction: 'out',
 			info: {
-				url: oauth.auth_url,
+				url: OAUTH_AUTH_URL,
 				method: 'get',
 			}
 		}));
 
 		const startTime = new Date();
 		return Rx.Observable.fromPromise(fetch(authURL.toString(), requestOpts))
-			.timeout(config.get('api.timeout'))
+			.timeout(API_TIMEOUT)
 			.do(() => {
 				console.log(JSON.stringify({
-					message: `Incoming response GET ${oauth.auth_url}`,
+					message: `Incoming response GET ${OAUTH_AUTH_URL}`,
 					type: 'response',
 					direction: 'in',
 					info: {
-						url: oauth.auth_url,
+						url: OAUTH_AUTH_URL,
 						method: 'get',
 						time: new Date() - startTime,
 					}
 				}));
 			})
-			.flatMap(tryJSON(oauth.auth_url))
+			.flatMap(tryJSON(OAUTH_AUTH_URL))
 			.map(({ code }) => ({
 				grant_type: 'anonymous_code',
 				token: code
@@ -158,27 +155,24 @@ export function getAnonymousCode$(redirect_uri) {
 /**
  * Curry the config to generate a function that receives a grant type and grant
  * token that can be used to generate an oauth access token from the API
+ * @param {Object} config object containing the oauth secret and key
  * @param {String} redirect_uri Return url after anonymous grant
  * @param {Object} headers Hapi request headers for anonymous user request
  * @return {Object} the JSON-parsed response from the authorize endpoint
  *   - contains 'access_token', 'refresh_token'
  */
-export const getAccessToken$ = (redirect_uri) => {
-	const oauth = config.get('oauth');
-
+export const getAccessToken$ = ({ API_TIMEOUT=5000, OAUTH_ACCESS_URL, oauth }, redirect_uri) => {
 	if (!oauth.key) {
 		throw new ReferenceError('OAuth consumer key is required');
 	}
 	if (!oauth.secret) {
 		throw new ReferenceError('OAuth consumer secret is required');
 	}
-
 	const params = {
 		client_id: oauth.key,
 		client_secret: oauth.secret,
 		redirect_uri
 	};
-
 	return headers => {
 		const requestOpts = {
 			method: 'POST',
@@ -193,7 +187,7 @@ export const getAccessToken$ = (redirect_uri) => {
 			.reduce((accessUrl, key) => {
 				accessUrl.searchParams.append(key, params[key]);
 				return accessUrl;
-			}, new URL(oauth.access_url));
+			}, new URL(OAUTH_ACCESS_URL));
 
 		return ({ grant_type, token }) => {
 
@@ -211,31 +205,31 @@ export const getAccessToken$ = (redirect_uri) => {
 			}
 
 			console.log(JSON.stringify({
-				message: `Outgoing request GET ${oauth.access_url}?${grant_type}`,
+				message: `Outgoing request GET ${OAUTH_ACCESS_URL}?${grant_type}`,
 				type: 'request',
 				direction: 'out',
 				info: {
-					url: oauth.access_url,
+					url: OAUTH_ACCESS_URL,
 					method: 'get',
 				}
 			}));
 
 			const startTime = new Date();
 			return Rx.Observable.fromPromise(fetch(accessUrl.toString(), requestOpts))
-				.timeout(config.get('api.timeout'))
+				.timeout(API_TIMEOUT)
 				.do(() => {
 					console.log(JSON.stringify({
-						message: `Incoming response GET ${oauth.access_url}?${grant_type}`,
+						message: `Incoming response GET ${OAUTH_ACCESS_URL}?${grant_type}`,
 						type: 'response',
 						direction: 'in',
 						info: {
-							url: oauth.access_url,
+							url: OAUTH_ACCESS_URL,
 							method: 'get',
 							time: new Date() - startTime,
 						}
 					}));
 				})
-				.flatMap(tryJSON(oauth.access_url));
+				.flatMap(tryJSON(OAUTH_ACCESS_URL));
 		};
 	};
 };
@@ -250,12 +244,13 @@ const refreshToken$ = refresh_token => Rx.Observable.of({
  * For an anonymous auth, the request header information is used to determine
  * the location and language of the anonymous member
  *
+ * @param {Object} config { OAUTH_AUTH_URL, OAUTH_ACCESS_URL, oauth }
  * @param {Object} request the Hapi request that needs to be authorized
  */
-export const getRequestAuthorizer$ = () => {
+export const getRequestAuthorizer$ = config => {
 	const redirect_uri = 'http://www.meetup.com/';  // required param set in oauth consumer config
-	const anonymousCode$ = getAnonymousCode$(redirect_uri);
-	const accessToken$ = getAccessToken$(redirect_uri);
+	const anonymousCode$ = getAnonymousCode$(config, redirect_uri);
+	const accessToken$ = getAccessToken$(config, redirect_uri);
 
 	// if the request has a refresh_token, use it. Otherwise, get a new anonymous access token
 	return ({ headers, state: { refresh_token} }) =>

@@ -3,14 +3,12 @@ import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import StaticRouter from 'react-router-dom/StaticRouter';
 
-import config from '../util/config';
+import { getServerCreateStore } from '../util/createStoreServer';
 import Dom from '../components/dom';
 import NotFound from '../components/NotFound';
 import PlatformApp from '../components/PlatformApp';
-
-import { getServerCreateStore } from '../util/createStoreServer';
 import { polyfillNodeIntl } from '../util/localizationUtils';
-import { SERVER_RENDER } from '../actions/syncActionCreators';
+
 import {
 	configureApiUrl,
 	configureBaseUrl,
@@ -109,7 +107,7 @@ const getRouterRenderer = (
 	} catch(error) {
 		// log the error stack here in dev to make it a little more legible
 		// - prod will get stackdriver formatting
-		if (config.get('isDev')) {
+		if (process.env.NODE_ENV !== 'production') {
 			console.error(error.stack);
 		}
 		throw error;
@@ -197,7 +195,7 @@ const makeRenderer = (
 		}
 	}));
 	store.dispatch({
-		type: SERVER_RENDER,
+		type: '@@server/RENDER',
 		payload: url,
 	});
 	return storeIsReady$

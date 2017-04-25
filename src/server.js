@@ -1,11 +1,13 @@
-import https from 'https';
-
 import './util/globals';
-import config from './util/config';
+
+import getConfig from './util/config';
 import getPlugins from './plugins';
 import getRoutes from './routes';
 
-import { server } from './util/serverUtils';
+import {
+	configureEnv,
+	server,
+} from './util/serverUtils';
 
 /**
  * @module server
@@ -26,36 +28,35 @@ import { server } from './util/serverUtils';
  */
 export default function start(
 	renderRequestMap,
-	{ routes=[], plugins=[], platform_agent='consumer_name' }
+	{ routes=[], plugins=[], platform_agent='consumer_name' },
+	envConfigOverridePath
 ) {
-	// source maps make for better stack traces - might slow down prod?
+	// source maps make for better stack traces - we might not want this in
+	// production if it makes anything slower, though
+	// (process.env.NODE_ENV === 'production')
 	require('source-map-support').install();
 
-	// When using .dev.meetup endpoints, ignore self-signed SSL cert
-	https.globalAgent.options.rejectUnauthorized = config.get('isProd');
+	return getConfig(envConfigOverridePath)
+		.then(configureEnv)
+		.then(config => {
+			const baseRoutes = getRoutes(renderRequestMap);
+			const finalRoutes = [ ...routes, ...baseRoutes ];
 
-	const baseRoutes = getRoutes(renderRequestMap);
-	const finalRoutes = [ ...routes, ...baseRoutes ];
-
-	const connection = {
-		host: '0.0.0.0',
-		port: config.get('dev_server.port'),
-		routes: {
-			plugins: {
-				'electrode-csrf-jwt': {
-					enabled: false,
+			const connection = {
+				host: '0.0.0.0',
+				port: config.DEV_SERVER_PORT,
+				routes: {
+					plugins: {
+						'electrode-csrf-jwt': {
+							enabled: false,
+						}
+					}
 				}
-			}
-		}
-	};
+			};
 
-	const finalPlugins = [ ...plugins, ...getPlugins() ];
+			const finalPlugins = [ ...plugins, ...getPlugins(config) ];
 
-	return server(
-		finalRoutes,
-		connection,
-		finalPlugins,
-		platform_agent
-	);
+			return server(finalRoutes, connection, finalPlugins, platform_agent, config);
+		});
 }
 

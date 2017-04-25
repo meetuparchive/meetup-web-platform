@@ -1,7 +1,5 @@
 import Joi from 'joi';
 
-import config from './config';
-
 /**
  * @module authUtils
  */
@@ -76,14 +74,14 @@ export function validateSecret(secret) {
 }
 
 export const getMemberCookieName = server =>
-	server.app.isDev ? 'MEETUP_MEMBER_DEV' : 'MEETUP_MEMBER';
+	server.app.isDevConfig ? 'MEETUP_MEMBER_DEV' : 'MEETUP_MEMBER';
 
 /**
  * apply default cookie options for auth-related cookies
  */
 export const configureAuthCookies = server => {
-	const password = validateSecret(config.get('cookie_encrypt_secret'));
-	const isSecure = config.get('isProd');
+	const password = validateSecret(server.plugins.requestAuth.config.COOKIE_ENCRYPT_SECRET);
+	const isSecure = process.env.NODE_ENV === 'production';
 	const authCookieOptions = {
 		encoding: 'iron',
 		password,

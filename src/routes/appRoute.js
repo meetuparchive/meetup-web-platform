@@ -1,7 +1,5 @@
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
-
-import config from '../util/config';
 import { getAppRouteHandler } from './appRouteHandler';
 
 export const onPreResponse = {
@@ -18,7 +16,7 @@ export const onPreResponse = {
 	 */
 	method: (request, reply) => {
 		const response = request.response;
-		if (!response.isBoom || config.get('isProd')) {
+		if (!response.isBoom || process.env.NODE_ENV === 'production') {
 			return reply.continue();
 		}
 		const error = response;
