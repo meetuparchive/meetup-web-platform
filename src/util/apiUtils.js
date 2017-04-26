@@ -521,30 +521,32 @@ export const logApiResponse = request => ([response, body]) => {
 		statusCode
 	} = response;
 
+	const logger = request.server.app.logger;
 	// production logs will automatically be JSON-parsed in Stackdriver
-	const log = statusCode >= 400 && console.error ||
-		statusCode >= 300 && console.warn ||
-		console.log;
+	const log = (statusCode >= 400 && logger.error ||
+		statusCode >= 300 && logger.warn ||
+		logger.info).bind(logger);
 
-	log(JSON.stringify({
-		message: `Incoming response ${method.toUpperCase()} ${pathname} ${response.statusCode}`,
-		type: 'response',
-		direction: 'in',
-		info: {
-			url: href,
-			query: (query || '').split('&').reduce((acc, keyval) => {
-				const [key, val] = keyval.split('=');
-				acc[key] = val;
-				return acc;
-			}, {}),
-			method,
-			id,
-			originRequestId: request.id,
-			statusCode: statusCode,
-			time: elapsedTime,
-			body: body.length > 256 ? `${body.substr(0, 256)}...`: body,
-		}
-	}));
+	log(
+		{
+			type: 'response',
+			direction: 'in',
+			info: {
+				url: href,
+				query: (query || '').split('&').reduce((acc, keyval) => {
+					const [key, val] = keyval.split('=');
+					acc[key] = val;
+					return acc;
+				}, {}),
+				method,
+				id,
+				originRequestId: request.id,
+				statusCode: statusCode,
+				time: elapsedTime,
+				body: body.length > 256 ? `${body.substr(0, 256)}...`: body,
+			}
+		},
+		`Incoming response ${method.toUpperCase()} ${pathname} ${response.statusCode}`);
 };
 
 /**
@@ -611,16 +613,18 @@ export const makeApiRequest$ = request => {
 			} = requestOpts;
 
 			const parsedUrl = url.parse(requestOpts.url);
-			console.log(JSON.stringify({
-				message: `Outgoing request ${requestOpts.method.toUpperCase()} ${parsedUrl.pathname}`,
-				type: 'request',
-				direction: 'out',
-				info: {
-					headers,
-					url: parsedUrl,
-					method,
+			request.server.app.logger.info(
+				{
+					type: 'request',
+					direction: 'out',
+					info: {
+						headers,
+						url: parsedUrl,
+						method,
+					},
 				},
-			}));
+				`Outgoing request ${requestOpts.method.toUpperCase()} ${parsedUrl.pathname}`
+			);
 
 			return request$(requestOpts)
 				.do(logApiResponse(request))             // this will leak private info in API response

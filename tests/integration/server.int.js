@@ -103,7 +103,7 @@ describe('Cookie setting', () => {
 		coords: [23, 45],
 	};
 	const clickData = {
-		history: [click, click],
+		history: [click, { ...click }],
 	};
 	it('calls clickSerializer for each click and un-sets the click-track cookie', () => {
 		const cookie = `click-track=${encodeURIComponent(JSON.stringify(clickData))}`;
@@ -116,6 +116,8 @@ describe('Cookie setting', () => {
 		// spyOn(config, 'default').and.returnValue(Promise.resolve({}));
 		return start({}, { routes }, mockConfig)
 			.then(server => {
+				const avro = require('../../src/util/avro');
+				avro.clickSerializer.mockReturnValue('mocked clicktracking log');
 				const request = {
 					method: 'get',
 					url: '/ny-tech',
@@ -125,7 +127,7 @@ describe('Cookie setting', () => {
 				return server.inject(request).then(
 					response => {
 						const cookieUnsetString = 'click-track=;';
-						expect(require('../../src/util/avro').clickSerializer)
+						expect(avro.clickSerializer)
 							.toHaveBeenCalledTimes(clickData.history.length);
 						expect(response.headers['set-cookie'])
 							.toContainEqual(expect.stringContaining(cookieUnsetString));

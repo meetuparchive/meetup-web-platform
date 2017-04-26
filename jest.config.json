@@ -9,7 +9,8 @@
   ],
   "moduleFileExtensions": [
     "js",
-    "jsx"
+    "jsx",
+    "json"
   ],
   "testEnvironment": "node",
   "testRegex": "src\/.*\\.test\\.jsx?$"
