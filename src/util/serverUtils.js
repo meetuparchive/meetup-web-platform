@@ -129,10 +129,8 @@ export function server(routes, connection, plugins, platform_agent, config) {
 
 	// store runtime state
 	// https://hapijs.com/api#serverapp
-	server.app = {
-		isDevConfig: config.get('isDev'),  // indicates dev API or prod API
-		...config
-	};
+	server.app = config.getProperties();
+
 	server.decorate('reply', 'track', track(platform_agent));
 
 	const appConnection = server.connection(connection);

@@ -1,5 +1,4 @@
 import start from './server';
-import config from './util/config';
 import * as serverUtils from './util/serverUtils';
 
 jest.mock('source-map-support');

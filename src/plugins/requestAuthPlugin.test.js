@@ -16,6 +16,7 @@ const oauth = {
 	key: '1234',
 	secret: 'asdf',
 };
+
 const MOCK_SERVER = {
 	decorate() {},
 	route() {},
@@ -28,10 +29,13 @@ const MOCK_SERVER = {
 	expose: () => {},
 	plugins: { requestAuth: { config: { COOKIE_ENCRYPT_SECRET: 'asdfasdfasdfasdfasdfasdfasdfasdfasdf' } } }
 };
+
 const MOCK_HEADERS = {};
 const MOCK_REPLY_FN = () => {};
+
 MOCK_REPLY_FN.state = () => {};
 MOCK_REPLY_FN.continue = () => {};
+
 const MOCK_REQUEST = {
 	headers: MOCK_HEADERS,
 	state: {},
@@ -45,6 +49,7 @@ const MOCK_REQUEST = {
 		app: {},
 	},
 };
+
 MOCK_REQUEST.plugins.requestAuth = {
 	reply: MOCK_REPLY_FN
 };
@@ -59,6 +64,7 @@ const MOCK_AUTHED_REQUEST = {
 const GOOD_MOCK_FETCH_RESULT = Promise.resolve({
 	text: () => Promise.resolve('{}')
 });
+
 const BAD_MOCK_FETCH_RESULT = Promise.resolve({ text: () => Promise.resolve(undefined) });
 
 const OAUTH_AUTH_URL = 'http://example.com/auth_fakeout';
@@ -74,6 +80,7 @@ describe('getAnonymousCode$', () => {
 		});
 		getAnonymousCode$({ oauth, OAUTH_AUTH_URL }).subscribe(done);
 	});
+
 	it('throws error when response cannot be JSON parsed', function() {
 		spyOn(global, 'fetch').and.callFake((url, opts) => BAD_MOCK_FETCH_RESULT);
 
@@ -83,7 +90,6 @@ describe('getAnonymousCode$', () => {
 				expect(err).toEqual(jasmine.any(Error));
 			});
 	});
-
 });
 
 describe('getAccessToken$', () => {

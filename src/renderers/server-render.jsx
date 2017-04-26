@@ -8,7 +8,6 @@ import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import StaticRouter from 'react-router-dom/StaticRouter';
 
-import config from '../util/config';
 import Dom from '../components/dom';
 import NotFound from '../components/NotFound';
 import PlatformApp from '../components/PlatformApp';

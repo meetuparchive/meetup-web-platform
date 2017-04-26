@@ -54,7 +54,7 @@ let config = convict({
 	cookie_encrypt_secret: {
 		format: function (secret) {
 			if (secret.toString().length < 32) {
-				throw new Error('set COOKIE_ENCRYPT_SECRET env variable to a random 32+ character string')
+				throw new Error('set COOKIE_ENCRYPT_SECRET env variable to a random 32+ character string');
 			}
 		},
 		default: null,
@@ -63,7 +63,7 @@ let config = convict({
 	csrf_secret: {
 		format: function (secret) {
 			if (secret.toString().length < 32) {
-				throw new Error('set CSRF_SECRET env variable to a random 32+ character string')
+				throw new Error('set CSRF_SECRET env variable to a random 32+ character string');
 			}
 		},
 		default: null,
@@ -122,7 +122,7 @@ let config = convict({
 	}
 });
 
-//Load environment dependent configuration
+// Load environment dependent configuration
 const env = config.get('env');
 const configFile = `../config.${env}.json`;
 if (fs.existsSync(configFile)) {
