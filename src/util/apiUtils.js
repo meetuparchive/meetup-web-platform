@@ -23,6 +23,9 @@ import {
 } from './authUtils';
 
 import {
+	getCookieLang
+} from './languageUtils';
+import {
 	coerceBool,
 	toCamelCase,
 } from './stringUtils';
@@ -321,10 +324,20 @@ export function getAuthHeaders(request) {
 	};
 }
 
+export function getLanguageHeader(request) {
+	const cookieLang = getCookieLang(request);
+	const headerLang = request.headers['accept-language'];
+	const acceptLang = cookieLang && headerLang ?
+		`${cookieLang},${headerLang}` :
+		(cookieLang || headerLang);
+	return acceptLang;
+}
+
 export function parseRequestHeaders(request) {
 	const externalRequestHeaders = {
 		...request.headers,
 		...getAuthHeaders(request),
+		'accept-language': getLanguageHeader(request),
 	};
 
 	delete externalRequestHeaders['host'];  // let app server set 'host'

@@ -1,7 +1,10 @@
 import querystring from 'qs';
 import config from './config';
 
-export const MEMBER_COOKIE = config.get('isProd') ? 'MEETUP_MEMBER' : 'MEETUP_MEMBER_DEV';
+const isProd = config.get('isProd');
+
+export const MEMBER_COOKIE = isProd ? 'MEETUP_MEMBER' : 'MEETUP_MEMBER_DEV';
+export const LANGUAGE_COOKIE = isProd ? 'MEETUP_LANGUAGE' : 'MEETUP_LANGUAGE_DEV';
 
 export const parseMemberCookie = state => {
 	if (!state[MEMBER_COOKIE]) {
