@@ -76,6 +76,26 @@ export const matchedRouteQueriesReducer = location => (queries, { route, match }
 };
 
 /**
+ * Populate the 'component' property of all async routes
+ *
+ * @param {Array} routes an array of route objects
+ * @param {String} url the current URL path
+ * @return {Array} the queries attached to the active routes
+ */
+export const resolveRouteComponent = (routes, baseUrl) => location => {
+	const url = location.pathname.replace(baseUrl, '');
+	const matchedRoutes = matchRoutes(routes, url);
+	const componentPromises = matchedRoutes.map(
+		({ route }) => route.load ?
+			route.load().then(c => {
+				route.component = c.default;
+			}) :
+			Promise.resolve(route)
+	);
+	return Promise.all(componentPromises);
+};
+
+/**
  * Get the queries from all currently-active routes at the requested url path
  * @param {Array} routes an array of route objects
  * @param {String} url the current URL path

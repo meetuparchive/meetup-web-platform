@@ -4,8 +4,41 @@ import Route from 'react-router-dom/Route';
 
 import { decodeParams, getNestedRoutes } from '../util/routeUtils';
 
+const Empty = () => <div></div>;
+/**
+ * route rendering component
+ */
+class AsyncRoute extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			component: props.route.component || Empty,
+		};
+	}
+	componentDidMount() {
+		if (!this.props.route.component) {
+			this.props.route.load().then(component => this.setState({ component }));
+		}
+	}
+	render() {
+		const { route, match } = this.props;
+		// React Router will automatically encode the URL params - we want the
+		// decoded values in the component
+		match.params = decodeParams(match.params);
+		const nestedRoutes = getNestedRoutes({ route, match });
+		return (
+			<this.state.component {...this.props}>
+				{nestedRoutes &&
+					<RouteLayout routes={nestedRoutes} matchedPath={match.path} />
+				}
+			</this.state.component>
+		);
+
+	}
+}
+
 const RouteWithSubRoutes = route => {
-	if (!route.component) {
+	if (!route.component && !route.load) {
 		throw new Error(`route for path ${JSON.stringify(route.path)} must have a 'component' property`);
 	}
 	if (route.render || route.children) {
@@ -16,20 +49,7 @@ const RouteWithSubRoutes = route => {
 			path={route.path}
 			exact={route.exact || false}
 			strict={route.strict || false}
-			render={props => {
-				const { match } = props;
-				// React Router will automatically encode the URL params - we want the
-				// decoded values in the component
-				match.params = decodeParams(match.params);
-				const nestedRoutes = getNestedRoutes({ route, match });
-				return (
-					<route.component {...props}>
-						{nestedRoutes &&
-							<RouteLayout routes={nestedRoutes} matchedPath={match.path} />
-						}
-					</route.component>
-				);
-			}}
+			render={props => <AsyncRoute {...props} route={route} />}
 		/>
 	);
 };
