@@ -1,5 +1,3 @@
-import './util/globals';
-
 import config from './util/config';
 import getPlugins from './plugins';
 import getRoutes from './routes';
