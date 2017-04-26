@@ -31,15 +31,9 @@ const DOCTYPE = '<!DOCTYPE html>';
  * @module ServerRender
  */
 
-function getHtml(baseUrl, assetPublicPath, clientFilename, initialState={}, appMarkup='') {
+function getHtml(props) {
 	const htmlMarkup = ReactDOMServer.renderToString(
-		<Dom
-			baseUrl={baseUrl}
-			assetPublicPath={assetPublicPath}
-			clientFilename={clientFilename}
-			initialState={initialState}
-			appMarkup={appMarkup}
-		/>
+		<Dom {...props} />
 	);
 	return `${DOCTYPE}${htmlMarkup}`;
 }
@@ -98,13 +92,13 @@ const getRouterRenderer = (
 
 		// all the data for the full `<html>` element has been initialized by the app
 		// so go ahead and assemble the full response body
-		result = getHtml(
+		result = getHtml({
 			baseUrl,
 			assetPublicPath,
 			clientFilename,
 			initialState,
 			appMarkup
-		);
+		});
 
 		statusCode = NotFound.rewind() ||  // if NotFound is mounted, return 404
 			200;
@@ -123,6 +117,15 @@ const getRouterRenderer = (
 		result
 	};
 };
+
+const makeRenderer$ = (config: Object) => makeRenderer(
+		config.routes,
+		config.reducer,
+		config.clientFilename,
+		config.assetPublicPath,
+		config.middleware,
+		config.baseUrl
+	);
 
 /**
  * Curry a function that takes a Hapi request and returns an observable
@@ -178,7 +181,7 @@ const makeRenderer = (
 	// render skeleton if requested - the store is ready
 	if ('skeleton' in request.query) {
 		return Observable.of({
-			result: getHtml(baseUrl, assetPublicPath, clientFilename, store.getState()),
+			result: getHtml({baseUrl, assetPublicPath, clientFilename, initialState:store.getState()}),
 			statusCode: 200
 		});
 	}
