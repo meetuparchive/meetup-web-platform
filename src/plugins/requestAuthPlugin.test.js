@@ -1,8 +1,10 @@
 import { Observable } from 'rxjs/Observable';
+
 import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/throw';
 import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/catch';
+
 import register, {
 	getAuthenticate,
 	oauthScheme,
@@ -130,15 +132,17 @@ describe('getAccessToken$', () => {
 	});
 
 	it('throws an error when no oauth.key is supplied', function() {
-		const serverNoOauthKey = { ...MOCK_SERVER };
-		delete serverNoOauthKey.oauth.key;
+		let serverNoOauthKey = { ...MOCK_SERVER };
+		delete serverNoOauthKey.app.oauth.key;
+
 		expect(() => getAccessToken$(serverNoOauthKey, null))
 			.toThrowError(ReferenceError);
 	});
 
 	it('throws an error when no oauth.secret is supplied', function() {
-		const serverNoOauthSecret = { ...MOCK_SERVER };
-		delete serverNoOauthSecret.oauth.secret;
+		let serverNoOauthSecret = { ...MOCK_SERVER };
+		delete serverNoOauthSecret.app.oauth.secret;
+
 		expect(() => getAccessToken$(serverNoOauthSecret, null))
 			.toThrowError(ReferenceError);
 	});
@@ -146,6 +150,7 @@ describe('getAccessToken$', () => {
 	it('throws an error when no access code is supplied to the final curried function', function() {
 		const token = null;
 		const getToken$ = getAccessToken$(MOCK_SERVER, null);
+
 		expect(() => getToken$(MOCK_HEADERS)({ ...MOCK_CODE, token })).toThrowError(ReferenceError);
 	});
 
