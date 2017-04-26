@@ -211,4 +211,5 @@ const makeRenderer = (
 };
 
 export default makeRenderer;
+export makeRenderer$;
 
