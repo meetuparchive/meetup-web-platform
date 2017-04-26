@@ -55,14 +55,14 @@ function getHtml(props) {
  * @return {Object} the statusCode and result used by Hapi's `reply` API
  *   {@link http://hapijs.com/api#replyerr-result}
  */
-const getRouterRenderer = (
+const getRouterRenderer = ({
 	routes,
 	store,
 	location,
 	baseUrl,
 	clientFilename,
 	assetPublicPath
-) => {
+}) => {
 	// pre-render the app-specific markup, this is the string of markup that will
 	// be managed by React on the client.
 	//
@@ -207,9 +207,9 @@ const makeRenderer = (
 		payload: url,
 	});
 	return storeIsReady$
-		.map(() => getRouterRenderer(routes, store, url, baseUrl, clientFilename, assetPublicPath));
+		.map(() => getRouterRenderer({routes, store, location:url, baseUrl, clientFilename, assetPublicPath}));
 };
 
-export { makeRenderer$, makeRenderer }
+export { makeRenderer$, makeRenderer };
 export default makeRenderer;
 
