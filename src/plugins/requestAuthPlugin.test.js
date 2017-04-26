@@ -26,7 +26,7 @@ const MOCK_HEADERS = {};
 
 const MOCK_OAUTH = {
 	auth_url: 'http://example.com/auth_fakeout',
-	access_rul: 'http://example.com/access_fakeout',
+	access_url: 'http://example.com/access_fakeout',
 	key: '1234',
 	secret: 'asdf'
 };
