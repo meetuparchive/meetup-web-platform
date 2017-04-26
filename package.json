@@ -44,6 +44,7 @@
     "js-cookie": "2.1.4",
     "node-fetch": "1.6.3",
     "pino": "4.3.0",
+    "prop-types": "15.5.8",
     "qs": "6.4.0",
     "react-dom": "15.5.4",
     "react-side-effect": "1.1.0",
@@ -66,7 +67,7 @@
   },
   "devDependencies": {
     "babel-cli": "6.24.1",
-    "babel-eslint": "7.2.2",
+    "babel-eslint": "7.2.3",
     "babel-plugin-transform-flow-strip-types": "6.22.0",
     "babel-preset-es2015": "6.24.1",
     "babel-preset-react": "6.24.1",

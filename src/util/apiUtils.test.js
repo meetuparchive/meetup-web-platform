@@ -19,6 +19,9 @@ import {
 
 import { getServer, MOCK_LOGGER } from '../util/testUtils';
 import * as authUtils from '../util/authUtils';
+import {
+	LANGUAGE_COOKIE
+} from './cookieUtils';
 
 import {
 	apiResponseToQueryResponse,
@@ -26,6 +29,7 @@ import {
 	buildRequestArgs,
 	errorResponse$,
 	getAuthHeaders,
+	getLanguageHeader,
 	injectResponseCookies,
 	logApiResponse,
 	parseRequest,
@@ -33,6 +37,7 @@ import {
 	parseApiValue,
 	parseLoginAuth,
 	parseMetaHeaders,
+	parseVariantsHeader,
 	groupDuotoneSetter,
 } from './apiUtils';
 
@@ -78,6 +83,32 @@ describe('getAuthHeaders', () => {
 		expect(cookies['MEETUP_CSRF']).not.toBeUndefined();
 		expect(cookies['MEETUP_CSRF_DEV']).not.toBeUndefined();
 		expect(authHeaders['csrf-token']).toEqual(cookies['MEETUP_CSRF']);
+	});
+});
+
+describe('getLanguageHeader', () => {
+	it('returns accept-language containing parsed MEMBER_LANGUAGE cookie', () => {
+		const request = {
+			headers: {},
+			state: { [LANGUAGE_COOKIE]: 'language=fr&country=FR' },
+		};
+		expect(getLanguageHeader(request)).toEqual('fr-FR');
+	});
+	it('prepends parsed MEMBER_LANGUAGE cookie on existing accepts-langauge', () => {
+		const headerLang = 'foo';
+		const request = {
+			headers: { 'accept-language': headerLang },
+			state: { [LANGUAGE_COOKIE]: 'language=fr&country=FR' },
+		};
+		expect(getLanguageHeader(request)).toEqual(`fr-FR,${headerLang}`);
+	});
+	it('returns existing accepts-langauge unmodified when no language cookie', () => {
+		const headerLang = 'foo';
+		const request = {
+			headers: { 'accept-language': headerLang },
+			state: {},
+		};
+		expect(getLanguageHeader(request)).toEqual(headerLang);
 	});
 });
 
@@ -252,6 +283,31 @@ describe('parseMetaHeaders', () => {
 	it('returns empty object for empty headers', () => {
 		expect(parseMetaHeaders({}))
 			.toEqual({});
+	});
+});
+
+describe('parseVariantsHeader', () => {
+	it('parses a variants header into a nested object', () => {
+		const header = 'binge-pilot=123|variant critical-mass=1|control critical-mass=2|sendemail';
+		const expectedObj = {
+			'binge-pilot': {
+				123: 'variant',
+			},
+			'critical-mass': {
+				1: 'control',
+				2: 'sendemail',
+			},
+		};
+		expect(parseVariantsHeader(header)).toEqual(expectedObj);
+	});
+	it('sets `null` variant for missing variant', () => {
+		const header = 'binge-pilot=123|';
+		const expectedObj = {
+			'binge-pilot': {
+				123: null,
+			},
+		};
+		expect(parseVariantsHeader(header)).toEqual(expectedObj);
 	});
 });
 

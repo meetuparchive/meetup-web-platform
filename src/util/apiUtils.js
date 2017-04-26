@@ -20,6 +20,9 @@ import {
 	removeAuthState,
 } from './authUtils';
 import {
+	getCookieLang
+} from './languageUtils';
+import {
 	coerceBool,
 	toCamelCase,
 } from './stringUtils';
@@ -48,6 +51,26 @@ function makeMockResponseOk(requestOpts) {
 		},
 	};
 }
+
+/**
+ * Convert the X-Meetup-Variants response header into a state-ready object
+ *
+ * @see {@link https://meetup.atlassian.net/wiki/display/MUP/X-Meetup-Variants}
+ * @returns {Object} {
+ *   [experiment]: {
+ *     [context (member/chapter id)]: variantName
+ *   }
+ * }
+ */
+export const parseVariantsHeader = variantsHeader =>
+	variantsHeader.split(' ')
+		.reduce((variants, keyval) => {
+			const [experiment, val] = keyval.split('=');
+			variants[experiment] = variants[experiment] || {};
+			const [context, variant] = val.split('|');
+			variants[experiment][context] = variant || null;
+			return variants;
+		}, {});
 
 /**
  * In order to receive cookies from `externalRequest` requests, this function
@@ -87,6 +110,11 @@ export const parseMetaHeaders = headers => {
 			delimiter: ',',
 			decoder: coerceBool,
 		});
+	}
+
+	// special case handling for variants
+	if (meetupHeaders.variants) {
+		meetupHeaders.variants = parseVariantsHeader(meetupHeaders.variants);
 	}
 
 	const xHeaders = X_HEADERS.reduce((meta, h) => {
@@ -205,15 +233,25 @@ export const parseApiResponse = requestUrl => ([response, body]) => {
  *   `externalRequest` for the query
  */
 export const buildRequestArgs = externalRequestOpts =>
-	({ endpoint, params, flags }) => {
+	({ endpoint, params, flags, meta={} }) => {
 		const dataParams = querystring.stringify(params);
 		const headers = { ...externalRequestOpts.headers };
 		let url = encodeURI(`/${endpoint}`);
 		let body;
 		const jar = createCookieJar(url);
 
-		if (flags) {
-			headers['X-Meetup-Request-Flags'] = flags.join(',');
+		if (flags || meta.flags) {
+			headers['X-Meetup-Request-Flags'] = (flags || meta.flags).join(',');
+		}
+
+		if (meta.variants) {
+			headers['X-Meetup-Variants'] = Object.keys(meta.variants)
+				.reduce((header, experiment) => {
+					const context = meta.variants[experiment];
+					const contexts = context instanceof Array ? context : [context];
+					header += contexts.map(c => `${experiment}=${c}`).join(' ');
+					return header;
+				});
 		}
 
 		switch (externalRequestOpts.method) {
@@ -282,10 +320,20 @@ export function getAuthHeaders(request) {
 	};
 }
 
+export function getLanguageHeader(request) {
+	const cookieLang = getCookieLang(request);
+	const headerLang = request.headers['accept-language'];
+	const acceptLang = cookieLang && headerLang ?
+		`${cookieLang},${headerLang}` :
+		(cookieLang || headerLang);
+	return acceptLang;
+}
+
 export function parseRequestHeaders(request) {
 	const externalRequestHeaders = {
 		...request.headers,
 		...getAuthHeaders(request),
+		'accept-language': getLanguageHeader(request),
 	};
 
 	delete externalRequestHeaders['host'];  // let app server set 'host'

@@ -2,10 +2,14 @@ import querystring from 'qs';
 import url from 'url';
 import Accepts from 'accepts';
 
+import {
+	LANGUAGE_COOKIE
+} from './cookieUtils';
+
 export const LANG_DEFAULT = 'en-US';
 
 export const getCookieLang = (request, supportedLangs) => {
-	const cookie = request.state.MEETUP_LANGUAGE;
+	const cookie = request.state[LANGUAGE_COOKIE];
 	if (!cookie) {
 		return;
 	}
@@ -14,7 +18,10 @@ export const getCookieLang = (request, supportedLangs) => {
 		country,
 	} = querystring.parse(cookie);
 	const cookieLang = `${language}-${country}`;
-	return supportedLangs.includes(cookieLang) && cookieLang;
+	if (supportedLangs) {
+		return supportedLangs.includes(cookieLang) && cookieLang;
+	}
+	return cookieLang;
 };
 
 export const getUrlLang = (request, supportedLangs) => {
