@@ -191,7 +191,7 @@ describe('applyRequestAuthorizer$', () => {
 			state: {
 				MEETUP_MEMBER_DEV: 'foo',
 			},
-			server: { app: { isDevConfig: true } },
+			server: { app: { isProd: false } },
 		})
 		.toPromise()
 		.then(request => {

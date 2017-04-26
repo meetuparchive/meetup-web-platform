@@ -75,7 +75,7 @@ export function validateSecret(secret) {
 }
 
 export const getMemberCookieName = server =>
-	server.app.isDevConfig ? 'MEETUP_MEMBER_DEV' : 'MEETUP_MEMBER';
+	server.app.isProd ? 'MEETUP_MEMBER' : 'MEETUP_MEMBER_DEV';
 
 /**
  * apply default cookie options for auth-related cookies

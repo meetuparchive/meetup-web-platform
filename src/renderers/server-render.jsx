@@ -8,6 +8,7 @@ import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import StaticRouter from 'react-router-dom/StaticRouter';
 
+import config from '../util/config';
 import Dom from '../components/dom';
 import NotFound from '../components/NotFound';
 import PlatformApp from '../components/PlatformApp';
@@ -113,7 +114,7 @@ const getRouterRenderer = (
 	} catch(error) {
 		// log the error stack here in dev to make it a little more legible
 		// - prod will get stackdriver formatting
-		if (process.env.NODE_ENV !== 'production') {
+		if (!config.get('isProd')) {
 			console.error(error.stack);
 		}
 		throw error;
