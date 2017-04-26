@@ -30,11 +30,11 @@ function getInnerHTML(__html) {
  */
 const DOM = (props) => {
 	const {
-		appMarkup,
+		appMarkup='',
 		assetPublicPath,
 		baseUrl,
 		clientFilename,
-		initialState,
+		initialState={},
 	} = props;
 
 	/**
