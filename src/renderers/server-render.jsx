@@ -210,6 +210,6 @@ const makeRenderer = (
 		.map(() => getRouterRenderer(routes, store, url, baseUrl, clientFilename, assetPublicPath));
 };
 
+export { makeRenderer$, makeRenderer }
 export default makeRenderer;
-export makeRenderer$;
 
