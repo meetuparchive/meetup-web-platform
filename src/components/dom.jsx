@@ -30,11 +30,12 @@ function getInnerHTML(__html) {
  */
 const DOM = (props) => {
 	const {
-		appMarkup,
+		appMarkup='',
 		assetPublicPath,
 		baseUrl,
 		clientFilename,
-		initialState,
+		initialState={},
+		scripts=[],
 	} = props;
 
 	/**
@@ -59,6 +60,10 @@ const DOM = (props) => {
 		escapedState,
 	};
 
+	if(clientFilename){
+		scripts.push(clientFilename);
+	}
+
 	return (
 		<html>
 			<head>
@@ -70,7 +75,7 @@ const DOM = (props) => {
 			<body>
 				<div id='outlet' dangerouslySetInnerHTML={getInnerHTML(appMarkup)} />
 				<script dangerouslySetInnerHTML={getInnerHTML(`window.APP_RUNTIME=${JSON.stringify(APP_RUNTIME)};`)} />
-				<script src={`${assetPublicPath}${clientFilename}`} />
+				{scripts.map(asset => <script src={`${assetPublicPath}${asset}}`} />)}
 			</body>
 		</html>
 	);
