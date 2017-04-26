@@ -79,7 +79,7 @@ export const applyRequestAuthorizer$ = requestAuthorizer$ => request => {
 		plugins,
 	} = request;
 
-// logout is accomplished exclusively through a `logout` querystring value
+	// logout is accomplished exclusively through a `logout` querystring value
 	if ('logout' in query) {
 		handleLogout(request);
 	}
