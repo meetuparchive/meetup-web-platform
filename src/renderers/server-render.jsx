@@ -31,15 +31,9 @@ const DOCTYPE = '<!DOCTYPE html>';
  * @module ServerRender
  */
 
-function getHtml(baseUrl, assetPublicPath, clientFilename, initialState={}, appMarkup='') {
+function getHtml(props) {
 	const htmlMarkup = ReactDOMServer.renderToString(
-		<Dom
-			baseUrl={baseUrl}
-			assetPublicPath={assetPublicPath}
-			clientFilename={clientFilename}
-			initialState={initialState}
-			appMarkup={appMarkup}
-		/>
+		<Dom {...props} />
 	);
 	return `${DOCTYPE}${htmlMarkup}`;
 }
@@ -61,14 +55,15 @@ function getHtml(baseUrl, assetPublicPath, clientFilename, initialState={}, appM
  * @return {Object} the statusCode and result used by Hapi's `reply` API
  *   {@link http://hapijs.com/api#replyerr-result}
  */
-const getRouterRenderer = (
+const getRouterRenderer = ({
 	routes,
 	store,
 	location,
 	baseUrl,
 	clientFilename,
-	assetPublicPath
-) => {
+	assetPublicPath,
+	scripts,
+}) => {
 	// pre-render the app-specific markup, this is the string of markup that will
 	// be managed by React on the client.
 	//
@@ -98,13 +93,14 @@ const getRouterRenderer = (
 
 		// all the data for the full `<html>` element has been initialized by the app
 		// so go ahead and assemble the full response body
-		result = getHtml(
+		result = getHtml({
 			baseUrl,
 			assetPublicPath,
 			clientFilename,
 			initialState,
-			appMarkup
-		);
+			appMarkup,
+			scripts,
+		});
 
 		statusCode = NotFound.rewind() ||  // if NotFound is mounted, return 404
 			200;
@@ -123,6 +119,23 @@ const getRouterRenderer = (
 		result
 	};
 };
+
+const makeRenderer$ = (config: {
+		routes: Array<Object>,
+		reducer: Reducer<?Object, FluxStandardAction>,
+		assetPublicPath: string,
+		middleware: Array<Function>,
+		baseUrl: string,
+		scripts: Array<string>,
+	}) => makeRenderer(
+		config.routes,
+		config.reducer,
+		null,
+		config.assetPublicPath,
+		config.middleware,
+		config.baseUrl,
+		config.scripts
+	);
 
 /**
  * Curry a function that takes a Hapi request and returns an observable
@@ -149,7 +162,8 @@ const makeRenderer = (
 	clientFilename: string,
 	assetPublicPath: string,
 	middleware: Array<Function> = [],
-	baseUrl: string = ''
+	baseUrl: string = '',
+	scripts: Array<string>,
 ) => (request: Object) => {
 
 	middleware = middleware || [];
@@ -178,7 +192,7 @@ const makeRenderer = (
 	// render skeleton if requested - the store is ready
 	if ('skeleton' in request.query) {
 		return Observable.of({
-			result: getHtml(baseUrl, assetPublicPath, clientFilename, store.getState()),
+			result: getHtml({baseUrl, assetPublicPath, clientFilename, initialState:store.getState()}),
 			statusCode: 200
 		});
 	}
@@ -204,8 +218,9 @@ const makeRenderer = (
 		payload: url,
 	});
 	return storeIsReady$
-		.map(() => getRouterRenderer(routes, store, url, baseUrl, clientFilename, assetPublicPath));
+		.map(() => getRouterRenderer({routes, store, location:url, baseUrl, clientFilename, assetPublicPath, scripts}));
 };
 
+export { makeRenderer$, makeRenderer };
 export default makeRenderer;
 
