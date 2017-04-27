@@ -75,7 +75,7 @@ const DOM = (props) => {
 			<body>
 				<div id='outlet' dangerouslySetInnerHTML={getInnerHTML(appMarkup)} />
 				<script dangerouslySetInnerHTML={getInnerHTML(`window.APP_RUNTIME=${JSON.stringify(APP_RUNTIME)};`)} />
-				{scripts.map(url => <script src={url} />)}
+				{scripts.map((url,key) => <script src={url} key={key} />)}
 			</body>
 		</html>
 	);
