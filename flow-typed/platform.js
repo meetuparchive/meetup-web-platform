@@ -8,7 +8,7 @@ declare type FluxStandardAction = {
 	error?: boolean
 };
 
-declare type Reducer = (state: Object, action: FluxStandardAction) => Object;
+declare type Reducer = (state: ?Object, action: FluxStandardAction) => Object;
 
 // API query structure
 declare type Query = {
