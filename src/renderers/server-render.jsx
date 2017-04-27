@@ -120,7 +120,14 @@ const getRouterRenderer = ({
 	};
 };
 
-const makeRenderer$ = (config: Object) => makeRenderer(
+const makeRenderer$ = (config: {
+		routes: Array<Object>,
+		reducer: Reducer<?Object, FluxStandardAction>,
+		assetPublicPath: string,
+		middleware: Array<Function>,
+		baseUrl: string,
+		scripts: Array<string>,
+	}) => makeRenderer(
 		config.routes,
 		config.reducer,
 		null,
@@ -156,7 +163,7 @@ const makeRenderer = (
 	assetPublicPath: string,
 	middleware: Array<Function> = [],
 	baseUrl: string = '',
-	scripts,
+	scripts: Array<string>,
 ) => (request: Object) => {
 
 	middleware = middleware || [];
