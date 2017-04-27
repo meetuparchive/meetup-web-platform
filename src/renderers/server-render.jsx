@@ -31,10 +31,8 @@ const DOCTYPE = '<!DOCTYPE html>';
  * @module ServerRender
  */
 
-function getHtml(props) {
-	const htmlMarkup = ReactDOMServer.renderToString(
-		<Dom {...props} />
-	);
+function getHtml(el) {
+	const htmlMarkup = ReactDOMServer.renderToString(el);
 	return `${DOCTYPE}${htmlMarkup}`;
 }
 
@@ -93,14 +91,13 @@ const getRouterRenderer = ({
 
 		// all the data for the full `<html>` element has been initialized by the app
 		// so go ahead and assemble the full response body
-		result = getHtml({
-			baseUrl,
-			assetPublicPath,
-			clientFilename,
-			initialState,
-			appMarkup,
-			scripts,
-		});
+		result = getHtml(<Dom
+			baseUrl={baseUrl}
+			assetPublicPath={assetPublicPath}
+			clientFilename={clientFilename}
+			initialState={initialState}
+			appMarkup={appMarkup}
+			scripts={scripts} />);
 
 		statusCode = NotFound.rewind() ||  // if NotFound is mounted, return 404
 			200;
@@ -159,7 +156,7 @@ const makeRenderer$ = (config: {
 const makeRenderer = (
 	routes: Array<Object>,
 	reducer: Reducer<?Object, FluxStandardAction>,
-	clientFilename: string,
+	clientFilename: ?string,
 	assetPublicPath: string,
 	middleware: Array<Function> = [],
 	baseUrl: string = '',
@@ -192,7 +189,11 @@ const makeRenderer = (
 	// render skeleton if requested - the store is ready
 	if ('skeleton' in request.query) {
 		return Observable.of({
-			result: getHtml({baseUrl, assetPublicPath, clientFilename, initialState:store.getState()}),
+			result: getHtml(<Dom
+				baseUrl={baseUrl}
+				assetPublicPath={assetPublicPath}
+				clientFilename={clientFilename}
+				initialState={store.getState()} />),
 			statusCode: 200
 		});
 	}
