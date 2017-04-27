@@ -1,20 +1,20 @@
 import pino from 'pino';
 
 
-const isDev = process.env.NODE_ENV !== 'production';
-const isTest = process.env.NODE_ENV === 'test';
+const prettyPrint = process.env.NODE_ENV !== 'production';
+const enabled = process.argv.includes('--silent');
 
 const reqSerializerDev = req => `${req.method.toUpperCase()} ${req.url.href}`;
 const resSerializerDev = res => res.statusCode;
 
 const logger = pino({
-	prettyPrint: isDev,
-	timestamp: isDev,
-	messageKey: 'message',
-	enabled: !isTest,
+	prettyPrint,
+	timestamp: prettyPrint, // prod logs provide their own timestamp
+	messageKey: 'message', // Stackdriver uses this key for log summary
+	enabled,
 	serializers: {
-		req: isDev ? reqSerializerDev : pino.stdSerializers.req,
-		res: isDev ? resSerializerDev : pino.stdSerializers.res,
+		req: prettyPrint ? reqSerializerDev : pino.stdSerializers.req,
+		res: prettyPrint ? resSerializerDev : pino.stdSerializers.res,
 	}
 });
 
