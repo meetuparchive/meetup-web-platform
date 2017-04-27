@@ -61,7 +61,7 @@ const DOM = (props) => {
 	};
 
 	if(clientFilename){
-		scripts.push(clientFilename);
+		scripts.push(`${assetPublicPath}${clientFilename}`);
 	}
 
 	return (
@@ -75,7 +75,7 @@ const DOM = (props) => {
 			<body>
 				<div id='outlet' dangerouslySetInnerHTML={getInnerHTML(appMarkup)} />
 				<script dangerouslySetInnerHTML={getInnerHTML(`window.APP_RUNTIME=${JSON.stringify(APP_RUNTIME)};`)} />
-				{scripts.map(asset => <script src={`${assetPublicPath}${asset}`} />)}
+				{scripts.map(url => <script src={url} />)}
 			</body>
 		</html>
 	);
@@ -85,8 +85,9 @@ DOM.propTypes = {
 	appMarkup: React.PropTypes.string,
 	assetPublicPath: React.PropTypes.string.isRequired,
 	baseUrl: React.PropTypes.string,
-	clientFilename: React.PropTypes.string.isRequired,
+	clientFilename: React.PropTypes.string,
 	initialState: React.PropTypes.object.isRequired,
+	scripts: React.PropTypes.array
 };
 
 export default DOM;

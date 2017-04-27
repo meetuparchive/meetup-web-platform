@@ -61,7 +61,8 @@ const getRouterRenderer = ({
 	location,
 	baseUrl,
 	clientFilename,
-	assetPublicPath
+	assetPublicPath,
+	scripts,
 }) => {
 	// pre-render the app-specific markup, this is the string of markup that will
 	// be managed by React on the client.
@@ -97,7 +98,8 @@ const getRouterRenderer = ({
 			assetPublicPath,
 			clientFilename,
 			initialState,
-			appMarkup
+			appMarkup,
+			scripts,
 		});
 
 		statusCode = NotFound.rewind() ||  // if NotFound is mounted, return 404
@@ -121,10 +123,11 @@ const getRouterRenderer = ({
 const makeRenderer$ = (config: Object) => makeRenderer(
 		config.routes,
 		config.reducer,
-		config.clientFilename,
+		null,
 		config.assetPublicPath,
 		config.middleware,
-		config.baseUrl
+		config.baseUrl,
+		config.scripts
 	);
 
 /**
@@ -152,7 +155,8 @@ const makeRenderer = (
 	clientFilename: string,
 	assetPublicPath: string,
 	middleware: Array<Function> = [],
-	baseUrl: string = ''
+	baseUrl: string = '',
+	scripts,
 ) => (request: Object) => {
 
 	middleware = middleware || [];
@@ -207,7 +211,7 @@ const makeRenderer = (
 		payload: url,
 	});
 	return storeIsReady$
-		.map(() => getRouterRenderer({routes, store, location:url, baseUrl, clientFilename, assetPublicPath}));
+		.map(() => getRouterRenderer({routes, store, location:url, baseUrl, clientFilename, assetPublicPath, scripts}));
 };
 
 export { makeRenderer$, makeRenderer };
