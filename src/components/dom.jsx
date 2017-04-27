@@ -64,6 +64,10 @@ const DOM = (props) => {
 		scripts.push(`${assetPublicPath}${clientFilename}`);
 	}
 
+	if (!scripts.length) {
+		throw new Error('No client scripts supplied - check the `makeRenderer` call in your server entry script');
+	}
+
 	return (
 		<html>
 			<head>
