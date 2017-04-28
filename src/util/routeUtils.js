@@ -88,7 +88,7 @@ export const resolveRouteComponent = (routes, baseUrl) => location => {
 	const componentPromises = matchedRoutes.map(
 		({ route }) => route.load ?
 			route.load().then(c => {
-				route.component = c.default;
+				route.component = c;
 			}) :
 			Promise.resolve(route)
 	);

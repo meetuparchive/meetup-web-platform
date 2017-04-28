@@ -30,6 +30,7 @@ function makeRenderer(routes, reducer, middleware=[], baseUrl='') {
 	return (rootElId='outlet') => {
 		const createStore = getBrowserCreateStore(routes, middleware, baseUrl);
 		const store = createStore(reducer, getInitialState(window.APP_RUNTIME));
+		// need to resolve async components, then render
 		ReactDOM.render(
 			<BrowserApp routes={routes} store={store} basename={baseUrl} />,
 			document.getElementById(rootElId)

@@ -43,7 +43,7 @@ export const routes = [{
 		},
 		routes: [{
 			path: '/bar',
-			load: () => import('./MockContainer'),
+			load: () => import('./MockContainer').then(c => c.default),
 			query: () => ({
 				type: 'mock',
 				ref: 'foo_bar',
