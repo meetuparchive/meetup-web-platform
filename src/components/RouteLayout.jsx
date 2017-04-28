@@ -5,18 +5,40 @@ import Route from 'react-router-dom/Route';
 import { decodeParams, getNestedRoutes } from '../util/routeUtils';
 
 const Empty = () => <div></div>;
+const Loading = () => <div></div>;
 /**
  * route rendering component
  */
 class AsyncRoute extends React.Component {
 	constructor(props) {
 		super(props);
+		const component = props.route.component || Empty;
 		this.state = {
-			component: props.route.component || Empty,
+			component,
+			_cache: [component],
 		};
 	}
+	componentWillReceiveProps(nextProps) {
+		const { component, load } = nextProps.route;
+		if (component) {
+			this.setState(state => ({ component }));
+			return;
+		}
+		// async route - check for cache keyed by load function
+		const cached = this.state._cache[load.toString()];
+		if (cached) {
+			this.setState(state => ({ component: cached }));
+			return;
+		}
+
+		// load async route
+		this.setState(state => ({ component: Loading }));
+		load().then(component => {
+			this.setState({ component });
+		});
+	}
 	componentDidMount() {
-		if (!this.props.route.component) {
+		if (this.props.route.load) {
 			this.props.route.load().then(component => this.setState({ component }));
 		}
 	}
@@ -26,12 +48,13 @@ class AsyncRoute extends React.Component {
 		// decoded values in the component
 		match.params = decodeParams(match.params);
 		const nestedRoutes = getNestedRoutes({ route, match });
+		const Component = this.state.component;
 		return (
-			<this.state.component {...this.props}>
+			<Component {...this.props}>
 				{nestedRoutes &&
 					<RouteLayout routes={nestedRoutes} matchedPath={match.path} />
 				}
-			</this.state.component>
+			</Component>
 		);
 
 	}
