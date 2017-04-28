@@ -147,7 +147,7 @@ const getRouterRenderer = (
  */
 const makeRenderer = (
 	routes: Array<Object>,
-	reducer: Reducer<?Object, FluxStandardAction>,
+	reducer: Reducer,
 	clientFilename: string,
 	assetPublicPath: string,
 	middleware: Array<Function> = [],
