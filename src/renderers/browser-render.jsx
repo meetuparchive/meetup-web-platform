@@ -12,14 +12,18 @@ import BrowserApp from '../components/BrowserApp';
  * @module browser-render
  */
 
-type AppProps = { routes: Array<Object>, store: Object, basename: string };
+type AppProps = {
+	routes: Array<PlatformRoute>,
+	store: Object,
+	basename: string,
+};
 
 /**
  * Async resolver of the props needed for `BrowserApp`:
  * { routes, store, basename }
  */
 export function resolveAppProps(
-	routes: Array<Object>,
+	routes: Array<PlatformRoute>,
 	reducer: Reducer,
 	middleware: Array<Object> = []
 ): Promise<AppProps> {
@@ -43,7 +47,7 @@ export function resolveAppProps(
  * @deprecated see CHANGELOG v2.4
  */
 function makeRenderer(
-	routes: Array<Object>,
+	routes: Array<PlatformRoute>,
 	reducer: Reducer,
 	middleware: Array<Object> = []
 ) {
