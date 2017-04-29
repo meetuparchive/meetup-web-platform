@@ -6,7 +6,7 @@ import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import StaticRouter from 'react-router-dom/StaticRouter';
 
-import { resolveRouteComponent } from '../util/routeUtils';
+import { resolveRouteComponents } from '../util/routeUtils';
 import { getServerCreateStore } from '../util/createStoreServer';
 import Dom from '../components/dom';
 import NotFound from '../components/NotFound';
@@ -225,7 +225,7 @@ const makeRenderer = (
 	});
 
 	const getRouteComponents$ = Observable.fromPromise(
-		resolveRouteComponent(routes, baseUrl)(request.url)
+		resolveRouteComponents(routes, baseUrl)(request.url)
 	);
 	return storeIsReady$.mergeMap(() => getRouteComponents$).map(() =>
 		getRouterRenderer({
