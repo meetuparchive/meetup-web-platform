@@ -1,7 +1,9 @@
 ## [2.5]
 
 - **New feature** support for asyncronous routes (PR #266).
-  [Docs](./docs/Routing#async-routes)
+  [Docs](docs/Routing.md#load-asynchronous). Note the new `resolveAppProps`
+  helper that allows the browser script to delay rendering until async routes
+  are resolved - [rendering docs here](docs/Rendering#browser-rendering).
 
 ## [2.4]
 
