@@ -1,3 +1,8 @@
+## [2.5]
+
+- **New feature** support for asyncronous routes (PR #266).
+  [Docs](./docs/Routing#async-routes)
+
 ## [2.4]
 
 - **Deprecated** `renderers/browser-render.jsx` has been deprecated - consumer

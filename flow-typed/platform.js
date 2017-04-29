@@ -5,7 +5,7 @@ declare type FluxStandardAction = {
 	type: string,
 	payload?: any,
 	meta?: any,
-	error?: boolean
+	error?: boolean,
 };
 
 declare type Reducer = (state: ?Object, action: FluxStandardAction) => Object;
@@ -18,9 +18,9 @@ declare type Query = {
 	type?: string,
 	meta?: {
 		flags?: Array<string>,
-		method?: string
+		method?: string,
 	},
-}
+};
 
 declare type QueryResponse = {
 	ref: string,
@@ -30,3 +30,22 @@ declare type QueryResponse = {
 	meta?: Object,
 };
 
+declare type QueryFunction = (location: Object) => Query;
+
+type _RouteBase = {
+	path?: string,
+	exact?: boolean,
+	query?: QueryFunction,
+	indexRoute?: PlatformRoute,
+	routes?: Array<PlatformRoute>,
+};
+
+declare type AsyncPlatformRoute = _RouteBase & {
+	load: () => Promise<React$Element<any>>,
+};
+
+declare type SyncPlatformRoute = _RouteBase & {
+	component: React$Element<any>,
+};
+
+declare type PlatformRoute = AsyncPlatformRoute | SyncPlatformRoute;
