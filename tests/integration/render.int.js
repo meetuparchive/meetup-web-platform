@@ -42,6 +42,7 @@ describe('Full dummy app render', () => {
 					credentials: 'whatever',
 				};
 				return server.inject(request).then(response => {
+					expect(response.payload).toContain(fooPathContent);
 					expect(response.payload).not.toContain(ROOT_INDEX_CONTENT);
 					expect(response.payload).toContain(fakeApiProxyResponse);
 					expect(
