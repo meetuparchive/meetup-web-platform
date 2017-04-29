@@ -11,9 +11,9 @@ export const decodeParams = params =>
 	}, {});
 
 export const getNestedRoutes = ({ route, match }) =>
-	match.isExact && route.indexRoute ?
-		[route.indexRoute] :   // only render index route
-		route.routes;          // pass along any defined nested routes
+	(match.isExact && route.indexRoute
+		? [route.indexRoute] // only render index route
+		: route.routes); // pass along any defined nested routes
 
 const routePath = (route, matchedPath) =>
 	`${matchedPath}${route.path || ''}`.replace('//', '/');
@@ -33,8 +33,13 @@ const routePath = (route, matchedPath) =>
  * @param {String} matchedPath the part of the total path matched so far
  * @return {Array} an array of { route, match } objects
  */
-export const matchRoutes = (routes=[], url='', matchedRoutes=[], matchedPath='') => {
-	const route = routes.find(r => matchPath(url, routePath(r, matchedPath)));  // take the first match
+export const matchRoutes = (
+	routes = [],
+	url = '',
+	matchedRoutes = [],
+	matchedPath = ''
+) => {
+	const route = routes.find(r => matchPath(url, routePath(r, matchedPath))); // take the first match
 	if (!route) {
 		return matchedRoutes;
 	}
@@ -42,11 +47,16 @@ export const matchRoutes = (routes=[], url='', matchedRoutes=[], matchedPath='')
 	// add the route and its `match` object to the array of matched routes
 	const currentMatchedPath = routePath(route, matchedPath);
 	const match = matchPath(url, currentMatchedPath);
-	const currentMatchedRoutes = [ ...matchedRoutes, { route, match } ];
+	const currentMatchedRoutes = [...matchedRoutes, { route, match }];
 
 	// add any nested route matches
 	const nestedRoutes = getNestedRoutes({ route, match }) || [];
-	return matchRoutes(nestedRoutes, url, currentMatchedRoutes, currentMatchedPath);
+	return matchRoutes(
+		nestedRoutes,
+		url,
+		currentMatchedRoutes,
+		currentMatchedPath
+	);
 };
 
 /**
@@ -55,13 +65,16 @@ export const matchRoutes = (routes=[], url='', matchedRoutes=[], matchedPath='')
  * @param {Object} matchedRoute a { route, match } object to inspect for query functions
  * @return {Array} an array of returned query objects
  */
-export const matchedRouteQueriesReducer = location => (queries, { route, match }) => {
+export const matchedRouteQueriesReducer = location => (
+	queries,
+	{ route, match }
+) => {
 	if (!route.query) {
 		return queries;
 	}
-	const routeQueryFns = route.query instanceof Array ?
-		route.query :
-		[route.query];
+	const routeQueryFns = route.query instanceof Array
+		? route.query
+		: [route.query];
 
 	// call the query functions with non-url-encoded params
 	const params = decodeParams(match.params);
@@ -69,10 +82,28 @@ export const matchedRouteQueriesReducer = location => (queries, { route, match }
 		.map(queryFn => queryFn({ location, params }))
 		.filter(query => query);
 
-	return [
-		...queries,
-		...routeQueries,
-	];
+	return [...queries, ...routeQueries];
+};
+
+/**
+ * Populate the 'component' property of all async routes
+ *
+ * @param {Array} routes an array of route objects
+ * @param {String} url the current URL path
+ * @param {URL} location the parsed url
+ * @return {Promise} resolves with all matched routes when their components
+ *   have been resolved
+ */
+export const resolveRouteComponents = (routes, baseUrl) => location => {
+	const url = location.pathname.replace(baseUrl, '');
+	const matchedRoutes = matchRoutes(routes, url);
+	const componentPromises = matchedRoutes.map(
+		({ route }) =>
+			(route.load
+				? route.load().then(c => route.component = c).then(() => route)
+				: Promise.resolve(route))
+	);
+	return Promise.all(componentPromises);
 };
 
 /**
@@ -82,6 +113,7 @@ export const matchedRouteQueriesReducer = location => (queries, { route, match }
  * @return {Array} the queries attached to the active routes
  */
 export const activeRouteQueries = (routes, baseUrl) => location =>
-	matchRoutes(routes, location.pathname.replace(baseUrl, ''))
-		.reduce(matchedRouteQueriesReducer(location), []);
-
+	matchRoutes(routes, location.pathname.replace(baseUrl, '')).reduce(
+		matchedRouteQueriesReducer(location),
+		[]
+	);

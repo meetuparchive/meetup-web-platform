@@ -20,7 +20,7 @@ class MockContainer extends React.Component {
 			<div>
 				<Link to='/'>Home link</Link>
 				{fooPathContent}
-				{JSON.stringify(this.props.data || 'nope', null, 2)}
+				{JSON.stringify(this.props.route.data || 'nope', null, 2)}
 			</div>
 		);
 	}
