@@ -134,13 +134,13 @@ export function registerExtensionEvents(server) {
  * Make any environment changes that need to be made in response to the provided
  * config
  *
- * @param {Object} config the node-convict config object
+ * @param {Object} config the environment configuration object
  *
  * @return null
  */
 export function configureEnv(config) {
 	// When using .dev.meetup endpoints, ignore self-signed SSL cert
-	const USING_DEV_ENDPOINTS = checkForDevUrl(config.getProperties());
+	const USING_DEV_ENDPOINTS = checkForDevUrl(config);
 
 	https.globalAgent.options.rejectUnauthorized = !USING_DEV_ENDPOINTS;
 }
@@ -153,7 +153,7 @@ export function server(routes, connection, plugins, platform_agent, config) {
 
 	// store runtime state
 	// https://hapijs.com/api#serverapp
-	server.app = config.getProperties();
+	server.app = config;
 
 	server.decorate('reply', 'track', track(platform_agent));
 

@@ -107,7 +107,7 @@ const getRouterRenderer = ({
 	} catch(error) {
 		// log the error stack here in dev to make it a little more legible
 		// - prod will get stackdriver formatting
-		if (!config.get('isProd')) {
+		if (!config.isProd) {
 			console.error(error.stack);
 		}
 		throw error;
@@ -119,7 +119,7 @@ const getRouterRenderer = ({
 	};
 };
 
-const makeRenderer$ = (config: {
+const makeRenderer$ = (renderConfig: {
 		routes: Array<Object>,
 		reducer: Reducer,
 		assetPublicPath: string,
@@ -127,13 +127,13 @@ const makeRenderer$ = (config: {
 		baseUrl: string,
 		scripts: Array<string>,
 	}) => makeRenderer(
-		config.routes,
-		config.reducer,
+		renderConfig.routes,
+		renderConfig.reducer,
 		null,
-		config.assetPublicPath,
-		config.middleware,
-		config.baseUrl,
-		config.scripts
+		renderConfig.assetPublicPath,
+		renderConfig.middleware,
+		renderConfig.baseUrl,
+		renderConfig.scripts
 	);
 
 /**

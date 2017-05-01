@@ -585,7 +585,7 @@ export const injectResponseCookies = request => ([response, _, jar]) => {
 			path: cookie.path,
 			isHttpOnly: cookie.httpOnly,
 			isSameSite: false,
-			isSecure: config.get('isProd'),
+			isSecure: config.isProd,
 			strictHeader: false,  // Can't enforce RFC 6265 cookie validation on external services
 		};
 

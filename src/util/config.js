@@ -154,4 +154,4 @@ config.set(
 
 config.validate();
 
-export default config;
+export default config.getProperties();

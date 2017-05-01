@@ -17,7 +17,7 @@ export const onPreResponse = {
 	 */
 	method: (request, reply) => {
 		const response = request.response;
-		if (!response.isBoom || config.get('isProd')) {
+		if (!response.isBoom || config.isProd) {
 			return reply.continue();
 		}
 		const error = response;
@@ -65,4 +65,3 @@ const getApplicationRoute = renderRequestMap => ({
 });
 
 export default getApplicationRoute;
-
