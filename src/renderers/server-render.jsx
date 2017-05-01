@@ -31,16 +31,8 @@ const DOCTYPE = '<!DOCTYPE html>';
  * @module ServerRender
  */
 
-function getHtml(baseUrl, assetPublicPath, clientFilename, initialState={}, appMarkup='') {
-	const htmlMarkup = ReactDOMServer.renderToString(
-		<Dom
-			baseUrl={baseUrl}
-			assetPublicPath={assetPublicPath}
-			clientFilename={clientFilename}
-			initialState={initialState}
-			appMarkup={appMarkup}
-		/>
-	);
+function getHtml(el) {
+	const htmlMarkup = ReactDOMServer.renderToString(el);
 	return `${DOCTYPE}${htmlMarkup}`;
 }
 
@@ -61,14 +53,15 @@ function getHtml(baseUrl, assetPublicPath, clientFilename, initialState={}, appM
  * @return {Object} the statusCode and result used by Hapi's `reply` API
  *   {@link http://hapijs.com/api#replyerr-result}
  */
-const getRouterRenderer = (
+const getRouterRenderer = ({
 	routes,
 	store,
 	location,
 	baseUrl,
 	clientFilename,
-	assetPublicPath
-) => {
+	assetPublicPath,
+	scripts,
+}) => {
 	// pre-render the app-specific markup, this is the string of markup that will
 	// be managed by React on the client.
 	//
@@ -82,11 +75,7 @@ const getRouterRenderer = (
 	const context = {};
 
 	appMarkup = ReactDOMServer.renderToString(
-		<StaticRouter
-			basename={baseUrl}
-			location={location}
-			context={context}
-		>
+		<StaticRouter basename={baseUrl} location={location} context={context}>
 			<PlatformApp store={store} routes={routes} />
 		</StaticRouter>
 	);
@@ -98,21 +87,44 @@ const getRouterRenderer = (
 	// all the data for the full `<html>` element has been initialized by the app
 	// so go ahead and assemble the full response body
 	result = getHtml(
-		baseUrl,
-		assetPublicPath,
-		clientFilename,
-		initialState,
-		appMarkup
+		<Dom
+			baseUrl={baseUrl}
+			assetPublicPath={assetPublicPath}
+			clientFilename={clientFilename}
+			initialState={initialState}
+			appMarkup={appMarkup}
+			scripts={scripts}
+		/>
 	);
 
-	statusCode = NotFound.rewind() ||  // if NotFound is mounted, return 404
-		200;
+	statusCode =
+		NotFound.rewind() || 200; // if NotFound is mounted, return 404
 
 	return {
 		statusCode,
-		result
+		result,
 	};
 };
+
+const makeRenderer$ = (
+	config: {
+		routes: Array<Object>,
+		reducer: Reducer,
+		assetPublicPath: string,
+		middleware: Array<Function>,
+		baseUrl: string,
+		scripts: Array<string>,
+	}
+) =>
+	makeRenderer(
+		config.routes,
+		config.reducer,
+		null,
+		config.assetPublicPath,
+		config.middleware,
+		config.baseUrl,
+		config.scripts
+	);
 
 /**
  * Curry a function that takes a Hapi request and returns an observable
@@ -136,31 +148,30 @@ const getRouterRenderer = (
 const makeRenderer = (
 	routes: Array<Object>,
 	reducer: Reducer,
-	clientFilename: string,
+	clientFilename: ?string,
 	assetPublicPath: string,
 	middleware: Array<Function> = [],
-	baseUrl: string = ''
+	baseUrl: string = '',
+	scripts: Array<string>
 ) => (request: Object) => {
-
 	middleware = middleware || [];
-	const {
-		connection,
-		headers,
-		info,
-		url,
-		server,
-		raw: { req },
-	} = request;
+	const { connection, headers, info, url, server, raw: { req } } = request;
 
 	// request protocol might be different from original request that hit proxy
 	// we want to use the proxy's protocol
-	const requestProtocol = headers['x-forwarded-proto'] || connection.info.protocol;
+	const requestProtocol =
+		headers['x-forwarded-proto'] || connection.info.protocol;
 	const host = `${requestProtocol}://${info.host}`;
 	const apiUrl = `${host}/mu_api`;
 
 	// create the store
 	const initialState = {};
-	const createStore = getServerCreateStore(routes, middleware, request, baseUrl);
+	const createStore = getServerCreateStore(
+		routes,
+		middleware,
+		request,
+		baseUrl
+	);
 	const store = createStore(reducer, initialState);
 
 	// load initial config
@@ -170,8 +181,15 @@ const makeRenderer = (
 	// render skeleton if requested - the store is ready
 	if ('skeleton' in request.query) {
 		return Observable.of({
-			result: getHtml(baseUrl, assetPublicPath, clientFilename, store.getState()),
-			statusCode: 200
+			result: getHtml(
+				<Dom
+					baseUrl={baseUrl}
+					assetPublicPath={assetPublicPath}
+					clientFilename={clientFilename}
+					initialState={store.getState()}
+				/>
+			),
+			statusCode: 200,
 		});
 	}
 
@@ -179,8 +197,7 @@ const makeRenderer = (
 	const storeIsReady$ = Observable.create(obs => {
 		obs.next(store.getState());
 		return store.subscribe(() => obs.next(store.getState()));
-	})
-	.first(state => state.preRenderChecklist.every(isReady => isReady));  // take the first ready state
+	}).first(state => state.preRenderChecklist.every(isReady => isReady)); // take the first ready state
 
 	const action = {
 		type: SERVER_RENDER,
@@ -191,9 +208,18 @@ const makeRenderer = (
 		`Dispatching RENDER for ${request.url.href}`
 	);
 	store.dispatch(action);
-	return storeIsReady$
-		.map(() => getRouterRenderer(routes, store, url, baseUrl, clientFilename, assetPublicPath));
+	return storeIsReady$.map(() =>
+		getRouterRenderer({
+			routes,
+			store,
+			location: url,
+			baseUrl,
+			clientFilename,
+			assetPublicPath,
+			scripts,
+		})
+	);
 };
 
+export { makeRenderer$, makeRenderer };
 export default makeRenderer;
-
