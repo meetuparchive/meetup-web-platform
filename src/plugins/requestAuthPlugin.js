@@ -310,8 +310,12 @@ export const getAuthenticate = authorizeRequest$ => (request, reply) => {
  *   auth stategy instance
  */
 export const oauthScheme = server => {
-	configureAuthCookies(server);       // apply default config for auth cookies
-	server.ext('onPreAuth', setPluginState);     // provide a reference to `reply` on the request
+	// apply default config for auth cookies
+	configureAuthCookies(server);
+
+	// provide a reference to `reply` on the request
+	server.ext('onPreAuth', setPluginState);
+
 	const authorizeRequest$ = applyRequestAuthorizer$(getRequestAuthorizer$(server.app));
 
 	return {

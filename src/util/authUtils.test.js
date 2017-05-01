@@ -10,13 +10,14 @@ import {
 describe('configureAuthCookies', () => {
 	const serverWithState = {
 		state: () => {},
-		app: {},
+		app: {
+			cookie_encrypt_secret: 'asdklfjahsdflkjasdfhlkajsdfkljasdlkasdjhfalksdjfbalkjsdhfalsdfasdlkfasd',
+		},
 	};
+
+	const plugins = { requestAuth: {} };
+
 	it('calls server.state for each auth cookie name', () => {
-		const config = {
-			COOKIE_ENCRYPT_SECRET: 'asdklfjahsdflkjasdfhlkajsdfkljasdlkasdjhfalksdjfbalkjsdhfalsdfasdlkfasd',
-		};
-		const plugins = { requestAuth: { config } };
 		spyOn(serverWithState, 'state');
 		configureAuthCookies({
 			...serverWithState,
@@ -29,21 +30,23 @@ describe('configureAuthCookies', () => {
 			expect(args[1]).toEqual(jasmine.any(Object));  // the cookie config
 		});
 	});
+
 	it('throws an error when secret is missing', () => {
-		const config = {};
-		const plugins = { requestAuth: { config } };
+		let serverWithNoSecret = { ...serverWithState };
+		delete serverWithNoSecret.app.cookie_encrypt_secret;
+
 		expect(() => configureAuthCookies({
-			...serverWithState,
+			...serverWithNoSecret,
 			plugins,
 		})).toThrow();
 	});
+
 	it('throws an error when secret is too short', () => {
-		const config = {
-			COOKIE_ENCRYPT_SECRET: 'less than 32 characters',
-		};
-		const plugins = { requestAuth: { config } };
+		let serverWithShortSecret = { ...serverWithState };
+		serverWithShortSecret.app.cookie_encrypt_secret = 'asdf';
+
 		expect(() => configureAuthCookies({
-			...serverWithState,
+			...serverWithShortState,
 			plugins,
 		})).toThrow();
 	});
