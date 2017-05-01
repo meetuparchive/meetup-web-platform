@@ -67,7 +67,7 @@ const MOCK_SERVER = {
 	},
 	ext: () => {},
 	state: () => {},
-	app: { ...MOCK_SERVER_APP },
+	app: {},
 	expose: () => {},
 	plugins: {
 		requestAuth: {},
@@ -85,7 +85,7 @@ const MOCK_REQUEST = {
 			reply: MOCK_REPLY_FN
 		},
 	},
-	server: { ...MOCK_SERVER },
+	server: {},
 };
 
 const MOCK_AUTHED_REQUEST = {
@@ -106,13 +106,13 @@ describe('getAnonymousCode$', () => {
 			return GOOD_MOCK_FETCH_RESULT;
 		});
 
-		getAnonymousCode$({ ...MOCK_SERVER_APP }, null).subscribe(done);
+		getAnonymousCode$(MOCK_SERVER_APP, null).subscribe(done);
 	});
 
 	it('throws error when response cannot be JSON parsed', function() {
 		spyOn(global, 'fetch').and.callFake((url, opts) => BAD_MOCK_FETCH_RESULT);
 
-		return getAnonymousCode$({ ...MOCK_SERVER_APP }, null)
+		return getAnonymousCode$(MOCK_SERVER_APP, null)
 			.toPromise()
 			.catch(err => {
 				expect(err).toEqual(jasmine.any(Error));
@@ -127,39 +127,46 @@ describe('getAccessToken$', () => {
 			return GOOD_MOCK_FETCH_RESULT;
 		});
 
-		const getToken$ = getAccessToken$({ ...MOCK_SERVER_APP }, null);
+		const getToken$ = getAccessToken$(MOCK_SERVER_APP, null);
 		getToken$(MOCK_HEADERS)(MOCK_CODE).subscribe(done);
 	});
 
-	xit('throws an error when no oauth.key is supplied', function() {
-		let serverAppNoOauthKey = { ...MOCK_SERVER_APP };
-		delete serverAppNoOauthKey.oauth.key;
+	it('throws an error when no oauth.key is supplied', function() {
+		const oauthNoKey = { ...MOCK_SERVER_APP.oauth };
+		delete oauthNoKey.key;
 
-		expect(() => getAccessToken$({ ...serverAppNoOauthKey }, null))
+		const serverAppNoOauthKey = {
+			...MOCK_SERVER_APP,
+			oauth: oauthNoKey,
+		};
+
+		expect(() => getAccessToken$(serverAppNoOauthKey, null))
 			.toThrowError(ReferenceError);
 	});
 
 	xit('throws an error when no oauth.secret is supplied', function() {
-		let serverAppNoOauthSecret = { ...MOCK_SERVER_APP };
-		delete serverAppNoOauthSecret.oauth.secret;
+		const oauthNoSecret = { ...MOCK_SERVER_APP.oauth };
+		delete oauthNoSecret.secret;
+
+		const serverAppNoOauthSecret = {
+			...MOCK_SERVER_APP,
+			oauth: oauthNoSecret,
+		};
 
 		expect(() => getAccessToken$(serverAppNoOauthSecret, null))
 			.toThrowError(ReferenceError);
 	});
 
 	it('throws an error when no access code is supplied to the final curried function', function() {
-		//console.log(MOCK_SERVER_APP);
-		//console.log('-------------');
-		//console.log(MOCK_SERVER);
 		const token = null;
-		const getToken$ = getAccessToken$({ ...MOCK_SERVER_APP }, null);
+		const getToken$ = getAccessToken$(MOCK_SERVER_APP, null);
 
 		expect(() => getToken$(MOCK_HEADERS)({ ...MOCK_CODE, token })).toThrowError(ReferenceError);
 	});
 
 	it('throws an error when response cannot be JSON parsed', function(done) {
 		spyOn(global, 'fetch').and.callFake((url, opts) => BAD_MOCK_FETCH_RESULT);
-		const getToken$ = getAccessToken$({ ...MOCK_SERVER_APP }, null);
+		const getToken$ = getAccessToken$(MOCK_SERVER_APP, null);
 
 		getToken$(MOCK_HEADERS)(MOCK_CODE)
 			.catch(err => {

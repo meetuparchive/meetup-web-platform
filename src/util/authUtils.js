@@ -80,6 +80,7 @@ export const getMemberCookieName = server =>
  * apply default cookie options for auth-related cookies
  */
 export const configureAuthCookies = server => {
+console.log(server.app);
 	const password = validateSecret(server.app.cookie_encrypt_secret);
 	const isSecure = server.app.isProd;
 	const authCookieOptions = {
