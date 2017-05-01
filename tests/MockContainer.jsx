@@ -1,11 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import Link from 'react-router-dom/Link';
+import logger from '../src/util/logger';
 
 export const fooPathContent = 'Looking good';
 
 function mapStateToProps(state) {
-	console.log(JSON.stringify(state));
+	logger.info(state);
 	return {
 		data: (state.api.foo || {}).value
 	};
