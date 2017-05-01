@@ -67,7 +67,7 @@ const MOCK_SERVER = {
 	},
 	ext: () => {},
 	state: () => {},
-	app: {},
+	app: MOCK_SERVER_APP,
 	expose: () => {},
 	plugins: {
 		requestAuth: {},
@@ -85,7 +85,7 @@ const MOCK_REQUEST = {
 			reply: MOCK_REPLY_FN
 		},
 	},
-	server: {},
+	server: MOCK_SERVER,
 };
 
 const MOCK_AUTHED_REQUEST = {
