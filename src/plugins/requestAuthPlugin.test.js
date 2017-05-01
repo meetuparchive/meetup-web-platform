@@ -106,13 +106,13 @@ describe('getAnonymousCode$', () => {
 			return GOOD_MOCK_FETCH_RESULT;
 		});
 
-		getAnonymousCode$(MOCK_SERVER, null).subscribe(done);
+		getAnonymousCode$(MOCK_SERVER_APP, null).subscribe(done);
 	});
 
 	it('throws error when response cannot be JSON parsed', function() {
 		spyOn(global, 'fetch').and.callFake((url, opts) => BAD_MOCK_FETCH_RESULT);
 
-		return getAnonymousCode$(MOCK_SERVER, null)
+		return getAnonymousCode$(MOCK_SERVER_APP, null)
 			.toPromise()
 			.catch(err => {
 				expect(err).toEqual(jasmine.any(Error));
@@ -127,36 +127,36 @@ describe('getAccessToken$', () => {
 			return GOOD_MOCK_FETCH_RESULT;
 		});
 
-		const getToken$ = getAccessToken$(MOCK_SERVER, null);
+		const getToken$ = getAccessToken$(MOCK_SERVER_APP, null);
 		getToken$(MOCK_HEADERS)(MOCK_CODE).subscribe(done);
 	});
 
 	it('throws an error when no oauth.key is supplied', function() {
-		let serverNoOauthKey = { ...MOCK_SERVER };
-		delete serverNoOauthKey.app.oauth.key;
+		let serverAppNoOauthKey = { ...MOCK_SERVER_APP };
+		delete serverAppNoOauthKey.oauth.key;
 
-		expect(() => getAccessToken$(serverNoOauthKey, null))
+		expect(() => getAccessToken$(serverAppNoOauthKey, null))
 			.toThrowError(ReferenceError);
 	});
 
 	it('throws an error when no oauth.secret is supplied', function() {
-		let serverNoOauthSecret = { ...MOCK_SERVER };
-		delete serverNoOauthSecret.app.oauth.secret;
+		let serverAppNoOauthSecret = { ...MOCK_SERVER_APP };
+		delete serverAppNoOauthSecret.oauth.secret;
 
-		expect(() => getAccessToken$(serverNoOauthSecret, null))
+		expect(() => getAccessToken$(serverAppNoOauthSecret, null))
 			.toThrowError(ReferenceError);
 	});
 
 	it('throws an error when no access code is supplied to the final curried function', function() {
 		const token = null;
-		const getToken$ = getAccessToken$(MOCK_SERVER, null);
+		const getToken$ = getAccessToken$(MOCK_SERVER_APP, null);
 
 		expect(() => getToken$(MOCK_HEADERS)({ ...MOCK_CODE, token })).toThrowError(ReferenceError);
 	});
 
 	it('throws an error when response cannot be JSON parsed', function(done) {
 		spyOn(global, 'fetch').and.callFake((url, opts) => BAD_MOCK_FETCH_RESULT);
-		const getToken$ = getAccessToken$(MOCK_SERVER, null);
+		const getToken$ = getAccessToken$(MOCK_SERVER_APP, null);
 
 		getToken$(MOCK_HEADERS)(MOCK_CODE)
 			.catch(err => {
@@ -181,7 +181,7 @@ describe('getRequestAuthorizer$', () => {
 				});
 			}
 		});
-		const requestAuthorizer$ = getRequestAuthorizer$(MOCK_SERVER);
+		const requestAuthorizer$ = getRequestAuthorizer$(MOCK_SERVER_APP);
 
 		requestAuthorizer$({ ...MOCK_REQUEST }).subscribe(auth => {
 			expect(auth.oauth_token).toBe('good_token');
@@ -191,7 +191,7 @@ describe('getRequestAuthorizer$', () => {
 });
 
 describe('applyRequestAuthorizer$', () => {
-	const requestAuthorizer$ = getRequestAuthorizer$(MOCK_SERVER);
+	const requestAuthorizer$ = getRequestAuthorizer$(MOCK_SERVER_APP);
 	const authorizeRequest$ = applyRequestAuthorizer$(requestAuthorizer$);
 	it('does not try to fetch when provided a request with oauth_token in state', () => {
 		spyOn(global, 'fetch');

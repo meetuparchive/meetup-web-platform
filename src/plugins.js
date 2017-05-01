@@ -35,18 +35,24 @@ export function setCsrfCookies(request, reply) {
  * function calls `server.state` for both cookie names before registering the
  * plugin.
  *
- * @return {Object} the { register, options } object for a `server.register` call.
+ * @return {Object} the { register } object for a `server.register` call.
  */
 export function getCsrfPlugin() {
-	const register = (server, options, next) => {
+	const register = (server, next) => {
+		const options = {
+			secret: server.app.csrf_secret,
+		};
+
 		const cookieOptions = {
 			path: '/',
 			isSecure: server.app.isProd,
 		};
+
 		server.state(
 			'x-csrf-jwt',  // set by plugin
 			{ ...cookieOptions, isHttpOnly: true }  // no client-side interaction needed
 		);
+
 		server.state(
 			'x-csrf-jwt-header',  // set by onPreResponse
 			{ ...cookieOptions, isHttpOnly: false } // the client must read this cookie and return as a custom header
@@ -57,12 +63,11 @@ export function getCsrfPlugin() {
 
 		return registration;
 	};
+
 	register.attributes = CsrfPlugin.register.attributes;
+
 	return {
-		register,
-		options: {
-			secret: server.app.csrf_secret,
-		}
+		register
 	};
 }
 

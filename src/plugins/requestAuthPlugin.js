@@ -107,17 +107,17 @@ export const applyRequestAuthorizer$ = requestAuthorizer$ => request => {
  * Get an anonymous code from the API that can be used to generate an oauth
  * access token
  *
- * @param {Object} server the Hapi app server instance
+ * @param {Object} serverAppConfig the Hapi `server.app` object
  * @param {String} redirect_uri Return url after anonymous grant
  */
-export function getAnonymousCode$(server, redirect_uri) {
-	if (!server.app.oauth.key) {
+export function getAnonymousCode$(serverAppConfig, redirect_uri) {
+	if (!serverAppConfig.oauth.key) {
 		throw new ReferenceError('OAuth consumer key is required');
 	}
 
-	const authURL = new URL(server.app.oauth.auth_url);
+	const authURL = new URL(serverAppConfig.oauth.auth_url);
 	authURL.searchParams.append('response_type', 'anonymous_code');
-	authURL.searchParams.append('client_id', server.app.oauth.key);
+	authURL.searchParams.append('client_id', serverAppConfig.oauth.key);
 	authURL.searchParams.append('redirect_uri', redirect_uri);
 	const requestOpts = {
 		method: 'GET',
@@ -128,31 +128,31 @@ export function getAnonymousCode$(server, redirect_uri) {
 
 	return Observable.defer(() => {
 		console.log(JSON.stringify({
-			message: `Outgoing request GET ${server.app.oauth.auth_url}`,
+			message: `Outgoing request GET ${serverAppConfig.oauth.auth_url}`,
 			type: 'request',
 			direction: 'out',
 			info: {
-				url: server.app.oauth.auth_url,
+				url: serverAppConfig.oauth.auth_url,
 				method: 'get',
 			}
 		}));
 
 		const startTime = new Date();
 		return Observable.fromPromise(fetch(authURL.toString(), requestOpts))
-			.timeout(server.app.api.timeout)
+			.timeout(serverAppConfig.api.timeout)
 			.do(() => {
 				console.log(JSON.stringify({
-					message: `Incoming response GET ${server.app.oauth.auth_url}`,
+					message: `Incoming response GET ${serverAppConfig.oauth.auth_url}`,
 					type: 'response',
 					direction: 'in',
 					info: {
-						url: server.app.oauth.auth_url,
+						url: serverAppConfig.oauth.auth_url,
 						method: 'get',
 						time: new Date() - startTime,
 					}
 				}));
 			})
-			.mergeMap(tryJSON(server.app.oauth.auth_url))
+			.mergeMap(tryJSON(serverAppConfig.oauth.auth_url))
 			.map(({ code }) => ({
 				grant_type: 'anonymous_code',
 				token: code
@@ -164,21 +164,22 @@ export function getAnonymousCode$(server, redirect_uri) {
  * Generate a function that receives a grant type and grant
  * token that can be used to generate an oauth access token from the API
  *
- * @param {Object} server the Hapi app server instance
+ * @param {Object} serverAppConfig the Hapi `server.app` config object
  * @param {String} redirect_uri Return url after anonymous grant
+ *
  * @return {Object} the JSON-parsed response from the authorize endpoint
  *   - contains 'access_token', 'refresh_token'
  */
-export const getAccessToken$ = (server, redirect_uri) => {
-	if (!server.app.oauth.key) {
+export const getAccessToken$ = (serverAppConfig, redirect_uri) => {
+	if (!serverAppConfig.oauth.key) {
 		throw new ReferenceError('OAuth consumer key is required');
 	}
-	if (!server.app.oauth.secret) {
+	if (!serverAppConfig.oauth.secret) {
 		throw new ReferenceError('OAuth consumer secret is required');
 	}
 	const params = {
-		client_id: server.app.oauth.key,
-		client_secret: server.app.oauth.secret,
+		client_id: serverAppConfig.oauth.key,
+		client_secret: serverAppConfig.oauth.secret,
 		redirect_uri
 	};
 	return headers => {
@@ -195,7 +196,7 @@ export const getAccessToken$ = (server, redirect_uri) => {
 			.reduce((accessUrl, key) => {
 				accessUrl.searchParams.append(key, params[key]);
 				return accessUrl;
-			}, new URL(server.app.oauth.access_url));
+			}, new URL(serverAppConfig.oauth.access_url));
 
 		return ({ grant_type, token }) => {
 
@@ -213,31 +214,31 @@ export const getAccessToken$ = (server, redirect_uri) => {
 			}
 
 			console.log(JSON.stringify({
-				message: `Outgoing request GET ${server.app.oauth.access_url}?${grant_type}`,
+				message: `Outgoing request GET ${serverAppConfig.oauth.access_url}?${grant_type}`,
 				type: 'request',
 				direction: 'out',
 				info: {
-					url: server.app.oauth.access_url,
+					url: serverAppConfig.oauth.access_url,
 					method: 'get',
 				}
 			}));
 
 			const startTime = new Date();
 			return Observable.fromPromise(fetch(accessUrl.toString(), requestOpts))
-				.timeout(server.app.api.timeout)
+				.timeout(serverAppConfig.api.timeout)
 				.do(() => {
 					console.log(JSON.stringify({
-						message: `Incoming response GET ${server.app.oauth.access_url}?${grant_type}`,
+						message: `Incoming response GET ${serverAppConfig.oauth.access_url}?${grant_type}`,
 						type: 'response',
 						direction: 'in',
 						info: {
-							url: server.app.oauth.access_url,
+							url: serverAppConfig.oauth.access_url,
 							method: 'get',
 							time: new Date() - startTime,
 						}
 					}));
 				})
-				.mergeMap(tryJSON(server.app.oauth.access_url));
+				.mergeMap(tryJSON(serverAppConfig.oauth.access_url));
 		};
 	};
 };
@@ -252,12 +253,12 @@ const refreshToken$ = refresh_token => Observable.of({
  * For an anonymous auth, the request header information is used to determine
  * the location and language of the anonymous member
  *
- * @param {Object} server the Hapi app server instance
+ * @param {Object} serverAppConfig the Hapi `server.app` config object
  */
-export const getRequestAuthorizer$ = (server) => {
+export const getRequestAuthorizer$ = (serverAppConfig) => {
 	const redirect_uri = 'http://www.meetup.com/';  // required param set in oauth consumer config
-	const anonymousCode$ = getAnonymousCode$(server, redirect_uri);
-	const accessToken$ = getAccessToken$(server, redirect_uri);
+	const anonymousCode$ = getAnonymousCode$(serverAppConfig, redirect_uri);
+	const accessToken$ = getAccessToken$(serverAppConfig, redirect_uri);
 
 	// if the request has a refresh_token, use it. Otherwise, get a new anonymous access token
 	return ({ headers, state: { refresh_token} }) =>
@@ -311,7 +312,7 @@ export const getAuthenticate = authorizeRequest$ => (request, reply) => {
 export const oauthScheme = server => {
 	configureAuthCookies(server);       // apply default config for auth cookies
 	server.ext('onPreAuth', setPluginState);     // provide a reference to `reply` on the request
-	const authorizeRequest$ = applyRequestAuthorizer$(getRequestAuthorizer$(server));
+	const authorizeRequest$ = applyRequestAuthorizer$(getRequestAuthorizer$(server.app));
 
 	return {
 		authenticate: getAuthenticate(authorizeRequest$),
