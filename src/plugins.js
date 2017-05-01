@@ -38,10 +38,8 @@ export function setCsrfCookies(request, reply) {
  * @return {Object} the { register } object for a `server.register` call.
  */
 export function getCsrfPlugin() {
-	const register = (server, next) => {
-		const options = {
-			secret: server.app.csrf_secret,
-		};
+	const register = (server, options, next) => {
+		options.secret = server.app.csrf_secret;
 
 		const cookieOptions = {
 			path: '/',
