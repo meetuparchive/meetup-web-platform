@@ -3,6 +3,8 @@ import { logTrack } from './tracking';
 import { clickToClickRecord } from './clickTrackingReader';
 import * as avro from './avro';
 
+const extractRecord = /^analytics=(.+?)\n$/;
+
 describe('avroSerializer', () => {
 	it('encodes record of provided schema', () => {
 		const schema = {
@@ -17,7 +19,7 @@ describe('avroSerializer', () => {
 		const serialized = serializer(data);
 
 		// parse stringified object
-		const valObj = JSON.parse(serialized);
+		const valObj = JSON.parse(extractRecord.exec(serialized)[1]);
 		// create a new buffer from that string
 		const avroBuffer = new Buffer(valObj.record, 'base64');
 		// get the avro-encoded record
@@ -45,7 +47,7 @@ describe('Activity tracking', () => {
 		const serialized = avro.activitySerializer(trackInfo);
 
 		// parse stringified object
-		const valObj = JSON.parse(serialized);
+		const valObj = JSON.parse(extractRecord.exec(serialized)[1]);
 		// create a new buffer from that string
 		const avroBuffer = new Buffer(valObj.record, 'base64');
 		// get the avro-encoded record
@@ -76,7 +78,7 @@ describe('Click tracking', () => {
 		const serialized = avro.clickSerializer(trackInfo);
 
 		// parse stringified object
-		const valObj = JSON.parse(serialized);
+		const valObj = JSON.parse(extractRecord.exec(serialized)[1]);
 		// create a new buffer from that string
 		const avroBuffer = new Buffer(valObj.record, 'base64');
 		// get the avro-encoded record

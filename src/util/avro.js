@@ -65,7 +65,7 @@ const avroSerializer = schema => data => {
 		schema: `gs://meetup-logs/avro_schemas/${schema.name}_${schema.doc}.avsc`,
 		date: timestamp.substr(0, 10),  // YYYY-MM-DD
 	};
-	return JSON.stringify(analytics);
+	return `analytics=${JSON.stringify(analytics)}\n`;
 };
 
 module.exports = {

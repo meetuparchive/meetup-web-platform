@@ -3,6 +3,7 @@ import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/throw';
 import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/catch';
+import { MOCK_LOGGER } from '../util/testUtils';
 import register, {
 	getAuthenticate,
 	oauthScheme,
@@ -24,7 +25,8 @@ const MOCK_SERVER = {
 	},
 	ext: () => {},
 	state: () => {},
-	app: {},
+	logger: () => MOCK_LOGGER,
+	app: { logger: MOCK_LOGGER },
 	expose: () => {},
 	plugins: { requestAuth: { config: { COOKIE_ENCRYPT_SECRET: 'asdfasdfasdfasdfasdfasdfasdfasdfasdf' } } }
 };
@@ -41,8 +43,10 @@ const MOCK_REQUEST = {
 	plugins: {
 		requestAuth: {},
 	},
-	server: {
-		app: {},
+	server: MOCK_SERVER,
+	raw: {
+		req: {},
+		res: {},
 	},
 };
 MOCK_REQUEST.plugins.requestAuth = {
