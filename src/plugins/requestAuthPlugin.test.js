@@ -21,7 +21,7 @@ MOCK_REPLY_FN.continue = () => {};
 
 const MOCK_CODE = {
 	grant_type: 'anonymous_code',
-	token: 'mock_anon_code'
+	token: 'mock_anon_code',
 };
 
 const MOCK_HEADERS = {};
@@ -30,7 +30,7 @@ const MOCK_OAUTH = {
 	auth_url: 'http://example.com/auth_fakeout',
 	access_url: 'http://example.com/access_fakeout',
 	key: '1234',
-	secret: 'asdf'
+	secret: 'asdf',
 };
 
 const MOCK_SERVER_APP = {
@@ -56,7 +56,7 @@ const MOCK_SERVER_APP = {
 		foo: 'http://example.com'
 	},
 	isProd: 'false',
-	isDev: 'true'
+	isDev: 'true',
 };
 
 const MOCK_SERVER = {
@@ -71,7 +71,7 @@ const MOCK_SERVER = {
 	expose: () => {},
 	plugins: {
 		requestAuth: {},
-	}
+	},
 };
 
 const MOCK_REQUEST = {
@@ -85,7 +85,7 @@ const MOCK_REQUEST = {
 			reply: MOCK_REPLY_FN
 		},
 	},
-	server: MOCK_SERVER
+	server: MOCK_SERVER,
 };
 
 const MOCK_AUTHED_REQUEST = {
