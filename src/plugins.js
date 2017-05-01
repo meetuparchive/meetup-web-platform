@@ -4,8 +4,6 @@ import Good from 'good';
 import GoodTracking from './plugins/good-tracking';
 import requestAuthPlugin from './plugins/requestAuthPlugin';
 
-import config from './util/config';
-
 import {
 	activitySerializer,
 	clickSerializer,
@@ -37,14 +35,13 @@ export function setCsrfCookies(request, reply) {
  * function calls `server.state` for both cookie names before registering the
  * plugin.
  *
- * @param {String} secret the 'salt' for encoding the CSRF tokens
  * @return {Object} the { register, options } object for a `server.register` call.
  */
-export function getCsrfPlugin(secret) {
+export function getCsrfPlugin() {
 	const register = (server, options, next) => {
 		const cookieOptions = {
 			path: '/',
-			isSecure: config.get('isProd'),
+			isSecure: server.app.isProd,
 		};
 		server.state(
 			'x-csrf-jwt',  // set by plugin
@@ -64,7 +61,7 @@ export function getCsrfPlugin(secret) {
 	return {
 		register,
 		options: {
-			secret,
+			secret: server.app.csrf_secret,
 		}
 	};
 }
@@ -139,9 +136,9 @@ export function getRequestAuthPlugin() {
 	};
 }
 
-export default function getPlugins(config) {
+export default function getPlugins() {
 	return [
-		getCsrfPlugin(config.get('csrf_secret')),
+		getCsrfPlugin(),
 		getConsoleLogPlugin(),
 		getRequestAuthPlugin(),
 	];
