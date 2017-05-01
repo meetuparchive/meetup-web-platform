@@ -4,8 +4,8 @@ import Route from 'react-router-dom/Route';
 
 import { decodeParams, getNestedRoutes } from '../util/routeUtils';
 
-const Empty = () => <div></div>;
-const Loading = () => <div></div>;
+const Empty = () => <div />;
+const Loading = () => <div />;
 /**
  * route rendering component
  */
@@ -13,19 +13,22 @@ class AsyncRoute extends React.Component {
 	constructor(props) {
 		super(props);
 		const component = props.route.component || Empty;
+		const routes = props.route.routes || null;
 		this.state = {
 			component,
-			_cache: [component],
+			routes,
+			_componentCache: [component],
+			_routesCache: [routes],
 		};
 	}
-	componentWillReceiveProps(nextProps) {
+	resolveComponents(nextProps) {
 		const { component, load } = nextProps.route;
 		if (component) {
 			this.setState(state => ({ component }));
 			return;
 		}
 		// async route - check for cache keyed by load function
-		const cached = this.state._cache[load.toString()];
+		const cached = this.state._componentCache[load.toString()];
 		if (cached) {
 			this.setState(state => ({ component: cached }));
 			return;
@@ -36,6 +39,28 @@ class AsyncRoute extends React.Component {
 		load().then(component => {
 			this.setState({ component });
 		});
+	}
+	resolveRoutes(nextProps) {
+		const { routes, loadNestedRoutes } = nextProps.route;
+		if (routes) {
+			this.setState(state => ({ routes }));
+			return;
+		}
+		// async route - check for cache keyed by load function
+		const cached = this.state._componentCache[loadNestedRoutes.toString()];
+		if (cached) {
+			this.setState(state => ({ component: cached }));
+			return;
+		}
+
+		// load async route
+		loadNestedRoutes().then(component => {
+			this.setState({ component });
+		});
+	}
+	componentWillReceiveProps(nextProps) {
+		this.resolveComponents(nextProps);
+		this.resolveRoutes(nextProps);
 	}
 	componentDidMount() {
 		if (this.props.route.load) {
@@ -52,17 +77,17 @@ class AsyncRoute extends React.Component {
 		return (
 			<Component {...this.props}>
 				{nestedRoutes &&
-					<RouteLayout routes={nestedRoutes} matchedPath={match.path} />
-				}
+					<RouteLayout routes={nestedRoutes} matchedPath={match.path} />}
 			</Component>
 		);
-
 	}
 }
 
 const RouteWithSubRoutes = route => {
 	if (!route.component && !route.load) {
-		throw new Error(`route for path ${JSON.stringify(route.path)} must have a 'component' property`);
+		throw new Error(
+			`route for path ${JSON.stringify(route.path)} must have a 'component' property`
+		);
 	}
 	if (route.render || route.children) {
 		console.warn('route.render and route.children function not supported');
@@ -82,17 +107,14 @@ const RouteWithSubRoutes = route => {
  */
 class RouteLayout extends React.Component {
 	render() {
-		const {
-			routes,
-			matchedPath='/'
-		} = this.props;
+		const { routes, matchedPath = '/' } = this.props;
 
 		return (
 			<Switch>
 				{routes.map((route, i) => {
-					const path = matchedPath === '/' ?  // root path, no need to prepend
-						route.path :
-						`${matchedPath}${route.path || ''}`;
+					const path = matchedPath === '/' // root path, no need to prepend
+						? route.path
+						: `${matchedPath}${route.path || ''}`;
 
 					return <RouteWithSubRoutes key={i} {...route} path={path} />;
 				})}
@@ -107,4 +129,3 @@ RouteLayout.propTypes = {
 };
 
 export default RouteLayout;
-

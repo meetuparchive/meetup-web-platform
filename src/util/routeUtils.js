@@ -10,10 +10,13 @@ export const decodeParams = params =>
 		return decodedParams;
 	}, {});
 
+// THIS MIGHT NEED TO BE A PROMISE to resolve nested routes
 export const getNestedRoutes = ({ route, match }) =>
-	(match.isExact && route.indexRoute
-		? [route.indexRoute] // only render index route
-		: route.routes); // pass along any defined nested routes
+	Promise.resolve(
+		match.isExact && route.indexRoute
+			? [route.indexRoute] // only render index route
+			: route.routes
+	); // pass along any defined nested routes
 
 const routePath = (route, matchedPath) =>
 	`${matchedPath}${route.path || ''}`.replace('//', '/');
@@ -31,7 +34,7 @@ const routePath = (route, matchedPath) =>
  * @param {String} url a URL path (no host) starting with `/`
  * @param {Array} matchedRoutes an array of [ route, match ] tuples
  * @param {String} matchedPath the part of the total path matched so far
- * @return {Array} an array of { route, match } objects
+ * @return {Promise<Array>} an array of { route, match } objects
  */
 export const matchRoutes = (
 	routes = [],
@@ -50,12 +53,16 @@ export const matchRoutes = (
 	const currentMatchedRoutes = [...matchedRoutes, { route, match }];
 
 	// add any nested route matches
-	const nestedRoutes = getNestedRoutes({ route, match }) || [];
-	return matchRoutes(
-		nestedRoutes,
-		url,
-		currentMatchedRoutes,
-		currentMatchedPath
+	return getNestedRoutes({ route, match }).then(
+		nestedRoutes =>
+			(nestedRoutes
+				? matchRoutes(
+						nestedRoutes,
+						url,
+						currentMatchedRoutes,
+						currentMatchedPath
+					)
+				: currentMatchedRoutes)
 	);
 };
 
@@ -104,6 +111,20 @@ export const resolveRouteComponents = (routes, baseUrl) => location => {
 				: Promise.resolve(route))
 	);
 	return Promise.all(componentPromises);
+};
+
+/**
+ * Populate the 'routes' property of all async routes
+ *
+ * @param {Array} routes an array of route objects
+ * @param {String} url the current URL path
+ * @param {URL} location the parsed url
+ * @return {Promise} resolves with all matched routes when their `routes`
+ *   children have been resolved
+ */
+export const resolveNestedRoutes = (routes, baseUrl) => location => {
+	const url = location.pathname.replace(baseUrl, '');
+	return matchRoutes(routes, url); // if this was a promise, job done
 };
 
 /**
