@@ -35,15 +35,14 @@ export function setCsrfCookies(request, reply) {
  * function calls `server.state` for both cookie names before registering the
  * plugin.
  *
+ * @param {Object} config the environment configuration object
  * @return {Object} the { register } object for a `server.register` call.
  */
-export function getCsrfPlugin() {
+export function getCsrfPlugin(config) {
 	const register = (server, options, next) => {
-		options.secret = server.app.csrf_secret;
-
 		const cookieOptions = {
 			path: '/',
-			isSecure: server.app.isProd,
+			isSecure: options.isProd,
 		};
 
 		server.state(
@@ -65,7 +64,11 @@ export function getCsrfPlugin() {
 	register.attributes = CsrfPlugin.register.attributes;
 
 	return {
-		register
+		register,
+		options: {
+			secret: config.csrf_secret,
+			isProd: config.isProd,
+		}
 	};
 }
 
@@ -139,9 +142,9 @@ export function getRequestAuthPlugin() {
 	};
 }
 
-export default function getPlugins() {
+export default function getPlugins(config) {
 	return [
-		getCsrfPlugin(),
+		getCsrfPlugin(config),
 		getConsoleLogPlugin(),
 		getRequestAuthPlugin(),
 	];

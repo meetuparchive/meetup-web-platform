@@ -53,7 +53,7 @@ export default function start(
 
 	const finalPlugins = [
 		...plugins,
-		...getPlugins()
+		...getPlugins(config)
 	];
 
 	return server(

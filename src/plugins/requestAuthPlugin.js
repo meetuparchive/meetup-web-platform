@@ -334,7 +334,7 @@ export const oauthScheme = server => {
  *
  * {@link http://hapijs.com/tutorials/plugins}
  */
-export default function register(server, next) {
+export default function register(server, options, next) {
 	// register the plugin's auth scheme
 	server.auth.scheme('oauth', oauthScheme);
 
