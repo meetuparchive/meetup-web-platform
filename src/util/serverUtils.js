@@ -6,6 +6,26 @@ import uuid from 'uuid';
 import track from './tracking';
 import clickTrackingReader from './clickTrackingReader';
 
+/**
+ * determine whether a nested object of values has
+ * a string that contains `.dev.meetup.`
+ *
+ * @param {String|Object} value string or nested object
+ * with values that could be URL strings
+ *
+ * @return {Boolean} whether the `value` contains a 'dev' URL string
+ */
+export function checkForDevUrl(value) {
+	switch(typeof value) {
+	case 'string':
+		return value.indexOf('.dev.meetup.') > -1;
+	case 'object':
+		return Object.keys(value).some(key => checkForDevUrl(value[key]));
+	}
+
+	return false;
+}
+
 export function onRequestExtension(request, reply) {
 	request.id = uuid.v4();
 
@@ -113,12 +133,16 @@ export function registerExtensionEvents(server) {
 /**
  * Make any environment changes that need to be made in response to the provided
  * config
+ *
  * @param {Object} config the node-convict config object
+ *
  * @return null
  */
 export function configureEnv(config) {
 	// When using .dev.meetup endpoints, ignore self-signed SSL cert
-	https.globalAgent.options.rejectUnauthorized = config.get('isProd');
+	const USING_DEV_ENDPOINTS = checkForDevUrl(config.getProperties());
+
+	https.globalAgent.options.rejectUnauthorized = !USING_DEV_ENDPOINTS;
 }
 
 /**
