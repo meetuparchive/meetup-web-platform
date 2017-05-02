@@ -23,8 +23,7 @@ before_install:
 before_script:
   - git diff --exit-code
 
-after_success:
-  - npm run coveralls
+after_script:
   - git config --global user.email "builds@travis-ci.com"
   - git config --global user.name "Travis CI"
   - $(npm bin)/set-up-ssh --key "$encrypted_ee3d73113e03_key" --iv "$encrypted_ee3d73113e03_iv" --path-encrypted-key ".travis/github_deploy_key.enc"
@@ -39,22 +38,18 @@ after_success:
   - echo "GIT_TAG=$GIT_TAG"
   - echo "NPM_TAG=$NPM_TAG"
   - >
-    [ "${TRAVIS_BRANCH}" = "master" ] &&
+    [ "${TRAVIS_BRANCH}" != "master" ] &&
+    echo "skipping versioning" ||
     yarn run build &&
     npm version $GIT_TAG -m "Version $GIT_TAG built by Travis CI - https://travis-ci.com/$TRAVIS_REPO_SLUG/builds/$TRAVIS_JOB_ID" &&
     git push --tags git@github.com:$TRAVIS_REPO_SLUG.git &&
-    npm publish --tag $NPM_TAG ||
-    echo "skipping versioning"
+    npm publish --tag $NPM_TAG
+
+after_success:
+  - npm run coveralls
 
 notifications:
   # slack integration
   slack:
-    # encrypted token for the meetuphq slack channel
-    secure: J7M6eSgKWcbMqFs9Z2wSiHemn/IGOj8D/iB6AB2WXPYxr8+HQnzE6L96lmdwwSHNscB0tbg7y7xsMJHh+qeiiFgrMTAP7SbbT0kV9JdFWEJs4mwZtMBeQXbyfIJ/6HSFAsAjOxBgyhNnmx6PYKWKc+HGVcRui4dWJQRO24Nmfup93gJon63U/KsdXyvTpVN/dZ2EneQzhh/Evg0fXRxo9ETeqfeJ7KNTc0FvklVYdMe0d9cPKZ7/22qoYM7KKELE5ER/pDEeU42ttz4axm1l7WQAddDTQElH1oZP46Eq62Adu244bSuQUBIRwSBJOjUMnIzxn+2s3u4BfeSSGm9d8X8PD46fcaIKbIQaYOnlL9IK4s8jUhv1j0/qEHm3X5OJ7nrHM1FEmlY8R/lgCPyFI6Rr1z722n2iCxKrsasqFaF4bNQjp1L1hHmuFS1bAsGYouc6IRYVLntl0KHI5RpLWxCf6s3kaYHRb8sKcrZTXK+lf/Hlk0iWfXK+SU5vdKtjSrIJusWBU5AmcDKJbjTBbi85/zxJ86jYJy0WN2HsyR6K2mm+iGwTcBD52Ut/7J3PcHgJyp9kq+NQIxyuyk1PmGFWwy6N+xpirlFo7ztgSSEa2teD0gb9Feh1XaLiuAXtmMyaO8esAbXqygweLJGSXoTQgvjJ1Bvgb5GJSej0LME=
-
-    # dont notify successful builds
-    on_success: never
-
-    # always notify build failures
-    on_failure: always
+    secure: roG6o9RL+fORpBVvhrcjSiC/UlYNLfkHs+MbzZuOqOGB4h8hS7J9ANH2/w2jkJlg/CKIgGEJmscmcrU/7xoB1eEoc5KD/av8sItvRdHx7RSqcAw6+hs96yMEMCbI3ldLTXgfvXpbQh/SFTFrul1aWSoM2oWhbBkjurLOPbmxO1cJhXTiMTvcghXxpzswmlSLtuygbMyNdmVnf4W/oG7Bci+WhOwi8k/V6d1e4v3MuLL8pK74BkpRc8ogTqgTKiWv2MlDUedaPskf2Th9GXaJySCjQ9bat4VQde1Dr4Qeftjef59yfbUtleQIsIemxoFAbgzFG/vTXqTUHUjYvuaFh8kG7NBGv9rHjUza5UX10nDjXcTsw0Zues4jQkGGKIYfS4UVeEpni+6APkaEzlV7x5q2V7c5Kc4JRk/JY5beQjrOy9yXN3jbiPvUNU+cDhDG2uXG/RUIErmRub2YmaO1lMmNwuDw7Hv/KRAx3rB4z6hxWh/zgFhtAfijTnlnOlCr/tc/PHTWUmIuyLitAyVj9od3/PhERoFPBsI5tITp3Y+yZDHbuCoUKl2vdLEVoT2cPRgKqyA1C86EHUE8aHQnW9xp+vJvC0QRL9XMt2ZFnneaay3bOPVKTU/lwBSxW/v3aOJRRKDaCbG0N11+jdKgcz23NLC/N1i5USOx2tFFL88=
 
