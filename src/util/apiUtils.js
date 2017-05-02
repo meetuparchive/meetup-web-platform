@@ -16,11 +16,15 @@ import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/timeout';
 
+import config from './config';
+
 import { removeAuthState } from './authUtils';
+
 import { getCookieLang } from './languageUtils';
 import { coerceBool, toCamelCase } from './stringUtils';
 
 import { querySchema } from './validation';
+
 import { duotoneRef } from './duotone';
 
 const MOCK_RESPONSE_OK = {
@@ -376,7 +380,7 @@ export function parseRequestQueries(request) {
  * @return {Object} { queries, externalRequestOpts }
  */
 export function parseRequest(request) {
-	const baseUrl = request.server.app.API_SERVER_ROOT_URL;
+	const baseUrl = request.server.settings.app.api.root_url;
 	const externalRequestOpts = {
 		baseUrl,
 		method: request.method,
@@ -508,7 +512,7 @@ export const makeExternalApiRequest = request => requestOpts => {
 				);
 			}
 		)
-		.timeout(request.server.app.API_TIMEOUT)
+		.timeout(request.server.settings.app.api.timeout)
 		.map(([response, body]) => [response, body, requestOpts.jar]);
 };
 
@@ -589,7 +593,7 @@ export const injectResponseCookies = request => ([response, _, jar]) => {
 			path: cookie.path,
 			isHttpOnly: cookie.httpOnly,
 			isSameSite: false,
-			isSecure: process.env.NODE_ENV === 'production',
+			isSecure: config.isProd,
 			strictHeader: false, // Can't enforce RFC 6265 cookie validation on external services
 		};
 
@@ -607,7 +611,7 @@ export const injectResponseCookies = request => ([response, _, jar]) => {
  */
 export const makeApiRequest$ = request => {
 	const setApiResponseDuotones = apiResponseDuotoneSetter(
-		request.server.app.duotoneUrls
+		request.server.settings.app.duotone_urls
 	);
 	return ([requestOpts, query]) => {
 		const request$ = query.mockResponse
