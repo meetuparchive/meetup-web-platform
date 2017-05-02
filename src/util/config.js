@@ -115,7 +115,7 @@ let config = convict({
 	},
 	photo_scaler_salt: {
 		format: function(salt) {
-			if (salt.toString().length < 1) {
+			if (!salt || salt.toString().length < 1) {
 				throw new Error('get PHOTO_SCALER_SALT from #web-platform team');
 			}
 		},
