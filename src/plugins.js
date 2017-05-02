@@ -30,15 +30,16 @@ export function setCsrfCookies(request, reply) {
  * function calls `server.state` for both cookie names before registering the
  * plugin.
  *
- * @param {Object} config the environment configuration object
  * @return {Object} the { register } object for a `server.register` call.
  */
-export function getCsrfPlugin(config) {
+export function getCsrfPlugin() {
 	const register = (server, options, next) => {
 		const cookieOptions = {
 			path: '/',
-			isSecure: options.isProd,
+			isSecure: server.settings.app.isProd,
 		};
+
+		options.secret = server.settings.app.csrf_secret;
 
 		server.state(
 			'x-csrf-jwt', // set by plugin
@@ -60,10 +61,6 @@ export function getCsrfPlugin(config) {
 
 	return {
 		register,
-		options: {
-			secret: config.csrf_secret,
-			isProd: config.isProd,
-		},
 	};
 }
 
@@ -86,6 +83,6 @@ export function getLogger(options = {}) {
 	};
 }
 
-export default function getPlugins(config) {
-	return [getLogger(), getCsrfPlugin(config), getRequestAuthPlugin()];
+export default function getPlugins() {
+	return [getLogger(), getCsrfPlugin(), getRequestAuthPlugin()];
 }

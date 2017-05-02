@@ -2,9 +2,9 @@
   "api": {
     "protocol": "https",
     "host": "www.api.meetup.com",
-    "timeout": 10
+    "timeout": 10,
+    "root_url": "https://www.api.meetup.com"
   },
-  "api_server_root_url": "https://www.api.meetup.com",
   "csrf_secret": "asdfasdfasdfasdfasdfasdfasdfasdf",
   "cookie_encrypt_secret": "asdfasdfasdfasdfasdfasdfasdfasdf",
   "dev_server": {

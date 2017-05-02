@@ -162,7 +162,7 @@ describe('getAccessToken$', () => {
 		);
 	});
 
-	xit('throws an error when no oauth.secret is supplied', function() {
+	it('throws an error when no oauth.secret is supplied', function() {
 		const oauthNoSecret = { ...MOCK_SERVER_APP.oauth };
 		delete oauthNoSecret.secret;
 

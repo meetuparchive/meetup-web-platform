@@ -36,6 +36,10 @@ let config = convict({
 			default: 8000,
 			env: 'API_TIMEOUT',
 		},
+		root_url: {
+			format: String,
+			default: '',
+		},
 	},
 	asset_server: {
 		host: {
@@ -82,6 +86,18 @@ let config = convict({
 			default: 8000,
 			env: 'DEV_SERVER_PORT',
 		},
+	},
+	duotone_urls: {
+		format: Object,
+		default: {},
+	},
+	isDev: {
+		format: Boolean,
+		default: true,
+	},
+	isProd: {
+		format: Boolean,
+		default: false,
 	},
 	oauth: {
 		auth_url: {
@@ -139,7 +155,7 @@ config.set(
 );
 
 config.set(
-	'api_server_root_url',
+	'api.root_url',
 	`${config.get('api.protocol')}://${config.get('api.host')}`
 );
 

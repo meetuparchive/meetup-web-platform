@@ -380,7 +380,7 @@ export function parseRequestQueries(request) {
  * @return {Object} { queries, externalRequestOpts }
  */
 export function parseRequest(request) {
-	const baseUrl = request.server.settings.app.api_server_root_url;
+	const baseUrl = request.server.settings.app.api.root_url;
 	const externalRequestOpts = {
 		baseUrl,
 		method: request.method,

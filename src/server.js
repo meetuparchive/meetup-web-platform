@@ -49,7 +49,7 @@ export default function start(
 		},
 	};
 
-	const finalPlugins = [...plugins, ...getPlugins(config)];
+	const finalPlugins = [...plugins, ...getPlugins()];
 
 	return server(finalRoutes, connection, finalPlugins, platform_agent, config);
 }

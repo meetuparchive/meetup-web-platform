@@ -14,8 +14,8 @@ export const mockConfig = {
 		protocol: 'https',
 		host: 'www.api.meetup.com',
 		timeout: 10,
+		root_url: 'https://www.api.meetup.com',
 	},
-	api_server_root_url: 'https://www.api.meetup.com',
 	csrf_secret: random32,
 	cookie_encrypt_secret: random32,
 	dev_server: {
