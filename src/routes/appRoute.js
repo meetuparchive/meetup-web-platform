@@ -25,7 +25,9 @@ export const onPreResponse = {
 		const errorMarkup = ReactDOMServer.renderToString(
 			React.createElement(RedBoxError, { error })
 		);
-		const errorResponse = reply(`<!DOCTYPE html><html><body>${errorMarkup}</body></html>`);
+		const errorResponse = reply(
+			`<!DOCTYPE html><html><body>${errorMarkup}</body></html>`
+		);
 		errorResponse.code(error.output.statusCode);
 		return errorResponse;
 	},
@@ -54,12 +56,12 @@ const getApplicationRoute = renderRequestMap => ({
 		},
 		plugins: {
 			'electrode-csrf-jwt': {
-				enabled: true,  // need to generate tokens on page request
-			}
+				enabled: true, // need to generate tokens on page request
+			},
 		},
 		state: {
-			failAction: 'ignore',  // ignore cookie validation, just accept
-		}
+			failAction: 'ignore', // ignore cookie validation, just accept
+		},
 	},
 	handler: getAppRouteHandler(renderRequestMap),
 });

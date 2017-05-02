@@ -37,14 +37,13 @@ export function apiError(err) {
  */
 export function apiComplete() {
 	return {
-		type: 'API_COMPLETE'
+		type: 'API_COMPLETE',
 	};
 }
 
 export function locationChange(location) {
 	return {
 		type: LOCATION_CHANGE,
-		payload: location
+		payload: location,
 	};
 }
-

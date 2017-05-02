@@ -8,10 +8,7 @@ import RouteLayout from './RouteLayout';
  */
 class PlatformApp extends React.Component {
 	render() {
-		const {
-			store,
-			routes,
-		} = this.props;
+		const { store, routes } = this.props;
 		return (
 			<Provider store={store}>
 				<SyncContainer>
@@ -23,4 +20,3 @@ class PlatformApp extends React.Component {
 }
 
 export default PlatformApp;
-

@@ -1,7 +1,4 @@
-import {
-	coerceBool,
-	toCamelCase,
-} from './stringUtils';
+import { coerceBool, toCamelCase } from './stringUtils';
 
 describe('coerceBool', () => {
 	it('turns boolean strings into real Booleans', () => {
@@ -27,4 +24,3 @@ describe('toCamelCase', () => {
 		expect(toCamelCase('this-is-compLICAT-ED')).toEqual('thisIsCompLICATED');
 	});
 });
-

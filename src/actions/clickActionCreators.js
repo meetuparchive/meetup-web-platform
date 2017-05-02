@@ -7,4 +7,3 @@ export const click = clickData => ({
 });
 
 export const clearClick = () => ({ type: CLICK_TRACK_CLEAR_ACTION });
-

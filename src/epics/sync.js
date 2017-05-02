@@ -19,7 +19,6 @@ import { clearClick } from '../actions/clickActionCreators';
 import { activeRouteQueries } from '../util/routeUtils';
 import { getDeprecatedSuccessPayload } from '../util/fetchUtils';
 
-
 const logoutQueryMatch = /[?&]logout(?:[=&]|$)/;
 /**
  * Any operations that keep the browser application in sync with the
@@ -45,31 +44,30 @@ const logoutQueryMatch = /[?&]logout(?:[=&]|$)/;
  */
 export const getNavEpic = (routes, baseUrl) => {
 	const findActiveQueries = activeRouteQueries(routes, baseUrl);
-	let currentLocation = {};  // keep track of current route so that apiRequest can get 'referrer'
+	let currentLocation = {}; // keep track of current route so that apiRequest can get 'referrer'
 	return (action$, store) =>
-		action$.ofType(LOCATION_CHANGE, SERVER_RENDER)
-			.mergeMap(({ payload }) => {
-				// inject request metadata from context, including `store.getState()`
-				const requestMetadata = {
-					referrer: currentLocation.pathname || '',
-					logout: logoutQueryMatch.test(payload.search),
-					clickTracking: store.getState().clickTracking,
-				};
-				// now that referrer has been recorded, set new currentLocation
-				currentLocation = payload;
+		action$.ofType(LOCATION_CHANGE, SERVER_RENDER).mergeMap(({ payload }) => {
+			// inject request metadata from context, including `store.getState()`
+			const requestMetadata = {
+				referrer: currentLocation.pathname || '',
+				logout: logoutQueryMatch.test(payload.search),
+				clickTracking: store.getState().clickTracking,
+			};
+			// now that referrer has been recorded, set new currentLocation
+			currentLocation = payload;
 
-				const activeQueries = findActiveQueries(payload);
-				const actions = [api.requestAll(activeQueries, requestMetadata)];
+			const activeQueries = findActiveQueries(payload);
+			const actions = [api.requestAll(activeQueries, requestMetadata)];
 
-				// emit cache clear _only_ when logout requested
-				if (requestMetadata.logout) {
-					actions.unshift({ type: 'CACHE_CLEAR' });
-				}
+			// emit cache clear _only_ when logout requested
+			if (requestMetadata.logout) {
+				actions.unshift({ type: 'CACHE_CLEAR' });
+			}
 
-				actions.push(clearClick());
+			actions.push(clearClick());
 
-				return Observable.from(actions);
-			});
+			return Observable.from(actions);
+		});
 };
 
 /**
@@ -81,8 +79,9 @@ export const getNavEpic = (routes, baseUrl) => {
  * `browserHistory` is safe to use here.
  */
 export const locationSyncEpic = (action$, store) =>
-	action$.ofType('LOGIN_SUCCESS')
-		.ignoreElements()  // TODO: push window.location into history without querystring
+	action$
+		.ofType('LOGIN_SUCCESS')
+		.ignoreElements() // TODO: push window.location into history without querystring
 		.map(() => ({ type: LOCATION_CHANGE, payload: window.location }));
 
 /**
@@ -90,7 +89,8 @@ export const locationSyncEpic = (action$, store) =>
  * @deprecated
  */
 export const apiRequestToApiReq = action$ =>
-	action$.ofType('API_REQUEST')
+	action$
+		.ofType('API_REQUEST')
 		.map(action => api.requestAll(action.payload, action.meta));
 
 /**
@@ -109,34 +109,35 @@ export const apiRequestToApiReq = action$ =>
  * - API_COMPLETE
  */
 export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
-	action$.ofType(api.API_REQ)
-		.mergeMap(({ payload: queries, meta }) => {           // set up the fetch call to the app server
-			const { config } = store.getState();
-			const fetchQueries = fetchQueriesFn(config.apiUrl);
-			return Observable.fromPromise(fetchQueries(queries, meta))  // call fetch
-				.takeUntil(action$.ofType(LOCATION_CHANGE))  // cancel this fetch when nav happens
-				.mergeMap(({ successes=[], errors=[] }) => {
-					const actions = [
-						...successes.map(api.success),  // send the successes to success
-						...errors.map(api.error),     // send errors to error
-						apiSuccess(getDeprecatedSuccessPayload(successes, errors)),  // DEPRECATED - necessary to continue populating old state
-						api.complete(queries)
-					];
-					return Observable.of(...actions);
-				})
-				.catch(err => Observable.of(
+	action$.ofType(api.API_REQ).mergeMap(({ payload: queries, meta }) => {
+		// set up the fetch call to the app server
+		const { config } = store.getState();
+		const fetchQueries = fetchQueriesFn(config.apiUrl);
+		return Observable.fromPromise(fetchQueries(queries, meta)) // call fetch
+			.takeUntil(action$.ofType(LOCATION_CHANGE)) // cancel this fetch when nav happens
+			.mergeMap(({ successes = [], errors = [] }) => {
+				const actions = [
+					...successes.map(api.success), // send the successes to success
+					...errors.map(api.error), // send errors to error
+					apiSuccess(getDeprecatedSuccessPayload(successes, errors)), // DEPRECATED - necessary to continue populating old state
+					api.complete(queries),
+				];
+				return Observable.of(...actions);
+			})
+			.catch(err =>
+				Observable.of(
 					api.fail(err),
-					apiError(err),  // DEPRECATED
+					apiError(err), // DEPRECATED
 					api.complete(queries)
-				));
-		});
+				)
+			);
+	});
 
 export default function getSyncEpic(routes, fetchQueries, baseUrl) {
 	return combineEpics(
 		getNavEpic(routes, baseUrl),
 		// locationSyncEpic,
 		getFetchQueriesEpic(fetchQueries),
-		apiRequestToApiReq  // TODO: remove in v3 - apiRequest is deprecated
+		apiRequestToApiReq // TODO: remove in v3 - apiRequest is deprecated
 	);
 }
-

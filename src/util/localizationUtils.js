@@ -12,7 +12,6 @@ import LocaleDataPT from 'react-intl/locale-data/pt';
 
 import { addLocaleData } from 'react-intl';
 
-
 const localeMap = {
 	'en-US': {
 		// Use built-in locale-data for en
@@ -21,26 +20,26 @@ const localeMap = {
 		// Use built-in locale-data for en
 	},
 	'de-DE': {
-		data: LocaleDataDE
+		data: LocaleDataDE,
 	},
 	'fr-FR': {
-		data: LocaleDataFR
+		data: LocaleDataFR,
 	},
 	'ja-JP': {
-		data: LocaleDataJA
+		data: LocaleDataJA,
 	},
 	'it-IT': {
-		data: LocaleDataIT
+		data: LocaleDataIT,
 	},
 	'pt-BR': {
-		data: LocaleDataPT
+		data: LocaleDataPT,
 	},
 	'es-ES': {
-		data: LocaleDataES
+		data: LocaleDataES,
 	},
 	es: {
-		data: LocaleDataES
-	}
+		data: LocaleDataES,
+	},
 };
 
 /**
@@ -67,5 +66,5 @@ export function loadLocale(localeCode) {
  */
 export function getLocaleCode(self) {
 	// Retreive locale code from state (api response)
-	return (self && self.lang || 'en-US').replace('_', '-');
+	return ((self && self.lang) || 'en-US').replace('_', '-');
 }

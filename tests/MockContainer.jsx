@@ -8,7 +8,7 @@ export const fooPathContent = 'Looking good';
 function mapStateToProps(state) {
 	logger.info(state);
 	return {
-		data: (state.api.foo || {}).value
+		data: (state.api.foo || {}).value,
 	};
 }
 
@@ -19,7 +19,7 @@ class MockContainer extends React.Component {
 	render() {
 		return (
 			<div>
-				<Link to='/'>Home link</Link>
+				<Link to="/">Home link</Link>
 				{fooPathContent}
 				{JSON.stringify(this.props.data || 'nope', null, 2)}
 			</div>
@@ -28,4 +28,3 @@ class MockContainer extends React.Component {
 }
 
 export default connect(mapStateToProps)(MockContainer);
-

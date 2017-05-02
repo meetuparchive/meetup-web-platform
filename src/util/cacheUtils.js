@@ -44,9 +44,10 @@ export function makeCache() {
  * @return {Promise} resolves with cache hit, otherwise rejects
  */
 export const cacheReader = cache => query =>
-	cache.get(JSON.stringify(query))
+	cache
+		.get(JSON.stringify(query))
 		.then(response => ({ query, response }))
-		.catch(err => ({ query, response: null }));  // errors don't matter - just return null
+		.catch(err => ({ query, response: null })); // errors don't matter - just return null
 
 /**
  * Generates a function that can write query-response values into cache
@@ -63,4 +64,3 @@ export const cacheWriter = cache => (query, response) => {
 	}
 	return cache.set(JSON.stringify(query), response);
 };
-

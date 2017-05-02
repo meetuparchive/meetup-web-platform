@@ -12,7 +12,7 @@ describe('onPreResponse.method', () => {
 			server: getServer(),
 		};
 		const replyObj = {
-			code() {}
+			code() {},
 		};
 		const spyable = {
 			reply: () => replyObj,
@@ -26,4 +26,3 @@ describe('onPreResponse.method', () => {
 		expect(replyObj.code).toHaveBeenCalledWith(errorCode);
 	});
 });
-

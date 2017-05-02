@@ -1,8 +1,6 @@
 import querystring from 'qs';
 import url from 'url';
-import {
-	LANGUAGE_COOKIE
-} from './cookieUtils';
+import { LANGUAGE_COOKIE } from './cookieUtils';
 import {
 	getCookieLang,
 	getUrlLang,
@@ -26,7 +24,13 @@ const similarToDefault = 'en-AU';
 const altLang = 'fr-FR';
 const altLang2 = 'de-DE';
 const altLang3 = 'es-ES';
-const supportedLangs = [similarToDefault, defaultLang, altLang, altLang2, altLang3];
+const supportedLangs = [
+	similarToDefault,
+	defaultLang,
+	altLang,
+	altLang2,
+	altLang3,
+];
 describe('getCookieLang', () => {
 	it('returns undefined when no cookie in state', () => {
 		const request = { ...MOCK_HAPI_REQUEST };
@@ -38,7 +42,10 @@ describe('getCookieLang', () => {
 			country: 'FR',
 			language: 'fr',
 		});
-		const request = { ...MOCK_HAPI_REQUEST, state: { [LANGUAGE_COOKIE]: MEETUP_LANGUAGE } };
+		const request = {
+			...MOCK_HAPI_REQUEST,
+			state: { [LANGUAGE_COOKIE]: MEETUP_LANGUAGE },
+		};
 		const lang = getCookieLang(request, supportedLangs);
 		expect(lang).toEqual(altLang);
 	});
@@ -46,13 +53,19 @@ describe('getCookieLang', () => {
 describe('getUrlLang', () => {
 	it('returns false for unsupported lang in url', () => {
 		const requestLang = 'this-isnt-even-a-language';
-		const request = { ...MOCK_HAPI_REQUEST, url: url.parse(`${rootUrl}${requestLang}/`) };
+		const request = {
+			...MOCK_HAPI_REQUEST,
+			url: url.parse(`${rootUrl}${requestLang}/`),
+		};
 		const lang = getUrlLang(request, supportedLangs);
 		expect(lang).toBe(false);
 	});
 	it('returns supported language from URL pathname, if present', () => {
 		const requestLang = altLang;
-		const request = { ...MOCK_HAPI_REQUEST, url: url.parse(`${rootUrl}${requestLang}/`) };
+		const request = {
+			...MOCK_HAPI_REQUEST,
+			url: url.parse(`${rootUrl}${requestLang}/`),
+		};
 		const lang = getUrlLang(request, supportedLangs);
 		expect(lang).toEqual(requestLang);
 	});
@@ -60,20 +73,29 @@ describe('getUrlLang', () => {
 describe('getBrowserLang', () => {
 	it('returns false for unsupported browser language', () => {
 		const acceptLang = 'this-isnt-even-a-language';
-		const request = { ...MOCK_HAPI_REQUEST, headers: { 'accept-language': acceptLang } };
+		const request = {
+			...MOCK_HAPI_REQUEST,
+			headers: { 'accept-language': acceptLang },
+		};
 		const lang = getBrowserLang(request, supportedLangs);
 		expect(lang).toBe(false);
 	});
 	it('returns en-US instead of en-AU for "en" if en-US is preferred', () => {
 		const acceptLang = 'en';
-		const supportedLangs = ['en-US', 'en-AU'];  // sorted by preference
-		const request = { ...MOCK_HAPI_REQUEST, headers: { 'accept-language': acceptLang } };
+		const supportedLangs = ['en-US', 'en-AU']; // sorted by preference
+		const request = {
+			...MOCK_HAPI_REQUEST,
+			headers: { 'accept-language': acceptLang },
+		};
 		const lang = getBrowserLang(request, supportedLangs);
 		expect(lang).toEqual('en-US');
 	});
 	it('returns supported language from brower "Accept-Language" header, if present', () => {
 		const acceptLang = altLang;
-		const request = { ...MOCK_HAPI_REQUEST, headers: { 'accept-language': acceptLang } };
+		const request = {
+			...MOCK_HAPI_REQUEST,
+			headers: { 'accept-language': acceptLang },
+		};
 		const lang = getBrowserLang(request, supportedLangs);
 		expect(lang).toEqual(acceptLang);
 	});
@@ -87,12 +109,20 @@ describe('getLanguage', () => {
 describe('checkLanguageRedirect', () => {
 	function getRedirect({ requestLang, requestUrl }) {
 		const request = { ...MOCK_HAPI_REQUEST, url: url.parse(requestUrl) };
-		return checkLanguageRedirect(request, MOCK_HAPI_REPLY, requestLang, supportedLangs, defaultLang);
+		return checkLanguageRedirect(
+			request,
+			MOCK_HAPI_REPLY,
+			requestLang,
+			supportedLangs,
+			defaultLang
+		);
 	}
 	function expectRedirect(options) {
 		if (options.expectedRedirect) {
 			expect(getRedirect(options)).not.toBeNull();
-			expect(MOCK_HAPI_REPLY.redirect.calls.mostRecent().args).toEqual([options.expectedRedirect]);
+			expect(MOCK_HAPI_REPLY.redirect.calls.mostRecent().args).toEqual([
+				options.expectedRedirect,
+			]);
 		} else {
 			expect(getRedirect(options)).toBeNull();
 			expect(MOCK_HAPI_REPLY.redirect).not.toHaveBeenCalled();
@@ -102,7 +132,8 @@ describe('checkLanguageRedirect', () => {
 		expectRedirect(options);
 
 		options.requestUrl = `${options.requestUrl}foo`;
-		options.expectedRedirect = options.expectedRedirect && `${options.expectedRedirect}foo`;
+		options.expectedRedirect =
+			options.expectedRedirect && `${options.expectedRedirect}foo`;
 		expectRedirect(options);
 	}
 	beforeEach(() => {
@@ -114,22 +145,20 @@ describe('checkLanguageRedirect', () => {
 			requestLang: defaultLang,
 			requestUrl: `${rootUrl}${defaultLang}/`,
 			expectedRedirect: rootUrl,
-		})
-	);
+		}));
 	it('calls redirect to root path when default lang requested on incorrect language path', () =>
 		testRedirect({
 			requestLang: defaultLang,
 			requestUrl: `${rootUrl}${altLang}/`,
 			expectedRedirect: rootUrl,
-		})
-	);
+		}));
 	it('calls redirect to requestLanguage path from incorrect language path', () => {
 		const requestLang = altLang;
 		supportedLangs.filter(l => l !== altLang).forEach(lang =>
 			testRedirect({
 				requestLang,
 				requestUrl: `${rootUrl}${lang}/`,
-				expectedRedirect: `${rootUrl}${requestLang}/`
+				expectedRedirect: `${rootUrl}${requestLang}/`,
 			})
 		);
 	});

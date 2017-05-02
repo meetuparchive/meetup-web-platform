@@ -2,10 +2,7 @@ import { combineEpics, createEpicMiddleware } from 'redux-observable';
 
 import getSyncEpic from '../epics/sync';
 import getCacheEpic from '../epics/cache';
-import {
-	getPostEpic,
-	getDeleteEpic
-} from '../epics/mutate';  // DEPRECATED
+import { getPostEpic, getDeleteEpic } from '../epics/mutate'; // DEPRECATED
 
 /**
  * The middleware is exported as a getter because it needs the application's
@@ -16,14 +13,14 @@ import {
  * order to render the application. We may want to write a server-specific
  * middleware that doesn't include the other epics if performance is an issue
  */
-const getPlatformMiddleware = (routes, fetchQueries, baseUrl) => createEpicMiddleware(
-	combineEpics(
-		getSyncEpic(routes, fetchQueries, baseUrl),
-		getCacheEpic(),
-		getPostEpic(fetchQueries),  // DEPRECATED
-		getDeleteEpic(fetchQueries)  // DEPRECATED
-	)
-);
+const getPlatformMiddleware = (routes, fetchQueries, baseUrl) =>
+	createEpicMiddleware(
+		combineEpics(
+			getSyncEpic(routes, fetchQueries, baseUrl),
+			getCacheEpic(),
+			getPostEpic(fetchQueries), // DEPRECATED
+			getDeleteEpic(fetchQueries) // DEPRECATED
+		)
+	);
 
 export default getPlatformMiddleware;
-

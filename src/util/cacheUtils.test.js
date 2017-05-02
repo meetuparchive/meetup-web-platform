@@ -1,8 +1,4 @@
-import {
-	makeCache,
-	cacheWriter,
-	cacheReader,
-} from '../util/cacheUtils';
+import { makeCache, cacheWriter, cacheReader } from '../util/cacheUtils';
 
 describe('cache utils', () => {
 	it('creates a Promise-based cache', function() {
@@ -16,7 +12,8 @@ describe('cache utils', () => {
 	});
 	it('sets and gets from cache', function() {
 		const cache = makeCache();
-		return cache.set('foo', 'bar')
+		return cache
+			.set('foo', 'bar')
 			.then(() => cache.get('foo'))
 			.then(value => expect(value).toEqual('bar'))
 			.then(() => cache.set('foo', 'baz'))
@@ -25,7 +22,8 @@ describe('cache utils', () => {
 	});
 	it('deletes from cache', function() {
 		const cache = makeCache();
-		return cache.set('foo', 'bar')
+		return cache
+			.set('foo', 'bar')
 			.then(() => cache.delete('foo'))
 			.then(() => cache.get('foo'))
 			.then(value => expect(value).toBeUndefined())
@@ -58,11 +56,12 @@ describe('cache utils', () => {
 		const response = 'bar';
 		return cacheWriter(cache)(query, response)
 			.then(() => requestCache(query))
-			.then(({ query: cachedQuery, response: cachedResponse }) => {  // expecting two-element array response
+			.then(({ query: cachedQuery, response: cachedResponse }) => {
+				// expecting two-element array response
 				expect(cachedQuery).toEqual(query);
 				expect(cachedResponse).toEqual(response);
 			})
-			.then(() => requestCache(nonCachedQuery))  // test with un-cached query
+			.then(() => requestCache(nonCachedQuery)) // test with un-cached query
 			.then(({ query: cachedQuery, response: cachedResponse }) => {
 				expect(cachedQuery).toEqual(nonCachedQuery);
 				expect(cachedResponse).toBeUndefined();

@@ -21,5 +21,3 @@ export const catchAndReturn$ = (errorResponse, log) => error => {
 
 	return Observable.of(errorResponse || { error });
 };
-
-

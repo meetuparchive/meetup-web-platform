@@ -7,10 +7,7 @@ import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/filter';
 import 'rxjs/add/operator/mergeMap';
-import {
-	apiSuccess,
-	apiError,
-} from '../actions/syncActionCreators';
+import { apiSuccess, apiError } from '../actions/syncActionCreators';
 import * as api from '../actions/apiActionCreators';
 import { getDeprecatedSuccessPayload } from '../util/fetchUtils';
 
@@ -52,13 +49,12 @@ import { getDeprecatedSuccessPayload } from '../util/fetchUtils';
  * @param {Object} postAction, providing query, onSuccess, and onError
  * @return {Promise} results of the fetch, either onSuccess or onError
  */
-const getMethodQueryFetch = (method, fetchQueries, store) =>
-	query => {
-		// force presence of meta.method
-		query.meta = { ...(query.meta || {}), method };
-		const { config: { apiUrl } } = store.getState();
-		return fetchQueries(apiUrl)([query]);
-	};
+const getMethodQueryFetch = (method, fetchQueries, store) => query => {
+	// force presence of meta.method
+	query.meta = { ...(query.meta || {}), method };
+	const { config: { apiUrl } } = store.getState();
+	return fetchQueries(apiUrl)([query]);
+};
 
 /**
  * Make the mutation call to the API and send the responses to the appropriate
@@ -70,13 +66,13 @@ const getMethodQueryFetch = (method, fetchQueries, store) =>
  * 3. Failed mutation responses will be sent to the mutation action's `onError`
  */
 const doFetch$ = fetchQuery => ({ query, onSuccess, onError }) =>
-	Observable.fromPromise(fetchQuery(query))  // make the fetch call
+	Observable.fromPromise(fetchQuery(query)) // make the fetch call
 		.mergeMap(({ successes, errors }) => {
 			const responses = getDeprecatedSuccessPayload(successes, errors);
 			const actions = [
-				...successes.map(api.success),  // send the successes to success
-				...errors.map(api.error),     // send errors to error
-				apiSuccess(responses)
+				...successes.map(api.success), // send the successes to success
+				...errors.map(api.error), // send errors to error
+				apiSuccess(responses),
 			];
 			if (onSuccess) {
 				actions.push(onSuccess(responses));
@@ -92,23 +88,24 @@ const doFetch$ = fetchQuery => ({ query, onSuccess, onError }) =>
 		});
 
 const getMethodEpic = method => fetchQueries => (action$, store) =>
-	action$.filter(({ type }) =>
-		type.endsWith(`_${method.toUpperCase()}`) || type.startsWith(`${method.toUpperCase()}_`))
+	action$
+		.filter(
+			({ type }) =>
+				type.endsWith(`_${method.toUpperCase()}`) ||
+				type.startsWith(`${method.toUpperCase()}_`)
+		)
 		.do(({ type, payload: { query: { endpoint } } }) => {
 			if (endpoint.indexOf('.dev.') > -1) {
 				// using a dev endpoint, render a deprecation warning
-				console.warn(`This application is using Post/Delete middleware through ${type}.
+				console.warn(
+					`This application is using Post/Delete middleware through ${type}.
 See the platform Queries Recipes docs for refactoring options:
-https://github.com/meetup/meetup-web-platform/blob/master/docs/Queries.md#recipes`);
+https://github.com/meetup/meetup-web-platform/blob/master/docs/Queries.md#recipes`
+				);
 			}
 		})
 		.map(({ payload }) => payload)
-		.mergeMap(
-			doFetch$(
-				getMethodQueryFetch(method, fetchQueries, store)
-			)
-		);
+		.mergeMap(doFetch$(getMethodQueryFetch(method, fetchQueries, store)));
 
 export const getPostEpic = getMethodEpic('post');
 export const getDeleteEpic = getMethodEpic('delete');
-

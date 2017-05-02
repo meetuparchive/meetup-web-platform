@@ -2,9 +2,7 @@ import querystring from 'qs';
 import url from 'url';
 import Accepts from 'accepts';
 
-import {
-	LANGUAGE_COOKIE
-} from './cookieUtils';
+import { LANGUAGE_COOKIE } from './cookieUtils';
 
 export const LANG_DEFAULT = 'en-US';
 
@@ -13,10 +11,7 @@ export const getCookieLang = (request, supportedLangs) => {
 	if (!cookie) {
 		return;
 	}
-	const {
-		language,
-		country,
-	} = querystring.parse(cookie);
+	const { language, country } = querystring.parse(cookie);
 	const cookieLang = `${language}-${country}`;
 	if (supportedLangs) {
 		return supportedLangs.includes(cookieLang) && cookieLang;
@@ -39,13 +34,19 @@ export const getBrowserLang = (request, supportedLangs) => {
 	return Accepts(request).language(supportedLangs);
 };
 
-export const getLanguage = (request, supportedLangs, defaultLang=LANG_DEFAULT) => {
+export const getLanguage = (
+	request,
+	supportedLangs,
+	defaultLang = LANG_DEFAULT
+) => {
 	// return the first language hit in the order of preference
 	supportedLangs.sort(l => l !== defaultLang);
-	return getCookieLang(request, supportedLangs)
-		|| getUrlLang(request, supportedLangs)
-		|| getBrowserLang(request, supportedLangs)
-		|| defaultLang;
+	return (
+		getCookieLang(request, supportedLangs) ||
+		getUrlLang(request, supportedLangs) ||
+		getBrowserLang(request, supportedLangs) ||
+		defaultLang
+	);
 };
 
 const makeRedirect = (reply, originalUrl) => redirectPathname =>
@@ -56,7 +57,7 @@ export const checkLanguageRedirect = (
 	reply,
 	requestLanguage,
 	supportedLangs,
-	defaultLang=LANG_DEFAULT
+	defaultLang = LANG_DEFAULT
 ) => {
 	// ensure defaultLang is first in supportedLangs
 	supportedLangs.sort(l => l !== defaultLang);
@@ -66,15 +67,20 @@ export const checkLanguageRedirect = (
 	if (requestLanguage === defaultLang) {
 		// ensure that we are serving from un-prefixed URL
 		if (supportedLangs.includes(firstPathComponent)) {
-			request.log(['info'], `Incorrect lang path prefix (${firstPathComponent}), redirecting`);
+			request.log(
+				['info'],
+				`Incorrect lang path prefix (${firstPathComponent}), redirecting`
+			);
 			return redirect(originalPath.replace(`/${firstPathComponent}`, ''));
 		}
 	} else if (requestLanguage !== firstPathComponent) {
 		// must redirect either by correcting the lang prefix or inserting it
-		const cleanOriginal = originalPath.replace(new RegExp(`^/(${supportedLangs.join('|')})/`), '/');
+		const cleanOriginal = originalPath.replace(
+			new RegExp(`^/(${supportedLangs.join('|')})/`),
+			'/'
+		);
 		const newPathname = `/${requestLanguage}${cleanOriginal}`;
 		return redirect(newPathname);
 	}
 	return null;
 };
-
