@@ -126,8 +126,8 @@ let config = convict({
 
 // Load environment dependent configuration
 const configFile = path.resolve(
-	__dirname,
-	`../../config.${config.get('env')}.json`
+	process.cwd(),
+	`config.${config.get('env')}.json`
 );
 if (fs.existsSync(configFile)) {
 	config.loadFile(configFile);
