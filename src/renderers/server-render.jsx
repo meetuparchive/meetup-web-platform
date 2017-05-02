@@ -6,6 +6,7 @@ import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import StaticRouter from 'react-router-dom/StaticRouter';
 
+import { resolveRouteComponents } from '../util/routeUtils';
 import { getServerCreateStore } from '../util/createStoreServer';
 import Dom from '../components/dom';
 import NotFound from '../components/NotFound';
@@ -207,7 +208,10 @@ const makeRenderer = (
 		`Dispatching RENDER for ${request.url.href}`
 	);
 	store.dispatch(action);
-	return storeIsReady$.map(() =>
+	const getRouteComponents$ = Observable.fromPromise(
+		resolveRouteComponents(routes, baseUrl)(request.url)
+	);
+	return storeIsReady$.mergeMap(() => getRouteComponents$).map(() =>
 		getRouterRenderer({
 			routes,
 			store,
