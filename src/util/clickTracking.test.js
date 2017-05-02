@@ -21,7 +21,7 @@ xdescribe('trackStopPropagation', () => {
 		global.document = {
 			body: {
 				clientWidth: 100,
-			}
+			},
 		};
 	});
 	afterEach(() => {
@@ -36,7 +36,7 @@ xdescribe('trackStopPropagation', () => {
 	});
 	it('calls supplied event handler on stopPropagation', () => {
 		const spyable = {
-			dummyListener() {}
+			dummyListener() {},
 		};
 		spyOn(spyable, 'dummyListener');
 		clickTracking.trackStopPropagation(spyable.dummyListener);
@@ -49,7 +49,7 @@ xdescribe('trackStopPropagation', () => {
 	describe('stopPropAndTrack', () => {
 		it('calls trackClick', () => {
 			const spyable = {
-				dummyListener() {}
+				dummyListener() {},
 			};
 			spyOn(spyable, 'dummyListener');
 			clickTracking.trackStopPropagation(spyable.dummyListener);
@@ -62,4 +62,3 @@ xdescribe('trackStopPropagation', () => {
 	});
 	global.document = document;
 });
-

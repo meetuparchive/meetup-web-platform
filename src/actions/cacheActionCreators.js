@@ -13,14 +13,14 @@ export function cacheSet({ query, response }) {
 export function cacheRequest(queries) {
 	return {
 		type: CACHE_REQUEST,
-		payload: queries
+		payload: queries,
 	};
 }
 
 export function cacheSuccess({ query, response }) {
 	return {
 		type: CACHE_SUCCESS,
-		payload: { query, response }
+		payload: { query, response },
 	};
 }
 
@@ -29,4 +29,3 @@ export function cacheClear() {
 		type: CACHE_CLEAR,
 	};
 }
-

@@ -12,10 +12,13 @@ describe('avroSerializer', () => {
 			fields: [
 				{ name: 'requestId', type: 'string' },
 				{ name: 'timestamp', type: 'string' },
-			]
+			],
 		};
 		const serializer = avro.avroSerializer(schema);
-		const data = { requestId: 'foo', timestamp: new Date().getTime().toString() };
+		const data = {
+			requestId: 'foo',
+			timestamp: new Date().getTime().toString(),
+		};
 		const serialized = serializer(data);
 
 		// parse stringified object
@@ -33,13 +36,13 @@ describe('Activity tracking', () => {
 		request: {
 			id: 'foo',
 			headers: {},
-			log() {}
-		}
+			log() {},
+		},
 	};
 	const trackInfo = logTrack('WEB')(response, {
 		memberId: 1234,
 		trackId: 'foo',
-		sessionId: 'bar',  // not part of v3 spec
+		sessionId: 'bar', // not part of v3 spec
 		url: 'asdf',
 	});
 
@@ -51,12 +54,14 @@ describe('Activity tracking', () => {
 		// create a new buffer from that string
 		const avroBuffer = new Buffer(valObj.record, 'base64');
 		// get the avro-encoded record
-		const recordedInfo = avsc.parse(avro.schemas.activity).fromBuffer(avroBuffer);
+		const recordedInfo = avsc
+			.parse(avro.schemas.activity)
+			.fromBuffer(avroBuffer);
 		const expectedTrackedInfo = {
 			...trackInfo,
-			aggregratedUrl: '',  // misspelled, unused field in v3 spec, default ''
+			aggregratedUrl: '', // misspelled, unused field in v3 spec, default ''
 		};
-		delete expectedTrackedInfo.sessionId;  // not part of v3 spec
+		delete expectedTrackedInfo.sessionId; // not part of v3 spec
 		expect(recordedInfo).toEqual(expectedTrackedInfo);
 	});
 });
@@ -85,9 +90,8 @@ describe('Click tracking', () => {
 		const recordedInfo = avsc.parse(avro.schemas.click).fromBuffer(avroBuffer);
 		const expectedTrackedInfo = {
 			...trackInfo,
-			tag: '',  // not used in our click data - defaults to empty string
+			tag: '', // not used in our click data - defaults to empty string
 		};
 		expect(recordedInfo).toEqual(expectedTrackedInfo);
 	});
 });
-

@@ -8,7 +8,7 @@ import { ActionsObservable } from 'redux-observable';
 
 import {
 	MOCK_MEANINGLESS_ACTION,
-	MOCK_APP_STATE
+	MOCK_APP_STATE,
 } from 'meetup-web-mocks/lib/app';
 
 export const MOCK_LOGGER = {
@@ -28,15 +28,17 @@ export const createFakeStore = fakeData => ({
 
 export const middlewareDispatcher = middleware => (storeData, action) => {
 	let dispatched = null;
-	const dispatch = middleware(createFakeStore(storeData))(actionAttempt => dispatched = actionAttempt);
+	const dispatch = middleware(createFakeStore(storeData))(
+		actionAttempt => dispatched = actionAttempt
+	);
 	dispatch(action);
 	return dispatched;
 };
 
 export const parseCookieHeader = cookieHeader => {
-	const cookies = (cookieHeader instanceof Array) ?
-		cookieHeader.map(Cookie.parse) :
-		[Cookie.parse(cookieHeader)];
+	const cookies = cookieHeader instanceof Array
+		? cookieHeader.map(Cookie.parse)
+		: [Cookie.parse(cookieHeader)];
 
 	return cookies.reduce(
 		(acc, cookie) => ({ ...acc, [cookie.key]: cookie.value }),
@@ -64,14 +66,22 @@ export const getServer = app => {
 	return server;
 };
 
-export const epicIgnoreAction = (epic, action=MOCK_MEANINGLESS_ACTION, store=createFakeStore(MOCK_APP_STATE)) => () => {
+export const epicIgnoreAction = (
+	epic,
+	action = MOCK_MEANINGLESS_ACTION,
+	store = createFakeStore(MOCK_APP_STATE)
+) => () => {
 	const spyable = {
-		notCalled: () => {}
+		notCalled: () => {},
 	};
 	spyOn(spyable, 'notCalled');
 	const action$ = ActionsObservable.of(action);
 	return epic(action$, store)
-		.do(spyable.notCalled, null, expect(spyable.notCalled).not.toHaveBeenCalled())
+		.do(
+			spyable.notCalled,
+			null,
+			expect(spyable.notCalled).not.toHaveBeenCalled()
+		)
 		.toPromise();
 };
 
@@ -82,7 +92,7 @@ export function testCreateStore(createStoreFn) {
 		expect(basicStore.getState).toEqual(jasmine.any(Function));
 		expect(basicStore.dispatch).toEqual(jasmine.any(Function));
 	});
-	it('creates a store with supplied initialState', (done) => {
+	it('creates a store with supplied initialState', done => {
 		const initialState = { foo: 'bar' };
 		const basicStore = createStoreFn(IDENTITY_REDUCER, initialState);
 		basicStore.subscribe(() => {
@@ -92,4 +102,3 @@ export function testCreateStore(createStoreFn) {
 		basicStore.dispatch({ type: 'dummy' });
 	});
 }
-

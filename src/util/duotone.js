@@ -85,9 +85,13 @@ export const duotones = [
 export function generateSignedDuotoneUrl(salt, [light, dark]) {
 	const ref = duotoneRef(light, dark);
 	const spec = `event/rx300x400/${ref}`;
-	const signature = crypto.createHash('sha1').update(`${spec}${salt}`).digest('hex').substring(0, 10);
+	const signature = crypto
+		.createHash('sha1')
+		.update(`${spec}${salt}`)
+		.digest('hex')
+		.substring(0, 10);
 	return {
-		[ref]: `https://a248.e.akamai.net/secure.meetupstatic.com/photo_api/${spec}/sg${signature}`
+		[ref]: `https://a248.e.akamai.net/secure.meetupstatic.com/photo_api/${spec}/sg${signature}`,
 	};
 }
 
@@ -98,9 +102,11 @@ export function generateSignedDuotoneUrl(salt, [light, dark]) {
  * @param {String} PHOTO_SCALER_SALT **Secret** salt for generating signed urls
  */
 export const getDuotoneUrls = (duotones, PHOTO_SCALER_SALT) => {
-	return duotones.reduce((duotoneMap, [light, dark]) => ({
-		...duotoneMap,
-		...generateSignedDuotoneUrl(PHOTO_SCALER_SALT, [light, dark])
-	}), {});
+	return duotones.reduce(
+		(duotoneMap, [light, dark]) => ({
+			...duotoneMap,
+			...generateSignedDuotoneUrl(PHOTO_SCALER_SALT, [light, dark]),
+		}),
+		{}
+	);
 };
-

@@ -61,4 +61,3 @@ export function complete(queries) {
 		payload: queries,
 	};
 }
-

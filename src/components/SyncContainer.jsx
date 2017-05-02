@@ -46,7 +46,4 @@ SyncContainer.propTypes = {
 	history: React.PropTypes.object.isRequired,
 };
 
-export default connect(null, mapDispatchToProps)(
-	withRouter(SyncContainer)
-);
-
+export default connect(null, mapDispatchToProps)(withRouter(SyncContainer));

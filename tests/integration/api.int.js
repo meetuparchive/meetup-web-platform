@@ -1,16 +1,15 @@
 import rison from 'rison';
 import start from '../../src/server';
-import {
-	mockConfig,
-} from '../mocks';
+import { mockConfig } from '../mocks';
 import * as apiProxyHandler from '../../src/apiProxy/apiProxyHandler';
 
 jest.mock('request', () => {
-	const mock = jest.fn(
-		(requestOpts, cb) =>
-			setTimeout(() => {
-				console.log('calling callback');
-				cb(null, {
+	const mock = jest.fn((requestOpts, cb) =>
+		setTimeout(() => {
+			console.log('calling callback');
+			cb(
+				null,
+				{
 					headers: {},
 					statusCode: 200,
 					elapsedTime: 2,
@@ -21,8 +20,10 @@ jest.mock('request', () => {
 						},
 						method: 'get',
 					},
-				}, '{}');
-			}, 2)
+				},
+				'{}'
+			);
+		}, 2)
 	);
 	mock.post = jest.fn();
 	return mock;
@@ -34,52 +35,59 @@ describe('API proxy endpoint integration tests', () => {
 			handler: (request, reply) => reply('okay'),
 		};
 		spyOn(spyable, 'handler').and.callThrough();
-		spyOn(apiProxyHandler, 'getApiProxyRouteHandler')
-			.and.callFake(() => spyable.handler);
-		return start({}, {}, mockConfig)
-			.then(server => {
-				const request = {
-					method: 'get',
-					url: `/mu_api?queries=${rison.encode_array([{}])}`,
-					credentials: 'whatever',
-				};
-				return server.inject(request).then(
-					response => expect(spyable.handler).toHaveBeenCalled()
-				)
+		spyOn(apiProxyHandler, 'getApiProxyRouteHandler').and.callFake(
+			() => spyable.handler
+		);
+		return start({}, {}, mockConfig).then(server => {
+			const request = {
+				method: 'get',
+				url: `/mu_api?queries=${rison.encode_array([{}])}`,
+				credentials: 'whatever',
+			};
+			return server
+				.inject(request)
+				.then(response => expect(spyable.handler).toHaveBeenCalled())
 				.then(() => server.stop());
-			});
+		});
 	});
 	it('returns a formatted array of responses from GET /mu_api', () => {
 		const expectedResponse = {
-			responses: [{
-				ref: 'foo',
-				type: 'foo',
-				value: {},  // from the mocked `request` module
-				meta: {
-					endpoint: '/foo',
-					statusCode: 200,
+			responses: [
+				{
+					ref: 'foo',
+					type: 'foo',
+					value: {}, // from the mocked `request` module
+					meta: {
+						endpoint: '/foo',
+						statusCode: 200,
+					},
 				},
-			}],
+			],
 		};
-		const queries = rison.encode_array([{
-			type: 'foo', params: {}, ref: 'foo', endpoint: 'foo'
-		}]);
-		return start({}, {}, mockConfig)
-			.then(server => {
-				const request = {
-					method: 'get',
-					url: `/mu_api?queries=${queries}`,
-					credentials: 'whatever',
-				};
-				return server.inject(request).then(
-					response => expect(JSON.parse(response.payload)).toEqual(expectedResponse)
+		const queries = rison.encode_array([
+			{
+				type: 'foo',
+				params: {},
+				ref: 'foo',
+				endpoint: 'foo',
+			},
+		]);
+		return start({}, {}, mockConfig).then(server => {
+			const request = {
+				method: 'get',
+				url: `/mu_api?queries=${queries}`,
+				credentials: 'whatever',
+			};
+			return server
+				.inject(request)
+				.then(response =>
+					expect(JSON.parse(response.payload)).toEqual(expectedResponse)
 				)
 				.then(() => server.stop())
 				.catch(err => {
 					server.stop();
 					throw err;
 				});
-			});
+		});
 	});
 });
-

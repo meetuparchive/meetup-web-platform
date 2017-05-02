@@ -18,4 +18,3 @@ describe('method-specific creators', () => {
 		});
 	});
 });
-

@@ -1,10 +1,6 @@
 import JSCookie from 'js-cookie';
-import {
-	mockQuery,
-} from 'meetup-web-mocks/lib/app';
-import {
-	MOCK_GROUP,
-} from 'meetup-web-mocks/lib/api';
+import { mockQuery } from 'meetup-web-mocks/lib/app';
+import { MOCK_GROUP } from 'meetup-web-mocks/lib/api';
 import * as fetchUtils from './fetchUtils';
 
 global.FormData = function() {};
@@ -26,42 +22,50 @@ describe('fetchQueries', () => {
 	const API_URL = new URL('http://api.example.com/');
 	const csrfJwt = `${fetchUtils.CSRF_HEADER_COOKIE} value`;
 	const getQueries = [mockQuery({ params: {} })];
-	const POSTQueries = [{ ...mockQuery({ params: {} }), meta: { method: 'POST' }}];
+	const POSTQueries = [
+		{ ...mockQuery({ params: {} }), meta: { method: 'POST' } },
+	];
 	const meta = { foo: 'bar', clickTracking: { history: [] } };
 	const responses = [MOCK_GROUP];
 	const fakeSuccess = () =>
 		Promise.resolve({
 			json: () => Promise.resolve({ responses }),
 			headers: {
-				get: key => ({
-					'x-csrf-jwt': csrfJwt,
-				}[key]),
+				get: key =>
+					({
+						'x-csrf-jwt': csrfJwt,
+					}[key]),
 			},
 		});
 	const fakeSuccessError = () =>
 		Promise.resolve({
-			json: () => Promise.resolve({ error: 'you lose', message: 'fakeSuccessError'}),
+			json: () =>
+				Promise.resolve({ error: 'you lose', message: 'fakeSuccessError' }),
 			headers: {
-				get: key => ({
-					'x-csrf-jwt': csrfJwt,
-				}[key]),
+				get: key =>
+					({
+						'x-csrf-jwt': csrfJwt,
+					}[key]),
 			},
 		});
-
 
 	it('returns an object with successes and errors arrays', () => {
 		spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
-		return fetchUtils.fetchQueries(API_URL.toString())(getQueries)
+		return fetchUtils
+			.fetchQueries(API_URL.toString())(getQueries)
 			.then(response => {
-				expect(response.successes).toEqual([{ query: getQueries[0], response: responses[0] }]);
+				expect(response.successes).toEqual([
+					{ query: getQueries[0], response: responses[0] },
+				]);
 				expect(response.errors).toEqual([]);
 			});
 	});
 	it('returns a promise that will reject when response contains error prop', () => {
 		spyOn(global, 'fetch').and.callFake(fakeSuccessError);
 
-		return fetchUtils.fetchQueries(API_URL.toString())(getQueries)
+		return fetchUtils
+			.fetchQueries(API_URL.toString())(getQueries)
 			.then(
 				response => expect(true).toBe(false),
 				err => expect(err).toEqual(jasmine.any(Error))
@@ -74,7 +78,8 @@ describe('fetchQueries', () => {
 
 		const methodTest = method => () => {
 			query.meta = { method };
-			return fetchUtils.fetchQueries(API_URL.toString())(queries)
+			return fetchUtils
+				.fetchQueries(API_URL.toString())(queries)
 				.then(response => {
 					const [, config] = global.fetch.calls.mostRecent().args;
 					expect(config.method).toEqual(method);
@@ -109,11 +114,14 @@ describe('fetchQueries', () => {
 			JSCookie.set.mockClear();
 
 			return fetchUtils
-				.fetchQueries(API_URL.toString())(getQueries, { ...meta, clickTracking, logout: true })
+				.fetchQueries(API_URL.toString())(getQueries, {
+					...meta,
+					clickTracking,
+					logout: true,
+				})
 				.then(() => {
 					const calledWith = JSCookie.set.mock.calls[0];
-					expect(calledWith[0])
-						.toEqual('click-track');
+					expect(calledWith[0]).toEqual('click-track');
 				});
 		});
 
@@ -154,7 +162,8 @@ describe('fetchQueries', () => {
 		it('POST without meta calls fetch without metadata body params', () => {
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
-			return fetchUtils.fetchQueries(API_URL.toString())(POSTQueries)
+			return fetchUtils
+				.fetchQueries(API_URL.toString())(POSTQueries)
 				.then(() => {
 					const calledWith = global.fetch.calls.mostRecent().args;
 					const url = new URL(calledWith[0]);
@@ -177,10 +186,13 @@ describe('fetchQueries', () => {
 				}
 			};
 			FormData.prototype.append = jest.fn();
-			const formQueries = [{ ...mockQuery({ params: new FormData() }), meta: { method: 'POST' }}];
+			const formQueries = [
+				{ ...mockQuery({ params: new FormData() }), meta: { method: 'POST' } },
+			];
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
-			return fetchUtils.fetchQueries(API_URL.toString())(formQueries)
+			return fetchUtils
+				.fetchQueries(API_URL.toString())(formQueries)
 				.then(() => {
 					const calledWith = global.fetch.calls.mostRecent().args;
 					const url = new URL(calledWith[0]);
@@ -191,7 +203,6 @@ describe('fetchQueries', () => {
 					expect(options.headers['x-csrf-jwt']).toEqual(csrfJwt);
 				});
 		});
-
 	});
 });
 
@@ -220,7 +231,7 @@ describe('tryJSON', () => {
 		const theFetch = fetchUtils.tryJSON(reqUrl)(errorResponse);
 		expect(theFetch).toEqual(jasmine.any(Promise));
 		return theFetch.then(
-			response => expect(true).toBe(false),  // should not run - promise should be rejected
+			response => expect(true).toBe(false), // should not run - promise should be rejected
 			err => expect(err).toEqual(jasmine.any(Error))
 		);
 	});
@@ -228,9 +239,8 @@ describe('tryJSON', () => {
 		const theFetch = fetchUtils.tryJSON(reqUrl)(badJSONResponse);
 		expect(theFetch).toEqual(jasmine.any(Promise));
 		return theFetch.then(
-			response => expect(true).toBe(false),  // should not run - promise should be rejected
+			response => expect(true).toBe(false), // should not run - promise should be rejected
 			err => expect(err).toEqual(jasmine.any(Error))
 		);
 	});
 });
-

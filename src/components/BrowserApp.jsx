@@ -27,4 +27,3 @@ BrowserApp.defaultProps = {
 };
 
 export default BrowserApp;
-

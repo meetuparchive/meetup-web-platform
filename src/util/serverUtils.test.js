@@ -15,20 +15,31 @@ describe('checkForDevUrl', () => {
 		expect(serverUtils.checkForDevUrl(new Date())).toBe(false);
 	});
 	it('returns true for nested dev URLs', () => {
-		expect(serverUtils.checkForDevUrl({ url: 'www.dev.meetup.com' })).toBe(true);
-		expect(serverUtils.checkForDevUrl({ url1: 'www.meetup.com', url2: 'www.dev.meetup.com' })).toBe(true);
-		expect(serverUtils.checkForDevUrl({ url: { url: 'www.dev.meetup.com' } })).toBe(true);
+		expect(serverUtils.checkForDevUrl({ url: 'www.dev.meetup.com' })).toBe(
+			true
+		);
+		expect(
+			serverUtils.checkForDevUrl({
+				url1: 'www.meetup.com',
+				url2: 'www.dev.meetup.com',
+			})
+		).toBe(true);
+		expect(
+			serverUtils.checkForDevUrl({ url: { url: 'www.dev.meetup.com' } })
+		).toBe(true);
 	});
 });
 
 describe('configureEnv', function() {
 	beforeEach(() => {
 		// cache the 'default' setting for rejectUnauthorized
-		this.defaultRejectUnauthorized = https.globalAgent.options.rejectUnauthorized;
+		this.defaultRejectUnauthorized =
+			https.globalAgent.options.rejectUnauthorized;
 	});
 	afterEach(function() {
 		// restore the default setting for rejectUnauthorized
-		https.globalAgent.options.rejectUnauthorized = this.defaultRejectUnauthorized;
+		https.globalAgent.options.rejectUnauthorized = this
+			.defaultRejectUnauthorized;
 	});
 	it('sets global rejectUnauthorized to false when using dev URLs in config', () => {
 		serverUtils.configureEnv({ url: 'www.dev.meetup.com' });
@@ -84,8 +95,7 @@ describe('logResponse', () => {
 	it('calls console.log with response headers and request id', () => {
 		MOCK_LOGGER.info.mockClear();
 		serverUtils.logResponse(request);
-		const [data,] = MOCK_LOGGER.info.mock.calls[0];
+		const [data] = MOCK_LOGGER.info.mock.calls[0];
 		expect(data).toEqual(expect.any(Object));
 	});
 });
-

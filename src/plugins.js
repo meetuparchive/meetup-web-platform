@@ -40,16 +40,16 @@ export function getCsrfPlugin(secret) {
 			isSecure: process.env.NODE_ENV === 'production',
 		};
 		server.state(
-			'x-csrf-jwt',  // set by plugin
-			{ ...cookieOptions, isHttpOnly: true }  // no client-side interaction needed
+			'x-csrf-jwt', // set by plugin
+			{ ...cookieOptions, isHttpOnly: true } // no client-side interaction needed
 		);
 		server.state(
-			'x-csrf-jwt-header',  // set by onPreResponse
+			'x-csrf-jwt-header', // set by onPreResponse
 			{ ...cookieOptions, isHttpOnly: false } // the client must read this cookie and return as a custom header
 		);
 
 		const registration = CsrfPlugin.register(server, options, next);
-		server.ext('onPreResponse', setCsrfCookies);  // this extension must be registered _after_ plugin is registered
+		server.ext('onPreResponse', setCsrfCookies); // this extension must be registered _after_ plugin is registered
 
 		return registration;
 	};
@@ -58,7 +58,7 @@ export function getCsrfPlugin(secret) {
 		register,
 		options: {
 			secret,
-		}
+		},
 	};
 }
 
@@ -73,11 +73,11 @@ export function getRequestAuthPlugin(options) {
 	};
 }
 
-export function getLogger(options={}) {
+export function getLogger(options = {}) {
 	options.instance = logger;
 	return {
 		register: HapiPino,
-		options
+		options,
 	};
 }
 
@@ -88,4 +88,3 @@ export default function getPlugins(config) {
 		getRequestAuthPlugin(config),
 	];
 }
-

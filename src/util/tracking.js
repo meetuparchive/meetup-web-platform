@@ -24,11 +24,7 @@ export const SESSION_ID_COOKIE = isProd ? 'SESSION_ID' : 'SESSION_ID_DEV';
  */
 export const newSessionId = response => {
 	const sessionId = uuid.v4();
-	response.state(
-		SESSION_ID_COOKIE,
-		sessionId,
-		COOKIE_OPTS
-	);
+	response.state(SESSION_ID_COOKIE, sessionId, COOKIE_OPTS);
 	return sessionId;
 };
 
@@ -50,62 +46,48 @@ export const updateTrackId = (response, doRefresh) => {
 	if (!trackId || doRefresh) {
 		// Generate a new trackId cookie
 		trackId = uuid.v4();
-		response.state(
-			TRACK_ID_COOKIE,
-			trackId,
-			{
-				...COOKIE_OPTS,
-				ttl: YEAR_IN_MS * 20,
-			}
-		);
+		response.state(TRACK_ID_COOKIE, trackId, {
+			...COOKIE_OPTS,
+			ttl: YEAR_IN_MS * 20,
+		});
 	}
 	return trackId;
 };
 
 export const trackLogout = log => response =>
-	log(
-		response,
-		{
-			description: 'logout',
-			memberId: parseMemberCookie(response.request.state).id,
-			trackIdFrom: response.request.state[TRACK_ID_COOKIE] || '',
-			trackId: updateTrackId(response, true),
-			sessionId: response.request.state[SESSION_ID_COOKIE],
-			url: response.request.info.referrer | '',
-		}
-	);
+	log(response, {
+		description: 'logout',
+		memberId: parseMemberCookie(response.request.state).id,
+		trackIdFrom: response.request.state[TRACK_ID_COOKIE] || '',
+		trackId: updateTrackId(response, true),
+		sessionId: response.request.state[SESSION_ID_COOKIE],
+		url: response.request.info.referrer | '',
+	});
 
 export const trackNav = log => (response, queryResponses, url, referrer) => {
 	const apiRequests = queryResponses.map(({ meta }) => ({
 		requestId: meta.requestId,
 		endpoint: meta.endpoint,
 	}));
-	return log(
-		response,
-		{
-			description: 'nav',
-			memberId: parseMemberCookie(response.request.state).id,
-			trackId: response.request.state[TRACK_ID_COOKIE] || '',
-			sessionId: response.request.state[SESSION_ID_COOKIE] || '',
-			url: url || '',
-			referer: referrer || '',
-			apiRequests,
-		}
-	);
+	return log(response, {
+		description: 'nav',
+		memberId: parseMemberCookie(response.request.state).id,
+		trackId: response.request.state[TRACK_ID_COOKIE] || '',
+		sessionId: response.request.state[SESSION_ID_COOKIE] || '',
+		url: url || '',
+		referer: referrer || '',
+		apiRequests,
+	});
 };
 
-export const trackApi = log => (response, queryResponses, metadata={}) => {
-	const {
-		url,
-		referrer,
-		method,
-	} = metadata;
+export const trackApi = log => (response, queryResponses, metadata = {}) => {
+	const { url, referrer, method } = metadata;
 	if (method === 'get') {
 		return trackNav(log)(response, queryResponses, url, referrer);
 	}
 	// special case - login requests need to be tracked
 	const loginResponse = queryResponses.find(r => r.login);
-	if ((loginResponse && loginResponse.login.value || {}).member) {
+	if (((loginResponse && loginResponse.login.value) || {}).member) {
 		const memberId = JSON.stringify(loginResponse.login.value.member.id);
 		trackLogin(log)(response, memberId);
 	}
@@ -115,33 +97,27 @@ export const trackApi = log => (response, queryResponses, metadata={}) => {
 };
 
 export const trackLogin = log => (response, memberId) =>
-	log(
-		response,
-		{
-			description: 'login',
-			memberId: parseMemberCookie(response.request.state).id,
-			trackIdFrom: response.request.state[TRACK_ID_COOKIE] || '',
-			trackId: updateTrackId(response, true),
-			sessionId: response.request.state[SESSION_ID_COOKIE],
-			url: response.request.info.referrer || '',
-		}
-	);
+	log(response, {
+		description: 'login',
+		memberId: parseMemberCookie(response.request.state).id,
+		trackIdFrom: response.request.state[TRACK_ID_COOKIE] || '',
+		trackId: updateTrackId(response, true),
+		sessionId: response.request.state[SESSION_ID_COOKIE],
+		url: response.request.info.referrer || '',
+	});
 
 export const trackSession = log => response => {
 	if (response.request.state[SESSION_ID_COOKIE]) {
 		// if there's already a session id, there's nothing to track
 		return null;
 	}
-	return log(
-		response,
-		{
-			description: 'session',
-			memberId: parseMemberCookie(response.request.state).id,
-			trackId: updateTrackId(response),
-			sessionId: newSessionId(response),
-			url: response.request.url.path,
-		}
-	);
+	return log(response, {
+		description: 'session',
+		memberId: parseMemberCookie(response.request.state).id,
+		trackId: updateTrackId(response),
+		sessionId: newSessionId(response),
+		url: response.request.url.path,
+	});
 };
 
 export const logTrack = platformAgent => (response, trackInfo) => {
@@ -153,9 +129,9 @@ export const logTrack = platformAgent => (response, trackInfo) => {
 		ip: requestHeaders['remote-addr'] || '',
 		agent: requestHeaders['user-agent'] || '',
 		platform: 'mup-web',
-		platformAgent: 'WEB',  // TODO: set this more accurately, using allowed values from avro schema
+		platformAgent: 'WEB', // TODO: set this more accurately, using allowed values from avro schema
 		mobileWeb: false,
-		referer: '',  // misspelled to align with schema
+		referer: '', // misspelled to align with schema
 		trax: {},
 		...trackInfo,
 	};
@@ -180,4 +156,3 @@ export default function decorateTrack(platformAgent) {
 		return trackers[trackType](response, ...args);
 	};
 }
-

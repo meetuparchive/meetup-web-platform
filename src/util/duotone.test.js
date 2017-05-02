@@ -1,4 +1,8 @@
-import { duotoneRef, getDuotoneUrls, generateSignedDuotoneUrl } from './duotone';
+import {
+	duotoneRef,
+	getDuotoneUrls,
+	generateSignedDuotoneUrl,
+} from './duotone';
 
 const MOCK_SALT = 'abcd';
 const MOCK_DUOTONE = ['123456', '234567'];
@@ -8,7 +12,7 @@ describe('generateSignedDuotoneUrl', () => {
 	const ref = duotoneRef(...MOCK_DUOTONE);
 	it('maps a duotone ref to a string', () => {
 		expect(signedUrlMap).toEqual({
-			[ref]: jasmine.any(String)
+			[ref]: jasmine.any(String),
 		});
 	});
 	it('writes a url containing the ref', () => {
@@ -18,10 +22,7 @@ describe('generateSignedDuotoneUrl', () => {
 });
 
 describe('getDuotoneUrls', () => {
-	const duotones = [
-		MOCK_DUOTONE,
-		MOCK_DUOTONE_2
-	];
+	const duotones = [MOCK_DUOTONE, MOCK_DUOTONE_2];
 	it('generates an object with a prop for each duotone ref', () => {
 		const duotoneUrls = getDuotoneUrls(duotones, MOCK_SALT);
 		const refArray = duotones.map(dt => duotoneRef(...dt));
@@ -29,4 +30,3 @@ describe('getDuotoneUrls', () => {
 		expect(Object.keys(duotoneUrls)).toEqual(refArray);
 	});
 });
-

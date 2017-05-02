@@ -16,29 +16,19 @@ import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/timeout';
 
-import {
-	removeAuthState,
-} from './authUtils';
-import {
-	getCookieLang
-} from './languageUtils';
-import {
-	coerceBool,
-	toCamelCase,
-} from './stringUtils';
+import { removeAuthState } from './authUtils';
+import { getCookieLang } from './languageUtils';
+import { coerceBool, toCamelCase } from './stringUtils';
 
-import {
-	querySchema
-} from './validation';
-import {
-	duotoneRef,
-} from './duotone';
+import { querySchema } from './validation';
+import { duotoneRef } from './duotone';
 
-const MOCK_RESPONSE_OK = {  // minimal representation of http.IncomingMessage
+const MOCK_RESPONSE_OK = {
+	// minimal representation of http.IncomingMessage
 	statusCode: 200,
 	statusMessage: 'OK',
 	headers: {
-		'x-meetup-request-id': 'mock request'
+		'x-meetup-request-id': 'mock request',
 	},
 };
 
@@ -63,14 +53,13 @@ function makeMockResponseOk(requestOpts) {
  * }
  */
 export const parseVariantsHeader = variantsHeader =>
-	variantsHeader.split(' ')
-		.reduce((variants, keyval) => {
-			const [experiment, val] = keyval.split('=');
-			variants[experiment] = variants[experiment] || {};
-			const [context, variant] = val.split('|');
-			variants[experiment][context] = variant || null;
-			return variants;
-		}, {});
+	variantsHeader.split(' ').reduce((variants, keyval) => {
+		const [experiment, val] = keyval.split('=');
+		variants[experiment] = variants[experiment] || {};
+		const [context, variant] = val.split('|');
+		variants[experiment][context] = variant || null;
+		return variants;
+	}, {});
 
 /**
  * In order to receive cookies from `externalRequest` requests, this function
@@ -86,14 +75,12 @@ export const parseVariantsHeader = variantsHeader =>
 export const createCookieJar = requestUrl => {
 	const parsedUrl = url.parse(requestUrl);
 	if (parsedUrl.pathname === '/sessions') {
-		return externalRequest.jar();  // create request/url-specific cookie jar
+		return externalRequest.jar(); // create request/url-specific cookie jar
 	}
 	return null;
 };
 
-const X_HEADERS = [
-	'x-total-count'
-];
+const X_HEADERS = ['x-total-count'];
 
 export const parseMetaHeaders = headers => {
 	const meetupHeaders = Object.keys(headers)
@@ -125,8 +112,9 @@ export const parseMetaHeaders = headers => {
 		return meta;
 	}, {});
 
-	const linkHeader = headers.link && headers.link.split(',')
-		.reduce((links, link) => {
+	const linkHeader =
+		headers.link &&
+		headers.link.split(',').reduce((links, link) => {
 			const [urlString, relString] = link.split(';');
 			const url = urlString.replace(/<|>/g, '').trim();
 			var rel = relString.replace(/rel="([^"]+)"/, '$1').trim();
@@ -153,7 +141,7 @@ export const parseMetaHeaders = headers => {
 function formatApiError(err) {
 	return {
 		value: null,
-		error: err.message
+		error: err.message,
 	};
 }
 
@@ -174,16 +162,19 @@ export const parseApiValue = ([response, body]) => {
 		return formatApiError(new Error(response.statusMessage));
 	}
 	try {
-		if (response.statusCode === 204) {  // NoContent response type
+		if (response.statusCode === 204) {
+			// NoContent response type
 			return { value: null };
 		}
 
 		const value = JSON.parse(body);
 		if (value && value.problem) {
-			return formatApiError(new Error(`API problem: ${value.problem}: ${value.details}`));
+			return formatApiError(
+				new Error(`API problem: ${value.problem}: ${value.details}`)
+			);
 		}
 		return { value };
-	} catch(err) {
+	} catch (err) {
 		return formatApiError(err);
 	}
 };
@@ -213,7 +204,6 @@ export const parseApiResponse = requestUrl => ([response, body]) => {
 		error,
 		meta,
 	};
-
 };
 
 /**
@@ -232,29 +222,34 @@ export const parseApiResponse = requestUrl => ([response, body]) => {
  * @return {Object} externalRequestOptsQuery argument for the call to
  *   `externalRequest` for the query
  */
-export const buildRequestArgs = externalRequestOpts =>
-	({ endpoint, params, flags, meta={} }) => {
-		const dataParams = querystring.stringify(params);
-		const headers = { ...externalRequestOpts.headers };
-		let url = encodeURI(`/${endpoint}`);
-		let body;
-		const jar = createCookieJar(url);
+export const buildRequestArgs = externalRequestOpts => ({
+	endpoint,
+	params,
+	flags,
+	meta = {},
+}) => {
+	const dataParams = querystring.stringify(params);
+	const headers = { ...externalRequestOpts.headers };
+	let url = encodeURI(`/${endpoint}`);
+	let body;
+	const jar = createCookieJar(url);
 
-		if (flags || meta.flags) {
-			headers['X-Meetup-Request-Flags'] = (flags || meta.flags).join(',');
-		}
+	if (flags || meta.flags) {
+		headers['X-Meetup-Request-Flags'] = (flags || meta.flags).join(',');
+	}
 
-		if (meta.variants) {
-			headers['X-Meetup-Variants'] = Object.keys(meta.variants)
-				.reduce((header, experiment) => {
-					const context = meta.variants[experiment];
-					const contexts = context instanceof Array ? context : [context];
-					header += contexts.map(c => `${experiment}=${c}`).join(' ');
-					return header;
-				});
-		}
+	if (meta.variants) {
+		headers['X-Meetup-Variants'] = Object.keys(
+			meta.variants
+		).reduce((header, experiment) => {
+			const context = meta.variants[experiment];
+			const contexts = context instanceof Array ? context : [context];
+			header += contexts.map(c => `${experiment}=${c}`).join(' ');
+			return header;
+		});
+	}
 
-		switch (externalRequestOpts.method) {
+	switch (externalRequestOpts.method) {
 		case 'patch':
 		case 'post':
 			if (externalRequestOpts.formData) {
@@ -269,39 +264,43 @@ export const buildRequestArgs = externalRequestOpts =>
 			url += `?${dataParams}`;
 			headers['content-type'] = 'application/json';
 			headers['X-Meta-Photo-Host'] = 'secure';
-		}
+	}
 
-		const externalRequestOptsQuery = {
-			...externalRequestOpts,
-			headers,
-			jar,
-			url,
-		};
-
-		// only add body if defined
-		if (body) {
-			externalRequestOptsQuery.body = body;
-		}
-
-		return externalRequestOptsQuery;
+	const externalRequestOptsQuery = {
+		...externalRequestOpts,
+		headers,
+		jar,
+		url,
 	};
+
+	// only add body if defined
+	if (body) {
+		externalRequestOptsQuery.body = body;
+	}
+
+	return externalRequestOptsQuery;
+};
 
 /**
  * Format apiResponse to match expected state structure
  *
  * @param {Object} apiResponse JSON-parsed api response data
  */
-export const apiResponseToQueryResponse = query => ({ value, error, meta }) => ({
+export const apiResponseToQueryResponse = query => ({
+	value,
+	error,
+	meta,
+}) => ({
 	type: query.type,
 	ref: query.ref,
 	value,
 	error,
-	meta
+	meta,
 });
 
 export function getAuthHeaders(request) {
-	const oauth_token = request.state.oauth_token ||  // browser-based requests
-		request.plugins.requestAuth.oauth_token;  // internal server requests
+	const oauth_token =
+		request.state.oauth_token || request.plugins.requestAuth.oauth_token; // browser-based requests // internal server requests
 	if (!request.state.MEETUP_MEMBER && oauth_token) {
 		return {
 			authorization: `Bearer ${oauth_token}`,
@@ -312,7 +311,8 @@ export function getAuthHeaders(request) {
 	cookies.MEETUP_CSRF = csrf;
 	cookies.MEETUP_CSRF_DEV = csrf;
 	const cookie = Object.keys(cookies)
-		.map(name => `${name}=${cookies[name]}`).join('; ');
+		.map(name => `${name}=${cookies[name]}`)
+		.join('; ');
 
 	return {
 		cookie,
@@ -323,9 +323,9 @@ export function getAuthHeaders(request) {
 export function getLanguageHeader(request) {
 	const cookieLang = getCookieLang(request);
 	const headerLang = request.headers['accept-language'];
-	const acceptLang = cookieLang && headerLang ?
-		`${cookieLang},${headerLang}` :
-		(cookieLang || headerLang);
+	const acceptLang = cookieLang && headerLang
+		? `${cookieLang},${headerLang}`
+		: cookieLang || headerLang;
 	return acceptLang;
 }
 
@@ -336,10 +336,10 @@ export function parseRequestHeaders(request) {
 		'accept-language': getLanguageHeader(request),
 	};
 
-	delete externalRequestHeaders['host'];  // let app server set 'host'
-	delete externalRequestHeaders['accept-encoding'];  // let app server set 'accept'
-	delete externalRequestHeaders['content-length'];  // original request content-length is irrelevant
-	delete externalRequestHeaders['content-type'];  // the content type will be set in buildRequestArgs
+	delete externalRequestHeaders['host']; // let app server set 'host'
+	delete externalRequestHeaders['accept-encoding']; // let app server set 'accept'
+	delete externalRequestHeaders['content-length']; // original request content-length is irrelevant
+	delete externalRequestHeaders['content-type']; // the content type will be set in buildRequestArgs
 
 	// cloudflare headers we don't want to pass on
 	delete externalRequestHeaders['cf-ray'];
@@ -351,16 +351,11 @@ export function parseRequestHeaders(request) {
 }
 
 export function parseRequestQueries(request) {
-	const {
-		method,
-		mime,
-		payload,
-		query,
-	} = request;
+	const { method, mime, payload, query } = request;
 	const queriesRison = (method === 'post' || method === 'patch') &&
-		mime !== 'multipart/form-data' ?
-			payload.queries :
-			query.queries;
+		mime !== 'multipart/form-data'
+		? payload.queries
+		: query.queries;
 
 	if (!queriesRison) {
 		return null;
@@ -385,11 +380,11 @@ export function parseRequest(request) {
 	const externalRequestOpts = {
 		baseUrl,
 		method: request.method,
-		headers: parseRequestHeaders(request),  // make a copy to be immutable
+		headers: parseRequestHeaders(request), // make a copy to be immutable
 		mode: 'no-cors',
-		time: true,  // time the request for logging
+		time: true, // time the request for logging
 		agentOptions: {
-			rejectUnauthorized: baseUrl.indexOf('.dev') === -1
+			rejectUnauthorized: baseUrl.indexOf('.dev') === -1,
 		},
 	};
 	if (request.mime === 'multipart/form-data') {
@@ -397,23 +392,24 @@ export function parseRequest(request) {
 		// and file descriptors for file upload inputs { filename, path, headers }
 		// The file descriptors can be converted to readable streams for the API
 		// request.
-		externalRequestOpts.formData = Object.keys(request.payload)
-			.reduce((formData, key) => {
-				const value = request.payload[key];
-				if (value.filename) {
-					formData[key] = {
-						value: fs.createReadStream(value.path),
-						options: {
-							filename: value.filename,
-							contentType: value.headers['content-type'],
-						},
-					};
-					request.app.upload = value.path;
-				} else {
-					formData[key] = value;
-				}
-				return formData;
-			}, {});
+		externalRequestOpts.formData = Object.keys(
+			request.payload
+		).reduce((formData, key) => {
+			const value = request.payload[key];
+			if (value.filename) {
+				formData[key] = {
+					value: fs.createReadStream(value.path),
+					options: {
+						filename: value.filename,
+						contentType: value.headers['content-type'],
+					},
+				};
+				request.app.upload = value.path;
+			} else {
+				formData[key] = value;
+			}
+			return formData;
+		}, {});
 	}
 	return {
 		externalRequestOpts,
@@ -431,7 +427,9 @@ export function parseRequest(request) {
  */
 export const groupDuotoneSetter = duotoneUrls => group => {
 	const photo = group.key_photo || {};
-	const duotoneKey = group.photo_gradient && duotoneRef(
+	const duotoneKey =
+		group.photo_gradient &&
+		duotoneRef(
 			group.photo_gradient.light_color,
 			group.photo_gradient.dark_color
 		);
@@ -461,16 +459,19 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
 		}
 		let groups;
 		switch (type) {
-		case 'group':
-			groups = value instanceof Array ? value : [value];
-			groups.forEach(setGroupDuotone);
-			break;
-		case 'home':
-			(value.rows || []).map(({ items }) => items)
-				.forEach(items => items.filter(({ type }) => type === 'group')
-					.forEach(({ group }) => setGroupDuotone(group))
-				);
-			break;
+			case 'group':
+				groups = value instanceof Array ? value : [value];
+				groups.forEach(setGroupDuotone);
+				break;
+			case 'home':
+				(value.rows || [])
+					.map(({ items }) => items)
+					.forEach(items =>
+						items
+							.filter(({ type }) => type === 'group')
+							.forEach(({ group }) => setGroupDuotone(group))
+					);
+				break;
 		}
 		return queryResponse;
 	};
@@ -480,8 +481,10 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
  * Fake an API request and directly return the stringified mockResponse
  */
 export const makeMockRequest = mockResponse => requestOpts =>
-	Observable.of([makeMockResponseOk(requestOpts), JSON.stringify(mockResponse)])
-		.do(() => console.log(`MOCKING response to ${requestOpts.url}`));
+	Observable.of([
+		makeMockResponseOk(requestOpts),
+		JSON.stringify(mockResponse),
+	]).do(() => console.log(`MOCKING response to ${requestOpts.url}`));
 
 const externalRequest$ = Observable.bindNodeCallback(externalRequest);
 /**
@@ -489,17 +492,20 @@ const externalRequest$ = Observable.bindNodeCallback(externalRequest);
  */
 export const makeExternalApiRequest = request => requestOpts => {
 	return externalRequest$(requestOpts)
-		.do(  // log errors
+		.do(
+			// log errors
 			null,
 			err => {
-				console.error(JSON.stringify({
-					err: err.stack,
-					message: 'REST API request error',
-					request: {
-						id: request.id
-					},
-					context: requestOpts,
-				}));
+				console.error(
+					JSON.stringify({
+						err: err.stack,
+						message: 'REST API request error',
+						request: {
+							id: request.id,
+						},
+						context: requestOpts,
+					})
+				);
 			}
 		)
 		.timeout(request.server.app.API_TIMEOUT)
@@ -509,23 +515,16 @@ export const makeExternalApiRequest = request => requestOpts => {
 export const logApiResponse = request => ([response, body]) => {
 	const {
 		elapsedTime,
-		request :{
-			id,
-			uri: {
-				query,
-				pathname,
-				href,
-			},
-			method,
-		},
-		statusCode
+		request: { id, uri: { query, pathname, href }, method },
+		statusCode,
 	} = response;
 
 	const logger = request.server.app.logger;
 	// production logs will automatically be JSON-parsed in Stackdriver
-	const log = (statusCode >= 400 && logger.error ||
-		statusCode >= 300 && logger.warn ||
-		logger.info).bind(logger);
+	const log = ((statusCode >= 400 && logger.error) ||
+		(statusCode >= 300 && logger.warn) ||
+		logger.info)
+		.bind(logger);
 
 	log(
 		{
@@ -543,10 +542,11 @@ export const logApiResponse = request => ([response, body]) => {
 				originRequestId: request.id,
 				statusCode: statusCode,
 				time: elapsedTime,
-				body: body.length > 256 ? `${body.substr(0, 256)}...`: body,
-			}
+				body: body.length > 256 ? `${body.substr(0, 256)}...` : body,
+			},
 		},
-		`Incoming response ${method.toUpperCase()} ${pathname} ${response.statusCode}`);
+		`Incoming response ${method.toUpperCase()} ${pathname} ${response.statusCode}`
+	);
 };
 
 /**
@@ -556,13 +556,19 @@ export const logApiResponse = request => ([response, body]) => {
  * the login response unchanged
  */
 export const parseLoginAuth = (request, query) => response => {
-	if (query.type === 'login' && request.plugins.requestAuth && !response.error) {
+	if (
+		query.type === 'login' && request.plugins.requestAuth && !response.error
+	) {
 		// kill the logged-out auth
-		removeAuthState(['oauth_token', 'refresh_token'], request, request.plugins.requestAuth.reply);
+		removeAuthState(
+			['oauth_token', 'refresh_token'],
+			request,
+			request.plugins.requestAuth.reply
+		);
 		// only return the member, no oauth data
 		return {
 			...response,
-			value: { member: response.value.member }
+			value: { member: response.value.member },
 		};
 	}
 	return response;
@@ -584,7 +590,7 @@ export const injectResponseCookies = request => ([response, _, jar]) => {
 			isHttpOnly: cookie.httpOnly,
 			isSameSite: false,
 			isSecure: process.env.NODE_ENV === 'production',
-			strictHeader: false,  // Can't enforce RFC 6265 cookie validation on external services
+			strictHeader: false, // Can't enforce RFC 6265 cookie validation on external services
 		};
 
 		request.plugins.requestAuth.reply.state(
@@ -600,17 +606,16 @@ export const injectResponseCookies = request => ([response, _, jar]) => {
  * object shape
  */
 export const makeApiRequest$ = request => {
-	const setApiResponseDuotones = apiResponseDuotoneSetter(request.server.app.duotoneUrls);
+	const setApiResponseDuotones = apiResponseDuotoneSetter(
+		request.server.app.duotoneUrls
+	);
 	return ([requestOpts, query]) => {
-		const request$ = query.mockResponse ?
-			makeMockRequest(query.mockResponse) :
-			makeExternalApiRequest(request);
+		const request$ = query.mockResponse
+			? makeMockRequest(query.mockResponse)
+			: makeExternalApiRequest(request);
 
 		return Observable.defer(() => {
-			const {
-				method,
-				headers,
-			} = requestOpts;
+			const { method, headers } = requestOpts;
 
 			const parsedUrl = url.parse(requestOpts.url);
 			request.server.app.logger.info(
@@ -627,14 +632,13 @@ export const makeApiRequest$ = request => {
 			);
 
 			return request$(requestOpts)
-				.do(logApiResponse(request))             // this will leak private info in API response
+				.do(logApiResponse(request)) // this will leak private info in API response
 				.do(injectResponseCookies(request))
-				.map(parseApiResponse(requestOpts.url))  // parse into plain object
+				.map(parseApiResponse(requestOpts.url)) // parse into plain object
 				.catch(errorResponse$(requestOpts.url))
-				.map(parseLoginAuth(request, query))     // login has oauth secrets - special case
-				.map(apiResponseToQueryResponse(query))  // convert apiResponse to app-ready queryResponse
-				.map(setApiResponseDuotones);            // special duotone prop
+				.map(parseLoginAuth(request, query)) // login has oauth secrets - special case
+				.map(apiResponseToQueryResponse(query)) // convert apiResponse to app-ready queryResponse
+				.map(setApiResponseDuotones); // special duotone prop
 		});
 	};
 };
-

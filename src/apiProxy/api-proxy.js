@@ -7,7 +7,6 @@ import {
 	parseRequest,
 } from '../util/apiUtils';
 
-
 /**
  * Given the current request and API server host, proxy the request to the API
  * and return the responses corresponding to the provided queries.
@@ -20,7 +19,6 @@ import {
  *
  * @module ApiProxy
  */
-
 
 /**
  * This function transforms a single request to the application server into a
@@ -46,12 +44,14 @@ const apiProxy$ = (request, queries) => {
 
 	// 2. curry a function that uses `externalRequestOpts` as a base from which
 	// to build the query-specific API request options object
-	const queryToRequestOpts = buildRequestArgs(parsedRequest.externalRequestOpts);
+	const queryToRequestOpts = buildRequestArgs(
+		parsedRequest.externalRequestOpts
+	);
 
 	// 3. map the queries onto an array of api request observables
 	const apiRequests$ = queries
 		.map(queryToRequestOpts)
-		.map((opts, i) => ([opts, queries[i]]))  // zip the query back into the opts
+		.map((opts, i) => [opts, queries[i]]) // zip the query back into the opts
 		.map(makeApiRequest$(request));
 
 	// 4. zip them together to send them parallel and return responses in order
@@ -59,4 +59,3 @@ const apiProxy$ = (request, queries) => {
 };
 
 export default apiProxy$;
-

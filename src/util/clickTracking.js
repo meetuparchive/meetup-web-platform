@@ -3,7 +3,6 @@ const DATA_ATTR = 'clicktrack';
 
 function cleanTrackingUrl() {
 	// TODO: investigate and refactor to support this feature
-
 	/*
 	// remove tracking information from the url to prevent bad link copying
 	// and to clean up the url field
@@ -33,8 +32,8 @@ function cleanTrackingUrl() {
 }
 
 // set reference to un-modified stopPropagation
-const originalStopPropagation = typeof Event !== 'undefined' &&
-	Event.prototype.stopPropagation;
+const originalStopPropagation =
+	typeof Event !== 'undefined' && Event.prototype.stopPropagation;
 
 /**
  * Overriding stopPropagation for maximum click tracking
@@ -74,20 +73,21 @@ function elementShorthand(element, idOnly) {
 		return id;
 	}
 	const tag = element.tagName.toLowerCase();
-	const classes = `.${[ ...element.classList ].join('.')}`;
+	const classes = `.${[...element.classList].join('.')}`;
 
 	return `${tag}${id}${classes}`;
 }
 
 function _getData(e) {
 	const target = e.target;
-	const useChildData = e.type === 'change' && target.tagName.toLowerCase() === 'select';
+	const useChildData =
+		e.type === 'change' && target.tagName.toLowerCase() === 'select';
 	const el = useChildData ? target.children[target.selectedIndex] : target;
 
 	try {
 		const data = (el.dataset || {})[DATA_ATTR] || '{}';
 		return JSON.parse(data);
-	} catch(err) {
+	} catch (err) {
 		// data is not JSON-formatted
 		return {};
 	}
@@ -116,7 +116,7 @@ function getTrackClick(store) {
 
 		const linkText = el.textContent
 			.trim()
-			.substring(0, 16)  // truncate if text is long
+			.substring(0, 16) // truncate if text is long
 			.replace(/\s{2,}/g, ' ');
 		const clickLineage = [];
 		const targetPosition = el.getBoundingClientRect();
@@ -126,10 +126,10 @@ function getTrackClick(store) {
 		const data = _getData(e);
 
 		// 1. Build array of DOM tag lineage
-		clickLineage.push(elementShorthand(el));  // full shorthand for clicked el
+		clickLineage.push(elementShorthand(el)); // full shorthand for clicked el
 		var currentEl = el;
 		while ((currentEl = currentEl.parentNode) && currentEl !== document.body) {
-			clickLineage.push(elementShorthand(currentEl, true));  // id/tag only for parents
+			clickLineage.push(elementShorthand(currentEl, true)); // id/tag only for parents
 		}
 
 		// 2. Create click action with metadata
@@ -139,7 +139,7 @@ function getTrackClick(store) {
 			lineage: clickLineage.join('<'),
 			linkText: linkText,
 			coords: [x, y],
-			data: data
+			data: data,
 		});
 
 		// 3. dispatch the action - must be deferred until after click event has
@@ -156,4 +156,3 @@ function getTrackClick(store) {
 }
 
 export default getTrackClick;
-

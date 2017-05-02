@@ -6,15 +6,17 @@ const cookieRequest = cookies => ({
 	method: 'get',
 	url: '/foo',
 	headers: {
-		Cookie: Object.keys(cookies).map(name => `${name}=${cookies[name]}`).join('; ')
-	}
+		Cookie: Object.keys(cookies)
+			.map(name => `${name}=${cookies[name]}`)
+			.join('; '),
+	},
 });
 
-const makeMockFetchResponse = responseObj => Promise.resolve({
-	text: () => Promise.resolve(JSON.stringify(responseObj)),
-	json: () => Promise.resolve(responseObj),
-});
-
+const makeMockFetchResponse = responseObj =>
+	Promise.resolve({
+		text: () => Promise.resolve(JSON.stringify(responseObj)),
+		json: () => Promise.resolve(responseObj),
+	});
 
 const random32 = 'asdfasdfasdfasdfasdfasdfasdfasdf';
 const config = {
@@ -28,16 +30,17 @@ const config = {
 		key: random32,
 		secret: random32,
 	},
-	duotoneUrls: ['http://example.com/duotone.jpg']
+	duotoneUrls: ['http://example.com/duotone.jpg'],
 };
-const getEncryptedToken = token => new Promise((resolve, reject) =>
-	Iron.seal(token, random32, Iron.defaults, (err, sealed) => resolve(sealed))
-);
+const getEncryptedToken = token =>
+	new Promise((resolve, reject) =>
+		Iron.seal(token, random32, Iron.defaults, (err, sealed) => resolve(sealed))
+	);
 
 const expectedOauthToken = 'foobar';
 const expectedResponse = 'barfoo';
 
-const testAuth = (cookies, test, makeRequest=cookieRequest) => {
+const testAuth = (cookies, test, makeRequest = cookieRequest) => {
 	spyOn(global, 'fetch').and.callFake((url, opts) => {
 		if (url.includes(config.OAUTH_AUTH_URL)) {
 			return makeMockFetchResponse({
@@ -55,13 +58,13 @@ const testAuth = (cookies, test, makeRequest=cookieRequest) => {
 	const fooRoute = {
 		method: 'get',
 		path: '/foo',
-		handler: (request, reply) => reply(expectedResponse)
+		handler: (request, reply) => reply(expectedResponse),
 	};
 	const server = getServer({}, config);
 	return server
 		.register({
 			register: requestAuthPlugin,
-			options: config
+			options: config,
 		})
 		.then(() => server.route(fooRoute))
 		.then(() => server.auth.strategy('default', 'oauth', 'required'))
@@ -86,8 +89,10 @@ describe('logged-in member state', () => {
 			method: 'get',
 			url: '/foo?logout=true',
 			headers: {
-				Cookie: Object.keys(cookies).map(name => `${name}=${cookies[name]}`).join('; ')
-			}
+				Cookie: Object.keys(cookies)
+					.map(name => `${name}=${cookies[name]}`)
+					.join('; '),
+			},
 		});
 		const cookies = { MEETUP_MEMBER: 'foo' };
 		const test = response => {
@@ -109,8 +114,9 @@ describe('logged-out member state', () => {
 			expect(response.request.auth.credentials).toBe(cookies.oauth_token);
 		};
 
-		return getEncryptedToken(cookies.oauth_token)
-			.then(oauth_token => testAuth({ oauth_token }, test));
+		return getEncryptedToken(cookies.oauth_token).then(oauth_token =>
+			testAuth({ oauth_token }, test)
+		);
 	});
 
 	it('gets a new oauth_token when only refresh_token provided', () => {
@@ -120,19 +126,28 @@ describe('logged-out member state', () => {
 		};
 		const test = response => {
 			expect(response.payload).toEqual(expectedResponse);
-			expect(response.headers['set-cookie'][0].startsWith('oauth_token')).toBe(true);
-			expect(response.request.plugins.requestAuth.oauth_token).toBe(expectedOauthToken);
+			expect(response.headers['set-cookie'][0].startsWith('oauth_token')).toBe(
+				true
+			);
+			expect(response.request.plugins.requestAuth.oauth_token).toBe(
+				expectedOauthToken
+			);
 		};
-		return getEncryptedToken(cookies.refresh_token)
-			.then(refresh_token => testAuth({ refresh_token }, test));
+		return getEncryptedToken(cookies.refresh_token).then(refresh_token =>
+			testAuth({ refresh_token }, test)
+		);
 	});
 	it('gets a new oauth_token and refresh_token when no auth provided', () => {
 		// mock fetch for auth, grant_type: refresh_token
 		const cookies = {};
 		const test = response => {
 			expect(response.payload).toEqual(expectedResponse);
-			expect(response.headers['set-cookie'][0].startsWith('oauth_token')).toBe(true);
-			expect(response.headers['set-cookie'][1].startsWith('refresh_token')).toBe(true);
+			expect(response.headers['set-cookie'][0].startsWith('oauth_token')).toBe(
+				true
+			);
+			expect(
+				response.headers['set-cookie'][1].startsWith('refresh_token')
+			).toBe(true);
 		};
 		return testAuth(cookies, test);
 	});

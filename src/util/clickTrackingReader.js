@@ -25,7 +25,9 @@ export default function processClickTracking(request, reply) {
 	const rawCookieValue = (request.state || {})['click-track'];
 	// It's possible that multiple cookies with the same value were sent, e.g.
 	// one value for .dev.meetup.com and another for .meetup.com - parse only the first
-	const cookieValue = rawCookieValue instanceof Array ? rawCookieValue[0] : rawCookieValue;
+	const cookieValue = rawCookieValue instanceof Array
+		? rawCookieValue[0]
+		: rawCookieValue;
 	if (!cookieValue || cookieValue === 'undefined') {
 		return;
 	}
@@ -34,11 +36,8 @@ export default function processClickTracking(request, reply) {
 	const { history } = JSON.parse(cookieJSON);
 	history
 		.map(clickToClickRecord(request))
-		.forEach(clickRecord =>
-			process.stdout.write(clickSerializer(clickRecord))
-		);
+		.forEach(clickRecord => process.stdout.write(clickSerializer(clickRecord)));
 
 	reply.unstate('click-track', clickCookieOptions);
 	return;
 }
-

@@ -23,10 +23,10 @@ const getApiProxyRoutes = (path, apiProxyFn$) => {
 			plugins: {
 				'electrode-csrf-jwt': {
 					enabled: true,
-				}
+				},
 			},
 			state: {
-				failAction: 'ignore',  // ignore cookie validation, just accept
+				failAction: 'ignore', // ignore cookie validation, just accept
 			},
 		},
 	};
@@ -36,7 +36,7 @@ const getApiProxyRoutes = (path, apiProxyFn$) => {
 		config: {
 			...routeBase.config,
 			validate: {
-				query: validApiPayloadSchema
+				query: validApiPayloadSchema,
 			},
 		},
 	};
@@ -46,14 +46,11 @@ const getApiProxyRoutes = (path, apiProxyFn$) => {
 		config: {
 			...routeBase.config,
 			payload: {
-				allow: [
-					'application/x-www-form-urlencoded',
-					'multipart/form-data',
-				],
+				allow: ['application/x-www-form-urlencoded', 'multipart/form-data'],
 				multipart: {
-					output: 'file',  // parse file uploads into streams
+					output: 'file', // parse file uploads into streams
 				},
-				maxBytes: 1024 * 1024 * 10  // 10 MB max upload
+				maxBytes: 1024 * 1024 * 10, // 10 MB max upload
 			},
 		},
 	};
@@ -62,4 +59,3 @@ const getApiProxyRoutes = (path, apiProxyFn$) => {
 };
 
 export default getApiProxyRoutes;
-
