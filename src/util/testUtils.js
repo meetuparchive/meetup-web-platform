@@ -11,6 +11,7 @@ import {
 	MOCK_APP_STATE,
 } from 'meetup-web-mocks/lib/app';
 
+import { mockConfig } from '../../tests/mocks';
 export const MOCK_LOGGER = {
 	debug: jest.fn(),
 	info: jest.fn(),
@@ -46,13 +47,13 @@ export const parseCookieHeader = cookieHeader => {
 	);
 };
 
-export const getServer = app => {
+export const getServer = (config = mockConfig) => {
 	const server = new Hapi.Server();
 	server.connection();
 	server.app = {
-		...app,
 		logger: MOCK_LOGGER,
 	};
+	server.settings.app = config;
 
 	// mock the anonAuthPlugin
 	server.decorate(
