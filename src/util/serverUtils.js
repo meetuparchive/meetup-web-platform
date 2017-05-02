@@ -14,11 +14,11 @@ import clickTrackingReader from './clickTrackingReader';
  * @return {Boolean} whether the `value` contains a 'dev' URL string
  */
 export function checkForDevUrl(value) {
-	switch(typeof value) {
-	case 'string':
-		return value.indexOf('.dev.meetup.') > -1;
-	case 'object':
-		return Object.keys(value).some(key => checkForDevUrl(value[key]));
+	switch (typeof value) {
+		case 'string':
+			return value.indexOf('.dev.meetup.') > -1;
+		case 'object':
+			return Object.keys(value).some(key => checkForDevUrl(value[key]));
 	}
 	return false;
 }
@@ -26,8 +26,9 @@ export function checkForDevUrl(value) {
 export function onRequestExtension(request, reply) {
 	request.id = uuid.v4();
 
-	request.server.app.logger
-		.info(`Incoming request ${request.method.toUpperCase()} ${request.url.href}`);
+	request.server.app.logger.info(
+		`Incoming request ${request.method.toUpperCase()} ${request.url.href}`
+	);
 
 	return reply.continue();
 }
@@ -35,7 +36,7 @@ export function onRequestExtension(request, reply) {
 export function onPreHandlerExtension(request, reply) {
 	try {
 		clickTrackingReader(request, reply);
-	} catch(err) {
+	} catch (err) {
 		console.error(err);
 		request.server.app.logger.error(err);
 	}
@@ -68,14 +69,15 @@ export function logResponse(request) {
 
 	if (response.isBoom) {
 		// response is an Error object
-		logger.error(`Internal error ${response.message} ${url.pathname}`,
-			{ error: response.stack }
-		);
+		logger.error(`Internal error ${response.message} ${url.pathname}`, {
+			error: response.stack,
+		});
 	}
 
-	const log = (response.statusCode >= 400 && logger.error ||
-		response.statusCode >= 300 && logger.warn ||
-		logger.info).bind(logger);
+	const log = ((response.statusCode >= 400 && logger.error) ||
+		(response.statusCode >= 300 && logger.warn) ||
+		logger.info)
+		.bind(logger);
 
 	log(
 		{
@@ -100,13 +102,16 @@ export function logResponse(request) {
  * @return {Object} Hapi server
  */
 export function registerExtensionEvents(server) {
-	server.ext([{
-		type: 'onRequest',
-		method: onRequestExtension,
-	}, {
-		type: 'onPreHandler',
-		method: onPreHandlerExtension,
-	}]);
+	server.ext([
+		{
+			type: 'onRequest',
+			method: onRequestExtension,
+		},
+		{
+			type: 'onPreHandler',
+			method: onPreHandlerExtension,
+		},
+	]);
 	server.on('response', onResponse);
 	return server;
 }
@@ -136,7 +141,7 @@ export function server(routes, connection, plugins, platform_agent, config) {
 	// https://hapijs.com/api#serverapp
 	Object.assign(
 		server.app,
-		{ isDevConfig: checkForDevUrl(config) },  // indicates dev API or prod API
+		{ isDevConfig: checkForDevUrl(config) }, // indicates dev API or prod API
 		config
 	);
 
@@ -151,4 +156,3 @@ export function server(routes, connection, plugins, platform_agent, config) {
 		.then(() => server.start())
 		.then(() => server);
 }
-

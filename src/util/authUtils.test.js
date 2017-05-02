@@ -23,27 +23,31 @@ describe('configureAuthCookies', () => {
 		const callArgs = serverWithState.state.calls.allArgs();
 		expect(callArgs.length).toBeGreaterThan(0);
 		callArgs.forEach(args => {
-			expect(args[0]).toEqual(jasmine.any(String));  // the cookie name, e.g. 'oauth_token'
-			expect(args[1]).toEqual(jasmine.any(Object));  // the cookie config
+			expect(args[0]).toEqual(jasmine.any(String)); // the cookie name, e.g. 'oauth_token'
+			expect(args[1]).toEqual(jasmine.any(Object)); // the cookie config
 		});
 	});
 	it('throws an error when secret is missing', () => {
 		const config = {};
 		const plugins = { requestAuth: { config } };
-		expect(() => configureAuthCookies({
-			...serverWithState,
-			plugins,
-		})).toThrow();
+		expect(() =>
+			configureAuthCookies({
+				...serverWithState,
+				plugins,
+			})
+		).toThrow();
 	});
 	it('throws an error when secret is too short', () => {
 		const config = {
 			COOKIE_ENCRYPT_SECRET: 'less than 32 characters',
 		};
 		const plugins = { requestAuth: { config } };
-		expect(() => configureAuthCookies({
-			...serverWithState,
-			plugins,
-		})).toThrow();
+		expect(() =>
+			configureAuthCookies({
+				...serverWithState,
+				plugins,
+			})
+		).toThrow();
 	});
 });
 
@@ -114,8 +118,9 @@ describe('removeAuthState', () => {
 		};
 		spyOn(reply, 'unstate');
 		removeAuthState(Object.keys(request.state), request, reply);
-		expect(reply.unstate.calls.allArgs().map(args => args[0]).sort())
-			.toEqual(Object.keys(request.state).sort());
+		expect(reply.unstate.calls.allArgs().map(args => args[0]).sort()).toEqual(
+			Object.keys(request.state).sort()
+		);
 		expect(
 			Object.keys(request.state)
 				.map(k => request.state[k])
@@ -130,7 +135,7 @@ describe('configureAuthState', () => {
 			value: Joi.string().allow(''),
 			opts: {
 				ttl: Joi.number().integer(),
-			}
+			},
 		});
 		const authStateSchema = Joi.object({
 			oauth_token: cookieSchema,
@@ -146,18 +151,20 @@ describe('configureAuthState', () => {
 		const accessAuth = {
 			oauth_token: '1234',
 		};
-		expect(configureAuthState(oauthAuth).oauth_token.value)
-			.toEqual(oauthAuth.oauth_token);
-		expect(configureAuthState(accessAuth).oauth_token.value)
-			.toEqual(accessAuth.oauth_token);
+		expect(configureAuthState(oauthAuth).oauth_token.value).toEqual(
+			oauthAuth.oauth_token
+		);
+		expect(configureAuthState(accessAuth).oauth_token.value).toEqual(
+			accessAuth.oauth_token
+		);
 	});
 	it('sets ttl to 1000 x expires_in', () => {
 		const oauthAuth = {
 			oauth_token: '1234',
 			expires_in: 49302,
 		};
-		expect(configureAuthState(oauthAuth).oauth_token.opts.ttl)
-			.toEqual(oauthAuth.expires_in * 1000);
+		expect(configureAuthState(oauthAuth).oauth_token.opts.ttl).toEqual(
+			oauthAuth.expires_in * 1000
+		);
 	});
 });
-

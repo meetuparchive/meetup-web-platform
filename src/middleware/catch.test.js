@@ -5,7 +5,9 @@ describe('catchMiddleware', () => {
 		spyOn(console, 'error');
 
 		const theError = new Error('bad news');
-		const errorThrower = () => { throw theError; };
+		const errorThrower = () => {
+			throw theError;
+		};
 		const receivedError = catchMiddleware()(errorThrower)({});
 		expect(console.error).toHaveBeenCalled();
 		expect(receivedError).toBe(theError);
@@ -20,4 +22,3 @@ describe('catchMiddleware', () => {
 		expect(receivedError).toBe(next(action));
 	});
 });
-

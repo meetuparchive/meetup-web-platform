@@ -7,15 +7,10 @@ import Link from 'react-router-dom/Link';
  */
 class LogoutLink extends React.Component {
 	render() {
-		const {
-			to,
-			children
-		} = this.props;
+		const { to, children } = this.props;
 
 		return (
-			<Link
-				to={{ pathname: to, query: {logout: true} }}
-			>
+			<Link to={{ pathname: to, query: { logout: true } }}>
 				{children}
 			</Link>
 		);
@@ -27,7 +22,7 @@ LogoutLink.propTypes = {
 };
 
 LogoutLink.defaultProps = {
-	to: '/'
+	to: '/',
 };
 
 export default LogoutLink;

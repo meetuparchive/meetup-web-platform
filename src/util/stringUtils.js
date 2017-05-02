@@ -1,11 +1,11 @@
 export const coerceBool = s => {
-	switch(s) {
-	case 'true':
-		return true;
-	case 'false':
-		return false;
-	default:
-		return s;
+	switch (s) {
+		case 'true':
+			return true;
+		case 'false':
+			return false;
+		default:
+			return s;
 	}
 };
 
@@ -16,4 +16,3 @@ export const coerceBool = s => {
 export function toCamelCase(s) {
 	return s.replace(/-(\w)/g, g => g[1].toUpperCase());
 }
-

@@ -15,7 +15,7 @@ import 'rxjs/add/operator/toPromise';
  */
 export const serverFetchQueries = request => () => queries =>
 	apiProxy$(request, queries)
-		.map(responses => ({ responses }))  // package the responses in object like the API proxy endpoint does
+		.map(responses => ({ responses })) // package the responses in object like the API proxy endpoint does
 		.toPromise()
 		.then(parseQueryResponse(queries));
 
@@ -28,12 +28,7 @@ export const serverFetchQueries = request => () => queries =>
  * @param {Array} middleware additional middleware to inject into store
  * @param {Object} request the Hapi request for this store
  */
-export function getServerCreateStore(
-	routes,
-	middleware,
-	request,
-	baseUrl
-) {
+export function getServerCreateStore(routes, middleware, request, baseUrl) {
 	const middlewareToApply = [
 		catchMiddleware,
 		getEpicMiddleware(routes, serverFetchQueries(request), baseUrl),
@@ -44,4 +39,3 @@ export function getServerCreateStore(
 
 	return middlewareEnhancer(createStore);
 }
-

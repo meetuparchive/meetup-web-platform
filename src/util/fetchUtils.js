@@ -1,12 +1,13 @@
 import JSCookie from 'js-cookie';
 import rison from 'rison';
 
-
 const BrowserCookies = JSCookie.withConverter({
 	read: (value, name) => value,
 	write: (value, name) =>
-		encodeURIComponent(value)
-			.replace(/[!'()*]/g, c => `%${c.charCodeAt(0).toString(16)}`),
+		encodeURIComponent(value).replace(
+			/[!'()*]/g,
+			c => `%${c.charCodeAt(0).toString(16)}`
+		),
 });
 
 /**
@@ -21,36 +22,48 @@ export const CSRF_HEADER_COOKIE = 'x-csrf-jwt-header';
  * @deprecated
  */
 export function getDeprecatedSuccessPayload(successes, errors) {
-	const allQueryResponses = [ ...successes, ...errors ];
-	return allQueryResponses.reduce((payload, { query, response }) => {
-		if (!response) {
+	const allQueryResponses = [...successes, ...errors];
+	return allQueryResponses.reduce(
+		(payload, { query, response }) => {
+			if (!response) {
+				return payload;
+			}
+			const { ref, error, ...responseBody } = response;
+			if (error) {
+				// old payload expects error as a property of `value`
+				responseBody.value = { error };
+			}
+			payload.queries.push(query);
+			payload.responses.push({ [ref]: responseBody });
 			return payload;
-		}
-		const { ref, error, ...responseBody } = response;
-		if (error) {
-			// old payload expects error as a property of `value`
-			responseBody.value = { error };
-		}
-		payload.queries.push(query);
-		payload.responses.push({ [ref]: responseBody });
-		return payload;
-	}, { queries: [], responses: [] });
+		},
+		{ queries: [], responses: [] }
+	);
 }
 
-export const parseQueryResponse = queries => ({ responses, error, message }) => {
+export const parseQueryResponse = queries => ({
+	responses,
+	error,
+	message,
+}) => {
 	if (error) {
-		throw new Error(JSON.stringify({ error, message }));  // treat like an API error
+		throw new Error(JSON.stringify({ error, message })); // treat like an API error
 	}
 	responses = responses || [];
 	if (queries.length !== responses.length) {
 		throw new Error('Responses do not match requests');
 	}
 
-	return responses.reduce((categorized, response, i) => {
-		const targetArray = response.error ? categorized.errors : categorized.successes;
-		targetArray.push({ response, query: queries[i] });
-		return categorized;
-	}, { successes: [], errors: [] });
+	return responses.reduce(
+		(categorized, response, i) => {
+			const targetArray = response.error
+				? categorized.errors
+				: categorized.successes;
+			targetArray.push({ response, query: queries[i] });
+			return categorized;
+		},
+		{ successes: [], errors: [] }
+	);
 };
 
 /**
@@ -67,13 +80,10 @@ export const parseQueryResponse = queries => ({ responses, error, message }) => 
  */
 export const getFetchArgs = (apiUrl, queries, meta) => {
 	const headers = {};
-	const method = (
-		(queries[0].meta || {}).method ||
-			'GET'  // fallback to 'get'
-	).toUpperCase();  // must be upper case - requests can fail silently otherwise
+	const method = ((queries[0].meta || {}).method || 'GET') // fallback to 'get'
+		.toUpperCase(); // must be upper case - requests can fail silently otherwise
 
-	const hasBody = method === 'POST' ||
-		method === 'PATCH';
+	const hasBody = method === 'POST' || method === 'PATCH';
 	const isFormData = queries[0].params instanceof FormData;
 	const isDelete = method === 'DELETE';
 
@@ -81,18 +91,14 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 	fetchUrl.searchParams.append('queries', rison.encode_array(queries));
 
 	if (meta) {
-		const {
-			clickTracking,
-			logout,
-			...metadata
-		} = meta;
+		const { clickTracking, logout, ...metadata } = meta;
 
 		if (clickTracking) {
-			BrowserCookies.set(
-				'click-track',
-				JSON.stringify(clickTracking),
-				{ domain: apiUrl.indexOf('.dev.') > -1 ? '.dev.meetup.com' : '.meetup.com' }
-			);
+			BrowserCookies.set('click-track', JSON.stringify(clickTracking), {
+				domain: apiUrl.indexOf('.dev.') > -1
+					? '.dev.meetup.com'
+					: '.meetup.com',
+			});
 		}
 
 		// special logout param
@@ -109,9 +115,9 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 
 	if (!isFormData) {
 		// need to manually specify content-type for any non-multipart request
-		headers['content-type'] = hasBody ?
-			'application/x-www-form-urlencoded' :
-			'application/json';
+		headers['content-type'] = hasBody
+			? 'application/x-www-form-urlencoded'
+			: 'application/json';
 	}
 
 	if (hasBody || isDelete) {
@@ -121,12 +127,12 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 	const config = {
 		method,
 		headers,
-		credentials: 'same-origin'  // allow response to set-cookies
+		credentials: 'same-origin', // allow response to set-cookies
 	};
 	if (hasBody) {
-		config.body = isFormData ?
-			queries[0].params :
-			fetchUrl.searchParams.toString();
+		config.body = isFormData
+			? queries[0].params
+			: fetchUrl.searchParams.toString();
 	}
 	const url = isFormData || !hasBody ? fetchUrl.toString() : apiUrl;
 	return {
@@ -149,18 +155,14 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
  *   click tracking data
  * @return {Promise} resolves with a `{queries, responses}` object
  */
-export const fetchQueries = (apiUrl) => (queries, meta) => {
+export const fetchQueries = apiUrl => (queries, meta) => {
 	if (
-		typeof window === 'undefined' &&  // not in browser
-		typeof test === 'undefined'  // not in testing env (global set by Jest)
+		typeof window === 'undefined' && typeof test === 'undefined' // not in browser // not in testing env (global set by Jest)
 	) {
 		throw new Error('fetchQueries was called on server - cannot continue');
 	}
 
-	const {
-		url,
-		config,
-	} = getFetchArgs(apiUrl, queries, meta);
+	const { url, config } = getFetchArgs(apiUrl, queries, meta);
 
 	return fetch(url, config)
 		.then(queryResponse => queryResponse.json())
@@ -168,12 +170,14 @@ export const fetchQueries = (apiUrl) => (queries, meta) => {
 			...parseQueryResponse(queries)(queryJSON),
 		}))
 		.catch(err => {
-			console.error(JSON.stringify({
-				err: err.stack,
-				message: 'App server API fetch error',
-				context: config,
-			}));
-			throw err;  // handle the error upstream
+			console.error(
+				JSON.stringify({
+					err: err.stack,
+					message: 'App server API fetch error',
+					context: config,
+				})
+			);
+			throw err; // handle the error upstream
 		});
 };
 
@@ -186,11 +190,13 @@ export const fetchQueries = (apiUrl) => (queries, meta) => {
  */
 export const tryJSON = reqUrl => response => {
 	const { status, statusText } = response;
-	if (status >= 400) {  // status always 200: bugzilla #52128
+	if (status >= 400) {
+		// status always 200: bugzilla #52128
 		return Promise.reject(
-			new Error(`Request to ${reqUrl} responded with error code ${status}: ${statusText}`)
+			new Error(
+				`Request to ${reqUrl} responded with error code ${status}: ${statusText}`
+			)
 		);
 	}
 	return response.text().then(text => JSON.parse(text));
 };
-

@@ -12,18 +12,13 @@ import {
 	MOCK_ROUTES,
 } from 'meetup-web-mocks/lib/app';
 
-import {
-	createFakeStore,
-	epicIgnoreAction,
-} from '../util/testUtils';
+import { createFakeStore, epicIgnoreAction } from '../util/testUtils';
 
 import getSyncEpic from '../epics/sync';
 import * as api from '../actions/apiActionCreators';
 import * as syncActionCreators from '../actions/syncActionCreators';
 import * as authActionCreators from '../actions/authActionCreators';
-import {
-	CLICK_TRACK_CLEAR_ACTION,
-} from '../actions/clickActionCreators';
+import { CLICK_TRACK_CLEAR_ACTION } from '../actions/clickActionCreators';
 
 const EMPTY_ROUTES = {};
 
@@ -31,10 +26,19 @@ const EMPTY_ROUTES = {};
  * @module SyncEpicTest
  */
 describe('Sync epic', () => {
-	it('does not pass through arbitrary actions', epicIgnoreAction(getSyncEpic(MOCK_ROUTES)));
+	it(
+		'does not pass through arbitrary actions',
+		epicIgnoreAction(getSyncEpic(MOCK_ROUTES))
+	);
 	it('emits API_REQ and CLICK_TRACK_CLEAR for nav-related actions with matched query', function() {
-		const locationChange = { type: syncActionCreators.LOCATION_CHANGE, payload: MOCK_RENDERPROPS.location };
-		const serverRender = { type: '@@server/RENDER', payload: MOCK_RENDERPROPS.location };
+		const locationChange = {
+			type: syncActionCreators.LOCATION_CHANGE,
+			payload: MOCK_RENDERPROPS.location,
+		};
+		const serverRender = {
+			type: '@@server/RENDER',
+			payload: MOCK_RENDERPROPS.location,
+		};
 
 		const fakeStore = createFakeStore({});
 		const action$ = ActionsObservable.of(locationChange, serverRender);
@@ -52,7 +56,10 @@ describe('Sync epic', () => {
 			...MOCK_RENDERPROPS.location,
 			search: '?foo=bar&logout=true',
 		};
-		const locationChange = { type: syncActionCreators.LOCATION_CHANGE, payload: logoutLocation };
+		const locationChange = {
+			type: syncActionCreators.LOCATION_CHANGE,
+			payload: logoutLocation,
+		};
 
 		const fakeStore = createFakeStore({});
 		const action$ = ActionsObservable.of(locationChange);
@@ -71,52 +78,68 @@ describe('Sync epic', () => {
 
 		const pathname = '/noQuery';
 		const noMatchLocation = { ...MOCK_RENDERPROPS.location, pathname };
-		const locationChange = { type: syncActionCreators.LOCATION_CHANGE, payload: noMatchLocation };
-		const serverRender = { type: syncActionCreators.SERVER_RENDER, payload: noMatchLocation };
+		const locationChange = {
+			type: syncActionCreators.LOCATION_CHANGE,
+			payload: noMatchLocation,
+		};
+		const serverRender = {
+			type: syncActionCreators.SERVER_RENDER,
+			payload: noMatchLocation,
+		};
 
-		return epicIgnoreAction(SyncEpic, locationChange)()
-			.then(epicIgnoreAction(SyncEpic, serverRender));
+		return epicIgnoreAction(SyncEpic, locationChange)().then(
+			epicIgnoreAction(SyncEpic, serverRender)
+		);
 	});
 	it('does not emit for nav-related actions with query functions that return null', () => {
 		const SyncEpic = getSyncEpic(MOCK_ROUTES);
 
 		const pathname = '/nullQuery';
 		const noMatchLocation = { ...MOCK_RENDERPROPS.location, pathname };
-		const locationChange = { type: syncActionCreators.LOCATION_CHANGE, payload: noMatchLocation };
-		const serverRender = { type: syncActionCreators.SERVER_RENDER, payload: noMatchLocation };
+		const locationChange = {
+			type: syncActionCreators.LOCATION_CHANGE,
+			payload: noMatchLocation,
+		};
+		const serverRender = {
+			type: syncActionCreators.SERVER_RENDER,
+			payload: noMatchLocation,
+		};
 
-		return epicIgnoreAction(SyncEpic, locationChange)()
-			.then(epicIgnoreAction(SyncEpic, serverRender));
+		return epicIgnoreAction(SyncEpic, locationChange)().then(
+			epicIgnoreAction(SyncEpic, serverRender)
+		);
 	});
 
+	xit(
+		'strips logout query and calls browserHistory.replace on LOGIN_SUCCESS',
+		function() {
+			const history = { replace: jest.fn() };
+			const mockFetchQueries = () => () => Promise.resolve({});
+			const locationWithLogout = {
+				...MOCK_APP_STATE.routing.locationBeforeTransitions,
+				query: { logout: true },
+			};
+			const locationWithoutLogout = {
+				...locationWithLogout,
+				query: {},
+			};
+			const MOCK_APP_STATE_LOGOUT = {
+				...MOCK_APP_STATE,
+				routing: {
+					locationBeforeTransitions: locationWithLogout,
+				},
+			};
 
-	xit('strips logout query and calls browserHistory.replace on LOGIN_SUCCESS', function() {
-		const history = { replace: jest.fn() };
-		const mockFetchQueries = () => () => Promise.resolve({});
-		const locationWithLogout = {
-			...MOCK_APP_STATE.routing.locationBeforeTransitions,
-			query: { logout: true },
-		};
-		const locationWithoutLogout = {
-			...locationWithLogout,
-			query: {},
-		};
-		const MOCK_APP_STATE_LOGOUT = {
-			...MOCK_APP_STATE,
-			routing: {
-				locationBeforeTransitions: locationWithLogout
-			}
-		};
-
-		const locationSync = authActionCreators.loginSuccess();
-		const action$ = ActionsObservable.of(locationSync);
-		const fakeStore = createFakeStore(MOCK_APP_STATE_LOGOUT);
-		return getSyncEpic(EMPTY_ROUTES, mockFetchQueries)(action$, fakeStore)
-			.toPromise()
-			.then(() => {
-				expect(history.replace).toHaveBeenCalledWith(locationWithoutLogout);
-			});
-	});
+			const locationSync = authActionCreators.loginSuccess();
+			const action$ = ActionsObservable.of(locationSync);
+			const fakeStore = createFakeStore(MOCK_APP_STATE_LOGOUT);
+			return getSyncEpic(EMPTY_ROUTES, mockFetchQueries)(action$, fakeStore)
+				.toPromise()
+				.then(() => {
+					expect(history.replace).toHaveBeenCalledWith(locationWithoutLogout);
+				});
+		}
+	);
 
 	it('emits API_RESP_SUCCESS and API_RESP_COMPLETE on successful API_REQ', function() {
 		const mockFetchQueries = () => () => Promise.resolve({ successes: [{}] });
@@ -151,11 +174,10 @@ describe('Sync epic', () => {
 				expect(actions.map(a => a.type)).toEqual([
 					api.API_RESP_FAIL,
 					'API_ERROR',
-					api.API_RESP_COMPLETE // DO NOT REMOVE - must _ALWAYS_ be called in order to clean up inFlight state
+					api.API_RESP_COMPLETE, // DO NOT REMOVE - must _ALWAYS_ be called in order to clean up inFlight state
 				])
 			);
 	});
-
 });
 
 describe('DEPRECATED support for API_REQUEST', () => {
@@ -172,4 +194,3 @@ describe('DEPRECATED support for API_REQUEST', () => {
 			});
 	});
 });
-

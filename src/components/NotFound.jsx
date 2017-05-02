@@ -24,11 +24,8 @@ function reducePropsToState(propsList) {
 	return 404;
 }
 
-function handleStateChangeOnClient(code) {
-}
+function handleStateChangeOnClient(code) {}
 
-export default withSideEffect(
-	reducePropsToState,
-	handleStateChangeOnClient
-)(NotFound);
-
+export default withSideEffect(reducePropsToState, handleStateChangeOnClient)(
+	NotFound
+);

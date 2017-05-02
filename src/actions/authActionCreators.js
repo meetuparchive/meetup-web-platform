@@ -30,8 +30,8 @@ export function loginPost(params) {
 				// otherwise return the action
 				return loginSuccess();
 			},
-			onError: loginError
-		}
+			onError: loginError,
+		},
 	};
 }
 
@@ -48,4 +48,3 @@ export function loginError(response) {
 		payload: response,
 	};
 }
-

@@ -6,11 +6,15 @@ import getClickTracker from './clickTracking';
 import getEpicMiddleware from '../middleware/epic';
 import catchMiddleware from '../middleware/catch';
 
-declare var document: Object;  // ignore 'potentially null' document.body
+declare var document: Object; // ignore 'potentially null' document.body
 
 const noopMiddleware = store => next => action => next(action);
 
-export const clickTrackEnhancer = createStore => (reducer, initialState, enhancer) => {
+export const clickTrackEnhancer = createStore => (
+	reducer,
+	initialState,
+	enhancer
+) => {
 	const store = createStore(reducer, initialState, enhancer);
 	const clickTracker = getClickTracker(store);
 	document.body.addEventListener('click', clickTracker);
@@ -24,7 +28,9 @@ export const clickTrackEnhancer = createStore => (reducer, initialState, enhance
  * containing the HTML-escaped JSON string in `window.INITIAL_STATE.escapedState`.
  * unescape the text using native `textarea.textContent` unescaping
  */
-export const getInitialState = (APP_RUNTIME: { escapedState: string }): ?Object => {
+export const getInitialState = (
+	APP_RUNTIME: { escapedState: string }
+): ?Object => {
 	if (!APP_RUNTIME) {
 		return;
 	}
@@ -34,24 +40,19 @@ export const getInitialState = (APP_RUNTIME: { escapedState: string }): ?Object 
 	return JSON.parse(unescapedStateJSON);
 };
 
-export function getBrowserCreateStore(
-	routes,
-	middleware=[],
-	baseUrl
-) {
+export function getBrowserCreateStore(routes, middleware = [], baseUrl) {
 	const middlewareToApply = [
 		catchMiddleware,
 		getEpicMiddleware(routes, fetchQueries, baseUrl),
 		...middleware,
-		window.mupDevTools ? window.mupDevTools() : noopMiddleware,  // must be last middleware
+		window.mupDevTools ? window.mupDevTools() : noopMiddleware, // must be last middleware
 	];
 	const middlewareEnhancer = applyMiddleware(...middlewareToApply);
 
 	const enhancer = compose(
 		middlewareEnhancer,
 		clickTrackEnhancer,
-		window.devToolsExtension ? window.devToolsExtension() : fn => fn  // this must be last enhancer
+		window.devToolsExtension ? window.devToolsExtension() : fn => fn // this must be last enhancer
 	);
 	return enhancer(createStore);
 }
-

@@ -3,10 +3,10 @@ import * as clickActionCreators from '../actions/clickActionCreators';
 import * as syncActionCreators from '../actions/syncActionCreators';
 import {
 	DEFAULT_API_STATE,
-	DEFAULT_APP_STATE,  // DEPRECATED
+	DEFAULT_APP_STATE, // DEPRECATED
 	DEFAULT_CLICK_TRACK,
 	api,
-	app,  // DEPRECATED
+	app, // DEPRECATED
 	clickTracking,
 } from './platform';
 
@@ -25,7 +25,7 @@ describe('app reducer', () => {
 		const API_SUCCESS = {
 			type: 'API_SUCCESS',
 			payload: {
-				responses: [{ foo: 'bar'}, { bar: 'baz' }, { baz: 'foo' }],
+				responses: [{ foo: 'bar' }, { bar: 'baz' }, { baz: 'foo' }],
 			},
 		};
 		expect(app(undefined, API_SUCCESS)).toEqual({
@@ -57,16 +57,23 @@ describe('api reducer', () => {
 		});
 	});
 	it('adds success response to state tree', () => {
-		const API_RESP_SUCCESS = apiActions.success({ query: {}, response: { ref: 'bing', value: 'baz' } });
-		expect(api({ ...DEFAULT_API_STATE, foo: 'bar'}, API_RESP_SUCCESS)).toEqual({
+		const API_RESP_SUCCESS = apiActions.success({
+			query: {},
+			response: { ref: 'bing', value: 'baz' },
+		});
+		expect(
+			api({ ...DEFAULT_API_STATE, foo: 'bar' }, API_RESP_SUCCESS)
+		).toEqual({
 			foo: 'bar',
 			bing: { ref: 'bing', value: 'baz' },
 			inFlight: [],
 		});
 	});
 	it('adds error response to state tree', () => {
-		const API_RESP_ERROR = apiActions.error({ response: { ref: 'bing', error: 'baz' } });
-		expect(api({ ...DEFAULT_API_STATE, foo: 'bar'}, API_RESP_ERROR)).toEqual({
+		const API_RESP_ERROR = apiActions.error({
+			response: { ref: 'bing', error: 'baz' },
+		});
+		expect(api({ ...DEFAULT_API_STATE, foo: 'bar' }, API_RESP_ERROR)).toEqual({
 			foo: 'bar',
 			bing: { ref: 'bing', error: 'baz' },
 			inFlight: [],
@@ -75,7 +82,9 @@ describe('api reducer', () => {
 	it('populates an `fail` key on API_RESP_FAIL', () => {
 		const API_RESP_FAIL = apiActions.fail(new Error('this is the worst'));
 		const errorState = api({ ...DEFAULT_API_STATE }, API_RESP_FAIL);
-		expect(errorState).toEqual(expect.objectContaining({ fail: API_RESP_FAIL.payload }));
+		expect(errorState).toEqual(
+			expect.objectContaining({ fail: API_RESP_FAIL.payload })
+		);
 	});
 	it('adds query ref to inFlight array on API_REQ', () => {
 		const ref = 'foobar';
@@ -93,7 +102,10 @@ describe('api reducer', () => {
 		const expectedInFlightState = ['asdf'];
 		const completeAction = apiActions.complete([query1, query2]);
 
-		const apiState = api({ ...DEFAULT_API_STATE, inFlight: inFlightState }, completeAction);
+		const apiState = api(
+			{ ...DEFAULT_API_STATE, inFlight: inFlightState },
+			completeAction
+		);
 		expect(apiState).toMatchObject({ inFlight: expectedInFlightState });
 	});
 });
@@ -116,4 +128,3 @@ describe('clickTracking reducer', () => {
 		expect(clickTracking(initialState, { type: 'FOO' })).toBe(initialState);
 	});
 });
-

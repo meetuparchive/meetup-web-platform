@@ -1,6 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { getInitialState, getBrowserCreateStore } from '../util/createStoreBrowser';
+import {
+	getInitialState,
+	getBrowserCreateStore,
+} from '../util/createStoreBrowser';
 import BrowserApp from '../components/BrowserApp';
 
 /**
@@ -26,8 +29,8 @@ import BrowserApp from '../components/BrowserApp';
  * @returns {Function} a function that results in a ReactDOM.render call - can
  *   use a custom root element ID or default to `'outlet'`
  */
-function makeRenderer(routes, reducer, middleware=[], baseUrl='') {
-	return (rootElId='outlet') => {
+function makeRenderer(routes, reducer, middleware = [], baseUrl = '') {
+	return (rootElId = 'outlet') => {
 		const createStore = getBrowserCreateStore(routes, middleware, baseUrl);
 		const store = createStore(reducer, getInitialState(window.APP_RUNTIME));
 		ReactDOM.render(
@@ -39,4 +42,3 @@ function makeRenderer(routes, reducer, middleware=[], baseUrl='') {
 }
 
 export default makeRenderer;
-

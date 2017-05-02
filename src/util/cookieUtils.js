@@ -3,7 +3,9 @@ import logger from './logger';
 
 const isProd = process.env.NODE_ENV === 'production';
 export const MEMBER_COOKIE = isProd ? 'MEETUP_MEMBER' : 'MEETUP_MEMBER_DEV';
-export const LANGUAGE_COOKIE = isProd ? 'MEETUP_LANGUAGE' : 'MEETUP_LANGUAGE_DEV';
+export const LANGUAGE_COOKIE = isProd
+	? 'MEETUP_LANGUAGE'
+	: 'MEETUP_LANGUAGE_DEV';
 
 export const parseMemberCookie = state => {
 	if (!state[MEMBER_COOKIE]) {
@@ -15,4 +17,3 @@ export const parseMemberCookie = state => {
 	member.id = parseInt(member.id, 10) || 0;
 	return member;
 };
-

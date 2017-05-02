@@ -97,8 +97,7 @@ const getRouterRenderer = ({
 		/>
 	);
 
-	statusCode =
-		NotFound.rewind() || 200; // if NotFound is mounted, return 404
+	statusCode = NotFound.rewind() || 200; // if NotFound is mounted, return 404
 
 	return {
 		statusCode,

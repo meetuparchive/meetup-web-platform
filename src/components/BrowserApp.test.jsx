@@ -10,12 +10,9 @@ describe('BrowserApp', function() {
 	const browserApp = (
 		<BrowserApp routes={routes} store={{}} baseUrl={baseUrl} />
 	);
-	renderer.render(
-		browserApp
-	);
-	const app = renderer.getRenderOutput();  // this actually returns the <BrowserRouter> instance
+	renderer.render(browserApp);
+	const app = renderer.getRenderOutput(); // this actually returns the <BrowserRouter> instance
 	it('exists', function() {
 		expect(app).not.toBeNull();
 	});
 });
-

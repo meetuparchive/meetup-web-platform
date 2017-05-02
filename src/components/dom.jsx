@@ -28,14 +28,14 @@ function getInnerHTML(__html) {
  *
  * @module DOM
  */
-const DOM = (props) => {
+const DOM = props => {
 	const {
-		appMarkup='',
+		appMarkup = '',
 		assetPublicPath,
 		baseUrl,
 		clientFilename,
-		initialState={},
-		scripts=[],
+		initialState = {},
+		scripts = [],
 	} = props;
 
 	/**
@@ -60,12 +60,14 @@ const DOM = (props) => {
 		escapedState,
 	};
 
-	if(clientFilename){
+	if (clientFilename) {
 		scripts.push(`${assetPublicPath}${clientFilename}`);
 	}
 
 	if (!scripts.length) {
-		throw new Error('No client scripts supplied - check the `makeRenderer` call in your server entry script');
+		throw new Error(
+			'No client scripts supplied - check the `makeRenderer` call in your server entry script'
+		);
 	}
 
 	return (
@@ -77,9 +79,13 @@ const DOM = (props) => {
 				{head.script.toComponent()}
 			</head>
 			<body>
-				<div id='outlet' dangerouslySetInnerHTML={getInnerHTML(appMarkup)} />
-				<script dangerouslySetInnerHTML={getInnerHTML(`window.APP_RUNTIME=${JSON.stringify(APP_RUNTIME)};`)} />
-				{scripts.map((url,key) => <script src={url} key={key} />)}
+				<div id="outlet" dangerouslySetInnerHTML={getInnerHTML(appMarkup)} />
+				<script
+					dangerouslySetInnerHTML={getInnerHTML(
+						`window.APP_RUNTIME=${JSON.stringify(APP_RUNTIME)};`
+					)}
+				/>
+				{scripts.map((url, key) => <script src={url} key={key} />)}
 			</body>
 		</html>
 	);
@@ -91,7 +97,7 @@ DOM.propTypes = {
 	baseUrl: React.PropTypes.string,
 	clientFilename: React.PropTypes.string,
 	initialState: React.PropTypes.object.isRequired,
-	scripts: React.PropTypes.array
+	scripts: React.PropTypes.array,
 };
 
 export default DOM;

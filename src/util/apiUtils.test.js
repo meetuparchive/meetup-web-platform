@@ -19,9 +19,7 @@ import {
 
 import { getServer, MOCK_LOGGER } from '../util/testUtils';
 import * as authUtils from '../util/authUtils';
-import {
-	LANGUAGE_COOKIE
-} from './cookieUtils';
+import { LANGUAGE_COOKIE } from './cookieUtils';
 
 import {
 	apiResponseToQueryResponse,
@@ -117,7 +115,7 @@ describe('injectResponseCookies', () => {
 		plugins: {
 			requestAuth: {
 				reply: {
-					state() {}
+					state() {},
 				},
 			},
 		},
@@ -153,7 +151,7 @@ describe('injectResponseCookies', () => {
 		expect(request.plugins.requestAuth.reply.state).toHaveBeenCalledWith(
 			key,
 			value,
-			jasmine.any(Object)  // don't actually care about the cookie options
+			jasmine.any(Object) // don't actually care about the cookie options
 		);
 	});
 });
@@ -161,20 +159,28 @@ describe('injectResponseCookies', () => {
 describe('parseApiValue', () => {
 	const MOCK_RESPONSE = {
 		headers: {},
-		statusCode: 200
+		statusCode: 200,
 	};
 	it('converts valid JSON into an equivalent object', () => {
 		const validJSON = JSON.stringify(MOCK_GROUP);
-		expect(parseApiValue([MOCK_RESPONSE, validJSON])).toEqual(jasmine.any(Object));
-		expect(parseApiValue([MOCK_RESPONSE, validJSON])).toEqual({ value: MOCK_GROUP });
+		expect(parseApiValue([MOCK_RESPONSE, validJSON])).toEqual(
+			jasmine.any(Object)
+		);
+		expect(parseApiValue([MOCK_RESPONSE, validJSON])).toEqual({
+			value: MOCK_GROUP,
+		});
 	});
 	it('returns an object with a string "error" value for invalid JSON', () => {
 		const invalidJSON = 'not valid';
-		expect(parseApiValue([MOCK_RESPONSE, invalidJSON]).error).toEqual(jasmine.any(String));
+		expect(parseApiValue([MOCK_RESPONSE, invalidJSON]).error).toEqual(
+			jasmine.any(String)
+		);
 	});
 	it('returns an object with a string "error" value for API response with "problem"', () => {
 		const responeWithProblem = JSON.stringify(MOCK_API_PROBLEM);
-		expect(parseApiValue([MOCK_RESPONSE, responeWithProblem]).error).toEqual(jasmine.any(String));
+		expect(parseApiValue([MOCK_RESPONSE, responeWithProblem]).error).toEqual(
+			jasmine.any(String)
+		);
 	});
 	it('returns an object with a string "error" value for a not-ok response', () => {
 		const noContentStatus = {
@@ -190,20 +196,24 @@ describe('parseApiValue', () => {
 			statusMessage: 'Problems',
 		};
 		const nonOkReponse = { ...MOCK_RESPONSE, ...badStatus };
-		expect(parseApiValue([nonOkReponse, '{}']).error).toEqual(badStatus.statusMessage);
+		expect(parseApiValue([nonOkReponse, '{}']).error).toEqual(
+			badStatus.statusMessage
+		);
 	});
 });
 describe('parseApiResponse', () => {
 	const MOCK_RESPONSE = {
 		headers: {},
-		statusCode: 200
+		statusCode: 200,
 	};
 	it('returns the flags set in the X-Meetup-Flags header', () => {
 		const headers = {
 			'x-meetup-flags': 'foo=true,bar=false',
 		};
 		const flaggedResponse = { ...MOCK_RESPONSE, headers };
-		expect(parseApiResponse('http://example.com')([flaggedResponse, '{}']).meta.flags).toEqual({
+		expect(
+			parseApiResponse('http://example.com')([flaggedResponse, '{}']).meta.flags
+		).toEqual({
 			foo: true,
 			bar: false,
 		});
@@ -214,7 +224,10 @@ describe('parseApiResponse', () => {
 			'x-meetup-request-id': requestId,
 		};
 		const flaggedResponse = { ...MOCK_RESPONSE, headers };
-		expect(parseApiResponse('http://example.com')([flaggedResponse, '{}']).meta.requestId).toEqual(requestId);
+		expect(
+			parseApiResponse('http://example.com')([flaggedResponse, '{}']).meta
+				.requestId
+		).toEqual(requestId);
 	});
 });
 
@@ -258,37 +271,42 @@ describe('parseLoginAuth', () => {
 
 describe('parseMetaHeaders', () => {
 	it('returns x-meetup-flags as flags object with real booleans camelcased', () => {
-		expect(parseMetaHeaders({ 'x-meetup-foo-bar': 'whatwhat' }))
-			.toMatchObject({ fooBar: 'whatwhat' });
+		expect(parseMetaHeaders({ 'x-meetup-foo-bar': 'whatwhat' })).toMatchObject({
+			fooBar: 'whatwhat',
+		});
 	});
 	it('returns x-meetup-flags as flags object with real booleans', () => {
-		expect(parseMetaHeaders({ 'x-meetup-flags': 'foo=true,bar=false' }))
-			.toMatchObject({ flags: { foo: true, bar: false } });
+		expect(
+			parseMetaHeaders({ 'x-meetup-flags': 'foo=true,bar=false' })
+		).toMatchObject({ flags: { foo: true, bar: false } });
 	});
 	it('parses specified x- headers', () => {
-		expect(parseMetaHeaders({ 'x-total-count': 'whatwhat' }))
-			.toMatchObject({ totalCount: 'whatwhat' });
+		expect(parseMetaHeaders({ 'x-total-count': 'whatwhat' })).toMatchObject({
+			totalCount: 'whatwhat',
+		});
 	});
 	it('parses Link header', () => {
 		const next = 'http://example.com/next';
 		const prev = 'http://example.com/prev';
 
 		// both 'next' and 'prev'
-		expect(parseMetaHeaders({ link: `<${next}>; rel="next", <${prev}>; rel="prev"` }))
-			.toMatchObject({ link: { next, prev } });
+		expect(
+			parseMetaHeaders({ link: `<${next}>; rel="next", <${prev}>; rel="prev"` })
+		).toMatchObject({ link: { next, prev } });
 		// just 'next'
-		expect(parseMetaHeaders({ link: `<${next}>; rel="next"` }))
-			.toMatchObject({ link: { next } });
+		expect(parseMetaHeaders({ link: `<${next}>; rel="next"` })).toMatchObject({
+			link: { next },
+		});
 	});
 	it('returns empty object for empty headers', () => {
-		expect(parseMetaHeaders({}))
-			.toEqual({});
+		expect(parseMetaHeaders({})).toEqual({});
 	});
 });
 
 describe('parseVariantsHeader', () => {
 	it('parses a variants header into a nested object', () => {
-		const header = 'binge-pilot=123|variant critical-mass=1|control critical-mass=2|sendemail';
+		const header =
+			'binge-pilot=123|variant critical-mass=1|control critical-mass=2|sendemail';
 		const expectedObj = {
 			'binge-pilot': {
 				123: 'variant',
@@ -317,9 +335,9 @@ describe('buildRequestArgs', () => {
 	const options = {
 		url,
 		headers: {
-			authorization: 'Bearer testtoken'
+			authorization: 'Bearer testtoken',
 		},
-		mode: 'no-cors'
+		mode: 'no-cors',
 	};
 
 	it('Converts an api config to arguments for a node-request call', () => {
@@ -328,13 +346,14 @@ describe('buildRequestArgs', () => {
 		method = 'post';
 		const postArgs = buildRequestArgs({ ...options, method })(testQueryResults);
 		expect(getArgs).toEqual(jasmine.any(Object));
-		expect(getArgs.url).toMatch(/\?.+/);  // get requests will add querystring
-		expect(getArgs.hasOwnProperty('body')).toBe(false);  // get requests will not have a body
-		expect(postArgs.url).not.toMatch(/\?.+/);  // post requests will not add querystring
-		expect(postArgs.body).toEqual(jasmine.any(String));  // post requests will add body string
+		expect(getArgs.url).toMatch(/\?.+/); // get requests will add querystring
+		expect(getArgs.hasOwnProperty('body')).toBe(false); // get requests will not have a body
+		expect(postArgs.url).not.toMatch(/\?.+/); // post requests will not add querystring
+		expect(postArgs.body).toEqual(jasmine.any(String)); // post requests will add body string
 		// post requests will add body string
-		expect(postArgs.headers['content-type']).toEqual('application/x-www-form-urlencoded');
-
+		expect(postArgs.headers['content-type']).toEqual(
+			'application/x-www-form-urlencoded'
+		);
 	});
 
 	it('Sets X-Meetup-Request-Flags header when query has flags', () => {
@@ -356,11 +375,12 @@ describe('buildRequestArgs', () => {
 
 	it('Properly encodes the URL', () => {
 		const method = 'get';
-		const getArgs = buildRequestArgs({ ...options, method })(testQueryResults_utf8);
+		const getArgs = buildRequestArgs({ ...options, method })(
+			testQueryResults_utf8
+		);
 		const { pathname } = require('url').parse(getArgs.url);
-		expect(/^[\x00-\xFF]*$/.test(pathname)).toBe(true);  // eslint-disable-line no-control-regex
+		expect(/^[\x00-\xFF]*$/.test(pathname)).toBe(true); // eslint-disable-line no-control-regex
 	});
-
 });
 
 describe('apiResponseToQueryResponse', () => {
@@ -373,8 +393,10 @@ describe('apiResponseToQueryResponse', () => {
 
 	it('transforms an API response object to an object for State consumption', function() {
 		this.MOCK_API_RESPONSES
-			.map((apiResponse, i) => apiResponseToQueryResponse(this.queries[i])(apiResponse))
-			.forEach((queryResponse, i)=> {
+			.map((apiResponse, i) =>
+				apiResponseToQueryResponse(this.queries[i])(apiResponse)
+			)
+			.forEach((queryResponse, i) => {
 				expect(queryResponse).toEqual(jasmine.any(Object));
 				expect(queryResponse.ref).toEqual(this.refs[i]);
 			});
@@ -399,9 +421,11 @@ describe('apiResponseDuotoneSetter', () => {
 		const groupApiResponse = {
 			ref,
 			type,
-			value: group
+			value: group,
 		};
-		const modifiedResponse = apiResponseDuotoneSetter(MOCK_DUOTONE_URLS)(groupApiResponse);
+		const modifiedResponse = apiResponseDuotoneSetter(MOCK_DUOTONE_URLS)(
+			groupApiResponse
+		);
 		const { duotoneUrl } = modifiedResponse.value;
 		const expectedUrl = MOCK_DUOTONE_URLS.dtaxb;
 		expect(duotoneUrl.startsWith(expectedUrl)).toBe(true);
@@ -415,20 +439,24 @@ describe('apiResponseDuotoneSetter', () => {
 			ref: 'memberHome',
 			type: 'home',
 			value: {
-				rows: [{
-					items: [{
-						type: 'group',
-						group
-					}],
-				}]
-			}
+				rows: [
+					{
+						items: [
+							{
+								type: 'group',
+								group,
+							},
+						],
+					},
+				],
+			},
 		};
 		// run the function - rely on side effect in group
 		apiResponseDuotoneSetter(MOCK_DUOTONE_URLS)(homeApiResponse);
 		const expectedUrl = MOCK_DUOTONE_URLS.dtaxb;
 		expect(group.duotoneUrl.startsWith(expectedUrl)).toBe(true);
 	});
-	it('returns object unmodified when it doesn\'t need duotones', () => {
+	it("returns object unmodified when it doesn't need duotones", () => {
 		const member = { ...MOCK_MEMBER };
 		const memberResponse = {
 			ref: 'self',
@@ -445,7 +473,7 @@ describe('apiResponseDuotoneSetter', () => {
 				value: {
 					error: new Error(),
 				},
-			}
+			},
 		};
 		const errorExpectedResponse = { ...errorResponse };
 		apiResponseDuotoneSetter(MOCK_DUOTONE_URLS)(errorResponse);
@@ -471,7 +499,7 @@ describe('logApiResponse', () => {
 			uri: {
 				pathname: '/foo',
 			},
-			method: 'post'
+			method: 'post',
 		},
 	};
 	it('emits parsed request and response data for GET request', () => {
@@ -516,12 +544,15 @@ describe('logApiResponse', () => {
 		expect(loggedObject.info.body).toEqual(body);
 	});
 	it('returns a truncated response body if more than 256 characters', () => {
-		const body300 = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean egestas viverra sem vel congue. Cras vitae malesuada justo. Fusce ut finibus felis, at sagittis leo. Morbi nec velit dignissim, viverra tellus at, pretium nisi. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla turpis duis.';
+		const body300 =
+			'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean egestas viverra sem vel congue. Cras vitae malesuada justo. Fusce ut finibus felis, at sagittis leo. Morbi nec velit dignissim, viverra tellus at, pretium nisi. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla turpis duis.';
 		MOCK_LOGGER.info.mockClear();
 		logApiResponse(request)([MOCK_INCOMINGMESSAGE_GET, body300]);
 		expect(MOCK_LOGGER.info).toHaveBeenCalled();
 		const loggedObject = MOCK_LOGGER.info.mock.calls[0][0];
-		expect(loggedObject.info.body.startsWith(body300.substr(0, 256))).toBe(true);
+		expect(loggedObject.info.body.startsWith(body300.substr(0, 256))).toBe(
+			true
+		);
 		expect(loggedObject.info.body.startsWith(body300)).toBe(false);
 	});
 });
@@ -540,7 +571,9 @@ describe('parseRequest', () => {
 			},
 			server: getServer({ API_SERVER_ROOT_URL: 'http://example.com' }),
 		};
-		expect(parseRequest(getRequest, 'http://dummy.api.meetup.com').queries).toEqual(queries);
+		expect(
+			parseRequest(getRequest, 'http://dummy.api.meetup.com').queries
+		).toEqual(queries);
 	});
 	it('extracts the queries provided in POST requests', () => {
 		const data = { queries: rison.encode_array(queries) };
@@ -553,7 +586,9 @@ describe('parseRequest', () => {
 			},
 			server: getServer({ API_SERVER_ROOT_URL: 'http://example.com' }),
 		};
-		expect(parseRequest(postRequest, 'http://dummy.api.meetup.com').queries).toEqual(queries);
+		expect(
+			parseRequest(postRequest, 'http://dummy.api.meetup.com').queries
+		).toEqual(queries);
 	});
 	it('extracts the queries provided in PATCH requests', () => {
 		const data = { queries: rison.encode_array(queries) };
@@ -566,7 +601,9 @@ describe('parseRequest', () => {
 			},
 			server: getServer({ API_SERVER_ROOT_URL: 'http://example.com' }),
 		};
-		expect(parseRequest(patchRequest, 'http://dummy.api.meetup.com').queries).toEqual(queries);
+		expect(
+			parseRequest(patchRequest, 'http://dummy.api.meetup.com').queries
+		).toEqual(queries);
 	});
 	it('throws an error for mal-formed queries', () => {
 		const notAQuery = { foo: 'bar' };
@@ -580,7 +617,8 @@ describe('parseRequest', () => {
 			},
 			server: getServer({ API_SERVER_ROOT_URL: 'http://example.com' }),
 		};
-		expect(() => parseRequest(getRequest, 'http://dummy.api.meetup.com')).toThrow();
+		expect(() =>
+			parseRequest(getRequest, 'http://dummy.api.meetup.com')
+		).toThrow();
 	});
 });
-

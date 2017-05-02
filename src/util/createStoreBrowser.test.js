@@ -4,9 +4,7 @@ import {
 	getInitialState,
 	getBrowserCreateStore,
 } from './createStoreBrowser';
-import {
-	testCreateStore
-} from './testUtils';
+import { testCreateStore } from './testUtils';
 
 const MOCK_ROUTES = {};
 const IDENTITY_REDUCER = state => state;
@@ -49,7 +47,9 @@ describe('getInitialState', () => {
 	it('returns "unescaped" APP_RUNTIME.escapedState', () => {
 		const state = { baz: 'qux' };
 		const APP_RUNTIME = { escapedState: JSON.stringify(state) };
-		expect(getInitialState(APP_RUNTIME)).toEqual({ ...injectedState, ...state });
+		expect(getInitialState(APP_RUNTIME)).toEqual({
+			...injectedState,
+			...state,
+		});
 	});
 });
-
