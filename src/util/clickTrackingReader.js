@@ -1,3 +1,4 @@
+import { clickSerializer } from './avro';
 import config from './config';
 import { parseMemberCookie } from './cookieUtils';
 
@@ -23,29 +24,19 @@ export default function processClickTracking(request, reply) {
 	const rawCookieValue = (request.state || {})['click-track'];
 	// It's possible that multiple cookies with the same value were sent, e.g.
 	// one value for .dev.meetup.com and another for .meetup.com - parse only the first
-	const cookieValue = rawCookieValue instanceof Array ? rawCookieValue[0] : rawCookieValue;
+	const cookieValue = rawCookieValue instanceof Array
+		? rawCookieValue[0]
+		: rawCookieValue;
 	if (!cookieValue || cookieValue === 'undefined') {
 		return;
 	}
 
-	try {
-		const cookieJSON = decodeURIComponent(cookieValue);
-		const { history } = JSON.parse(cookieJSON);
-		history
-			.map(clickToClickRecord(request))
-			.forEach(clickRecord =>
-				request.log(['click'], JSON.stringify(clickRecord))
-			);
-	} catch(err) {
-		console.error(JSON.stringify({
-			message: 'Could not parse click-track cookie',
-			cookieValue,
-			error: err.stack,
-		}));
-		return;
-	}
+	const cookieJSON = decodeURIComponent(cookieValue);
+	const { history } = JSON.parse(cookieJSON);
+	history
+		.map(clickToClickRecord(request))
+		.forEach(clickRecord => process.stdout.write(clickSerializer(clickRecord)));
 
 	reply.unstate('click-track', clickCookieOptions);
 	return;
 }
-

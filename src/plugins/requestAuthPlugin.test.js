@@ -5,6 +5,8 @@ import 'rxjs/add/observable/throw';
 import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/catch';
 
+import { MEMBER_COOKIE } from '../util/cookieUtils';
+import { MOCK_LOGGER } from '../util/testUtils';
 import register, {
 	getAuthenticate,
 	oauthScheme,
@@ -66,7 +68,13 @@ const MOCK_SERVER = {
 	},
 	ext: () => {},
 	state: () => {},
-	app: MOCK_SERVER_APP,
+	logger: () => MOCK_LOGGER,
+	app: {
+		logger: MOCK_LOGGER,
+	},
+	settings: {
+		app: MOCK_SERVER_APP,
+	},
 	expose: () => {},
 	plugins: {
 		requestAuth: {},
@@ -87,6 +95,10 @@ const MOCK_REQUEST = {
 		},
 	},
 	server: MOCK_SERVER,
+	raw: {
+		req: {},
+		res: {},
+	},
 };
 
 const MOCK_AUTHED_REQUEST = {
@@ -213,7 +225,7 @@ describe('applyRequestAuthorizer$', () => {
 	const requestAuthorizer$ = getRequestAuthorizer$(MOCK_SERVER_APP);
 	const authorizeRequest$ = applyRequestAuthorizer$(requestAuthorizer$);
 	it('does not try to fetch when provided a request with oauth_token in state', () => {
-		spyOn(global, 'fetch');
+		spyOn(global, 'fetch').and.callFake(() => Promise.resolve());
 
 		return authorizeRequest$({
 			...MOCK_REQUEST,
@@ -227,35 +239,21 @@ describe('applyRequestAuthorizer$', () => {
 			});
 	});
 
-	it('does not try to fetch when provided a request with MEETUP_MEMBER in state', () => {
-		spyOn(global, 'fetch');
-
-		return authorizeRequest$({
+	it('does not try to fetch when provided a request with [MEMBER_COOKIE] in state', () => {
+		spyOn(global, 'fetch').and.callFake(() => Promise.resolve());
+		const promise = authorizeRequest$({
 			...MOCK_REQUEST,
 			state: {
-				MEETUP_MEMBER: 'foo',
+				[MEMBER_COOKIE]: 'foo',
 			},
-		})
-			.toPromise()
-			.then(request => {
+		}).toPromise();
+
+		return promise.then(
+			request => {
 				expect(global.fetch).not.toHaveBeenCalled();
-			});
-	});
-
-	it('does not try to fetch when provided a request with MEETUP_MEMBER_DEV in state', () => {
-		spyOn(global, 'fetch');
-
-		return authorizeRequest$({
-			...MOCK_AUTHED_REQUEST,
-			state: {
-				MEETUP_MEMBER_DEV: 'foo',
 			},
-			server: { app: { isProd: false } },
-		})
-			.toPromise()
-			.then(request => {
-				expect(global.fetch).not.toHaveBeenCalled();
-			});
+			err => console.warn(err)
+		);
 	});
 
 	it('calls fetch when provided a request without an oauth token in state', () => {

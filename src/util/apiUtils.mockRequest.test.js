@@ -1,10 +1,8 @@
 import 'rxjs/add/operator/toPromise';
 
-import {
-	mockQuery,
-	MOCK_RENDERPROPS,
-} from 'meetup-web-mocks/lib/app';
+import { mockQuery, MOCK_RENDERPROPS } from 'meetup-web-mocks/lib/app';
 
+import { getServer } from './testUtils';
 import {
 	createCookieJar,
 	makeApiRequest$,
@@ -13,29 +11,33 @@ import {
 
 // Mock the request module with a an empty response delayed by 200ms
 jest.mock('request', () => {
-	const mock = jest.fn(
-		(requestOpts, cb) =>
-			setTimeout(() =>
-				cb(null, {
-					headers: {},
-					statusCode: 200,
-					elapsedTime: 1234,
-					request: {
-						uri: {
-							query: 'foo=bar',
-							pathname: '/foo',
+	const mock = jest.fn((requestOpts, cb) =>
+		setTimeout(
+			() =>
+				cb(
+					null,
+					{
+						headers: {},
+						statusCode: 200,
+						elapsedTime: 1234,
+						request: {
+							uri: {
+								query: 'foo=bar',
+								pathname: '/foo',
+							},
+							method: 'get',
 						},
-						method: 'get',
 					},
-				}, '{}'), 2
-			)
+					'{}'
+				),
+			2
+		)
 	);
 	mock.jar = jest.fn(() => 'myMockJar');
 	return mock;
 });
 
-const API_TIMEOUT = 10;
-const MOCK_HAPI_REQUEST = { server: { app: { API_TIMEOUT } } };
+const MOCK_HAPI_REQUEST = { server: getServer() };
 
 describe('createCookieJar', () => {
 	it('returns a cookie jar for /sessions endpoint', () => {
@@ -65,10 +67,14 @@ describe('makeExternalApiRequest', () => {
 			foo: 'bar',
 			url: 'http://example.com',
 		};
-		return makeExternalApiRequest({ server: { app: { API_TIMEOUT } } })(requestOpts)
+		return makeExternalApiRequest({
+			server: {
+				settings: { app: { api: { timeout: API_TIMEOUT } } },
+			},
+		})(requestOpts)
 			.toPromise()
 			.then(
-				() => expect(true).toBe(false),  // should not be called
+				() => expect(true).toBe(false), // should not be called
 				err => expect(err).toEqual(jasmine.any(Error))
 			);
 	});
@@ -88,14 +94,20 @@ describe('makeApiRequest$', () => {
 	const endpoint = 'foo';
 	it('makes a GET request', () => {
 		const query = { ...mockQuery(MOCK_RENDERPROPS) };
-		return makeApiRequest$(MOCK_HAPI_REQUEST)([{ method: 'get', url: endpoint }, query])
+		return makeApiRequest$(MOCK_HAPI_REQUEST)([
+			{ method: 'get', url: endpoint },
+			query,
+		])
 			.toPromise()
 			.then(() => require('request').mock.calls.pop()[0])
 			.then(arg => expect(arg.method).toBe('get'));
 	});
 	it('makes a POST request', () => {
 		const query = { ...mockQuery(MOCK_RENDERPROPS) };
-		return makeApiRequest$(MOCK_HAPI_REQUEST)([{ method: 'post', url: endpoint }, query])
+		return makeApiRequest$(MOCK_HAPI_REQUEST)([
+			{ method: 'post', url: endpoint },
+			query,
+		])
 			.toPromise()
 			.then(() => require('request').mock.calls.pop()[0])
 			.then(arg => expect(arg.method).toBe('post'));
@@ -114,9 +126,11 @@ describe('makeApiRequest$', () => {
 			value: mockResponse,
 			error: undefined,
 		};
-		return makeApiRequest$(MOCK_HAPI_REQUEST)([{ url: endpoint, method: 'get' }, query])
+		return makeApiRequest$(MOCK_HAPI_REQUEST)([
+			{ url: endpoint, method: 'get' },
+			query,
+		])
 			.toPromise()
 			.then(response => expect(response).toEqual(expectedResponse));
 	});
 });
-

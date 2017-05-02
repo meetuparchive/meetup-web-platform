@@ -8,7 +8,6 @@ import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import StaticRouter from 'react-router-dom/StaticRouter';
 
-import config from '../util/config';
 import Dom from '../components/dom';
 import NotFound from '../components/NotFound';
 import PlatformApp from '../components/PlatformApp';
@@ -76,57 +75,48 @@ const getRouterRenderer = ({
 	let statusCode;
 	const context = {};
 
-	try {
-		appMarkup = ReactDOMServer.renderToString(
-			<StaticRouter
-				basename={baseUrl}
-				location={location}
-				context={context}
-			>
-				<PlatformApp store={store} routes={routes} />
-			</StaticRouter>
-		);
+	appMarkup = ReactDOMServer.renderToString(
+		<StaticRouter basename={baseUrl} location={location} context={context}>
+			<PlatformApp store={store} routes={routes} />
+		</StaticRouter>
+	);
 
-		if (context.url) {
-			// redirect
-		}
+	if (context.url) {
+		// redirect
+	}
 
-		// all the data for the full `<html>` element has been initialized by the app
-		// so go ahead and assemble the full response body
-		result = getHtml(<Dom
+	// all the data for the full `<html>` element has been initialized by the app
+	// so go ahead and assemble the full response body
+	result = getHtml(
+		<Dom
 			baseUrl={baseUrl}
 			assetPublicPath={assetPublicPath}
 			clientFilename={clientFilename}
 			initialState={initialState}
 			appMarkup={appMarkup}
-			scripts={scripts} />);
+			scripts={scripts}
+		/>
+	);
 
-		statusCode = NotFound.rewind() ||  // if NotFound is mounted, return 404
-			200;
-
-	} catch(error) {
-		// log the error stack here in dev to make it a little more legible
-		// - prod will get stackdriver formatting
-		if (!config.isProd) {
-			console.error(error.stack);
-		}
-		throw error;
-	}
+	statusCode = NotFound.rewind() || 200; // if NotFound is mounted, return 404
 
 	return {
 		statusCode,
-		result
+		result,
 	};
 };
 
-const makeRenderer$ = (renderConfig: {
+const makeRenderer$ = (
+	renderConfig: {
 		routes: Array<Object>,
 		reducer: Reducer,
 		assetPublicPath: string,
 		middleware: Array<Function>,
 		baseUrl: string,
 		scripts: Array<string>,
-	}) => makeRenderer(
+	}
+) =>
+	makeRenderer(
 		renderConfig.routes,
 		renderConfig.reducer,
 		null,
@@ -162,26 +152,26 @@ const makeRenderer = (
 	assetPublicPath: string,
 	middleware: Array<Function> = [],
 	baseUrl: string = '',
-	scripts: Array<string>,
+	scripts: Array<string>
 ) => (request: Object) => {
-
 	middleware = middleware || [];
-	const {
-		connection,
-		headers,
-		info,
-		url,
-	} = request;
+	const { connection, headers, info, url, server, raw: { req } } = request;
 
 	// request protocol might be different from original request that hit proxy
 	// we want to use the proxy's protocol
-	const requestProtocol = headers['x-forwarded-proto'] || connection.info.protocol;
+	const requestProtocol =
+		headers['x-forwarded-proto'] || connection.info.protocol;
 	const host = `${requestProtocol}://${info.host}`;
 	const apiUrl = `${host}/mu_api`;
 
 	// create the store
 	const initialState = {};
-	const createStore = getServerCreateStore(routes, middleware, request, baseUrl);
+	const createStore = getServerCreateStore(
+		routes,
+		middleware,
+		request,
+		baseUrl
+	);
 	const store = createStore(reducer, initialState);
 
 	// load initial config
@@ -191,12 +181,15 @@ const makeRenderer = (
 	// render skeleton if requested - the store is ready
 	if ('skeleton' in request.query) {
 		return Observable.of({
-			result: getHtml(<Dom
-				baseUrl={baseUrl}
-				assetPublicPath={assetPublicPath}
-				clientFilename={clientFilename}
-				initialState={store.getState()} />),
-			statusCode: 200
+			result: getHtml(
+				<Dom
+					baseUrl={baseUrl}
+					assetPublicPath={assetPublicPath}
+					clientFilename={clientFilename}
+					initialState={store.getState()}
+				/>
+			),
+			statusCode: 200,
 		});
 	}
 
@@ -204,26 +197,29 @@ const makeRenderer = (
 	const storeIsReady$ = Observable.create(obs => {
 		obs.next(store.getState());
 		return store.subscribe(() => obs.next(store.getState()));
-	})
-	.first(state => state.preRenderChecklist.every(isReady => isReady));  // take the first ready state
+	}).first(state => state.preRenderChecklist.every(isReady => isReady)); // take the first ready state
 
-	console.log(JSON.stringify({
-		message: `Dispatching RENDER for ${request.url.href}`,
-		type: 'dispatch',
-		info: {
-			url: request.url,
-			method: request.method,
-			id: request.id,
-		}
-	}));
-	store.dispatch({
+	const action = {
 		type: SERVER_RENDER,
 		payload: url,
-	});
-	return storeIsReady$
-		.map(() => getRouterRenderer({routes, store, location:url, baseUrl, clientFilename, assetPublicPath, scripts}));
+	};
+	server.app.logger.debug(
+		{ type: 'dispatch', action, req },
+		`Dispatching RENDER for ${request.url.href}`
+	);
+	store.dispatch(action);
+	return storeIsReady$.map(() =>
+		getRouterRenderer({
+			routes,
+			store,
+			location: url,
+			baseUrl,
+			clientFilename,
+			assetPublicPath,
+			scripts,
+		})
+	);
 };
 
 export { makeRenderer$, makeRenderer };
 export default makeRenderer;
-

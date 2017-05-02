@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import { getServer } from './testUtils';
 import {
 	applyAuthState,
 	setPluginState,
@@ -8,26 +9,21 @@ import {
 } from './authUtils';
 
 describe('configureAuthCookies', () => {
-	const serverWithState = {
-		state: () => {},
-		app: {
-			cookie_encrypt_secret: 'asdklfjahsdflkjasdfhlkajsdfkljasdlkasdjhfalksdjfbalkjsdhfalsdfasdlkfasd',
-		},
-	};
-
 	const plugins = { requestAuth: {} };
+	const serverWithState = getServer();
+	serverWithState.plugins = plugins;
+	serverWithState.app = {
+		cookie_encrypt_secret: 'asdklfjahsdflkjasdfhlkajsdfkljasdlkasdjhfalksdjfbalkjsdhfalsdfasdlkfasd',
+	};
 
 	it('calls server.state for each auth cookie name', () => {
 		spyOn(serverWithState, 'state');
-		configureAuthCookies({
-			...serverWithState,
-			plugins,
-		});
+		configureAuthCookies(serverWithState);
 		const callArgs = serverWithState.state.calls.allArgs();
 		expect(callArgs.length).toBeGreaterThan(0);
 		callArgs.forEach(args => {
-			expect(args[0]).toEqual(jasmine.any(String));  // the cookie name, e.g. 'oauth_token'
-			expect(args[1]).toEqual(jasmine.any(Object));  // the cookie config
+			expect(args[0]).toEqual(jasmine.any(String)); // the cookie name, e.g. 'oauth_token'
+			expect(args[1]).toEqual(jasmine.any(Object)); // the cookie config
 		});
 	});
 
@@ -35,20 +31,14 @@ describe('configureAuthCookies', () => {
 		let serverWithNoSecret = { ...serverWithState };
 		delete serverWithNoSecret.app.cookie_encrypt_secret;
 
-		expect(() => configureAuthCookies({
-			...serverWithNoSecret,
-			plugins,
-		})).toThrow();
+		expect(() => configureAuthCookies(serverWithNoSecret)).toThrow();
 	});
 
 	it('throws an error when secret is too short', () => {
 		let serverWithShortSecret = { ...serverWithState };
 		serverWithShortSecret.app.cookie_encrypt_secret = 'asdf';
 
-		expect(() => configureAuthCookies({
-			...serverWithShortState,
-			plugins,
-		})).toThrow();
+		expect(() => configureAuthCookies(serverWithShortSecret)).toThrow();
 	});
 });
 
@@ -63,6 +53,8 @@ describe('applyAuthState', () => {
 			plugins: {
 				requestAuth: {},
 			},
+			raw: { req: {}, res: {} },
+			server: getServer(),
 		};
 		spyOn(reply, 'state');
 		const testApply = applyAuthState(request, reply);
@@ -117,8 +109,9 @@ describe('removeAuthState', () => {
 		};
 		spyOn(reply, 'unstate');
 		removeAuthState(Object.keys(request.state), request, reply);
-		expect(reply.unstate.calls.allArgs().map(args => args[0]).sort())
-			.toEqual(Object.keys(request.state).sort());
+		expect(reply.unstate.calls.allArgs().map(args => args[0]).sort()).toEqual(
+			Object.keys(request.state).sort()
+		);
 		expect(
 			Object.keys(request.state)
 				.map(k => request.state[k])
@@ -133,7 +126,7 @@ describe('configureAuthState', () => {
 			value: Joi.string().allow(''),
 			opts: {
 				ttl: Joi.number().integer(),
-			}
+			},
 		});
 		const authStateSchema = Joi.object({
 			oauth_token: cookieSchema,
@@ -149,18 +142,20 @@ describe('configureAuthState', () => {
 		const accessAuth = {
 			oauth_token: '1234',
 		};
-		expect(configureAuthState(oauthAuth).oauth_token.value)
-			.toEqual(oauthAuth.oauth_token);
-		expect(configureAuthState(accessAuth).oauth_token.value)
-			.toEqual(accessAuth.oauth_token);
+		expect(configureAuthState(oauthAuth).oauth_token.value).toEqual(
+			oauthAuth.oauth_token
+		);
+		expect(configureAuthState(accessAuth).oauth_token.value).toEqual(
+			accessAuth.oauth_token
+		);
 	});
 	it('sets ttl to 1000 x expires_in', () => {
 		const oauthAuth = {
 			oauth_token: '1234',
 			expires_in: 49302,
 		};
-		expect(configureAuthState(oauthAuth).oauth_token.opts.ttl)
-			.toEqual(oauthAuth.expires_in * 1000);
+		expect(configureAuthState(oauthAuth).oauth_token.opts.ttl).toEqual(
+			oauthAuth.expires_in * 1000
+		);
 	});
 });
-

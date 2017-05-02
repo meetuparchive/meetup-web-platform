@@ -1,50 +1,57 @@
-import Hapi from 'hapi';
 import Iron from 'iron';
+import { MEMBER_COOKIE } from '../../src/util/cookieUtils';
+import { getServer } from '../../src/util/testUtils';
 import requestAuthPlugin from '../../src/plugins/requestAuthPlugin';
 
 const cookieRequest = cookies => ({
 	method: 'get',
 	url: '/foo',
 	headers: {
-		Cookie: Object.keys(cookies).map(name => `${name}=${cookies[name]}`).join('; ')
-	}
+		Cookie: Object.keys(cookies)
+			.map(name => `${name}=${cookies[name]}`)
+			.join('; '),
+	},
 });
 
-const makeMockFetchResponse = responseObj => Promise.resolve({
-	text: () => Promise.resolve(JSON.stringify(responseObj)),
-	json: () => Promise.resolve(responseObj),
-});
-
+const makeMockFetchResponse = responseObj =>
+	Promise.resolve({
+		text: () => Promise.resolve(JSON.stringify(responseObj)),
+		json: () => Promise.resolve(responseObj),
+	});
 
 const random32 = 'asdfasdfasdfasdfasdfasdfasdfasdf';
 const config = {
-	API_HOST: 'www.api.meetup.com',
-	API_TIMEOUT: 10,
-	CSRF_SECRET: random32,
-	COOKIE_ENCRYPT_SECRET: random32,
-	OAUTH_AUTH_URL: 'https://secure.dev.meetup.com/oauth2/authorize',
-	OAUTH_ACCESS_URL: 'https://secure.dev.meetup.com/oauth2/access',
+	api: {
+		protocol: 'https',
+		host: 'www.api.meetup.com',
+		timeout: 10,
+	},
+	csrf_secret: random32,
+	cookie_encrypt_secret: random32,
 	oauth: {
+		auth_url: 'https://secure.dev.meetup.com/oauth2/authorize',
+		access_url: 'https://secure.dev.meetup.com/oauth2/access',
 		key: random32,
 		secret: random32,
 	},
-	duotoneUrls: ['http://example.com/duotone.jpg']
+	duotoneUrls: ['http://example.com/duotone.jpg'],
 };
-const getEncryptedToken = token => new Promise((resolve, reject) =>
-	Iron.seal(token, random32, Iron.defaults, (err, sealed) => resolve(sealed))
-);
+const getEncryptedToken = token =>
+	new Promise((resolve, reject) =>
+		Iron.seal(token, random32, Iron.defaults, (err, sealed) => resolve(sealed))
+	);
 
 const expectedOauthToken = 'foobar';
 const expectedResponse = 'barfoo';
 
-const testAuth = (cookies, test, makeRequest=cookieRequest) => {
+const testAuth = (cookies, test, makeRequest = cookieRequest) => {
 	spyOn(global, 'fetch').and.callFake((url, opts) => {
-		if (url.includes(config.OAUTH_AUTH_URL)) {
+		if (url.includes(config.oauth.auth_url)) {
 			return makeMockFetchResponse({
 				code: 'foo',
 			});
 		}
-		if (url.includes(config.OAUTH_ACCESS_URL)) {
+		if (url.includes(config.oauth.access_url)) {
 			return makeMockFetchResponse({
 				oauth_token: expectedOauthToken,
 				refresh_token: 'whatever',
@@ -55,17 +62,15 @@ const testAuth = (cookies, test, makeRequest=cookieRequest) => {
 	const fooRoute = {
 		method: 'get',
 		path: '/foo',
-		handler: (request, reply) => reply(expectedResponse)
+		handler: (request, reply) => reply(expectedResponse),
 	};
-	const server = new Hapi.Server();
-	server.app = config;
-	const testConnection = server.connection();
-	return testConnection
+	const server = getServer(config);
+	return server
 		.register({
 			register: requestAuthPlugin,
-			options: config
+			options: config,
 		})
-		.then(() => testConnection.route(fooRoute))
+		.then(() => server.route(fooRoute))
 		.then(() => server.auth.strategy('default', 'oauth', 'required'))
 		.then(() => server.inject(makeRequest(cookies)))
 		.then(test)
@@ -75,10 +80,10 @@ const testAuth = (cookies, test, makeRequest=cookieRequest) => {
 describe('logged-in member state', () => {
 	// logged-in auth provides MEETUP_MEMBER
 	it('Passes MEETUP_MEMBER value as request credentials', () => {
-		const cookies = { MEETUP_MEMBER: 'foo' };
+		const cookies = { [MEMBER_COOKIE]: 'foo' };
 		const test = response => {
 			expect(response.payload).toEqual(expectedResponse);
-			expect(response.request.auth.credentials).toBe(cookies.MEETUP_MEMBER);
+			expect(response.request.auth.credentials).toBe(cookies[MEMBER_COOKIE]);
 		};
 		return testAuth(cookies, test);
 	});
@@ -88,13 +93,15 @@ describe('logged-in member state', () => {
 			method: 'get',
 			url: '/foo?logout=true',
 			headers: {
-				Cookie: Object.keys(cookies).map(name => `${name}=${cookies[name]}`).join('; ')
-			}
+				Cookie: Object.keys(cookies)
+					.map(name => `${name}=${cookies[name]}`)
+					.join('; '),
+			},
 		});
-		const cookies = { MEETUP_MEMBER: 'foo' };
+		const cookies = { [MEMBER_COOKIE]: 'foo' };
 		const test = response => {
 			expect(response.payload).toEqual(expectedResponse);
-			expect(response.request.state.MEETUP_MEMBER).toBeNull();
+			expect(response.request.state[MEMBER_COOKIE]).toBeNull();
 		};
 		return testAuth(cookies, test, makeLogoutRequest);
 	});
@@ -111,8 +118,9 @@ describe('logged-out member state', () => {
 			expect(response.request.auth.credentials).toBe(cookies.oauth_token);
 		};
 
-		return getEncryptedToken(cookies.oauth_token)
-			.then(oauth_token => testAuth({ oauth_token }, test));
+		return getEncryptedToken(cookies.oauth_token).then(oauth_token =>
+			testAuth({ oauth_token }, test)
+		);
 	});
 
 	it('gets a new oauth_token when only refresh_token provided', () => {
@@ -122,19 +130,28 @@ describe('logged-out member state', () => {
 		};
 		const test = response => {
 			expect(response.payload).toEqual(expectedResponse);
-			expect(response.headers['set-cookie'][0].startsWith('oauth_token')).toBe(true);
-			expect(response.request.plugins.requestAuth.oauth_token).toBe(expectedOauthToken);
+			expect(response.headers['set-cookie'][0].startsWith('oauth_token')).toBe(
+				true
+			);
+			expect(response.request.plugins.requestAuth.oauth_token).toBe(
+				expectedOauthToken
+			);
 		};
-		return getEncryptedToken(cookies.refresh_token)
-			.then(refresh_token => testAuth({ refresh_token }, test));
+		return getEncryptedToken(cookies.refresh_token).then(refresh_token =>
+			testAuth({ refresh_token }, test)
+		);
 	});
 	it('gets a new oauth_token and refresh_token when no auth provided', () => {
 		// mock fetch for auth, grant_type: refresh_token
 		const cookies = {};
 		const test = response => {
 			expect(response.payload).toEqual(expectedResponse);
-			expect(response.headers['set-cookie'][0].startsWith('oauth_token')).toBe(true);
-			expect(response.headers['set-cookie'][1].startsWith('refresh_token')).toBe(true);
+			expect(response.headers['set-cookie'][0].startsWith('oauth_token')).toBe(
+				true
+			);
+			expect(
+				response.headers['set-cookie'][1].startsWith('refresh_token')
+			).toBe(true);
 		};
 		return testAuth(cookies, test);
 	});

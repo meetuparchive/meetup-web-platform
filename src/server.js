@@ -1,13 +1,10 @@
 import './util/globals';
 
-import config from './util/config';
+import defaultConfig from './util/config';
 import getPlugins from './plugins';
 import getRoutes from './routes';
 
-import {
-	configureEnv,
-	server,
-} from './util/serverUtils';
+import { configureEnv, server } from './util/serverUtils';
 
 /**
  * @module server
@@ -28,7 +25,8 @@ import {
  */
 export default function start(
 	renderRequestMap,
-	{ routes=[], plugins=[], platform_agent='consumer_name' }
+	{ routes = [], plugins = [], platform_agent = 'consumer_name' },
+	config = defaultConfig
 ) {
 	// source maps make for better stack traces
 	// we might not want this in production if it makes anything slower
@@ -37,7 +35,7 @@ export default function start(
 	configureEnv(config);
 
 	const baseRoutes = getRoutes(renderRequestMap);
-	const finalRoutes = [ ...routes, ...baseRoutes ];
+	const finalRoutes = [...routes, ...baseRoutes];
 
 	const connection = {
 		host: '0.0.0.0',
@@ -46,21 +44,12 @@ export default function start(
 			plugins: {
 				'electrode-csrf-jwt': {
 					enabled: false,
-				}
-			}
-		}
+				},
+			},
+		},
 	};
 
-	const finalPlugins = [
-		...plugins,
-		...getPlugins(config)
-	];
+	const finalPlugins = [...plugins, ...getPlugins(config)];
 
-	return server(
-		finalRoutes,
-		connection,
-		finalPlugins,
-		platform_agent,
-		config
-	);
+	return server(finalRoutes, connection, finalPlugins, platform_agent, config);
 }

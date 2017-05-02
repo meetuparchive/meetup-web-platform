@@ -16,11 +16,11 @@ import clickTrackingReader from './clickTrackingReader';
  * @return {Boolean} whether the `value` contains a 'dev' URL string
  */
 export function checkForDevUrl(value) {
-	switch(typeof value) {
-	case 'string':
-		return value.indexOf('.dev.meetup.') > -1;
-	case 'object':
-		return Object.keys(value).some(key => checkForDevUrl(value[key]));
+	switch (typeof value) {
+		case 'string':
+			return value.indexOf('.dev.meetup.') > -1;
+		case 'object':
+			return Object.keys(value).some(key => checkForDevUrl(value[key]));
 	}
 
 	return false;
@@ -29,25 +29,20 @@ export function checkForDevUrl(value) {
 export function onRequestExtension(request, reply) {
 	request.id = uuid.v4();
 
-	console.log(JSON.stringify({
-		message: `Incoming request ${request.method.toUpperCase()} ${request.url.href}`,
-		type: 'request',
-		direction: 'in',
-		info: {
-			url: request.url,
-			method: request.method,
-			headers: request.headers,
-			id: request.id,
-			referrer: request.info.referrer,
-			remoteAddress: request.info.remoteAddress,
-		}
-	}));
+	request.server.app.logger.info(
+		`Incoming request ${request.method.toUpperCase()} ${request.url.href}`
+	);
 
 	return reply.continue();
 }
 
 export function onPreHandlerExtension(request, reply) {
-	clickTrackingReader(request, reply);
+	try {
+		clickTrackingReader(request, reply);
+	} catch (err) {
+		console.error(err);
+		request.server.app.logger.error(err);
+	}
 	return reply.continue();
 }
 
@@ -56,10 +51,10 @@ export function onResponse(request) {
 	if (request.app.upload) {
 		fs.unlink(request.app.upload, err => {
 			if (err) {
-				console.error(JSON.stringify({
-					message: 'Could not delete uploaded file',
-					info: request.app.upload,
-				}));
+				request.server.app.logger.error(
+					{ info: request.app.upload },
+					'Could not delete uploaded file'
+				);
 			}
 		});
 	}
@@ -67,47 +62,38 @@ export function onResponse(request) {
 
 export function logResponse(request) {
 	const {
-		headers,
-		id,
-		info,
 		method,
 		response,
+		id,
+		info,
+		server: { app: { logger } },
 		url,
 	} = request;
 
 	if (response.isBoom) {
 		// response is an Error object
-		console.error(JSON.stringify({
-			message: `Internal error ${response.message} ${url.pathname}`,
-			info: {
-				error: response.stack,
-				headers,
-				id,
-				method,
-				url,
-			},
-		}));
-		return;
+		logger.error(`Internal error ${response.message} ${url.pathname}`, {
+			error: response.stack,
+		});
 	}
 
-	const log = response.statusCode >= 400 && console.error ||
-		response.statusCode >= 300 && console.warn ||
-		console.log;
+	const log = ((response.statusCode >= 400 && logger.error) ||
+		(response.statusCode >= 300 && logger.warn) ||
+		logger.info)
+		.bind(logger);
 
-	log(JSON.stringify({
-		message: `Outgoing response ${method.toUpperCase()} ${url.pathname} ${response.statusCode}`,
-		type: 'response',
-		direction: 'out',
-		info: {
+	log(
+		{
 			headers: response.headers,
 			id,
 			method,
 			referrer: info.referrer,
 			remoteAddress: info.remoteAddress,
 			time: info.responded - info.received,
-			url,
-		}
-	}));
+			href: url.href,
+		},
+		`Outgoing response ${method.toUpperCase()} ${url.pathname} ${response.statusCode}`
+	);
 
 	return;
 }
@@ -119,13 +105,16 @@ export function logResponse(request) {
  * @return {Object} Hapi server
  */
 export function registerExtensionEvents(server) {
-	server.ext([{
-		type: 'onRequest',
-		method: onRequestExtension,
-	}, {
-		type: 'onPreHandler',
-		method: onPreHandlerExtension,
-	}]);
+	server.ext([
+		{
+			type: 'onRequest',
+			method: onRequestExtension,
+		},
+		{
+			type: 'onPreHandler',
+			method: onPreHandlerExtension,
+		},
+	]);
 	server.on('response', onResponse);
 	return server;
 }
@@ -151,9 +140,14 @@ export function configureEnv(config) {
 export function server(routes, connection, plugins, platform_agent, config) {
 	const server = new Hapi.Server();
 
-	// store runtime state
+	// store runtime state - must modify existing server.settings.app in order to keep
+	// previously-defined properties
 	// https://hapijs.com/api#serverapp
-	server.app = config;
+	server.settings.app = Object.assign(
+		server.settings.app || {},
+		{ isDevConfig: checkForDevUrl(config) }, // indicates dev API or prod API
+		config
+	);
 
 	server.decorate('reply', 'track', track(platform_agent));
 
@@ -162,11 +156,7 @@ export function server(routes, connection, plugins, platform_agent, config) {
 		.register(plugins)
 		.then(() => registerExtensionEvents(server))
 		.then(() => server.auth.strategy('default', 'oauth', true))
-		.then(() => server.log(['start'], `${plugins.length} plugins registered, assigning routes...`))
 		.then(() => appConnection.route(routes))
-		.then(() => server.log(['start'], `${routes.length} routes assigned, starting server...`))
 		.then(() => server.start())
-		.then(() => server.log(['start'], `Dev server is listening at ${server.info.uri}`))
 		.then(() => server);
 }
-
