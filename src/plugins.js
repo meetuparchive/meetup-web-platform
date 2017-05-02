@@ -30,19 +30,21 @@ export function setCsrfCookies(request, reply) {
  * function calls `server.state` for both cookie names before registering the
  * plugin.
  *
- * @param {String} secret the 'salt' for encoding the CSRF tokens
- * @return {Object} the { register, options } object for a `server.register` call.
+ * @param {Object} config the environment configuration object
+ * @return {Object} the { register } object for a `server.register` call.
  */
-export function getCsrfPlugin(secret) {
+export function getCsrfPlugin(config) {
 	const register = (server, options, next) => {
 		const cookieOptions = {
 			path: '/',
-			isSecure: process.env.NODE_ENV === 'production',
+			isSecure: options.isProd,
 		};
+
 		server.state(
 			'x-csrf-jwt', // set by plugin
 			{ ...cookieOptions, isHttpOnly: true } // no client-side interaction needed
 		);
+
 		server.state(
 			'x-csrf-jwt-header', // set by onPreResponse
 			{ ...cookieOptions, isHttpOnly: false } // the client must read this cookie and return as a custom header
@@ -53,23 +55,26 @@ export function getCsrfPlugin(secret) {
 
 		return registration;
 	};
+
 	register.attributes = CsrfPlugin.register.attributes;
+
 	return {
 		register,
 		options: {
-			secret,
+			secret: config.csrf_secret,
+			isProd: config.isProd,
 		},
 	};
 }
 
 /**
- * configure and return the plugin that will allow requests to get anonymous
- * oauth tokens to communicate with the API
+ * configure and return the plugin that
+ * allows requests to get anonymous oauth tokens
+ * to communicate with the API
  */
-export function getRequestAuthPlugin(options) {
+export function getRequestAuthPlugin() {
 	return {
 		register: requestAuthPlugin,
-		options,
 	};
 }
 
@@ -82,9 +87,5 @@ export function getLogger(options = {}) {
 }
 
 export default function getPlugins(config) {
-	return [
-		getLogger(),
-		getCsrfPlugin(config.CSRF_SECRET),
-		getRequestAuthPlugin(config),
-	];
+	return [getLogger(), getCsrfPlugin(config), getRequestAuthPlugin()];
 }

@@ -1,9 +1,11 @@
 import querystring from 'qs';
+import config from './config';
 import logger from './logger';
 
-const isProd = process.env.NODE_ENV === 'production';
-export const MEMBER_COOKIE = isProd ? 'MEETUP_MEMBER' : 'MEETUP_MEMBER_DEV';
-export const LANGUAGE_COOKIE = isProd
+export const MEMBER_COOKIE = config.isProd
+	? 'MEETUP_MEMBER'
+	: 'MEETUP_MEMBER_DEV';
+export const LANGUAGE_COOKIE = config.isProd
 	? 'MEETUP_LANGUAGE'
 	: 'MEETUP_LANGUAGE_DEV';
 
