@@ -75,39 +75,30 @@ const getRouterRenderer = ({
 	let statusCode;
 	const context = {};
 
-	try {
-		appMarkup = ReactDOMServer.renderToString(
-			<StaticRouter basename={baseUrl} location={location} context={context}>
-				<PlatformApp store={store} routes={routes} />
-			</StaticRouter>
-		);
+	appMarkup = ReactDOMServer.renderToString(
+		<StaticRouter basename={baseUrl} location={location} context={context}>
+			<PlatformApp store={store} routes={routes} />
+		</StaticRouter>
+	);
 
-		if (context.url) {
-			// redirect
-		}
-
-		// all the data for the full `<html>` element has been initialized by the app
-		// so go ahead and assemble the full response body
-		result = getHtml(
-			<Dom
-				baseUrl={baseUrl}
-				assetPublicPath={assetPublicPath}
-				clientFilename={clientFilename}
-				initialState={initialState}
-				appMarkup={appMarkup}
-				scripts={scripts}
-			/>
-		);
-
-		statusCode = NotFound.rewind() || 200; // if NotFound is mounted, return 404
-	} catch (error) {
-		// log the error stack here in dev to make it a little more legible
-		// - prod will get stackdriver formatting
-		if (process.env.NODE_ENV !== 'production') {
-			console.error(error.stack);
-		}
-		throw error;
+	if (context.url) {
+		// redirect
 	}
+
+	// all the data for the full `<html>` element has been initialized by the app
+	// so go ahead and assemble the full response body
+	result = getHtml(
+		<Dom
+			baseUrl={baseUrl}
+			assetPublicPath={assetPublicPath}
+			clientFilename={clientFilename}
+			initialState={initialState}
+			appMarkup={appMarkup}
+			scripts={scripts}
+		/>
+	);
+
+	statusCode = NotFound.rewind() || 200; // if NotFound is mounted, return 404
 
 	return {
 		statusCode,
@@ -164,7 +155,7 @@ const makeRenderer = (
 	scripts: Array<string>
 ) => (request: Object) => {
 	middleware = middleware || [];
-	const { connection, headers, info, url } = request;
+	const { connection, headers, info, url, server, raw: { req } } = request;
 
 	// request protocol might be different from original request that hit proxy
 	// we want to use the proxy's protocol
@@ -208,22 +199,15 @@ const makeRenderer = (
 		return store.subscribe(() => obs.next(store.getState()));
 	}).first(state => state.preRenderChecklist.every(isReady => isReady)); // take the first ready state
 
-	console.log(
-		JSON.stringify({
-			message: `Dispatching RENDER for ${request.url.href}`,
-			type: 'dispatch',
-			info: {
-				url: request.url,
-				method: request.method,
-				id: request.id,
-			},
-		})
-	);
-	store.dispatch({
+	const action = {
 		type: SERVER_RENDER,
 		payload: url,
-	});
-
+	};
+	server.app.logger.debug(
+		{ type: 'dispatch', action, req },
+		`Dispatching RENDER for ${request.url.href}`
+	);
+	store.dispatch(action);
 	const getRouteComponents$ = Observable.fromPromise(
 		resolveRouteComponents(routes, baseUrl)(request.url)
 	);

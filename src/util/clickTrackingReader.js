@@ -1,3 +1,4 @@
+import { clickSerializer } from './avro';
 import { parseMemberCookie } from './cookieUtils';
 
 const isProd = process.env.NODE_ENV === 'production';
@@ -29,22 +30,13 @@ export default function processClickTracking(request, reply) {
 		return;
 	}
 
-	try {
-		const cookieJSON = decodeURIComponent(cookieValue);
-		const { history } = JSON.parse(cookieJSON);
-		history
-			.map(clickToClickRecord(request))
-			.forEach(clickRecord =>
-				request.log(['click'], JSON.stringify(clickRecord))
-			);
-	} catch(err) {
-		console.error(JSON.stringify({
-			message: 'Could not parse click-track cookie',
-			cookieValue,
-			error: err.stack,
-		}));
-		return;
-	}
+	const cookieJSON = decodeURIComponent(cookieValue);
+	const { history } = JSON.parse(cookieJSON);
+	history
+		.map(clickToClickRecord(request))
+		.forEach(clickRecord =>
+			process.stdout.write(clickSerializer(clickRecord))
+		);
 
 	reply.unstate('click-track', clickCookieOptions);
 	return;
