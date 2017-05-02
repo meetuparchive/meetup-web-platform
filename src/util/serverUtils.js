@@ -7,27 +7,31 @@ import track from './tracking';
 import clickTrackingReader from './clickTrackingReader';
 
 /**
- * determine whether a nested object of values contains a string that contains
- * `.dev.meetup.`
- * @param {String|Object} value string or nested object with
- * values that could be URL strings
+ * determine whether a nested object of values has
+ * a string that contains `.dev.meetup.`
+ *
+ * @param {String|Object} value string or nested object
+ * with values that could be URL strings
+ *
  * @return {Boolean} whether the `value` contains a 'dev' URL string
  */
 export function checkForDevUrl(value) {
-	switch(typeof value) {
-	case 'string':
-		return value.indexOf('.dev.meetup.') > -1;
-	case 'object':
-		return Object.keys(value).some(key => checkForDevUrl(value[key]));
+	switch (typeof value) {
+		case 'string':
+			return value.indexOf('.dev.meetup.') > -1;
+		case 'object':
+			return Object.keys(value).some(key => checkForDevUrl(value[key]));
 	}
+
 	return false;
 }
 
 export function onRequestExtension(request, reply) {
 	request.id = uuid.v4();
 
-	request.server.app.logger
-		.info(`Incoming request ${request.method.toUpperCase()} ${request.url.href}`);
+	request.server.app.logger.info(
+		`Incoming request ${request.method.toUpperCase()} ${request.url.href}`
+	);
 
 	return reply.continue();
 }
@@ -35,7 +39,7 @@ export function onRequestExtension(request, reply) {
 export function onPreHandlerExtension(request, reply) {
 	try {
 		clickTrackingReader(request, reply);
-	} catch(err) {
+	} catch (err) {
 		console.error(err);
 		request.server.app.logger.error(err);
 	}
@@ -68,14 +72,15 @@ export function logResponse(request) {
 
 	if (response.isBoom) {
 		// response is an Error object
-		logger.error(`Internal error ${response.message} ${url.pathname}`,
-			{ error: response.stack }
-		);
+		logger.error(`Internal error ${response.message} ${url.pathname}`, {
+			error: response.stack,
+		});
 	}
 
-	const log = (response.statusCode >= 400 && logger.error ||
-		response.statusCode >= 300 && logger.warn ||
-		logger.info).bind(logger);
+	const log = ((response.statusCode >= 400 && logger.error) ||
+		(response.statusCode >= 300 && logger.warn) ||
+		logger.info)
+		.bind(logger);
 
 	log(
 		{
@@ -100,13 +105,16 @@ export function logResponse(request) {
  * @return {Object} Hapi server
  */
 export function registerExtensionEvents(server) {
-	server.ext([{
-		type: 'onRequest',
-		method: onRequestExtension,
-	}, {
-		type: 'onPreHandler',
-		method: onPreHandlerExtension,
-	}]);
+	server.ext([
+		{
+			type: 'onRequest',
+			method: onRequestExtension,
+		},
+		{
+			type: 'onPreHandler',
+			method: onPreHandlerExtension,
+		},
+	]);
 	server.on('response', onResponse);
 	return server;
 }
@@ -114,15 +122,16 @@ export function registerExtensionEvents(server) {
 /**
  * Make any environment changes that need to be made in response to the provided
  * config
- * @param {Object} config
- * @return {Object} the original config object
+ *
+ * @param {Object} config the environment configuration object
+ *
+ * @return null
  */
 export function configureEnv(config) {
 	// When using .dev.meetup endpoints, ignore self-signed SSL cert
 	const USING_DEV_ENDPOINTS = checkForDevUrl(config);
-	https.globalAgent.options.rejectUnauthorized = !USING_DEV_ENDPOINTS;
 
-	return config;
+	https.globalAgent.options.rejectUnauthorized = !USING_DEV_ENDPOINTS;
 }
 
 /**
@@ -131,12 +140,12 @@ export function configureEnv(config) {
 export function server(routes, connection, plugins, platform_agent, config) {
 	const server = new Hapi.Server();
 
-	// store runtime state - must modify existing server.app in order to keep
+	// store runtime state - must modify existing server.settings.app in order to keep
 	// previously-defined properties
 	// https://hapijs.com/api#serverapp
-	Object.assign(
-		server.app,
-		{ isDevConfig: checkForDevUrl(config) },  // indicates dev API or prod API
+	server.settings.app = Object.assign(
+		server.settings.app || {},
+		{ isDevConfig: checkForDevUrl(config) }, // indicates dev API or prod API
 		config
 	);
 
@@ -151,4 +160,3 @@ export function server(routes, connection, plugins, platform_agent, config) {
 		.then(() => server.start())
 		.then(() => server);
 }
-
