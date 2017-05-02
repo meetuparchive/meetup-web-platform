@@ -10,10 +10,10 @@ import 'rxjs/add/operator/map';
 
 import logger from '../util/logger';
 import { tryJSON } from '../util/fetchUtils';
+import { MEMBER_COOKIE } from '../util/cookieUtils';
 import {
 	applyAuthState,
 	configureAuthCookies,
-	getMemberCookieName,
 	removeAuthState,
 	setPluginState,
 } from '../util/authUtils';
@@ -35,24 +35,21 @@ const verifyAuth = logger => auth => {
 };
 
 const handleLogout = request => {
-	const {
-		raw: { req },
-		server: { app: { logger } },
-	} = request;
+	const { raw: { req }, server: { app: { logger } } } = request;
 	logger.info({ req }, 'Logout - clearing cookies');
 	return removeAuthState(
-		[getMemberCookieName(request.server), 'oauth_token', 'refresh_token'],
+		[MEMBER_COOKIE, 'oauth_token', 'refresh_token'],
 		request,
 		request.plugins.requestAuth.reply
 	);
 };
 
 function getAuthType(request) {
-	const memberCookie = getMemberCookieName(request.server);
-	const allowedAuthTypes = [memberCookie, 'oauth_token'];
+	const allowedAuthTypes = [MEMBER_COOKIE, 'oauth_token'];
 	// search for a request.state cookie name that matches an allowed auth type
 	return allowedAuthTypes.reduce(
-		(authType, allowedType) => authType || request.state[allowedType] && allowedType,
+		(authType, allowedType) =>
+			authType || (request.state[allowedType] && allowedType),
 		null
 	);
 }
@@ -69,14 +66,9 @@ function getAuthType(request) {
  * @return {Observable} Observable that emits the request with auth applied
  */
 export const applyRequestAuthorizer$ = requestAuthorizer$ => request => {
-	const {
-		query,
-		plugins,
-		server: { app: { logger } },
-		raw: { req },
-	} = request;
+	const { query, plugins, server: { app: { logger } }, raw: { req } } = request;
 
-// logout is accomplished exclusively through a `logout` querystring value
+	// logout is accomplished exclusively through a `logout` querystring value
 	if ('logout' in query) {
 		handleLogout(request);
 	}
@@ -92,7 +84,7 @@ export const applyRequestAuthorizer$ = requestAuthorizer$ => request => {
 	}
 
 	logger.warn({ req }, 'Request does not contain auth token');
-	return requestAuthorizer$(request)  // get anonymous oauth_token
+	return requestAuthorizer$(request) // get anonymous oauth_token
 		.do(applyAuthState(request, plugins.requestAuth.reply))
 		.map(() => request);
 };
@@ -101,22 +93,22 @@ export const applyRequestAuthorizer$ = requestAuthorizer$ => request => {
  * Get an anonymous code from the API that can be used to generate an oauth
  * access token
  *
- * @param {Object} config { OAUTH_AUTH_URL, oauth }
+ * @param {Object} serverAppConfig the Hapi `server.settings.app` object
  * @param {String} redirect_uri Return url after anonymous grant
  */
-export function getAnonymousCode$({ API_TIMEOUT=5000, OAUTH_AUTH_URL, oauth }, redirect_uri) {
-	if (!oauth.key) {
+export function getAnonymousCode$(serverAppConfig, redirect_uri) {
+	if (!serverAppConfig.oauth.key) {
 		throw new ReferenceError('OAuth consumer key is required');
 	}
 
-	const authURL = new URL(OAUTH_AUTH_URL);
+	const authURL = new URL(serverAppConfig.oauth.auth_url);
 	authURL.searchParams.append('response_type', 'anonymous_code');
-	authURL.searchParams.append('client_id', oauth.key);
+	authURL.searchParams.append('client_id', serverAppConfig.oauth.key);
 	authURL.searchParams.append('redirect_uri', redirect_uri);
 	const requestOpts = {
 		method: 'GET',
 		headers: {
-			Accept: 'application/json'
+			Accept: 'application/json',
 		},
 	};
 
@@ -126,58 +118,59 @@ export function getAnonymousCode$({ API_TIMEOUT=5000, OAUTH_AUTH_URL, oauth }, r
 				type: 'request',
 				direction: 'out',
 				info: {
-					url: OAUTH_AUTH_URL,
+					url: serverAppConfig.oauth.auth_url,
 					method: 'get',
-				}
+				},
 			},
-			`Outgoing request GET ${OAUTH_AUTH_URL}`
+			`Outgoing request GET ${serverAppConfig.oauth.auth_url}`
 		);
 
 		const startTime = new Date();
 		return Observable.fromPromise(fetch(authURL.toString(), requestOpts))
-			.timeout(API_TIMEOUT)
+			.timeout(serverAppConfig.api.timeout)
 			.do(() => {
 				logger.info(
 					{
 						type: 'response',
 						direction: 'in',
 						info: {
-							url: OAUTH_AUTH_URL,
+							url: serverAppConfig.oauth.auth_url,
 							method: 'get',
 							responseTime: new Date() - startTime,
-						}
+						},
 					},
-					`Incoming response GET ${OAUTH_AUTH_URL}`
+					`Incoming response GET ${serverAppConfig.oauth.auth_url}`
 				);
 			})
-			.mergeMap(tryJSON(OAUTH_AUTH_URL))
+			.mergeMap(tryJSON(serverAppConfig.oauth.auth_url))
 			.map(({ code }) => ({
 				grant_type: 'anonymous_code',
-				token: code
+				token: code,
 			}));
 	});
 }
 
 /**
- * Curry the config to generate a function that receives a grant type and grant
+ * Generate a function that receives a grant type and grant
  * token that can be used to generate an oauth access token from the API
- * @param {Object} config object containing the oauth secret and key
+ *
+ * @param {Object} serverAppConfig the Hapi `server.settings.app` config object
  * @param {String} redirect_uri Return url after anonymous grant
- * @param {Object} headers Hapi request headers for anonymous user request
+ *
  * @return {Object} the JSON-parsed response from the authorize endpoint
  *   - contains 'access_token', 'refresh_token'
  */
-export const getAccessToken$ = ({ API_TIMEOUT=5000, OAUTH_ACCESS_URL, oauth }, redirect_uri) => {
-	if (!oauth.key) {
+export const getAccessToken$ = (serverAppConfig, redirect_uri) => {
+	if (!serverAppConfig.oauth.key) {
 		throw new ReferenceError('OAuth consumer key is required');
 	}
-	if (!oauth.secret) {
+	if (!serverAppConfig.oauth.secret) {
 		throw new ReferenceError('OAuth consumer secret is required');
 	}
 	const params = {
-		client_id: oauth.key,
-		client_secret: oauth.secret,
-		redirect_uri
+		client_id: serverAppConfig.oauth.key,
+		client_secret: serverAppConfig.oauth.secret,
+		redirect_uri,
 	};
 	return headers => {
 		const requestOpts = {
@@ -186,20 +179,20 @@ export const getAccessToken$ = ({ API_TIMEOUT=5000, OAUTH_ACCESS_URL, oauth }, r
 				Cookie: headers.cookie,
 				Accept: headers.accept,
 				'Accept-Language': headers['accept-language'],
-				'Cache-Control': headers['cache-control']
+				'Cache-Control': headers['cache-control'],
 			},
 		};
-		const accessUrl = Object.keys(params)
-			.reduce((accessUrl, key) => {
-				accessUrl.searchParams.append(key, params[key]);
-				return accessUrl;
-			}, new URL(OAUTH_ACCESS_URL));
+		const accessUrl = Object.keys(params).reduce((accessUrl, key) => {
+			accessUrl.searchParams.append(key, params[key]);
+			return accessUrl;
+		}, new URL(serverAppConfig.oauth.access_url));
 
 		return ({ grant_type, token }) => {
-
 			if (!token) {
 				// programmer error or catastrophic auth failure - throw exception
-				throw new ReferenceError('No grant token provided - cannot obtain access token');
+				throw new ReferenceError(
+					'No grant token provided - cannot obtain access token'
+				);
 			}
 
 			accessUrl.searchParams.append('grant_type', grant_type);
@@ -215,62 +208,62 @@ export const getAccessToken$ = ({ API_TIMEOUT=5000, OAUTH_ACCESS_URL, oauth }, r
 					type: 'request',
 					direction: 'out',
 					info: {
-						url: OAUTH_ACCESS_URL,
+						url: serverAppConfig.oauth.access_url,
 						method: 'get',
-					}
+					},
 				},
-				`Outgoing request GET ${OAUTH_ACCESS_URL}?${grant_type}`
+				`Outgoing request GET ${serverAppConfig.oauth.access_url}?${grant_type}`
 			);
 
 			const startTime = new Date();
 			return Observable.fromPromise(fetch(accessUrl.toString(), requestOpts))
-				.timeout(API_TIMEOUT)
+				.timeout(serverAppConfig.api.timeout)
 				.do(() => {
 					logger.info(
 						{
 							type: 'response',
 							direction: 'in',
 							info: {
-								url: OAUTH_ACCESS_URL,
+								url: serverAppConfig.oauth.access_url,
 								method: 'get',
 								responseTime: new Date() - startTime,
-							}
+							},
 						},
-						`Incoming response GET ${OAUTH_ACCESS_URL}?${grant_type}`
+						`Incoming response GET ${serverAppConfig.oauth.access_url}?${grant_type}`
 					);
 				})
-				.mergeMap(tryJSON(OAUTH_ACCESS_URL));
+				.mergeMap(tryJSON(serverAppConfig.oauth.access_url));
 		};
 	};
 };
 
-const refreshToken$ = refresh_token => Observable.of({
-	grant_type: 'refresh_token',
-	token: refresh_token
-});
+const refreshToken$ = refresh_token =>
+	Observable.of({
+		grant_type: 'refresh_token',
+		token: refresh_token,
+	});
 
 /**
  * Curry a function that will get a new auth token for a passed-in request.
  * For an anonymous auth, the request header information is used to determine
  * the location and language of the anonymous member
  *
- * @param {Object} config { OAUTH_AUTH_URL, OAUTH_ACCESS_URL, oauth }
- * @param {Object} request the Hapi request that needs to be authorized
+ * @param {Object} serverAppConfig the Hapi `server.settings.app` config object
  */
-export const getRequestAuthorizer$ = config => {
-	const redirect_uri = 'http://www.meetup.com/';  // required param set in oauth consumer config
-	const anonymousCode$ = getAnonymousCode$(config, redirect_uri);
-	const accessToken$ = getAccessToken$(config, redirect_uri);
+export const getRequestAuthorizer$ = serverAppConfig => {
+	const redirect_uri = 'http://www.meetup.com/'; // required param set in oauth consumer config
+	const anonymousCode$ = getAnonymousCode$(serverAppConfig, redirect_uri);
+	const accessToken$ = getAccessToken$(serverAppConfig, redirect_uri);
 
 	// if the request has a refresh_token, use it. Otherwise, get a new anonymous access token
-	return ({ headers, state: { refresh_token}, server: { app: { logger } } }) =>
+	return ({ headers, state: { refresh_token }, server: { app: { logger } } }) =>
 		Observable.if(
 			() => refresh_token,
 			refreshToken$(refresh_token),
 			anonymousCode$
 		)
-		.mergeMap(accessToken$(headers))
-		.do(verifyAuth(logger));
+			.mergeMap(accessToken$(headers))
+			.do(verifyAuth(logger));
 };
 
 export const getAuthenticate = authorizeRequest$ => (request, reply) => {
@@ -282,7 +275,8 @@ export const getAuthenticate = authorizeRequest$ => (request, reply) => {
 		})
 		.subscribe(
 			request => {
-				const credentials = request.state[getAuthType(request)] ||
+				const credentials =
+					request.state[getAuthType(request)] ||
 					request.plugins.requestAuth.oauth_token;
 				reply.continue({ credentials, artifacts: credentials });
 			},
@@ -306,15 +300,21 @@ export const getAuthenticate = authorizeRequest$ => (request, reply) => {
  *   auth stategy instance
  */
 export const oauthScheme = server => {
-	configureAuthCookies(server);       // apply default config for auth cookies
-	server.ext('onPreAuth', setPluginState);     // provide a reference to `reply` on the request
-	const options = server.plugins.requestAuth.config;
-	const authorizeRequest$ = applyRequestAuthorizer$(getRequestAuthorizer$(options));
+	// apply default config for auth cookies
+	configureAuthCookies(server);
+
+	// provide a reference to `reply` on the request
+	server.ext('onPreAuth', setPluginState);
+
+	const authorizeRequest$ = applyRequestAuthorizer$(
+		getRequestAuthorizer$(server.settings.app)
+	);
 
 	return {
 		authenticate: getAuthenticate(authorizeRequest$),
 	};
 };
+
 /**
  * This plugin does two things.
  *
@@ -327,16 +327,13 @@ export const oauthScheme = server => {
  * {@link http://hapijs.com/tutorials/plugins}
  */
 export default function register(server, options, next) {
-	// allow plugin to access config at server.plugins.requestAuth.config
-	server.expose('config', options);
-
 	// register the plugin's auth scheme
 	server.auth.scheme('oauth', oauthScheme);
 
 	next();
 }
+
 register.attributes = {
 	name: 'requestAuth',
 	version: '1.0.0',
 };
-

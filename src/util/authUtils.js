@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import { MEMBER_COOKIE } from './cookieUtils';
 
 /**
  * @module authUtils
@@ -26,7 +27,7 @@ export const configureAuthState = auth => {
 			opts: {
 				ttl: YEAR_IN_MS * 2,
 			},
-		}
+		},
 	};
 };
 
@@ -49,7 +50,7 @@ export const applyAuthState = (request, reply) => auth => {
 	Object.keys(authState).forEach(name => {
 		const cookieVal = authState[name];
 		// apply to request
-		request.plugins.requestAuth[name] = cookieVal.value;  // this will only be used for generating internal requests
+		request.plugins.requestAuth[name] = cookieVal.value; // this will only be used for generating internal requests
 		// apply to response - note this special `request.authorize.reply` prop assigned onPreAuth
 		reply.state(name, cookieVal.value, cookieVal.opts);
 	});
@@ -64,22 +65,22 @@ export const removeAuthState = (names, request, reply) => {
 };
 
 export function validateSecret(secret) {
-	const { value, error } = Joi.validate(secret, Joi.string().min(32).required());
+	const { value, error } = Joi.validate(
+		secret,
+		Joi.string().min(32).required()
+	);
 	if (error) {
 		throw error;
 	}
 	return value;
 }
 
-export const getMemberCookieName = server =>
-	server.app.isDevConfig ? 'MEETUP_MEMBER_DEV' : 'MEETUP_MEMBER';
-
 /**
  * apply default cookie options for auth-related cookies
  */
 export const configureAuthCookies = server => {
-	const password = validateSecret(server.plugins.requestAuth.config.COOKIE_ENCRYPT_SECRET);
-	const isSecure = process.env.NODE_ENV === 'production';
+	const password = validateSecret(server.settings.app.cookie_encrypt_secret);
+	const isSecure = server.settings.app.isProd;
 	const authCookieOptions = {
 		encoding: 'iron',
 		password,
@@ -90,7 +91,7 @@ export const configureAuthCookies = server => {
 	};
 	server.state('oauth_token', authCookieOptions);
 	server.state('refresh_token', authCookieOptions);
-	server.state(getMemberCookieName(server), { isSecure, isHttpOnly: true });
+	server.state(MEMBER_COOKIE, { isSecure, isHttpOnly: true });
 };
 
 export const setPluginState = (request, reply) => {
@@ -101,4 +102,3 @@ export const setPluginState = (request, reply) => {
 
 	return reply.continue();
 };
-
