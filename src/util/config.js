@@ -105,7 +105,7 @@ let config = convict({
 		},
 		key: {
 			format: function(key) {
-				if (key.toString().length < 1) {
+				if (!key || key.toString().length < 1) {
 					throw oauthError;
 				}
 			},
@@ -127,7 +127,7 @@ let config = convict({
 // Load environment dependent configuration
 const configFile = path.resolve(
 	__dirname,
-	`../config.${config.get('env')}.json`
+	`../../config.${config.get('env')}.json`
 );
 if (fs.existsSync(configFile)) {
 	config.loadFile(configFile);
