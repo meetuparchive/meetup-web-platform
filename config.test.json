@@ -13,6 +13,7 @@
   "duotone_urls": [
     "http://example.com/duotone.jpg"
   ],
+  "photo_scaler_salt": "asdfasdfasdfasdfasdfasdfasdfasdf",
   "oauth": {
     "auth_url": "https://secure.dev.meetup.com/oauth2/authorize",
     "access_url": "https://secure.dev.meetup.com/oauth2/access",
