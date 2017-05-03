@@ -119,6 +119,7 @@ describe('injectResponseCookies', () => {
 				},
 			},
 		},
+		server: getServer(),
 	};
 	const responseObj = {
 		request: {

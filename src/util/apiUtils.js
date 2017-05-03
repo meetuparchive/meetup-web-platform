@@ -16,8 +16,6 @@ import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/timeout';
 
-import config from './config';
-
 import { removeAuthState } from './authUtils';
 
 import { getCookieLang } from './languageUtils';
@@ -561,7 +559,9 @@ export const logApiResponse = request => ([response, body]) => {
  */
 export const parseLoginAuth = (request, query) => response => {
 	if (
-		query.type === 'login' && request.plugins.requestAuth && !response.error
+		query.type === 'login' &&
+		request.plugins.requestAuth &&
+		!response.error
 	) {
 		// kill the logged-out auth
 		removeAuthState(
@@ -588,12 +588,14 @@ export const injectResponseCookies = request => ([response, _, jar]) => {
 	}
 	const requestUrl = response.toJSON().request.uri.href;
 	jar.getCookies(requestUrl).forEach(cookie => {
+		console.log('************************************************');
+		console.log(request);
 		const cookieOptions = {
 			domain: cookie.domain,
 			path: cookie.path,
 			isHttpOnly: cookie.httpOnly,
 			isSameSite: false,
-			isSecure: config.isProd,
+			isSecure: request.server.settings.app.isProd,
 			strictHeader: false, // Can't enforce RFC 6265 cookie validation on external services
 		};
 
