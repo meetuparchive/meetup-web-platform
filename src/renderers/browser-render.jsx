@@ -1,15 +1,41 @@
+// @flow
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {
 	getInitialState,
 	getBrowserCreateStore,
 } from '../util/createStoreBrowser';
+import { getRouteResolver } from '../util/routeUtils';
 import BrowserApp from '../components/BrowserApp';
 
 /**
  * @module browser-render
- * @deprecated see CHANGELOG v2.4
  */
+
+type AppProps = {
+	routes: Array<PlatformRoute>,
+	store: Object,
+	basename: string,
+};
+
+/**
+ * Async resolver of the props needed for `BrowserApp`:
+ * { routes, store, basename }
+ */
+export function resolveAppProps(
+	routes: Array<PlatformRoute>,
+	reducer: Reducer,
+	middleware: Array<Object> = []
+): Promise<AppProps> {
+	const basename = window.APP_RUNTIME.baseUrl || '';
+	const createStore = getBrowserCreateStore(routes, middleware, basename);
+	const store = createStore(reducer, getInitialState(window.APP_RUNTIME));
+	return getRouteResolver(routes, basename)(window.location).then(() => ({
+		routes,
+		store,
+		basename,
+	}));
+}
 
 /**
  * This function creates a 'renderer', which is just a function that, when
@@ -18,26 +44,21 @@ import BrowserApp from '../components/BrowserApp';
  * The routes, reducer, and app-specific middleware are provided by the
  * application - everything else is general to the meetup web platform
  *
- * @deprecated
- * @param {Object} routes the React Router routes object
- * @param {Function} reducer the root Redux reducer for the app
- * @param {Function} middleware (optional) any app-specific middleware that
- *   should be applied to the store
- * @param {String} baseUrl an optional baseUrl to serve the site from,
- * 	_including_ surrounding slashes, e.g. '/en-US/'
- *
- * @returns {Function} a function that results in a ReactDOM.render call - can
- *   use a custom root element ID or default to `'outlet'`
+ * @deprecated see CHANGELOG v2.4
  */
-function makeRenderer(routes, reducer, middleware = [], baseUrl = '') {
-	return (rootElId = 'outlet') => {
-		const createStore = getBrowserCreateStore(routes, middleware, baseUrl);
-		const store = createStore(reducer, getInitialState(window.APP_RUNTIME));
-		ReactDOM.render(
-			<BrowserApp routes={routes} store={store} basename={baseUrl} />,
-			document.getElementById(rootElId)
-		);
-		return store;
+function makeRenderer(
+	routes: Array<PlatformRoute>,
+	reducer: Reducer,
+	middleware: Array<Object> = []
+) {
+	return (rootElId: string = 'outlet') => {
+		resolveAppProps(routes, reducer, middleware).then(props => {
+			ReactDOM.render(
+				<BrowserApp {...props} />,
+				document.getElementById(rootElId)
+			);
+			return props.store;
+		});
 	};
 }
 

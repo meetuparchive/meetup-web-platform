@@ -5,6 +5,10 @@ import catchMiddleware from '../middleware/catch';
 import apiProxy$ from '../apiProxy/api-proxy';
 import 'rxjs/add/operator/toPromise';
 
+const logError = logger => err => {
+	logger.error(err);
+};
+
 /**
  * on the server, we can proxy the API requests directly without making a
  * request to the server's own API proxy endpoint
@@ -30,7 +34,7 @@ export const serverFetchQueries = request => () => queries =>
  */
 export function getServerCreateStore(routes, middleware, request, baseUrl) {
 	const middlewareToApply = [
-		catchMiddleware,
+		catchMiddleware(logError(request.server.app.logger)),
 		getEpicMiddleware(routes, serverFetchQueries(request), baseUrl),
 		...middleware,
 	];
