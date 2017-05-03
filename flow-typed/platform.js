@@ -1,4 +1,5 @@
 // @flow
+import type { Match } from 'react-router-dom';
 declare var Intl: Object;
 
 declare type FluxStandardAction = {
@@ -32,7 +33,10 @@ declare type QueryResponse = {
 
 declare type QueryFunction = (location: Object) => Query;
 
-type _RouteBase = {
+declare type PlatformRoute = {
+	component?: React$Element<any>,
+	getNestedRoutes?: () => Promise<Array<PlatformRoute>>,
+	getIndexRoute?: () => Promise<PlatformRoute>,
 	path?: string,
 	exact?: boolean,
 	query?: QueryFunction,
@@ -40,12 +44,4 @@ type _RouteBase = {
 	routes?: Array<PlatformRoute>,
 };
 
-declare type AsyncPlatformRoute = _RouteBase & {
-	load: () => Promise<React$Element<any>>,
-};
-
-declare type SyncPlatformRoute = _RouteBase & {
-	component: React$Element<any>,
-};
-
-declare type PlatformRoute = AsyncPlatformRoute | SyncPlatformRoute;
+declare type MatchedRoute = { route: PlatformRoute, match: Match };

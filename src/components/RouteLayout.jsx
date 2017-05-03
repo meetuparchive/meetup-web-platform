@@ -2,82 +2,84 @@ import React from 'react';
 import Switch from 'react-router-dom/Switch';
 import Route from 'react-router-dom/Route';
 
-import { decodeParams, getNestedRoutes } from '../util/routeUtils';
+import { decodeParams } from '../util/routeUtils';
 
-const Empty = () => <div />;
-const Loading = () => <div />;
 /**
  * route rendering component
  */
 class AsyncRoute extends React.Component {
 	constructor(props) {
 		super(props);
-		const component = props.route.component || Empty;
-		const routes = props.route.routes || null;
+		const childRoutes = this.getChildRoutes();
 		this.state = {
-			component,
-			routes,
-			_componentCache: [component],
-			_routesCache: [routes],
+			childRoutes,
+			_routesCache: {},
 		};
 	}
-	resolveComponents(nextProps) {
-		const { component, load } = nextProps.route;
-		if (component) {
-			this.setState(state => ({ component }));
-			return;
-		}
-		// async route - check for cache keyed by load function
-		const cached = this.state._componentCache[load.toString()];
-		if (cached) {
-			this.setState(state => ({ component: cached }));
-			return;
-		}
-
-		// load async route
-		this.setState(state => ({ component: Loading }));
-		load().then(component => {
-			this.setState({ component });
-		});
+	getChildRoutes() {
+		const { route, match } = this.props;
+		const useIndex = match.isExact && (route.indexRoute || route.getIndexRoute);
+		return useIndex && route.indexRoute
+			? [route.indexRoute]
+			: route.routes || [];
 	}
-	resolveRoutes(nextProps) {
-		const { routes, loadNestedRoutes } = nextProps.route;
-		if (routes) {
-			this.setState(state => ({ routes }));
-			return;
-		}
-		// async route - check for cache keyed by load function
-		const cached = this.state._componentCache[loadNestedRoutes.toString()];
+	updateChildRoutes(childRoutes, key) {
+		this.setState(state => ({
+			childRoutes,
+			_routesCache: {
+				...state._routesCache,
+				[key]: childRoutes,
+			},
+		}));
+	}
+	resolveAsyncChildRoutes(resolver) {
+		const key = resolver.toString();
+		// async route - check for cache keyed by stringified load function
+		const cached = this.state._routesCache[key];
 		if (cached) {
-			this.setState(state => ({ component: cached }));
+			this.setState(state => ({ childRoutes: cached }));
 			return;
 		}
-
-		// load async route
-		loadNestedRoutes().then(component => {
-			this.setState({ component });
+		resolver().then(routes => {
+			routes = routes instanceof Array ? routes : [routes];
+			this.updateChildRoutes(routes, key);
 		});
+		return;
 	}
 	componentWillReceiveProps(nextProps) {
-		this.resolveComponents(nextProps);
-		this.resolveRoutes(nextProps);
-	}
-	componentDidMount() {
-		if (this.props.route.load) {
-			this.props.route.load().then(component => this.setState({ component }));
+		const { match, route } = nextProps;
+		const useIndex = match.isExact && (route.indexRoute || route.getIndexRoute);
+		if (useIndex) {
+			this.setState(state => ({
+				childRoutes: route.indexRoute ? [route.indexRoute] : [],
+			}));
+			if (route.getIndexRoute) {
+				this.resolveAsyncChildRoutes(route.getIndexRoute);
+			}
+			return;
 		}
+
+		this.setState(state => ({
+			childRoutes: route.routes || [],
+		}));
+		if (route.getNestedRoutes) {
+			this.resolveAsyncChildRoutes(route.getNestedRoutes);
+		}
+		return;
 	}
 	render() {
 		const { route, match } = this.props;
+		const { childRoutes } = this.state;
 		// React Router will automatically encode the URL params - we want the
 		// decoded values in the component
 		match.params = decodeParams(match.params);
-		const nestedRoutes = getNestedRoutes({ route, match });
-		const Component = this.state.component;
+
+		const Component = route.component;
+
 		return (
 			<Component {...this.props}>
-				{nestedRoutes &&
-					<RouteLayout routes={nestedRoutes} matchedPath={match.path} />}
+				{childRoutes.length > 0 &&
+					<RouteLayout routes={childRoutes} matchedPath={match.path} />}
 			</Component>
 		);
 	}

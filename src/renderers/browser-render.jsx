@@ -5,7 +5,7 @@ import {
 	getInitialState,
 	getBrowserCreateStore,
 } from '../util/createStoreBrowser';
-import { resolveRouteComponents } from '../util/routeUtils';
+import { getRouteResolver } from '../util/routeUtils';
 import BrowserApp from '../components/BrowserApp';
 
 /**
@@ -30,7 +30,7 @@ export function resolveAppProps(
 	const basename = window.APP_RUNTIME.baseUrl || '';
 	const createStore = getBrowserCreateStore(routes, middleware, basename);
 	const store = createStore(reducer, getInitialState(window.APP_RUNTIME));
-	return resolveRouteComponents(routes, basename)(window.location).then(() => ({
+	return getRouteResolver(routes, basename)(window.location).then(() => ({
 		routes,
 		store,
 		basename,
