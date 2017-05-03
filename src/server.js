@@ -1,6 +1,6 @@
 import './util/globals';
 
-import getConfig from './util/config';
+import defaultConfig from './util/config';
 import getPlugins from './plugins';
 import getRoutes from './routes';
 
@@ -26,37 +26,30 @@ import { configureEnv, server } from './util/serverUtils';
 export default function start(
 	renderRequestMap,
 	{ routes = [], plugins = [], platform_agent = 'consumer_name' },
-	config = getConfig
+	config = defaultConfig
 ) {
-	// source maps make for better stack traces - we might not want this in
-	// production if it makes anything slower, though
-	// (process.env.NODE_ENV === 'production')
+	// source maps make for better stack traces
+	// we might not want this in production if it makes anything slower
 	require('source-map-support').install();
 
-	return config().then(configureEnv).then(config => {
-		const baseRoutes = getRoutes(renderRequestMap);
-		const finalRoutes = [...routes, ...baseRoutes];
+	configureEnv(config);
 
-		const connection = {
-			host: '0.0.0.0',
-			port: config.DEV_SERVER_PORT,
-			routes: {
-				plugins: {
-					'electrode-csrf-jwt': {
-						enabled: false,
-					},
+	const baseRoutes = getRoutes(renderRequestMap);
+	const finalRoutes = [...routes, ...baseRoutes];
+
+	const connection = {
+		host: '0.0.0.0',
+		port: config.dev_server.port,
+		routes: {
+			plugins: {
+				'electrode-csrf-jwt': {
+					enabled: false,
 				},
 			},
-		};
+		},
+	};
 
-		const finalPlugins = [...plugins, ...getPlugins(config)];
+	const finalPlugins = [...plugins, ...getPlugins()];
 
-		return server(
-			finalRoutes,
-			connection,
-			finalPlugins,
-			platform_agent,
-			config
-		);
-	});
+	return server(finalRoutes, connection, finalPlugins, platform_agent, config);
 }
