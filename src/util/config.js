@@ -82,7 +82,7 @@ let config = convict({
 	asset_server: {
 		host: {
 			format: String,
-			default: '0.0.0.0',
+			default: 'beta2.dev.meetup.com',
 			env: 'ASSET_SERVER_HOST',
 		},
 		port: {
@@ -104,7 +104,7 @@ let config = convict({
 	dev_server: {
 		host: {
 			format: String,
-			default: '0.0.0.0',
+			default: 'beta2.dev.meetup.com',
 			env: 'DEV_SERVER_HOST',
 		},
 		port: {
