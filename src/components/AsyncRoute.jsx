@@ -65,16 +65,14 @@ class AsyncRoute extends React.Component {
 		return;
 	}
 	render() {
-		const { route, match } = this.props;
+		const { route, match, ...props } = this.props;
 		const { childRoutes } = this.state;
-		// React Router will automatically encode the URL params - we want the
-		// decoded values in the component
-		match.params = decodeParams(match.params);
-
+		// React Router encodes the URL params - send decoded values to component
+		const params = decodeParams(match.params);
 		const Component = route.component;
 
 		return (
-			<Component {...this.props}>
+			<Component {...props} route={route} match={{ ...match, params }}>
 				{childRoutes.length > 0 &&
 					<RouteLayout routes={childRoutes} matchedPath={match.path} />}
 			</Component>
