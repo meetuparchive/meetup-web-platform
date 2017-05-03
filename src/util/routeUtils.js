@@ -5,7 +5,7 @@
  */
 import matchPath from 'react-router-dom/matchPath';
 
-// A type for mutating object an object asynchronously
+// A type for functions that mutate an object asynchronously
 type Resolver<T> = (input: T) => Promise<T>;
 
 /*
@@ -44,6 +44,8 @@ const resolveIndexRoute: Resolver<MatchedRoute> = matchedRoute =>
  * Given a matched route, return the expected child route(s). This function
  * encapsulates the logic for selecting between the `indexRoute` and the
  * child `routes` array
+ *
+ * This is essentially an async `getChildRoutes`
  */
 export const resolveChildRoutes = (
 	matchedRoute: MatchedRoute
@@ -65,7 +67,7 @@ const routePath = (route: PlatformRoute, matchedPath: string): string =>
  * find all routes from a given array of route config objects that match the
  * supplied `url`
  *
- * this function matches the signature of `react-router-config`'s `matchRoutes`
+ * this function matches the signature of `react-router-config`'s `resolveRouteMatches`
  * function, but interprets all `route.path` settings as nested
  *
  * @see {@link https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config#matchroutesroutes-pathname}
@@ -97,7 +99,11 @@ export const matchedRouteQueriesReducer = (location: URL) => (
 	return [...queries, ...routeQueries];
 };
 
-export const matchRoutes = (
+/*
+ * Find all routes in the routes array that match the provided URL, including
+ * nested routes that may be async
+ */
+export const resolveRouteMatches = (
 	routes: Array<PlatformRoute> = [],
 	url: string = '',
 	matchedRoutes: Array<MatchedRoute> = [],
@@ -117,7 +123,7 @@ export const matchRoutes = (
 	return resolveChildRoutes({ route, match }).then(
 		childRoutes =>
 			(childRoutes.length
-				? matchRoutes(
+				? resolveRouteMatches(
 						childRoutes,
 						url,
 						currentMatchedRoutes,
@@ -127,22 +133,30 @@ export const matchRoutes = (
 	);
 };
 
-/**
- * Populate all async 'getters' of all _matched_ routes
+/*
+ * An alternative, curried interface into `resolveRouteMatches`, using `baseUrl`
+ * + `location` instead of `url`
  */
 export const getRouteResolver = (
 	routes: Array<PlatformRoute>,
 	baseUrl: string
 ) => (location: URL): Promise<Array<MatchedRoute>> => {
 	const url = location.pathname.replace(baseUrl, '');
-	return matchRoutes(routes, url);
+	return resolveRouteMatches(routes, url);
 };
 
+/*
+ * A synchronous, curried interface to derive the query values returned by the
+ * query functions of a provided set of routes given a particular location
+ */
 export const getMatchedQueries = (location: URL) => (
 	matchedRoutes: Array<MatchedRoute>
 ): Array<Query> =>
 	matchedRoutes.reduce(matchedRouteQueriesReducer(location), []);
 
+/*
+ * A curried interface into `resolveRouteMatches` + `getMatchedQueries`
+ */
 export const activeRouteQueries = (
 	routes: Array<PlatformRoute>,
 	baseUrl: string

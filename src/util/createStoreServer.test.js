@@ -13,7 +13,7 @@ jest.mock('../apiProxy/api-proxy', () =>
 const MOCK_ROUTES = {};
 const MOCK_HAPI_REQUEST = {
 	state: {},
-	server: { app: { logger: jest.fn() } },
+	server: { app: { logger: { error: jest.fn() } } },
 };
 
 describe('getServerCreateStore', () => {
