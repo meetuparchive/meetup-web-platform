@@ -8,15 +8,9 @@ import matchPath from 'react-router-dom/matchPath';
 // A type for functions that mutate an object asynchronously
 type Resolver<T> = (input: T) => Promise<T>;
 
-/*
- * Determine whether the indexRoute or nested route should be considered the
- * child route for a particular MatchedRoute
- */
-export const getChildRoutes = (matchedRoute: MatchedRoute) => {
-	const { route, match } = matchedRoute;
-	const useIndex = match.isExact && (route.indexRoute || route.getIndexRoute);
-	return useIndex && route.indexRoute ? [route.indexRoute] : route.routes || [];
-};
+// munge a route's 'relative' `path` with the full matchedPath
+const routePath = (route: PlatformRoute, matchedPath: string): string =>
+	`${matchedPath}${route.path || ''}`.replace('//', '/');
 
 export const decodeParams = (params: Object) =>
 	Object.keys(params).reduce((decodedParams, key) => {
@@ -24,21 +18,17 @@ export const decodeParams = (params: Object) =>
 		return decodedParams;
 	}, {});
 
-const resolveNestedRoutes: Resolver<MatchedRoute> = matchedRoute =>
-	(matchedRoute.route.getNestedRoutes
-		? matchedRoute.route
-				.getNestedRoutes()
-				.then(routes => (matchedRoute.route.routes = routes))
-				.then(() => matchedRoute)
-		: Promise.resolve(matchedRoute));
-
-const resolveIndexRoute: Resolver<MatchedRoute> = matchedRoute =>
-	(matchedRoute.route.getIndexRoute
-		? matchedRoute.route
-				.getIndexRoute()
-				.then(indexRoute => (matchedRoute.route.indexRoute = indexRoute))
-				.then(() => matchedRoute)
-		: Promise.resolve(matchedRoute));
+/*
+ * Determine whether the indexRoute or nested route should be considered the
+ * child route for a particular MatchedRoute
+ */
+export const getChildRoutes = (
+	matchedRoute: MatchedRoute
+): Array<PlatformRoute> => {
+	const { route, match } = matchedRoute;
+	const useIndex = match.isExact && (route.indexRoute || route.getIndexRoute);
+	return useIndex && route.indexRoute ? [route.indexRoute] : route.routes || [];
+};
 
 /*
  * Given a matched route, return the expected child route(s). This function
@@ -57,11 +47,21 @@ export const resolveChildRoutes = (
 			)
 		: resolveNestedRoutes(matchedRoute).then(m => m.route.routes || []));
 
-/*
- * munge a route's 'relative' `path` with the full matchedPath
- */
-const routePath = (route: PlatformRoute, matchedPath: string): string =>
-	`${matchedPath}${route.path || ''}`.replace('//', '/');
+const resolveNestedRoutes: Resolver<MatchedRoute> = matchedRoute =>
+	(matchedRoute.route.getNestedRoutes
+		? matchedRoute.route
+				.getNestedRoutes()
+				.then(routes => (matchedRoute.route.routes = routes))
+				.then(() => matchedRoute)
+		: Promise.resolve(matchedRoute));
+
+const resolveIndexRoute: Resolver<MatchedRoute> = matchedRoute =>
+	(matchedRoute.route.getIndexRoute
+		? matchedRoute.route
+				.getIndexRoute()
+				.then(indexRoute => (matchedRoute.route.indexRoute = indexRoute))
+				.then(() => matchedRoute)
+		: Promise.resolve(matchedRoute));
 
 /*
  * find all routes from a given array of route config objects that match the

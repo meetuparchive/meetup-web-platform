@@ -34,7 +34,7 @@ declare type QueryResponse = {
 declare type QueryFunction = (location: Object) => Query;
 
 declare type PlatformRoute = {
-	component: React$Element<any>,
+	component: ReactClass<*>,
 	getNestedRoutes?: () => Promise<Array<PlatformRoute>>,
 	getIndexRoute?: () => Promise<PlatformRoute>,
 	path?: string,

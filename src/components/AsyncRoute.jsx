@@ -1,13 +1,28 @@
+// @flow
 import React from 'react';
+import type { RouterHistory } from 'react-router-dom';
 import { decodeParams, getChildRoutes } from '../util/routeUtils';
 import RouteLayout from './RouteLayout';
+
+type Props = {
+	route: PlatformRoute,
+	match: Match,
+	location: URL,
+	history: RouterHistory,
+};
+
 /**
  * Route rendering component that will render nested routes asynchronously
  * The nested routes are cached so that the async data is not re-requested
  * each time a route is re-rendered.
  */
 class AsyncRoute extends React.Component {
-	constructor(props) {
+	state: {
+		childRoutes: Array<PlatformRoute>,
+		_routesCache: { [string]: Array<PlatformRoute> },
+	};
+	props: Props;
+	constructor(props: Props) {
 		super(props);
 		const { match, route } = props;
 		const childRoutes = getChildRoutes({ match, route });
@@ -16,7 +31,7 @@ class AsyncRoute extends React.Component {
 			_routesCache: {},
 		};
 	}
-	updateChildRoutes(childRoutes, key) {
+	updateChildRoutes(childRoutes: Array<PlatformRoute>, key: string) {
 		this.setState(state => ({
 			childRoutes,
 			_routesCache: {
@@ -25,7 +40,9 @@ class AsyncRoute extends React.Component {
 			},
 		}));
 	}
-	resolveAsyncChildRoutes(resolver) {
+	resolveAsyncChildRoutes(
+		resolver: () => Promise<Array<PlatformRoute> | PlatformRoute>
+	) {
 		const key = resolver.toString();
 		// async route - check for cache keyed by stringified load function
 		const cached = this.state._routesCache[key];
@@ -44,7 +61,7 @@ class AsyncRoute extends React.Component {
 	 * this.state.childRoutes to correspond to the indexRoute or nested routes
 	 * defined by the new route
 	 */
-	componentWillReceiveProps(nextProps) {
+	componentWillReceiveProps(nextProps: Props) {
 		const { match, route } = nextProps;
 		if (route === this.props.route && match === this.props.match) {
 			return;
