@@ -8,7 +8,49 @@ import { duotones, getDuotoneUrls } from './duotone';
  * @module config
  */
 
-const oauthError = new Error('get oauth secrets from #web-platform team');
+export const PROTOCOL_ERROR = 'Protocol must be http or https';
+export const COOKIE_SECRET_ERROR =
+	'Cookie Encrypt Secret must be a random 32+ char string';
+export const CSRF_SECRET_ERROR = 'CSRF Secret must be a random 32+ char string';
+export const OAUTH_SECRET_ERROR = 'Invalid OAUTH Secret';
+export const OAUTH_KEY_ERROR = 'Invalid OAUTH Key';
+export const SALT_ERROR = 'Invalid Photo Scaler Salt';
+
+export const validateProtocol = protocol => {
+	if (!['http', 'https'].includes(protocol)) {
+		throw new Error(PROTOCOL_ERROR);
+	}
+};
+
+export const validateCookieSecret = secret => {
+	if (!secret || secret.toString().length < 32) {
+		throw new Error(COOKIE_SECRET_ERROR);
+	}
+};
+
+export const validateCsrfSecret = secret => {
+	if (!secret || secret.toString().length < 32) {
+		throw new Error(CSRF_SECRET_ERROR);
+	}
+};
+
+export const validateOauthSecret = secret => {
+	if (!secret || secret.toString().length < 1) {
+		throw new Error(OAUTH_SECRET_ERROR);
+	}
+};
+
+export const validateOauthKey = key => {
+	if (!key || key.toString().length < 1) {
+		throw new Error(OAUTH_KEY_ERROR);
+	}
+};
+
+export const validatePhotoScalerSalt = salt => {
+	if (!salt || salt.toString().length < 1) {
+		throw new Error(SALT_ERROR);
+	}
+};
 
 let config = convict({
 	env: {
@@ -18,11 +60,7 @@ let config = convict({
 	},
 	api: {
 		protocol: {
-			format: function(protocol) {
-				if (!['http', 'https'].includes(protocol)) {
-					throw new Error('must be http or https');
-				}
-			},
+			format: validateProtocol,
 			default: 'https',
 			env: 'API_PROTOCOL',
 		},
@@ -54,24 +92,12 @@ let config = convict({
 		},
 	},
 	cookie_encrypt_secret: {
-		format: function(secret) {
-			if (!secret || secret.toString().length < 32) {
-				throw new Error(
-					'set COOKIE_ENCRYPT_SECRET env variable to a random 32+ character string'
-				);
-			}
-		},
+		format: validateCookieSecret,
 		default: null,
 		env: 'COOKIE_ENCRYPT_SECRET',
 	},
 	csrf_secret: {
-		format: function(secret) {
-			if (!secret || secret.toString().length < 32) {
-				throw new Error(
-					'set CSRF_SECRET env variable to a random 32+ character string'
-				);
-			}
-		},
+		format: validateCsrfSecret,
 		default: null,
 		env: 'CSRF_SECRET',
 	},
@@ -111,30 +137,18 @@ let config = convict({
 			env: 'OAUTH_ACCESS_URL',
 		},
 		secret: {
-			format: function(secret) {
-				if (!secret || secret.toString().length < 1) {
-					throw oauthError;
-				}
-			},
+			format: validateOauthSecret,
 			default: null,
 			env: 'MUPWEB_OAUTH_SECRET',
 		},
 		key: {
-			format: function(key) {
-				if (!key || key.toString().length < 1) {
-					throw oauthError;
-				}
-			},
+			format: validateOauthKey,
 			default: null,
 			env: 'MUPWEB_OAUTH_KEY',
 		},
 	},
 	photo_scaler_salt: {
-		format: function(salt) {
-			if (!salt || salt.toString().length < 1) {
-				throw new Error('get PHOTO_SCALER_SALT from #web-platform team');
-			}
-		},
+		format: validatePhotoScalerSalt,
 		default: null,
 		env: 'PHOTO_SCALER_SALT',
 	},
@@ -145,6 +159,7 @@ const configFile = path.resolve(
 	process.cwd(),
 	`config.${config.get('env')}.json`
 );
+
 if (fs.existsSync(configFile)) {
 	config.loadFile(configFile);
 }

@@ -588,8 +588,6 @@ export const injectResponseCookies = request => ([response, _, jar]) => {
 	}
 	const requestUrl = response.toJSON().request.uri.href;
 	jar.getCookies(requestUrl).forEach(cookie => {
-		console.log('************************************************');
-		console.log(request);
 		const cookieOptions = {
 			domain: cookie.domain,
 			path: cookie.path,
