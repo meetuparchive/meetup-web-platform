@@ -21,7 +21,7 @@ const logger = pino(
 			res: prettyPrint ? resSerializerDev : pino.stdSerializers.res,
 		},
 	},
-	pretty
+	prettyPrint ? pretty : process.stdout
 );
 
 export default logger;
