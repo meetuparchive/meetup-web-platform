@@ -7,7 +7,7 @@ const reqSerializerDev = req => `${req.method.toUpperCase()} ${req.url.href}`;
 const resSerializerDev = res => res.statusCode;
 
 const pretty = pino.pretty({
-	forceColor: prettyPrint,
+	forceColor: true,
 	messageKey: 'message', // Stackdriver uses this key for log summary
 });
 pretty.pipe(process.stdout);
