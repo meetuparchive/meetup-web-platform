@@ -125,10 +125,7 @@ export const getRouteResolver = (
 	baseUrl: string
 ) => (location: URL): Promise<Array<MatchedRoute>> => {
 	const url = location.pathname.replace(baseUrl, '');
-	return matchRoutes(routes, url).then(x => {
-		console.log(x);
-		return x;
-	});
+	return matchRoutes(routes, url);
 };
 
 export const getMatchedQueries = (location: URL) => (
