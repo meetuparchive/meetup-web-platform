@@ -7,10 +7,12 @@ import track from './tracking';
 import clickTrackingReader from './clickTrackingReader';
 
 /**
- * determine whether a nested object of values contains a string that contains
- * `.dev.meetup.`
- * @param {String|Object} value string or nested object with
- * values that could be URL strings
+ * determine whether a nested object of values has
+ * a string that contains `.dev.meetup.`
+ *
+ * @param {String|Object} value string or nested object
+ * with values that could be URL strings
+ *
  * @return {Boolean} whether the `value` contains a 'dev' URL string
  */
 export function checkForDevUrl(value) {
@@ -20,6 +22,7 @@ export function checkForDevUrl(value) {
 		case 'object':
 			return Object.keys(value).some(key => checkForDevUrl(value[key]));
 	}
+
 	return false;
 }
 
@@ -119,15 +122,16 @@ export function registerExtensionEvents(server) {
 /**
  * Make any environment changes that need to be made in response to the provided
  * config
- * @param {Object} config
- * @return {Object} the original config object
+ *
+ * @param {Object} config the environment configuration object
+ *
+ * @return null
  */
 export function configureEnv(config) {
 	// When using .dev.meetup endpoints, ignore self-signed SSL cert
 	const USING_DEV_ENDPOINTS = checkForDevUrl(config);
-	https.globalAgent.options.rejectUnauthorized = !USING_DEV_ENDPOINTS;
 
-	return config;
+	https.globalAgent.options.rejectUnauthorized = !USING_DEV_ENDPOINTS;
 }
 
 /**
@@ -136,11 +140,11 @@ export function configureEnv(config) {
 export function server(routes, connection, plugins, platform_agent, config) {
 	const server = new Hapi.Server();
 
-	// store runtime state - must modify existing server.app in order to keep
+	// store runtime state - must modify existing server.settings.app in order to keep
 	// previously-defined properties
 	// https://hapijs.com/api#serverapp
-	Object.assign(
-		server.app,
+	server.settings.app = Object.assign(
+		server.settings.app || {},
 		{ isDevConfig: checkForDevUrl(config) }, // indicates dev API or prod API
 		config
 	);
