@@ -8,6 +8,16 @@ import matchPath from 'react-router-dom/matchPath';
 // A type for mutating object an object asynchronously
 type Resolver<T> = (input: T) => Promise<T>;
 
+/*
+ * Determine whether the indexRoute or nested route should be considered the
+ * child route for a particular MatchedRoute
+ */
+export const getChildRoutes = (matchedRoute: MatchedRoute) => {
+	const { route, match } = matchedRoute;
+	const useIndex = match.isExact && (route.indexRoute || route.getIndexRoute);
+	return useIndex && route.indexRoute ? [route.indexRoute] : route.routes || [];
+};
+
 export const decodeParams = (params: Object) =>
 	Object.keys(params).reduce((decodedParams, key) => {
 		decodedParams[key] = params[key] && decodeURI(params[key]);

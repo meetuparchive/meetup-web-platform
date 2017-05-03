@@ -21,14 +21,14 @@ component tree, using `route` definitions that conform to the [type defined in
 
 ```js
 type PlatformRoute = {
-	component: React$Element<any>,
-	path?: string,
-	indexRoute?: PlatformRoute,
+  component: React$Element<any>,
+  path?: string,
+  indexRoute?: PlatformRoute,
   getIndexRoute?: () => Promise<PlatformRoute>,
-	routes?: () => Promise<Array<PlatformRoute>>,
+  routes?: () => Promise<Array<PlatformRoute>>,
   getNestedRoutes: 
-	query?: QueryFunction,
-	exact?: boolean,
+  query?: QueryFunction,
+  exact?: boolean,
 };
 ```
 
