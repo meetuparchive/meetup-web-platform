@@ -21,17 +21,16 @@ component tree, using `route` definitions that conform to the [type defined in
 
 ```js
 type PlatformRoute = {
-	component?: React$Element<any>,
-  load?: Promise<React$Element<any>,
+	component: React$Element<any>,
 	path?: string,
-	exact?: boolean,
-	query?: QueryFunction,
 	indexRoute?: PlatformRoute,
-	routes?: Array<PlatformRoute>,
+  getIndexRoute?: () => Promise<PlatformRoute>,
+	routes?: () => Promise<Array<PlatformRoute>>,
+  getNestedRoutes: 
+	query?: QueryFunction,
+	exact?: boolean,
 };
 ```
-
-_Note: either `load` **or** `component` must be defined_
 
 Route arrays will be rendered _exclusively_, in order, so overlapping routes
 should put the most specific route at the top of the `routes` array. Within app
@@ -40,22 +39,9 @@ v4 API](https://reacttraining.com/react-router/api). However, be aware that any
 navigation-based data fetching must be defined in this top-level `routes`
 configuration object passed to the app renderers.
 
-### `component` (synchronous)
+### `component`
 
 The React component that will be rendered when the route matches.
-
-### `load` (asynchronous)
-
-If you want the route component (and all its unique dependencies) to load
-asynchronously, specify a `load` function that returns a promise that will
-resolve with the component instance.
-
-```js
-const myAsyncRoute = {
-  path: '/foo',
-  load: () => import('./FooContainer').then(c => c.default), // ES6 modules will return the element at `.default`
-}
-```
 
 ### `path`
 
@@ -75,11 +61,38 @@ Only render the current route when the URL matches exactly
 
 This is a function that yeilds a [`Query` object](./Queries.md).
 
-### Index Route
+### `indexRoute` (synchronous)
 
 The `indexRoute` parameter is a pared-down `PlatformRoute` definition that
 contains just the `component` that should be rendered when the location/url
 matches the root `path` _exactly_.
+
+### `getIndexRoute` (asynchronous)
+
+A function that, when invoked, will return a Promise that resolves with a
+`Route` object. This can be used for code splitting by using `import()` to
+dynamically import a route to be used as the `exact` index root.
+
+### `routes`
+
+An array of 'child routes' that will be rendered as children of any parent
+routes. Child routes' `path` property will be concatenated with the parent
+`route`.
+
+### `getNestedRoutes` (asynchronous)
+
+A function that, when invoked, will return a Promise that resolves with a
+`routes` array. This can be used for code splitting by using `import()` to
+dynamically import a route subtree
+
+```js
+{
+  path: '/',
+  component: RootContainer,
+  getNestedRoutes: () => import('./childRoutes').then(r => r.default),
+}
+```
+
 
 ### 404 Not Found route
 
