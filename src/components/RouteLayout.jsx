@@ -3,27 +3,8 @@ import Switch from 'react-router-dom/Switch';
 import Route from 'react-router-dom/Route';
 import AsyncRoute from './AsyncRoute';
 
-const RouteWithSubRoutes = route => {
-	if (!route.component && !route.load) {
-		throw new Error(
-			`route for path ${JSON.stringify(route.path)} must have a 'component' property`
-		);
-	}
-	if (route.render || route.children) {
-		console.warn('route.render and route.children function not supported');
-	}
-	return (
-		<Route
-			path={route.path}
-			exact={route.exact || false}
-			strict={route.strict || false}
-			render={props => <AsyncRoute {...props} route={route} />}
-		/>
-	);
-};
-
 /**
- * @module RouteLayout
+ * @class RouteLayout
  */
 class RouteLayout extends React.Component {
 	render() {
@@ -36,7 +17,15 @@ class RouteLayout extends React.Component {
 						? route.path
 						: `${matchedPath}${route.path || ''}`;
 
-					return <RouteWithSubRoutes key={i} {...route} path={path} />;
+					return (
+						<Route
+							key={i}
+							path={path}
+							exact={route.exact || false}
+							strict={route.strict || false}
+							render={props => <AsyncRoute {...props} route={route} />}
+						/>
+					);
 				})}
 			</Switch>
 		);
