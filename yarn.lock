@@ -3385,9 +3385,9 @@ pinkie@^2.0.0:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/pinkie/-/pinkie-2.0.4.tgz#72556b80cfa0d48a974e80e77248e80ed4f7f870"
 
-pino@4.3.0, pino@^4.2.4:
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/pino/-/pino-4.3.0.tgz#67c5ef9ef9d39db1d28aa46c535262153574205a"
+pino@4.5.0, pino@^4.2.4:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/pino/-/pino-4.5.0.tgz#8f6cee446bc8b8cf8433bdf51f54cb1031e0682b"
   dependencies:
     chalk "^1.1.1"
     fast-json-parse "^1.0.0"
