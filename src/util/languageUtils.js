@@ -40,7 +40,8 @@ export const getLanguage = (
 	defaultLang = LANG_DEFAULT
 ) => {
 	// return the first language hit in the order of preference
-	supportedLangs.sort(l => l !== defaultLang);
+	// TODO - better comment
+	supportedLangs.unshift(defaultLang);
 	return (
 		getCookieLang(request, supportedLangs) ||
 		getUrlLang(request, supportedLangs) ||
