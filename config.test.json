@@ -1,0 +1,23 @@
+{
+  "api": {
+    "protocol": "https",
+    "host": "www.api.dev.meetup.com",
+    "timeout": 10,
+    "root_url": "https://www.api.dev.meetup.com"
+  },
+  "csrf_secret": "asdfasdfasdfasdfasdfasdfasdfasdf",
+  "cookie_encrypt_secret": "asdfasdfasdfasdfasdfasdfasdfasdf",
+  "dev_server": {
+    "host": "beta2.dev.meetup.com"
+  },
+  "duotone_urls": [
+    "http://example.com/duotone.jpg"
+  ],
+  "photo_scaler_salt": "asdfasdfasdfasdfasdfasdfasdfasdf",
+  "oauth": {
+    "auth_url": "https://secure.dev.meetup.com/oauth2/authorize",
+    "access_url": "https://secure.dev.meetup.com/oauth2/access",
+    "key": "asdfasdfasdfasdfasdfasdfasdfasdf",
+    "secret": "asdfasdfasdfasdfasdfasdfasdfasdf"
+  }
+}
