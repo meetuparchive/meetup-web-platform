@@ -21,12 +21,12 @@ export function requestAll(queries, meta) {
 	};
 }
 
-export const _applyMethod = method => query => {
+export const _applyMethod = method => (query, meta) => {
 	query.meta = {
 		...(query.meta || {}),
 		method,
 	};
-	return requestAll([query]);
+	return requestAll([query], meta);
 };
 
 export const get = _applyMethod('get');
