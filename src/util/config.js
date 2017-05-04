@@ -79,18 +79,6 @@ let config = convict({
 			default: '',
 		},
 	},
-	asset_server: {
-		host: {
-			format: String,
-			default: 'beta2.dev.meetup.com',
-			env: 'ASSET_SERVER_HOST',
-		},
-		port: {
-			format: 'port',
-			default: 8001,
-			env: 'ASSET_SERVER_PORT',
-		},
-	},
 	cookie_encrypt_secret: {
 		format: validateCookieSecret,
 		default: null,
@@ -175,9 +163,7 @@ config.set(
 );
 
 config.set('isProd', config.get('env') === 'production');
-
 config.set('isDev', config.get('env') === 'development');
-
 config.validate();
 
 export default config.getProperties();

@@ -31,9 +31,6 @@ describe('config', () => {
 		expect(config.api.host).toBeTruthy();
 		expect(config.api.timeout).toBeTruthy();
 		expect(config.api.root_url).toBeTruthy();
-		expect(config.asset_server).toBeTruthy();
-		expect(config.asset_server.host).toBeTruthy();
-		expect(config.asset_server.port).toBeTruthy();
 		expect(config.cookie_encrypt_secret).toBeTruthy();
 		expect(config.csrf_secret).toBeTruthy();
 		expect(config.dev_server).toBeTruthy();
