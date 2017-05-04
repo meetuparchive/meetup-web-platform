@@ -25,8 +25,8 @@ const altLang = 'fr-FR';
 const altLang2 = 'de-DE';
 const altLang3 = 'es-ES';
 const supportedLangs = [
-	similarToDefault,
 	defaultLang,
+	similarToDefault,
 	altLang,
 	altLang2,
 	altLang3,
