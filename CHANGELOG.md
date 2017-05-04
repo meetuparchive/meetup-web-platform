@@ -1,3 +1,11 @@
+## [2.5]
+
+- **Deprecated** `~/.mupweb.config` has been deprecated - node convict now
+  manages are configurations in `util/src/config.js`. To override any of the
+  default values in development, create a `config.development.json` file
+  with the name of the configuration and new value. This file is automatically
+  gitignored.
+
 ## [2.4]
 
 - **Deprecated** `renderers/browser-render.jsx` has been deprecated - consumer
