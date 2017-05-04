@@ -1,10 +1,10 @@
 ## [2.5]
 
 - **Deprecated** `~/.mupweb.config` has been deprecated - node convict now
-  manages are configurations in `util/src/config.js`. To override any of the
-  default values in development, create a `config.development.json` file
+  manages environment configurations in `util/src/config.js`. To override any
+  of the default values in development, create a `config.development.json` file
   with the name of the configuration and new value. This file is automatically
-  gitignored.
+  gitignored. See `config.test.json` for an example configuration.
 
 ## [2.4]
 
