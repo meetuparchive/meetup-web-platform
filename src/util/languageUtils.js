@@ -38,10 +38,17 @@ export const getLanguage = (
 	request,
 	supportedLangs,
 	defaultLang = LANG_DEFAULT
-) => getCookieLang(request, supportedLangs) ||
+) => {
+	// return the first language hit in the order of preference
+	// TODO - better comment
+	supportedLangs.unshift(defaultLang);
+	return (
+		getCookieLang(request, supportedLangs) ||
 		getUrlLang(request, supportedLangs) ||
 		getBrowserLang(request, supportedLangs) ||
-		defaultLang;
+		defaultLang
+	);
+};
 
 const makeRedirect = (reply, originalUrl) => redirectPathname =>
 	reply.redirect(url.format({ ...originalUrl, pathname: redirectPathname }));
