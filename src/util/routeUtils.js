@@ -26,8 +26,10 @@ export const getChildRoutes = (
 	matchedRoute: MatchedRoute
 ): Array<PlatformRoute> => {
 	const { route, match } = matchedRoute;
-	const useIndex = match.isExact && (route.indexRoute || route.getIndexRoute);
-	return useIndex && route.indexRoute ? [route.indexRoute] : route.routes || [];
+	if (match.isExact) {
+		return route.indexRoute ? [route.indexRoute] : [];
+	}
+	return route.routes || [];
 };
 
 /*
@@ -39,13 +41,15 @@ export const getChildRoutes = (
  */
 export const resolveChildRoutes = (
 	matchedRoute: MatchedRoute
-): Promise<Array<PlatformRoute>> =>
-	(matchedRoute.match.isExact &&
-		(matchedRoute.route.indexRoute || matchedRoute.route.getIndexRoute)
-		? resolveIndexRoute(matchedRoute).then(
-				m => (m.route.indexRoute ? [m.route.indexRoute] : [])
-			)
-		: resolveNestedRoutes(matchedRoute).then(m => m.route.routes || []));
+): Promise<Array<PlatformRoute>> => {
+	const { match } = matchedRoute;
+	if (match.isExact) {
+		return resolveIndexRoute(matchedRoute).then(
+			m => (m.route.indexRoute ? [m.route.indexRoute] : [])
+		);
+	}
+	return resolveNestedRoutes(matchedRoute).then(m => m.route.routes || []);
+};
 
 const resolveNestedRoutes: Resolver<MatchedRoute> = matchedRoute =>
 	(matchedRoute.route.getNestedRoutes
@@ -65,9 +69,9 @@ const resolveIndexRoute: Resolver<MatchedRoute> = matchedRoute =>
 
 /*
  * find all routes from a given array of route config objects that match the
- * supplied `url`
+ * supplied `location`
  *
- * this function matches the signature of `react-router-config`'s `resolveRouteMatches`
+ * this function matches the signature of `react-router-config`'s `_resolveRouteMatches`
  * function, but interprets all `route.path` settings as nested
  *
  * @see {@link https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config#matchroutesroutes-pathname}
@@ -76,10 +80,10 @@ const resolveIndexRoute: Resolver<MatchedRoute> = matchedRoute =>
  * Collect the return values of each query functions associated with the matched
  * routes, called with the provided location URL
  *
- * The function returned from calling `matchedRouteQueriesReducer` with a
+ * The function returned from calling `_matchedRouteQueriesReducer` with a
  * `location` should be used as the callback to an `array.reduce` call.
  */
-export const matchedRouteQueriesReducer = (location: URL) => (
+export const _matchedRouteQueriesReducer = (location: URL) => (
 	queries: Array<Query>,
 	{ route, match }: MatchedRoute
 ): Array<Query> => {
@@ -103,29 +107,29 @@ export const matchedRouteQueriesReducer = (location: URL) => (
  * Find all routes in the routes array that match the provided URL, including
  * nested routes that may be async
  */
-export const resolveRouteMatches = (
+const _resolveRouteMatches = (
 	routes: Array<PlatformRoute> = [],
-	url: string = '',
+	path: string = '',
 	matchedRoutes: Array<MatchedRoute> = [],
 	matchedPath: string = ''
 ): Promise<Array<MatchedRoute>> => {
-	const route = routes.find(r => matchPath(url, routePath(r, matchedPath))); // take the first match
+	const route = routes.find(r => matchPath(path, routePath(r, matchedPath))); // take the first match
 	if (!route) {
 		return Promise.resolve(matchedRoutes);
 	}
 
 	// add the route and its `match` object to the array of matched routes
 	const currentMatchedPath = routePath(route, matchedPath);
-	const match = matchPath(url, currentMatchedPath);
+	const match = matchPath(path, currentMatchedPath);
 	const currentMatchedRoutes = [...matchedRoutes, { route, match }];
 
 	// add any nested route matches
 	return resolveChildRoutes({ route, match }).then(
 		childRoutes =>
 			(childRoutes.length
-				? resolveRouteMatches(
+				? _resolveRouteMatches(
 						childRoutes,
-						url,
+						path,
 						currentMatchedRoutes,
 						currentMatchedPath
 					)
@@ -134,15 +138,15 @@ export const resolveRouteMatches = (
 };
 
 /*
- * An alternative, curried interface into `resolveRouteMatches`, using `baseUrl`
- * + `location` instead of `url`
+ * An curried interface into `_resolveRouteMatches`, using `baseUrl`
+ * + `location` instead of `path`
  */
 export const getRouteResolver = (
 	routes: Array<PlatformRoute>,
 	baseUrl: string
 ) => (location: URL): Promise<Array<MatchedRoute>> => {
-	const url = location.pathname.replace(baseUrl, '');
-	return resolveRouteMatches(routes, url);
+	const path = location.pathname.replace(baseUrl, '');
+	return _resolveRouteMatches(routes, path);
 };
 
 /*
@@ -152,10 +156,10 @@ export const getRouteResolver = (
 export const getMatchedQueries = (location: URL) => (
 	matchedRoutes: Array<MatchedRoute>
 ): Array<Query> =>
-	matchedRoutes.reduce(matchedRouteQueriesReducer(location), []);
+	matchedRoutes.reduce(_matchedRouteQueriesReducer(location), []);
 
 /*
- * A curried interface into `resolveRouteMatches` + `getMatchedQueries`
+ * A curried interface into `_resolveRouteMatches` + `getMatchedQueries`
  */
 export const activeRouteQueries = (
 	routes: Array<PlatformRoute>,
