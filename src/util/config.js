@@ -90,6 +90,11 @@ let config = convict({
 		env: 'CSRF_SECRET',
 	},
 	dev_server: {
+		protocol: {
+			format: validateProtocol,
+			default: 'http',
+			env: 'DEV_SERVER_PROTOCOL',
+		},
 		host: {
 			format: String,
 			default: 'beta2.dev.meetup.com',

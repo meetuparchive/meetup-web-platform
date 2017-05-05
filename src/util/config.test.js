@@ -34,6 +34,7 @@ describe('config', () => {
 		expect(config.cookie_encrypt_secret).toBeTruthy();
 		expect(config.csrf_secret).toBeTruthy();
 		expect(config.dev_server).toBeTruthy();
+		expect(config.dev_server.protocol).toBeTruthy();
 		expect(config.dev_server.host).toBeTruthy();
 		expect(config.dev_server.port).toBeTruthy();
 		expect(config.duotone_urls).toBeTruthy();
