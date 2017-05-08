@@ -2,7 +2,7 @@ const log = require('./logger').default;
 const MOCK_PUBSUB = {
 	topic: () => ({ publish: () => Promise.resolve() }),
 };
-const pubsub = process.env.GAE === 'true'
+const pubsub = process.env.GAE_INSTANCE // set by GAE, must be passed into Docker
 	? require('@google-cloud/pubsub')()
 	: MOCK_PUBSUB;
 const avro = require('avsc');
