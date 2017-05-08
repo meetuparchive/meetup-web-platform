@@ -67,17 +67,17 @@ The `indexRoute` parameter is a pared-down `PlatformRoute` definition that
 contains just the `component` that should be rendered when the location/url
 matches the root `path` _exactly_.
 
+### `routes` (synchronous)
+
+An array of 'child routes' that will be rendered as children of any parent
+routes. Child routes' `path` property will be concatenated with the parent
+`route`.
+
 ### `getIndexRoute` (asynchronous)
 
 A function that, when invoked, will return a Promise that resolves with a
 `Route` object. This can be used for code splitting by using `import()` to
 dynamically import a route to be used as the `exact` index root.
-
-### `routes`
-
-An array of 'child routes' that will be rendered as children of any parent
-routes. Child routes' `path` property will be concatenated with the parent
-`route`.
 
 ### `getNestedRoutes` (asynchronous)
 

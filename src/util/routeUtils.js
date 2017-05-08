@@ -83,7 +83,7 @@ const resolveIndexRoute: Resolver<MatchedRoute> = matchedRoute =>
  * The function returned from calling `_matchedRouteQueriesReducer` with a
  * `location` should be used as the callback to an `array.reduce` call.
  */
-export const _matchedRouteQueriesReducer = (location: URL) => (
+const _matchedRouteQueriesReducer = (location: URL) => (
 	queries: Array<Query>,
 	{ route, match }: MatchedRoute
 ): Array<Query> => {
