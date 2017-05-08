@@ -16,7 +16,7 @@
     "test": "yarn run flow && yarn run test:unit && yarn run test:integration -- --silent",
     "test:base": "jest --config jest.config.json",
     "test:integration": "NODE_ENV=test jest --config jest.int.config.json",
-    "test:unit": "NODE_ENV=test yarn test:base -- --silent --coverage",
+    "test:unit": "NODE_ENV=test yarn test:base",
     "test:watch": "yarn test:base -- --watch"
   },
   "repository": {
