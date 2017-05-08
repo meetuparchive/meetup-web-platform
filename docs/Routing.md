@@ -83,7 +83,7 @@ dynamically import a route to be used as the `exact` index root.
 
 A function that, when invoked, will return a Promise that resolves with a
 `routes` array. This can be used for code splitting by using `import()` to
-dynamically import a route subtree
+dynamically import a route subtree. 
 
 ```js
 {
@@ -93,6 +93,13 @@ dynamically import a route subtree
 }
 ```
 
+Be cautious with using async routes - they are very useful for splitting your
+app bundle into smaller chunks, but they also force the application to make two
+HTTP roundtrips when loading a new async chunk - one to get the route subtree,
+and another to fetch the API data defined in that subtree. In general, it's a
+good idea to use async routes near the root of your app so that it can be
+broken into large chunks but define the branches with synchronous routes that
+will be immediately parseable as the user navigates deeper into the application.
 
 ### 404 Not Found route
 
