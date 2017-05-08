@@ -1,4 +1,13 @@
+const log = require('./logger').default;
+const MOCK_PUBSUB = {
+	topic: () => ({ publish: () => Promise.resolve() }),
+};
+const pubsub = process.env.GAE === 'true'
+	? require('@google-cloud/pubsub')()
+	: MOCK_PUBSUB;
 const avro = require('avsc');
+
+const analyticsLog = pubsub.topic('analytics-log-json');
 
 // currently the schema is manually copied from
 // https://github.dev.meetup.com/meetup/meetup/blob/master/modules/base/src/main/versioned_avro/Click_v2.avsc
@@ -71,12 +80,22 @@ const avroSerializer = schema => data => {
 		schema: `gs://meetup-logs/avro_schemas/${schema.name}_${schema.doc}.avsc`,
 		date: timestamp.substr(0, 10), // YYYY-MM-DD
 	};
-	return `analytics=${JSON.stringify(analytics)}\n`;
+	return JSON.stringify(analytics);
 };
 
 const logger = serializer => record => {
 	const serializedRecord = serializer(record);
-	process.stdout.write(serializedRecord);
+	// raw stdout logger
+	process.stdout.write(`analytics=${serializedRecord}\n`);
+	// GAE logger
+	analyticsLog.publish(serializedRecord).then(
+		(messageIds, apiResponse) => {
+			if (messageIds) {
+				log.info({ messageIds }, 'GAE PubSub');
+			}
+		},
+		err => log.error(err)
+	);
 };
 
 const schemas = {
