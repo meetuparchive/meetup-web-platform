@@ -74,12 +74,28 @@ const avroSerializer = schema => data => {
 	return `analytics=${JSON.stringify(analytics)}\n`;
 };
 
+const logger = serializer => record => {
+	const serializedRecord = serializer(record);
+	process.stdout.write(serializedRecord);
+};
+
+const schemas = {
+	activity,
+	click,
+};
+const serializers = {
+	avro: avroSerializer,
+	activity: avroSerializer(schemas.activity),
+	click: avroSerializer(schemas.click),
+};
+const loggers = {
+	activity: logger(serializers.activity),
+	click: logger(serializers.click),
+};
+
 module.exports = {
 	avroSerializer,
-	activitySerializer: avroSerializer(activity),
-	clickSerializer: avroSerializer(click),
-	schemas: {
-		activity,
-		click,
-	},
+	serializers,
+	schemas,
+	loggers,
 };

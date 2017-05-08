@@ -5,7 +5,7 @@ import * as avro from './avro';
 
 const extractRecord = /^analytics=(.+?)\n$/;
 
-describe('avroSerializer', () => {
+describe('serializers.avro', () => {
 	it('encodes record of provided schema', () => {
 		const schema = {
 			type: 'record',
@@ -14,7 +14,7 @@ describe('avroSerializer', () => {
 				{ name: 'timestamp', type: 'string' },
 			],
 		};
-		const serializer = avro.avroSerializer(schema);
+		const serializer = avro.serializers.avro(schema);
 		const data = {
 			requestId: 'foo',
 			timestamp: new Date().getTime().toString(),
@@ -47,7 +47,7 @@ describe('Activity tracking', () => {
 	});
 
 	it('encodes standard output from logTrack', () => {
-		const serialized = avro.activitySerializer(trackInfo);
+		const serialized = avro.serializers.activity(trackInfo);
 
 		// parse stringified object
 		const valObj = JSON.parse(extractRecord.exec(serialized)[1]);
@@ -80,7 +80,7 @@ describe('Click tracking', () => {
 
 	it('encodes standard output from clickToClickRecord', () => {
 		const trackInfo = clickToClickRecord(request)(click);
-		const serialized = avro.clickSerializer(trackInfo);
+		const serialized = avro.serializers.click(trackInfo);
 
 		// parse stringified object
 		const valObj = JSON.parse(extractRecord.exec(serialized)[1]);

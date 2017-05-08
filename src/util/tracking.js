@@ -1,5 +1,5 @@
 import uuid from 'uuid';
-import { activitySerializer } from './avro';
+import { loggers } from './avro';
 import { parseMemberCookie } from './cookieUtils';
 
 const isProd = process.env.NODE_ENV === 'production';
@@ -136,7 +136,7 @@ export const logTrack = platformAgent => (response, trackInfo) => {
 		...trackInfo,
 	};
 
-	process.stdout.write(activitySerializer(record));
+	loggers.activity(record);
 	return record;
 };
 
