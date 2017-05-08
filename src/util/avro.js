@@ -1,13 +1,26 @@
 const log = require('./logger').default;
-const MOCK_PUBSUB = {
-	topic: () => ({ publish: () => Promise.resolve() }),
-};
-const pubsub = process.env.GAE_INSTANCE // set by GAE, must be passed into Docker
-	? require('@google-cloud/pubsub')()
-	: MOCK_PUBSUB;
 const avro = require('avsc');
 
-const analyticsLog = pubsub.topic('analytics-log-json');
+const getPlatformAnalyticsLog = () => {
+	if (process.env.GAE_INSTANCE) {
+		const pubsub = require('@google-cloud/pubsub')();
+		const analyticsLog = pubsub.topic('analytics-log-json');
+		return serializedRecord => {
+			analyticsLog.publish(serializedRecord).then(
+				(messageIds, apiResponse) => {
+					if (messageIds) {
+						log.info({ messageIds }, 'GAE PubSub');
+					}
+				},
+				err => log.error(err)
+			);
+		};
+	}
+	return serializedRecord =>
+		process.stdout.write(`analytics=${serializedRecord}\n`);
+};
+
+const analyticsLog = getPlatformAnalyticsLog();
 
 // currently the schema is manually copied from
 // https://github.dev.meetup.com/meetup/meetup/blob/master/modules/base/src/main/versioned_avro/Click_v2.avsc
@@ -85,17 +98,7 @@ const avroSerializer = schema => data => {
 
 const logger = serializer => record => {
 	const serializedRecord = serializer(record);
-	// raw stdout logger
-	process.stdout.write(`analytics=${serializedRecord}\n`);
-	// GAE logger
-	analyticsLog.publish(serializedRecord).then(
-		(messageIds, apiResponse) => {
-			if (messageIds) {
-				log.info({ messageIds }, 'GAE PubSub');
-			}
-		},
-		err => log.error(err)
-	);
+	analyticsLog(serializedRecord);
 };
 
 const schemas = {
