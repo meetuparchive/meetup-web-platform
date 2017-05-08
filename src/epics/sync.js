@@ -1,6 +1,8 @@
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/empty';
 import 'rxjs/add/observable/from';
 import 'rxjs/add/observable/fromPromise';
+import 'rxjs/add/observable/merge';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
@@ -16,7 +18,7 @@ import {
 	SERVER_RENDER,
 } from '../actions/syncActionCreators';
 import { clearClick } from '../actions/clickActionCreators';
-import { activeRouteQueries } from '../util/routeUtils';
+import { getRouteResolver, getMatchedQueries } from '../util/routeUtils';
 import { getDeprecatedSuccessPayload } from '../util/fetchUtils';
 
 const logoutQueryMatch = /[?&]logout(?:[=&]|$)/;
@@ -43,31 +45,33 @@ const logoutQueryMatch = /[?&]logout(?:[=&]|$)/;
  * @returns {Function} an Epic function that emits an API_REQUEST action
  */
 export const getNavEpic = (routes, baseUrl) => {
-	const findActiveQueries = activeRouteQueries(routes, baseUrl);
+	const resolveRoutes = getRouteResolver(routes, baseUrl);
 	let currentLocation = {}; // keep track of current route so that apiRequest can get 'referrer'
 	return (action$, store) =>
-		action$.ofType(LOCATION_CHANGE, SERVER_RENDER).mergeMap(({ payload }) => {
-			// inject request metadata from context, including `store.getState()`
-			const requestMetadata = {
-				referrer: currentLocation.pathname || '',
-				logout: logoutQueryMatch.test(payload.search),
-				clickTracking: store.getState().clickTracking,
-			};
-			// now that referrer has been recorded, set new currentLocation
-			currentLocation = payload;
+		action$
+			.ofType(LOCATION_CHANGE, SERVER_RENDER)
+			.mergeMap(({ payload: location }) => {
+				// inject request metadata from context, including `store.getState()`
+				const requestMetadata = {
+					referrer: currentLocation.pathname || '',
+					logout: logoutQueryMatch.test(location.search),
+					clickTracking: store.getState().clickTracking,
+				};
+				// now that referrer has been recorded, set new currentLocation
+				currentLocation = location;
 
-			const activeQueries = findActiveQueries(payload);
-			const actions = [api.requestAll(activeQueries, requestMetadata)];
+				const cacheAction$ = requestMetadata.logout
+					? Observable.of({ type: 'CACHE_CLEAR' })
+					: Observable.empty();
 
-			// emit cache clear _only_ when logout requested
-			if (requestMetadata.logout) {
-				actions.unshift({ type: 'CACHE_CLEAR' });
-			}
+				const apiAction$ = Observable.fromPromise(
+					resolveRoutes(location, baseUrl).then(getMatchedQueries(location))
+				).map(q => api.requestAll(q, requestMetadata));
 
-			actions.push(clearClick());
+				const clickAction$ = Observable.of(clearClick());
 
-			return Observable.from(actions);
-		});
+				return Observable.merge(cacheAction$, apiAction$, clickAction$);
+			});
 };
 
 /**

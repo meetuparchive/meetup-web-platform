@@ -42,7 +42,7 @@ export const getInitialState = (
 
 export function getBrowserCreateStore(routes, middleware = [], baseUrl) {
 	const middlewareToApply = [
-		catchMiddleware,
+		catchMiddleware(console.error),
 		getEpicMiddleware(routes, fetchQueries, baseUrl),
 		...middleware,
 		window.mupDevTools ? window.mupDevTools() : noopMiddleware, // must be last middleware
