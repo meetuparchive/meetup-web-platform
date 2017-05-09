@@ -1,4 +1,4 @@
-import { clickSerializer } from './avro';
+import { loggers } from './avro';
 import { parseMemberCookie } from './cookieUtils';
 
 const isProd = process.env.NODE_ENV === 'production';
@@ -34,9 +34,7 @@ export default function processClickTracking(request, reply) {
 
 	const cookieJSON = decodeURIComponent(cookieValue);
 	const { history } = JSON.parse(cookieJSON);
-	history
-		.map(clickToClickRecord(request))
-		.forEach(clickRecord => process.stdout.write(clickSerializer(clickRecord)));
+	history.map(clickToClickRecord(request)).forEach(loggers.click);
 
 	reply.unstate('click-track', clickCookieOptions);
 	return;

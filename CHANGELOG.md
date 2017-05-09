@@ -1,3 +1,10 @@
+## [2.6]
+
+- **New feature** Google App Engine PubSub tracking logs. To enable, consumer
+  apps must ensure that the `GAE_INSTANCE` environment variable is set in the
+  app container - GAE provides it automatically to the GAE runtime. Docs:
+  https://cloud.google.com/appengine/docs/flexible/nodejs/runtime#environment_variables
+
 ## [2.5]
 
 - **New feature** support for asyncronous routes (PR #266).

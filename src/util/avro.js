@@ -1,4 +1,26 @@
+const log = require('./logger').default;
 const avro = require('avsc');
+
+const getPlatformAnalyticsLog = (isGAE = process.env.GAE_INSTANCE) => {
+	if (isGAE) {
+		const pubsub = require('@google-cloud/pubsub')();
+		const analyticsLog = pubsub.topic('analytics-log-json');
+		return serializedRecord => {
+			analyticsLog.publish(serializedRecord).then(
+				(messageIds, apiResponse) => {
+					if (messageIds) {
+						log.info({ messageIds }, 'GAE PubSub');
+					}
+				},
+				err => log.error(err)
+			);
+		};
+	}
+	return serializedRecord =>
+		process.stdout.write(`analytics=${serializedRecord}\n`);
+};
+
+const analyticsLog = getPlatformAnalyticsLog();
 
 // currently the schema is manually copied from
 // https://github.dev.meetup.com/meetup/meetup/blob/master/modules/base/src/main/versioned_avro/Click_v2.avsc
@@ -71,15 +93,32 @@ const avroSerializer = schema => data => {
 		schema: `gs://meetup-logs/avro_schemas/${schema.name}_${schema.doc}.avsc`,
 		date: timestamp.substr(0, 10), // YYYY-MM-DD
 	};
-	return `analytics=${JSON.stringify(analytics)}\n`;
+	return JSON.stringify(analytics);
+};
+
+const logger = serializer => record => {
+	const serializedRecord = serializer(record);
+	analyticsLog(serializedRecord);
+};
+
+const schemas = {
+	activity,
+	click,
+};
+const serializers = {
+	avro: avroSerializer,
+	activity: avroSerializer(schemas.activity),
+	click: avroSerializer(schemas.click),
+};
+const loggers = {
+	activity: logger(serializers.activity),
+	click: logger(serializers.click),
 };
 
 module.exports = {
 	avroSerializer,
-	activitySerializer: avroSerializer(activity),
-	clickSerializer: avroSerializer(click),
-	schemas: {
-		activity,
-		click,
-	},
+	getPlatformAnalyticsLog,
+	schemas,
+	serializers,
+	loggers,
 };
