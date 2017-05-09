@@ -33,10 +33,10 @@ describe('config', () => {
 		expect(config.api.root_url).toBeTruthy();
 		expect(config.cookie_encrypt_secret).toBeTruthy();
 		expect(config.csrf_secret).toBeTruthy();
-		expect(config.dev_server).toBeTruthy();
-		expect(config.dev_server.protocol).toBeTruthy();
-		expect(config.dev_server.host).toBeTruthy();
-		expect(config.dev_server.port).toBeTruthy();
+		expect(config.app_server).toBeTruthy();
+		expect(config.app_server.protocol).toBeTruthy();
+		expect(config.app_server.host).toBeTruthy();
+		expect(config.app_server.port).toBeTruthy();
 		expect(config.duotone_urls).toBeTruthy();
 		expect(config.isDev).toBeDefined();
 		expect(config.isProd).toBeDefined();

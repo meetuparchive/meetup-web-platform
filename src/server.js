@@ -1,6 +1,6 @@
 import './util/globals';
 
-import defaultConfig from './util/config';
+import appConfig from './util/config';
 import getPlugins from './plugins';
 import getRoutes from './routes';
 
@@ -25,21 +25,20 @@ import { configureEnv, server } from './util/serverUtils';
  */
 export default function start(
 	renderRequestMap,
-	{ routes = [], plugins = [], platform_agent = 'consumer_name' },
-	config = defaultConfig
+	{ routes = [], plugins = [], platform_agent = 'consumer_name' }
 ) {
 	// source maps make for better stack traces
 	// we might not want this in production if it makes anything slower
 	require('source-map-support').install();
 
-	configureEnv(config);
+	configureEnv(appConfig);
 
 	const baseRoutes = getRoutes(renderRequestMap);
 	const finalRoutes = [...routes, ...baseRoutes];
 
 	const connection = {
 		host: '0.0.0.0',
-		port: config.dev_server.port,
+		port: appConfig.app_server.port,
 		routes: {
 			plugins: {
 				'electrode-csrf-jwt': {
@@ -51,5 +50,11 @@ export default function start(
 
 	const finalPlugins = [...plugins, ...getPlugins()];
 
-	return server(finalRoutes, connection, finalPlugins, platform_agent, config);
+	return server(
+		finalRoutes,
+		connection,
+		finalPlugins,
+		platform_agent,
+		appConfig
+	);
 }

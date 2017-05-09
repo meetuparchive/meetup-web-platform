@@ -5,10 +5,15 @@
     "timeout": 10,
     "root_url": "https://www.api.dev.meetup.com"
   },
+  "asset_server": {
+    "host": "beta2.dev.meetup.com",
+    "port": 8124
+  },
   "csrf_secret": "asdfasdfasdfasdfasdfasdfasdfasdf",
   "cookie_encrypt_secret": "asdfasdfasdfasdfasdfasdfasdfasdf",
-  "dev_server": {
-    "host": "beta2.dev.meetup.com"
+  "app_server": {
+    "host": "beta2.dev.meetup.com",
+    "port": 8123
   },
   "duotone_urls": [
     "http://example.com/duotone.jpg"

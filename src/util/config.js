@@ -5,8 +5,31 @@ import path from 'path';
 import { duotones, getDuotoneUrls } from './duotone';
 
 /**
+ * This module provides a single source of truth for application configuration
+ * info. It uses node-convict to read configuration info from, in increasing
+ * order of precedence:
+ *
+ * 1. Default value
+ * 2. File (`config.loadFile()`) - app root `config.<NODE_ENV>.json`
+ * 3. Environment variables
+ * 4. Command line arguments
+ * 5. Set and load calls (config.set() and config.load())
+ *
+ * Note that environment variables have _higher_ precedence than values in
+ * config files, so the config files will only work if environment variables
+ * are cleared.
+ *
+ * The only values that _must_ be in environment variables are the secrets that
+ * are used to interact with external systems:
+ *
+ * - `MUPWEB_OAUTH_SECRET`
+ * - `MUPWEB_OAUTH_KEY`
+ * - `PHOTO_SCALER_SALT`
+ *
  * @module config
  */
+
+const random32 = 'asdfasdfasdfasdfasdfasdfasdfasdf';
 
 export const PROTOCOL_ERROR = 'Protocol must be http or https';
 export const COOKIE_SECRET_ERROR =
@@ -79,31 +102,55 @@ let config = convict({
 			default: '',
 		},
 	},
+	asset_server: {
+		host: {
+			format: String,
+			default: 'beta2.dev.meetup.com',
+			env: 'ASSET_SERVER_HOST',
+		},
+		path: {
+			format: String,
+			default: '/static',
+			env: 'ASSET_PATH',
+		},
+		port: {
+			format: 'port',
+			default: 8001,
+			arg: 'asset-port',
+			env: 'ASSET_SERVER_PORT',
+		},
+	},
+	disable_hmr: {
+		format: Boolean,
+		default: false,
+		env: 'DISABLE_HMR',
+	},
 	cookie_encrypt_secret: {
 		format: validateCookieSecret,
-		default: null,
+		default: process.env.NODE_ENV !== 'production' && random32,
 		env: 'COOKIE_ENCRYPT_SECRET',
 	},
 	csrf_secret: {
 		format: validateCsrfSecret,
-		default: null,
+		default: process.env.NODE_ENV !== 'production' && random32,
 		env: 'CSRF_SECRET',
 	},
-	dev_server: {
+	app_server: {
 		protocol: {
 			format: validateProtocol,
 			default: 'http',
-			env: 'DEV_SERVER_PROTOCOL',
+			env: 'DEV_SERVER_PROTOCOL', // legacy naming
 		},
 		host: {
 			format: String,
 			default: 'beta2.dev.meetup.com',
-			env: 'DEV_SERVER_HOST',
+			env: 'DEV_SERVER_HOST', // legacy naming
 		},
 		port: {
 			format: 'port',
 			default: 8000,
-			env: 'DEV_SERVER_PORT',
+			arg: 'app-port',
+			env: 'DEV_SERVER_PORT', // legacy naming
 		},
 	},
 	duotone_urls: {

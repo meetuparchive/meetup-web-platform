@@ -47,7 +47,7 @@ const MOCK_SERVER_APP = {
 	},
 	cookie_encrypt_secret: 'asdfasdfasdfasdfasdfasdfasdfasdfasdf',
 	csrf_secret: 'asdfasdfasdfasdfasdfasdfasdfasdfasdf',
-	dev_server: {
+	app_server: {
 		host: '0.0.0.0',
 		port: 8000,
 	},
