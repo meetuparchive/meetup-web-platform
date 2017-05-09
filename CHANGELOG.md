@@ -1,9 +1,13 @@
-## [2.6]
+## [3.1]
 
 - **New feature** Google App Engine PubSub tracking logs. To enable, consumer
   apps must ensure that the `GAE_INSTANCE` environment variable is set in the
   app container - GAE provides it automatically to the GAE runtime. Docs:
   https://cloud.google.com/appengine/docs/flexible/nodejs/runtime#environment_variables
+
+## [3.0]
+- **Refactor** default locale is determined by first locale in list,
+  as specified in consuming repo's /src/util/locales.js
 
 ## [2.5]
 
