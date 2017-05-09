@@ -518,6 +518,14 @@ babel-plugin-check-es2015-constants@^6.22.0:
   dependencies:
     babel-runtime "^6.22.0"
 
+babel-plugin-dynamic-import-node@1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/babel-plugin-dynamic-import-node/-/babel-plugin-dynamic-import-node-1.0.1.tgz#2da67305da3cc34ad81b4490620cbd40e05f8c2c"
+  dependencies:
+    babel-plugin-syntax-dynamic-import "^6.18.0"
+    babel-template "^6.23.0"
+    babel-types "^6.23.0"
+
 babel-plugin-istanbul@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/babel-plugin-istanbul/-/babel-plugin-istanbul-4.0.0.tgz#36bde8fbef4837e5ff0366531a2beabd7b1ffa10"
@@ -934,7 +942,7 @@ babel-runtime@^6.18.0, babel-runtime@^6.22.0:
     core-js "^2.4.0"
     regenerator-runtime "^0.10.0"
 
-babel-template@^6.16.0, babel-template@^6.24.1:
+babel-template@^6.16.0, babel-template@^6.23.0, babel-template@^6.24.1:
   version "6.24.1"
   resolved "https://registry.yarnpkg.com/babel-template/-/babel-template-6.24.1.tgz#04ae514f1f93b3a2537f2a0f60a5a45fb8308333"
   dependencies:
@@ -2116,17 +2124,7 @@ growly@^1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/growly/-/growly-1.3.0.tgz#f10748cbe76af964b7c96c93c6bcc28af120c081"
 
-grpc@^1.2:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/grpc/-/grpc-1.3.1.tgz#c53601223fb32569252bb86a63f8a1d7face3fa5"
-  dependencies:
-    arguejs "^0.2.3"
-    lodash "^4.15.0"
-    nan "^2.0.0"
-    node-pre-gyp "^0.6.0"
-    protobufjs "^5.0.0"
-
-grpc@~1.2.4:
+grpc@^1.2, grpc@~1.2.4:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/grpc/-/grpc-1.2.4.tgz#ef0c8c708245d8fc797e39aa330dce409b3dd03c"
   dependencies:

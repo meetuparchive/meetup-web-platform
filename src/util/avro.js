@@ -1,8 +1,8 @@
 const log = require('./logger').default;
 const avro = require('avsc');
 
-const getPlatformAnalyticsLog = () => {
-	if (process.env.GAE_INSTANCE) {
+const getPlatformAnalyticsLog = (isGAE = process.env.GAE_INSTANCE) => {
+	if (isGAE) {
 		const pubsub = require('@google-cloud/pubsub')();
 		const analyticsLog = pubsub.topic('analytics-log-json');
 		return serializedRecord => {
@@ -117,7 +117,8 @@ const loggers = {
 
 module.exports = {
 	avroSerializer,
-	serializers,
+	getPlatformAnalyticsLog,
 	schemas,
+	serializers,
 	loggers,
 };

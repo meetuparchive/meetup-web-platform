@@ -8,7 +8,7 @@ describe('catchMiddleware', () => {
 		const errorThrower = () => {
 			throw theError;
 		};
-		const receivedError = catchMiddleware()(errorThrower)({});
+		const receivedError = catchMiddleware(console.error)()(errorThrower)({});
 		expect(console.error).toHaveBeenCalled();
 		expect(receivedError).toBe(theError);
 	});
@@ -17,7 +17,7 @@ describe('catchMiddleware', () => {
 
 		const action = { foo: 'bar' };
 		const next = x => x;
-		const receivedError = catchMiddleware()(next)(action);
+		const receivedError = catchMiddleware(console.error)()(next)(action);
 		expect(console.error).not.toHaveBeenCalled();
 		expect(receivedError).toBe(next(action));
 	});
