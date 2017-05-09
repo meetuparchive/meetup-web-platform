@@ -11,6 +11,8 @@ const avro = require('avsc');
  * The Pub/Sub setup _only_ works when the environment is configured to
  * automatically authorize Pub/Sub messages, so we use an `isGAE` env variable
  * to determine whether the app is running in GAE.
+ *
+ * @see https://meetup.atlassian.net/wiki/display/MUP/Analytics+Logging#AnalyticsLogging-Theinputmechanism
  */
 const getPlatformAnalyticsLog = (
 	isGAE: ?string = process.env.GAE_INSTANCE
