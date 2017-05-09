@@ -1,3 +1,11 @@
+## [3.1]
+
+- **Deprecated** `~/.mupweb.config` has been deprecated - node convict now
+  manages environment configurations in `util/src/config.js`. To override any
+  of the default values in development, create a `config.development.json` file
+  with the name of the configuration and new value. This file is automatically
+  gitignored. See `config.test.json` for an example configuration.
+
 ## [3.0]
 - **Refactor** default locale is determined by first locale in list,
   as specified in consuming repo's /src/util/locales.js
