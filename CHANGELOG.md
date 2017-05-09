@@ -1,10 +1,21 @@
-## [2.5]
+## [3.1]
 
 - **Deprecated** `~/.mupweb.config` has been deprecated - node convict now
   manages environment configurations in `util/src/config.js`. To override any
   of the default values in development, create a `config.development.json` file
   with the name of the configuration and new value. This file is automatically
   gitignored. See `config.test.json` for an example configuration.
+
+## [3.0]
+- **Refactor** default locale is determined by first locale in list,
+  as specified in consuming repo's /src/util/locales.js
+
+## [2.5]
+
+- **New feature** support for asyncronous routes (PR #266).
+  [Docs](docs/Routing.md#load-asynchronous). Note the new `resolveAppProps`
+  helper that allows the browser script to delay rendering until async routes
+  are resolved - [rendering docs here](docs/Rendering#browser-rendering).
 
 ## [2.4]
 

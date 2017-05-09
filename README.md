@@ -17,6 +17,8 @@ In general, application-specific code will live outside of this package.
 - [Auth flow from `requestAuthPlugin`](docs/auth.md)
 - [API requests through api-proxy](docs/api-proxy.md)
 - ['Query': structuring data dependencies](docs/Queries.md)
+- [Rendering in consumer applications](docs/Rendering.md)
+- [Routing configuration](docs/Routing.md)
 
 # Usage
 

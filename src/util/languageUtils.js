@@ -4,8 +4,6 @@ import Accepts from 'accepts';
 
 import { LANGUAGE_COOKIE } from './cookieUtils';
 
-export const LANG_DEFAULT = 'en-US';
-
 export const getCookieLang = (request, supportedLangs) => {
 	const cookie = request.state[LANGUAGE_COOKIE];
 	if (!cookie) {
@@ -34,18 +32,12 @@ export const getBrowserLang = (request, supportedLangs) => {
 	return Accepts(request).language(supportedLangs);
 };
 
-export const getLanguage = (
-	request,
-	supportedLangs,
-	defaultLang = LANG_DEFAULT
-) => {
+export const getLanguage = (request, supportedLangs) => {
 	// return the first language hit in the order of preference
-	supportedLangs.sort(l => l !== defaultLang);
 	return (
 		getCookieLang(request, supportedLangs) ||
 		getUrlLang(request, supportedLangs) ||
-		getBrowserLang(request, supportedLangs) ||
-		defaultLang
+		getBrowserLang(request, supportedLangs)
 	);
 };
 
@@ -56,15 +48,13 @@ export const checkLanguageRedirect = (
 	request,
 	reply,
 	requestLanguage,
-	supportedLangs,
-	defaultLang = LANG_DEFAULT
+	supportedLangs
 ) => {
-	// ensure defaultLang is first in supportedLangs
-	supportedLangs.sort(l => l !== defaultLang);
 	const originalPath = request.url.pathname;
 	const firstPathComponent = originalPath.split('/')[1];
 	const redirect = makeRedirect(reply, request.url);
-	if (requestLanguage === defaultLang) {
+	// first listed locale is default
+	if (requestLanguage === supportedLangs[0]) {
 		// ensure that we are serving from un-prefixed URL
 		if (supportedLangs.includes(firstPathComponent)) {
 			request.log(
