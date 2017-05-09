@@ -1,11 +1,24 @@
+// @flow
 const log = require('./logger').default;
 const avro = require('avsc');
 
-const getPlatformAnalyticsLog = (isGAE = process.env.GAE_INSTANCE) => {
+/*
+ * There are currently 2 distinct analytics logging methods
+ * 1. `stdout`, which will be consumed automatically from apps running in
+ *    Google Container Engine
+ * 2. Google Pub/Sub, which is used from inside Google App Engine
+ *
+ * The Pub/Sub setup _only_ works when the environment is configured to
+ * automatically authorize Pub/Sub messages, so we use an `isGAE` env variable
+ * to determine whether the app is running in GAE.
+ */
+const getPlatformAnalyticsLog = (
+	isGAE: ?string = process.env.GAE_INSTANCE
+): (string => void) => {
 	if (isGAE) {
 		const pubsub = require('@google-cloud/pubsub')();
 		const analyticsLog = pubsub.topic('analytics-log-json');
-		return serializedRecord => {
+		return (serializedRecord: string) => {
 			analyticsLog.publish(serializedRecord).then(
 				(messageIds, apiResponse) => {
 					if (messageIds) {
@@ -16,8 +29,9 @@ const getPlatformAnalyticsLog = (isGAE = process.env.GAE_INSTANCE) => {
 			);
 		};
 	}
-	return serializedRecord =>
+	return (serializedRecord: string) => {
 		process.stdout.write(`analytics=${serializedRecord}\n`);
+	};
 };
 
 const analyticsLog = getPlatformAnalyticsLog();
@@ -79,12 +93,9 @@ const activity = {
 	],
 };
 
-/**
- * @param {Object} schema an avro JSON schema (.avsc)
- * @param {Object} data the data matching the schema.
- * @return {String} JSON string of the avro-encoded record wrapped with metadata
- */
-const avroSerializer = schema => data => {
+type Serializer = Object => string;
+
+const avroSerializer: Object => Serializer = schema => data => {
 	const record = avro.parse(schema).toBuffer(data);
 	// data.timestamp _must_ be ISOString if it exists
 	const timestamp = data.timestamp || new Date().toISOString();
@@ -96,7 +107,7 @@ const avroSerializer = schema => data => {
 	return JSON.stringify(analytics);
 };
 
-const logger = serializer => record => {
+const logger = (serializer: Serializer) => (record: Object) => {
 	const serializedRecord = serializer(record);
 	analyticsLog(serializedRecord);
 };
