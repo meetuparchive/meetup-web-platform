@@ -1,3 +1,7 @@
+## [3.0]
+- **Refactor** default locale is determined by first locale in list,
+  as specified in consuming repo's /src/util/locales.js
+
 ## [2.5]
 
 - **New feature** support for asyncronous routes (PR #266).
