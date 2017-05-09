@@ -143,11 +143,7 @@ export function server(routes, connection, plugins, platform_agent, config) {
 	// store runtime state - must modify existing server.settings.app in order to keep
 	// previously-defined properties
 	// https://hapijs.com/api#serverapp
-	server.settings.app = Object.assign(
-		server.settings.app || {},
-		{ isDevConfig: checkForDevUrl(config) }, // indicates dev API or prod API
-		config
-	);
+	server.settings.app = Object.assign(server.settings.app || {}, config);
 
 	server.decorate('reply', 'track', track(platform_agent));
 
