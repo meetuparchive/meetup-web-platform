@@ -21,7 +21,7 @@ export function requestAll(queries, meta) {
 	};
 }
 
-export const _applyMethod = method => (query, meta) => {
+const _applyMethod = method => (query, meta) => {
 	query.meta = {
 		...(query.meta || {}),
 		method,

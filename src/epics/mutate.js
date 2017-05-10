@@ -29,7 +29,13 @@ import 'rxjs/add/operator/filter';
  * @module MutateEpic
  */
 
-const getMethodEpic = method => action$ =>
+/*
+ * Delegate method-specific request actions (e.g. 'POST_MY_FORM') to the sync
+ * middleware by modifying the request actions' query payloads to include
+ * request method properties
+ * @deprecated
+ */
+const _getMethodEpic = method => action$ =>
 	action$
 		.filter(
 			({ type }) =>
@@ -56,5 +62,5 @@ https://github.com/meetup/meetup-web-platform/blob/master/docs/Queries.md#recipe
 			return api[actionCreator](query, meta);
 		});
 
-export const postEpic = getMethodEpic('post');
-export const deleteEpic = getMethodEpic('delete');
+export const postEpic = _getMethodEpic('post');
+export const deleteEpic = _getMethodEpic('delete');
