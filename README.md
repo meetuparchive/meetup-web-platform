@@ -15,35 +15,12 @@ In general, application-specific code will live outside of this package.
 # Docs
 
 - [API requests through api-proxy](docs/api-proxy.md)
+- [App configuration management](docs/Config.md)
 - [Auth flow from `requestAuthPlugin`](docs/auth.md)
 - [Analytics/tracking](docs/Tracking.md)
 - ['Query': structuring data dependencies](docs/Queries.md)
 - [Rendering in consumer applications](docs/Rendering.md)
 - [Routing configuration](docs/Routing.md)
-
-# Usage
-
-## Environment
-
-The platform code uses [node-convict](https://github.com/mozilla/node-convict)
-for configuration management in `src/util/config.js`. All
-development defaults are set within `config.js` but can be overwritten 
-with a root directory `config.dev.json` that is gitignored.
-
-For example, if you want to use the production api in dev, 
-create the following `config.dev.json` file:
-
-```
-{
-  "api": {
-    "host": "www.api.meetup.com",
-  },
-  "oauth": {
-    "auth_url": "https://secure.meetup.com/oauth2/authorize",
-    "access_url": "https://secure.meetup.com/oauth2/access",
-  }
-}
-```
 
 # Releases
 
