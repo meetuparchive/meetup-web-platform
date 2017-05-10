@@ -217,6 +217,5 @@ config.set(
 config.set('isProd', config.get('env') === 'production');
 config.set('isDev', config.get('env') === 'development');
 config.validate();
-process.stdout.write(JSON.stringify(config.getProperties(), null, 2));
 
 export default config.getProperties();

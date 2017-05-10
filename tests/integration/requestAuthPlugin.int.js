@@ -92,7 +92,7 @@ describe('logged-in member state', () => {
 	});
 });
 
-describe('logged-out member state', () => {
+describe.skip('logged-out member state', () => {
 	// anonymous auth provides oauth_token
 	it('Passes oauth_token value as request credentials', () => {
 		const cookies = {
