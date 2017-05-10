@@ -1,7 +1,7 @@
 import querystring from 'querystring';
 import Boom from 'boom';
 import rison from 'rison';
-import { getCsrfHeaders, mockConfig } from '../mocks';
+import { getCsrfHeaders } from '../mocks';
 import start from '../../src/server';
 import * as apiProxyHandler from '../../src/apiProxy/apiProxyHandler';
 
@@ -36,11 +36,7 @@ const mockPostPayload = {
 	queries: rison.encode_array([mockQuery]),
 };
 
-const runTest = (
-	test,
-	payload = mockPostPayload,
-	csrfHeaders = getCsrfHeaders
-) => server =>
+const runTest = (test, csrfHeaders = getCsrfHeaders) => server =>
 	csrfHeaders()
 		.then(([headerToken, cookieToken]) => {
 			const headers = {
@@ -51,7 +47,7 @@ const runTest = (
 			const request = {
 				method: 'post',
 				url: '/mu_api',
-				payload: querystring.stringify(payload),
+				payload: querystring.stringify(mockPostPayload),
 				credentials: 'whatever',
 				headers,
 			};
@@ -76,7 +72,7 @@ describe('API proxy POST endpoint integration tests', () => {
 
 		const test = response => expect(spyable.handler).toHaveBeenCalled();
 
-		return start({}, {}, mockConfig).then(runTest(test));
+		return start({}, {}).then(runTest(test));
 	});
 	it('returns a formatted array of responses from POST /mu_api', () => {
 		const expectedResponse = {
@@ -95,7 +91,7 @@ describe('API proxy POST endpoint integration tests', () => {
 		const test = response =>
 			expect(JSON.parse(response.payload)).toEqual(expectedResponse);
 
-		return start({}, {}, mockConfig).then(runTest(test));
+		return start({}, {}).then(runTest(test));
 	});
 	it('return a an object with an error key when CSRF is invalid', () => {
 		const expectedPayload = JSON.stringify(
@@ -105,8 +101,6 @@ describe('API proxy POST endpoint integration tests', () => {
 		const csrfHeaders = () =>
 			getCsrfHeaders().then(([cookieToken, headerToken]) => [cookieToken, '']);
 
-		return start({}, {}, mockConfig).then(
-			runTest(test, mockConfig, csrfHeaders)
-		);
+		return start({}, {}).then(runTest(test, csrfHeaders));
 	});
 });
