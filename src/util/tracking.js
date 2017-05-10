@@ -1,6 +1,6 @@
 import uuid from 'uuid';
 import config from './config';
-import { activitySerializer } from './avro';
+import avro from './avro';
 import { parseMemberCookie } from './cookieUtils';
 
 const YEAR_IN_MS = 1000 * 60 * 60 * 24 * 365;
@@ -137,7 +137,7 @@ export const logTrack = platformAgent => (response, trackInfo) => {
 		...trackInfo,
 	};
 
-	process.stdout.write(activitySerializer(record));
+	avro.loggers.activity(record);
 	return record;
 };
 
