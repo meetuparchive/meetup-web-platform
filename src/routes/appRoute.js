@@ -16,7 +16,7 @@ export const onPreResponse = {
 	 */
 	method: (request, reply) => {
 		const response = request.response;
-		if (!response.isBoom || process.env.NODE_ENV === 'production') {
+		if (!response.isBoom || request.server.settings.app.isProd) {
 			return reply.continue();
 		}
 		const error = response;

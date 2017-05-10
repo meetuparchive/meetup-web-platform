@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import { MEMBER_COOKIE } from './cookieUtils';
 
 /**
  * @module authUtils
@@ -74,17 +75,12 @@ export function validateSecret(secret) {
 	return value;
 }
 
-export const getMemberCookieName = server =>
-	(server.app.isDevConfig ? 'MEETUP_MEMBER_DEV' : 'MEETUP_MEMBER');
-
 /**
  * apply default cookie options for auth-related cookies
  */
 export const configureAuthCookies = server => {
-	const password = validateSecret(
-		server.plugins.requestAuth.config.COOKIE_ENCRYPT_SECRET
-	);
-	const isSecure = process.env.NODE_ENV === 'production';
+	const password = validateSecret(server.settings.app.cookie_encrypt_secret);
+	const isSecure = server.settings.app.isProd;
 	const authCookieOptions = {
 		encoding: 'iron',
 		password,
@@ -95,7 +91,7 @@ export const configureAuthCookies = server => {
 	};
 	server.state('oauth_token', authCookieOptions);
 	server.state('refresh_token', authCookieOptions);
-	server.state(getMemberCookieName(server), { isSecure, isHttpOnly: true });
+	server.state(MEMBER_COOKIE, { isSecure, isHttpOnly: true });
 };
 
 export const setPluginState = (request, reply) => {

@@ -1,12 +1,11 @@
-import { loggers } from './avro';
+import avro from './avro';
+import config from './config';
 import { parseMemberCookie } from './cookieUtils';
 
-const isProd = process.env.NODE_ENV === 'production';
-
 export const clickCookieOptions = {
-	isSecure: isProd,
+	isSecure: config.isProd,
 	isHttpOnly: false,
-	domain: `${isProd ? '' : '.dev'}.meetup.com`,
+	domain: `${config.isProd ? '' : '.dev'}.meetup.com`,
 };
 
 export const clickToClickRecord = request => click => {
@@ -34,7 +33,7 @@ export default function processClickTracking(request, reply) {
 
 	const cookieJSON = decodeURIComponent(cookieValue);
 	const { history } = JSON.parse(cookieJSON);
-	history.map(clickToClickRecord(request)).forEach(loggers.click);
+	history.map(clickToClickRecord(request)).forEach(avro.loggers.click);
 
 	reply.unstate('click-track', clickCookieOptions);
 	return;

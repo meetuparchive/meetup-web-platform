@@ -10,6 +10,7 @@ import {
 	MOCK_MEANINGLESS_ACTION,
 	MOCK_APP_STATE,
 } from 'meetup-web-mocks/lib/app';
+import appConfig from './config';
 
 export const MOCK_LOGGER = {
 	debug: jest.fn(),
@@ -29,7 +30,7 @@ export const createFakeStore = fakeData => ({
 export const middlewareDispatcher = middleware => (storeData, action) => {
 	let dispatched = null;
 	const dispatch = middleware(createFakeStore(storeData))(
-		actionAttempt => dispatched = actionAttempt
+		actionAttempt => (dispatched = actionAttempt)
 	);
 	dispatch(action);
 	return dispatched;
@@ -46,13 +47,13 @@ export const parseCookieHeader = cookieHeader => {
 	);
 };
 
-export const getServer = app => {
+export const getServer = () => {
 	const server = new Hapi.Server();
-	server.connection();
+	server.connection({ port: 0 });
 	server.app = {
-		...app,
 		logger: MOCK_LOGGER,
 	};
+	server.settings.app = appConfig;
 
 	// mock the anonAuthPlugin
 	server.decorate(
