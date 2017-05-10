@@ -1,4 +1,12 @@
-## [3.1]
+## [3.2]
+
+- **Deprecated** `~/.mupweb.config` has been deprecated - node convict now
+  manages environment configurations in `util/src/config.js`. To override any
+  of the default values in development, create a `config.development.json` file
+  with the name of the configuration and new value. This file is automatically
+  gitignored. See `config.test.json` for an example configuration.
+
+# [3.1]
 
 - **New feature** Google App Engine PubSub tracking logs. To enable, consumer
   apps must ensure that the `GAE_INSTANCE` environment variable is set in the

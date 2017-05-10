@@ -15,47 +15,12 @@ In general, application-specific code will live outside of this package.
 # Docs
 
 - [API requests through api-proxy](docs/api-proxy.md)
+- [App configuration management](docs/Config.md)
 - [Auth flow from `requestAuthPlugin`](docs/auth.md)
 - [Analytics/tracking](docs/Tracking.md)
 - ['Query': structuring data dependencies](docs/Queries.md)
 - [Rendering in consumer applications](docs/Rendering.md)
 - [Routing configuration](docs/Routing.md)
-
-# Usage
-
-## Environment
-
-Platform configuration is read from environment variables, which must be
-declared in `.mupweb.config` in your home directory (i.e.
-`$HOME/.mupweb.config`) in the following format:
-
-```
-API_HOST=api.meetup.com
-API_PROTOCOL=https
-DEV_SERVER_PORT=8000
-ASSET_SERVER_HOST=0.0.0.0
-ASSET_SERVER_PORT=8001
-OAUTH_AUTH_URL=https://secure.meetup.com/oauth2/authorize
-OAUTH_ACCESS_URL=https://secure.meetup.com/oauth2/access
-MUPWEB_OAUTH_KEY=<check with an admin>
-MUPWEB_OAUTH_SECRET=<check with an admin>
-PHOTO_SCALER_SALT='<check with admin>'  # single quotes are required
-CSRF_SECRET='<any random string over 32 characters long>'
-COOKIE_ENCRYPT_SECRET='<any random string over 32 characters long>'
-```
-
-**Note**: you _can_ use `dev.meetup.com` URLs for `API_HOST`, `OAUTH_AUTH_URL`,
-and `OAUTH_ACCESS_URL`, but you will need to ensure that your devbox is up and
-running with a recent build of Meetup classic.
-
-To automatically add these env variables into your terminal session,
-`source` the config file in your `.bashrc` or `.zshrc`:
-
-```
-set -a  # auto-export all subequent env variable assignments
-source $HOME/.mupweb.config
-set +a  # turn off auto-export of env variables
-```
 
 # Releases
 

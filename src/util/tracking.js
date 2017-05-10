@@ -1,19 +1,20 @@
 import uuid from 'uuid';
-import { loggers } from './avro';
+import config from './config';
+import avro from './avro';
 import { parseMemberCookie } from './cookieUtils';
-
-const isProd = process.env.NODE_ENV === 'production';
 
 const YEAR_IN_MS = 1000 * 60 * 60 * 24 * 365;
 const COOKIE_OPTS = {
 	encoding: 'none',
 	path: '/',
 	isHttpOnly: true,
-	isSecure: isProd,
+	isSecure: config.isProd,
 };
 
-export const TRACK_ID_COOKIE = isProd ? 'TRACK_ID' : 'TRACK_ID_DEV';
-export const SESSION_ID_COOKIE = isProd ? 'SESSION_ID' : 'SESSION_ID_DEV';
+export const TRACK_ID_COOKIE = config.isProd ? 'TRACK_ID' : 'TRACK_ID_DEV';
+export const SESSION_ID_COOKIE = config.isProd
+	? 'SESSION_ID'
+	: 'SESSION_ID_DEV';
 
 /**
  * @method newSessionId
@@ -136,7 +137,7 @@ export const logTrack = platformAgent => (response, trackInfo) => {
 		...trackInfo,
 	};
 
-	loggers.activity(record);
+	avro.loggers.activity(record);
 	return record;
 };
 
