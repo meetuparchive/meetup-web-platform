@@ -91,7 +91,13 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 	fetchUrl.searchParams.append('queries', rison.encode_array(queries));
 
 	if (meta) {
-		const { clickTracking, logout, ...metadata } = meta;
+		const {
+			clickTracking,
+			logout,
+			onSuccess, // eslint-disable-line no-unused-vars
+			onError, // eslint-disable-line no-unused-vars
+			...metadata
+		} = meta;
 
 		if (clickTracking) {
 			BrowserCookies.set('click-track', JSON.stringify(clickTracking), {
@@ -107,9 +113,10 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 		}
 
 		// send other metadata in searchParams
-		if (Object.keys(metadata).length) {
+		const encodedMetadata = metadata && rison.encode_object(metadata);
+		if (encodedMetadata) {
 			// send other metadata in searchParams
-			fetchUrl.searchParams.append('metadata', rison.encode_object(metadata));
+			fetchUrl.searchParams.append('metadata', encodedMetadata);
 		}
 	}
 
@@ -157,7 +164,8 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
  */
 export const fetchQueries = apiUrl => (queries, meta) => {
 	if (
-		typeof window === 'undefined' && typeof test === 'undefined' // not in browser // not in testing env (global set by Jest)
+		typeof window === 'undefined' &&
+		typeof test === 'undefined' // not in browser // not in testing env (global set by Jest)
 	) {
 		throw new Error('fetchQueries was called on server - cannot continue');
 	}
