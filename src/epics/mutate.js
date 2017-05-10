@@ -1,15 +1,7 @@
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/observable/from';
-import 'rxjs/add/observable/fromPromise';
-import 'rxjs/add/operator/catch';
+import * as api from '../actions/apiActionCreators';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/filter';
-import 'rxjs/add/operator/mergeMap';
-import { apiSuccess, apiError } from '../actions/syncActionCreators';
-import * as api from '../actions/apiActionCreators';
-import { getDeprecatedSuccessPayload } from '../util/fetchUtils';
 
 /**
  * Mutate epic  provides a generic interface for triggering POST and DELETE requests
@@ -37,65 +29,22 @@ import { getDeprecatedSuccessPayload } from '../util/fetchUtils';
  * @module MutateEpic
  */
 
-/**
- * get a function that receives a mutation-specific action and returns the
- * corresponding fetch Promise
- *
- * The wrapping function needs current app state in order to apply correct
- * config
- *
- * @param {String} method the desirect HTTP method ('post', 'delete', 'patch')
- * @param {Object} { apiUrl } from state.config
- * @param {Object} postAction, providing query, onSuccess, and onError
- * @return {Promise} results of the fetch, either onSuccess or onError
+/*
+ * Delegate method-specific request actions (e.g. 'POST_MY_FORM') to the sync
+ * middleware by modifying the request actions' query payloads to include
+ * request method properties
+ * @deprecated
  */
-const getMethodQueryFetch = (method, fetchQueries, store) => query => {
-	// force presence of meta.method
-	query.meta = { ...(query.meta || {}), method };
-	const { config: { apiUrl } } = store.getState();
-	return fetchQueries(apiUrl)([query]);
-};
-
-/**
- * Make the mutation call to the API and send the responses to the appropriate
- * places
- *
- * 1. Always send successful mutation responses to API_SUCCESS action
- * 2. If mutation action has an 'onSuccess' action creators, send successful
- *    responses there as well
- * 3. Failed mutation responses will be sent to the mutation action's `onError`
- */
-const doFetch$ = fetchQuery => ({ query, onSuccess, onError }) =>
-	Observable.fromPromise(fetchQuery(query)) // make the fetch call
-		.mergeMap(({ successes, errors }) => {
-			const responses = getDeprecatedSuccessPayload(successes, errors);
-			const actions = [
-				...successes.map(api.success), // send the successes to success
-				...errors.map(api.error), // send errors to error
-				apiSuccess(responses),
-			];
-			if (onSuccess) {
-				actions.push(onSuccess(responses));
-			}
-			return Observable.from(actions);
-		})
-		.catch(err => {
-			const actions = [api.fail(err), apiError(err)];
-			if (onError) {
-				actions.push(onError(err));
-			}
-			return Observable.from(actions);
-		});
-
-const getMethodEpic = method => fetchQueries => (action$, store) =>
+const _getMethodEpic = method => action$ =>
 	action$
 		.filter(
 			({ type }) =>
 				type.endsWith(`_${method.toUpperCase()}`) ||
 				type.startsWith(`${method.toUpperCase()}_`)
 		)
-		.do(({ type, payload: { query: { endpoint } } }) => {
-			if (endpoint.indexOf('.dev.') > -1) {
+		.do(({ type }) => {
+			// Webpack will make sure process.env.NODE_ENV is populated on client
+			if (process.env.NODE_ENV !== 'production') {
 				// using a dev endpoint, render a deprecation warning
 				console.warn(
 					`This application is using Post/Delete middleware through ${type}.
@@ -104,8 +53,14 @@ https://github.com/meetup/meetup-web-platform/blob/master/docs/Queries.md#recipe
 				);
 			}
 		})
-		.map(({ payload }) => payload)
-		.mergeMap(doFetch$(getMethodQueryFetch(method, fetchQueries, store)));
+		.map(({ payload: { query, onSuccess, onError } }) => ({
+			query,
+			meta: { onSuccess, onError },
+		}))
+		.map(({ query, meta }) => {
+			const actionCreator = method === 'delete' ? 'del' : method;
+			return api[actionCreator](query, meta);
+		});
 
-export const getPostEpic = getMethodEpic('post');
-export const getDeleteEpic = getMethodEpic('delete');
+export const postEpic = _getMethodEpic('post');
+export const deleteEpic = _getMethodEpic('delete');

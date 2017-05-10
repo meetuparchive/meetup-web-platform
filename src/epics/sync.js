@@ -120,21 +120,33 @@ export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 		return Observable.fromPromise(fetchQueries(queries, meta)) // call fetch
 			.takeUntil(action$.ofType(LOCATION_CHANGE)) // cancel this fetch when nav happens
 			.mergeMap(({ successes = [], errors = [] }) => {
+				const deprecatedSuccessPayload = getDeprecatedSuccessPayload(
+					successes,
+					errors
+				);
+				const deprecatedActions = [apiSuccess(deprecatedSuccessPayload)];
+				if (meta && meta.onSuccess) {
+					deprecatedActions.push(meta.onSuccess(deprecatedSuccessPayload));
+				}
 				const actions = [
 					...successes.map(api.success), // send the successes to success
 					...errors.map(api.error), // send errors to error
-					apiSuccess(getDeprecatedSuccessPayload(successes, errors)), // DEPRECATED - necessary to continue populating old state
+					...deprecatedActions,
 					api.complete(queries),
 				];
 				return Observable.of(...actions);
 			})
-			.catch(err =>
-				Observable.of(
+			.catch(err => {
+				const deprecatedActions = [apiError(err)];
+				if (meta && meta.onError) {
+					deprecatedActions.push(meta.onError(err));
+				}
+				return Observable.of(
 					api.fail(err),
-					apiError(err), // DEPRECATED
+					...deprecatedActions,
 					api.complete(queries)
-				)
-			);
+				);
+			});
 	});
 
 export default function getSyncEpic(routes, fetchQueries, baseUrl) {
