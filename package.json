@@ -31,6 +31,7 @@
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "dependencies": {
     "@alrra/travis-scripts": "3.0.1",
+    "@google-cloud/pubsub": "0.11.0",
     "accepts": "1.3.3",
     "avsc": "5.0.1",
     "boom": "4.3.1",
@@ -69,6 +70,7 @@
   "devDependencies": {
     "babel-cli": "6.24.1",
     "babel-eslint": "7.2.3",
+    "babel-plugin-dynamic-import-node": "1.0.1",
     "babel-plugin-transform-flow-strip-types": "6.22.0",
     "babel-preset-es2015": "6.24.1",
     "babel-preset-react": "6.24.1",

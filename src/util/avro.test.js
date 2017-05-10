@@ -3,9 +3,18 @@ import { logTrack } from './tracking';
 import { clickToClickRecord } from './clickTrackingReader';
 import * as avro from './avro';
 
-const extractRecord = /^analytics=(.+?)\n$/;
+jest.mock('@google-cloud/pubsub', () => {
+	const publish = jest.fn(() => Promise.resolve('okay!'));
+	const main = jest.fn(() => ({
+		topic: jest.fn(() => ({
+			publish,
+		})),
+	}));
+	main.publish = publish; // hook to make publish calls visible to calling test
+	return main;
+});
 
-describe('avroSerializer', () => {
+describe('serializers.avro', () => {
 	it('encodes record of provided schema', () => {
 		const schema = {
 			type: 'record',
@@ -14,7 +23,7 @@ describe('avroSerializer', () => {
 				{ name: 'timestamp', type: 'string' },
 			],
 		};
-		const serializer = avro.avroSerializer(schema);
+		const serializer = avro.serializers.avro(schema);
 		const data = {
 			requestId: 'foo',
 			timestamp: new Date().getTime().toString(),
@@ -22,7 +31,7 @@ describe('avroSerializer', () => {
 		const serialized = serializer(data);
 
 		// parse stringified object
-		const valObj = JSON.parse(extractRecord.exec(serialized)[1]);
+		const valObj = JSON.parse(serialized);
 		// create a new buffer from that string
 		const avroBuffer = new Buffer(valObj.record, 'base64');
 		// get the avro-encoded record
@@ -47,10 +56,10 @@ describe('Activity tracking', () => {
 	});
 
 	it('encodes standard output from logTrack', () => {
-		const serialized = avro.activitySerializer(trackInfo);
+		const serialized = avro.serializers.activity(trackInfo);
 
 		// parse stringified object
-		const valObj = JSON.parse(extractRecord.exec(serialized)[1]);
+		const valObj = JSON.parse(serialized);
 		// create a new buffer from that string
 		const avroBuffer = new Buffer(valObj.record, 'base64');
 		// get the avro-encoded record
@@ -80,10 +89,10 @@ describe('Click tracking', () => {
 
 	it('encodes standard output from clickToClickRecord', () => {
 		const trackInfo = clickToClickRecord(request)(click);
-		const serialized = avro.clickSerializer(trackInfo);
+		const serialized = avro.serializers.click(trackInfo);
 
 		// parse stringified object
-		const valObj = JSON.parse(extractRecord.exec(serialized)[1]);
+		const valObj = JSON.parse(serialized);
 		// create a new buffer from that string
 		const avroBuffer = new Buffer(valObj.record, 'base64');
 		// get the avro-encoded record
@@ -93,5 +102,20 @@ describe('Click tracking', () => {
 			tag: '', // not used in our click data - defaults to empty string
 		};
 		expect(recordedInfo).toEqual(expectedTrackedInfo);
+	});
+});
+
+describe('getPlatformAnalyticsLog', () => {
+	it('logs to stdout by default', () => {
+		spyOn(process.stdout, 'write').and.callThrough();
+		const analyticsLog = avro.getPlatformAnalyticsLog();
+		analyticsLog('foo');
+		expect(process.stdout.write).toHaveBeenCalled();
+	});
+	it('calls pub/sub topic.publish when isGAE', () => {
+		const isGAE = true;
+		const analyticsLog = avro.getPlatformAnalyticsLog(isGAE);
+		analyticsLog('foo');
+		expect(require('@google-cloud/pubsub').publish).toHaveBeenCalled();
 	});
 });

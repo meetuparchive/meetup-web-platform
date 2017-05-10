@@ -30,7 +30,7 @@ export const serverFetchQueries = request => () => queries =>
  */
 export function getServerCreateStore(routes, middleware, request, baseUrl) {
 	const middlewareToApply = [
-		catchMiddleware,
+		catchMiddleware(err => request.server.app.logger.error(err)),
 		getEpicMiddleware(routes, serverFetchQueries(request), baseUrl),
 		...middleware,
 	];

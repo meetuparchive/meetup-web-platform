@@ -1,3 +1,21 @@
+## [3.1]
+
+- **New feature** Google App Engine PubSub tracking logs. To enable, consumer
+  apps must ensure that the `GAE_INSTANCE` environment variable is set in the
+  app container - GAE provides it automatically to the GAE runtime. Docs:
+  https://cloud.google.com/appengine/docs/flexible/nodejs/runtime#environment_variables
+
+## [3.0]
+- **Refactor** default locale is determined by first locale in list,
+  as specified in consuming repo's /src/util/locales.js
+
+## [2.5]
+
+- **New feature** support for asyncronous routes (PR #266).
+  [Docs](docs/Routing.md#load-asynchronous). Note the new `resolveAppProps`
+  helper that allows the browser script to delay rendering until async routes
+  are resolved - [rendering docs here](docs/Rendering#browser-rendering).
+
 ## [2.4]
 
 - **Deprecated** `renderers/browser-render.jsx` has been deprecated - consumer
