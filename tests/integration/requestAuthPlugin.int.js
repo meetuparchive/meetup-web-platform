@@ -1,4 +1,5 @@
 import Iron from 'iron';
+import appConfig from '../../src/util/config';
 import { MEMBER_COOKIE } from '../../src/util/cookieUtils';
 import { getServer } from '../../src/util/testUtils';
 import requestAuthPlugin from '../../src/plugins/requestAuthPlugin';
@@ -20,22 +21,6 @@ const makeMockFetchResponse = responseObj =>
 	});
 
 const random32 = 'asdfasdfasdfasdfasdfasdfasdfasdf';
-const config = {
-	api: {
-		protocol: 'https',
-		host: 'www.api.meetup.com',
-		timeout: 10,
-	},
-	csrf_secret: random32,
-	cookie_encrypt_secret: random32,
-	oauth: {
-		auth_url: 'https://secure.dev.meetup.com/oauth2/authorize',
-		access_url: 'https://secure.dev.meetup.com/oauth2/access',
-		key: random32,
-		secret: random32,
-	},
-	duotoneUrls: ['http://example.com/duotone.jpg'],
-};
 const getEncryptedToken = token =>
 	new Promise((resolve, reject) =>
 		Iron.seal(token, random32, Iron.defaults, (err, sealed) => resolve(sealed))
@@ -46,12 +31,12 @@ const expectedResponse = 'barfoo';
 
 const testAuth = (cookies, test, makeRequest = cookieRequest) => {
 	spyOn(global, 'fetch').and.callFake((url, opts) => {
-		if (url.includes(config.oauth.auth_url)) {
+		if (url.includes(appConfig.oauth.auth_url)) {
 			return makeMockFetchResponse({
 				code: 'foo',
 			});
 		}
-		if (url.includes(config.oauth.access_url)) {
+		if (url.includes(appConfig.oauth.access_url)) {
 			return makeMockFetchResponse({
 				oauth_token: expectedOauthToken,
 				refresh_token: 'whatever',
@@ -64,11 +49,11 @@ const testAuth = (cookies, test, makeRequest = cookieRequest) => {
 		path: '/foo',
 		handler: (request, reply) => reply(expectedResponse),
 	};
-	const server = getServer(config);
+	const server = getServer();
 	return server
 		.register({
 			register: requestAuthPlugin,
-			options: config,
+			options: appConfig,
 		})
 		.then(() => server.route(fooRoute))
 		.then(() => server.auth.strategy('default', 'oauth', 'required'))
