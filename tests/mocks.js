@@ -1,6 +1,7 @@
 import csrf from 'electrode-csrf-jwt/lib/csrf';
 import uuid from 'uuid';
 
+import appConfig from '../src/util/config';
 import makeRenderer from '../src/renderers/server-render';
 
 import { assetPublicPath, clientFilename, routes, reducer } from './mockApp';
@@ -19,7 +20,7 @@ export const getMockFetch = (
 
 export function getCsrfHeaders() {
 	const options = {
-		secret: 'asdfasdfasdfasdfasdfasdfasdfasdf',
+		secret: appConfig.csrf_secret,
 	};
 	const id = uuid.v4();
 	const headerPayload = { type: 'header', uuid: id };
