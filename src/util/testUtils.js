@@ -49,7 +49,7 @@ export const parseCookieHeader = cookieHeader => {
 
 export const getServer = () => {
 	const server = new Hapi.Server();
-	server.connection();
+	server.connection({ port: 0 });
 	server.app = {
 		logger: MOCK_LOGGER,
 	};
