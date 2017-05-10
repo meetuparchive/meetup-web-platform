@@ -10,7 +10,7 @@ export const getCookieLang = (request, supportedLangs) => {
 		return;
 	}
 	const { language, country } = querystring.parse(cookie);
-	const cookieLang = `${language}-${country}`;
+	const cookieLang = country ? `${language}-${country}` : language;
 	if (supportedLangs) {
 		return supportedLangs.includes(cookieLang) && cookieLang;
 	}
