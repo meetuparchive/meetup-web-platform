@@ -2139,17 +2139,7 @@ growly@^1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/growly/-/growly-1.3.0.tgz#f10748cbe76af964b7c96c93c6bcc28af120c081"
 
-grpc@^1.2:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/grpc/-/grpc-1.3.1.tgz#c53601223fb32569252bb86a63f8a1d7face3fa5"
-  dependencies:
-    arguejs "^0.2.3"
-    lodash "^4.15.0"
-    nan "^2.0.0"
-    node-pre-gyp "^0.6.0"
-    protobufjs "^5.0.0"
-
-grpc@~1.2.4:
+grpc@^1.2, grpc@~1.2.4:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/grpc/-/grpc-1.2.4.tgz#ef0c8c708245d8fc797e39aa330dce409b3dd03c"
   dependencies:
