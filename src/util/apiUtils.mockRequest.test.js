@@ -37,8 +37,7 @@ jest.mock('request', () => {
 	return mock;
 });
 
-const API_TIMEOUT = 10;
-const MOCK_HAPI_REQUEST = { server: getServer({ API_TIMEOUT }) };
+const MOCK_HAPI_REQUEST = { server: getServer() };
 
 describe('createCookieJar', () => {
 	it('returns a cookie jar for /sessions endpoint', () => {
@@ -68,9 +67,11 @@ describe('makeExternalApiRequest', () => {
 			foo: 'bar',
 			url: 'http://example.com',
 		};
-		return makeExternalApiRequest({ server: { app: { API_TIMEOUT } } })(
-			requestOpts
-		)
+		return makeExternalApiRequest({
+			server: {
+				settings: { app: { api: { timeout: API_TIMEOUT } } },
+			},
+		})(requestOpts)
 			.toPromise()
 			.then(
 				() => expect(true).toBe(false), // should not be called
