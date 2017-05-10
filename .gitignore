@@ -39,3 +39,7 @@ jspm_packages
 lib
 
 github_deploy_key
+
+# server config files
+config.*.json
+!config.test.json

@@ -1,6 +1,5 @@
 import rison from 'rison';
 import start from '../../src/server';
-import { mockConfig } from '../mocks';
 import * as apiProxyHandler from '../../src/apiProxy/apiProxyHandler';
 
 jest.mock('request', () => {
@@ -38,7 +37,7 @@ describe('API proxy endpoint integration tests', () => {
 		spyOn(apiProxyHandler, 'getApiProxyRouteHandler').and.callFake(
 			() => spyable.handler
 		);
-		return start({}, {}, mockConfig).then(server => {
+		return start({}, {}).then(server => {
 			const request = {
 				method: 'get',
 				url: `/mu_api?queries=${rison.encode_array([{}])}`,
@@ -72,7 +71,7 @@ describe('API proxy endpoint integration tests', () => {
 				endpoint: 'foo',
 			},
 		]);
-		return start({}, {}, mockConfig).then(server => {
+		return start({}, {}).then(server => {
 			const request = {
 				method: 'get',
 				url: `/mu_api?queries=${queries}`,
