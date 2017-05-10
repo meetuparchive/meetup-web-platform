@@ -1,4 +1,42 @@
+// @flow
+const log = require('./logger').default;
 const avro = require('avsc');
+
+/*
+ * There are currently 2 distinct analytics logging methods
+ * 1. `stdout`, which will be consumed automatically from apps running in
+ *    Google Container Engine
+ * 2. Google Pub/Sub, which is used from inside Google App Engine
+ *
+ * The Pub/Sub setup _only_ works when the environment is configured to
+ * automatically authorize Pub/Sub messages, so we use an `isGAE` env variable
+ * to determine whether the app is running in GAE.
+ *
+ * @see https://meetup.atlassian.net/wiki/display/MUP/Analytics+Logging#AnalyticsLogging-Theinputmechanism
+ */
+const getPlatformAnalyticsLog = (
+	isGAE: ?string = process.env.GAE_INSTANCE
+): (string => void) => {
+	if (isGAE) {
+		const pubsub = require('@google-cloud/pubsub')();
+		const analyticsLog = pubsub.topic('analytics-log-json');
+		return (serializedRecord: string) => {
+			analyticsLog.publish(serializedRecord).then(
+				(messageIds, apiResponse) => {
+					if (messageIds) {
+						log.info({ messageIds }, 'GAE PubSub');
+					}
+				},
+				err => log.error(err)
+			);
+		};
+	}
+	return (serializedRecord: string) => {
+		process.stdout.write(`analytics=${serializedRecord}\n`);
+	};
+};
+
+const analyticsLog = getPlatformAnalyticsLog();
 
 // currently the schema is manually copied from
 // https://github.dev.meetup.com/meetup/meetup/blob/master/modules/base/src/main/versioned_avro/Click_v2.avsc
@@ -57,12 +95,9 @@ const activity = {
 	],
 };
 
-/**
- * @param {Object} schema an avro JSON schema (.avsc)
- * @param {Object} data the data matching the schema.
- * @return {String} JSON string of the avro-encoded record wrapped with metadata
- */
-const avroSerializer = schema => data => {
+type Serializer = Object => string;
+
+const avroSerializer: Object => Serializer = schema => data => {
 	const record = avro.parse(schema).toBuffer(data);
 	// data.timestamp _must_ be ISOString if it exists
 	const timestamp = data.timestamp || new Date().toISOString();
@@ -71,15 +106,32 @@ const avroSerializer = schema => data => {
 		schema: `gs://meetup-logs/avro_schemas/${schema.name}_${schema.doc}.avsc`,
 		date: timestamp.substr(0, 10), // YYYY-MM-DD
 	};
-	return `analytics=${JSON.stringify(analytics)}\n`;
+	return JSON.stringify(analytics);
+};
+
+const logger = (serializer: Serializer) => (record: Object) => {
+	const serializedRecord = serializer(record);
+	analyticsLog(serializedRecord);
+};
+
+const schemas = {
+	activity,
+	click,
+};
+const serializers = {
+	avro: avroSerializer,
+	activity: avroSerializer(schemas.activity),
+	click: avroSerializer(schemas.click),
+};
+const loggers = {
+	activity: logger(serializers.activity),
+	click: logger(serializers.click),
 };
 
 module.exports = {
 	avroSerializer,
-	activitySerializer: avroSerializer(activity),
-	clickSerializer: avroSerializer(click),
-	schemas: {
-		activity,
-		click,
-	},
+	getPlatformAnalyticsLog,
+	schemas,
+	serializers,
+	loggers,
 };
