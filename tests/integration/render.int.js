@@ -1,5 +1,5 @@
 import { ROOT_INDEX_CONTENT, FOO_INDEX_CONTENT } from '../mockApp';
-import { getMockRenderRequestMap, mockConfig } from '../mocks';
+import { getMockRenderRequestMap } from '../mocks';
 import start from '../../src/server';
 import { fooPathContent } from '../MockContainer';
 
@@ -31,7 +31,7 @@ const fakeApiProxyResponse = 'value from api proxy';
 
 describe('Full dummy app render', () => {
 	it('renders the expected app content for nested path of mock app route config', () => {
-		return start(getMockRenderRequestMap(), {}, mockConfig).then(server => {
+		return start(getMockRenderRequestMap(), {}).then(server => {
 			const request = {
 				method: 'get',
 				url: '/foo/bar?heyhey=true',
@@ -57,7 +57,7 @@ describe('Full dummy app render', () => {
 		});
 	});
 	it('renders the expected root index route app content at `/`', () => {
-		return start(getMockRenderRequestMap(), {}, mockConfig).then(server => {
+		return start(getMockRenderRequestMap(), {}).then(server => {
 			const request = {
 				method: 'get',
 				url: '/',
@@ -77,7 +77,7 @@ describe('Full dummy app render', () => {
 		});
 	});
 	it('renders the expected child index route app content at `/foo`', () => {
-		return start(getMockRenderRequestMap(), {}, mockConfig).then(server => {
+		return start(getMockRenderRequestMap(), {}).then(server => {
 			const request = {
 				method: 'get',
 				url: '/foo',
@@ -97,8 +97,7 @@ describe('Full dummy app render', () => {
 		});
 	});
 	it('calls request with url-encoded params', () => {
-		require('request').mockReset();
-		return start(getMockRenderRequestMap(), {}, mockConfig).then(server => {
+		return start(getMockRenderRequestMap(), {}).then(server => {
 			const urlname = '驚くばかり';
 			const encodedUrlname = encodeURI(urlname);
 			const url = `/${urlname}`;
