@@ -150,7 +150,7 @@ const configPath = path.resolve(
 );
 
 const localRunConfig = fs.existsSync(configPath)
-	? require(configPath).runtime || {}
+	? require(configPath) || {}
 	: {};
 
 config.load(localRunConfig);

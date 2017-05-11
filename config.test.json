@@ -1,22 +1,18 @@
 {
-  "buildtime": {
-    "asset_server": {
-      "port": 0
-    },
-    "app_server": {
-      "port": 0
-    }
+  "asset_server": {
+    "port": 0
   },
-  "runtime": {
-    "api": {
-      "timeout": 10
-    },
-    "csrf_secret": "asdfasdfasdfasdfasdfasdfasdfasdf",
-    "cookie_encrypt_secret": "asdfasdfasdfasdfasdfasdfasdfasdf",
-    "photo_scaler_salt": "asdfasdfasdfasdfasdfasdfasdfasdf",
-    "oauth": {
-      "key": "asdfasdfasdfasdfasdfasdfasdfasdf",
-      "secret": "asdfasdfasdfasdfasdfasdfasdfasdf"
-    }
+  "app_server": {
+    "port": 0
+  },
+  "api": {
+    "timeout": 10
+  },
+  "csrf_secret": "asdfasdfasdfasdfasdfasdfasdfasdf",
+  "cookie_encrypt_secret": "asdfasdfasdfasdfasdfasdfasdfasdf",
+  "photo_scaler_salt": "asdfasdfasdfasdfasdfasdfasdfasdf",
+  "oauth": {
+    "key": "asdfasdfasdfasdfasdfasdfasdfasdf",
+    "secret": "asdfasdfasdfasdfasdfasdfasdfasdf"
   }
 }
