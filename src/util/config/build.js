@@ -82,10 +82,12 @@ export const { asset_server, app_server } = fs.existsSync(configPath)
 	? require(configPath)
 	: {};
 // only load buildtime vars - nothing else from config file
-config.load({
-	asset_server,
-	app_server,
-});
+if (asset_server) {
+	config.load({ asset_server });
+}
+if (app_server) {
+	config.load({ app_server });
+}
 
 config.set('isProd', config.get('env') === 'production');
 config.set('isDev', config.get('env') === 'development');
