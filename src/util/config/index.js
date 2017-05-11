@@ -149,11 +149,8 @@ const configPath = path.resolve(
 	`config.${config.get('env')}.json`
 );
 
-const localRunConfig = fs.existsSync(configPath)
-	? require(configPath) || {}
-	: {};
-
-config.load(localRunConfig);
+const localConfig = fs.existsSync(configPath) ? require(configPath) : {};
+config.load(localConfig);
 
 config.set(
 	'api.root_url',

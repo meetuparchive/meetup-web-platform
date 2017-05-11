@@ -78,11 +78,13 @@ const configPath = path.resolve(
 	`config.${config.get('env')}.json`
 );
 
-export const localConfig = fs.existsSync(configPath) ? require(configPath) : {};
-
+export const { asset_server, app_server } = fs.existsSync(configPath)
+	? require(configPath)
+	: {};
+// only load buildtime vars - nothing else from config file
 config.load({
-	asset_server: localConfig.asset_server,
-	app_server: localConfig.app_server,
+	asset_server,
+	app_server,
 });
 
 config.set('isProd', config.get('env') === 'production');
