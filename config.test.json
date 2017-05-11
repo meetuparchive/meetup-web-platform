@@ -1,27 +1,20 @@
 {
   "buildtime": {
     "asset_server": {
-      "host": "beta2.dev.meetup.com",
       "port": 0
     },
     "app_server": {
-      "host": "beta2.dev.meetup.com",
       "port": 0
     }
   },
   "runtime": {
     "api": {
-      "protocol": "https",
-      "host": "www.api.dev.meetup.com",
-      "timeout": 10,
-      "root_url": "https://www.api.dev.meetup.com"
+      "timeout": 10
     },
     "csrf_secret": "asdfasdfasdfasdfasdfasdfasdfasdf",
     "cookie_encrypt_secret": "asdfasdfasdfasdfasdfasdfasdfasdf",
     "photo_scaler_salt": "asdfasdfasdfasdfasdfasdfasdfasdf",
     "oauth": {
-      "auth_url": "https://secure.dev.meetup.com/oauth2/authorize",
-      "access_url": "https://secure.dev.meetup.com/oauth2/access",
       "key": "asdfasdfasdfasdfasdfasdfasdfasdf",
       "secret": "asdfasdfasdfasdfasdfasdfasdfasdf"
     }
