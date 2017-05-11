@@ -168,6 +168,5 @@ config.set(
 config.set('isProd', config.get('env') === 'production');
 config.set('isDev', config.get('env') === 'development');
 config.validate();
-// console.warn(config.getProperties());
 
 export default config.getProperties();
