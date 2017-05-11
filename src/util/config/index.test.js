@@ -1,17 +1,15 @@
 import config, {
-	PROTOCOL_ERROR,
 	COOKIE_SECRET_ERROR,
 	CSRF_SECRET_ERROR,
 	OAUTH_SECRET_ERROR,
 	OAUTH_KEY_ERROR,
 	SALT_ERROR,
-	validateProtocol,
 	validateCookieSecret,
 	validateCsrfSecret,
 	validateOauthSecret,
 	validateOauthKey,
 	validatePhotoScalerSalt,
-} from './config';
+} from './index';
 
 const string1 = '1';
 const string31 = 'asdfasdfasdfasdfasdfasdfasdfasd';
@@ -45,17 +43,6 @@ describe('config', () => {
 		expect(config.oauth.secret).toBeTruthy();
 		expect(config.oauth.key).toBeTruthy();
 		expect(config.photo_scaler_salt).toBeTruthy();
-	});
-});
-
-describe('validateProtocol', () => {
-	it('does not error when protocol is `http` or `https`', () => {
-		expect(() => validateProtocol('http')).not.toThrow();
-		expect(() => validateProtocol('https')).not.toThrow();
-	});
-
-	it('throws error when the protocol is not `http` or `https`', () => {
-		expect(() => validateProtocol('ftp')).toThrowError(PROTOCOL_ERROR);
 	});
 });
 
