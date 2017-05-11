@@ -3,28 +3,7 @@ import convict from 'convict';
 import path from 'path';
 
 /**
- * This module provides a single source of truth for application configuration
- * info. It uses node-convict to read configuration info from, in increasing
- * order of precedence:
- *
- * 1. Default value
- * 2. File (`config.loadFile()`) - app root `config.<NODE_ENV>.json`
- * 3. Environment variables
- * 4. Command line arguments
- * 5. Set and load calls (config.set() and config.load())
- *
- * Note that environment variables have _higher_ precedence than values in
- * config files, so the config files will only work if environment variables
- * are cleared.
- *
- * The only values that _must_ be in environment variables are the secrets that
- * are used to interact with external systems:
- *
- * - `MUPWEB_OAUTH_SECRET`
- * - `MUPWEB_OAUTH_KEY`
- * - `PHOTO_SCALER_SALT`
- *
- * @module config
+ * This module populates build time configuration data
  */
 
 export const PROTOCOL_ERROR = 'Protocol must be http or https';
