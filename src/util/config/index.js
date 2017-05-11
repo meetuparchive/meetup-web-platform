@@ -2,7 +2,7 @@ import fs from 'fs';
 import convict from 'convict';
 import path from 'path';
 
-import { schema as buildSchema, validateProtocol } from './build';
+import buildConfig, { schema as buildSchema, validateProtocol } from './build';
 import { duotones, getDuotoneUrls } from '../duotone';
 
 /**
@@ -31,6 +31,7 @@ import { duotones, getDuotoneUrls } from '../duotone';
  */
 
 const random32 = 'asdfasdfasdfasdfasdfasdfasdfasdf';
+const secretDefault = (process.env.NODE_ENV !== 'production' && random32) || ''; // no prod default
 
 export const COOKIE_SECRET_ERROR =
 	'Cookie Encrypt Secret must be a random 32+ char string';
@@ -98,13 +99,13 @@ export const config = convict({
 	},
 	cookie_encrypt_secret: {
 		format: validateCookieSecret,
-		default: (process.env.NODE_ENV !== 'production' && random32) || '',
+		default: secretDefault,
 		env: 'COOKIE_ENCRYPT_SECRET',
 		sensitive: true,
 	},
 	csrf_secret: {
 		format: validateCsrfSecret,
-		default: (process.env.NODE_ENV !== 'production' && random32) || '',
+		default: secretDefault,
 		env: 'CSRF_SECRET',
 		sensitive: true,
 	},
@@ -140,16 +141,24 @@ export const config = convict({
 	},
 });
 
+config.load(buildConfig);
+
 // Load environment dependent configuration
 const configPath = path.resolve(
 	process.cwd(),
 	`config.${config.get('env')}.json`
 );
 
-if (fs.existsSync(configPath)) {
-	const runConfig = require(configPath).runtime || {};
-	config.load(runConfig);
-}
+const localRunConfig = fs.existsSync(configPath)
+	? require(configPath).runtime || {}
+	: {};
+
+config.load(localRunConfig);
+
+config.set(
+	'api.root_url',
+	`${config.get('api.protocol')}://${config.get('api.host')}`
+);
 
 config.set(
 	'duotone_urls',
@@ -159,5 +168,6 @@ config.set(
 config.set('isProd', config.get('env') === 'production');
 config.set('isDev', config.get('env') === 'development');
 config.validate();
+// console.warn(config.getProperties());
 
 export default config.getProperties();

@@ -56,7 +56,7 @@ export const schema = {
 			format: 'port',
 			default: 8001,
 			arg: 'asset-port',
-			env: 'ASSET_SERVER_PORT',
+			env: process.env.NODE_ENV !== 'test' && 'ASSET_SERVER_PORT', // don't read env in tests
 		},
 	},
 	app_server: {
@@ -99,15 +99,11 @@ const configPath = path.resolve(
 	`config.${config.get('env')}.json`
 );
 
-if (fs.existsSync(configPath)) {
-	const buildConfig = require(configPath).buildtime || {};
-	config.load(buildConfig);
-}
+export const localBuildConfig = fs.existsSync(configPath)
+	? require(configPath).buildtime || {}
+	: {};
 
-config.set(
-	'api.root_url',
-	`${config.get('api.protocol')}://${config.get('api.host')}`
-);
+config.load(localBuildConfig);
 
 config.set('isProd', config.get('env') === 'production');
 config.set('isDev', config.get('env') === 'development');
