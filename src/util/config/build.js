@@ -33,7 +33,7 @@ export const schema = {
 		},
 		port: {
 			format: 'port',
-			default: 8001,
+			default: 8001, // must be 443 for prod
 			arg: 'asset-port',
 			env: process.env.NODE_ENV !== 'test' && 'ASSET_SERVER_PORT', // don't read env in tests
 		},

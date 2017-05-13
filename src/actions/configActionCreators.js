@@ -1,3 +1,10 @@
+export function configureLocaleCode(localeCode) {
+	return {
+		type: 'CONFIGURE_LOCALE_CODE',
+		payload: localeCode,
+	};
+}
+
 export function configureApiUrl(url) {
 	return {
 		type: 'CONFIGURE_API_URL',

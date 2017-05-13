@@ -12,8 +12,10 @@ export const getAppRouteHandler = renderRequestMap => (request, reply) => {
 	if (redirect) {
 		return redirect;
 	}
+	request.app.localeCode = requestLanguage;
+	const renderRequest = renderRequestMap[requestLanguage];
 
-	return renderRequestMap[requestLanguage](request)
+	return renderRequest(request)
 		.do(() => request.server.app.logger.debug('HTML response ready'))
 		.subscribe(({ result, statusCode }) => {
 			// response is sent when this function returns (`nextTick`)

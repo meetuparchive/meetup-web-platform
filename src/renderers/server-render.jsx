@@ -17,6 +17,7 @@ import { SERVER_RENDER } from '../actions/syncActionCreators';
 import {
 	configureApiUrl,
 	configureBaseUrl,
+	configureLocaleCode,
 } from '../actions/configActionCreators';
 
 // Ensure global Intl for use with FormatJS
@@ -155,7 +156,15 @@ const makeRenderer = (
 	scripts: Array<string>
 ) => (request: Object) => {
 	middleware = middleware || [];
-	const { connection, headers, info, url, server, raw: { req } } = request;
+	const {
+		app: { localeCode },
+		connection,
+		headers,
+		info,
+		url,
+		server,
+		raw: { req },
+	} = request;
 
 	// request protocol might be different from original request that hit proxy
 	// we want to use the proxy's protocol
@@ -177,6 +186,7 @@ const makeRenderer = (
 	// load initial config
 	store.dispatch(configureApiUrl(apiUrl));
 	store.dispatch(configureBaseUrl(host));
+	store.dispatch(configureLocaleCode(localeCode));
 
 	// render skeleton if requested - the store is ready
 	if ('skeleton' in request.query) {
