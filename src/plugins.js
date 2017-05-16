@@ -1,6 +1,5 @@
 import CsrfPlugin from 'electrode-csrf-jwt';
 import Good from 'good';
-import GoodMeetupTracking from './plugins/good-meetup-tracking';
 import requestAuthPlugin from './plugins/requestAuthPlugin';
 
 /**
@@ -39,16 +38,16 @@ export function getCsrfPlugin(secret) {
 			isSecure: process.env.NODE_ENV === 'production',
 		};
 		server.state(
-			'x-csrf-jwt',  // set by plugin
-			{ ...cookieOptions, isHttpOnly: true }  // no client-side interaction needed
+			'x-csrf-jwt', // set by plugin
+			{ ...cookieOptions, isHttpOnly: true } // no client-side interaction needed
 		);
 		server.state(
-			'x-csrf-jwt-header',  // set by onPreResponse
+			'x-csrf-jwt-header', // set by onPreResponse
 			{ ...cookieOptions, isHttpOnly: false } // the client must read this cookie and return as a custom header
 		);
 
 		const registration = CsrfPlugin.register(server, options, next);
-		server.ext('onPreResponse', setCsrfCookies);  // this extension must be registered _after_ plugin is registered
+		server.ext('onPreResponse', setCsrfCookies); // this extension must be registered _after_ plugin is registered
 
 		return registration;
 	};
@@ -57,7 +56,7 @@ export function getCsrfPlugin(secret) {
 		register,
 		options: {
 			secret,
-		}
+		},
 	};
 }
 
@@ -67,42 +66,40 @@ export function getCsrfPlugin(secret) {
  * @see {@link https://github.com/hapijs/good}
  */
 export function getConsoleLogPlugin() {
-	const logFilter = process.env.LOG_FILTER || { include: [], exclude: ['tracking'] };
+	const logFilter = process.env.LOG_FILTER || {
+		include: [],
+		exclude: ['tracking'],
+	};
 	return {
 		register: Good,
 		options: {
-			ops: false,  // no ops reporting (for now)
+			ops: false, // no ops reporting (for now)
 			reporters: {
 				console: [
-					{  // filter events with good-squeeze
-						module: 'good-squeeze',
-						name: 'Squeeze',
-						args: [{
-							error: logFilter,
-							log: logFilter,
-						}]
-					}, {  // format with good-console
-						module: 'good-console',
-						args: [{
-							format: 'YYYY-MM-DD HH:mm:ss.SSS',
-						}]
-					},
-					'stdout'  // pipe to stdout
-				],
-				tracking: [
 					{
+						// filter events with good-squeeze
 						module: 'good-squeeze',
 						name: 'Squeeze',
-						args: [{
-							request: 'tracking'
-						}],
-					}, {
-						module: GoodMeetupTracking,
+						args: [
+							{
+								error: logFilter,
+								log: logFilter,
+							},
+						],
 					},
-					'stdout'
+					{
+						// format with good-console
+						module: 'good-console',
+						args: [
+							{
+								format: 'YYYY-MM-DD HH:mm:ss.SSS',
+							},
+						],
+					},
+					'stdout', // pipe to stdout
 				],
-			}
-		}
+			},
+		},
 	};
 }
 
@@ -124,4 +121,3 @@ export default function getPlugins(config) {
 		getRequestAuthPlugin(config),
 	];
 }
-
