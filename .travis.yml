@@ -1,32 +1,28 @@
-sudo: required
+sudo: false
 language: node_js
 node_js:
-  - "7"
+  - "7.8"
+cache:
+  yarn: true
+  directories:
+    - node_modules
 
 env:
   global:
-    # compiler command for Travis
-    - CXX=g++-4.8
-    # build number used by blt pipeline
     - CI_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER
-
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - g++-4.8
+    - secure: "UdU7dYh5Jef1yVYORQgpvRd3oVGi9UzPkoanUsAPF6Xmp/hpYN9bAG0nTnEE3OSFK4WehE2VdEQDtgvB/lgH6xgAmUcXv1ewNIZxRUvNQz7urYu6O+plbXlM+IUdDjOxGvj8P+ooWAiYuDYrChnfGOwcWydp1zOQc5RLmUSL9gi7E0hG119fCMPP+qJwaoDRpVQ2HdBQWLMCkcFqrRjYYEjf4ZYNhkNlL1jOx4+mgzbrezGL0jErnd9eX3ODt/NLH3NpX2XXt0WEYz9Q41HyMlV7eyUq/RHJRXWaksZYkEWHSitIJsjSOONFkBmEsLPD8VPS2fVYKfV1lXVoEVbERyy8HbbGDEbdm06DafOe3dB3+KSidSb95SyL8eUpdRetbySYyDSWsR4u8EF4Tr/SHUTl9ctOh6f0REvJzXjPRMM/uG+Pq5Fr+vGyA8YQj7n2LSvaw5zO2I07Nlf4MCFGY+CS0IE22AthnEptBKXbjFTFpLyTorkP5j8Tuvhru9BHZ3odJSOT2jFiZ5kxArbn5W+pg6Qiidm+JFmXZbtEVSsiS3HSJWXBxVJpBhWjMRpimKqdUMc272jyQ8KdEdpEVC0kEZtpE3Ul0ahdcIj492wnvhziGYHBR6s87fD4m9oPQ9r70iYQ3NcKbIo36uN7+Zd2w+C/jZr8XDIisg9NtI8="
 
 before_install:
+  - openssl aes-256-cbc -K $encrypted_ee3d73113e03_key -iv $encrypted_ee3d73113e03_iv -in '.travis/github_deploy_key.enc' -out github_deploy_key -d
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
 
 before_script:
   - git diff --exit-code
 
-after_success:
-  - npm run coveralls
+after_script:
   - git config --global user.email "builds@travis-ci.com"
   - git config --global user.name "Travis CI"
+  - $(npm bin)/set-up-ssh --key "$encrypted_ee3d73113e03_key" --iv "$encrypted_ee3d73113e03_iv" --path-encrypted-key ".travis/github_deploy_key.enc"
   - >
     export GIT_TAG=$(make version) ||
     export GIT_TAG=$(make version)-beta
@@ -36,20 +32,15 @@ after_success:
   - echo "GIT_TAG=$GIT_TAG"
   - echo "NPM_TAG=$NPM_TAG"
   - >
+    echo "skipping versioning" ||
+    yarn run build &&
     npm version $GIT_TAG -m "Version $GIT_TAG built by Travis CI - https://travis-ci.com/$TRAVIS_REPO_SLUG/builds/$TRAVIS_JOB_ID" &&
-    git push -q https://$GITHUB_USER:$GITHUB_TOKEN@github.com/$TRAVIS_REPO_SLUG --tags &&
-    npm publish --tag $NPM_TAG ||
-    echo "skipping versioning"
+    git push --tags git@github.com:$TRAVIS_REPO_SLUG.git &&
+    npm publish --tag $NPM_TAG
+
+after_success:
+  - npm run coveralls
 
 notifications:
-  # slack integration
   slack:
-    # encrypted token for the meetuphq slack channel
-    secure: J7M6eSgKWcbMqFs9Z2wSiHemn/IGOj8D/iB6AB2WXPYxr8+HQnzE6L96lmdwwSHNscB0tbg7y7xsMJHh+qeiiFgrMTAP7SbbT0kV9JdFWEJs4mwZtMBeQXbyfIJ/6HSFAsAjOxBgyhNnmx6PYKWKc+HGVcRui4dWJQRO24Nmfup93gJon63U/KsdXyvTpVN/dZ2EneQzhh/Evg0fXRxo9ETeqfeJ7KNTc0FvklVYdMe0d9cPKZ7/22qoYM7KKELE5ER/pDEeU42ttz4axm1l7WQAddDTQElH1oZP46Eq62Adu244bSuQUBIRwSBJOjUMnIzxn+2s3u4BfeSSGm9d8X8PD46fcaIKbIQaYOnlL9IK4s8jUhv1j0/qEHm3X5OJ7nrHM1FEmlY8R/lgCPyFI6Rr1z722n2iCxKrsasqFaF4bNQjp1L1hHmuFS1bAsGYouc6IRYVLntl0KHI5RpLWxCf6s3kaYHRb8sKcrZTXK+lf/Hlk0iWfXK+SU5vdKtjSrIJusWBU5AmcDKJbjTBbi85/zxJ86jYJy0WN2HsyR6K2mm+iGwTcBD52Ut/7J3PcHgJyp9kq+NQIxyuyk1PmGFWwy6N+xpirlFo7ztgSSEa2teD0gb9Feh1XaLiuAXtmMyaO8esAbXqygweLJGSXoTQgvjJ1Bvgb5GJSej0LME=
-
-    # dont notify successful builds
-    on_success: never
-
-    # always notify build failures
-    on_failure: always
-
+    secure: ACnCq4lvEhY9YFErraIrKy6spRPy4z/+PdFg0Fd4I8WtFf+Bc5qkOr17m8+lb3in4SNGsPPk1eue6ZDHvBkGn190GQfWIqqqs6lXh5UgBB4e2boTKe5lMpTmme7FMNQuUgt69Xr2J2J8Mt2N0C8DWAm0yKPlPjN/2HUVzkHPnemOsYQDjJ0GJxLwYiL8NM1tgwFfOXloFMCQuQxHZvKPxdjBOS5PMkyOG/717j806bbED2yuT3PeZQEj8h3rPxSHJTmTOuP4CKZtnxv+4kf3YbHWNvRogpoizlUuUhwXO1xpNzH58T5sFgPIr353WJeBpvHeIe8F8ekuJYBJIbbRkA3eIrJemlJzOjMzuXtSEKAgolkbu0FWiZuJ/HTjeCJK4r56UzCzYDLMA316uXQ1Nlbk5hXhnkL08xWf5mtXWyXt2/4OUq1Tn8hpr9ZohulTj3B/lV3CV+rFzxeFyfTJi7JN3lmRkUIZRMv28Kh2aIn91UZqOHkhPY184HJOOPtU+JeJUXMZ1ltrnGDP1GBSJcXiLY8rK6mdcJrZPtonFB5MBrGNPKejuTuMFHqs9bY5Dtd3PVfRi4f7VThp0IUZt9qo3Us/9weboClQpRwkbsNogZHnu0w+bnOqLR/ZLVGx5P1XO1u3iO6zfinhFBatD1KsVNwTfJvv0NCy+gvyG6A=
