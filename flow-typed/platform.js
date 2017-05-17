@@ -53,3 +53,13 @@ declare type Match = {
 };
 
 declare type MatchedRoute = { route: PlatformRoute, match: Match };
+declare type MatchPathOptions = {
+  path: string,
+  exact?: boolean,
+  strict?: boolean,
+}
+
+declare module 'react-router-dom/matchPath' {
+	declare function matchPath(pathname: string, options: MatchPathOptions): null | Match;
+	declare module.exports: typeof matchPath;
+}
