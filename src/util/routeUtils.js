@@ -9,10 +9,14 @@ import matchPath from 'react-router-dom/matchPath';
 type Resolver<T> = (input: T) => Promise<T>;
 
 // munge a route's 'relative' `path` with the full matchedPath
-const routePath = (route: PlatformRoute, matchedPath: string): string =>
-	`${matchedPath}${route.path || ''}`.replace('//', '/');
+const routePath = (
+	route: PlatformRoute,
+	matchedPath: string
+): { path: string, strict?: boolean, exact?: boolean } => ({
+	path: `${matchedPath}${route.path || ''}`.replace('//', '/'),
+});
 
-export const decodeParams = (params: Object) =>
+export const decodeParams = (params: Params) =>
 	Object.keys(params).reduce((decodedParams, key) => {
 		decodedParams[key] = params[key] && decodeURI(params[key]);
 		return decodedParams;
@@ -26,7 +30,7 @@ export const getChildRoutes = (
 	matchedRoute: MatchedRoute
 ): Array<PlatformRoute> => {
 	const { route, match } = matchedRoute;
-	if (match.isExact) {
+	if (match && match.isExact) {
 		return route.indexRoute ? [route.indexRoute] : [];
 	}
 	return route.routes || [];
@@ -43,15 +47,15 @@ export const resolveChildRoutes = (
 	matchedRoute: MatchedRoute
 ): Promise<Array<PlatformRoute>> => {
 	const { match } = matchedRoute;
-	if (match.isExact) {
-		return resolveIndexRoute(matchedRoute).then(
+	if (match && match.isExact) {
+		return _resolveIndexRoute(matchedRoute).then(
 			m => (m.route.indexRoute ? [m.route.indexRoute] : [])
 		);
 	}
-	return resolveNestedRoutes(matchedRoute).then(m => m.route.routes || []);
+	return _resolveNestedRoutes(matchedRoute).then(m => m.route.routes || []);
 };
 
-const resolveNestedRoutes: Resolver<MatchedRoute> = matchedRoute =>
+const _resolveNestedRoutes: Resolver<MatchedRoute> = matchedRoute =>
 	(matchedRoute.route.getNestedRoutes
 		? matchedRoute.route
 				.getNestedRoutes()
@@ -59,7 +63,7 @@ const resolveNestedRoutes: Resolver<MatchedRoute> = matchedRoute =>
 				.then(() => matchedRoute)
 		: Promise.resolve(matchedRoute));
 
-const resolveIndexRoute: Resolver<MatchedRoute> = matchedRoute =>
+const _resolveIndexRoute: Resolver<MatchedRoute> = matchedRoute =>
 	(matchedRoute.route.getIndexRoute
 		? matchedRoute.route
 				.getIndexRoute()
@@ -87,7 +91,7 @@ const _matchedRouteQueriesReducer = (location: URL) => (
 	queries: Array<Query>,
 	{ route, match }: MatchedRoute
 ): Array<Query> => {
-	if (!route.query) {
+	if (!route.query || !match) {
 		return queries;
 	}
 	const routeQueryFns = route.query instanceof Array
@@ -113,7 +117,9 @@ const _resolveRouteMatches = (
 	matchedRoutes: Array<MatchedRoute> = [],
 	matchedPath: string = ''
 ): Promise<Array<MatchedRoute>> => {
-	const route = routes.find(r => matchPath(path, routePath(r, matchedPath))); // take the first match
+	const route = routes.find(
+		r => matchPath(path, routePath(r, matchedPath)) !== null
+	); // take the first match
 	if (!route) {
 		return Promise.resolve(matchedRoutes);
 	}
@@ -121,17 +127,21 @@ const _resolveRouteMatches = (
 	// add the route and its `match` object to the array of matched routes
 	const currentMatchedPath = routePath(route, matchedPath);
 	const match = matchPath(path, currentMatchedPath);
-	const currentMatchedRoutes = [...matchedRoutes, { route, match }];
+	if (!match) {
+		return Promise.resolve(matchedRoutes);
+	}
+	const matchedRoute = { route, match };
+	const currentMatchedRoutes = [...matchedRoutes, matchedRoute];
 
 	// add any nested route matches
-	return resolveChildRoutes({ route, match }).then(
+	return resolveChildRoutes(matchedRoute).then(
 		childRoutes =>
 			(childRoutes.length
 				? _resolveRouteMatches(
 						childRoutes,
 						path,
 						currentMatchedRoutes,
-						currentMatchedPath
+						currentMatchedPath.path
 					)
 				: currentMatchedRoutes)
 	);
