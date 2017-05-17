@@ -9,10 +9,16 @@ import matchPath from 'react-router-dom/matchPath';
 type Resolver<T> = (input: T) => Promise<T>;
 
 // munge a route's 'relative' `path` with the full matchedPath
-const routePath = (route: PlatformRoute, matchedPath: string): string =>
-	`${matchedPath}${route.path || ''}`.replace('//', '/');
+const routePath = (
+	route: PlatformRoute,
+	matchedPath: string
+): MatchPathOptions => ({
+	path: `${matchedPath}${route.path || ''}`.replace('//', '/'),
+	strict: route.strict,
+	exact: route.exact,
+});
 
-export const decodeParams = (params: Object) =>
+export const decodeParams = (params: Params) =>
 	Object.keys(params).reduce((decodedParams, key) => {
 		decodedParams[key] = params[key] && decodeURI(params[key]);
 		return decodedParams;
@@ -44,14 +50,14 @@ export const resolveChildRoutes = (
 ): Promise<Array<PlatformRoute>> => {
 	const { match } = matchedRoute;
 	if (match.isExact) {
-		return resolveIndexRoute(matchedRoute).then(
+		return _resolveIndexRoute(matchedRoute).then(
 			m => (m.route.indexRoute ? [m.route.indexRoute] : [])
 		);
 	}
-	return resolveNestedRoutes(matchedRoute).then(m => m.route.routes || []);
+	return _resolveNestedRoutes(matchedRoute).then(m => m.route.routes || []);
 };
 
-const resolveNestedRoutes: Resolver<MatchedRoute> = matchedRoute =>
+const _resolveNestedRoutes: Resolver<MatchedRoute> = matchedRoute =>
 	(matchedRoute.route.getNestedRoutes
 		? matchedRoute.route
 				.getNestedRoutes()
@@ -59,7 +65,7 @@ const resolveNestedRoutes: Resolver<MatchedRoute> = matchedRoute =>
 				.then(() => matchedRoute)
 		: Promise.resolve(matchedRoute));
 
-const resolveIndexRoute: Resolver<MatchedRoute> = matchedRoute =>
+const _resolveIndexRoute: Resolver<MatchedRoute> = matchedRoute =>
 	(matchedRoute.route.getIndexRoute
 		? matchedRoute.route
 				.getIndexRoute()
@@ -119,19 +125,25 @@ const _resolveRouteMatches = (
 	}
 
 	// add the route and its `match` object to the array of matched routes
-	const currentMatchedPath = routePath(route, matchedPath);
-	const match = matchPath(path, currentMatchedPath);
-	const currentMatchedRoutes = [...matchedRoutes, { route, match }];
+	const currentMatchOptions = routePath(route, matchedPath);
+	const match = matchPath(path, currentMatchOptions);
+	if (!match) {
+		// we know that this won't ever run because we've established the match in
+		// `.find`, but this check is for type safety
+		return Promise.resolve(matchedRoutes);
+	}
+	const matchedRoute = { route, match };
+	const currentMatchedRoutes = [...matchedRoutes, matchedRoute];
 
 	// add any nested route matches
-	return resolveChildRoutes({ route, match }).then(
+	return resolveChildRoutes(matchedRoute).then(
 		childRoutes =>
 			(childRoutes.length
 				? _resolveRouteMatches(
 						childRoutes,
 						path,
 						currentMatchedRoutes,
-						currentMatchedPath
+						currentMatchOptions.path
 					)
 				: currentMatchedRoutes)
 	);
