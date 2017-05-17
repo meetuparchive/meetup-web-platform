@@ -9,7 +9,7 @@ import matchPath from 'react-router-dom/matchPath';
 type Resolver<T> = (input: T) => Promise<T>;
 
 // munge a route's 'relative' `path` with the full matchedPath
-const routePath = (
+const _routeMatchOptions = (
 	route: PlatformRoute,
 	matchedPath: string
 ): MatchPathOptions => ({
@@ -119,13 +119,15 @@ const _resolveRouteMatches = (
 	matchedRoutes: Array<MatchedRoute> = [],
 	matchedPath: string = ''
 ): Promise<Array<MatchedRoute>> => {
-	const route = routes.find(r => matchPath(path, routePath(r, matchedPath))); // take the first match
+	const route = routes.find(r =>
+		matchPath(path, _routeMatchOptions(r, matchedPath))
+	); // take the first match
 	if (!route) {
 		return Promise.resolve(matchedRoutes);
 	}
 
 	// add the route and its `match` object to the array of matched routes
-	const currentMatchOptions = routePath(route, matchedPath);
+	const currentMatchOptions = _routeMatchOptions(route, matchedPath);
 	const match = matchPath(path, currentMatchOptions);
 	if (!match) {
 		// we know that this won't ever run because we've established the match in
