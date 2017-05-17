@@ -12,7 +12,7 @@ type Resolver<T> = (input: T) => Promise<T>;
 const routePath = (route: PlatformRoute, matchedPath: string): string =>
 	`${matchedPath}${route.path || ''}`.replace('//', '/');
 
-export const decodeParams = (params: Object) =>
+export const decodeParams = (params: Params) =>
 	Object.keys(params).reduce((decodedParams, key) => {
 		decodedParams[key] = params[key] && decodeURI(params[key]);
 		return decodedParams;

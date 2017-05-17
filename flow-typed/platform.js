@@ -1,6 +1,8 @@
 // @flow
-import type { Match } from 'react-router-dom';
+import type { Match } from 'react-router-';
 declare var Intl: Object;
+
+declare type Params = { [string]: string };
 
 declare type FluxStandardAction = {
 	type: string,
@@ -15,7 +17,7 @@ declare type Reducer = (state: ?Object, action: FluxStandardAction) => Object;
 declare type Query = {
 	ref: string,
 	endpoint: string,
-	params?: Object,
+	params?: Params,
 	type?: string,
 	meta?: {
 		flags?: Array<string>,
@@ -31,7 +33,7 @@ declare type QueryResponse = {
 	meta?: Object,
 };
 
-declare type QueryFunction = (location: Object) => Query;
+declare type QueryFunction = (location: { [string]: mixed }) => Query;
 
 declare type PlatformRoute = {
 	component: ReactClass<*>,
@@ -39,7 +41,7 @@ declare type PlatformRoute = {
 	getIndexRoute?: () => Promise<PlatformRoute>,
 	path?: string,
 	exact?: boolean,
-	query?: QueryFunction,
+	query?: QueryFunction | Array<QueryFunction>,
 	indexRoute?: PlatformRoute,
 	routes?: Array<PlatformRoute>,
 };
