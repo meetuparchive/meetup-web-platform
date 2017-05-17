@@ -1,5 +1,5 @@
 // @flow
-import type { Match } from 'react-router-';
+import type { Match } from 'react-router-dom';
 declare var Intl: Object;
 
 declare type Params = { [string]: string };
