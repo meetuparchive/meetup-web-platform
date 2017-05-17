@@ -292,9 +292,7 @@ describe('parseMetaHeaders', () => {
 
 		// both 'next' and 'prev'
 		expect(
-			parseMetaHeaders({
-				link: `<${next}>; rel="next", <${prev}>; rel="prev"`,
-			})
+			parseMetaHeaders({ link: `<${next}>; rel="next", <${prev}>; rel="prev"` })
 		).toMatchObject({ link: { next, prev } });
 		// just 'next'
 		expect(parseMetaHeaders({ link: `<${next}>; rel="next"` })).toMatchObject({
@@ -386,7 +384,7 @@ describe('buildRequestArgs', () => {
 	});
 });
 
-describe('apiResponseToQueryResponse', function() {
+describe('apiResponseToQueryResponse', () => {
 	beforeEach(function() {
 		this.refs = ['foo', 'bar'];
 		this.queries = this.refs.map(ref => ({ ref }));
