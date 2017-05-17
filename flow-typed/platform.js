@@ -40,6 +40,7 @@ declare type PlatformRoute = {
 	getIndexRoute?: () => Promise<PlatformRoute>,
 	path?: string,
 	exact?: boolean,
+	strict?: boolean,
 	query?: QueryFunction | Array<QueryFunction>,
 	indexRoute?: PlatformRoute,
 	routes?: Array<PlatformRoute>,

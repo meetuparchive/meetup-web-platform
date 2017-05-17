@@ -12,8 +12,10 @@ type Resolver<T> = (input: T) => Promise<T>;
 const routePath = (
 	route: PlatformRoute,
 	matchedPath: string
-): { path: string, strict?: boolean, exact?: boolean } => ({
+): MatchPathOptions => ({
 	path: `${matchedPath}${route.path || ''}`.replace('//', '/'),
+	strict: route.strict,
+	exact: route.exact,
 });
 
 export const decodeParams = (params: Params) =>
@@ -30,7 +32,7 @@ export const getChildRoutes = (
 	matchedRoute: MatchedRoute
 ): Array<PlatformRoute> => {
 	const { route, match } = matchedRoute;
-	if (match && match.isExact) {
+	if (match.isExact) {
 		return route.indexRoute ? [route.indexRoute] : [];
 	}
 	return route.routes || [];
@@ -47,7 +49,7 @@ export const resolveChildRoutes = (
 	matchedRoute: MatchedRoute
 ): Promise<Array<PlatformRoute>> => {
 	const { match } = matchedRoute;
-	if (match && match.isExact) {
+	if (match.isExact) {
 		return _resolveIndexRoute(matchedRoute).then(
 			m => (m.route.indexRoute ? [m.route.indexRoute] : [])
 		);
@@ -91,7 +93,7 @@ const _matchedRouteQueriesReducer = (location: URL) => (
 	queries: Array<Query>,
 	{ route, match }: MatchedRoute
 ): Array<Query> => {
-	if (!route.query || !match) {
+	if (!route.query) {
 		return queries;
 	}
 	const routeQueryFns = route.query instanceof Array
@@ -117,17 +119,17 @@ const _resolveRouteMatches = (
 	matchedRoutes: Array<MatchedRoute> = [],
 	matchedPath: string = ''
 ): Promise<Array<MatchedRoute>> => {
-	const route = routes.find(
-		r => matchPath(path, routePath(r, matchedPath)) !== null
-	); // take the first match
+	const route = routes.find(r => matchPath(path, routePath(r, matchedPath))); // take the first match
 	if (!route) {
 		return Promise.resolve(matchedRoutes);
 	}
 
 	// add the route and its `match` object to the array of matched routes
-	const currentMatchedPath = routePath(route, matchedPath);
-	const match = matchPath(path, currentMatchedPath);
+	const currentMatchOptions = routePath(route, matchedPath);
+	const match = matchPath(path, currentMatchOptions);
 	if (!match) {
+		// we know that this won't ever run because we've established the match in
+		// `.find`, but this check is for type safety
 		return Promise.resolve(matchedRoutes);
 	}
 	const matchedRoute = { route, match };
@@ -141,7 +143,7 @@ const _resolveRouteMatches = (
 						childRoutes,
 						path,
 						currentMatchedRoutes,
-						currentMatchedPath.path
+						currentMatchOptions.path
 					)
 				: currentMatchedRoutes)
 	);
