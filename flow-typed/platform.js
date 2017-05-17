@@ -1,5 +1,4 @@
 // @flow
-import type { Match } from 'react-router-dom';
 declare var Intl: Object;
 
 declare type Params = { [string]: string };
@@ -44,6 +43,13 @@ declare type PlatformRoute = {
 	query?: QueryFunction | Array<QueryFunction>,
 	indexRoute?: PlatformRoute,
 	routes?: Array<PlatformRoute>,
+};
+
+declare type Match = {
+	params: Params,
+	isExact: boolean,
+	path: string,
+	url: string,
 };
 
 declare type MatchedRoute = { route: PlatformRoute, match: Match };

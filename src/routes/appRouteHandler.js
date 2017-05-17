@@ -1,3 +1,4 @@
+import 'rxjs/add/operator/do';
 import { getLanguage, checkLanguageRedirect } from '../util/languageUtils';
 
 export const getAppRouteHandler = renderRequestMap => (request, reply) => {
