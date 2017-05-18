@@ -1,35 +1,46 @@
 # App configuration
 
 The platform code uses [node-convict](https://github.com/mozilla/node-convict)
-for configuration management. By default, the platform will automatically
-provide a base set of dev-friendly defaults for all non-secret values.
+for configuration management. The platform will automatically provide a base set
+of dev-friendly defaults for all non-secret values.
 
-All config values can be set by a local config file and/or environment vars.
-Local config is preferred in order to not interfere with other apps running in
-the same environment.
+All default values can be overwritten via a local config file or environment
+vars. **Using a config file is preferred** in order to not interfere with other
+apps running in the same environment.
 
-An example local config file can be found in
-[`config.test.json`](../config.test.json) - this is the file used to set env
-values for unit tests. The 'secret' values are dummy values that will not work
-for actual development, so you will need to provide the real values in a config
-file.
+## Configuration precedence
 
-1. The OAuth consumer `key` for the platform
-2. The OAuth consumer `secret`
-3. The photo scaler salt for Meetup Classic
+Configuration values are read in the following order of increasing precedence:
+
+1. Default value - defined in [`../src/util/config.js`](../src/util/config.js)
+2. Application root `config.<NODE_ENV>.json` file
+3. Environment variable in `$HOME/.mupweb.config`
+4. Command line arguments
+
+**Note** that if a configuration variable is set in _BOTH_ a local config file AND
+in an environment var, the environment variable will take precedence.
 
 ## Config file API
 
-Config files should be placed in the root of the application repo, and be named
+Config files should be placed in the **root of the application repo**, and be named
 with the format `config.<target NODE_ENV>.json`, e.g.
 
 - `config.test.json` (can be committed - should not contain secrets)
 - `config.development.json` (must be `.gitignore`d)
 - `config.production.json` (must be `.gitignore`d)
 
-The schema for all supported values is in `../src/util/config.js`. 
+The schema for all supported values is in `../src/util/config.js`.
 
-### Example
+
+## Example local config files
+
+### Sample `config.test.json` file
+
+This example local config file can be found in
+[`config.test.json`](../config.test.json) and is used to set config values
+for unit test.
+
+The secrets in this example are dummy values and won't work in an actual app.
 
 ```json
 {
@@ -65,3 +76,22 @@ The schema for all supported values is in `../src/util/config.js`.
 }
 ```
 
+### Sample `config.development.json` file for prod apis
+
+Creating a `config.development.json` file with the following content
+at the root of your application repo will allow you to use the production
+api instead of the default dev api:
+
+```json
+{
+  "api": {
+    "host": "api.meetup.com"
+  },
+  "oauth": {
+    "auth_url": "https://secure.meetup.com/oauth2/authorize",
+    "access_url": "https://secure.meetup.com/oauth2/access"
+  }
+}
+```
+
+You can change any default configuration value by defining it in this file.
