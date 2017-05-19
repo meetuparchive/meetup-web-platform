@@ -1,5 +1,5 @@
 import avsc from 'avsc';
-import { logTrack } from './activity';
+import { getLogger } from './activity';
 import { clickToClickRecord } from '../../util/clickTrackingReader';
 import * as avro from './avro';
 
@@ -48,14 +48,14 @@ describe('Activity tracking', () => {
 			log() {},
 		},
 	};
-	const trackInfo = logTrack('WEB')(response, {
+	const trackInfo = getLogger('WEB')(response, {
 		memberId: 1234,
 		trackId: 'foo',
 		sessionId: 'bar', // not part of v3 spec
 		url: 'asdf',
 	});
 
-	it('encodes standard output from logTrack', () => {
+	it('encodes standard output from getLogger', () => {
 		const serialized = avro.serializers.activity(trackInfo);
 
 		// parse stringified object
