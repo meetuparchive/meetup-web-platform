@@ -1,7 +1,6 @@
 import { MEMBER_COOKIE } from '../../util/cookieUtils';
+import { newSessionId, updateTrackId } from './util/idUtils';
 import {
-	newSessionId,
-	updateTrackId,
 	getTrackApi,
 	getTrackLogout,
 	getTrackLogin,
