@@ -102,6 +102,5 @@ export default function getPlugins() {
 		getCsrfPlugin(),
 		getRequestAuthPlugin(),
 		getActivityTrackingPlugin({ platform_agent, isProd }),
-		// getClickTrackingPlugin(),
 	];
 }
