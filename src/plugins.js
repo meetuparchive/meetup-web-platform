@@ -1,8 +1,10 @@
+import config from './util/config';
 import HapiPino from 'hapi-pino';
 import CsrfPlugin from 'electrode-csrf-jwt';
 
 import logger from './util/logger';
 import requestAuthPlugin from './plugins/requestAuthPlugin';
+import activityPlugin from './plugins/tracking/activity';
 
 /**
  * Hapi plugins for the dev server
@@ -83,6 +85,23 @@ export function getLogger(options = {}) {
 	};
 }
 
+function getActivityTrackingPlugin({ platform_agent, isProd }) {
+	return {
+		register: activityPlugin,
+		options: {
+			platform_agent,
+			isProd,
+		},
+	};
+}
+
 export default function getPlugins() {
-	return [getLogger(), getCsrfPlugin(), getRequestAuthPlugin()];
+	const { platform_agent, isProd } = config;
+	return [
+		getLogger(),
+		getCsrfPlugin(),
+		getRequestAuthPlugin(),
+		getActivityTrackingPlugin({ platform_agent, isProd }),
+		// getClickTrackingPlugin(),
+	];
 }

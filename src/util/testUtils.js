@@ -62,7 +62,7 @@ export const getServer = () => {
 		request => () => Observable.of(request),
 		{ apply: true }
 	);
-	server.decorate('reply', 'track', () => ({}));
+	server.decorate('reply', 'activity', () => ({}));
 	server.logger = () => MOCK_LOGGER;
 	return server;
 };

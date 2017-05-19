@@ -21,6 +21,6 @@ export const getAppRouteHandler = renderRequestMap => (request, reply) => {
 			// response is sent when this function returns (`nextTick`)
 			const response = reply(result).code(statusCode);
 
-			reply.track(response, 'session');
+			reply.activity(response, 'session');
 		});
 };
