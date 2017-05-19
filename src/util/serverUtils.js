@@ -3,7 +3,6 @@ import https from 'https';
 import Hapi from 'hapi';
 import uuid from 'uuid';
 
-import track from './tracking';
 import clickTrackingReader from './clickTrackingReader';
 
 /**
@@ -144,8 +143,6 @@ export function server(routes, connection, plugins, platform_agent, config) {
 	// previously-defined properties
 	// https://hapijs.com/api#serverapp
 	server.settings.app = Object.assign(server.settings.app || {}, config);
-
-	server.decorate('reply', 'track', track(platform_agent));
 
 	const appConnection = server.connection(connection);
 	return appConnection

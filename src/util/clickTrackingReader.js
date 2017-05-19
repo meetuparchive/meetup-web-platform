@@ -1,4 +1,4 @@
-import avro from './avro';
+import avro from '../plugins/tracking/util/avro';
 import config from './config';
 import { parseMemberCookie } from './cookieUtils';
 
