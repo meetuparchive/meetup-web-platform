@@ -19,7 +19,7 @@ const handleQueryResponses = (request, reply) => queryResponses => {
 	metadata.url = url.parse(originUrl).pathname;
 	metadata.method = response.request.method;
 
-	reply.track(response, 'api', queryResponses, metadata);
+	reply.trackApi(response, queryResponses, metadata);
 };
 
 export const getApiProxyRouteHandler = proxyApiRequest$ => (request, reply) => {
