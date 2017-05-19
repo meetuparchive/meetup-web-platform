@@ -24,12 +24,9 @@ type TrackOpts = {
 	cookieOpts: CookieOpts,
 };
 type TrackGetter = TrackOpts => Tracker;
-/**
- * @method newSessionId
- *
+
+/*
  * simple tracking id for the browser session
- *
- * @param {Object} hapi response object
  */
 export const newSessionId: ({
 	sessionIdCookieName: string,
@@ -229,7 +226,7 @@ export function getTrackers(options: {
 		sessionIdCookieName,
 		cookieOpts,
 	};
-	const trackers: { [string]: Logger } = {
+	const trackers: { [string]: Tracker } = {
 		trackApi: getTrackApi(trackOpts),
 		trackLogin: getTrackLogin(trackOpts),
 		trackLogout: getTrackLogout(trackOpts),
