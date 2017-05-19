@@ -126,7 +126,7 @@ export const trackApi: Tracker = (trackOpts: TrackOpts) => (
 		((((loginResponse || {}).login || {}).value || {}).member || {}).id ||
 			''
 	);
-	if ((((loginResponse && loginResponse.login) || {}).value || {}).member) {
+	if (memberId) {
 		trackLogin(trackOpts)(response, memberId);
 	}
 	if ('logout' in response.request.query) {
