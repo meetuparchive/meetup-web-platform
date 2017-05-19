@@ -46,6 +46,13 @@ declare type PlatformRoute = {
 	routes?: Array<PlatformRoute>,
 };
 
+declare type CookieOpts = {
+	path?: string,
+	isHttpOnly?: boolean,
+	isSecure?: boolean,
+	encoding?: string,
+};
+
 declare type Match = {
 	params: Params,
 	isExact: boolean,
