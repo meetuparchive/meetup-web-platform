@@ -1,4 +1,4 @@
-// @flow weak
+// @flow
 import uuid from 'uuid';
 import avro from './avro';
 import { parseMemberCookie } from '../../util/cookieUtils';
@@ -127,12 +127,11 @@ export const getTrackApi: TrackGetter = (trackOpts: TrackOpts) => (
 	}
 	// special case - login requests need to be tracked
 	const loginResponse = queryResponses.find(r => r.login);
-	const memberId: string = JSON.stringify(
+	const memberId: number =
 		((((loginResponse || {}).login || {}).value || {}).member || {}).id ||
-			''
-	);
+		0;
 	if (memberId) {
-		getTrackLogin(trackOpts)(response, memberId);
+		getTrackLogin(trackOpts)(response, JSON.stringify(memberId));
 	}
 	if ('logout' in response.request.query) {
 		getTrackLogout(trackOpts)(response);
@@ -228,8 +227,6 @@ export function getTrackers(options: {
 	};
 	const trackers: { [string]: Tracker } = {
 		trackApi: getTrackApi(trackOpts),
-		trackLogin: getTrackLogin(trackOpts),
-		trackLogout: getTrackLogout(trackOpts),
 		trackSession: getTrackSession(trackOpts),
 	};
 	return trackers;
