@@ -2,7 +2,7 @@ import { mockConfig } from '../mocks';
 import start from '../../src/server';
 import * as appRouteHandler from '../../src/routes/appRouteHandler';
 
-jest.mock('../../src/plugins/tracking/avro'); // will spy on calls to this
+jest.mock('../../src/plugins/tracking/util/avro'); // will spy on calls to this
 
 describe('General server startup tests', () => {
 	it('starts the server', () => {
@@ -118,7 +118,7 @@ describe('Cookie setting', () => {
 		const routes = [fooRoute];
 		// spyOn(config, 'default').and.returnValue(Promise.resolve({}));
 		return start({}, { routes }, mockConfig).then(server => {
-			const avro = require('../../src/plugins/tracking/avro');
+			const avro = require('../../src/plugins/tracking/util/avro');
 			avro.loggers.click.mockReturnValue('mocked clicktracking log');
 			const request = {
 				method: 'get',
