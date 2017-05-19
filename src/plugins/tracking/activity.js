@@ -15,14 +15,15 @@ import { parseMemberCookie } from '../../util/cookieUtils';
  */
 
 const YEAR_IN_MS: number = 1000 * 60 * 60 * 24 * 365;
-type Log = (response: Object, ...args: Array<any>) => mixed;
+type Logger = (Object, Object) => mixed;
+type Tracker = (response: Object, ...args: Array<any>) => mixed;
 type TrackOpts = {
-	log: Log,
+	log: Logger,
 	trackIdCookieName: string,
 	sessionIdCookieName: string,
 	cookieOpts: CookieOpts,
 };
-type Tracker = TrackOpts => Log;
+type TrackGetter = TrackOpts => Tracker;
 /**
  * @method newSessionId
  *
@@ -40,17 +41,13 @@ export const newSessionId: ({
 	return sessionId;
 };
 
-/**
- * @method updateTrackId
- *
+/*
  * Initialize the trackId for member or anonymous user - the longest-living id
  * we can assign to a user. Stays in place until login or logout, when it is
  * exchanged for a new trackId
  *
  *  - If the user has a tracking cookie already set, do nothing.
  *  - Otherwise, generate a new uuid and set a tracking cookie.
- *
- * @param {Object} hapi response object
  */
 type UpdateTrackId = ({
 	trackIdCookieName: string,
@@ -75,7 +72,7 @@ export const updateTrackId: UpdateTrackId = (options: {
 	return trackId;
 };
 
-export const getTrackLogout: Tracker = ({
+export const getTrackLogout: TrackGetter = ({
 	log,
 	trackIdCookieName,
 	sessionIdCookieName,
@@ -93,7 +90,7 @@ export const getTrackLogout: Tracker = ({
 		url: response.request.info.referrer || '',
 	});
 
-export const trackNav: Tracker = ({
+export const trackNav: TrackGetter = ({
 	log,
 	trackIdCookieName,
 	sessionIdCookieName,
@@ -121,7 +118,7 @@ export const trackNav: Tracker = ({
 	});
 };
 
-export const getTrackApi: Tracker = (trackOpts: TrackOpts) => (
+export const getTrackApi: TrackGetter = (trackOpts: TrackOpts) => (
 	response: Object,
 	queryResponses: Array<Object>,
 	metadata: ?Object
@@ -145,7 +142,7 @@ export const getTrackApi: Tracker = (trackOpts: TrackOpts) => (
 	}
 };
 
-export const getTrackLogin: Tracker = (trackOpts: TrackOpts) => (
+export const getTrackLogin: TrackGetter = (trackOpts: TrackOpts) => (
 	response: Object,
 	memberId: string
 ) =>
@@ -161,7 +158,7 @@ export const getTrackLogin: Tracker = (trackOpts: TrackOpts) => (
 		url: response.request.info.referrer || '',
 	});
 
-export const getTrackSession: Tracker = ({
+export const getTrackSession: TrackGetter = ({
 	log,
 	sessionIdCookieName,
 	trackIdCookieName,
@@ -211,7 +208,7 @@ export const logTrack: string => (Object, Object) => mixed = (
 export function getTrackers(options: {
 	platform_agent: string,
 	isProd: boolean,
-}): { [string]: Log } {
+}): { [string]: Tracker } {
 	const { platform_agent, isProd } = options;
 	const cookieOpts: CookieOpts = {
 		encoding: 'none',
@@ -225,14 +222,14 @@ export function getTrackers(options: {
 		? 'SESSION_ID'
 		: 'SESSION_ID_DEV';
 
-	const log: Log = logTrack(platform_agent);
+	const log: Logger = logTrack(platform_agent);
 	const trackOpts: TrackOpts = {
 		log,
 		trackIdCookieName,
 		sessionIdCookieName,
 		cookieOpts,
 	};
-	const trackers: { [string]: Log } = {
+	const trackers: { [string]: Logger } = {
 		trackApi: getTrackApi(trackOpts),
 		trackLogin: getTrackLogin(trackOpts),
 		trackLogout: getTrackLogout(trackOpts),
@@ -246,7 +243,7 @@ export default function register(
 	options: { platform_agent: string, isProd: boolean },
 	next: () => void
 ) {
-	const trackers: { [string]: Log } = getTrackers(options);
+	const trackers: { [string]: Tracker } = getTrackers(options);
 
 	Object.keys(trackers).forEach((trackType: string) => {
 		server.decorate('reply', trackType, trackers[trackType]);
