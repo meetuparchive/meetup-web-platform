@@ -1,6 +1,6 @@
 import avsc from 'avsc';
-import { getLogger } from './activity';
-import { clickToClickRecord } from '../../util/clickTrackingReader';
+import { getLogger } from '../activity';
+import { clickToClickRecord } from '../../../util/clickTrackingReader';
 import * as avro from './avro';
 
 jest.mock('@google-cloud/pubsub', () => {

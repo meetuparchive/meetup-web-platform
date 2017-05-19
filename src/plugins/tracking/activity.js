@@ -1,5 +1,5 @@
 // @flow
-import avro from './avro';
+import avro from './util/avro';
 import { getTrackApi, getTrackSession } from './_activityTrackers';
 
 /*
