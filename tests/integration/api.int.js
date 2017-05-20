@@ -7,9 +7,6 @@ import * as apiProxyHandler from '../../src/apiProxy/apiProxyHandler';
 
 const mockQuery = { type: 'foo', params: {}, ref: 'foo', endpoint: 'foo' };
 const queries = rison.encode_array([mockQuery]);
-/*
- * BEGIN 'GET' TESTS
- */
 const GET_RESPONSE = {
 	headers: {},
 	statusCode: 200,
@@ -50,7 +47,10 @@ const DELETE_RESPONSE = {
 };
 const DELETE_BODY = { foo: 'patch' };
 
-describe('API proxy endpoint integration tests', () => {
+/*
+ * BEGIN 'GET' TESTS
+ */
+describe('API proxy GET endpoint integration tests', () => {
 	it('calls the GET handler for /mu_api', () => {
 		require('request').__setMockResponse(
 			GET_RESPONSE,

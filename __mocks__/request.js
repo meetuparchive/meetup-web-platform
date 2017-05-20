@@ -1,3 +1,4 @@
+const actual_request = require.requireActual('request');
 /**
  * Jest will automatically apply this mock for every call to the `request`
  * package when running tests. This means that the network will not be hit by
@@ -49,6 +50,7 @@ const request = jest.fn((requestOpts, cb) => {
 	);
 });
 request.post = jest.fn(request);
+request.jar = actual_request.jar;
 
 request.__setMockResponse = (response, body) => {
 	mockResponse = response;
