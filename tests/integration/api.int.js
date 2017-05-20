@@ -5,27 +5,57 @@ import { getCsrfHeaders } from '../mocks';
 import start from '../../src/server';
 import * as apiProxyHandler from '../../src/apiProxy/apiProxyHandler';
 
+const mockQuery = { type: 'foo', params: {}, ref: 'foo', endpoint: 'foo' };
+const queries = rison.encode_array([mockQuery]);
 /*
  * BEGIN 'GET' TESTS
  */
-require('request').__setMockResponse(
-	{
-		headers: {},
-		statusCode: 200,
-		elapsedTime: 2,
-		request: {
-			uri: {
-				query: 'foo=bar',
-				pathname: '/foo',
-			},
-			method: 'get',
+const GET_RESPONSE = {
+	headers: {},
+	statusCode: 200,
+	elapsedTime: 2,
+	request: {
+		uri: {
+			query: 'foo=bar',
+			pathname: '/foo',
 		},
+		method: 'get',
 	},
-	'{}'
-);
+};
+const GET_BODY = { foo: 'get' };
+const POST_RESPONSE = {
+	...GET_RESPONSE,
+	request: {
+		uri: {
+			pathname: '/foo',
+		},
+		method: 'post',
+	},
+};
+const POST_BODY = { foo: 'post' };
+const PATCH_RESPONSE = {
+	...POST_RESPONSE,
+	request: {
+		...POST_RESPONSE.request,
+		method: 'patch',
+	},
+};
+const PATCH_BODY = { foo: 'patch' };
+const DELETE_RESPONSE = {
+	...POST_RESPONSE,
+	request: {
+		...POST_RESPONSE.request,
+		method: 'patch',
+	},
+};
+const DELETE_BODY = { foo: 'patch' };
 
 describe('API proxy endpoint integration tests', () => {
 	it('calls the GET handler for /mu_api', () => {
+		require('request').__setMockResponse(
+			GET_RESPONSE,
+			JSON.stringify(GET_BODY)
+		);
 		const spyable = {
 			handler: (request, reply) => reply('okay'),
 		};
@@ -36,7 +66,7 @@ describe('API proxy endpoint integration tests', () => {
 		return start({}, {}).then(server => {
 			const request = {
 				method: 'get',
-				url: `/mu_api?queries=${rison.encode_array([{}])}`,
+				url: `/mu_api?queries=${queries}`,
 				credentials: 'whatever',
 			};
 			return server
@@ -46,12 +76,16 @@ describe('API proxy endpoint integration tests', () => {
 		});
 	});
 	it('returns a formatted array of responses from GET /mu_api', () => {
+		require('request').__setMockResponse(
+			GET_RESPONSE,
+			JSON.stringify(GET_BODY)
+		);
 		const expectedResponse = {
 			responses: [
 				{
 					ref: 'foo',
 					type: 'foo',
-					value: {}, // from the mocked `request` module
+					value: GET_BODY,
 					meta: {
 						endpoint: '/foo',
 						statusCode: 200,
@@ -59,14 +93,6 @@ describe('API proxy endpoint integration tests', () => {
 				},
 			],
 		};
-		const queries = rison.encode_array([
-			{
-				type: 'foo',
-				params: {},
-				ref: 'foo',
-				endpoint: 'foo',
-			},
-		]);
 		return start({}, {}).then(server => {
 			const request = {
 				method: 'get',
@@ -92,28 +118,13 @@ describe('API proxy endpoint integration tests', () => {
 /*
  * BEGIN 'POST' TESTS
  */
-require('request').__setMockResponse(
-	{
-		headers: {},
-		statusCode: 200,
-		elapsedTime: 2,
-		request: {
-			uri: {
-				pathname: '/foo',
-			},
-			method: 'post',
-		},
-	},
-	'{}'
-);
-
-const mockQuery = { type: 'foo', params: {}, ref: 'foo', endpoint: 'foo' };
 const mockPostPayload = {
-	queries: rison.encode_array([mockQuery]),
+	queries,
 };
 
-const runTest = (test, csrfHeaders = getCsrfHeaders) => server =>
-	csrfHeaders()
+const runMutationTest = ({ csrfHeaders, method, test, queries }) => server => {
+	csrfHeaders = csrfHeaders || getCsrfHeaders;
+	return csrfHeaders()
 		.then(([headerToken, cookieToken]) => {
 			const headers = {
 				'x-csrf-jwt': headerToken,
@@ -121,9 +132,11 @@ const runTest = (test, csrfHeaders = getCsrfHeaders) => server =>
 				cookie: `x-csrf-jwt=${cookieToken}`,
 			};
 			const request = {
-				method: 'post',
-				url: '/mu_api',
-				payload: querystring.stringify(mockPostPayload),
+				method,
+				url: `/mu_api${queries ? `?queries=${queries}` : ''}`,
+				payload: queries
+					? undefined
+					: querystring.stringify(mockPostPayload),
 				credentials: 'whatever',
 				headers,
 			};
@@ -135,28 +148,35 @@ const runTest = (test, csrfHeaders = getCsrfHeaders) => server =>
 			server.stop();
 			throw err;
 		});
+};
 
 describe('API proxy POST endpoint integration tests', () => {
 	it('calls the POST handler for /mu_api', () => {
-		const spyable = {
-			handler: (request, reply) => reply('okay'),
-		};
-		spyOn(spyable, 'handler').and.callThrough();
+		require('request').__setMockResponse(
+			POST_RESPONSE,
+			JSON.stringify(POST_BODY)
+		);
+		const handler = jest.fn((request, reply) => reply('okay'));
+		// use spyOn here so that mock will be cleaned up after test
 		spyOn(apiProxyHandler, 'getApiProxyRouteHandler').and.callFake(
-			() => spyable.handler
+			() => handler
 		);
 
-		const test = response => expect(spyable.handler).toHaveBeenCalled();
+		const test = response => expect(handler).toHaveBeenCalled();
 
-		return start({}, {}).then(runTest(test));
+		return start({}, {}).then(runMutationTest({ method: 'post', test }));
 	});
 	it('returns a formatted array of responses from POST /mu_api', () => {
+		require('request').__setMockResponse(
+			POST_RESPONSE,
+			JSON.stringify(POST_BODY)
+		);
 		const expectedResponse = {
 			responses: [
 				{
 					ref: mockQuery.ref,
 					type: mockQuery.type,
-					value: {}, // from the mocked `request` module
+					value: POST_BODY, // from the mocked `request` module
 					meta: {
 						endpoint: '/foo',
 						statusCode: 200,
@@ -167,9 +187,13 @@ describe('API proxy POST endpoint integration tests', () => {
 		const test = response =>
 			expect(JSON.parse(response.payload)).toEqual(expectedResponse);
 
-		return start({}, {}).then(runTest(test));
+		return start({}, {}).then(runMutationTest({ method: 'post', test }));
 	});
 	it('return a an object with an error key when CSRF is invalid', () => {
+		require('request').__setMockResponse(
+			POST_RESPONSE,
+			JSON.stringify(POST_BODY)
+		);
 		const expectedPayload = JSON.stringify(
 			Boom.create(400, 'INVALID_JWT').output.payload
 		);
@@ -181,10 +205,52 @@ describe('API proxy POST endpoint integration tests', () => {
 				'',
 			]);
 
-		return start({}, {}).then(runTest(test, csrfHeaders));
+		return start({}, {}).then(
+			runMutationTest({ method: 'post', test, csrfHeaders })
+		);
 	});
 });
 
 /*
- *
+ * BEGIN PATCH TEST
  */
+describe('API proxy PATCH endpoint integration tests', () => {
+	it('calls the PATCH handler for /mu_api', () => {
+		require('request').__setMockResponse(
+			PATCH_RESPONSE,
+			JSON.stringify(PATCH_BODY)
+		);
+		const handler = jest.fn((request, reply) => reply('okay'));
+		// use spyOn here so that mock will be cleaned up after test
+		spyOn(apiProxyHandler, 'getApiProxyRouteHandler').and.callFake(
+			() => handler
+		);
+
+		const test = response => expect(handler).toHaveBeenCalled();
+
+		return start({}, {}).then(runMutationTest({ method: 'patch', test }));
+	});
+});
+
+/*
+ * BEGIN DELETE TEST
+ */
+describe('API proxy DELETE endpoint integration tests', () => {
+	it('calls the DELETE handler for /mu_api', () => {
+		require('request').__setMockResponse(
+			DELETE_RESPONSE,
+			JSON.stringify(DELETE_BODY)
+		);
+		const handler = jest.fn((request, reply) => reply('okay'));
+		// use spyOn here so that mock will be cleaned up after test
+		spyOn(apiProxyHandler, 'getApiProxyRouteHandler').and.callFake(
+			() => handler
+		);
+
+		const test = response => expect(handler).toHaveBeenCalled();
+
+		return start({}, {}).then(
+			runMutationTest({ method: 'delete', test, queries })
+		);
+	});
+});
