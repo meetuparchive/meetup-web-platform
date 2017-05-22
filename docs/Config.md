@@ -12,7 +12,7 @@ apps running in the same environment.
 
 Configuration values are read in the following order of increasing precedence:
 
-1. Default value - defined in [`../src/util/config.js`](../src/util/config.js)
+1. Default value - see `src/util/config/index.js` and `src/util/config/build.js`
 2. Application root `config.<NODE_ENV>.json` file
 3. Environment variable in `$HOME/.mupweb.config`
 4. Command line arguments
@@ -29,7 +29,8 @@ with the format `config.<target NODE_ENV>.json`, e.g.
 - `config.development.json` (must be `.gitignore`d)
 - `config.production.json` (must be `.gitignore`d)
 
-The schema for all supported values is in `../src/util/config.js`.
+The schema for all supported values can be found in `src/util/config/index.js`
+and `src/util/config/build.js`.
 
 
 ## Examples
