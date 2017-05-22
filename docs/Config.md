@@ -32,7 +32,7 @@ with the format `config.<target NODE_ENV>.json`, e.g.
 The schema for all supported values is in `../src/util/config.js`.
 
 
-## Example local config files
+## Examples
 
 ### Sample `config.test.json` file
 
@@ -75,23 +75,3 @@ The secrets in this example are dummy values and won't work in an actual app.
   }
 }
 ```
-
-### Sample `config.development.json` file for prod apis
-
-Creating a `config.development.json` file with the following content
-at the root of your application repo will allow you to use the production
-api instead of the default dev api:
-
-```json
-{
-  "api": {
-    "host": "api.meetup.com"
-  },
-  "oauth": {
-    "auth_url": "https://secure.meetup.com/oauth2/authorize",
-    "access_url": "https://secure.meetup.com/oauth2/access"
-  }
-}
-```
-
-You can change any default configuration value by defining it in this file.
