@@ -209,7 +209,7 @@ describe('parseApiResponse', () => {
 	};
 	it('returns the flags set in the X-Meetup-Flags header', () => {
 		const headers = {
-			'x-meetup-flags': 'foo=true,bar=false',
+			'x-meetup-flags': 'foo=true, bar=false',
 		};
 		const flaggedResponse = { ...MOCK_RESPONSE, headers };
 		expect(
@@ -278,7 +278,7 @@ describe('parseMetaHeaders', () => {
 	});
 	it('returns x-meetup-flags as flags object with real booleans', () => {
 		expect(
-			parseMetaHeaders({ 'x-meetup-flags': 'foo=true,bar=false' })
+			parseMetaHeaders({ 'x-meetup-flags': 'foo=true, bar=false' })
 		).toMatchObject({ flags: { foo: true, bar: false } });
 	});
 	it('parses specified x- headers', () => {
