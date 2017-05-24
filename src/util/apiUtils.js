@@ -96,7 +96,7 @@ export const parseMetaHeaders = headers => {
 	// special case handling for flags
 	if (meetupHeaders.flags) {
 		meetupHeaders.flags = querystring.parse(meetupHeaders.flags, {
-			delimiter: ',',
+			delimiter: ', ',
 			decoder: coerceBool,
 		});
 	}
