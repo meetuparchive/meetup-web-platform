@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import withRouter from 'react-router-dom/withRouter';
 import { bindActionCreators } from 'redux';
@@ -40,10 +41,10 @@ export class SyncContainer extends React.Component {
 }
 
 SyncContainer.propTypes = {
-	children: React.PropTypes.element.isRequired,
-	dispatchLocationChange: React.PropTypes.func.isRequired,
-	location: React.PropTypes.object.isRequired,
-	history: React.PropTypes.object.isRequired,
+	children: PropTypes.element.isRequired,
+	dispatchLocationChange: PropTypes.func.isRequired,
+	location: PropTypes.object.isRequired,
+	history: PropTypes.object.isRequired,
 };
 
 export default connect(null, mapDispatchToProps)(withRouter(SyncContainer));

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Switch from 'react-router-dom/Switch';
 import Route from 'react-router-dom/Route';
@@ -33,8 +34,8 @@ class RouteLayout extends React.Component {
 }
 
 RouteLayout.propTypes = {
-	routes: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
-	matchedPath: React.PropTypes.string,
+	routes: PropTypes.arrayOf(PropTypes.object).isRequired,
+	matchedPath: PropTypes.string,
 };
 
 export default RouteLayout;

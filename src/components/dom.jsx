@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Helmet from 'react-helmet';
 import escapeHtml from 'escape-html';
@@ -92,12 +93,12 @@ const DOM = props => {
 };
 
 DOM.propTypes = {
-	appMarkup: React.PropTypes.string,
-	assetPublicPath: React.PropTypes.string.isRequired,
-	baseUrl: React.PropTypes.string,
-	clientFilename: React.PropTypes.string,
-	initialState: React.PropTypes.object.isRequired,
-	scripts: React.PropTypes.array,
+	appMarkup: PropTypes.string,
+	assetPublicPath: PropTypes.string.isRequired,
+	baseUrl: PropTypes.string,
+	clientFilename: PropTypes.string,
+	initialState: PropTypes.object.isRequired,
+	scripts: PropTypes.array,
 };
 
 export default DOM;

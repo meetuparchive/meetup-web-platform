@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Link from 'react-router-dom/Link';
 
@@ -18,7 +19,7 @@ class LogoutLink extends React.Component {
 }
 
 LogoutLink.propTypes = {
-	to: React.PropTypes.string,
+	to: PropTypes.string,
 };
 
 LogoutLink.defaultProps = {
