@@ -15,7 +15,6 @@ Configuration values are read in the following order of increasing precedence:
 1. Default value - see `src/util/config/index.js` and `src/util/config/build.js`
 2. Application root `config.<NODE_ENV>.json` file
 3. Environment variable in `$HOME/.mupweb.config`
-4. Command line arguments
 
 **Note** that if a configuration variable is set in _BOTH_ a local config file AND
 in an environment var, the environment variable will take precedence.
