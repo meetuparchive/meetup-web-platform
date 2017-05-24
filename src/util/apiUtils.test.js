@@ -372,6 +372,31 @@ describe('buildRequestArgs', () => {
 		expect(postArgs.headers['X-Meetup-Request-Flags']).not.toBeUndefined();
 	});
 
+	it('Sets X-Meetup-Variants header when query has flags', () => {
+		const experiment = 'binge-pilot';
+		const context = '1234';
+		const query = {
+			endpoint: 'foo',
+			type: 'bar',
+			params: {
+				foo: 'bar',
+			},
+			meta: {
+				variants: {
+					[experiment]: context,
+				},
+			},
+		};
+		const getArgs = buildRequestArgs({ ...options, method: 'get' })(query);
+		expect(getArgs.headers['X-Meetup-Variants']).toEqual(
+			`${experiment}=${context}`
+		);
+		const postArgs = buildRequestArgs({ ...options, method: 'post' })(query);
+		expect(postArgs.headers['X-Meetup-Variants']).toEqual(
+			`${experiment}=${context}`
+		);
+	});
+
 	const testQueryResults_utf8 = mockQuery(MOCK_RENDERPROPS_UTF8);
 
 	it('Properly encodes the URL', () => {

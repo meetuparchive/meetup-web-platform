@@ -248,7 +248,7 @@ export const buildRequestArgs = externalRequestOpts => ({
 			const contexts = context instanceof Array ? context : [context];
 			header += contexts.map(c => `${experiment}=${c}`).join(' ');
 			return header;
-		});
+		}, '');
 	}
 
 	switch (externalRequestOpts.method) {
