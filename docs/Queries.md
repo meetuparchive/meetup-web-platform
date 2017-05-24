@@ -46,8 +46,8 @@ A Query is just a plain object with the following shape:
     flags: ['thisflag', 'thatflag'],
     method: 'get',  // generally not needed
     variants: {
-      'my-member-experiment': 1234,  // memberId
-      'my-group-experiment': 5678,    // chapterId
+      'my-member-experiment': '1234',  // memberId - MUST BE STRING (e.g. `memberId.toString()`)
+      'my-group-experiment': '5678',    // chapterId
     },
   },
 }
