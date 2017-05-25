@@ -3,18 +3,56 @@ import config, {
 	CSRF_SECRET_ERROR,
 	OAUTH_SECRET_ERROR,
 	OAUTH_KEY_ERROR,
+	PROTOCOL_ERROR,
 	SALT_ERROR,
 	validateCookieSecret,
 	validateCsrfSecret,
 	validateOauthSecret,
 	validateOauthKey,
 	validatePhotoScalerSalt,
+	validateProtocol,
+	validateServerHost,
 } from './index';
 
 const string1 = '1';
 const string31 = 'asdfasdfasdfasdfasdfasdfasdfasd';
 const string32 = 'asdfasdfasdfasdfasdfasdfasdfasdf';
 const string36 = 'asdfasdfasdfasdfasdfasdfasdfasdfasdf';
+
+describe('validateProtocol', () => {
+	it('does not error when protocol is `http` or `https`', () => {
+		expect(() => validateProtocol('http')).not.toThrow();
+		expect(() => validateProtocol('https')).not.toThrow();
+	});
+
+	it('throws error when the protocol is not `http` or `https`', () => {
+		expect(() => validateProtocol('ftp')).toThrowError(PROTOCOL_ERROR);
+	});
+});
+
+describe('validateServerHost', () => {
+	it('throws an error for non-string values', () => {
+		expect(() => validateServerHost(null)).toThrow();
+		expect(() => validateServerHost(1234)).toThrow();
+		expect(() => validateServerHost({ foo: 'bar' })).toThrow();
+		expect(() => validateServerHost(['foo'])).toThrow();
+		expect(() => validateServerHost('foo')).not.toThrow();
+	});
+	it('throws error for dev in prod', () => {
+		const _env = process.env.NODE_ENV; // cache the 'real' value to restore later
+		process.env.NODE_ENV = 'production';
+		expect(() => validateServerHost('foo.dev.bar.com')).toThrow();
+		expect(() => validateServerHost('foo.bar.com')).not.toThrow();
+		process.env.NODE_ENV = _env; // restore original env value
+	});
+	it('throws error for dev in prod', () => {
+		const _env = process.env.NODE_ENV; // cache the 'real' value to restore later
+		process.env.NODE_ENV = 'development';
+		expect(() => validateServerHost('foo.dev.bar.com')).not.toThrow();
+		expect(() => validateServerHost('foo.bar.com')).toThrow();
+		process.env.NODE_ENV = _env; // restore original env value
+	});
+});
 
 describe('config', () => {
 	it('is a valid JS object', () => {
@@ -52,7 +90,9 @@ describe('validateCookieSecret', () => {
 	});
 
 	it('throws error when secret is missing or less than 32 characters', () => {
-		expect(() => validateCookieSecret(null)).toThrowError(COOKIE_SECRET_ERROR);
+		expect(() => validateCookieSecret(null)).toThrowError(
+			COOKIE_SECRET_ERROR
+		);
 		expect(() => validateCookieSecret(string31)).toThrowError(
 			COOKIE_SECRET_ERROR
 		);
@@ -67,7 +107,9 @@ describe('validateCsrfSecret', () => {
 
 	it('throws error when secret is missing or less than 32 characters', () => {
 		expect(() => validateCsrfSecret(null)).toThrowError(CSRF_SECRET_ERROR);
-		expect(() => validateCsrfSecret(string31)).toThrowError(CSRF_SECRET_ERROR);
+		expect(() => validateCsrfSecret(string31)).toThrowError(
+			CSRF_SECRET_ERROR
+		);
 	});
 });
 
@@ -78,7 +120,9 @@ describe('validateOauthSecret', () => {
 	});
 
 	it('throws error when secret is missing or empty', () => {
-		expect(() => validateOauthSecret(null)).toThrowError(OAUTH_SECRET_ERROR);
+		expect(() => validateOauthSecret(null)).toThrowError(
+			OAUTH_SECRET_ERROR
+		);
 		expect(() => validateOauthSecret('')).toThrowError(OAUTH_SECRET_ERROR);
 	});
 });
