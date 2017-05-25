@@ -18,6 +18,7 @@ import {
 	configureApiUrl,
 	configureBaseUrl,
 	configureLocaleCode,
+	configureSupportedLocaleCodes,
 } from '../actions/configActionCreators';
 
 // Ensure global Intl for use with FormatJS
@@ -107,16 +108,14 @@ const getRouterRenderer = ({
 	};
 };
 
-const makeRenderer$ = (
-	renderConfig: {
-		routes: Array<Object>,
-		reducer: Reducer,
-		assetPublicPath: string,
-		middleware: Array<Function>,
-		baseUrl: string,
-		scripts: Array<string>,
-	}
-) =>
+const makeRenderer$ = (renderConfig: {
+	routes: Array<Object>,
+	reducer: Reducer,
+	assetPublicPath: string,
+	middleware: Array<Function>,
+	baseUrl: string,
+	scripts: Array<string>,
+}) =>
 	makeRenderer(
 		renderConfig.routes,
 		renderConfig.reducer,
@@ -157,7 +156,7 @@ const makeRenderer = (
 ) => (request: Object) => {
 	middleware = middleware || [];
 	const {
-		app: { localeCode },
+		app: { localeCode, supportedLocaleCodes },
 		connection,
 		headers,
 		info,
@@ -187,6 +186,7 @@ const makeRenderer = (
 	store.dispatch(configureApiUrl(apiUrl));
 	store.dispatch(configureBaseUrl(host));
 	store.dispatch(configureLocaleCode(localeCode));
+	store.dispatch(configureSupportedLocaleCodes(supportedLocaleCodes));
 
 	// render skeleton if requested - the store is ready
 	if ('skeleton' in request.query) {

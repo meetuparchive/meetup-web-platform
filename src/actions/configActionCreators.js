@@ -1,20 +1,15 @@
-export function configureLocaleCode(localeCode) {
-	return {
-		type: 'CONFIGURE_LOCALE_CODE',
-		payload: localeCode,
-	};
-}
+// @flow
+export const configure = (config: { [string]: mixed }) => ({
+	type: 'CONFIGURE',
+	payload: config,
+});
+export const configureSupportedLocaleCodes = (
+	supportedLocaleCodes: Array<string>
+) => configure({ supportedLocaleCodes });
 
-export function configureApiUrl(url) {
-	return {
-		type: 'CONFIGURE_API_URL',
-		payload: url,
-	};
-}
+export const configureLocaleCode = (localeCode: string) =>
+	configure({ localeCode });
 
-export function configureBaseUrl(url) {
-	return {
-		type: 'CONFIGURE_BASE_URL',
-		payload: url,
-	};
-}
+export const configureApiUrl = (apiUrl: string) => configure({ apiUrl });
+
+export const configureBaseUrl = (baseUrl: string) => configure({ baseUrl });
