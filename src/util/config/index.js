@@ -2,7 +2,7 @@ import fs from 'fs';
 import convict from 'convict';
 import path from 'path';
 
-import buildConfig, { schema as buildSchema, validateProtocol } from './build';
+import buildConfig, { schema as buildSchema } from './build';
 import { duotones, getDuotoneUrls } from '../duotone';
 
 /**
@@ -70,8 +70,67 @@ export const validatePhotoScalerSalt = salt => {
 	}
 };
 
+export const PROTOCOL_ERROR = 'Protocol must be http or https';
+
+export const validateProtocol = protocol => {
+	if (!['http', 'https'].includes(protocol)) {
+		throw new Error(PROTOCOL_ERROR);
+	}
+};
+
+const DEV_SUBSTRING = '.dev.';
+export const validateServerHost = host => {
+	if (typeof host !== 'string') {
+		throw new Error('Server host property must be a string');
+	}
+	const isDev =
+		process.env.NODE_ENV === 'development' || !process.env.NODE_ENV;
+	if (process.env.NODE_ENV === 'production' && host.includes(DEV_SUBSTRING)) {
+		throw new Error(
+			`Server host ${host} must not include '.dev.' in production`
+		);
+	}
+	if (isDev && !host.includes(DEV_SUBSTRING)) {
+		throw new Error(
+			`Server host ${host} must include '.dev.' in development`
+		);
+	}
+};
+
 export const config = convict({
 	...buildSchema,
+	app_server: {
+		protocol: {
+			format: validateProtocol,
+			default: 'http',
+			env: 'DEV_SERVER_PROTOCOL', // legacy naming
+		},
+		// host: '0.0.0.0', ALWAYS 0.0.0.0
+		port: {
+			format: 'port',
+			default: 8000,
+			arg: 'app-port',
+			env: process.env.NODE_ENV !== 'test' && 'DEV_SERVER_PORT', // don't read env in tests
+		},
+	},
+	asset_server: {
+		host: {
+			format: String,
+			default: 'beta2.dev.meetup.com',
+			env: 'ASSET_SERVER_HOST',
+		},
+		path: {
+			format: String,
+			default: '/static',
+			env: 'ASSET_PATH',
+		},
+		port: {
+			format: 'port',
+			default: 8001, // must be 443 for prod
+			arg: 'asset-port',
+			env: process.env.NODE_ENV !== 'test' && 'ASSET_SERVER_PORT', // don't read env in tests
+		},
+	},
 	api: {
 		protocol: {
 			format: validateProtocol,
@@ -79,7 +138,7 @@ export const config = convict({
 			env: 'API_PROTOCOL',
 		},
 		host: {
-			format: String,
+			format: validateServerHost,
 			default: 'api.dev.meetup.com',
 			env: 'API_HOST',
 		},
