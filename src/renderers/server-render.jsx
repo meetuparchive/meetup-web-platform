@@ -14,12 +14,7 @@ import PlatformApp from '../components/PlatformApp';
 
 import { getServerCreateStore } from '../util/createStoreServer';
 import { SERVER_RENDER } from '../actions/syncActionCreators';
-import {
-	configureApiUrl,
-	configureBaseUrl,
-	configureLocaleCode,
-	configureSupportedLocaleCodes,
-} from '../actions/configActionCreators';
+import configure from '../actions/configActionCreators';
 
 // Ensure global Intl for use with FormatJS
 Intl.NumberFormat = IntlPolyfill.NumberFormat;
@@ -183,11 +178,14 @@ const makeRenderer = (
 	const store = createStore(reducer, initialState);
 
 	// load initial config
-	store.dispatch(configureApiUrl(apiUrl));
-	store.dispatch(configureBaseUrl(host));
-	store.dispatch(configureLocaleCode(localeCode));
-	store.dispatch(configureSupportedLocaleCodes(supportedLocaleCodes));
-
+	store.dispatch(
+		configure({
+			apiUrl,
+			baseUrl: host,
+			localeCode,
+			supportedLocaleCodes,
+		})
+	);
 	// render skeleton if requested - the store is ready
 	if ('skeleton' in request.query) {
 		return Observable.of({
