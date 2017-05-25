@@ -19,17 +19,14 @@ export const validateServerHost = host => {
 	if (typeof host !== 'string') {
 		throw new Error('Server host property must be a string');
 	}
-	const isDev =
-		process.env.NODE_ENV === 'development' || !process.env.NODE_ENV;
+	const isDev = process.env.NODE_ENV === 'development' || !process.env.NODE_ENV;
 	if (process.env.NODE_ENV === 'production' && host.includes(DEV_SUBSTRING)) {
 		throw new Error(
 			`Server host ${host} must not include '.dev.' in production`
 		);
 	}
 	if (isDev && !host.includes(DEV_SUBSTRING)) {
-		throw new Error(
-			`Server host ${host} must include '.dev.' in development`
-		);
+		throw new Error(`Server host ${host} must include '.dev.' in development`);
 	}
 };
 
@@ -63,11 +60,7 @@ export const schema = {
 			default: 'http',
 			env: 'DEV_SERVER_PROTOCOL', // legacy naming
 		},
-		host: {
-			format: validateServerHost,
-			default: 'beta2.dev.meetup.com',
-			env: 'DEV_SERVER_HOST', // legacy naming
-		},
+		// host: 0.0.0.0', ALWAYS 0.0.0.0
 		port: {
 			format: 'port',
 			default: 8000,
