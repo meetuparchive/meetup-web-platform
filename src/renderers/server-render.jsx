@@ -184,6 +184,7 @@ const makeRenderer = (
 			baseUrl: host,
 			localeCode,
 			supportedLocaleCodes,
+			initialNow: new Date().getTime(),
 		})
 	);
 	// render skeleton if requested - the store is ready
