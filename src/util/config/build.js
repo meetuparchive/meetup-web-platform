@@ -38,7 +38,7 @@ export const schema = {
 	},
 	asset_server: {
 		host: {
-			format: validateServerHost,
+			format: String,
 			default: 'beta2.dev.meetup.com',
 			env: 'ASSET_SERVER_HOST',
 		},
