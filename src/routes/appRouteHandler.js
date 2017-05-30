@@ -13,6 +13,7 @@ export const getAppRouteHandler = renderRequestMap => (request, reply) => {
 		return redirect;
 	}
 	request.app.localeCode = requestLanguage;
+	request.app.supportedLocaleCodes = supportedLangs;
 	const renderRequest = renderRequestMap[requestLanguage];
 
 	return renderRequest(request)

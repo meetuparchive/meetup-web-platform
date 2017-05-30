@@ -133,16 +133,10 @@ export function clickTracking(state = DEFAULT_CLICK_TRACK, action) {
 }
 
 export function config(state = {}, action) {
-	switch (action.type) {
-		case 'CONFIGURE_API_URL':
-			return { ...state, apiUrl: action.payload };
-		case 'CONFIGURE_LOCALE_CODE':
-			return { ...state, localeCode: action.payload };
-		case 'CONFIGURE_BASE_URL':
-			return { ...state, baseUrl: action.payload };
-		default:
-			return state;
+	if (action.type === 'CONFIGURE') {
+		return { ...state, ...action.payload };
 	}
+	return state;
 }
 
 /**
