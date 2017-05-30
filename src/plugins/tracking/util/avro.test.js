@@ -1,6 +1,6 @@
 import avsc from 'avsc';
-import { logTrack } from './tracking';
-import { clickToClickRecord } from './clickTrackingReader';
+import { getLogger } from '../activity';
+import { clickToClickRecord } from '../../../util/clickTrackingReader';
 import * as avro from './avro';
 
 jest.mock('@google-cloud/pubsub', () => {
@@ -48,14 +48,14 @@ describe('Activity tracking', () => {
 			log() {},
 		},
 	};
-	const trackInfo = logTrack('WEB')(response, {
+	const trackInfo = getLogger('WEB')(response, {
 		memberId: 1234,
 		trackId: 'foo',
 		sessionId: 'bar', // not part of v3 spec
 		url: 'asdf',
 	});
 
-	it('encodes standard output from logTrack', () => {
+	it('encodes standard output from getLogger', () => {
 		const serialized = avro.serializers.activity(trackInfo);
 
 		// parse stringified object
@@ -96,7 +96,9 @@ describe('Click tracking', () => {
 		// create a new buffer from that string
 		const avroBuffer = new Buffer(valObj.record, 'base64');
 		// get the avro-encoded record
-		const recordedInfo = avsc.parse(avro.schemas.click).fromBuffer(avroBuffer);
+		const recordedInfo = avsc
+			.parse(avro.schemas.click)
+			.fromBuffer(avroBuffer);
 		const expectedTrackedInfo = {
 			...trackInfo,
 			tag: '', // not used in our click data - defaults to empty string
