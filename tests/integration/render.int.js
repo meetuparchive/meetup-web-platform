@@ -1,4 +1,9 @@
-import { ROOT_INDEX_CONTENT, FOO_INDEX_CONTENT } from '../mockApp';
+import {
+	ROOT_INDEX_CONTENT,
+	FOO_INDEX_CONTENT,
+	EXTERNAL_REDIRECT_URL,
+	INTERNAL_REDIRECT_PATH,
+} from '../mockApp';
 import { getMockRenderRequestMap } from '../mocks';
 import start from '../../src/server';
 import { fooPathContent } from '../MockContainer';
@@ -127,4 +132,46 @@ describe('Full dummy app render', () => {
 				});
 		});
 	});
+	it('redirects to internal route for <Redirect to={internalPath} />', () =>
+		start(getMockRenderRequestMap(), {}).then(server => {
+			const request = {
+				method: 'get',
+				url: '/redirect/internal',
+				credentials: 'whatever',
+			};
+			return server
+				.inject(request)
+				.then(response => {
+					expect(response.statusCode).toBe(302);
+					expect(response.headers.location).toBe(
+						INTERNAL_REDIRECT_PATH
+					);
+				})
+				.then(() => server.stop())
+				.catch(err => {
+					server.stop();
+					throw err;
+				});
+		}));
+	it('redirects to external route for <Redirect to={URL object} />', () =>
+		start(getMockRenderRequestMap(), {}).then(server => {
+			const request = {
+				method: 'get',
+				url: '/redirect/external',
+				credentials: 'whatever',
+			};
+			return server
+				.inject(request)
+				.then(response => {
+					expect(response.statusCode).toBe(302);
+					expect(response.headers.location).toBe(
+						EXTERNAL_REDIRECT_URL
+					);
+				})
+				.then(() => server.stop())
+				.catch(err => {
+					server.stop();
+					throw err;
+				});
+		}));
 });

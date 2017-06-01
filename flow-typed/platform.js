@@ -71,3 +71,20 @@ declare module 'react-router-dom/matchPath' {
 	declare function matchPath(pathname: string, options: MatchPathOptions): null | Match;
 	declare module.exports: typeof matchPath;
 }
+
+declare type LocationShape = {
+  pathname?: string,
+  search?: string,
+  hash?: string,
+  state?: any,
+}
+
+declare class RouterRedirect extends React$Component {
+	props: {
+		to: string | LocationShape,
+		push?: boolean,
+	}
+}
+declare module 'react-router-dom/Redirect' {
+	declare export default typeof RouterRedirect;
+}
