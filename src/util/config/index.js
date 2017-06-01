@@ -83,17 +83,14 @@ export const validateServerHost = host => {
 	if (typeof host !== 'string') {
 		throw new Error('Server host property must be a string');
 	}
-	const isDev =
-		process.env.NODE_ENV === 'development' || !process.env.NODE_ENV;
+	const isDev = process.env.NODE_ENV === 'development' || !process.env.NODE_ENV;
 	if (process.env.NODE_ENV === 'production' && host.includes(DEV_SUBSTRING)) {
 		throw new Error(
 			`Server host ${host} must not include '.dev.' in production`
 		);
 	}
 	if (isDev && !host.includes(DEV_SUBSTRING)) {
-		throw new Error(
-			`Server host ${host} must include '.dev.' in development`
-		);
+		throw new Error(`Server host ${host} must include '.dev.' in development`);
 	}
 };
 
@@ -111,24 +108,6 @@ export const config = convict({
 			default: 8000,
 			arg: 'app-port',
 			env: process.env.NODE_ENV !== 'test' && 'DEV_SERVER_PORT', // don't read env in tests
-		},
-	},
-	asset_server: {
-		host: {
-			format: String,
-			default: 'beta2.dev.meetup.com',
-			env: 'ASSET_SERVER_HOST',
-		},
-		path: {
-			format: String,
-			default: '/static',
-			env: 'ASSET_PATH',
-		},
-		port: {
-			format: 'port',
-			default: 8001, // must be 443 for prod
-			arg: 'asset-port',
-			env: process.env.NODE_ENV !== 'test' && 'ASSET_SERVER_PORT', // don't read env in tests
 		},
 	},
 	api: {
