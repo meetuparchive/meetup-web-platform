@@ -3,26 +3,44 @@ import React from 'react';
 import withSideEffect from 'react-side-effect';
 import RouterRedirect from 'react-router-dom/Redirect';
 
-const testForExternal = (to: string) => to.startsWith('http');
-
+type RouterTo = string | LocationShape | URL;
 type RedirectProps = {
-	to: string,
+	to: RouterTo,
+	push?: boolean,
 };
+const testForExternal = (to: RouterTo): boolean => {
+	if (to instanceof URL) {
+		return true;
+	}
+	if (typeof to === 'string') {
+		return to.startsWith('http');
+	}
+	return false; // this is a React Router 'location'
+};
+
 class Redirect extends React.Component {
 	props: RedirectProps;
 	render() {
-		const { to } = this.props;
-		if (testForExternal(to)) {
+		const { to, push } = this.props;
+		if (to instanceof URL || testForExternal(to)) {
 			return null;
 		}
-		return <RouterRedirect to={to} />;
+		return <RouterRedirect to={to} push={push} />;
 	}
 }
 
-const reducePropsToState = (propsList: Array<RedirectProps>) =>
-	propsList.pop().to;
+const reducePropsToState = (propsList: Array<{ to: RouterTo }>): ?string => {
+	const { to } = propsList.pop();
+	if (to instanceof URL) {
+		return to.toString();
+	}
+	if (!testForExternal(to) || typeof to !== 'string') {
+		return undefined;
+	}
+	return to;
+};
 
-const handleStateChangeOnClient = (to: string) => {
+const handleStateChangeOnClient = (to: RouterTo) => {
 	if (!testForExternal(to)) {
 		// 'internal' links will be handled by React Router
 		return;
