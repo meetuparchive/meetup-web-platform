@@ -3,12 +3,18 @@
  * @module localizationUtils
  */
 
+// locale data comes from https://github.com/andyearnshaw/Intl.js/tree/master/locale-data/json
 import LocaleDataFR from 'react-intl/locale-data/fr';
 import LocaleDataDE from 'react-intl/locale-data/de';
-import LocaleDataJA from 'react-intl/locale-data/ja';
 import LocaleDataES from 'react-intl/locale-data/es';
 import LocaleDataIT from 'react-intl/locale-data/it';
+import LocaleDataJA from 'react-intl/locale-data/ja';
 import LocaleDataPT from 'react-intl/locale-data/pt';
+import LocaleDataKO from 'react-intl/locale-data/ko';
+import LocaleDataNL from 'react-intl/locale-data/nl';
+import LocaleDataPL from 'react-intl/locale-data/pl';
+import LocaleDataTH from 'react-intl/locale-data/th';
+import LocaleDataTR from 'react-intl/locale-data/tr';
 
 import { addLocaleData } from 'react-intl';
 
@@ -19,26 +25,41 @@ const localeMap = {
 	'en-AU': {
 		// Use built-in locale-data for en
 	},
-	'de-DE': {
-		data: LocaleDataDE,
-	},
-	'fr-FR': {
-		data: LocaleDataFR,
-	},
-	'ja-JP': {
-		data: LocaleDataJA,
-	},
-	'it-IT': {
-		data: LocaleDataIT,
-	},
-	'pt-BR': {
-		data: LocaleDataPT,
+	es: {
+		data: LocaleDataES,
 	},
 	'es-ES': {
 		data: LocaleDataES,
 	},
-	es: {
-		data: LocaleDataES,
+	'fr-FR': {
+		data: LocaleDataFR,
+	},
+	'de-DE': {
+		data: LocaleDataDE,
+	},
+	'it-IT': {
+		data: LocaleDataIT,
+	},
+	'ja-JP': {
+		data: LocaleDataJA,
+	},
+	'ko-KR': {
+		data: LocaleDataKO,
+	},
+	'nl-NL': {
+		data: LocaleDataNL,
+	},
+	'pl-PL': {
+		data: LocaleDataPL,
+	},
+	'pt-BR': {
+		data: LocaleDataPT,
+	},
+	'th-TH': {
+		data: LocaleDataTH,
+	},
+	'tr-TR': {
+		data: LocaleDataTR,
 	},
 };
 
