@@ -3,11 +3,6 @@ import React from 'react';
 import withSideEffect from 'react-side-effect';
 import RouterRedirect from 'react-router-dom/Redirect';
 
-type RouterTo = string | LocationShape | URL;
-type RedirectProps = {
-	to: RouterTo,
-	push?: boolean,
-};
 const testForExternal = (to: RouterTo): boolean => {
 	if (to instanceof URL) {
 		return true;
@@ -18,6 +13,38 @@ const testForExternal = (to: RouterTo): boolean => {
 	return false; // this is a React Router 'location'
 };
 
+type RouterTo = string | LocationShape | URL;
+type RedirectProps = {
+	to: RouterTo,
+	push?: boolean,
+};
+
+/*
+ * A routing component that, when rendered, will redirect the application to
+ * another internal route _or_ external URL. On the server, the redirect will
+ * be handled with a 302 redirect HTTP response to the browser. On the client,
+ * `window.location.replace` will be used for external URLs, but React Router
+ * will respect a `push: false` property to decide whether to push or replace
+ * ``window.history` state.
+ *
+ * Strings, location objects, and URL objects are all supported in the `to`
+ * prop, but location objects will _only_ be treated as internal routes, and URL
+ * objects will _only_ be treated as external URLs.
+ *
+ * Example:
+ *
+ * ```
+ * // internal route, string URL
+ * <Router to='/foo/bar' />
+ * // internal route, location object
+ * <Router to={{pathname: '/foo/bar', search: '?foo=bar', hash: '#thing'}} />
+ *
+ * // external URL, string URL
+ * <Router to='http://example.com' />
+ * // external URL, URL object
+ * <Router to={new URL('http://example.com')} />
+ * ```
+ */
 class Redirect extends React.Component {
 	props: RedirectProps;
 	render() {
@@ -29,7 +56,7 @@ class Redirect extends React.Component {
 	}
 }
 
-const reducePropsToState = (propsList: Array<{ to: RouterTo }>): ?string => {
+const reducePropsToState = (propsList: Array<RedirectProps>): ?string => {
 	const { to } = propsList.pop();
 	if (to instanceof URL) {
 		return to.toString();
