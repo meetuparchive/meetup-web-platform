@@ -38,9 +38,11 @@ describe('Server rendering', () => {
 		expect(httpsContext.url).toBeUndefined();
 		expect(Redirect.rewind()).toEqual(externalTo.href);
 
-		const internalTo = 'foo/bar';
+		const internalTo = { pathname: '/foo/bar', search: '?foo=bar' };
 		const httpContext = renderToContext(internalTo);
-		expect(httpContext.url).toEqual(internalTo);
+		expect(httpContext.url).toEqual(
+			`${internalTo.pathname}${internalTo.search}`
+		);
 		expect(Redirect.rewind()).toBeUndefined();
 	});
 	it('returns undefined when no Redirect', () => {
