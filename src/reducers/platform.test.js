@@ -18,7 +18,9 @@ describe('app reducer', () => {
 		expect(app(undefined, {})).toEqual(DEFAULT_APP_STATE);
 	});
 	it('re-sets app state on logout API_REQUEST', function() {
-		const logoutRequest = syncActionCreators.apiRequest([], { logout: true });
+		const logoutRequest = syncActionCreators.apiRequest([], {
+			logout: true,
+		});
 		expect(app(this.MOCK_STATE, logoutRequest)).toEqual(DEFAULT_APP_STATE);
 	});
 	it('assembles success responses into single state tree', () => {
@@ -50,9 +52,27 @@ describe('api reducer', () => {
 	});
 	it('re-sets api state on logout API_REQ, with inFlight query', function() {
 		const ref = 'foobar';
-		const logoutRequest = apiActions.requestAll([{ ref }], { logout: true });
+		const logoutRequest = apiActions.requestAll([{ ref }], {
+			logout: true,
+		});
 		expect(api({ ...DEFAULT_API_STATE }, logoutRequest)).toEqual({
 			...DEFAULT_API_STATE,
+			inFlight: [ref],
+		});
+	});
+	it('clears refs corresponding to new requests', function() {
+		const ref = 'foobar';
+		const populatedState = {
+			...DEFAULT_API_STATE,
+			bar: 'something unrelated',
+		};
+		const populatedStateWithRef = {
+			...populatedState,
+			[ref]: 'not empty',
+		};
+		const action = apiActions.requestAll([{ ref }]);
+		expect(api(populatedStateWithRef, action)).toEqual({
+			...populatedState,
 			inFlight: [ref],
 		});
 	});
