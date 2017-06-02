@@ -29,12 +29,15 @@ export const DEFAULT_APP_STATE = {};
 
 type ObjectFilter = (Object, ...args?: Array<any>) => Object;
 const filterKeys: ObjectFilter = (obj: ApiState, keys: Array<string>) =>
-	Object.keys(obj).reduce((newObj: ApiState, key: string) => {
-		if (keys.includes(key)) {
-			newObj[key] = obj[key];
-		}
-		return newObj;
-	}, DEFAULT_API_STATE);
+	Object.keys(obj).reduce(
+		(newObj: ApiState, key: string) => {
+			if (!keys.includes(key)) {
+				newObj[key] = obj[key];
+			}
+			return newObj;
+		},
+		{ ...DEFAULT_API_STATE }
+	);
 
 export const responseToState = (
 	response: QueryResponse
