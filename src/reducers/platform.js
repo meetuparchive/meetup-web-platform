@@ -63,7 +63,7 @@ export function api(
 			}
 
 			// remove any `ref`s that are being refreshed - eliminate stale data
-			const newState: ApiState = {
+			const newState = {
 				...filterKeys(state, requestRefs),
 				inFlight,
 			};
