@@ -25,6 +25,9 @@ import { querySchema } from './validation';
 
 import { duotoneRef } from './duotone';
 
+// match escpaed unicode characters that are treated as newline literals in JS
+const ESCAPED_UNICODE_NEWLINES = /\\u2028|\\u2029/g;
+
 const MOCK_RESPONSE_OK = {
 	// minimal representation of http.IncomingMessage
 	statusCode: 200,
@@ -34,6 +37,9 @@ const MOCK_RESPONSE_OK = {
 	},
 };
 
+/*
+ * When an API response is being mocked (dev only), this response will be used
+ */
 function makeMockResponseOk(requestOpts) {
 	return {
 		...MOCK_RESPONSE_OK,
@@ -169,7 +175,10 @@ export const parseApiValue = ([response, body]) => {
 			return { value: null };
 		}
 
-		const value = JSON.parse(body);
+		// Some newline literals will not work in JS string literals - they must be
+		// converted to an escaped newline character that will work end to end ('\n')
+		const safeBody = body.replace(ESCAPED_UNICODE_NEWLINES, '\\n');
+		const value = JSON.parse(safeBody);
 		if (value && value.problem) {
 			return formatApiError(
 				new Error(`API problem: ${value.problem}: ${value.details}`)
