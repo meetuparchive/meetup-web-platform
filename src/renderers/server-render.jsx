@@ -11,6 +11,7 @@ import StaticRouter from 'react-router-dom/StaticRouter';
 import Dom from '../components/dom';
 import NotFound from '../components/NotFound';
 import PlatformApp from '../components/PlatformApp';
+import Redirect from '../components/Redirect';
 
 import { getServerCreateStore } from '../util/createStoreServer';
 import { SERVER_RENDER } from '../actions/syncActionCreators';
@@ -51,6 +52,9 @@ function getHtml(el) {
  * @return {Object} the statusCode and result used by Hapi's `reply` API
  *   {@link http://hapijs.com/api#replyerr-result}
  */
+type RenderResult =
+	| { result: string, statusCode: number }
+	| { redirect: string };
 const getRouterRenderer = ({
 	routes,
 	store,
@@ -59,7 +63,7 @@ const getRouterRenderer = ({
 	clientFilename,
 	assetPublicPath,
 	scripts,
-}) => {
+}): RenderResult => {
 	// pre-render the app-specific markup, this is the string of markup that will
 	// be managed by React on the client.
 	//
@@ -68,9 +72,7 @@ const getRouterRenderer = ({
 	// `<head>` contents
 	const initialState = store.getState();
 	let appMarkup;
-	let result;
-	let statusCode;
-	const context = {};
+	const context: { url?: string } = {};
 
 	appMarkup = ReactDOMServer.renderToString(
 		<StaticRouter basename={baseUrl} location={location} context={context}>
@@ -78,13 +80,14 @@ const getRouterRenderer = ({
 		</StaticRouter>
 	);
 
-	if (context.url) {
-		// redirect
+	const redirect: ?string = context.url || Redirect.rewind();
+	if (redirect) {
+		return { redirect };
 	}
 
 	// all the data for the full `<html>` element has been initialized by the app
 	// so go ahead and assemble the full response body
-	result = getHtml(
+	const result = getHtml(
 		<Dom
 			baseUrl={baseUrl}
 			assetPublicPath={assetPublicPath}
@@ -95,7 +98,7 @@ const getRouterRenderer = ({
 		/>
 	);
 
-	statusCode = NotFound.rewind() || 200; // if NotFound is mounted, return 404
+	const statusCode = NotFound.rewind() || 200; // if NotFound is mounted, return 404
 
 	return {
 		statusCode,

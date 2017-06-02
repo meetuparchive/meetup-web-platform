@@ -18,8 +18,11 @@ export const getAppRouteHandler = renderRequestMap => (request, reply) => {
 
 	return renderRequest(request)
 		.do(() => request.server.app.logger.debug('HTML response ready'))
-		.subscribe(({ result, statusCode }) => {
+		.subscribe(({ redirect, result, statusCode }) => {
 			// response is sent when this function returns (`nextTick`)
+			if (redirect) {
+				return reply.redirect(redirect);
+			}
 			const response = reply(result).code(statusCode);
 
 			reply.trackSession(response);
