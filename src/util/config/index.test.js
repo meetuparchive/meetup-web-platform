@@ -90,9 +90,7 @@ describe('validateCookieSecret', () => {
 	});
 
 	it('throws error when secret is missing or less than 32 characters', () => {
-		expect(() => validateCookieSecret(null)).toThrowError(
-			COOKIE_SECRET_ERROR
-		);
+		expect(() => validateCookieSecret(null)).toThrowError(COOKIE_SECRET_ERROR);
 		expect(() => validateCookieSecret(string31)).toThrowError(
 			COOKIE_SECRET_ERROR
 		);
@@ -107,9 +105,7 @@ describe('validateCsrfSecret', () => {
 
 	it('throws error when secret is missing or less than 32 characters', () => {
 		expect(() => validateCsrfSecret(null)).toThrowError(CSRF_SECRET_ERROR);
-		expect(() => validateCsrfSecret(string31)).toThrowError(
-			CSRF_SECRET_ERROR
-		);
+		expect(() => validateCsrfSecret(string31)).toThrowError(CSRF_SECRET_ERROR);
 	});
 });
 
@@ -120,9 +116,7 @@ describe('validateOauthSecret', () => {
 	});
 
 	it('throws error when secret is missing or empty', () => {
-		expect(() => validateOauthSecret(null)).toThrowError(
-			OAUTH_SECRET_ERROR
-		);
+		expect(() => validateOauthSecret(null)).toThrowError(OAUTH_SECRET_ERROR);
 		expect(() => validateOauthSecret('')).toThrowError(OAUTH_SECRET_ERROR);
 	});
 });

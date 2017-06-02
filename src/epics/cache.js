@@ -79,12 +79,12 @@ export const cacheQueryEpic = cache => action$ =>
 		.map(cacheSuccess);
 
 const getCacheEpic = (cache = makeCache()) =>
-	(checkEnable()
+	checkEnable()
 		? combineEpics(
 				cacheClearEpic(cache),
 				cacheSetEpic(cache),
 				cacheQueryEpic(cache)
 			)
-		: action$ => action$.ignoreElements());
+		: action$ => action$.ignoreElements();
 
 export default getCacheEpic;

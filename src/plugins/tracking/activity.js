@@ -54,9 +54,7 @@ export function getTrackers(options: {
 	};
 
 	const trackIdCookieName: string = isProd ? 'TRACK_ID' : 'TRACK_ID_DEV';
-	const sessionIdCookieName: string = isProd
-		? 'SESSION_ID'
-		: 'SESSION_ID_DEV';
+	const sessionIdCookieName: string = isProd ? 'SESSION_ID' : 'SESSION_ID_DEV';
 
 	const log: Logger = getLogger(platform_agent);
 	const trackOpts: TrackOpts = {

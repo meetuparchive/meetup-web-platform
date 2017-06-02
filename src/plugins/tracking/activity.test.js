@@ -222,9 +222,7 @@ describe('tracking loggers', () => {
 		expect(trackInfo.description).toEqual('session'); // this may change, but need to ensure tag is always correct
 		// new
 		expect(trackInfo.sessionId).toBeDefined();
-		expect(trackInfo.sessionId).not.toEqual(
-			request.state[sessionIdCookieName]
-		);
+		expect(trackInfo.sessionId).not.toEqual(request.state[sessionIdCookieName]);
 		// old
 		expect(trackInfo.trackId).toBeDefined();
 		expect(trackInfo.trackId).toEqual(request.state[trackIdCookieName]);

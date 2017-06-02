@@ -229,7 +229,8 @@ export const getAccessToken$ = (serverAppConfig, redirect_uri) => {
 								responseTime: new Date() - startTime,
 							},
 						},
-						`Incoming response GET ${serverAppConfig.oauth.access_url}?${grant_type}`
+						`Incoming response GET ${serverAppConfig.oauth
+							.access_url}?${grant_type}`
 					);
 				})
 				.mergeMap(tryJSON(serverAppConfig.oauth.access_url));

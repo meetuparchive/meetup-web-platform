@@ -96,9 +96,7 @@ describe('Click tracking', () => {
 		// create a new buffer from that string
 		const avroBuffer = new Buffer(valObj.record, 'base64');
 		// get the avro-encoded record
-		const recordedInfo = avsc
-			.parse(avro.schemas.click)
-			.fromBuffer(avroBuffer);
+		const recordedInfo = avsc.parse(avro.schemas.click).fromBuffer(avroBuffer);
 		const expectedTrackedInfo = {
 			...trackInfo,
 			tag: '', // not used in our click data - defaults to empty string

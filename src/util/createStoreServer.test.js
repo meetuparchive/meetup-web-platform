@@ -30,7 +30,8 @@ describe('serverFetchQueries', () => {
 		const queries = [];
 		const expectedParsedResponse = 'foo';
 		spyOn(fetchUtils, 'parseQueryResponse').and.callFake(() => () =>
-			expectedParsedResponse);
+			expectedParsedResponse
+		);
 		return serverFetchQueries(request)()(queries).then(parsedResponse => {
 			expect(require('../apiProxy/api-proxy')).toHaveBeenCalledWith(
 				request,

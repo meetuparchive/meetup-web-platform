@@ -58,20 +58,20 @@ export const resolveChildRoutes = (
 };
 
 const _resolveNestedRoutes: Resolver<MatchedRoute> = matchedRoute =>
-	(matchedRoute.route.getNestedRoutes
+	matchedRoute.route.getNestedRoutes
 		? matchedRoute.route
 				.getNestedRoutes()
 				.then(routes => (matchedRoute.route.routes = routes))
 				.then(() => matchedRoute)
-		: Promise.resolve(matchedRoute));
+		: Promise.resolve(matchedRoute);
 
 const _resolveIndexRoute: Resolver<MatchedRoute> = matchedRoute =>
-	(matchedRoute.route.getIndexRoute
+	matchedRoute.route.getIndexRoute
 		? matchedRoute.route
 				.getIndexRoute()
 				.then(indexRoute => (matchedRoute.route.indexRoute = indexRoute))
 				.then(() => matchedRoute)
-		: Promise.resolve(matchedRoute));
+		: Promise.resolve(matchedRoute);
 
 /*
  * find all routes from a given array of route config objects that match the
@@ -140,14 +140,14 @@ const _resolveRouteMatches = (
 	// add any nested route matches
 	return resolveChildRoutes(matchedRoute).then(
 		childRoutes =>
-			(childRoutes.length
+			childRoutes.length
 				? _resolveRouteMatches(
 						childRoutes,
 						path,
 						currentMatchedRoutes,
 						currentMatchOptions.path
 					)
-				: currentMatchedRoutes)
+				: currentMatchedRoutes
 	);
 };
 

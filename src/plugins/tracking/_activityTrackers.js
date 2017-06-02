@@ -20,12 +20,7 @@ import { updateTrackId, newSessionId } from './util/idUtils';
 export const getTrackSession: TrackGetter = (trackOpts: TrackOpts) => (
 	response: Object
 ) => {
-	const {
-		log,
-		sessionIdCookieName,
-		trackIdCookieName,
-		cookieOpts,
-	} = trackOpts;
+	const { log, sessionIdCookieName, trackIdCookieName, cookieOpts } = trackOpts;
 	if (response.request.state[sessionIdCookieName]) {
 		// if there's already a session id, there's nothing to track
 		return null;
@@ -46,20 +41,12 @@ export const getTrackSession: TrackGetter = (trackOpts: TrackOpts) => (
 export const getTrackLogout: TrackGetter = (trackOpts: TrackOpts) => (
 	response: Object
 ) => {
-	const {
-		log,
-		trackIdCookieName,
-		sessionIdCookieName,
-		cookieOpts,
-	} = trackOpts;
+	const { log, trackIdCookieName, sessionIdCookieName, cookieOpts } = trackOpts;
 	return log(response, {
 		description: 'logout',
 		memberId: parseMemberCookie(response.request.state).id,
 		trackIdFrom: response.request.state[trackIdCookieName] || '',
-		trackId: updateTrackId({ trackIdCookieName, cookieOpts })(
-			response,
-			true
-		),
+		trackId: updateTrackId({ trackIdCookieName, cookieOpts })(response, true),
 		sessionId: response.request.state[sessionIdCookieName],
 		url: response.request.info.referrer || '',
 	});
@@ -68,12 +55,7 @@ export const getTrackLogin: TrackGetter = (trackOpts: TrackOpts) => (
 	response: Object,
 	memberId: string
 ) => {
-	const {
-		log,
-		trackIdCookieName,
-		sessionIdCookieName,
-		cookieOpts,
-	} = trackOpts;
+	const { log, trackIdCookieName, sessionIdCookieName, cookieOpts } = trackOpts;
 	return log(response, {
 		description: 'login',
 		memberId: parseMemberCookie(response.request.state).id,
@@ -125,8 +107,7 @@ export const getTrackApi: TrackGetter = (trackOpts: TrackOpts) => (
 	// special case - login requests need to be tracked
 	const loginResponse = queryResponses.find(r => r.login);
 	const memberId: number =
-		((((loginResponse || {}).login || {}).value || {}).member || {}).id ||
-		0;
+		((((loginResponse || {}).login || {}).value || {}).member || {}).id || 0;
 	if (memberId) {
 		getTrackLogin(trackOpts)(response, JSON.stringify(memberId));
 	}
