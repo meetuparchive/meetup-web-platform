@@ -49,9 +49,7 @@ const DOM = props => {
 	// stringify the whole object so that it can be escaped in one pass
 	const initialStateJson = JSON.stringify(initialState);
 	// escape the string
-	const escapedState = escapeHtml(
-		initialStateJson.replace(/[^\u0000-\u007E]/g, '')
-	);
+	const escapedState = escapeHtml(initialStateJson);
 
 	// Extract the `<head>` information from any page-specific `<Helmet>` components
 	const head = Helmet.rewind();
