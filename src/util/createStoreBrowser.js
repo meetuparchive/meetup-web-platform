@@ -5,6 +5,7 @@ import { fetchQueries } from '../util/fetchUtils';
 import getClickTracker from './clickTracking';
 import getEpicMiddleware from '../middleware/epic';
 import catchMiddleware from '../middleware/catch';
+import injectPromise from '../middleware/injectPromise';
 
 declare var document: Object; // ignore 'potentially null' document.body
 
@@ -43,6 +44,7 @@ export const getInitialState = (APP_RUNTIME: {
 export function getBrowserCreateStore(routes, middleware = [], baseUrl) {
 	const middlewareToApply = [
 		catchMiddleware(console.error),
+		injectPromise,
 		getEpicMiddleware(routes, fetchQueries, baseUrl),
 		...middleware,
 		window.mupDevTools ? window.mupDevTools() : noopMiddleware, // must be last middleware
