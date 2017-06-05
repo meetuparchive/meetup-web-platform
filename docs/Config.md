@@ -101,7 +101,7 @@ need to add these values to both the `asset_server` and the `app_server`.
   "csrf_secret": "asdfasdfasdfasdfasdfasdfasdfasdf",
   "cookie_encrypt_secret": "asdfasdfasdfasdfasdfasdfasdfasdf",
   "app_server": {
-    "protocol": "http",
+    "protocol": "https",
     "host": "beta2.dev.meetup.com",
     "port": 0,
     "crt_file":"/path/to/certificate.crt",
