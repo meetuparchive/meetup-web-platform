@@ -25,6 +25,21 @@ export const schema = {
 			arg: 'asset-port',
 			env: process.env.NODE_ENV !== 'test' && 'ASSET_SERVER_PORT', // don't read env in tests
 		},
+		protocol: {
+			format: String,
+			default: 'http',
+			env: 'ASSET_SERVER_PROTOCOL',
+		},
+		key_file: {
+			format: String,
+			default: '',
+			env: 'KEY_FILE',
+		},
+		crt_file: {
+			format: String,
+			default: '',
+			env: 'CRT_FILE',
+		},
 	},
 	env: {
 		format: ['production', 'development', 'test'],
