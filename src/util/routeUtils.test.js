@@ -77,7 +77,7 @@ describe('activeRouteQueries', () => {
 });
 
 describe('decodeParams', () => {
-	it('url-decodes all values of object', () => {
+	it('url-decodes all defined values of object', () => {
 		const rawValues = ['&asdfkj%20sfd', 'asdfs', '%dsjdasdf///', '驚くばかり'];
 		const encodedValues = rawValues.map(encodeURI);
 		const params = encodedValues.reduce(
@@ -92,6 +92,11 @@ describe('decodeParams', () => {
 		Object.keys(decoded).forEach(k => {
 			expect(decoded[k]).toEqual(rawValues[k]);
 		});
+	});
+	it('skips keys with undefined values', () => {
+		const params = { foo: undefined, bar: 'baz', qux: null };
+		const decoded = decodeParams(params);
+		expect(decoded).toEqual({ bar: 'baz', qux: null });
 	});
 	it('returns empty object unchanged', () => {
 		const object = {};
@@ -210,7 +215,10 @@ describe('getMatchedQueries', () => {
 			match: { params },
 		};
 		getMatchedQueries(location)([matchedRoute]);
-		expect(matchedRoute.route.query).toHaveBeenCalledWith({ location, params });
+		expect(matchedRoute.route.query).toHaveBeenCalledWith({
+			location,
+			params,
+		});
 	});
 });
 
