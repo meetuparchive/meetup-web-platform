@@ -75,3 +75,45 @@ The secrets in this example are dummy values and won't work in an actual app.
   }
 }
 ```
+
+### Running over HTTPS
+
+You need to change change the `protocol` to `https`, and tell the server where
+to find the certificate and the private key (`crt_file` and `key_file`). You'll
+need to add these values to both the `asset_server` and the `app_server`.
+
+```json
+{
+  "api": {
+    "protocol": "https",
+    "host": "www.api.dev.meetup.com",
+    "timeout": 10,
+    "root_url": "https://www.api.dev.meetup.com"
+  },
+  "asset_server": {
+    "protocol": "https",
+    "host": "beta2.dev.meetup.com",
+    "port": 0,
+    "crt_file":"/path/to/certificate.crt",
+    "key_file":"/path/to/certificate.key",
+
+  },
+  "csrf_secret": "asdfasdfasdfasdfasdfasdfasdfasdf",
+  "cookie_encrypt_secret": "asdfasdfasdfasdfasdfasdfasdfasdf",
+  "app_server": {
+    "protocol": "https",
+    "host": "beta2.dev.meetup.com",
+    "port": 0,
+    "crt_file":"/path/to/certificate.crt",
+    "key_file":"/path/to/certificate.key",
+  },
+  "disable_hmr": false,
+  "photo_scaler_salt": "asdfasdfasdfasdfasdfasdfasdfasdf",
+  "oauth": {
+    "auth_url": "https://secure.dev.meetup.com/oauth2/authorize",
+    "access_url": "https://secure.dev.meetup.com/oauth2/access",
+    "key": "asdfasdfasdfasdfasdfasdfasdfasdf",
+    "secret": "asdfasdfasdfasdfasdfasdfasdfasdf"
+  }
+}
+```

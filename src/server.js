@@ -1,5 +1,7 @@
 import './util/globals';
 
+import fs from 'fs';
+
 import appConfig from './util/config';
 import getPlugins from './plugins';
 import getRoutes from './routes';
@@ -47,6 +49,13 @@ export default function start(
 			},
 		},
 	};
+
+	if (appConfig.app_server.protocol === 'https') {
+		connection.tls = {
+			key: fs.readFileSync(appConfig.app_server.key_file),
+			cert: fs.readFileSync(appConfig.app_server.crt_file),
+		};
+	}
 
 	const finalPlugins = [...plugins, ...getPlugins()];
 
