@@ -1,8 +1,8 @@
 import React from 'react';
-import TestUtils from 'react-dom/test-utils';
+import ShallowRenderer from 'react-test-renderer/shallow';
 import BrowserApp from './BrowserApp';
 
-const renderer = TestUtils.createRenderer();
+const renderer = new ShallowRenderer();
 
 describe('BrowserApp', function() {
 	const routes = [];
