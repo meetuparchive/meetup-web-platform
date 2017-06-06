@@ -17,6 +17,10 @@ describe('postEpic', () => {
 		return postEpic(action$).toPromise().then(action => {
 			const { query, onSuccess, onError } = MOCK_POST_ACTION.payload;
 			const expectedAction = api.del(query, { onSuccess, onError });
+			// make the expected functions generic
+			expectedAction.meta.request = expect.any(Promise);
+			expectedAction.meta.resolve = expect.any(Function);
+			expectedAction.meta.reject = expect.any(Function);
 			expect(action).toMatchObject(expectedAction);
 		});
 	});
@@ -29,6 +33,10 @@ describe('deleteEpic', () => {
 		return deleteEpic(action$).toPromise().then(action => {
 			const { query, onSuccess, onError } = MOCK_DELETE_ACTION.payload;
 			const expectedAction = api.del(query, { onSuccess, onError });
+			// make the expected functions generic
+			expectedAction.meta.request = expect.any(Promise);
+			expectedAction.meta.resolve = expect.any(Function);
+			expectedAction.meta.reject = expect.any(Function);
 			expect(action).toMatchObject(expectedAction);
 		});
 	});
