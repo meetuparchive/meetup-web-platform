@@ -1,6 +1,10 @@
 // @flow
+import url from 'url';
+import rison from 'rison';
 import { parseMemberCookie } from '../../util/cookieUtils';
 import { updateTrackId, newSessionId } from './util/idUtils';
+
+const parseUrl = url.parse;
 
 /*
  * This module exports specific tracking functions that consume the `response`
@@ -96,10 +100,17 @@ export const getTrackNav: TrackGetter = (trackOpts: TrackOpts) => (
 
 export const getTrackApi: TrackGetter = (trackOpts: TrackOpts) => (
 	response: Object,
-	queryResponses: Array<Object>,
-	metadata: ?Object
+	queryResponses: Array<Object>
 ) => {
-	metadata = metadata || {};
+	const { request } = response;
+	const payload = request.method === 'post' ? request.payload : request.query;
+
+	const metadataRison = payload.metadata || rison.encode_object({});
+	const metadata = rison.decode_object(metadataRison);
+	const originUrl = response.request.info.referrer;
+	metadata.url = parseUrl(originUrl).pathname;
+	metadata.method = response.request.method;
+
 	const { url, referrer, method } = metadata;
 	if (method === 'get') {
 		return getTrackNav(trackOpts)(response, queryResponses, url, referrer);
