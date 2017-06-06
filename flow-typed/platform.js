@@ -1,7 +1,7 @@
 // @flow
 declare var Intl: Object;
 
-declare type Params = { [string]: string };
+declare type Params = { [string]: string | number };
 
 declare type FluxStandardAction = {
 	type: string,
