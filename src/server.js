@@ -37,22 +37,10 @@ export default function start(
 
 	const baseRoutes = getRoutes(renderRequestMap);
 	const finalRoutes = [...routes, ...baseRoutes];
-	let tls = null;
-	if (
-		appConfig.app_server.protocol === 'https' &&
-		appConfig.app_server.key_file &&
-		appConfig.app_server.crt_file
-	) {
-		tls = {
-			key: fs.readFileSync(appConfig.app_server.key_file),
-			cert: fs.readFileSync(appConfig.app_server.crt_file),
-		};
-	}
 
 	const connection = {
 		host: '0.0.0.0',
 		port: appConfig.app_server.port,
-		tls: tls,
 		routes: {
 			plugins: {
 				'electrode-csrf-jwt': {
@@ -61,6 +49,13 @@ export default function start(
 			},
 		},
 	};
+
+	if (appConfig.app_server.protocol === 'https') {
+		connection.tls = {
+			key: fs.readFileSync(appConfig.app_server.key_file),
+			cert: fs.readFileSync(appConfig.app_server.crt_file),
+		};
+	}
 
 	const finalPlugins = [...plugins, ...getPlugins()];
 

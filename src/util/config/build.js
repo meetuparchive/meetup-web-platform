@@ -33,12 +33,12 @@ export const schema = {
 		key_file: {
 			format: String,
 			default: '',
-			env: 'KEY_FILE',
+			env: 'ASSET_KEY_FILE',
 		},
 		crt_file: {
 			format: String,
 			default: '',
-			env: 'CRT_FILE',
+			env: 'ASSET_CRT_FILE',
 		},
 	},
 	env: {
@@ -76,6 +76,16 @@ if (asset_server) {
 
 config.set('isProd', config.get('env') === 'production');
 config.set('isDev', config.get('env') === 'development');
+
+const assetConf = config.get('asset_server');
+
+if (
+	assetConf.protocol === 'https' &&
+	(!fs.existsSync(assetConf.key_file) || !fs.existsSync(assetConf.crt_file))
+) {
+	throw new Error('Missing HTTPS cert or key!');
+}
+
 config.validate();
 
 export default config.getProperties();
