@@ -18,9 +18,12 @@ const _routeMatchOptions = (
 	exact: route.exact,
 });
 
-export const decodeParams = (params: Params) =>
+export const decodeParams = (params: { [string]: any }): Params =>
 	Object.keys(params).reduce((decodedParams, key) => {
-		decodedParams[key] = params[key] && decodeURI(params[key]);
+		if (typeof params[key] !== 'undefined') {
+			// skip 'undefined' values that cannot be encoded (null is okay)
+			decodedParams[key] = params[key] && decodeURI(params[key]);
+		}
 		return decodedParams;
 	}, {});
 
