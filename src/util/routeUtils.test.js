@@ -94,9 +94,9 @@ describe('decodeParams', () => {
 		});
 	});
 	it('skips keys with undefined values', () => {
-		const params = { foo: undefined, bar: 'baz' };
+		const params = { foo: undefined, bar: 'baz', qux: null };
 		const decoded = decodeParams(params);
-		expect(decoded).toEqual({ bar: 'baz' });
+		expect(decoded).toEqual({ bar: 'baz', qux: null });
 	});
 	it('returns empty object unchanged', () => {
 		const object = {};
