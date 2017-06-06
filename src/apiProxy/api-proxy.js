@@ -1,3 +1,4 @@
+// Implicit dependency: tracking plugin providing request.trackApi method
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/zip';
 
@@ -54,8 +55,10 @@ const apiProxy$ = (request, queries) => {
 		.map((opts, i) => [opts, queries[i]]) // zip the query back into the opts
 		.map(makeApiRequest$(request));
 
-	// 4. zip them together to send them parallel and return responses in order
-	return Observable.zip(...apiRequests$);
+	// 4. zip them together to make requests in parallel and return responses in order
+	return Observable.zip(...apiRequests$).do(responses =>
+		request.trackApi({ request }, responses)
+	);
 };
 
 export default apiProxy$;
