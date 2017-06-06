@@ -15,7 +15,6 @@ import 'rxjs/add/operator/toPromise';
  */
 export const serverFetchQueries = request => () => queries =>
 	apiProxy$(request, queries)
-		.do(responses => request.trackApi({ request }, responses)) // move this into apiProxy$ to consolidate
 		.map(responses => ({ responses })) // package the responses in object like the API proxy endpoint does
 		.toPromise()
 		.then(parseQueryResponse(queries));
