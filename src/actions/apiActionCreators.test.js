@@ -15,6 +15,9 @@ describe('method-specific creators', () => {
 			expect(requestAction.type).toBe('API_REQ');
 			expect(requestAction.payload).toHaveLength(1);
 			expect(requestAction.payload[0]).toMatchObject(expectedQuery);
+			expect(requestAction.meta.request).toEqual(expect.any(Promise));
+			expect(requestAction.meta.resolve).toEqual(expect.any(Function));
+			expect(requestAction.meta.reject).toEqual(expect.any(Function));
 		});
 	});
 });
