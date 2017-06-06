@@ -27,6 +27,18 @@ type ApiState = {
 export const DEFAULT_API_STATE: ApiState = { inFlight: [] };
 export const DEFAULT_APP_STATE = {};
 
+type ObjectFilter = (Object, ...args?: Array<any>) => Object;
+const filterKeys: ObjectFilter = (obj: ApiState, keys: Array<string>) =>
+	Object.keys(obj).reduce(
+		(newObj: ApiState, key: string) => {
+			if (!keys.includes(key)) {
+				newObj[key] = obj[key];
+			}
+			return newObj;
+		},
+		{ ...DEFAULT_API_STATE }
+	);
+
 export const responseToState = (
 	response: QueryResponse
 ): { [string]: QueryResponse } => ({ [response.ref]: response });
@@ -50,7 +62,13 @@ export function api(
 				return { ...DEFAULT_API_STATE, inFlight };
 			}
 
-			return { ...state, inFlight };
+			// remove any `ref`s that are being refreshed - eliminate stale data
+			const newState = {
+				...filterKeys(state, requestRefs),
+				inFlight,
+			};
+
+			return newState;
 		}
 		case API_RESP_SUCCESS: // fall though
 		case API_RESP_ERROR:
