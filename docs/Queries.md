@@ -221,16 +221,13 @@ actions.
 #### `Promise` interface for dispatched queries
 
 An API request action object always has a type of `API_REQ`, and it will always
-have a `meta` property that contains a `promise` property corresponding to the
+have a `meta` property that contains a `request` property corresponding to the
 current status of the request. The Promise will resolve on a successful API
 request, and `reject` on a 400/500 error from the fetch call.
 
-Note that the value resolved by the Promise will be an _array of all query
-responses_, even if only one query was dispatched.
-
 This property can be accessed by the `dispatch` _caller_ by consuming the return
 value of the `dispatch()` call, which is the dispatched action itself. The
-caller can then attach response handlers in `action.meta.promise.then()` Promise
+caller can then attach response handlers in `action.meta.request.then()` Promise
 callbacks.
 
 **Example using `mapDispatchToProps`**
@@ -248,8 +245,8 @@ class Example extends React.Component {
   onSubmit() {
     const formQuery = { ... };
     const apiRequest = api.post(formQuery); // this triggers the POST
-    apiRequest.then(responses => {
-      const formResponse = responses[0];
+    apiRequest.then(response => {
+      const formResponse = response;
       // validate the form, throw `SubmissionError` as needed
     })
   }

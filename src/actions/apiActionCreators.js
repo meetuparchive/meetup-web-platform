@@ -39,7 +39,14 @@ const _applyMethod = method => (query: Query, meta: ?Object) => {
 		...(query.meta || {}),
 		method,
 	};
-	return requestAll([query], meta);
+	// delegate to `requestAll`
+	const requestAction = requestAll([query], meta);
+	// modify the promise to automatically pull out the single response
+	// corresponding to the single query
+	requestAction.meta.promise = requestAction.meta.request.then(
+		responses => responses[0]
+	);
+	return requestAction;
 };
 
 export const get = _applyMethod('get');
