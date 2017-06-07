@@ -42,21 +42,24 @@ describe('configureEnv', function() {
 
 	afterEach(function() {
 		// restore the default setting for rejectUnauthorized
-		https.globalAgent.options.rejectUnauthorized = this
-			.defaultRejectUnauthorized;
+		https.globalAgent.options.rejectUnauthorized = this.defaultRejectUnauthorized;
 	});
 
 	it('sets global rejectUnauthorized to false when using dev URLs in config', () => {
-		serverUtils.configureEnv(convict({
-			url: 'www.dev.meetup.com',
-		}));
+		serverUtils.configureEnv(
+			convict({
+				url: 'www.dev.meetup.com',
+			})
+		);
 		expect(https.globalAgent.options.rejectUnauthorized).toBe(false);
 	});
 
 	it('sets global rejectUnauthorized to true when using prod URLs in config', () => {
-		serverUtils.configureEnv(convict({
-			url: 'www.meetup.com',
-		}));
+		serverUtils.configureEnv(
+			convict({
+				url: 'www.meetup.com',
+			})
+		);
 		expect(https.globalAgent.options.rejectUnauthorized).toBe(true);
 	});
 });

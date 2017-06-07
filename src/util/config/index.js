@@ -33,11 +33,11 @@ import { duotones, getDuotoneUrls } from '../duotone';
 const random32 = 'asdfasdfasdfasdfasdfasdfasdfasdf';
 const secretDefault = (process.env.NODE_ENV !== 'production' && random32) || ''; // no prod default
 
-export const COOKIE_SECRET_ERROR =
-	'Cookie Encrypt Secret must be a random 32+ char string';
 export const CSRF_SECRET_ERROR = 'CSRF Secret must be a random 32+ char string';
 export const OAUTH_SECRET_ERROR = 'Invalid OAUTH Secret';
 export const OAUTH_KEY_ERROR = 'Invalid OAUTH Key';
+export const COOKIE_SECRET_ERROR =
+	'Cookie Secret must be a random 32+ char string';
 export const SALT_ERROR = 'Invalid Photo Scaler Salt';
 
 export const validateCookieSecret = secret => {
@@ -83,17 +83,14 @@ export const validateServerHost = host => {
 	if (typeof host !== 'string') {
 		throw new Error('Server host property must be a string');
 	}
-	const isDev =
-		process.env.NODE_ENV === 'development' || !process.env.NODE_ENV;
+	const isDev = process.env.NODE_ENV === 'development' || !process.env.NODE_ENV;
 	if (process.env.NODE_ENV === 'production' && host.includes(DEV_SUBSTRING)) {
 		throw new Error(
 			`Server host ${host} must not include '.dev.' in production`
 		);
 	}
 	if (isDev && !host.includes(DEV_SUBSTRING)) {
-		throw new Error(
-			`Server host ${host} must include '.dev.' in development`
-		);
+		throw new Error(`Server host ${host} must include '.dev.' in development`);
 	}
 };
 
@@ -112,23 +109,15 @@ export const config = convict({
 			arg: 'app-port',
 			env: process.env.NODE_ENV !== 'test' && 'DEV_SERVER_PORT', // don't read env in tests
 		},
-	},
-	asset_server: {
-		host: {
+		key_file: {
 			format: String,
-			default: 'beta2.dev.meetup.com',
-			env: 'ASSET_SERVER_HOST',
+			default: '',
+			env: 'APP_KEY_FILE',
 		},
-		path: {
+		crt_file: {
 			format: String,
-			default: '/static',
-			env: 'ASSET_PATH',
-		},
-		port: {
-			format: 'port',
-			default: 8001, // must be 443 for prod
-			arg: 'asset-port',
-			env: process.env.NODE_ENV !== 'test' && 'ASSET_SERVER_PORT', // don't read env in tests
+			default: '',
+			env: 'APP_CRT_FILE',
 		},
 	},
 	api: {
@@ -209,6 +198,7 @@ const configPath = path.resolve(
 );
 
 const localConfig = fs.existsSync(configPath) ? require(configPath) : {};
+
 config.load(localConfig);
 
 config.set(
@@ -224,5 +214,12 @@ config.set(
 config.set('isProd', config.get('env') === 'production');
 config.set('isDev', config.get('env') === 'development');
 config.validate();
+const appConf = config.get('app_server');
+if (
+	appConf.protocol === 'https' &&
+	(!fs.existsSync(appConf.key_file) || !fs.existsSync(appConf.crt_file))
+) {
+	throw new Error('Missing HTTPS cert or key!');
+}
 
 export default config.getProperties();

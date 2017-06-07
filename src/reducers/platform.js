@@ -16,6 +16,7 @@ import {
 	API_RESP_FAIL,
 	API_RESP_COMPLETE,
 } from '../actions/apiActionCreators';
+import { LOCATION_CHANGE, SERVER_RENDER } from '../actions/syncActionCreators';
 import { CACHE_SUCCESS } from '../actions/cacheActionCreators';
 
 type ApiState = {
@@ -26,6 +27,18 @@ type ApiState = {
 
 export const DEFAULT_API_STATE: ApiState = { inFlight: [] };
 export const DEFAULT_APP_STATE = {};
+
+type ObjectFilter = (Object, ...args?: Array<any>) => Object;
+const filterKeys: ObjectFilter = (obj: ApiState, keys: Array<string>) =>
+	Object.keys(obj).reduce(
+		(newObj: ApiState, key: string) => {
+			if (!keys.includes(key)) {
+				newObj[key] = obj[key];
+			}
+			return newObj;
+		},
+		{ ...DEFAULT_API_STATE }
+	);
 
 export const responseToState = (
 	response: QueryResponse
@@ -50,7 +63,13 @@ export function api(
 				return { ...DEFAULT_API_STATE, inFlight };
 			}
 
-			return { ...state, inFlight };
+			// remove any `ref`s that are being refreshed - eliminate stale data
+			const newState = {
+				...filterKeys(state, requestRefs),
+				inFlight,
+			};
+
+			return newState;
 		}
 		case API_RESP_SUCCESS: // fall though
 		case API_RESP_ERROR:
@@ -151,12 +170,27 @@ export function preRenderChecklist([apiDataLoaded] = [false], action) {
 	return [apiDataLoaded || action.type === API_RESP_COMPLETE];
 }
 
+/*
+ * Store routing state to allow middleware to record more accurate
+ * tracking info
+ */
+export function routing(state = {}, action) {
+	if (action.type === LOCATION_CHANGE || action.type === SERVER_RENDER) {
+		return {
+			referrer: state.location || {},
+			location: action.payload,
+		};
+	}
+	return state;
+}
+
 const platformReducers = {
 	api,
 	app,
 	clickTracking,
 	config,
 	preRenderChecklist,
+	routing,
 };
 
 /**

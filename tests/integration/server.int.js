@@ -36,9 +36,7 @@ describe('General server startup tests', () => {
 			};
 			return server
 				.inject(requestFooRoute)
-				.then(response =>
-					expect(response.payload).toEqual(expectedResponse)
-				)
+				.then(response => expect(response.payload).toEqual(expectedResponse))
 				.then(() => server.stop())
 				.catch(err => {
 					server.stop();
@@ -63,9 +61,7 @@ describe('General server startup tests', () => {
 			};
 			return server
 				.inject(authedRequestFooRoute)
-				.then(response =>
-					expect(response.payload).toEqual(expectedResponse)
-				)
+				.then(response => expect(response.payload).toEqual(expectedResponse))
 				.then(() => server.stop())
 				.catch(err => {
 					server.stop();
@@ -109,7 +105,9 @@ describe('Cookie setting', () => {
 		history: [click, { ...click }],
 	};
 	it('calls loggers.click for each click and un-sets the click-track cookie', () => {
-		const cookie = `click-track=${encodeURIComponent(JSON.stringify(clickData))}`;
+		const cookie = `click-track=${encodeURIComponent(
+			JSON.stringify(clickData)
+		)}`;
 		const fooRoute = {
 			method: 'get',
 			path: '/ny-tech',

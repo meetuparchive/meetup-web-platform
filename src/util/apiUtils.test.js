@@ -201,6 +201,12 @@ describe('parseApiValue', () => {
 			badStatus.statusMessage
 		);
 	});
+	it('returns a value without any JS-literal unfriendly newline characters', () => {
+		const fragileValue = 'foo \\u2028 \\u2029';
+		const fragileJSON = JSON.stringify({ foo: fragileValue });
+		const parsed = parseApiValue([MOCK_RESPONSE, fragileJSON]).value.foo;
+		expect(parsed).toEqual('foo \\n \\n');
+	});
 });
 describe('parseApiResponse', () => {
 	const MOCK_RESPONSE = {
@@ -292,7 +298,9 @@ describe('parseMetaHeaders', () => {
 
 		// both 'next' and 'prev'
 		expect(
-			parseMetaHeaders({ link: `<${next}>; rel="next", <${prev}>; rel="prev"` })
+			parseMetaHeaders({
+				link: `<${next}>; rel="next", <${prev}>; rel="prev"`,
+			})
 		).toMatchObject({ link: { next, prev } });
 		// just 'next'
 		expect(parseMetaHeaders({ link: `<${next}>; rel="next"` })).toMatchObject({

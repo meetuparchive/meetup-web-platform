@@ -1,6 +1,10 @@
 // @flow
+import url from 'url';
+import rison from 'rison';
 import { parseMemberCookie } from '../../util/cookieUtils';
 import { updateTrackId, newSessionId } from './util/idUtils';
+
+const parseUrl = url.parse;
 
 /*
  * This module exports specific tracking functions that consume the `response`
@@ -20,12 +24,7 @@ import { updateTrackId, newSessionId } from './util/idUtils';
 export const getTrackSession: TrackGetter = (trackOpts: TrackOpts) => (
 	response: Object
 ) => {
-	const {
-		log,
-		sessionIdCookieName,
-		trackIdCookieName,
-		cookieOpts,
-	} = trackOpts;
+	const { log, sessionIdCookieName, trackIdCookieName, cookieOpts } = trackOpts;
 	if (response.request.state[sessionIdCookieName]) {
 		// if there's already a session id, there's nothing to track
 		return null;
@@ -46,20 +45,12 @@ export const getTrackSession: TrackGetter = (trackOpts: TrackOpts) => (
 export const getTrackLogout: TrackGetter = (trackOpts: TrackOpts) => (
 	response: Object
 ) => {
-	const {
-		log,
-		trackIdCookieName,
-		sessionIdCookieName,
-		cookieOpts,
-	} = trackOpts;
+	const { log, trackIdCookieName, sessionIdCookieName, cookieOpts } = trackOpts;
 	return log(response, {
 		description: 'logout',
 		memberId: parseMemberCookie(response.request.state).id,
 		trackIdFrom: response.request.state[trackIdCookieName] || '',
-		trackId: updateTrackId({ trackIdCookieName, cookieOpts })(
-			response,
-			true
-		),
+		trackId: updateTrackId({ trackIdCookieName, cookieOpts })(response, true),
 		sessionId: response.request.state[sessionIdCookieName],
 		url: response.request.info.referrer || '',
 	});
@@ -68,12 +59,7 @@ export const getTrackLogin: TrackGetter = (trackOpts: TrackOpts) => (
 	response: Object,
 	memberId: string
 ) => {
-	const {
-		log,
-		trackIdCookieName,
-		sessionIdCookieName,
-		cookieOpts,
-	} = trackOpts;
+	const { log, trackIdCookieName, sessionIdCookieName, cookieOpts } = trackOpts;
 	return log(response, {
 		description: 'login',
 		memberId: parseMemberCookie(response.request.state).id,
@@ -114,10 +100,17 @@ export const getTrackNav: TrackGetter = (trackOpts: TrackOpts) => (
 
 export const getTrackApi: TrackGetter = (trackOpts: TrackOpts) => (
 	response: Object,
-	queryResponses: Array<Object>,
-	metadata: ?Object
+	queryResponses: Array<Object>
 ) => {
-	metadata = metadata || {};
+	const { request } = response;
+	const payload = request.method === 'post' ? request.payload : request.query;
+
+	const metadataRison = payload.metadata || rison.encode_object({});
+	const metadata = rison.decode_object(metadataRison);
+	const originUrl = request.info.referrer;
+	metadata.url = parseUrl(originUrl).pathname;
+	metadata.method = request.method;
+
 	const { url, referrer, method } = metadata;
 	if (method === 'get') {
 		return getTrackNav(trackOpts)(response, queryResponses, url, referrer);
@@ -125,8 +118,7 @@ export const getTrackApi: TrackGetter = (trackOpts: TrackOpts) => (
 	// special case - login requests need to be tracked
 	const loginResponse = queryResponses.find(r => r.login);
 	const memberId: number =
-		((((loginResponse || {}).login || {}).value || {}).member || {}).id ||
-		0;
+		((((loginResponse || {}).login || {}).value || {}).member || {}).id || 0;
 	if (memberId) {
 		getTrackLogin(trackOpts)(response, JSON.stringify(memberId));
 	}

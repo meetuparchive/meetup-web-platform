@@ -25,6 +25,6 @@ export const getAppRouteHandler = renderRequestMap => (request, reply) => {
 			}
 			const response = reply(result).code(statusCode);
 
-			reply.trackSession(response);
+			request.trackSession(response);
 		});
 };

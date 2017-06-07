@@ -13,7 +13,8 @@ describe('configureAuthCookies', () => {
 	const serverWithState = getServer();
 	serverWithState.plugins = plugins;
 	serverWithState.app = {
-		cookie_encrypt_secret: 'asdklfjahsdflkjasdfhlkajsdfkljasdlkasdjhfalksdjfbalkjsdhfalsdfasdlkfasd',
+		cookie_encrypt_secret:
+			'asdklfjahsdflkjasdfhlkajsdfkljasdlkasdjhfalksdjfbalkjsdhfalsdfasdlkfasd',
 	};
 
 	it('calls server.state for each auth cookie name', () => {

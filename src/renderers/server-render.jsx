@@ -80,7 +80,8 @@ const getRouterRenderer = ({
 		</StaticRouter>
 	);
 
-	const redirect: ?string = context.url || Redirect.rewind();
+	const externalRedirect = Redirect.rewind(); // must _always_ call Redirect.rewind() to avoid memory leak
+	const redirect: ?string = context.url || externalRedirect;
 	if (redirect) {
 		return { redirect };
 	}
@@ -187,6 +188,7 @@ const makeRenderer = (
 			baseUrl: host,
 			localeCode,
 			supportedLocaleCodes,
+			initialNow: new Date().getTime(),
 		})
 	);
 	// render skeleton if requested - the store is ready
