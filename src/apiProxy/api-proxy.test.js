@@ -20,6 +20,7 @@ describe('apiProxy$', () => {
 			},
 			server: getServer(),
 			log: () => {},
+			trackApi: () => {},
 		};
 		const requestResult = {
 			type: 'fake',

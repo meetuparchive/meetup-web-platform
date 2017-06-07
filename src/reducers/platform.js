@@ -16,6 +16,7 @@ import {
 	API_RESP_FAIL,
 	API_RESP_COMPLETE,
 } from '../actions/apiActionCreators';
+import { LOCATION_CHANGE, SERVER_RENDER } from '../actions/syncActionCreators';
 import { CACHE_SUCCESS } from '../actions/cacheActionCreators';
 
 type ApiState = {
@@ -169,12 +170,27 @@ export function preRenderChecklist([apiDataLoaded] = [false], action) {
 	return [apiDataLoaded || action.type === API_RESP_COMPLETE];
 }
 
+/*
+ * Store routing state to allow middleware to report record more accurate
+ * tracking info
+ */
+export function routing(state = {}, action) {
+	if (action.type === LOCATION_CHANGE || action.type === SERVER_RENDER) {
+		return {
+			referrer: state.location || {},
+			location: action.payload,
+		};
+	}
+	return state;
+}
+
 const platformReducers = {
 	api,
 	app,
 	clickTracking,
 	config,
 	preRenderChecklist,
+	routing,
 };
 
 /**
