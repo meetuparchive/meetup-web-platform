@@ -46,19 +46,19 @@ const logoutQueryMatch = /[?&]logout(?:[=&]|$)/;
  */
 export const getNavEpic = (routes, baseUrl) => {
 	const resolveRoutes = getRouteResolver(routes, baseUrl);
-	let currentLocation = {}; // keep track of current route so that apiRequest can get 'referrer'
 	return (action$, store) =>
 		action$
 			.ofType(LOCATION_CHANGE, SERVER_RENDER)
 			.mergeMap(({ payload: location }) => {
+				// note that this function executes _downstream_ of reducers, so the
+				// new `routing` data has already been populated in `state`
+				const state = store.getState();
 				// inject request metadata from context, including `store.getState()`
 				const requestMetadata = {
-					referrer: currentLocation.pathname || '',
+					referrer: (state.routing.referrer || {}).pathname || '',
 					logout: logoutQueryMatch.test(location.search),
-					clickTracking: store.getState().clickTracking,
+					clickTracking: state.clickTracking,
 				};
-				// now that referrer has been recorded, set new currentLocation
-				currentLocation = location;
 
 				const cacheAction$ = requestMetadata.logout
 					? Observable.of({ type: 'CACHE_CLEAR' })

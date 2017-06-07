@@ -26,7 +26,7 @@ describe('serverFetchQueries', () => {
 	// 	.toPromise()
 	// 	.then(parseQueryResponse(queries));
 	it('calls apiProxy$ with request and queries, passes ', () => {
-		const request = {};
+		const request = { trackApi: jest.fn() };
 		const queries = [];
 		const expectedParsedResponse = 'foo';
 		spyOn(fetchUtils, 'parseQueryResponse').and.callFake(() => () =>

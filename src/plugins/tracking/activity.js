@@ -3,7 +3,7 @@ import avro from './util/avro';
 import { getTrackApi, getTrackSession } from './_activityTrackers';
 
 /*
- * This plugin provides `reply.track...` methods that track events related to
+ * This plugin provides `request.track...` methods that track events related to
  * particular server responses, e.g. new sesssions and navigation activity.
  *
  * Available trackers:
@@ -39,7 +39,7 @@ export const getLogger: string => (Object, Object) => mixed = (
  * Each tracking function is a composition of a logging function and data about
  * the `response` object. This function computes some configuration information
  * to create the tracking functions, and returns each of them in a map keyed by
- * the target `reply` method name
+ * the target `request` method name
  */
 export function getTrackers(options: {
 	platform_agent: string,
@@ -63,7 +63,7 @@ export function getTrackers(options: {
 		sessionIdCookieName,
 		cookieOpts,
 	};
-	// These are the tracking methods that will be set on the `reply` interface
+	// These are the tracking methods that will be set on the `request` interface
 	const trackers: { [string]: Tracker } = {
 		trackApi: getTrackApi(trackOpts),
 		trackSession: getTrackSession(trackOpts),
@@ -72,7 +72,7 @@ export function getTrackers(options: {
 }
 
 /*
- * The plugin register function that will 'decorate' the `reply` interface with
+ * The plugin register function that will 'decorate' the `request` interface with
  * all tracking functions returned from `getTrackers`
  */
 export default function register(
@@ -83,7 +83,7 @@ export default function register(
 	const trackers: { [string]: Tracker } = getTrackers(options);
 
 	Object.keys(trackers).forEach((trackType: string) => {
-		server.decorate('reply', trackType, trackers[trackType]);
+		server.decorate('request', trackType, trackers[trackType]);
 	});
 
 	next();
