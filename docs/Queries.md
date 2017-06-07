@@ -238,14 +238,15 @@ import { SubmissionError } from 'redux-form';
 import * as api from 'meetup-web-platform/lib/actions/apiActionCreators';
 
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({ get: api.get }, dispatch);
+  return bindActionCreators({ post: api.post }, dispatch);
 }
 
 class Example extends React.Component {
   onSubmit() {
     const formQuery = { ... };
-    const apiRequest = api.post(formQuery); // this triggers the POST
-    apiRequest.then(response => {
+    const apiRequest = this.props.post(formQuery); // this triggers the POST, returns dispatched action object
+    const { request } = apiRequest.meta;
+    request.then(response => {
       const formResponse = response;
       // validate the form, throw `SubmissionError` as needed
     })
