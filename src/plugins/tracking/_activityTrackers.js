@@ -107,9 +107,9 @@ export const getTrackApi: TrackGetter = (trackOpts: TrackOpts) => (
 
 	const metadataRison = payload.metadata || rison.encode_object({});
 	const metadata = rison.decode_object(metadataRison);
-	const originUrl = response.request.info.referrer;
+	const originUrl = request.info.referrer;
 	metadata.url = parseUrl(originUrl).pathname;
-	metadata.method = response.request.method;
+	metadata.method = request.method;
 
 	const { url, referrer, method } = metadata;
 	if (method === 'get') {
