@@ -34,15 +34,6 @@ const config = {
 		'no-useless-escape': 2,
 		'no-whitespace-before-property': 2,
 		'prefer-template': 2,
-		'require-jsdoc': [
-			2,
-			{
-				require: {
-					FunctionDeclaration: false,
-					ClassDeclaration: true,
-				},
-			},
-		],
 		'react/jsx-no-undef': 0,
 		'react/jsx-uses-react': 1,
 		'react/jsx-uses-vars': 1,

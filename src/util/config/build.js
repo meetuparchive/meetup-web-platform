@@ -25,6 +25,21 @@ export const schema = {
 			arg: 'asset-port',
 			env: process.env.NODE_ENV !== 'test' && 'ASSET_SERVER_PORT', // don't read env in tests
 		},
+		protocol: {
+			format: String,
+			default: 'http',
+			env: 'ASSET_SERVER_PROTOCOL',
+		},
+		key_file: {
+			format: String,
+			default: '',
+			env: 'ASSET_KEY_FILE',
+		},
+		crt_file: {
+			format: String,
+			default: '',
+			env: 'ASSET_CRT_FILE',
+		},
 	},
 	env: {
 		format: ['production', 'development', 'test'],
@@ -61,6 +76,16 @@ if (asset_server) {
 
 config.set('isProd', config.get('env') === 'production');
 config.set('isDev', config.get('env') === 'development');
+
+const assetConf = config.get('asset_server');
+
+if (
+	assetConf.protocol === 'https' &&
+	(!fs.existsSync(assetConf.key_file) || !fs.existsSync(assetConf.crt_file))
+) {
+	throw new Error('Missing HTTPS cert or key!');
+}
+
 config.validate();
 
 export default config.getProperties();

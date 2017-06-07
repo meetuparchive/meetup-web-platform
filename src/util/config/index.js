@@ -33,11 +33,11 @@ import { duotones, getDuotoneUrls } from '../duotone';
 const random32 = 'asdfasdfasdfasdfasdfasdfasdfasdf';
 const secretDefault = (process.env.NODE_ENV !== 'production' && random32) || ''; // no prod default
 
-export const COOKIE_SECRET_ERROR =
-	'Cookie Encrypt Secret must be a random 32+ char string';
 export const CSRF_SECRET_ERROR = 'CSRF Secret must be a random 32+ char string';
 export const OAUTH_SECRET_ERROR = 'Invalid OAUTH Secret';
 export const OAUTH_KEY_ERROR = 'Invalid OAUTH Key';
+export const COOKIE_SECRET_ERROR =
+	'Cookie Secret must be a random 32+ char string';
 export const SALT_ERROR = 'Invalid Photo Scaler Salt';
 
 export const validateCookieSecret = secret => {
@@ -108,6 +108,16 @@ export const config = convict({
 			default: 8000,
 			arg: 'app-port',
 			env: process.env.NODE_ENV !== 'test' && 'DEV_SERVER_PORT', // don't read env in tests
+		},
+		key_file: {
+			format: String,
+			default: '',
+			env: 'APP_KEY_FILE',
+		},
+		crt_file: {
+			format: String,
+			default: '',
+			env: 'APP_CRT_FILE',
 		},
 	},
 	api: {
@@ -188,6 +198,7 @@ const configPath = path.resolve(
 );
 
 const localConfig = fs.existsSync(configPath) ? require(configPath) : {};
+
 config.load(localConfig);
 
 config.set(
@@ -203,5 +214,12 @@ config.set(
 config.set('isProd', config.get('env') === 'production');
 config.set('isDev', config.get('env') === 'development');
 config.validate();
+const appConf = config.get('app_server');
+if (
+	appConf.protocol === 'https' &&
+	(!fs.existsSync(appConf.key_file) || !fs.existsSync(appConf.crt_file))
+) {
+	throw new Error('Missing HTTPS cert or key!');
+}
 
 export default config.getProperties();

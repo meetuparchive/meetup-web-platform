@@ -40,7 +40,7 @@ describe('Sync epic', () => {
 			payload: MOCK_RENDERPROPS.location,
 		};
 
-		const fakeStore = createFakeStore({});
+		const fakeStore = createFakeStore({ routing: {} });
 		const action$ = ActionsObservable.of(locationChange, serverRender);
 		return getSyncEpic(MOCK_ROUTES)(action$, fakeStore)
 			.toArray()
@@ -61,7 +61,7 @@ describe('Sync epic', () => {
 			payload: logoutLocation,
 		};
 
-		const fakeStore = createFakeStore({});
+		const fakeStore = createFakeStore({ routing: {} });
 		const action$ = ActionsObservable.of(locationChange);
 		return getSyncEpic(MOCK_ROUTES)(action$, fakeStore)
 			.toArray()
