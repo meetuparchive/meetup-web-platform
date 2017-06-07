@@ -26,7 +26,7 @@ type PlatformRoute = {
   indexRoute?: PlatformRoute,
   getIndexRoute?: () => Promise<PlatformRoute>,
   routes?: () => Promise<Array<PlatformRoute>>,
-  getNestedRoutes: 
+  getNestedRoutes:
   query?: QueryFunction,
   exact?: boolean,
 };
@@ -83,7 +83,7 @@ dynamically import a route to be used as the `exact` index root.
 
 A function that, when invoked, will return a Promise that resolves with a
 `routes` array. This can be used for code splitting by using `import()` to
-dynamically import a route subtree. 
+dynamically import a route subtree.
 
 ```js
 {
@@ -109,3 +109,15 @@ of the root route, so it can contain the data/context of that route. For
 example, the 404 route at the group `/:urlname` level could include Group
 information and links back to the group homepage or event list.
 
+## Redirects
+
+All redirects should be implemented with the platform's [`<Redirect />`
+component](../src/components/Redirect.jsx), which functions almost identically
+to
+[React Router's `<Redirect>`](https://reacttraining.com/react-router/web/api/Redirect)
+but includes support for redirecting to external URLs in addition to internal
+routes. See the component's code docs for details on usage - you should never
+have to use `window.location.assign`, `window.location.replace`, or an
+equivalent programmatic navigation API - just render a
+`<Redirect to={...next route/url...} />` and let the application handle the
+logistics.

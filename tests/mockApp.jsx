@@ -1,5 +1,6 @@
 import React from 'react';
 import makeRootReducer from '../src/reducers/platform';
+import Redirect from '../src/components/Redirect';
 
 export const clientFilename = 'client.whatever.js';
 export const assetPublicPath = '//whatever';
@@ -9,6 +10,14 @@ export const ROOT_INDEX_CONTENT = 'this is the life';
 const MockRootIndex = props => <div>{ROOT_INDEX_CONTENT}</div>;
 export const FOO_INDEX_CONTENT = 'yo dawg i heard you like foo';
 const MockFooIndex = props => <div>{FOO_INDEX_CONTENT}</div>;
+export const EXTERNAL_REDIRECT_URL = 'http://example.com/foo?return=foo';
+export const INTERNAL_REDIRECT_PATH = '/foo';
+const MockRedirect = props => {
+	const to = props.match.params.redirectType === 'internal'
+		? INTERNAL_REDIRECT_PATH
+		: new URL(EXTERNAL_REDIRECT_URL);
+	return <div><Redirect to={to} /></div>;
+};
 
 export const routes = [
 	{
@@ -39,7 +48,12 @@ export const routes = [
 						params: {},
 					}),
 				},
-				getNestedRoutes: () => import('./mockAsyncRoute').then(r => r.default),
+				getNestedRoutes: () =>
+					import('./mockAsyncRoute').then(r => r.default),
+			},
+			{
+				path: '/redirect/:redirectType',
+				component: MockRedirect,
 			},
 			{
 				// param-based route
