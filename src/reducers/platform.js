@@ -153,7 +153,7 @@ export function preRenderChecklist([apiDataLoaded] = [false], action) {
 }
 
 /*
- * Store routing state to allow middleware to report record more accurate
+ * Store routing state to allow middleware to record more accurate
  * tracking info
  */
 export function routing(state = {}, action) {

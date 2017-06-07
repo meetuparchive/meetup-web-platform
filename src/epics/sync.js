@@ -51,7 +51,7 @@ export const getNavEpic = (routes, baseUrl) => {
 			.ofType(LOCATION_CHANGE, SERVER_RENDER)
 			.mergeMap(({ payload: location }) => {
 				// note that this function executes _downstream_ of reducers, so the
-				// new location has already been incorporated into `state`
+				// new `routing` data has already been populated in `state`
 				const state = store.getState();
 				// inject request metadata from context, including `store.getState()`
 				const requestMetadata = {
