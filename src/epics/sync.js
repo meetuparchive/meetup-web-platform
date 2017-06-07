@@ -120,6 +120,8 @@ export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 		return Observable.fromPromise(fetchQueries(queries, meta)) // call fetch
 			.takeUntil(action$.ofType(LOCATION_CHANGE)) // cancel this fetch when nav happens
 			.mergeMap(({ successes = [], errors = [] }) => {
+				// meta contains a Promise that must be resolved
+				meta.resolve([...successes, ...errors]);
 				const deprecatedSuccessPayload = getDeprecatedSuccessPayload(
 					successes,
 					errors
@@ -137,6 +139,8 @@ export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 				return Observable.of(...actions);
 			})
 			.catch(err => {
+				// meta contains a Promise that must be rejected
+				meta.reject(err);
 				const deprecatedActions = [apiError(err)];
 				if (meta && meta.onError) {
 					deprecatedActions.push(meta.onError(err));

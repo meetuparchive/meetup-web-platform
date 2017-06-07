@@ -160,6 +160,24 @@ describe('Sync epic', () => {
 			});
 	});
 
+	it('calls action.meta.resolve successful API_REQ', function() {
+		const expectedSuccesses = [{}];
+		const mockFetchQueries = () => () =>
+			Promise.resolve({ successes: expectedSuccesses });
+
+		const queries = [mockQuery({})];
+		const apiRequest = api.requestAll(queries);
+		apiRequest.meta.resolve = jest.fn();
+		const action$ = ActionsObservable.of(apiRequest);
+		const fakeStore = createFakeStore(MOCK_APP_STATE);
+		return getSyncEpic(EMPTY_ROUTES, mockFetchQueries)(action$, fakeStore)
+			.toArray()
+			.toPromise()
+			.then(actions => {
+				expect(apiRequest.meta.resolve).toHaveBeenCalledWith(expectedSuccesses);
+			});
+	});
+
 	it('emits API_RESP_FAIL on failed API_REQ', function() {
 		const mockFetchQueries = () => () => Promise.reject(new Error());
 
@@ -176,6 +194,22 @@ describe('Sync epic', () => {
 					'API_ERROR',
 					api.API_RESP_COMPLETE, // DO NOT REMOVE - must _ALWAYS_ be called in order to clean up inFlight state
 				])
+			);
+	});
+	it('calls action.meta.reject on failed API_REQ', function() {
+		const expectedError = new Error();
+		const mockFetchQueries = () => () => Promise.reject(expectedError);
+
+		const queries = [mockQuery({})];
+		const apiRequest = api.requestAll(queries);
+		apiRequest.meta.reject = jest.fn();
+		const action$ = ActionsObservable.of(apiRequest);
+		const fakeStore = createFakeStore(MOCK_APP_STATE);
+		return getSyncEpic(EMPTY_ROUTES, mockFetchQueries)(action$, fakeStore)
+			.toArray()
+			.toPromise()
+			.then(actions =>
+				expect(apiRequest.meta.reject).toHaveBeenCalledWith(expectedError)
 			);
 	});
 });

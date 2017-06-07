@@ -142,13 +142,37 @@ you must test for the existence of `meta.variants` before reading from it.
 
 ## Usage
 
-In general, queries start as properties of API-request-related actions, yielding
-responses that are applied to Redux state.
+In general, queries start as the payload of an `API_REQ` action, which will
+generate responses that are applied to Redux state.
 
 ### Action creation
 
-You should generally use the action creators in `apiActionCreators` to create
-actions for queries
+You should always use the action creators in `apiActionCreators` to create
+actions for queries.
+
+#### `requestAll`
+
+All API action creators delegate to this action creator, which produces an
+`API_REQ` action with the queries as the action `payload`, and additional
+context automatically supplied to a `meta` property.
+
+You should _only_ use `requestAll` directly if you need to send multiple queries
+simultaneously using the same request method (GET/POST/PATCH/DELETE).
+Otherwise, use the method-specific single-query action creators documented below.
+
+```js
+import * as api from 'meetup-web-platform/lib/actions/apiActionCreators';
+
+const query1 = {
+  endpoint: 'ny-tech/members',
+  ref: 'members',
+};
+const query2 = {
+  endpoint: 'ny-tech/events',
+  ref: 'events',
+};
+const requestAllAction = api.requestAll([query1, query2]);
+```
 
 #### `get`
 
@@ -162,7 +186,7 @@ const getQuery = {
 const getAction = api.get(getQuery);
 ```
 
-#### `post`
+#### `post`/`patch`
 
 ```js
 import * as api from 'meetup-web-platform/lib/actions/apiActionCreators';
@@ -173,6 +197,7 @@ const postQuery = {
   params: { name, bio },
 };
 const postAction = api.post(postQuery);
+const patchAction = api.patch(postQuery);
 ```
 
 #### `delete`
@@ -192,6 +217,42 @@ const deleteAction = api.del(deleteQuery);  // note `api.del` not `api.delete` b
 
 Use Redux's `store.dispatch` or `bindActionCreators` to dispatch the query
 actions.
+
+#### `Promise` interface for dispatched queries
+
+An API request action object always has a type of `API_REQ`, and it will always
+have a `meta` property that contains a `request` property corresponding to the
+current status of the request. The Promise will resolve on a successful API
+request, and `reject` on a 400/500 error from the fetch call.
+
+This property can be accessed by the `dispatch` _caller_ by consuming the return
+value of the `dispatch()` call, which is the dispatched action itself. The
+caller can then attach response handlers in `action.meta.request.then()` Promise
+callbacks.
+
+**Example using `mapDispatchToProps`**
+
+```js
+// Example.jsx
+import { SubmissionError } from 'redux-form';
+import * as api from 'meetup-web-platform/lib/actions/apiActionCreators';
+
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators({ post: api.post }, dispatch);
+}
+
+class Example extends React.Component {
+  onSubmit() {
+    const formQuery = { ... };
+    const apiRequest = this.props.post(formQuery); // this triggers the POST, returns dispatched action object
+    const { request } = apiRequest.meta;
+    request.then(response => {
+      const formResponse = response;
+      // validate the form, throw `SubmissionError` as needed
+    })
+  }
+}
+```
 
 ### Sync middleware
 
@@ -494,4 +555,3 @@ action creator from `apiActionCreators`.
 The response will generally be a '204 - No Content',
 so you'll have to read the 'updated' value in Redux state a little more
 carefully.
-
