@@ -80,7 +80,8 @@ const getRouterRenderer = ({
 		</StaticRouter>
 	);
 
-	const externalRedirect = Redirect.rewind(); // must _always_ call Redirect.rewind() to avoid memory leak
+	// must _always_ call Redirect.rewind() to avoid memory leak
+	const externalRedirect = Redirect.rewind();
 	const redirect: ?string = context.url || externalRedirect;
 	if (redirect) {
 		return { redirect };

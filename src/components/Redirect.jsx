@@ -10,7 +10,7 @@ const testForExternal = (to: RouterTo): boolean => {
 	if (typeof to === 'string') {
 		return to.startsWith('http');
 	}
-	return false; // this is a React Router 'location'
+	return false; // not external - this must be a React Router 'location'
 };
 
 type RouterTo = string | LocationShape | URL;
@@ -59,9 +59,11 @@ class Redirect extends React.Component {
 const reducePropsToState = (propsList: Array<RedirectProps>): ?string => {
 	const { to } = propsList.pop();
 	if (to instanceof URL) {
+		// return the external URL as a string
 		return to.toString();
 	}
 	if (!testForExternal(to) || typeof to !== 'string') {
+		// no external URL string
 		return undefined;
 	}
 	return to;
