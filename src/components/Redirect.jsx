@@ -52,7 +52,7 @@ type RedirectState = {
  * <Router to={new URL('http://example.com')} />
 
  * // internal route, permanent redirect
- * <Router to='http://example.com' permanent />
+ * <Router to='/foo/bar' permanent />
  * // external URL, permanent redirect
  * <Router to='http://example.com' permanent />
  * ```
@@ -65,7 +65,10 @@ class Redirect extends React.Component {
 			// this is an external URL, so let `withSideEffect` handlers do redirect
 			return null;
 		}
-		// internal route URL
+		// internal route URL - <Route> provides access to the static routing
+		// context on the server so we can populate the `permanent` value, and the
+		// `<Redirect>` will populate the context `url` value or trigger the
+		// `window.location` redirect in the browser
 		return (
 			<Route
 				render={({ staticContext }) => {
