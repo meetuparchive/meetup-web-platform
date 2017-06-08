@@ -21,7 +21,7 @@ export const getAppRouteHandler = renderRequestMap => (request, reply) => {
 		.subscribe(({ redirect, result, statusCode }) => {
 			// response is sent when this function returns (`nextTick`)
 			if (redirect) {
-				return reply.redirect(redirect);
+				return reply.redirect(redirect.url).permanent(redirect.permanent);
 			}
 			const response = reply(result).code(statusCode);
 

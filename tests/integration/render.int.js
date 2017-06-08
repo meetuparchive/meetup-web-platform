@@ -174,4 +174,46 @@ describe('Full dummy app render', () => {
 					throw err;
 				});
 		}));
+	it('redirects permanently (301) to internal route for <Redirect to={internalPath} permanent />', () =>
+		start(getMockRenderRequestMap(), {}).then(server => {
+			const request = {
+				method: 'get',
+				url: '/redirect/internal/permanent',
+				credentials: 'whatever',
+			};
+			return server
+				.inject(request)
+				.then(response => {
+					expect(response.statusCode).toBe(301);
+					expect(response.headers.location).toBe(
+						INTERNAL_REDIRECT_PATH
+					);
+				})
+				.then(() => server.stop())
+				.catch(err => {
+					server.stop();
+					throw err;
+				});
+		}));
+	it('redirects permanently (301) to external route for <Redirect to={URL object} permanent />', () =>
+		start(getMockRenderRequestMap(), {}).then(server => {
+			const request = {
+				method: 'get',
+				url: '/redirect/external/permanent',
+				credentials: 'whatever',
+			};
+			return server
+				.inject(request)
+				.then(response => {
+					expect(response.statusCode).toBe(301);
+					expect(response.headers.location).toBe(
+						EXTERNAL_REDIRECT_URL
+					);
+				})
+				.then(() => server.stop())
+				.catch(err => {
+					server.stop();
+					throw err;
+				});
+		}));
 });
