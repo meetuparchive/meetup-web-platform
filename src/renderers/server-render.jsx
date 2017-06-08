@@ -35,6 +35,18 @@ function getHtml(el) {
 	return `${DOCTYPE}${htmlMarkup}`;
 }
 
+function getRedirect(context) {
+	if (!context || !context.url) {
+		return;
+	}
+	return {
+		redirect: {
+			url: context.url,
+			permanent: context.permanent,
+		},
+	};
+}
+
 /**
  * Using the current route information and Redux store, render the app to an
  * HTML string and server response code.
@@ -54,7 +66,7 @@ function getHtml(el) {
  */
 type RenderResult =
 	| { result: string, statusCode: number }
-	| { redirect: string };
+	| { redirect: { url: string, permanent?: boolean } };
 const getRouterRenderer = ({
 	routes,
 	store,
@@ -72,19 +84,24 @@ const getRouterRenderer = ({
 	// `<head>` contents
 	const initialState = store.getState();
 	let appMarkup;
-	const context: { url?: string } = {};
+	const staticContext: { url?: string, permanent?: boolean } = {};
 
 	appMarkup = ReactDOMServer.renderToString(
-		<StaticRouter basename={baseUrl} location={location} context={context}>
+		<StaticRouter
+			basename={baseUrl}
+			location={location}
+			context={staticContext}
+		>
 			<PlatformApp store={store} routes={routes} />
 		</StaticRouter>
 	);
 
 	// must _always_ call Redirect.rewind() to avoid memory leak
-	const externalRedirect = Redirect.rewind();
-	const redirect: ?string = context.url || externalRedirect;
+	const externalRedirect = getRedirect(Redirect.rewind());
+	const internalRedirect = getRedirect(staticContext);
+	const redirect = internalRedirect || externalRedirect;
 	if (redirect) {
-		return { redirect };
+		return redirect;
 	}
 
 	// all the data for the full `<html>` element has been initialized by the app

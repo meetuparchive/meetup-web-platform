@@ -16,7 +16,8 @@ const MockRedirect = props => {
 	const to = props.match.params.redirectType === 'internal'
 		? INTERNAL_REDIRECT_PATH
 		: new URL(EXTERNAL_REDIRECT_URL);
-	return <div><Redirect to={to} /></div>;
+	const permanent = Boolean(props.match.params.isPermanent);
+	return <div><Redirect to={to} permanent={permanent} /></div>;
 };
 
 export const routes = [
@@ -52,7 +53,7 @@ export const routes = [
 					import('./mockAsyncRoute').then(r => r.default),
 			},
 			{
-				path: '/redirect/:redirectType',
+				path: '/redirect/:redirectType?/:isPermanent?',
 				component: MockRedirect,
 			},
 			{
