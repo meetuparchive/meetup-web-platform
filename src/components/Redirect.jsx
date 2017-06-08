@@ -50,6 +50,11 @@ type RedirectState = {
  * <Router to='http://example.com' />
  * // external URL, URL object
  * <Router to={new URL('http://example.com')} />
+
+ * // internal route, permanent redirect
+ * <Router to='http://example.com' permanent />
+ * // external URL, permanent redirect
+ * <Router to='http://example.com' permanent />
  * ```
  */
 class Redirect extends React.Component {
