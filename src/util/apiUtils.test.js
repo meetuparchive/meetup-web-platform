@@ -418,22 +418,16 @@ describe('buildRequestArgs', () => {
 });
 
 describe('apiResponseToQueryResponse', () => {
-	beforeEach(function() {
-		this.refs = ['foo', 'bar'];
-		this.queries = this.refs.map(ref => ({ ref }));
-		// mock api response is just a map of refs to empty objects
-		this.MOCK_API_RESPONSES = this.refs.map(ref => ({ ref }));
-	});
-
+	const refs = ['foo', 'bar'];
+	const queries = refs.map(ref => ({ ref }));
+	const MOCK_API_RESPONSES = refs.map(ref => ({ ref }));
 	it('transforms an API response object to an object for State consumption', function() {
-		this.MOCK_API_RESPONSES
-			.map((apiResponse, i) =>
-				apiResponseToQueryResponse(this.queries[i])(apiResponse)
-			)
-			.forEach((queryResponse, i) => {
-				expect(queryResponse).toEqual(jasmine.any(Object));
-				expect(queryResponse.ref).toEqual(this.refs[i]);
-			});
+		MOCK_API_RESPONSES.map((apiResponse, i) =>
+			apiResponseToQueryResponse(queries[i])(apiResponse)
+		).forEach((queryResponse, i) => {
+			expect(queryResponse).toEqual(jasmine.any(Object));
+			expect(queryResponse.ref).toEqual(refs[i]);
+		});
 	});
 });
 
