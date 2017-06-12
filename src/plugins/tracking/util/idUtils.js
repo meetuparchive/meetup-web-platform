@@ -18,7 +18,8 @@ export const updateTrackId: UpdateTrackId = (options: TrackOpts) => (
 	let trackId: string = request.state[trackIdCookieName];
 
 	if (!trackId || doRefresh) {
-		// Generate a new trackId cookie
+		// Generate a new trackId value and store in request. Cookie will be
+		// set in the plugin's onResponse handler
 		trackId = uuid.v4();
 		request.plugins.tracking.trackId = trackId;
 	}
@@ -26,8 +27,9 @@ export const updateTrackId: UpdateTrackId = (options: TrackOpts) => (
 };
 
 /*
- * This function creates a new browser session id and stores it in a cookie that
- * will be shared across browser tabs
+ * This function creates a new browser session id and stores it in the request.
+ * A corresponding cookie will be set in the plugin's onResponse handler in
+ * order to share the session cookie across browser tabs.
  */
 export const newSessionId: Object => string = request => {
 	const sessionId: string = uuid.v4();

@@ -48,7 +48,7 @@ export const getTrackLogout: TrackGetter = (trackOpts: TrackOpts) => (
 	const { log, trackIdCookieName, sessionIdCookieName } = trackOpts;
 	return log(request, {
 		description: 'logout',
-		memberId: parseMemberCookie(request.request.state).id,
+		memberId: parseMemberCookie(request.state).id,
 		trackIdFrom: request.state[trackIdCookieName] || '',
 		trackId: updateTrackId(trackOpts)(request, true),
 		sessionId: request.state[sessionIdCookieName],

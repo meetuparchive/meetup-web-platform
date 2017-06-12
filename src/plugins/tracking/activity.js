@@ -65,23 +65,57 @@ export function getTrackers(options: {
 }
 
 /*
+ * Run request-initialization routines
+ */
+const onRequest = (request, reply) => {
+	// initialize request.plugins.tracking to store cookie vals
+	request.plugins.tracking = {};
+	reply.continue();
+};
+/*
+ * Read from request data to prepare/modify response. Mainly looking for new
+ * tracking cookies that need to be set using request.response.state.
+ */
+const getOnPreResponse = cookieConfig => (request, reply) => {
+	const { sessionId, trackId } = request.plugins.tracking;
+	const { sessionIdCookieName, trackIdCookieName, isProd } = cookieConfig;
+	const cookieOpts: CookieOpts = {
+		encoding: 'none',
+		path: '/',
+		isHttpOnly: true,
+		isSecure: isProd,
+	};
+
+	if (sessionId) {
+		request.response.state(sessionIdCookieName, sessionId, cookieOpts);
+	}
+	if (trackId) {
+		request.response.state(trackIdCookieName, trackId, {
+			...cookieOpts,
+			ttl: YEAR_IN_MS * 20,
+		});
+	}
+	reply.continue();
+};
+
+/*
  * The plugin register function that will 'decorate' the `request` interface with
- * all tracking functions returned from `getTrackers`
+ * all tracking functions returned from `getTrackers`, as well as assign request
+ * lifecycle event handlers that can affect the response, e.g. by setting cookies
  */
 export default function register(
 	server: Object,
 	options: { platform_agent: string, isProd: boolean },
 	next: () => void
 ) {
-	const sessionIdCookieName: string = options.isProd
-		? 'SESSION_ID'
-		: 'SESSION_ID_DEV';
+	const { platform_agent, isProd } = options;
 
-	const trackIdCookieName: string = options.isProd
-		? 'TRACK_ID'
-		: 'TRACK_ID_DEV';
+	const sessionIdCookieName: string = isProd ? 'SESSION_ID' : 'SESSION_ID_DEV';
+
+	const trackIdCookieName: string = isProd ? 'TRACK_ID' : 'TRACK_ID_DEV';
+
 	const trackers: { [string]: Tracker } = getTrackers({
-		platform_agent: options.platform_agent,
+		platform_agent: platform_agent,
 		trackIdCookieName,
 		sessionIdCookieName,
 	});
@@ -90,30 +124,11 @@ export default function register(
 		server.decorate('request', trackType, trackers[trackType]);
 	});
 
-	const cookieOpts: CookieOpts = {
-		encoding: 'none',
-		path: '/',
-		isHttpOnly: true,
-		isSecure: options.isProd,
-	};
-
-	// initialize request.plugins.tracking
-	server.on('onPreHandler', (request, reply) => {
-		request.plugins.tracking = {};
-		reply.continue();
-	});
-	server.on('response', request => {
-		const { sessionId, trackId } = request.plugins.tracking;
-		if (sessionId) {
-			request.response.state(sessionIdCookieName, sessionId, cookieOpts);
-		}
-		if (trackId) {
-			request.response.state(trackIdCookieName, trackId, {
-				...cookieOpts,
-				ttl: YEAR_IN_MS * 20,
-			});
-		}
-	});
+	server.ext('onRequest', onRequest);
+	server.ext(
+		'onPreResponse',
+		getOnPreResponse({ sessionIdCookieName, trackIdCookieName, isProd })
+	);
 
 	next();
 }
