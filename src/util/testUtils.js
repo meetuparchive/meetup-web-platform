@@ -65,6 +65,10 @@ export const getServer = () => {
 	server.decorate('request', 'trackApi', () => ({}));
 	server.decorate('request', 'trackSession', () => ({}));
 	server.logger = () => MOCK_LOGGER;
+	server.ext('onPreHandler', (request, reply) => {
+		request.plugins.tracking = {};
+		reply.continue();
+	});
 	return server;
 };
 

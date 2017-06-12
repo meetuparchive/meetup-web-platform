@@ -2,6 +2,8 @@
 import avro from './util/avro';
 import { getTrackApi, getTrackSession } from './_activityTrackers';
 
+const YEAR_IN_MS: number = 1000 * 60 * 60 * 24 * 365;
+
 /*
  * This plugin provides `request.track...` methods that track events related to
  * particular server responses, e.g. new sesssions and navigation activity.
@@ -15,12 +17,12 @@ import { getTrackApi, getTrackSession } from './_activityTrackers';
 
 export const getLogger: string => (Object, Object) => mixed = (
 	platform_agent: string
-) => (response: Object, trackInfo: Object) => {
-	const requestHeaders = response.request.headers;
+) => (request: Object, trackInfo: Object) => {
+	const requestHeaders = request.headers;
 	const now: Date = new Date();
 	const record = {
 		timestamp: now.toISOString(),
-		requestId: response.request.id,
+		requestId: request.id,
 		ip: requestHeaders['remote-addr'] || '',
 		agent: requestHeaders['user-agent'] || '',
 		platform: 'mup-web',
@@ -37,31 +39,22 @@ export const getLogger: string => (Object, Object) => mixed = (
 
 /*
  * Each tracking function is a composition of a logging function and data about
- * the `response` object. This function computes some configuration information
+ * the `request` object. This function computes some configuration information
  * to create the tracking functions, and returns each of them in a map keyed by
  * the target `request` method name
  */
 export function getTrackers(options: {
 	platform_agent: string,
-	isProd: boolean,
+	trackIdCookieName: string,
+	sessionIdCookieName: string,
 }): { [string]: Tracker } {
-	const { platform_agent, isProd } = options;
-	const cookieOpts: CookieOpts = {
-		encoding: 'none',
-		path: '/',
-		isHttpOnly: true,
-		isSecure: isProd,
-	};
-
-	const trackIdCookieName: string = isProd ? 'TRACK_ID' : 'TRACK_ID_DEV';
-	const sessionIdCookieName: string = isProd ? 'SESSION_ID' : 'SESSION_ID_DEV';
+	const { platform_agent, trackIdCookieName, sessionIdCookieName } = options;
 
 	const log: Logger = getLogger(platform_agent);
 	const trackOpts: TrackOpts = {
 		log,
 		trackIdCookieName,
 		sessionIdCookieName,
-		cookieOpts,
 	};
 	// These are the tracking methods that will be set on the `request` interface
 	const trackers: { [string]: Tracker } = {
@@ -72,19 +65,70 @@ export function getTrackers(options: {
 }
 
 /*
+ * Run request-initialization routines
+ */
+const onRequest = (request, reply) => {
+	// initialize request.plugins.tracking to store cookie vals
+	request.plugins.tracking = {};
+	reply.continue();
+};
+/*
+ * Read from request data to prepare/modify response. Mainly looking for new
+ * tracking cookies that need to be set using request.response.state.
+ */
+const getOnPreResponse = cookieConfig => (request, reply) => {
+	const { sessionId, trackId } = request.plugins.tracking;
+	const { sessionIdCookieName, trackIdCookieName, isProd } = cookieConfig;
+	const cookieOpts: CookieOpts = {
+		encoding: 'none',
+		path: '/',
+		isHttpOnly: true,
+		isSecure: isProd,
+	};
+
+	if (sessionId) {
+		request.response.state(sessionIdCookieName, sessionId, cookieOpts);
+	}
+	if (trackId) {
+		request.response.state(trackIdCookieName, trackId, {
+			...cookieOpts,
+			ttl: YEAR_IN_MS * 20,
+		});
+	}
+	reply.continue();
+};
+
+/*
  * The plugin register function that will 'decorate' the `request` interface with
- * all tracking functions returned from `getTrackers`
+ * all tracking functions returned from `getTrackers`, as well as assign request
+ * lifecycle event handlers that can affect the response, e.g. by setting cookies
  */
 export default function register(
 	server: Object,
 	options: { platform_agent: string, isProd: boolean },
 	next: () => void
 ) {
-	const trackers: { [string]: Tracker } = getTrackers(options);
+	const { platform_agent, isProd } = options;
+
+	const sessionIdCookieName: string = isProd ? 'SESSION_ID' : 'SESSION_ID_DEV';
+
+	const trackIdCookieName: string = isProd ? 'TRACK_ID' : 'TRACK_ID_DEV';
+
+	const trackers: { [string]: Tracker } = getTrackers({
+		platform_agent: platform_agent,
+		trackIdCookieName,
+		sessionIdCookieName,
+	});
 
 	Object.keys(trackers).forEach((trackType: string) => {
 		server.decorate('request', trackType, trackers[trackType]);
 	});
+
+	server.ext('onRequest', onRequest);
+	server.ext(
+		'onPreResponse',
+		getOnPreResponse({ sessionIdCookieName, trackIdCookieName, isProd })
+	);
 
 	next();
 }

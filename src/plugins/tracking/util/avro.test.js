@@ -41,14 +41,12 @@ describe('serializers.avro', () => {
 });
 
 describe('Activity tracking', () => {
-	const response = {
-		request: {
-			id: 'foo',
-			headers: {},
-			log() {},
-		},
+	const request = {
+		id: 'foo',
+		headers: {},
+		log() {},
 	};
-	const trackInfo = getLogger('WEB')(response, {
+	const trackInfo = getLogger('WEB')(request, {
 		memberId: 1234,
 		trackId: 'foo',
 		sessionId: 'bar', // not part of v3 spec

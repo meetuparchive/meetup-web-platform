@@ -57,7 +57,7 @@ const apiProxy$ = (request, queries) => {
 
 	// 4. zip them together to make requests in parallel and return responses in order
 	return Observable.zip(...apiRequests$).do(responses =>
-		request.trackApi({ request }, responses)
+		request.trackApi(request, responses)
 	);
 };
 

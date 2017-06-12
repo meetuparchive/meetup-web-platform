@@ -5,6 +5,5 @@ declare type TrackOpts = {
 	log: Logger,
 	trackIdCookieName: string,
 	sessionIdCookieName: string,
-	cookieOpts: CookieOpts,
 };
 declare type TrackGetter = TrackOpts => Tracker;
