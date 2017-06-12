@@ -1,10 +1,7 @@
 // @flow
 import uuid from 'uuid';
 
-type UpdateTrackIdOpts = {
-	trackIdCookieName: string,
-};
-type UpdateTrackId = UpdateTrackIdOpts => (Object, ?boolean) => string;
+type UpdateTrackId = TrackOpts => (Object, ?boolean) => string;
 /*
  * Initialize the trackId for member or anonymous user - the longest-living id
  * we can assign to a user. Stays in place until login or logout, when it is

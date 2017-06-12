@@ -97,6 +97,11 @@ export default function register(
 		isSecure: options.isProd,
 	};
 
+	// initialize request.plugins.tracking
+	server.on('onPreHandler', (request, reply) => {
+		request.plugins.tracking = {};
+		reply.continue();
+	});
 	server.on('response', request => {
 		const { sessionId, trackId } = request.plugins.tracking;
 		if (sessionId) {
