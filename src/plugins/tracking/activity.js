@@ -3,6 +3,7 @@ import avro from './util/avro';
 import { getTrackApi, getTrackSession } from './_activityTrackers';
 
 const YEAR_IN_MS: number = 1000 * 60 * 60 * 24 * 365;
+export const ACTIVITY_PLUGIN_NAME = 'tracking';
 
 /*
  * This plugin provides `request.track...` methods that track events related to
@@ -65,11 +66,11 @@ export function getTrackers(options: {
 }
 
 /*
- * Run request-initialization routines
+ * Run request-initialization routines, e.g. creating plugin data store
  */
 const onRequest = (request, reply) => {
-	// initialize request.plugins.tracking to store cookie vals
-	request.plugins.tracking = {};
+	// initialize request.plugins[ACTIVITY_PLUGIN_NAME] to store cookie vals
+	request.plugins[ACTIVITY_PLUGIN_NAME] = {};
 	reply.continue();
 };
 /*
@@ -77,7 +78,7 @@ const onRequest = (request, reply) => {
  * tracking cookies that need to be set using request.response.state.
  */
 const getOnPreResponse = cookieConfig => (request, reply) => {
-	const { sessionId, trackId } = request.plugins.tracking;
+	const { sessionId, trackId } = request.plugins[ACTIVITY_PLUGIN_NAME];
 	const { sessionIdCookieName, trackIdCookieName, isProd } = cookieConfig;
 	const cookieOpts: CookieOpts = {
 		encoding: 'none',
@@ -111,7 +112,6 @@ export default function register(
 	const { platform_agent, isProd } = options;
 
 	const sessionIdCookieName: string = isProd ? 'SESSION_ID' : 'SESSION_ID_DEV';
-
 	const trackIdCookieName: string = isProd ? 'TRACK_ID' : 'TRACK_ID_DEV';
 
 	const trackers: { [string]: Tracker } = getTrackers({
@@ -134,6 +134,6 @@ export default function register(
 }
 
 register.attributes = {
-	name: 'tracking',
+	name: ACTIVITY_PLUGIN_NAME,
 	version: '1.0.0',
 };

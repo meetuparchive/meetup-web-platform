@@ -1,5 +1,6 @@
 // @flow
 import uuid from 'uuid';
+import { ACTIVITY_PLUGIN_NAME } from '../activity';
 
 type UpdateTrackId = TrackOpts => (Object, ?boolean) => string;
 /*
@@ -21,7 +22,7 @@ export const updateTrackId: UpdateTrackId = (options: TrackOpts) => (
 		// Generate a new trackId value and store in request. Cookie will be
 		// set in the plugin's onResponse handler
 		trackId = uuid.v4();
-		request.plugins.tracking.trackId = trackId;
+		request.plugins[ACTIVITY_PLUGIN_NAME].trackId = trackId;
 	}
 	return trackId;
 };
@@ -33,6 +34,6 @@ export const updateTrackId: UpdateTrackId = (options: TrackOpts) => (
  */
 export const newSessionId: Object => string = request => {
 	const sessionId: string = uuid.v4();
-	request.plugins.tracking.sessionId = sessionId;
+	request.plugins[ACTIVITY_PLUGIN_NAME].sessionId = sessionId;
 	return sessionId;
 };
