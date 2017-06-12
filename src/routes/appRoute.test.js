@@ -22,7 +22,7 @@ describe('onPreResponse.method', () => {
 		const errorResponse = onPreResponse.method(request, spyable.reply);
 		expect(errorResponse).toBe(replyObj);
 		const errorMarkup = spyable.reply.calls.mostRecent().args[0];
-		expect(errorMarkup.indexOf(errorMessage)).toBeGreaterThan(-1);
+		expect(errorMarkup).toContain(errorMessage);
 		expect(replyObj.code).toHaveBeenCalledWith(errorCode);
 	});
 });
