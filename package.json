@@ -88,7 +88,7 @@
     "jest-cli": "20.0.4",
     "lint-staged": "3.6.0",
     "meetup-web-mocks": "1.0.190",
-    "prettier": "1.4.2",
+    "prettier": "1.4.4",
     "react": "15.5.4",
     "react-addons-test-utils": "15.5.1",
     "react-helmet": "5.1.3",
