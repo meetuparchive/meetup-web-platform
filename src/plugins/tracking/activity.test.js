@@ -133,36 +133,46 @@ describe('tracking loggers', () => {
 		expect(trackInfo.trackIdFrom).toEqual(request.state[trackIdCookieName]);
 		expect(trackInfo.sessionId).toEqual(request.state[sessionIdCookieName]);
 	});
-	it('getTrackApi: calls logger with "login" when login in queryResponses', () => {
-		spyOn(spyable, 'log').and.callThrough();
-		getTrackApi({
-			log: spyable.log,
-			trackIdCookieName,
-			sessionIdCookieName,
-			cookieOpts,
-		})(getMockRequest(), [
-			{ login: { type: 'login', value: { member: { id: 1234 } } } },
-		]);
-		expect(spyable.log).toHaveBeenCalled();
-		const trackInfo = spyable.log.calls.mostRecent().args[1];
-		expect(trackInfo.description).toEqual('login');
-	});
-	it('getTrackApi: calls logger with "logout" when "logout" in request.query', () => {
-		spyOn(spyable, 'log').and.callThrough();
-		const request = {
-			...getMockRequest(),
-			query: { logout: null },
-		};
-		getTrackApi({
-			log: spyable.log,
-			trackIdCookieName,
-			sessionIdCookieName,
-			cookieOpts,
-		})(request, [{}]);
-		expect(spyable.log).toHaveBeenCalled();
-		const trackInfo = spyable.log.calls.mostRecent().args[1];
-		expect(trackInfo.description).toEqual('logout');
-	});
+	// skipping this test for now - need to remove all login/logout tracking until
+	// it can be rebuilt properly
+	xit(
+		'getTrackApi: calls logger with "login" when login in queryResponses',
+		() => {
+			spyOn(spyable, 'log').and.callThrough();
+			getTrackApi({
+				log: spyable.log,
+				trackIdCookieName,
+				sessionIdCookieName,
+				cookieOpts,
+			})(getMockRequest(), [
+				{ login: { type: 'login', value: { member: { id: 1234 } } } },
+			]);
+			expect(spyable.log).toHaveBeenCalled();
+			const trackInfo = spyable.log.calls.mostRecent().args[1];
+			expect(trackInfo.description).toEqual('login');
+		}
+	);
+	// skipping this test for now - need to remove all login/logout tracking until
+	// it can be rebuilt properly
+	xit(
+		'getTrackApi: calls logger with "logout" when "logout" in request.query',
+		() => {
+			spyOn(spyable, 'log').and.callThrough();
+			const request = {
+				...getMockRequest(),
+				query: { logout: null },
+			};
+			getTrackApi({
+				log: spyable.log,
+				trackIdCookieName,
+				sessionIdCookieName,
+				cookieOpts,
+			})(request, [{}]);
+			expect(spyable.log).toHaveBeenCalled();
+			const trackInfo = spyable.log.calls.mostRecent().args[1];
+			expect(trackInfo.description).toEqual('logout');
+		}
+	);
 	it('getTrackSession: calls logger with "session", new sessionId, old trackId & memberId', () => {
 		spyOn(spyable, 'log').and.callThrough();
 		const request = {

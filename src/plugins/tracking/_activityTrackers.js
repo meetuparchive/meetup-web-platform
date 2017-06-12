@@ -10,10 +10,6 @@ const parseUrl = url.parse;
  * This module exports specific tracking functions that consume the `request`
  * object and any additional arguments that are relevant to generating the
  * tracking record.
- *
- * Note that some trackers use cookies to maintain state across sessions - these
- * functions are not guarantees to be pure because they may use the
- * `request.state` interface to set long-lived cookies
  */
 
 /*
@@ -50,7 +46,7 @@ export const getTrackLogout: TrackGetter = (trackOpts: TrackOpts) => (
 		description: 'logout',
 		memberId: parseMemberCookie(request.state).id,
 		trackIdFrom: request.state[trackIdCookieName] || '',
-		trackId: updateTrackId(trackOpts)(request, true),
+		trackId: updateTrackId(trackOpts)(request, true), // `true` force trackId refresh
 		sessionId: request.state[sessionIdCookieName],
 		url: request.info.referrer || '',
 	});
@@ -70,7 +66,7 @@ export const getTrackLogin: TrackGetter = (trackOpts: TrackOpts) => (
 	});
 };
 
-export const getTrackNav: TrackGetter = (trackOpts: TrackOpts) => (
+export const getTrackApiRequest: TrackGetter = (trackOpts: TrackOpts) => (
 	request: Object,
 	queryResponses: Array<Object>,
 	url: string,
@@ -95,30 +91,40 @@ export const getTrackNav: TrackGetter = (trackOpts: TrackOpts) => (
 	});
 };
 
-export const getTrackApi: TrackGetter = (trackOpts: TrackOpts) => (
-	request: Object,
-	queryResponses: Array<Object>
-) => {
-	const payload = request.method === 'post' ? request.payload : request.query;
+/*
+ * get the trackApi handler - the core tracking handler for navigation and
+ * login-related activity.
+ */
+export const getTrackApi: TrackGetter = (trackOpts: TrackOpts) => {
+	const trackApiRequest = getTrackApiRequest(trackOpts);
+	const trackLogin = getTrackLogin(trackOpts);
+	const trackLogout = getTrackLogout(trackOpts);
 
-	const metadataRison = payload.metadata || rison.encode_object({});
-	const metadata = rison.decode_object(metadataRison);
-	const originUrl = request.info.referrer;
-	metadata.url = parseUrl(originUrl).pathname;
-	metadata.method = request.method;
+	return (request: Object, queryResponses: Array<Object>) => {
+		const payload = request.method === 'post' ? request.payload : request.query;
 
-	const { url, referrer, method } = metadata;
-	if (method === 'get') {
-		return getTrackNav(trackOpts)(request, queryResponses, url, referrer);
-	}
-	// special case - login requests need to be tracked
-	const loginResponse = queryResponses.find(r => r.login);
-	const memberId: number =
-		((((loginResponse || {}).login || {}).value || {}).member || {}).id || 0;
-	if (memberId) {
-		getTrackLogin(trackOpts)(request, JSON.stringify(memberId));
-	}
-	if ('logout' in request.query) {
-		getTrackLogout(trackOpts)(request);
-	}
+		const metadataRison = payload.metadata || rison.encode_object({});
+		const metadata = rison.decode_object(metadataRison);
+		const originUrl = request.info.referrer;
+		metadata.url = parseUrl(originUrl).pathname;
+		metadata.method = request.method;
+
+		const { url, referrer, method } = metadata;
+
+		// special case - login requests need to be tracked (This needs to be
+		// redone when login/logout is fully implemented)
+		if (method === 'post') {
+			const loginResponse = queryResponses.find(r => r.login);
+			const memberId: number =
+				((((loginResponse || {}).login || {}).value || {}).member || {}).id ||
+				0;
+			if (memberId) {
+				trackLogin(request, JSON.stringify(memberId));
+			}
+			if ('logout' in request.query) {
+				trackLogout(request);
+			}
+		}
+		return trackApiRequest(request, queryResponses, url, referrer);
+	};
 };
