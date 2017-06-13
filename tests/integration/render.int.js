@@ -143,9 +143,7 @@ describe('Full dummy app render', () => {
 				.inject(request)
 				.then(response => {
 					expect(response.statusCode).toBe(302);
-					expect(response.headers.location).toBe(
-						INTERNAL_REDIRECT_PATH
-					);
+					expect(response.headers.location).toBe(INTERNAL_REDIRECT_PATH);
 				})
 				.then(() => server.stop())
 				.catch(err => {
@@ -164,9 +162,7 @@ describe('Full dummy app render', () => {
 				.inject(request)
 				.then(response => {
 					expect(response.statusCode).toBe(302);
-					expect(response.headers.location).toBe(
-						EXTERNAL_REDIRECT_URL
-					);
+					expect(response.headers.location).toBe(EXTERNAL_REDIRECT_URL);
 				})
 				.then(() => server.stop())
 				.catch(err => {
@@ -185,9 +181,7 @@ describe('Full dummy app render', () => {
 				.inject(request)
 				.then(response => {
 					expect(response.statusCode).toBe(301);
-					expect(response.headers.location).toBe(
-						INTERNAL_REDIRECT_PATH
-					);
+					expect(response.headers.location).toBe(INTERNAL_REDIRECT_PATH);
 				})
 				.then(() => server.stop())
 				.catch(err => {
@@ -206,10 +200,24 @@ describe('Full dummy app render', () => {
 				.inject(request)
 				.then(response => {
 					expect(response.statusCode).toBe(301);
-					expect(response.headers.location).toBe(
-						EXTERNAL_REDIRECT_URL
-					);
+					expect(response.headers.location).toBe(EXTERNAL_REDIRECT_URL);
 				})
+				.then(() => server.stop())
+				.catch(err => {
+					server.stop();
+					throw err;
+				});
+		}));
+	it('returns 500 error for React rendering errors - developer error', () =>
+		start(getMockRenderRequestMap(), {}).then(server => {
+			const request = {
+				method: 'get',
+				url: '/badImplementation',
+				credentials: 'whatever',
+			};
+			return server
+				.inject(request)
+				.then(response => expect(response.statusCode).toBe(500))
 				.then(() => server.stop())
 				.catch(err => {
 					server.stop();
