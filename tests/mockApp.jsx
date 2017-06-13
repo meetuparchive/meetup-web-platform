@@ -49,8 +49,14 @@ export const routes = [
 						params: {},
 					}),
 				},
-				getNestedRoutes: () =>
-					import('./mockAsyncRoute').then(r => r.default),
+				getNestedRoutes: () => import('./mockAsyncRoute').then(r => r.default),
+			},
+			{
+				path: '/badImplementation',
+				component: () => {
+					throw new Error('your implementation is bad and you should feel bad');
+					return <div />; // eslint-disable-line no-unreachable
+				},
 			},
 			{
 				path: '/redirect/:redirectType?/:isPermanent?',
