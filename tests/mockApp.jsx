@@ -39,6 +39,13 @@ export const routes = [
 		},
 		routes: [
 			{
+				path: '/badImplementation',
+				component: () => {
+					throw new Error('your implementation is bad and you should feel bad');
+					return <div />; // eslint-disable-line no-unreachable
+				},
+			},
+			{
 				path: '/foo',
 				component: 'div',
 				indexRoute: {
@@ -49,8 +56,7 @@ export const routes = [
 						params: {},
 					}),
 				},
-				getNestedRoutes: () =>
-					import('./mockAsyncRoute').then(r => r.default),
+				getNestedRoutes: () => import('./mockAsyncRoute').then(r => r.default),
 			},
 			{
 				path: '/redirect/:redirectType?/:isPermanent?',
