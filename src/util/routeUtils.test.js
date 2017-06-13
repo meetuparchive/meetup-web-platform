@@ -206,18 +206,24 @@ describe('getMatchedQueries', () => {
 	});
 	it('calls query functions with params + location object', () => {
 		const location = new URL('http://foo.com/bar/baz');
-		const params = { foo: 'bar' };
+		const path = '/';
+		const match = {
+			isExact: false,
+			params: { foo: 'bar' },
+			path,
+			url: '/',
+		};
 		const matchedRoute = {
 			route: {
-				path: '/',
-				query: jest.fn(() => 'bar'),
+				path,
+				query: jest.fn(),
 			},
-			match: { params },
+			match,
 		};
 		getMatchedQueries(location)([matchedRoute]);
 		expect(matchedRoute.route.query).toHaveBeenCalledWith({
+			...match,
 			location,
-			params,
 		});
 	});
 });

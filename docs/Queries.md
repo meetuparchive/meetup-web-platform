@@ -329,7 +329,7 @@ the corresponding `ref` from `state.api.inFlight`.
 {
   [ref]: {
     ref,
-    type,
+    type?,
     value: {},
     meta?: {}
   },
@@ -344,7 +344,7 @@ the corresponding `ref` from `state.api.inFlight`.
   [ref]: {
     ref,
     type?,
-    error?: [],
+    error: error,
     meta?: {}
   },
   // ...
@@ -366,6 +366,11 @@ the failed call.
 
 ### Route query functions
 
+```js
+// see description for docs about object argument
+({ params, isExact, url, path, location }) => Query
+```
+
 One of the primary uses for queries is to load route-specific data from the
 API. The application will automatically generate these queries by calling
 particular 'query creator' functions that are assigned to application routes,
@@ -375,14 +380,17 @@ Route query creator functions have two requirements:
 
 1. They are assigned as _props_ of React Router `route`s .The `query` prop can
 be either a single query creator function or an array of functions
-2. They are pure functions that take the Router's `location` and `params`
-extracted from the URL), and deliver a query object for the associated route.
+2. They are pure functions that take a single object argument constructed from the
+[`match` object from React Router](https://reacttraining.com/react-router/web/api/match),
+which includes `params` extracted from the URL) with an additional `location`
+property corresponding to the current
+[React Router `location`](https://reacttraining.com/react-router/web/api/location).
 
 #### Example query function
 
 ```js
 export const GROUP_REF = 'group';
-function groupQuery({ location, params }) {
+function groupQuery({ params, location }) {
 	const { urlname } = params;
 
 	return {
