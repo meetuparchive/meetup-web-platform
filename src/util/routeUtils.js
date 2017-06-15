@@ -106,7 +106,7 @@ const _matchedRouteQueriesReducer = (location: URL) => (
 	// call the query functions with non-url-encoded params
 	const params = decodeParams(match.params);
 	const routeQueries = routeQueryFns
-		.map(queryFn => queryFn({ location, params }))
+		.map(queryFn => queryFn({ ...match, location, params }))
 		.filter(query => query);
 
 	return [...queries, ...routeQueries];
