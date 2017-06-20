@@ -27,7 +27,7 @@ type PlatformRoute = {
   getIndexRoute?: () => Promise<PlatformRoute>,
   routes?: () => Promise<Array<PlatformRoute>>,
   getNestedRoutes:
-  query?: QueryFunction,
+  query?: QueryFunction? | Array<QueryFunction?>,
   exact?: boolean,
 };
 ```
@@ -59,7 +59,10 @@ Only render the current route when the URL matches exactly
 
 ### `query`
 
-This is a function that yeilds a [`Query` object](./Queries.md).
+This is a function or array of functions that yield(s) a
+[`Query` object](./Queries.md) or `null`. All query functions will be executed
+when the route matches, and all resulting non-null queries will be included in
+the resulting API request.
 
 ### `indexRoute` (synchronous)
 

@@ -386,6 +386,8 @@ which includes `params` extracted from the URL) with an additional `location`
 property corresponding to the current
 [React Router `location`](https://reacttraining.com/react-router/web/api/location).
 
+More info in the [Routing docs](./Routing.md).
+
 #### Example query function
 
 ```js
@@ -407,7 +409,7 @@ function groupQuery({ params, location }) {
 
 const groupRoute = {
 	path: '/:urlname',
-	query: groupQuery,
+	query: groupQuery, // or [groupQuery, ...<other queries>]
 	component: GroupContainer,
 };
 ```
