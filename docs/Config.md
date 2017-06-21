@@ -75,8 +75,9 @@ The secrets in this example are dummy values and won't work in an actual app.
 ### Running over HTTPS
 
 By default, the app server and asset server will run over HTTPS, but you must
-supply the cert files (`.key` and `.crt`). By default, the platform will look
-for these files in `~/.certs/` and warn you if they are not found.
+supply the cert files (`.key` and `.crt`). The platform will look for these
+files in `~/.certs/` and warn you if they are not found, although you can supply
+a custom file path if desired.
 
 To get the cert files, you can copy them from the chapstick repo at
 `/util/conf/localdev/ssl/`. You should copy the
@@ -87,6 +88,7 @@ your dev machine.
 checked into version control
 
 ```
+$ mkdir ~/.certs # if it doesn't exist
 $ scp www.dev.meetup.com:/usr/local/meetup/util/conf/localdev/ssl/star.dev.meetup.com.* ~/.certs/
 ```
 
