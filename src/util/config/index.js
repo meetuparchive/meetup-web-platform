@@ -102,7 +102,9 @@ export const config = convict({
 	app_server: {
 		protocol: {
 			format: validateProtocol,
-			default: 'http',
+			default: process.env.NODE_ENV === 'production'
+				? 'http' // SSL handled by load balancer
+				: 'https',
 			env: 'DEV_SERVER_PROTOCOL', // legacy naming
 		},
 		// host: '0.0.0.0', ALWAYS 0.0.0.0
