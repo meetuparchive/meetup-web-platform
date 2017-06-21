@@ -1,6 +1,9 @@
 import fs from 'fs';
-import convict from 'convict';
+import os from 'os';
 import path from 'path';
+
+import chalk from 'chalk';
+import convict from 'convict';
 
 /**
  * This module populates build time configuration data
@@ -27,17 +30,17 @@ export const schema = {
 		},
 		protocol: {
 			format: String,
-			default: 'http',
+			default: 'https',
 			env: 'ASSET_SERVER_PROTOCOL',
 		},
 		key_file: {
 			format: String,
-			default: '',
+			default: path.resolve(os.homedir(), '.certs', 'star.dev.meetup.com.key'),
 			env: 'ASSET_KEY_FILE',
 		},
 		crt_file: {
 			format: String,
-			default: '',
+			default: path.resolve(os.homedir(), '.certs', 'star.dev.meetup.com.crt'),
 			env: 'ASSET_CRT_FILE',
 		},
 	},
@@ -83,7 +86,18 @@ if (
 	assetConf.protocol === 'https' &&
 	(!fs.existsSync(assetConf.key_file) || !fs.existsSync(assetConf.crt_file))
 ) {
-	throw new Error('Missing HTTPS cert or key!');
+	const message = 'Missing HTTPS cert or key for asset server!';
+	if (config.isProd) {
+		throw new Error(message);
+	}
+	console.error(chalk.red(message));
+	console.warn(
+		chalk.yellow(
+			'Re-setting protocol to HTTP - some features may not work as expected'
+		)
+	);
+	console.warn(chalk.yellow('See MWP config docs to configure HTTPS'));
+	config.set('asset_server.protocol', 'http');
 }
 
 config.validate();

@@ -51,16 +51,12 @@ The secrets in this example are dummy values and won't work in an actual app.
     "root_url": "https://www.api.dev.meetup.com"
   },
   "asset_server": {
-    "protocol": "http",
     "host": "beta2.dev.meetup.com",
-    "port": 0
   },
   "csrf_secret": "asdfasdfasdfasdfasdfasdfasdfasdf",
   "cookie_encrypt_secret": "asdfasdfasdfasdfasdfasdfasdfasdf",
   "app_server": {
-    "protocol": "http",
     "host": "beta2.dev.meetup.com",
-    "port": 0
   },
   "disable_hmr": false,
   "duotone_urls": [
@@ -78,42 +74,40 @@ The secrets in this example are dummy values and won't work in an actual app.
 
 ### Running over HTTPS
 
-You need to change change the `protocol` to `https`, and tell the server where
-to find the certificate and the private key (`crt_file` and `key_file`). You'll
-need to add these values to both the `asset_server` and the `app_server`.
+By default, the app server and asset server will run over HTTPS, but you must
+supply the cert files (`.key` and `.crt`). The platform will look for these
+files in `~/.certs/` and warn you if they are not found, although you can supply
+a custom file path if desired.
+
+To get the cert files, you can copy them from the chapstick repo at
+`/util/conf/localdev/ssl/`. You should copy the
+`star.dev.meetup.com.crt` and `star.dev.meetup.com.key` files to `~/certs/` on
+your dev machine.
+
+**Important** DO NOT copy the files into the mup-web repo - they should not be
+checked into version control
+
+```
+$ mkdir ~/.certs # if it doesn't exist
+$ scp www.dev.meetup.com:/usr/local/meetup/util/conf/localdev/ssl/star.dev.meetup.com.* ~/.certs/
+```
+
+If you want to keep the cert files elsewhere, you will need to create/update
+your `config.development.json` to tell the platform where to find them
 
 ```json
 {
-  "api": {
-    "protocol": "https",
-    "host": "www.api.dev.meetup.com",
-    "timeout": 10,
-    "root_url": "https://www.api.dev.meetup.com"
-  },
   "asset_server": {
-    "protocol": "https",
-    "host": "beta2.dev.meetup.com",
-    "port": 0,
     "crt_file":"/path/to/certificate.crt",
-    "key_file":"/path/to/certificate.key",
-
+    "key_file":"/path/to/certificate.key"
   },
-  "csrf_secret": "asdfasdfasdfasdfasdfasdfasdfasdf",
-  "cookie_encrypt_secret": "asdfasdfasdfasdfasdfasdfasdfasdf",
   "app_server": {
-    "protocol": "https",
-    "host": "beta2.dev.meetup.com",
-    "port": 0,
     "crt_file":"/path/to/certificate.crt",
-    "key_file":"/path/to/certificate.key",
-  },
-  "disable_hmr": false,
-  "photo_scaler_salt": "asdfasdfasdfasdfasdfasdfasdfasdf",
-  "oauth": {
-    "auth_url": "https://secure.dev.meetup.com/oauth2/authorize",
-    "access_url": "https://secure.dev.meetup.com/oauth2/access",
-    "key": "asdfasdfasdfasdfasdfasdfasdfasdf",
-    "secret": "asdfasdfasdfasdfasdfasdfasdfasdf"
+    "key_file":"/path/to/certificate.key"
   }
 }
 ```
+
+The current certs are valid until April 2019 and are issued by a Certificate
+Authority (GeoTrust), so you shouldn't have to ignore SSL warnings about self-
+signed certificates.
