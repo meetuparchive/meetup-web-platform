@@ -1,6 +1,9 @@
 import fs from 'fs';
-import convict from 'convict';
+import os from 'os';
 import path from 'path';
+
+import chalk from 'chalk';
+import convict from 'convict';
 
 import buildConfig, { schema as buildSchema } from './build';
 import { duotones, getDuotoneUrls } from '../duotone';
@@ -99,7 +102,9 @@ export const config = convict({
 	app_server: {
 		protocol: {
 			format: validateProtocol,
-			default: 'http',
+			default: process.env.NODE_ENV === 'production'
+				? 'http' // SSL handled by load balancer
+				: 'https',
 			env: 'DEV_SERVER_PROTOCOL', // legacy naming
 		},
 		// host: '0.0.0.0', ALWAYS 0.0.0.0
@@ -111,12 +116,12 @@ export const config = convict({
 		},
 		key_file: {
 			format: String,
-			default: '',
+			default: path.resolve(os.homedir(), '.certs', 'star.dev.meetup.com.key'),
 			env: 'APP_KEY_FILE',
 		},
 		crt_file: {
 			format: String,
-			default: '',
+			default: path.resolve(os.homedir(), '.certs', 'star.dev.meetup.com.crt'),
 			env: 'APP_CRT_FILE',
 		},
 	},
@@ -213,13 +218,24 @@ config.set(
 
 config.set('isProd', config.get('env') === 'production');
 config.set('isDev', config.get('env') === 'development');
-config.validate();
 const appConf = config.get('app_server');
 if (
 	appConf.protocol === 'https' &&
 	(!fs.existsSync(appConf.key_file) || !fs.existsSync(appConf.crt_file))
 ) {
-	throw new Error('Missing HTTPS cert or key!');
+	const message = 'Missing HTTPS cert or key for application server!';
+	if (config.isProd) {
+		throw new Error(message);
+	}
+	console.error(chalk.red(message));
+	console.warn(
+		chalk.yellow(
+			'Re-setting protocol to HTTP - some features may not work as expected'
+		)
+	);
+	console.warn(chalk.yellow('See MWP config docs to configure HTTPS'));
+	config.set('app_server.protocol', 'http');
 }
+config.validate();
 
 export default config.getProperties();
