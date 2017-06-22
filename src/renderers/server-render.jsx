@@ -187,7 +187,7 @@ const makeRenderer = (
 	const requestProtocol =
 		headers['x-forwarded-proto'] || connection.info.protocol;
 	const host = `${requestProtocol}://${info.host}`;
-	const apiUrl = `${host}/mu_api`;
+	const apiUrl = '/mu_api';
 
 	// create the store
 	const initialState = {};
