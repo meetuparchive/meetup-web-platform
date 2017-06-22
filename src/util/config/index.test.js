@@ -70,6 +70,7 @@ describe('config', () => {
 		expect(config.cookie_encrypt_secret).toBeTruthy();
 		expect(config.csrf_secret).toBeTruthy();
 		expect(config.app_server).toBeTruthy();
+		expect(config.app_server.host).toBeTruthy();
 		expect(config.app_server.protocol).toBeTruthy();
 		expect(config.duotone_urls).toBeTruthy();
 		expect(config.isDev).toBeDefined();
