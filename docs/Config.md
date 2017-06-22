@@ -88,8 +88,7 @@ your dev machine.
 checked into version control
 
 ```
-$ mkdir ~/.certs # if it doesn't exist
-$ scp www.dev.meetup.com:/usr/local/meetup/util/conf/localdev/ssl/star.dev.meetup.com.* ~/.certs/
+$ scp <username>@www.dev.meetup.com:/usr/local/meetup/util/conf/localdev/ssl/star.dev.meetup.com.* ~/.certs/
 ```
 
 If you want to keep the cert files elsewhere, you will need to create/update
