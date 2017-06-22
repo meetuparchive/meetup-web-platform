@@ -2,8 +2,10 @@ import JSCookie from 'js-cookie';
 import { mockQuery } from 'meetup-web-mocks/lib/app';
 import { MOCK_GROUP } from 'meetup-web-mocks/lib/api';
 import * as fetchUtils from './fetchUtils';
+import { URLSearchParams } from 'url';
 
 global.FormData = function() {};
+global.URLSearchParams = URLSearchParams;
 
 jest.mock('js-cookie', () => {
 	const get = jest.fn(name => `${name} value`);
