@@ -87,10 +87,8 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 	const isFormData = queries[0].params instanceof FormData;
 	const isDelete = method === 'DELETE';
 
-	const searchParams = new URLSearchParams().append(
-		'queries',
-		rison.encode_array(queries)
-	);
+	const searchParams = new URLSearchParams();
+	searchParams.append('queries', rison.encode_array(queries));
 
 	if (meta) {
 		const {
