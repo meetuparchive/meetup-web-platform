@@ -107,7 +107,11 @@ export const config = convict({
 				: 'https',
 			env: 'DEV_SERVER_PROTOCOL', // legacy naming
 		},
-		// host: '0.0.0.0', ALWAYS 0.0.0.0
+		host: {
+			format: validateServerHost,
+			default: 'beta2.dev.meetup.com',
+			env: 'DEV_SERVER_HOST',
+		},
 		port: {
 			format: 'port',
 			default: 8000,
