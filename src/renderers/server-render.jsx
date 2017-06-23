@@ -218,6 +218,7 @@ const makeRenderer = (
 					assetPublicPath={assetPublicPath}
 					clientFilename={clientFilename}
 					initialState={store.getState()}
+					scripts={scripts}
 				/>
 			),
 			statusCode: 200,
