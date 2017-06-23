@@ -1,10 +1,12 @@
-import config from './util/config';
+import Inert from 'inert';
 import HapiPino from 'hapi-pino';
 import CsrfPlugin from 'electrode-csrf-jwt';
 
+import config from './util/config';
 import logger from './util/logger';
 import requestAuthPlugin from './plugins/requestAuthPlugin';
 import activityPlugin from './plugins/tracking/activity';
+import serviceWorkerPlugin from './plugins/service-worker';
 
 /**
  * Hapi plugins for the dev server
@@ -95,6 +97,12 @@ function getActivityTrackingPlugin({ platform_agent, isProd }) {
 	};
 }
 
+function getServiceWorkerPlugin() {
+	return {
+		register: serviceWorkerPlugin,
+	};
+}
+
 export default function getPlugins() {
 	const { platform_agent, isProd } = config;
 	return [
@@ -102,5 +110,7 @@ export default function getPlugins() {
 		getCsrfPlugin(),
 		getRequestAuthPlugin(),
 		getActivityTrackingPlugin({ platform_agent, isProd }),
+		getServiceWorkerPlugin(),
+		Inert,
 	];
 }
