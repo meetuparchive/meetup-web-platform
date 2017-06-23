@@ -6,7 +6,7 @@ const path = require('path');
  * The service worker plugin will register a root-level route for serving the
  * service worker script file.
  *
- * The location of the script file is determined by plugin config.
+ * Disk location of the script file is determined by builder CLI config import.
  */
 export default function register(
 	server: Object,
@@ -15,10 +15,12 @@ export default function register(
 ) {
 	/*
 	 * Route for service worker script at top-level path. Depends on `Inert`
+	 * `path` must match client `serviceWorker.register` call - MWP provides this
+	 * in the `<ServiceWorker>` component
 	 */
 	server.route({
 		method: 'GET',
-		path: '/asset-service-worker.{localeCode}.js', // must match client `serviceWorker.register` call
+		path: '/asset-service-worker.{localeCode}.js',
 		config: {
 			auth: false,
 		},
