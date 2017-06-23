@@ -87,8 +87,8 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 	const isFormData = queries[0].params instanceof FormData;
 	const isDelete = method === 'DELETE';
 
-	const fetchUrl = new URL(apiUrl);
-	fetchUrl.searchParams.append('queries', rison.encode_array(queries));
+	const searchParams = new URLSearchParams();
+	searchParams.append('queries', rison.encode_array(queries));
 
 	if (meta) {
 		const {
@@ -109,14 +109,14 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 
 		// special logout param
 		if (logout) {
-			fetchUrl.searchParams.append('logout', true);
+			searchParams.append('logout', true);
 		}
 
 		// send other metadata in searchParams
 		const encodedMetadata = metadata && rison.encode_object(metadata);
 		if (encodedMetadata) {
 			// send other metadata in searchParams
-			fetchUrl.searchParams.append('metadata', encodedMetadata);
+			searchParams.append('metadata', encodedMetadata);
 		}
 	}
 
@@ -137,11 +137,10 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 		credentials: 'same-origin', // allow response to set-cookies
 	};
 	if (hasBody) {
-		config.body = isFormData
-			? queries[0].params
-			: fetchUrl.searchParams.toString();
+		config.body = isFormData ? queries[0].params : searchParams.toString();
 	}
-	const url = isFormData || !hasBody ? fetchUrl.toString() : apiUrl;
+	const useQueryString = isFormData || !hasBody;
+	const url = useQueryString ? `${apiUrl}?${searchParams}` : apiUrl;
 	return {
 		url,
 		config,
