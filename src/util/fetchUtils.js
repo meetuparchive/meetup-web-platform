@@ -139,8 +139,7 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 	if (hasBody) {
 		config.body = isFormData ? queries[0].params : searchParams.toString();
 	}
-	const url =
-		isFormData || apiUrl + (hasBody ? '' : `?${searchParams.toString()}`);
+	const url = isFormData || !hasBody ? `${apiUrl}?${searchParams}` : apiUrl;
 	return {
 		url,
 		config,
