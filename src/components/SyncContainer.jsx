@@ -5,28 +5,22 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { locationChange } from '../actions/syncActionCreators';
 
-const mapStateToProps = state => ({ localeCode: state.config.localeCode });
-const mapDispatchToProps = dispatch => ({
-	dispatchLocationChange: bindActionCreators(locationChange, dispatch),
-});
+function mapDispatchToProps(dispatch) {
+	return {
+		dispatchLocationChange: bindActionCreators(locationChange, dispatch),
+	};
+}
 
-/*
- * 1. Register the asset-caching service worker to sync static assets
- * 2. Connect route changes to Redux actions. When the router
- *    injects new props, the container determines whether or not to dispatch a
- *    'locationChange' action
+/**
+ * @module SyncContainer
  */
 export class SyncContainer extends React.Component {
-	componentDidMount() {
-		if (
-			navigator.serviceWorker &&
-			process.env.NODE_ENV === 'production' // sw caching creates confusion in dev
-		) {
-			navigator.serviceWorker.register(
-				`/asset-service-worker.${this.props.localeCode}.js`
-			); // must serve from root URL path
-		}
-	}
+	/**
+	 * This container connects route changes to Redux actions. When the router
+	 * inject new props, the container determines whether or not to dispatch a
+	 * 'locationChange' action
+	 * @return {undefined} side effect only - dispatch
+	 */
 	componentWillReceiveProps(nextProps) {
 		if (nextProps.location !== this.props.location) {
 			this.props.dispatchLocationChange(nextProps.location);
@@ -38,6 +32,9 @@ export class SyncContainer extends React.Component {
 			// events (back button) to re-set the previous scroll position
 		}
 	}
+	/**
+	 * @return {Function} React element
+	 */
 	render() {
 		return this.props.children;
 	}
@@ -50,6 +47,4 @@ SyncContainer.propTypes = {
 	history: PropTypes.object.isRequired,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(
-	withRouter(SyncContainer)
-);
+export default connect(null, mapDispatchToProps)(withRouter(SyncContainer));

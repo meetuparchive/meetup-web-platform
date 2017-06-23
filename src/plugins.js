@@ -1,7 +1,8 @@
-import config from './util/config';
+import Inert from 'inert';
 import HapiPino from 'hapi-pino';
 import CsrfPlugin from 'electrode-csrf-jwt';
 
+import config from './util/config';
 import logger from './util/logger';
 import requestAuthPlugin from './plugins/requestAuthPlugin';
 import activityPlugin from './plugins/tracking/activity';
@@ -110,5 +111,6 @@ export default function getPlugins() {
 		getRequestAuthPlugin(),
 		getActivityTrackingPlugin({ platform_agent, isProd }),
 		getServiceWorkerPlugin(),
+		Inert,
 	];
 }

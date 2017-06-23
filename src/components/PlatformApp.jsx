@@ -1,6 +1,7 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import SyncContainer from './SyncContainer';
+import ServiceWorker from './ServiceWorker';
 import RouteLayout from './RouteLayout';
 
 /**
@@ -11,9 +12,11 @@ class PlatformApp extends React.Component {
 		const { store, routes } = this.props;
 		return (
 			<Provider store={store}>
-				<SyncContainer>
-					<RouteLayout routes={routes} />
-				</SyncContainer>
+				<ServiceWorker>
+					<SyncContainer>
+						<RouteLayout routes={routes} />
+					</SyncContainer>
+				</ServiceWorker>
 			</Provider>
 		);
 	}
