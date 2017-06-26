@@ -26,7 +26,7 @@ export const getAppRouteHandler = renderRequestMap => (request, reply) => {
 				}
 				const response = reply(result).code(statusCode);
 
-				request.trackSession(response);
+				request.trackSession(response.request);
 			},
 			err => reply(err) // 500 error - will only be thrown on bad implementation
 		);
