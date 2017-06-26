@@ -17,9 +17,7 @@ const parseUrl = url.parse;
  * link (JOIN) between track ids pre/post login/logout, but does not carry over
  * to a new browser session
  */
-export const getTrackSession: TrackGetter = (trackOpts: TrackOpts) => (
-	request: Object
-) => {
+export const getTrackSession: TrackGetter = trackOpts => request => () => {
 	const { log, sessionIdCookieName } = trackOpts;
 	if (request.state[sessionIdCookieName]) {
 		// if there's already a session id, there's nothing to track
@@ -38,9 +36,7 @@ export const getTrackSession: TrackGetter = (trackOpts: TrackOpts) => (
  * Track logout actions - this function is not used to produce a top-level
  * tracker because the `trackApi` tracker delegates to it as necessary
  */
-export const getTrackLogout: TrackGetter = (trackOpts: TrackOpts) => (
-	request: Object
-) => {
+export const getTrackLogout: TrackGetter = trackOpts => request => () => {
 	const { log, trackIdCookieName, sessionIdCookieName } = trackOpts;
 	return log(request, {
 		description: 'logout',
@@ -51,8 +47,7 @@ export const getTrackLogout: TrackGetter = (trackOpts: TrackOpts) => (
 		url: request.info.referrer || '',
 	});
 };
-export const getTrackLogin: TrackGetter = (trackOpts: TrackOpts) => (
-	request: Object,
+export const getTrackLogin: TrackGetter = trackOpts => request => (
 	memberId: string
 ) => {
 	const { log, trackIdCookieName, sessionIdCookieName } = trackOpts;
@@ -66,8 +61,7 @@ export const getTrackLogin: TrackGetter = (trackOpts: TrackOpts) => (
 	});
 };
 
-export const getTrackApiRequest: TrackGetter = (trackOpts: TrackOpts) => (
-	request: Object,
+export const getTrackApiResponses: TrackGetter = trackOpts => request => (
 	queryResponses: Array<Object>,
 	url: string,
 	referrer: string
@@ -95,36 +89,31 @@ export const getTrackApiRequest: TrackGetter = (trackOpts: TrackOpts) => (
  * get the trackApi handler - the core tracking handler for navigation and
  * login-related activity.
  */
-export const getTrackApi: TrackGetter = (trackOpts: TrackOpts) => {
-	const trackApiRequest = getTrackApiRequest(trackOpts);
-	const trackLogin = getTrackLogin(trackOpts);
-	const trackLogout = getTrackLogout(trackOpts);
+export const getTrackApi: TrackGetter = trackOpts => request => (
+	queryResponses: Array<Object>
+) => {
+	const payload = request.method === 'post' ? request.payload : request.query;
 
-	return (request: Object, queryResponses: Array<Object>) => {
-		const payload = request.method === 'post' ? request.payload : request.query;
+	const metadataRison = payload.metadata || rison.encode_object({});
+	const metadata = rison.decode_object(metadataRison);
+	const originUrl = request.info.referrer;
+	metadata.url = parseUrl(originUrl).pathname;
+	metadata.method = request.method;
 
-		const metadataRison = payload.metadata || rison.encode_object({});
-		const metadata = rison.decode_object(metadataRison);
-		const originUrl = request.info.referrer;
-		metadata.url = parseUrl(originUrl).pathname;
-		metadata.method = request.method;
+	const { url, referrer, method } = metadata;
 
-		const { url, referrer, method } = metadata;
-
-		// special case - login requests need to be tracked (This needs to be
-		// redone when login/logout is fully implemented)
-		if (method === 'post') {
-			const loginResponse = queryResponses.find(r => r.login);
-			const memberId: number =
-				((((loginResponse || {}).login || {}).value || {}).member || {}).id ||
-				0;
-			if (memberId) {
-				trackLogin(request, JSON.stringify(memberId));
-			}
-			if ('logout' in request.query) {
-				trackLogout(request);
-			}
+	// special case - login requests need to be tracked (This needs to be
+	// redone when login/logout is fully implemented)
+	if (method === 'post') {
+		const loginResponse = queryResponses.find(r => r.login);
+		const memberId: number =
+			((((loginResponse || {}).login || {}).value || {}).member || {}).id || 0;
+		if (memberId) {
+			request.trackLogin(JSON.stringify(memberId));
 		}
-		return trackApiRequest(request, queryResponses, url, referrer);
-	};
+		if ('logout' in request.query) {
+			request.trackLogout();
+		}
+	}
+	return request.trackApiResponses(queryResponses, url, referrer);
 };

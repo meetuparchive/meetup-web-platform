@@ -24,9 +24,8 @@ export const getAppRouteHandler = renderRequestMap => (request, reply) => {
 				if (redirect) {
 					return reply.redirect(redirect.url).permanent(redirect.permanent);
 				}
-				const response = reply(result).code(statusCode);
-
-				request.trackSession(response.request);
+				request.trackSession();
+				return reply(result).code(statusCode);
 			},
 			err => reply(err) // 500 error - will only be thrown on bad implementation
 		);

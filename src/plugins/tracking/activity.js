@@ -1,6 +1,12 @@
 // @flow
 import avro from './util/avro';
-import { getTrackApi, getTrackSession } from './_activityTrackers';
+import {
+	getTrackApi,
+	getTrackSession,
+	getTrackLogin,
+	getTrackLogout,
+	getTrackApiResponses,
+} from './_activityTrackers';
 
 const YEAR_IN_MS: number = 1000 * 60 * 60 * 24 * 365;
 export const ACTIVITY_PLUGIN_NAME = 'tracking';
@@ -61,6 +67,9 @@ export function getTrackers(options: {
 	const trackers: { [string]: Tracker } = {
 		trackApi: getTrackApi(trackOpts),
 		trackSession: getTrackSession(trackOpts),
+		trackLogin: getTrackLogin(trackOpts),
+		trackLogout: getTrackLogout(trackOpts),
+		trackApiResponses: getTrackApiResponses(trackOpts),
 	};
 	return trackers;
 }
@@ -121,7 +130,9 @@ export default function register(
 	});
 
 	Object.keys(trackers).forEach((trackType: string) => {
-		server.decorate('request', trackType, trackers[trackType]);
+		server.decorate('request', trackType, trackers[trackType], {
+			apply: true, // make the `request` available to tracker
+		});
 	});
 
 	server.ext('onRequest', onRequest);
