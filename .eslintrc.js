@@ -16,7 +16,7 @@ const config = {
 		jasmine: true,
 		es6: true,
 	},
-	plugins: ['react', 'flowtype'],
+	plugins: ['flowtype', 'react'],
 	rules: {
 		'array-callback-return': 2,
 		'comma-dangle': 0,
