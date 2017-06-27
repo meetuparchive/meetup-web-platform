@@ -1,6 +1,7 @@
 import './util/globals';
 
 import fs from 'fs';
+import Http2 from 'spdy'; // eventually this will be a native node module
 
 import appConfig from './util/config';
 import getPlugins from './plugins';
@@ -51,7 +52,6 @@ export default function start(
 	};
 
 	if (appConfig.app_server.protocol === 'https') {
-		const Http2 = require('spdy');
 		const listener = Http2.createServer({
 			key: fs.readFileSync(appConfig.app_server.key_file),
 			cert: fs.readFileSync(appConfig.app_server.crt_file),
