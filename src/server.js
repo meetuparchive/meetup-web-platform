@@ -51,10 +51,14 @@ export default function start(
 	};
 
 	if (appConfig.app_server.protocol === 'https') {
-		connection.tls = {
+		const Http2 = require('spdy');
+		const listener = Http2.createServer({
 			key: fs.readFileSync(appConfig.app_server.key_file),
 			cert: fs.readFileSync(appConfig.app_server.crt_file),
-		};
+		});
+
+		connection.listener = listener;
+		connection.tls = true;
 	}
 
 	const finalPlugins = [...plugins, ...getPlugins()];
