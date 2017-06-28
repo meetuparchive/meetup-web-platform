@@ -1,6 +1,7 @@
 import './util/globals';
 
 import fs from 'fs';
+import Http2 from 'spdy'; // eventually this will be a native node module
 
 import appConfig from './util/config';
 import getPlugins from './plugins';
@@ -51,10 +52,12 @@ export default function start(
 	};
 
 	if (appConfig.app_server.protocol === 'https') {
-		connection.tls = {
+		// enable HTTP/2
+		connection.tls = true;
+		connection.listener = Http2.createServer({
 			key: fs.readFileSync(appConfig.app_server.key_file),
 			cert: fs.readFileSync(appConfig.app_server.crt_file),
-		};
+		});
 	}
 
 	const finalPlugins = [...plugins, ...getPlugins()];
