@@ -88,7 +88,7 @@ describe('tracking loggers', () => {
 			trackIdCookieName,
 			sessionIdCookieName,
 			cookieOpts,
-		})(request);
+		})(request)();
 		expect(spyable.log).toHaveBeenCalled();
 		const trackInfo = spyable.log.calls.mostRecent().args[1];
 		expect(spyable.log).toHaveBeenCalled();
@@ -119,7 +119,7 @@ describe('tracking loggers', () => {
 			trackIdCookieName,
 			sessionIdCookieName,
 			cookieOpts,
-		})(request, memberId);
+		})(request)(memberId);
 		expect(spyable.log).toHaveBeenCalled();
 		const trackInfo = spyable.log.calls.mostRecent().args[1];
 		expect(spyable.log).toHaveBeenCalled();
@@ -144,7 +144,7 @@ describe('tracking loggers', () => {
 				trackIdCookieName,
 				sessionIdCookieName,
 				cookieOpts,
-			})(getMockRequest(), [
+			})(getMockRequest())([
 				{ login: { type: 'login', value: { member: { id: 1234 } } } },
 			]);
 			expect(spyable.log).toHaveBeenCalled();
@@ -167,7 +167,7 @@ describe('tracking loggers', () => {
 				trackIdCookieName,
 				sessionIdCookieName,
 				cookieOpts,
-			})(request, [{}]);
+			})(request)([{}]);
 			expect(spyable.log).toHaveBeenCalled();
 			const trackInfo = spyable.log.calls.mostRecent().args[1];
 			expect(trackInfo.description).toEqual('logout');
@@ -187,7 +187,7 @@ describe('tracking loggers', () => {
 			trackIdCookieName,
 			sessionIdCookieName,
 			cookieOpts,
-		})(request);
+		})(request)();
 		expect(spyable.log).toHaveBeenCalled();
 		const trackInfo = spyable.log.calls.mostRecent().args[1];
 		expect(trackInfo.description).toEqual('session'); // this may change, but need to ensure tag is always correct
@@ -214,7 +214,7 @@ describe('tracking loggers', () => {
 			trackIdCookieName,
 			sessionIdCookieName,
 			cookieOpts,
-		})(request);
+		})(request)();
 		expect(spyable.log).not.toHaveBeenCalled();
 	});
 });
