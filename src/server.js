@@ -52,13 +52,12 @@ export default function start(
 	};
 
 	if (appConfig.app_server.protocol === 'https') {
-		const listener = Http2.createServer({
+		// enable HTTP/2
+		connection.tls = true;
+		connection.listener = Http2.createServer({
 			key: fs.readFileSync(appConfig.app_server.key_file),
 			cert: fs.readFileSync(appConfig.app_server.crt_file),
 		});
-
-		connection.listener = listener;
-		connection.tls = true;
 	}
 
 	const finalPlugins = [...plugins, ...getPlugins()];
