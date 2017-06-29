@@ -16,7 +16,7 @@ class ServiceWorker extends React.Component {
 	componentDidMount() {
 		const { localeCode, activateSW } = this.props;
 		if (
-			activateSW && // TODO: set up meetup.com route for service worker
+			activateSW &&
 			navigator.serviceWorker &&
 			process.env.NODE_ENV === 'production' // sw caching creates confusion in dev
 		) {
