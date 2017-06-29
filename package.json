@@ -79,6 +79,7 @@
     "intl-messageformat": "1.3.0",
     "intl-relativeformat": "1.3.0",
     "iron": "4.0.5",
+    "jest": "20.0.4",
     "jest-cli": "20.0.4",
     "lint-staged": "3.6.0",
     "meetup-web-mocks": "1.0.190",
