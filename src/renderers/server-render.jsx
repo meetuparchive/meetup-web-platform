@@ -207,6 +207,7 @@ const makeRenderer = (
 			localeCode,
 			supportedLocaleCodes,
 			initialNow: new Date().getTime(),
+			activateSW: false, // TODO: enable this when a meetup.com route for SW is active https://meetup.atlassian.net/browse/WP-385
 		})
 	);
 	// render skeleton if requested - the store is ready
