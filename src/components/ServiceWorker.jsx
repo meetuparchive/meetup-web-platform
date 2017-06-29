@@ -2,7 +2,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-const mapStateToProps = state => state.config;
+const mapStateToProps = state => ({
+	localeCode: state.config.localeCode,
+	activateSW: state.config.activateSW,
+});
+
 /*
  * A lifecycle-only component that registers the platform service worker when
  * the component mounts on the client.
@@ -14,14 +18,13 @@ class ServiceWorker extends React.Component {
 		children: React$Element<*>,
 	};
 	componentDidMount() {
-		const { localeCode, activateSW } = this.props;
 		if (
-			activateSW &&
+			this.props.activateSW &&
 			navigator.serviceWorker &&
 			process.env.NODE_ENV === 'production' // sw caching creates confusion in dev
 		) {
 			navigator.serviceWorker.register(
-				`/asset-service-worker.${localeCode}.js`
+				`/asset-service-worker.${this.props.localeCode}.js`
 			); // must serve from root URL path
 		}
 	}
