@@ -67,7 +67,10 @@ const localeMap: { [string]: { data?: Object } } = {
 /*
  * Load data for given localeCode into ReactIntl
  */
-export function loadLocale(localeCode: string) {
+export function loadLocale(localeCode: ?string) {
+	if (!localeCode) {
+		return;
+	}
 	if (!(localeCode in localeMap)) {
 		console.warn(`${localeCode} not supported`);
 	}
