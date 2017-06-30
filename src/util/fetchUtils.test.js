@@ -92,18 +92,17 @@ describe('fetchQueries', () => {
 			.then(methodTest('DELETE'));
 	});
 	describe('GET', () => {
-		it('GET calls fetch with API url and queries, metadata, logout querystring params', () => {
+		it('GET calls fetch with API url and queries, metadata', () => {
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
 			return fetchUtils
-				.fetchQueries(API_URL.toString())(getQueries, { ...meta, logout: true })
+				.fetchQueries(API_URL.toString())(getQueries, { ...meta })
 				.then(() => {
 					const calledWith = global.fetch.calls.mostRecent().args;
 					const url = new URL(calledWith[0]);
 					expect(url.origin).toBe(API_URL.origin);
 					expect(url.searchParams.has('queries')).toBe(true);
 					expect(url.searchParams.has('metadata')).toBe(true);
-					expect(url.searchParams.has('logout')).toBe(true);
 					expect(calledWith[1].method).toEqual('GET');
 				});
 		});

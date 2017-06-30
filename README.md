@@ -112,25 +112,6 @@ each specific application's client and server entry points.
 Based on `redux-observable`, this middleware provides the following
 functionality through "Epics":
 
-#### Auth `epics/auth.js`
-
-_in development - API will provide most auth needs_
-
-Auth/login requires side-effect interaction with an authentication server, which has an endpoint distinct from the
-regular data API - the current branch implements it as part of the API server, responding to requests to `/api/login`.
-
-**on `LOGIN_REQUEST`**, which provides `credentials`
-
-1. Format `credentials` for API using a `query` for login
-2. Make API call
-3. Trigger `LOGIN_SUCCESS` containing API response (could format before triggering action if needed)
-4. Write auth cookie to maintain login across sessions
-
-**on `LOGOUT`** (no attached data)
-
-- delete auth cookie (not currently implemented)
-- clearing local state is not a side effect, so it's handled directly by the `auth` reducer in `coreReducers`
-
 #### Sync `epics/sync.js`
 
 This epic is currently only responsible for fetching the data from the API server on initial render or client-side

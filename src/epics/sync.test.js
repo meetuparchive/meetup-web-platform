@@ -17,7 +17,6 @@ import { createFakeStore, epicIgnoreAction } from '../util/testUtils';
 import getSyncEpic from '../epics/sync';
 import * as api from '../actions/apiActionCreators';
 import * as syncActionCreators from '../actions/syncActionCreators';
-import * as authActionCreators from '../actions/authActionCreators';
 import { CLICK_TRACK_CLEAR_ACTION } from '../actions/clickActionCreators';
 
 const EMPTY_ROUTES = {};
@@ -51,28 +50,31 @@ describe('Sync epic', () => {
 				expect(types.includes(CLICK_TRACK_CLEAR_ACTION)).toBe(true);
 			});
 	});
-	it('emits API_REQ, CACHE_CLEAR, and CLICK_TRACK_CLEAR for nav-related actions with logout query', function() {
-		const logoutLocation = {
-			...MOCK_RENDERPROPS.location,
-			search: '?foo=bar&logout=true',
-		};
-		const locationChange = {
-			type: syncActionCreators.LOCATION_CHANGE,
-			payload: logoutLocation,
-		};
+	it.skip(
+		'emits API_REQ, CACHE_CLEAR, and CLICK_TRACK_CLEAR for nav-related actions with logout request',
+		function() {
+			const logoutLocation = {
+				...MOCK_RENDERPROPS.location,
+				pathname: '/logout',
+			};
+			const locationChange = {
+				type: syncActionCreators.LOCATION_CHANGE,
+				payload: logoutLocation,
+			};
 
-		const fakeStore = createFakeStore({ routing: {} });
-		const action$ = ActionsObservable.of(locationChange);
-		return getSyncEpic(MOCK_ROUTES)(action$, fakeStore)
-			.toArray()
-			.toPromise()
-			.then(actions => {
-				const types = actions.map(a => a.type);
-				expect(types).toContain(api.API_REQ);
-				expect(types.includes('CACHE_CLEAR')).toBe(true);
-				expect(types.includes(CLICK_TRACK_CLEAR_ACTION)).toBe(true);
-			});
-	});
+			const fakeStore = createFakeStore({ routing: {} });
+			const action$ = ActionsObservable.of(locationChange);
+			return getSyncEpic(MOCK_ROUTES)(action$, fakeStore)
+				.toArray()
+				.toPromise()
+				.then(actions => {
+					const types = actions.map(a => a.type);
+					expect(types).toContain(api.API_REQ);
+					expect(types.includes('CACHE_CLEAR')).toBe(true);
+					expect(types.includes(CLICK_TRACK_CLEAR_ACTION)).toBe(true);
+				});
+		}
+	);
 	it('does not emit for nav-related actions without matched query', () => {
 		const SyncEpic = getSyncEpic(MOCK_ROUTES);
 
@@ -109,37 +111,6 @@ describe('Sync epic', () => {
 			epicIgnoreAction(SyncEpic, serverRender)
 		);
 	});
-
-	xit(
-		'strips logout query and calls browserHistory.replace on LOGIN_SUCCESS',
-		function() {
-			const history = { replace: jest.fn() };
-			const mockFetchQueries = () => () => Promise.resolve({});
-			const locationWithLogout = {
-				...MOCK_APP_STATE.routing.locationBeforeTransitions,
-				query: { logout: true },
-			};
-			const locationWithoutLogout = {
-				...locationWithLogout,
-				query: {},
-			};
-			const MOCK_APP_STATE_LOGOUT = {
-				...MOCK_APP_STATE,
-				routing: {
-					locationBeforeTransitions: locationWithLogout,
-				},
-			};
-
-			const locationSync = authActionCreators.loginSuccess();
-			const action$ = ActionsObservable.of(locationSync);
-			const fakeStore = createFakeStore(MOCK_APP_STATE_LOGOUT);
-			return getSyncEpic(EMPTY_ROUTES, mockFetchQueries)(action$, fakeStore)
-				.toPromise()
-				.then(() => {
-					expect(history.replace).toHaveBeenCalledWith(locationWithoutLogout);
-				});
-		}
-	);
 
 	it('emits API_RESP_SUCCESS and API_RESP_COMPLETE on successful API_REQ', function() {
 		const mockFetchQueries = () => () => Promise.resolve({ successes: [{}] });
