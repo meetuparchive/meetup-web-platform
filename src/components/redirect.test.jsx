@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import StaticRouter from 'react-router-dom/StaticRouter';
-import Redirect from './Redirect';
+import Redirect, { handleStateChangeOnClient } from './Redirect';
 
 const renderToContext = (to, permanent) => {
 	const context = {};
@@ -67,5 +67,20 @@ describe('Server rendering', () => {
 	it('returns undefined when no Redirect', () => {
 		ReactDOMServer.renderToString(<div />);
 		expect(Redirect.rewind()).toBeUndefined();
+	});
+});
+describe('Client behavior', () => {
+	global.window = { location: { replace: jest.fn() } };
+	it('calls window.location.replace for external URLs', () => {
+		window.location.replace.mockClear();
+		const url = 'https://google.com';
+		handleStateChangeOnClient({ url });
+		expect(window.location.replace).toHaveBeenCalledWith(url);
+	});
+	it('does not call window.location.replace for internal URLs', () => {
+		window.location.replace.mockClear();
+		const url = '/foo/bar';
+		handleStateChangeOnClient({ url });
+		expect(window.location.replace).not.toHaveBeenCalled();
 	});
 });
