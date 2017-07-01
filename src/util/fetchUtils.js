@@ -74,7 +74,7 @@ export const parseQueryResponse = queries => ({
  * @param {String} apiUrl the general-purpose endpoint for API calls to the
  *   application server
  * @param {Array} queries the queries to send - must all use the same `method`
- * @param {Object} meta additional characteristics of the request, e.g. logout,
+ * @param {Object} meta additional characteristics of the request, e.g.
  *   click tracking data
  * @return {Object} { url, config } arguments for a fetch call
  */
@@ -93,7 +93,6 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 	if (meta) {
 		const {
 			clickTracking,
-			logout,
 			onSuccess, // eslint-disable-line no-unused-vars
 			onError, // eslint-disable-line no-unused-vars
 			...metadata
@@ -105,11 +104,6 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 					? '.dev.meetup.com'
 					: '.meetup.com',
 			});
-		}
-
-		// special logout param
-		if (logout) {
-			searchParams.append('logout', true);
 		}
 
 		// send other metadata in searchParams
@@ -157,7 +151,7 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
  * @param {String} apiUrl the general-purpose endpoint for API calls to the
  *   application server
  * @param {Array} queries the queries to send - must all use the same `method`
- * @param {Object} meta additional characteristics of the request, e.g. logout,
+ * @param {Object} meta additional characteristics of the request, e.g.
  *   click tracking data
  * @return {Promise} resolves with a `{queries, responses}` object
  */
