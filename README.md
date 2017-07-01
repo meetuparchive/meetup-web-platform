@@ -114,26 +114,24 @@ functionality through "Epics":
 
 #### Sync `epics/sync.js`
 
-This epic is currently only responsible for fetching the data from the API server on initial render or client-side
+This epic is currently only responsible for fetching the data from the API
+server on initial render or client-side
 user navigation.
 
 **on `server/RENDER` or `LOCATION_CHANGE`**, which provide a `location` (URL):
 
-1. Match `location` to defined `routes` and extract the `renderProps` like URL path  and querystring params
-2. Check `routes` for `query` functions that return data needs, and process them into an array
-3. Trigger `API_REQUEST` containing the `queries`
+1. Match `location` to defined `routes` and extract the `renderProps` like URL
+   path and querystring params
+2. Check `routes` for `query` functions that return data needs, and process
+   them into an array
+3. Trigger `API_REQ` containing the `queries`
 
-**on `API_REQUEST`**, which provides `queries`:
+**on `API_REQ`**, which provides `queries`:
 1. Send the queries to the application server, which will make the
 	 corresponding external API calls.
-2. When the application server returns data, trigger `API_SUCCESS` action containing API response array and query array
+2. When the application server returns data, trigger `API_SUCCESS` action
+   containing API response array and query array
 3. If the application server responds with an error, trigger `API_ERROR`
-
-_Interesting feature_: `navRenderSub` is a `Rx.SerialDisposable`, which means that when a user navigates to a new page,
-any "pending" API requests will *not be processed*. This is a Very Good Thing because it means that we won't be calling
-`API_COMPLETE` for a page load that is no longer applicable. A similar tool is used for the AuthEpic so that only
-one login request can be processed, but it's less likely to be an issue there since it's rare that users would be trying
-to log in repeatedly without waiting for previous login requests to be processed.
 
 #### Cache `epics/cache.js`
 
@@ -174,22 +172,6 @@ the page is refreshed/reloaded without the param in the querystring.
 http://localhost:8000/ny-tech/?__nocache
 ```
 
-#### POST
-
-`POST` API requests are handled by `PostMiddleware`, which provides a generalized
-interface for sending data to the API and handling return values. The middleware
-only responds to actions that have a `POST_` prefix or a `_POST` suffix in the
-action `type`.
-
-The `action.payload` must have a `query` property containing a Query object (with
-a `type`, `ref`, and `params`). Optionally, it may supply `onSuccess` and/or
-`onError` properties, which must be actionCreator functions that will be called
-in addition to `apiSuccess` and `apiError`, respectively. The `onSuccess` and
-`onError` action creators will receive the same arguments as `apiSuccess`
-(`{ queries, responses }`) and `apiError` (`err`). 
-
-Use reducers to parse the response and update application state.
-
 ## Client
 
 ### Rendering 'empty' state with `<NotFound>`
@@ -223,9 +205,9 @@ class GroupContainer extends React.Component {
 When starting the server, applications provide a `platform_agent` identifier,
 e.g. `'mup-web'` that is used to tag all of the automatically-generated
 tracking data produced by platform-related activity, including data requests,
-browser sessions and login/logout actions. Over time, this system will expand
-to include click tracking and other types of tracking defined by the Data team
-and implemented through platform-provided unique IDs.
+and browser sessions.
+
+The platform also tracks clicks similar to Meetup classic.
 
 More info in Confluence [here](https://meetup.atlassian.net/wiki/display/WP/Tracking+data+needs)
 
