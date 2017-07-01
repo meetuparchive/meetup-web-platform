@@ -50,31 +50,28 @@ describe('Sync epic', () => {
 				expect(types.includes(CLICK_TRACK_CLEAR_ACTION)).toBe(true);
 			});
 	});
-	it.skip(
-		'emits API_REQ, CACHE_CLEAR, and CLICK_TRACK_CLEAR for nav-related actions with logout request',
-		function() {
-			const logoutLocation = {
-				...MOCK_RENDERPROPS.location,
-				pathname: '/logout',
-			};
-			const locationChange = {
-				type: syncActionCreators.LOCATION_CHANGE,
-				payload: logoutLocation,
-			};
+	it('emits API_REQ, CACHE_CLEAR, and CLICK_TRACK_CLEAR for nav-related actions with logout request', function() {
+		const logoutLocation = {
+			...MOCK_RENDERPROPS.location,
+			pathname: '/logout',
+		};
+		const locationChange = {
+			type: syncActionCreators.LOCATION_CHANGE,
+			payload: logoutLocation,
+		};
 
-			const fakeStore = createFakeStore({ routing: {} });
-			const action$ = ActionsObservable.of(locationChange);
-			return getSyncEpic(MOCK_ROUTES)(action$, fakeStore)
-				.toArray()
-				.toPromise()
-				.then(actions => {
-					const types = actions.map(a => a.type);
-					expect(types).toContain(api.API_REQ);
-					expect(types.includes('CACHE_CLEAR')).toBe(true);
-					expect(types.includes(CLICK_TRACK_CLEAR_ACTION)).toBe(true);
-				});
-		}
-	);
+		const fakeStore = createFakeStore({ routing: {} });
+		const action$ = ActionsObservable.of(locationChange);
+		return getSyncEpic(MOCK_ROUTES)(action$, fakeStore)
+			.toArray()
+			.toPromise()
+			.then(actions => {
+				const types = actions.map(a => a.type);
+				expect(types).toContain(api.API_REQ);
+				expect(types.includes('CACHE_CLEAR')).toBe(true);
+				expect(types.includes(CLICK_TRACK_CLEAR_ACTION)).toBe(true);
+			});
+	});
 	it('does not emit for nav-related actions without matched query', () => {
 		const SyncEpic = getSyncEpic(MOCK_ROUTES);
 
