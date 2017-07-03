@@ -18,7 +18,6 @@ import {
 } from 'meetup-web-mocks/lib/api';
 
 import { getServer, MOCK_LOGGER } from '../util/testUtils';
-import * as authUtils from '../util/authUtils';
 import { LANGUAGE_COOKIE } from './cookieUtils';
 
 import {
@@ -33,7 +32,6 @@ import {
 	parseRequest,
 	parseApiResponse,
 	parseApiValue,
-	parseLoginAuth,
 	parseMetaHeaders,
 	parseVariantsHeader,
 	groupDuotoneSetter,
@@ -235,44 +233,6 @@ describe('parseApiResponse', () => {
 			parseApiResponse('http://example.com')([flaggedResponse, '{}']).meta
 				.requestId
 		).toEqual(requestId);
-	});
-});
-
-describe('parseLoginAuth', () => {
-	it('calls removeAuthState for login responses', () => {
-		spyOn(authUtils, 'removeAuthState').and.returnValue(() => {});
-		const request = { plugins: { requestAuth: {} } };
-		const query = { type: 'login' };
-		const loginResponse = { type: 'login', value: {} };
-		parseLoginAuth(request, query)(loginResponse);
-		expect(authUtils.removeAuthState).toHaveBeenCalled();
-	});
-	it('does not call removeAuthState for non-login responses', () => {
-		spyOn(authUtils, 'removeAuthState').and.returnValue(() => {});
-		const request = { plugins: { requestAuth: {} } };
-		const query = { type: 'member' };
-		const apiResponse = { type: 'member', value: {} };
-		const returnVal = parseLoginAuth(request, query)(apiResponse);
-		expect(authUtils.removeAuthState).not.toHaveBeenCalled();
-		expect(returnVal).toBe(apiResponse);
-	});
-	it('does not call removeAuthState when request.plugins does not exist', () => {
-		spyOn(authUtils, 'removeAuthState').and.returnValue(() => {});
-		const request = { plugins: {} };
-		const query = { type: 'login' };
-		const loginResponse = { type: 'login', value: {} };
-		const returnVal = parseLoginAuth(request, query)(loginResponse);
-		expect(authUtils.removeAuthState).not.toHaveBeenCalled();
-		expect(returnVal).toBe(loginResponse);
-	});
-	it('does not call removeAuthState when response has errors', () => {
-		spyOn(authUtils, 'removeAuthState').and.returnValue(() => {});
-		const request = { plugins: {} };
-		const query = { type: 'login' };
-		const loginResponse = { type: 'login', value: { error: true } };
-		const returnVal = parseLoginAuth(request, query)(loginResponse);
-		expect(authUtils.removeAuthState).not.toHaveBeenCalled();
-		expect(returnVal).toBe(loginResponse);
 	});
 });
 

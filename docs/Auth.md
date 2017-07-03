@@ -34,10 +34,7 @@ In the `auth` step of the [Hapi request lifecycle](http://hapijs.com/api#request
 which happens _before_ the route handler is invoked, the `requestAuthPlugin`
 `authenticate` function is run, which handles all aspects of authenticating the request
 
-1. Does the request contain a `logout` query param?
-  - **YES**: clear all auth cookies from the request
-  - **NO**: continue
-2. Does the request contain an `oauth_token` or `MEETUP_MEMBER` cookie?
+1. Does the request contain an `oauth_token` or `MEETUP_MEMBER` cookie?
   - **YES**: continue
   - **NO**: Does the request contain a `refresh_token` cookie?
     - **YES**: Get a new access token using the `refresh_token` grant
@@ -46,35 +43,18 @@ which happens _before_ the route handler is invoked, the `requestAuthPlugin`
       - Get a new anonymous access token using the `anonymous_code` grant
     - Apply the new `oauth_token` to the `request` **AND** the `reply` to send
       it back to the client
-3. If the Meetup API is being called (which is basically for all requests), the
-`MEETUP_MEMBER` cookie will be forwarded for logged-in requests, or the
+2. The `MEETUP_MEMBER` cookie will be forwarded for logged-in requests, or the
 `oauth_token` cookie will be converted to an `Authorization` header
 in each request to the Meetup API - this happens in
 [`api-proxy.js:parseRequest`](../apiProxy/api-proxy.js)
-4. The API proxy will also generate and send a UUID CSRF cookie and header,
+3. The API proxy will also generate and send a UUID CSRF cookie and header,
 which is generated fresh for every API request. The only constraint is that the
-header and cookie are identical.
+header and cookie must be identical.
 
 ## Login
 
-Logging in is a special kind of API request that receives a new MEETUP_MEMBER
-cookie from the `/sessions` API endpoint that must be forwarded to the browser.
-When the `api-proxy` makes its API requests, it creates a 'cookie jar' to store
-cookies that are returned by the API (when necessary). When processing each API
-response, the API proxy reads from this cookie jar and sends the cookies along
-to the browser.
-
-The API proxy also strips oauth-related data from the `/sessions` response in
-order to avoid leaking auth information.
+Login is not managed by the platform - you must redirect to Meetup Classic.
 
 ## Logout
 
-Logging out is handled by `requestAuthPlugin` as described above. However, since logout
-is querystring-based when navigating the _app_ URLs, and SPA navigation doesn't _directly_
-hit the app server, the [`fetchUtils.js:fetchQueries`](../util/fetchUtils.js) function is responsible for
-injecting the `logout` querystring property when creating a navigation-based API request
-to the `/mu_api` endpoint - it does this by checking whether the current _app_ location
-contains the querystring value, and adds it to the `/mu_api` request querystring if so.
-
-The response to this `/mu_api` request will provide logged-out data and new 'anonymous user'
-oauth tokens in the `Set-Cookie` header.
+Logout is not managed by the platform - you must redirect to Meetup Classic.

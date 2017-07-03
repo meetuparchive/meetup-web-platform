@@ -32,35 +32,6 @@ export const getTrackSession: TrackGetter = trackOpts => request => () => {
 	});
 };
 
-/*
- * Track logout actions - this function is not used to produce a top-level
- * tracker because the `trackApi` tracker delegates to it as necessary
- */
-export const getTrackLogout: TrackGetter = trackOpts => request => () => {
-	const { log, trackIdCookieName, sessionIdCookieName } = trackOpts;
-	return log(request, {
-		description: 'logout',
-		memberId: parseMemberCookie(request.state).id,
-		trackIdFrom: request.state[trackIdCookieName] || '',
-		trackId: updateTrackId(trackOpts)(request, true), // `true` force trackId refresh
-		sessionId: request.state[sessionIdCookieName],
-		url: request.info.referrer || '',
-	});
-};
-export const getTrackLogin: TrackGetter = trackOpts => request => (
-	memberId: string
-) => {
-	const { log, trackIdCookieName, sessionIdCookieName } = trackOpts;
-	return log(request, {
-		description: 'login',
-		memberId: parseMemberCookie(request.state).id,
-		trackIdFrom: request.state[trackIdCookieName] || '',
-		trackId: updateTrackId(trackOpts)(request, true),
-		sessionId: request.state[sessionIdCookieName],
-		url: request.info.referrer || '',
-	});
-};
-
 export const getTrackApiResponses: TrackGetter = trackOpts => request => (
 	queryResponses: Array<Object>,
 	url: string,
@@ -100,20 +71,9 @@ export const getTrackApi: TrackGetter = trackOpts => request => (
 	metadata.url = parseUrl(originUrl).pathname;
 	metadata.method = request.method;
 
-	const { url, referrer, method } = metadata;
+	const { url, referrer } = metadata;
 
 	// special case - login requests need to be tracked (This needs to be
 	// redone when login/logout is fully implemented)
-	if (method === 'post') {
-		const loginResponse = queryResponses.find(r => r.login);
-		const memberId: number =
-			((((loginResponse || {}).login || {}).value || {}).member || {}).id || 0;
-		if (memberId) {
-			request.trackLogin(JSON.stringify(memberId));
-		}
-		if ('logout' in request.query) {
-			request.trackLogout();
-		}
-	}
 	return request.trackApiResponses(queryResponses, url, referrer);
 };

@@ -3,8 +3,6 @@ import avro from './util/avro';
 import {
 	getTrackApi,
 	getTrackSession,
-	getTrackLogin,
-	getTrackLogout,
 	getTrackApiResponses,
 } from './_activityTrackers';
 
@@ -67,8 +65,6 @@ export function getTrackers(options: {
 	const trackers: { [string]: Tracker } = {
 		trackApi: getTrackApi(trackOpts),
 		trackSession: getTrackSession(trackOpts),
-		trackLogin: getTrackLogin(trackOpts),
-		trackLogout: getTrackLogout(trackOpts),
 		trackApiResponses: getTrackApiResponses(trackOpts),
 	};
 	return trackers;
