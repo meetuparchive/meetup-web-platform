@@ -1,8 +1,7 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-import SyncContainer from './SyncContainer';
+import { SyncContainer, RouteLayout } from '../router';
 import ServiceWorker from './ServiceWorker';
-import RouteLayout from './RouteLayout';
 
 /**
  * @module PlatformApp
