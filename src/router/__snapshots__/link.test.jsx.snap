@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Server rendering Renders a valid link for external URL object 1`] = `
+<a
+  href="http://example.com/foo/bar"
+/>
+`;
+
+exports[`Server rendering Renders a valid link for external URL string 1`] = `
+<a
+  href="http://example.com/foo/bar"
+/>
+`;

@@ -70,6 +70,7 @@
     "babel-preset-react": "6.24.1",
     "babel-preset-stage-2": "6.24.1",
     "coveralls": "2.13.1",
+    "enzyme": "2.9.1",
     "eslint": "4.0.0",
     "eslint-config-prettier": "2.1.1",
     "eslint-plugin-flowtype": "2.34.0",
