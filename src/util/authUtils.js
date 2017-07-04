@@ -57,13 +57,6 @@ export const applyAuthState = (request, reply) => auth => {
 	return request;
 };
 
-export const removeAuthState = (names, request, reply) => {
-	names.forEach(name => {
-		request.state[name] = null;
-		reply.unstate(name);
-	});
-};
-
 export function validateSecret(secret) {
 	const { value, error } = Joi.validate(
 		secret,

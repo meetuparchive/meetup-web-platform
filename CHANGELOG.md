@@ -1,3 +1,12 @@
+## [4.0]
+
+### BREAKING CHANGES
+
+- **Removed** Support for `?logout` query parameter, and platform-based
+  Login/Logout components. Platform consumers should use the `<Redirect>`
+  component to redirect login and logout requests to Meetup classic until
+  login and logout can be handled fully by the platform in a future update.
+
 ## [3.3]
 
 - **New feature** API request actions now contain a reference to a Promise that
