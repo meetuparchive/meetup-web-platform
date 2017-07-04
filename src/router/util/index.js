@@ -1,5 +1,7 @@
 // @flow
 import type { RouterTo } from './types';
+export * from './resolve';
+export { decodeParams, getMatchedQueries } from './query';
 
 export const testForExternal = (to: RouterTo): boolean => {
 	if (to instanceof URL) {
