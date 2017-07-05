@@ -110,3 +110,6 @@ your `config.development.json` to tell the platform where to find them
 The current certs are valid until April 2019 and are issued by a Certificate
 Authority (GeoTrust), so you shouldn't have to ignore SSL warnings about self-
 signed certificates.
+
+
+*Note:* If you had a previous configuration of .mupweb make sure to update ASSET_SERVER_HOST + DEV_SERVER_HOST to `beta2.dev.meetup.com`
