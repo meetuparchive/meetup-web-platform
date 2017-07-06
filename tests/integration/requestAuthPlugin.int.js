@@ -72,27 +72,9 @@ describe('logged-in member state', () => {
 		};
 		return testAuth(cookies, test);
 	});
-
-	it('removes MEETUP_MEMBER auth cookies on logout', () => {
-		const makeLogoutRequest = cookies => ({
-			method: 'get',
-			url: '/foo?logout=true',
-			headers: {
-				Cookie: Object.keys(cookies)
-					.map(name => `${name}=${cookies[name]}`)
-					.join('; '),
-			},
-		});
-		const cookies = { [MEMBER_COOKIE]: 'foo' };
-		const test = response => {
-			expect(response.payload).toEqual(expectedResponse);
-			expect(response.request.state[MEMBER_COOKIE]).toBeNull();
-		};
-		return testAuth(cookies, test, makeLogoutRequest);
-	});
 });
 
-describe.skip('logged-out member state', () => {
+describe('logged-out member state', () => {
 	// anonymous auth provides oauth_token
 	it('Passes oauth_token value as request credentials', () => {
 		const cookies = {

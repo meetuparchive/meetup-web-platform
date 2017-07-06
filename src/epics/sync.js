@@ -21,7 +21,6 @@ import { clearClick } from '../actions/clickActionCreators';
 import { getRouteResolver, getMatchedQueries } from '../util/routeUtils';
 import { getDeprecatedSuccessPayload } from '../util/fetchUtils';
 
-const logoutQueryMatch = /[?&]logout(?:[=&]|$)/;
 /**
  * Any operations that keep the browser application in sync with the
  * server should be implemented here.
@@ -56,7 +55,7 @@ export const getNavEpic = (routes, baseUrl) => {
 				// inject request metadata from context, including `store.getState()`
 				const requestMetadata = {
 					referrer: (state.routing.referrer || {}).pathname || '',
-					logout: logoutQueryMatch.test(location.search),
+					logout: location.pathname.endsWith('logout'), // assume logout route ends with logout
 					clickTracking: state.clickTracking,
 				};
 

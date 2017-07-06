@@ -14,7 +14,6 @@ import { MEMBER_COOKIE } from '../util/cookieUtils';
 import {
 	applyAuthState,
 	configureAuthCookies,
-	removeAuthState,
 	setPluginState,
 } from '../util/authUtils';
 
@@ -32,16 +31,6 @@ const verifyAuth = logger => auth => {
 		);
 		throw new Error(errorMessage);
 	}
-};
-
-const handleLogout = request => {
-	const { raw: { req }, server: { app: { logger } } } = request;
-	logger.info({ req }, 'Logout - clearing cookies');
-	return removeAuthState(
-		[MEMBER_COOKIE, 'oauth_token', 'refresh_token'],
-		request,
-		request.plugins.requestAuth.reply
-	);
 };
 
 function getAuthType(request) {
@@ -66,12 +55,7 @@ function getAuthType(request) {
  * @return {Observable} Observable that emits the request with auth applied
  */
 export const applyRequestAuthorizer$ = requestAuthorizer$ => request => {
-	const { query, plugins, server: { app: { logger } }, raw: { req } } = request;
-
-	// logout is accomplished exclusively through a `logout` querystring value
-	if ('logout' in query) {
-		handleLogout(request);
-	}
+	const { plugins, server: { app: { logger } }, raw: { req } } = request;
 
 	// always need oauth_token, even if it's an anonymous (pre-reg) token
 	// This is 'deferred' because we don't want to start fetching the token

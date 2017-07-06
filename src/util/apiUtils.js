@@ -16,8 +16,6 @@ import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/timeout';
 
-import { removeAuthState } from './authUtils';
-
 import { getCookieLang } from './languageUtils';
 import { coerceBool, toCamelCase } from './stringUtils';
 
@@ -561,33 +559,6 @@ export const logApiResponse = request => ([response, body]) => {
 };
 
 /**
- * Login responses contain oauth info that should be applied to the response.
- * If `request.plugins.requestAuth.reply` exists (supplied by the requestAuthPlugin),
- * the application is able to set cookies on the response. Otherwise, return
- * the login response unchanged
- */
-export const parseLoginAuth = (request, query) => response => {
-	if (
-		query.type === 'login' &&
-		request.plugins.requestAuth &&
-		!response.error
-	) {
-		// kill the logged-out auth
-		removeAuthState(
-			['oauth_token', 'refresh_token'],
-			request,
-			request.plugins.requestAuth.reply
-		);
-		// only return the member, no oauth data
-		return {
-			...response,
-			value: { member: response.value.member },
-		};
-	}
-	return response;
-};
-
-/**
  * When a tough-cookie cookie jar is provided, forward the cookies along with
  * the overall /api response back to the client
  */
@@ -649,7 +620,6 @@ export const makeApiRequest$ = request => {
 				.do(injectResponseCookies(request))
 				.map(parseApiResponse(requestOpts.url)) // parse into plain object
 				.catch(errorResponse$(requestOpts.url))
-				.map(parseLoginAuth(request, query)) // login has oauth secrets - special case
 				.map(apiResponseToQueryResponse(query)) // convert apiResponse to app-ready queryResponse
 				.map(setApiResponseDuotones); // special duotone prop
 		});

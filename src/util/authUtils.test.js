@@ -5,7 +5,6 @@ import {
 	setPluginState,
 	configureAuthState,
 	configureAuthCookies,
-	removeAuthState,
 } from './authUtils';
 
 describe('configureAuthCookies', () => {
@@ -92,32 +91,6 @@ describe('setPluginState', () => {
 		};
 		setPluginState(request, reply);
 		expect(request.plugins.requestAuth.reply).toBe(reply);
-	});
-});
-
-describe('removeAuthState', () => {
-	it('calls reply.unstate and sets request.state to null for each auth cookie name', () => {
-		const reply = {
-			unstate() {},
-		};
-		const request = {
-			log() {},
-			state: {
-				a: 'b',
-				c: 'd',
-				foo: 'bar',
-			},
-		};
-		spyOn(reply, 'unstate');
-		removeAuthState(Object.keys(request.state), request, reply);
-		expect(reply.unstate.calls.allArgs().map(args => args[0]).sort()).toEqual(
-			Object.keys(request.state).sort()
-		);
-		expect(
-			Object.keys(request.state)
-				.map(k => request.state[k])
-				.every(v => v === null)
-		).toBe(true);
 	});
 });
 

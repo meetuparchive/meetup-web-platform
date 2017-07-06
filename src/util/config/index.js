@@ -153,7 +153,7 @@ export const config = convict({
 	cookie_encrypt_secret: {
 		format: validateCookieSecret,
 		default: secretDefault,
-		env: 'COOKIE_ENCRYPT_SECRET',
+		env: process.env.NODE_ENV !== 'test' && 'COOKIE_ENCRYPT_SECRET', // don't read env in tests
 		sensitive: true,
 	},
 	csrf_secret: {
