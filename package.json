@@ -45,7 +45,6 @@
     "intl": "1.2.5",
     "joi": "10.5.2",
     "js-cookie": "2.1.4",
-    "mwp-cli": "0.1.33",
     "node-fetch": "1.7.1",
     "pino": "4.5.3",
     "prop-types": "15.5.10",
@@ -61,6 +60,9 @@
     "url-regex": "3.2.0",
     "uuid": "3.0.1"
   },
+  "peerDependencies": {
+    "mwp-cli": "^1.0.71"
+  },
   "devDependencies": {
     "babel-cli": "6.24.1",
     "babel-eslint": "7.2.3",
@@ -73,7 +75,7 @@
     "eslint": "4.0.0",
     "eslint-config-prettier": "2.1.1",
     "eslint-plugin-flowtype": "2.34.0",
-    "eslint-plugin-react": "7.0.1",
+    "eslint-plugin-react": "7.1.0",
     "flow-bin": "0.47.0",
     "husky": "0.13.4",
     "intl-messageformat": "1.3.0",
@@ -82,6 +84,7 @@
     "jest": "20.0.4",
     "lint-staged": "3.6.0",
     "meetup-web-mocks": "1.0.190",
+    "mwp-cli": "1.0.71",
     "prettier": "1.4.4",
     "react": "15.5.4",
     "react-addons-test-utils": "15.5.1",
