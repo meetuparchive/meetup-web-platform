@@ -35,6 +35,7 @@ export const getLogger: string => (Object, Object) => mixed = (
 		mobileWeb: false,
 		referer: '', // misspelled to align with schema
 		trax: {},
+		isUserActivity: true,
 		...trackInfo,
 	};
 
