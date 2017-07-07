@@ -58,24 +58,24 @@ const click = {
 };
 
 // currently the schema is manually copied from
-// https://github.dev.meetup.com/meetup/meetup/blob/master/modules/base/src/main/versioned_avro/Activity_v3.avsc
+// https://github.dev.meetup.com/meetup/meetup/blob/master/modules/base/src/main/versioned_avro/Activity_v5.avsc
 const activity = {
 	namespace: 'com.meetup.base.avro',
 	type: 'record',
 	name: 'Activity',
-	doc: 'v3',
+	doc: 'v5',
 	fields: [
 		{ name: 'requestId', type: 'string' },
 		{ name: 'timestamp', type: 'string' },
 		{ name: 'url', type: 'string' },
-		{ name: 'aggregratedUrl', type: 'string', default: '' }, // it's misspelled in the original spec
+		{ name: 'aggregratedUrl', type: 'string', default: '' },
 		{ name: 'ip', type: 'string', default: '' },
 		{ name: 'agent', type: 'string', default: '' },
 		{ name: 'memberId', type: 'int' },
 		{ name: 'trackId', type: 'string' },
 		{ name: 'mobileWeb', type: 'boolean' },
 		{ name: 'platform', type: 'string' },
-		{ name: 'referer', type: 'string' }, // it's misspelled in the original spec
+		{ name: 'referer', type: 'string' },
 		{ name: 'trax', type: { type: 'map', values: 'string' } },
 		{
 			name: 'platformAgent',
@@ -84,6 +84,8 @@ const activity = {
 				name: 'PlatformAgent',
 				symbols: [
 					'WEB',
+					'MUP_WEB',
+					'PRO_WEB',
 					'NATIVE',
 					'NATIVE_APP_WEB_VIEW',
 					'THIRD_PARTY_UNKNOWN',
@@ -92,6 +94,7 @@ const activity = {
 			},
 			default: 'UNKNOWN',
 		},
+		{ name: 'isUserActivity', type: 'boolean', default: true },
 	],
 };
 
