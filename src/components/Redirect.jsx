@@ -98,8 +98,8 @@ const reducePropsToState = (
 	return { url: to, permanent };
 };
 
-export const handleStateChangeOnClient = (redirect: RedirectState) => {
-	if (!testForExternal(redirect.url)) {
+export const handleStateChangeOnClient = (redirect: ?RedirectState) => {
+	if (!redirect || !testForExternal(redirect.url)) {
 		// 'internal' links will be handled by React Router
 		return;
 	}
