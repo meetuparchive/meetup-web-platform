@@ -68,14 +68,14 @@ const activity = {
 		{ name: 'requestId', type: 'string' },
 		{ name: 'timestamp', type: 'string' },
 		{ name: 'url', type: 'string' },
-		{ name: 'aggregratedUrl', type: 'string', default: '' },
+		{ name: 'aggregratedUrl', type: 'string', default: '' }, // it's misspelled in the original spec
 		{ name: 'ip', type: 'string', default: '' },
 		{ name: 'agent', type: 'string', default: '' },
 		{ name: 'memberId', type: 'int' },
 		{ name: 'trackId', type: 'string' },
 		{ name: 'mobileWeb', type: 'boolean' },
 		{ name: 'platform', type: 'string' },
-		{ name: 'referer', type: 'string' },
+		{ name: 'referer', type: 'string' }, // it's misspelled in the original spec
 		{ name: 'trax', type: { type: 'map', values: 'string' } },
 		{
 			name: 'platformAgent',
