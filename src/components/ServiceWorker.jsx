@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 
 const mapStateToProps = state => ({
 	localeCode: state.config.localeCode,
-	activateSW: state.config.activateSW,
+	enableServiceWorker: state.config.enableServiceWorker,
 });
 
 /*
@@ -14,12 +14,12 @@ const mapStateToProps = state => ({
 class ServiceWorker extends React.Component {
 	props: {
 		localeCode: string,
-		activateSW: boolean,
+		enableServiceWorker: boolean,
 		children: React$Element<*>,
 	};
 	componentDidMount() {
 		if (
-			this.props.activateSW &&
+			this.props.enableServiceWorker &&
 			navigator.serviceWorker &&
 			process.env.NODE_ENV === 'production' // sw caching creates confusion in dev
 		) {

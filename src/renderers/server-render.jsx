@@ -132,6 +132,7 @@ const makeRenderer$ = (renderConfig: {
 	middleware: Array<Function>,
 	baseUrl: string,
 	scripts: Array<string>,
+	enableServiceWorker: boolean,
 }) =>
 	makeRenderer(
 		renderConfig.routes,
@@ -140,7 +141,8 @@ const makeRenderer$ = (renderConfig: {
 		renderConfig.assetPublicPath,
 		renderConfig.middleware,
 		renderConfig.baseUrl,
-		renderConfig.scripts
+		renderConfig.scripts,
+		renderConfig.enableServiceWorker
 	);
 
 /**
@@ -169,7 +171,8 @@ const makeRenderer = (
 	assetPublicPath: string,
 	middleware: Array<Function> = [],
 	baseUrl: string = '',
-	scripts: Array<string>
+	scripts: Array<string>,
+	enableServiceWorker: boolean
 ) => (request: Object) => {
 	middleware = middleware || [];
 	const {
@@ -204,10 +207,10 @@ const makeRenderer = (
 		configure({
 			apiUrl,
 			baseUrl: host,
+			enableServiceWorker,
 			localeCode,
 			supportedLocaleCodes,
 			initialNow: new Date().getTime(),
-			activateSW: false, // TODO: enable this when a meetup.com route for SW is active https://meetup.atlassian.net/browse/WP-385
 		})
 	);
 	// render skeleton if requested - the store is ready
