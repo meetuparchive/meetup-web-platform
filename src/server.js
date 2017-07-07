@@ -41,7 +41,7 @@ export default function start(
 
 	const connection = {
 		host: '0.0.0.0',
-		port: appConfig.app_server.port, // needed for custom port behind SSL proxy in prod
+		port: appConfig.app_server.port, // needed for custom port in prod
 		routes: {
 			plugins: {
 				'electrode-csrf-jwt': {
