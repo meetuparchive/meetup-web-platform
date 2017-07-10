@@ -22,6 +22,7 @@ In general, application-specific code will live outside of this package.
 - ['Query': structuring data dependencies](docs/Queries.md)
 - [Rendering in consumer applications](docs/Rendering.md)
 - [Routing configuration](docs/Routing.md)
+- [Caching - API and static assets](docs/Caching.md)
 
 # Releases
 
@@ -135,30 +136,7 @@ user navigation.
 
 #### Cache `epics/cache.js`
 
-The cache epic provides optimistic `state` updates for any data specified
-by active route queries, similar to the SyncEpic, but using locally
-cached data rather than an API. It is client-side only, and it *does not suppress*
-data fetched from the server - it simply pre-empts it before the API response
-returns and overwrites everything with the latest server data.
-
-**on `API_REQUEST`**, which provides `queries` for the requested route
-
-1. For each query, use the JSON-encoded query as a key into the cache
-2. Format responses from the cache to look like API responses
-3. Trigger `CACHE_SUCCESS` containing the cache hits
-
-**on `API_SUCCESS`**,  which provides fresh info from the server
-
-- make an entry in the cache with `key` as the JSON-encoded `query` and
-	the `value` as the corresponding `response`
-
-The cache is stored locally in the user's browser using IndexedDB so that it
-will survive multiple sessions. All API queries are stored, and the data is
-refreshed each time the query is re-requested.
-
-In dev, be aware that the cache may be masking failed API requests - keep your
-network dev tools open and watch the server logs to make sure you haven't broken
-anything. We will add tooling to make such cases more obvious in the future.
+See [the Caching docs](./docs/Caching.md#cache-middleware)
 
 ##### Disable cache
 
