@@ -16,9 +16,11 @@ responsiveness. There are two primary types of content that are cached:
 
 Currently the Meetup REST API does not provide a
 [`Cache-Control` header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control)
-(e.g. `max-age`), so the 'raw' API responses cannot be directly cached at the
-app server or browser level - the app must re-fetch every API request from the 
-browser to ensure that it delivers the requested data.
+(e.g. `max-age`), so the web application doesn't have any upstream indication of
+how long the data should be considered valid for. The platform therefore does
+not cache 'raw' API responses at the app server or browser level - the app
+re-fetches every API request from the  browser to ensure that it delivers valid
+data.
 
 ### CDN
 
