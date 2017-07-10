@@ -8,7 +8,7 @@ responsiveness. There are two primary types of content that are cached:
 
 ## Overview
 
-![Cache diagram](https://user-images.githubusercontent.com/1885153/27892985-d75546fe-6256-11e7-8272-66252caa5c85.png)
+![Cache diagram](https://user-images.githubusercontent.com/1885153/28044152-c9f076ce-6629-11e7-9c6b-1bdf31fb6b50.png)
 
 ([from web platform diagrams](https://docs.google.com/presentation/d/1c8jf8UtGa81Ay4oqlbHfoP4Ile2VkiRVrCMVag6cRBQ/#slide=id.g1f921bb8da_0_0))
 
