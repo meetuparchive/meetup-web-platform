@@ -24,20 +24,20 @@ data.
 
 ### CDN
 
-The CDN does not currently cache any API responses. [See the 'Future'
-discussion](#future) for potential changes to the behavior.
+The CDN does not currently cache any API responses. See the 'Future'
+discussion #322 for potential changes to the behavior.
 
 ### App server
 
-The app server does not currently cache any API responses. [See the 'Future' 
-discussion](#future) for potential changes to the behavior.
+The app server does not currently cache any API responses. See the 'Future' 
+discussion #322 for potential changes to the behavior.
 
 ### Browser
 
 #### Service Worker
 
 The service worker does not cache API requests/responses (and probably
-shouldn't - [see the 'Future' discussion](#future)).
+shouldn't - see the 'Future' discussion #322).
 
 #### Cache middleware
 
@@ -46,7 +46,7 @@ specified by dispatched `GET` queries, similar to the Sync epic, but uses
 locally cached data rather than an HTTP response. It is client-side only, and it
 *does not suppress* data fetched from the server - it simply pre-empts it before
 the API response returns and overwrites everything with the latest server data.
-[See the 'Future' discussion](#future) for potential changes to this behavior.
+See the 'Future' discussion #322 for potential changes to this behavior.
 
 The cache middleware implementation uses
 [IndexedDB](https://developer.mozilla.org/en/docs/Web/API/IndexedDB_API) for
