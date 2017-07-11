@@ -87,7 +87,6 @@
     "mwp-cli": "1.0.74",
     "prettier": "1.5.2",
     "react": "15.6.1",
-    "react-addons-test-utils": "15.6.0",
     "react-helmet": "5.1.3",
     "react-intl": "2.3.0",
     "react-redux": "5.0.5",
