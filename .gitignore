@@ -1,3 +1,7 @@
+# Editor
+*.swp
+*.swo
+
 # Logs
 logs
 *.log

@@ -23,6 +23,8 @@ import { querySchema } from './validation';
 
 import { duotoneRef } from './duotone';
 
+export const API_META_HEADER = 'X-Meta-Request-Headers';
+
 // match escpaed unicode characters that are treated as newline literals in JS
 const ESCAPED_UNICODE_NEWLINES = /\\u2028|\\u2029/g;
 
@@ -247,6 +249,10 @@ export const buildRequestArgs = externalRequestOpts => ({
 		headers['X-Meetup-Request-Flags'] = (flags || meta.flags).join(',');
 	}
 
+	if (meta.apiMetaHeaders) {
+		headers[API_META_HEADER] = meta.apiMetaHeaders.join(',');
+	}
+
 	if (meta.variants) {
 		headers['X-Meetup-Variants'] = Object.keys(
 			meta.variants
@@ -332,9 +338,10 @@ export function getAuthHeaders(request) {
 export function getLanguageHeader(request) {
 	const cookieLang = getCookieLang(request);
 	const headerLang = request.headers['accept-language'];
-	const acceptLang = cookieLang && headerLang
-		? `${cookieLang},${headerLang}`
-		: cookieLang || headerLang;
+	const acceptLang =
+		cookieLang && headerLang
+			? `${cookieLang},${headerLang}`
+			: cookieLang || headerLang;
 	return acceptLang;
 }
 
@@ -361,10 +368,10 @@ export function parseRequestHeaders(request) {
 
 export function parseRequestQueries(request) {
 	const { method, mime, payload, query } = request;
-	const queriesRison = (method === 'post' || method === 'patch') &&
-		mime !== 'multipart/form-data'
-		? payload.queries
-		: query.queries;
+	const queriesRison =
+		(method === 'post' || method === 'patch') && mime !== 'multipart/form-data'
+			? payload.queries
+			: query.queries;
 
 	if (!queriesRison) {
 		return null;
