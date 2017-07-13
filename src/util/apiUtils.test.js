@@ -35,6 +35,7 @@ import {
 	parseMetaHeaders,
 	parseVariantsHeader,
 	groupDuotoneSetter,
+	API_META_HEADER,
 } from './apiUtils';
 
 describe('errorResponse$', () => {
@@ -363,6 +364,20 @@ describe('buildRequestArgs', () => {
 		expect(postArgs.headers['X-Meetup-Variants']).toEqual(
 			`${experiment}=${context}`
 		);
+	});
+
+	it('adds api meta request header with expected value from array provided in query', () => {
+		const query = {
+			endpoint: 'foo',
+			type: 'bar',
+			meta: { metaRequestHeaders: ['foo', 'bar'] },
+		};
+		const requestArgs = buildRequestArgs({ ...options, method: 'get' })(query);
+		const requestHeaders = Object.keys(requestArgs.headers);
+		const expectedApiMetaHeader = 'foo,bar';
+
+		expect(requestHeaders).toContain(API_META_HEADER);
+		expect(requestArgs.headers[API_META_HEADER]).toBe(expectedApiMetaHeader);
 	});
 
 	const testQueryResults_utf8 = mockQuery(MOCK_RENDERPROPS_UTF8);
