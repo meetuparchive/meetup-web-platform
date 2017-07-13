@@ -367,23 +367,18 @@ describe('buildRequestArgs', () => {
 		);
 	});
 
-	it('does not set api-specific meta request header when apiMetaHeaders is not provided in a query', () => {
-		const headerKeys = Object.keys(testQueryResults.info.headers);
-		expect(headerKeys).not.toContain(API_META_HEADER);
-	});
-
 	it('adds api meta request header with expected value from array provided in query', () => {
-		const queryWithApiHeaders = mockQuery({
-				apiMetaHeaders: [
-					'foo',
-					'bar'
-				]
-		});
-		const expectedHeaderValue = 'foo,bar';
-		const headerKeys = Object.keys(queryWithApiHeaders.info.headers);
+		const query = {
+			endpoint: 'foo',
+			type: 'bar',
+			meta: { apiMetaHeaders: ['foo', 'bar'] },
+		};
+		const requestArgs = buildRequestArgs({ ...options, method: 'get' })(query);
+		const requestHeaders = Object.keys(requestArgs.headers);
+		const expectedApiMetaHeader = 'foo,bar';
 
-		expect(headerKeys).toContain(API_META_HEADER);
-		expect(queryWithApiHeaders.info.headers[API_META_HEADER]).toBe(expectedHeaderValue);
+		expect(requestHeaders).toContain(API_META_HEADER);
+		expect(requestArgs.headers[API_META_HEADER]).toBe(expectedApiMetaHeader);
 	});
 
 	const testQueryResults_utf8 = mockQuery(MOCK_RENDERPROPS_UTF8);
