@@ -37,6 +37,8 @@ import {
 	groupDuotoneSetter,
 } from './apiUtils';
 
+const API_META_HEADER = 'X-Meta-Request-Headers';
+
 describe('errorResponse$', () => {
 	it('returns the request url pathname as response.meta.endpoint', () => {
 		const endpoint = '/pathname';
@@ -363,6 +365,25 @@ describe('buildRequestArgs', () => {
 		expect(postArgs.headers['X-Meetup-Variants']).toEqual(
 			`${experiment}=${context}`
 		);
+	});
+
+	it('does not set api-specific meta request header when apiMetaHeaders is not provided in a query', () => {
+		const headerKeys = Object.keys(testQueryResults.info.headers);
+		expect(headerKeys).not.toContain(API_META_HEADER);
+	});
+
+	it('adds api meta request header with expected value from array provided in query', () => {
+		const queryWithApiHeaders = mockQuery({
+				apiMetaHeaders: [
+					'foo',
+					'bar'
+				]
+		});
+		const expectedHeaderValue = 'foo,bar';
+		const headerKeys = Object.keys(queryWithApiHeaders.info.headers);
+
+		expect(headerKeys).toContain(API_META_HEADER);
+		expect(queryWithApiHeaders.info.headers[API_META_HEADER]).toBe(expectedHeaderValue);
 	});
 
 	const testQueryResults_utf8 = mockQuery(MOCK_RENDERPROPS_UTF8);
