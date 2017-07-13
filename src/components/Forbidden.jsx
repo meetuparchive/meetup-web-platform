@@ -4,6 +4,9 @@ import withSideEffect from 'react-side-effect';
 /**
  * Use this component as a wrapper for your '403 Forbidden' UI when you determine
  * the user doesn't have sufficient permissions to view the requested route.
+ *
+ * Should only be used for logged-in members. Guests should be redirected to login.
+ *
  * Note that only one child is allowed for this component since it does not
  * provide any rendered output itself.
  */
