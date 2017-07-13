@@ -9,6 +9,7 @@ import ReactDOMServer from 'react-dom/server';
 import StaticRouter from 'react-router-dom/StaticRouter';
 
 import Dom from '../components/dom';
+import Forbidden from '../components/Forbidden.jsx';
 import NotFound from '../components/NotFound';
 import PlatformApp from '../components/PlatformApp';
 import Redirect from '../components/Redirect';
@@ -117,7 +118,9 @@ const getRouterRenderer = ({
 		/>
 	);
 
-	const statusCode = NotFound.rewind() || 200; // if NotFound is mounted, return 404
+	// if NotFound is mounted, return 404
+	// if Forbidden is mounted, return a 403
+	const statusCode = NotFound.rewind() || Forbidden.rewind() || 200;
 
 	return {
 		statusCode,
