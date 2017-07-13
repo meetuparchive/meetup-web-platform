@@ -35,9 +35,8 @@ import {
 	parseMetaHeaders,
 	parseVariantsHeader,
 	groupDuotoneSetter,
+	API_META_HEADER,
 } from './apiUtils';
-
-const API_META_HEADER = 'X-Meta-Request-Headers';
 
 describe('errorResponse$', () => {
 	it('returns the request url pathname as response.meta.endpoint', () => {
