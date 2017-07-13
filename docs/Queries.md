@@ -28,6 +28,7 @@ A Query is just a plain object with the following shape:
     variants: {
       [string]: string | number | string[] | number[],  // e.g. { experiment1: chapterId }
     },
+	metaRequestHeaders?: string[],
   },
 }
 ```
