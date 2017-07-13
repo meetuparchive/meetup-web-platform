@@ -91,6 +91,8 @@ array or a singleton.
 
 #### `meta`
 
+Request metadata. Includes `flags`, `variants`, and `metaRequestHeaders`. The `metaRequestHeaders` property is in reference to `X-Meta-Request-Headers` in the [meetup api](https://www.meetup.com/meetup_api/#meta-headers).
+
 ##### `flags`
 
 An array of feature flag (Runtime Flag) names that should be returned
