@@ -370,7 +370,7 @@ describe('buildRequestArgs', () => {
 		const query = {
 			endpoint: 'foo',
 			type: 'bar',
-			meta: { apiMetaHeaders: ['foo', 'bar'] },
+			meta: { metaRequestHeaders: ['foo', 'bar'] },
 		};
 		const requestArgs = buildRequestArgs({ ...options, method: 'get' })(query);
 		const requestHeaders = Object.keys(requestArgs.headers);

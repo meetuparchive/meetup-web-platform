@@ -249,8 +249,8 @@ export const buildRequestArgs = externalRequestOpts => ({
 		headers['X-Meetup-Request-Flags'] = (flags || meta.flags).join(',');
 	}
 
-	if (meta.apiMetaHeaders) {
-		headers[API_META_HEADER] = meta.apiMetaHeaders.join(',');
+	if (meta.metaRequestHeaders) {
+		headers[API_META_HEADER] = meta.metaRequestHeaders.join(',');
 	}
 
 	if (meta.variants) {
