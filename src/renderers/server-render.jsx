@@ -118,9 +118,10 @@ const getRouterRenderer = ({
 		/>
 	);
 
-	// if NotFound is mounted, return 404
-	// if Forbidden is mounted, return a 403
-	const statusCode = NotFound.rewind() || Forbidden.rewind() || 200;
+	// prioritized status code fallbacks
+	const statusCode = Forbidden.rewind() ||
+		NotFound.rewind() ||
+		200;
 
 	return {
 		statusCode,
