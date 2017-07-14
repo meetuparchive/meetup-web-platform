@@ -110,7 +110,7 @@ export const config = convict({
 		// host: '0.0.0.0', ALWAYS 0.0.0.0
 		port: {
 			format: 'port',
-			default: 8000,
+			default: process.getuid() === 0 ? 443 : 8000, // default to standard SSL port when running with sudo
 			arg: 'app-port',
 			env: process.env.NODE_ENV !== 'test' && 'DEV_SERVER_PORT', // don't read env in tests
 		},
