@@ -1,5 +1,5 @@
 // @flow
-const buildPaths = require('mwp-cli/src/commands/buildCommands/config/paths');
+const buildPaths = require('mwp-cli/src/config').paths;
 const path = require('path');
 
 /*
