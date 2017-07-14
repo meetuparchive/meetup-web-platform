@@ -2,11 +2,7 @@
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/zip';
 
-import {
-	buildRequestArgs,
-	makeApiRequest$,
-	parseRequest,
-} from '../util/apiUtils';
+import { buildRequestArgs, makeApiRequest$, parseRequest } from './util';
 
 /**
  * Given the current request and API server host, proxy the request to the API
@@ -38,7 +34,7 @@ import {
  *   requests.
  * @return Array$ contains all API responses corresponding to the provided queries
  */
-const apiProxy$ = (request, queries) => {
+export default request => queries => {
 	// 1. get the queries and the 'universal' `externalRequestOpts` from the request
 	const parsedRequest = parseRequest(request);
 	queries = queries || parsedRequest.queries;
@@ -60,5 +56,3 @@ const apiProxy$ = (request, queries) => {
 		request.trackApi(responses)
 	);
 };
-
-export default apiProxy$;

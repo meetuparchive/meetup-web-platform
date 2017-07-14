@@ -7,6 +7,7 @@ import logger from './util/logger';
 import requestAuthPlugin from './plugins/requestAuthPlugin';
 import activityPlugin from './plugins/tracking/activity';
 import serviceWorkerPlugin from './plugins/service-worker';
+import apiProxyPlugin from './plugins/api-proxy';
 
 /**
  * Hapi plugins for the dev server
@@ -103,6 +104,12 @@ function getServiceWorkerPlugin() {
 	};
 }
 
+function getApiProxyPlugin() {
+	return {
+		register: apiProxyPlugin,
+	};
+}
+
 export default function getPlugins() {
 	const { platform_agent, isProd } = config;
 	return [
@@ -111,6 +118,7 @@ export default function getPlugins() {
 		getRequestAuthPlugin(),
 		getActivityTrackingPlugin({ platform_agent, isProd }),
 		getServiceWorkerPlugin(),
+		getApiProxyPlugin(),
 		Inert,
 	];
 }

@@ -1,13 +1,11 @@
 import Joi from 'joi';
-import { getApiProxyRouteHandler } from './apiProxyHandler';
-
 const validApiPayloadSchema = Joi.object({
 	queries: Joi.string().required(), // should be rison.encode_array-encoded
 	metadata: Joi.string(),
 	logout: Joi.any(),
 });
 
-const getApiProxyRoutes = (path, apiProxyFn$) => {
+const getApiProxyRoutes = path => {
 	/**
 	 * This handler converts the application-supplied queries into external API
 	 * calls, and converts the API call responses into a standard format that
@@ -18,7 +16,13 @@ const getApiProxyRoutes = (path, apiProxyFn$) => {
 	 */
 	const routeBase = {
 		path,
-		handler: getApiProxyRouteHandler(apiProxyFn$),
+		handler: (request, reply) => {
+			request.proxyApi$().subscribe(
+				responses =>
+					reply(JSON.stringify({ responses })).type('application/json'),
+				err => reply(err) // 500 error - will only be thrown on bad implementation
+			);
+		},
 		config: {
 			plugins: {
 				'electrode-csrf-jwt': {
