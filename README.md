@@ -21,8 +21,11 @@ In general, application-specific code will live outside of this package.
 - [Application state management](docs/State.md)
 - ['Query': structuring data dependencies](docs/Queries.md)
 - [Rendering in consumer applications](docs/Rendering.md)
-- [Routing configuration](docs/Routing.md)
 - [Caching - API and static assets](docs/Caching.md)
+
+## Module docs
+
+- [Routing module](router/README.md)
 
 # Releases
 

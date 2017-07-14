@@ -18,7 +18,7 @@ import {
 	SERVER_RENDER,
 } from '../actions/syncActionCreators';
 import { clearClick } from '../actions/clickActionCreators';
-import { getRouteResolver, getMatchedQueries } from '../util/routeUtils';
+import { getRouteResolver, getMatchedQueries } from '../router/util';
 import { getDeprecatedSuccessPayload } from '../util/fetchUtils';
 
 /**

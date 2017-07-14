@@ -14,9 +14,10 @@ class RouteLayout extends React.Component {
 		return (
 			<Switch>
 				{routes.map((route, i) => {
-					const path = matchedPath === '/' // root path, no need to prepend
-						? route.path
-						: `${matchedPath}${route.path || ''}`;
+					const path =
+						matchedPath === '/' // root path, no need to prepend
+							? route.path
+							: `${matchedPath}${route.path || ''}`;
 
 					return (
 						<Route

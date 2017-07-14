@@ -9,10 +9,8 @@ import ReactDOMServer from 'react-dom/server';
 import StaticRouter from 'react-router-dom/StaticRouter';
 
 import Dom from '../components/dom';
-import Forbidden from '../components/Forbidden';
-import NotFound from '../components/NotFound';
+import { Forbidden, NotFound, Redirect } from '../router';
 import PlatformApp from '../components/PlatformApp';
-import Redirect from '../components/Redirect';
 
 import { getServerCreateStore } from '../util/createStoreServer';
 import { SERVER_RENDER } from '../actions/syncActionCreators';

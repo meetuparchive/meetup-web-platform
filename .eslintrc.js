@@ -40,7 +40,6 @@ const config = {
 		'react/no-deprecated': 2,
 		'react/no-string-refs': 1,
 		'react/react-in-jsx-scope': 2,
-		'react/jsx-wrap-multilines': 2,
 		'react/jsx-boolean-value': 2,
 		'react/jsx-equals-spacing': [2, 'never'],
 		'react/jsx-no-duplicate-props': 2,
