@@ -92,16 +92,17 @@ array or a singleton.
 
 #### `meta`
 
+##### `flags`
+
+An array of feature flag (Runtime Flag) names that should be returned
+alongside the main request.
+
 #### `metaRequestHeaders`
 
 The `metaRequestHeaders` property is in reference to `X-Meta-Request-Headers` in the
 [meetup api](https://www.meetup.com/meetup_api/#meta-headers).  The response for each
 header passed in will be in `REF.meta`, converted from `snake-case` to `camelCase`.
 
-##### `flags`
-
-An array of feature flag (Runtime Flag) names that should be returned
-alongside the main request.
 
 ##### `method`
 
