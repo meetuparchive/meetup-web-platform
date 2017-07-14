@@ -28,7 +28,7 @@ A Query is just a plain object with the following shape:
     variants: {
       [string]: string | number | string[] | number[],  // e.g. { experiment1: chapterId }
     },
-	metaRequestHeaders?: string[],
+    metaRequestHeaders?: string[],
   },
 }
 ```
@@ -91,7 +91,11 @@ array or a singleton.
 
 #### `meta`
 
-Request metadata. Includes `flags`, `variants`, and `metaRequestHeaders`. The `metaRequestHeaders` property is in reference to `X-Meta-Request-Headers` in the [meetup api](https://www.meetup.com/meetup_api/#meta-headers).
+#### `metaRequestHeaders`
+
+The `metaRequestHeaders` property is in reference to `X-Meta-Request-Headers` in the
+[meetup api](https://www.meetup.com/meetup_api/#meta-headers).  The response for each
+header passed in will be in `REF.meta`, converted from `snake-case` to `camelCase`.
 
 ##### `flags`
 
