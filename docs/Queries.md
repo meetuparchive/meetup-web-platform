@@ -50,6 +50,7 @@ A Query is just a plain object with the following shape:
       'my-member-experiment': '1234',  // memberId - MUST BE STRING (e.g. `memberId.toString()`)
       'my-group-experiment': '5678',    // chapterId
     },
+	metaRequestHeaders: ['unread-messages'],
   },
 }
 ```
