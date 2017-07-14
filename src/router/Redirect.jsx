@@ -3,18 +3,9 @@ import React from 'react';
 import withSideEffect from 'react-side-effect';
 import RouterRedirect from 'react-router-dom/Redirect';
 import Route from 'react-router-dom/Route';
+import { testForExternal } from './util';
+import type { RouterTo } from './util/types';
 
-const testForExternal = (to: RouterTo): boolean => {
-	if (to instanceof URL) {
-		return true;
-	}
-	if (typeof to === 'string') {
-		return to.startsWith('http');
-	}
-	return false; // not external - this must be a React Router 'location'
-};
-
-type RouterTo = string | LocationShape | URL;
 type RedirectProps = {
 	to: RouterTo,
 	permanent?: boolean,

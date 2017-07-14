@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import type { RouterHistory } from 'react-router-dom';
-import { decodeParams, getChildRoutes } from '../util/routeUtils';
+import { decodeParams, getChildRoutes } from './util';
 import RouteLayout from './RouteLayout';
 
 type Props = {

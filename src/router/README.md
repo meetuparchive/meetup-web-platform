@@ -1,13 +1,16 @@
-# Routing
+# Router
 
-Platform apps use [React Router v4](https://reacttraining.com/react-router/) to
-render application routes.
+The Meetup Web Platform router module provides React routing utilities. It is a
+wrapper around [React Router v4](https://reacttraining.com/react-router/) that
+enables async routing and some more flexible linking and response handling like
+redirects and 404s.
 
-Application routes must be provided in a static `routes` configuration option,
+Application routes must be provided in a static `routes` configuration object,
 which allows the application to determine the API data requirements of a route
 before it starts building the React virtual DOM on the server.
 
 Async routes that allow code splitting are supported.
+
 
 ## Route definition
 
@@ -15,9 +18,9 @@ Consumer apps are defined by their base routes + base reducer. The base routes
 connect URLs to data fetch requirements and the corresponding React container
 components.
 
-Inside the platform `renderers/`, the `routes` array is mapped onto a full React
+The platform rendering functions map the `routes` array onto a full React
 component tree, using `route` definitions that conform to the [type defined in
-`flow-typed/platform.js`](./flow-typed/platform.js).
+`flow-typed/platform.js`](../flow-typed/platform.js).
 
 ```js
 type PlatformRoute = {
@@ -60,7 +63,7 @@ Only render the current route when the URL matches exactly
 ### `query`
 
 This is a function or array of functions that yield(s) a
-[`Query` object](./Queries.md) or `null`. All query functions will be executed
+[`Query` object](../docs/Queries.md) or `null`. All query functions will be executed
 when the route matches, and all resulting non-null queries will be included in
 the resulting API request.
 
@@ -115,7 +118,7 @@ information and links back to the group homepage or event list.
 ## Redirects
 
 All redirects should be implemented with the platform's [`<Redirect />`
-component](../src/components/Redirect.jsx), which functions almost identically
+component](./Redirect.jsx), which functions almost identically
 to
 [React Router's `<Redirect>`](https://reacttraining.com/react-router/web/api/Redirect)
 but includes support for redirecting to external URLs in addition to internal
@@ -124,3 +127,37 @@ have to use `window.location.assign`, `window.location.replace`, or an
 equivalent programmatic navigation API - just render a
 `<Redirect to={...next route/url...} />` and let the application handle the
 logistics.
+
+## Links
+
+All links should be implemented with the platform's
+[`<Link />` component](./Link), which functions almost identically to
+[React Router's `<Link>`](https://reacttraining.com/react-router/web/api/Link)
+but includes support for linking to external URLs in addition to internal routes.
+
+## Components
+
+### `AsyncRouter`
+
+### `Link`
+
+### `Redirect`
+
+### `NotFound`
+
+### `RouteLayout`
+
+### `SyncContainer`
+
+## Utilities
+
+All public routing utilities are available from the `index` import of the `util`
+directory, i.e.
+
+```js
+const routeUtils = require('./router/util');
+```
+
+### Route resolvers (`util/resolve.js`)
+
+### Route Query handlers (`util/query.js`)
