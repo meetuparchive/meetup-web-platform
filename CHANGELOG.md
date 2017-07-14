@@ -1,3 +1,10 @@
+## [next]
+
+### BREAKING CHANGES
+
+- **Moved** `src/components/Redirect` --> `require('src/router').Redirect`
+- **Moved** `src/components/Forbidden` --> `require('src/router').Forbidden`
+
 ## [4.0]
 
 ### BREAKING CHANGES
