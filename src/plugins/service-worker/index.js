@@ -1,5 +1,5 @@
 // @flow
-const buildPaths = require('mwp-cli/src/commands/buildCommands/config/paths');
+const buildPaths = require('mwp-cli/src/config').paths;
 const path = require('path');
 
 /*
@@ -27,7 +27,7 @@ export default function register(
 		handler: (request, reply) => {
 			const { localeCode } = request.params;
 			const swPath = path.resolve(
-				buildPaths.browserAppOutputPath,
+				buildPaths.output.browser,
 				localeCode,
 				'asset-service-worker.js'
 			);

@@ -9,7 +9,7 @@ import ReactDOMServer from 'react-dom/server';
 import StaticRouter from 'react-router-dom/StaticRouter';
 
 import Dom from '../components/dom';
-import Forbidden from '../components/Forbidden.jsx';
+import Forbidden from '../components/Forbidden';
 import NotFound from '../components/NotFound';
 import PlatformApp from '../components/PlatformApp';
 import Redirect from '../components/Redirect';
@@ -119,9 +119,7 @@ const getRouterRenderer = ({
 	);
 
 	// prioritized status code fallbacks
-	const statusCode = Forbidden.rewind() ||
-		NotFound.rewind() ||
-		200;
+	const statusCode = Forbidden.rewind() || NotFound.rewind() || 200;
 
 	return {
 		statusCode,
