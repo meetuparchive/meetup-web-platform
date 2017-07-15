@@ -6,6 +6,7 @@ import config from './util/config';
 import logger from './util/logger';
 import requestAuthPlugin from './plugins/requestAuthPlugin';
 import activityPlugin from './plugins/tracking/activity';
+import languagePlugin from './plugins/language';
 import serviceWorkerPlugin from './plugins/service-worker';
 
 /**
@@ -103,7 +104,14 @@ function getServiceWorkerPlugin() {
 	};
 }
 
-export default function getPlugins() {
+function getLanguagePlugin(options) {
+	return {
+		register: languagePlugin,
+		options,
+	};
+}
+
+export default function getPlugins({ supportedLanguages }) {
 	const { platform_agent, isProd } = config;
 	return [
 		getLogger(),
@@ -111,6 +119,7 @@ export default function getPlugins() {
 		getRequestAuthPlugin(),
 		getActivityTrackingPlugin({ platform_agent, isProd }),
 		getServiceWorkerPlugin(),
+		getLanguagePlugin(),
 		Inert,
 	];
 }

@@ -176,14 +176,14 @@ const makeRenderer = (
 ) => (request: Object) => {
 	middleware = middleware || [];
 	const {
-		app: { localeCode, supportedLocaleCodes },
 		connection,
 		headers,
 		info,
 		url,
-		server,
+		server: { app: { logger }, settings: { app: { supportedLangs } } },
 		raw: { req },
 	} = request;
+	const requestLanguage = request.getLanguage();
 
 	// request protocol might be different from original request that hit proxy
 	// we want to use the proxy's protocol
@@ -208,8 +208,8 @@ const makeRenderer = (
 			apiUrl,
 			baseUrl: host,
 			enableServiceWorker,
-			localeCode,
-			supportedLocaleCodes,
+			requestLanguage,
+			supportedLangs,
 			initialNow: new Date().getTime(),
 		})
 	);
@@ -239,7 +239,7 @@ const makeRenderer = (
 		type: SERVER_RENDER,
 		payload: url,
 	};
-	server.app.logger.debug(
+	logger.debug(
 		{ type: 'dispatch', action, req },
 		`Dispatching RENDER for ${request.url.href}`
 	);
