@@ -111,7 +111,7 @@ function getLanguagePlugin(options) {
 	};
 }
 
-export default function getPlugins({ supportedLanguages }) {
+export default function getPlugins() {
 	const { platform_agent, isProd } = config;
 	return [
 		getLogger(),
