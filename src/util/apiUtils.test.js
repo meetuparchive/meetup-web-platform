@@ -573,6 +573,7 @@ describe('parseRequest', () => {
 			state: {
 				oauth_token: 'foo',
 			},
+			getLanguage: () => 'en-US',
 			server: getServer(),
 		};
 		expect(
@@ -588,6 +589,7 @@ describe('parseRequest', () => {
 			state: {
 				oauth_token: 'foo',
 			},
+			getLanguage: () => 'en-US',
 			server: getServer(),
 		};
 		expect(
@@ -603,6 +605,7 @@ describe('parseRequest', () => {
 			state: {
 				oauth_token: 'foo',
 			},
+			getLanguage: () => 'en-US',
 			server: getServer(),
 		};
 		expect(
