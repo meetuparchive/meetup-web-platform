@@ -1,8 +1,13 @@
+// @flow
 // Implicit dependency: tracking plugin providing request.trackApi method
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/zip';
 
-import { buildRequestArgs, makeApiRequest$, parseRequest } from './util';
+import {
+	buildRequestArgs,
+	makeApiRequest$,
+	getExternalRequestOpts,
+} from './util';
 
 /**
  * Given the current request and API server host, proxy the request to the API
@@ -24,7 +29,7 @@ import { buildRequestArgs, makeApiRequest$, parseRequest } from './util';
  * are formatted with properties from their corresponding query (ref, type).
  *
  * Most of the `options` for the `externalRequest` are shared for all the API
- * requests, so these are initialized in `parseRequest`. `buildRequestArgs`
+ * requests, so these are initialized in `getExternalRequestOpts`. `buildRequestArgs`
  * then curries those into a function that can accept a `query` to write the
  * query-specific options.
  *
@@ -36,14 +41,11 @@ import { buildRequestArgs, makeApiRequest$, parseRequest } from './util';
  */
 export default request => queries => {
 	// 1. get the queries and the 'universal' `externalRequestOpts` from the request
-	const parsedRequest = parseRequest(request);
-	queries = queries || parsedRequest.queries;
+	const externalRequestOpts = getExternalRequestOpts(request);
 
 	// 2. curry a function that uses `externalRequestOpts` as a base from which
 	// to build the query-specific API request options object
-	const queryToRequestOpts = buildRequestArgs(
-		parsedRequest.externalRequestOpts
-	);
+	const queryToRequestOpts = buildRequestArgs(externalRequestOpts);
 
 	// 3. map the queries onto an array of api request observables
 	const apiRequests$ = queries
@@ -52,7 +54,5 @@ export default request => queries => {
 		.map(makeApiRequest$(request));
 
 	// 4. zip them together to make requests in parallel and return responses in order
-	return Observable.zip(...apiRequests$).do(responses =>
-		request.trackApi(responses)
-	);
+	return Observable.zip(...apiRequests$).do(request.trackApi);
 };

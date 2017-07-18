@@ -2,13 +2,13 @@ import Inert from 'inert';
 import HapiPino from 'hapi-pino';
 import CsrfPlugin from 'electrode-csrf-jwt';
 
-import config from './util/config';
-import logger from './util/logger';
-import requestAuthPlugin from './plugins/requestAuthPlugin';
-import activityPlugin from './plugins/tracking/activity';
-import languagePlugin from './plugins/language';
-import serviceWorkerPlugin from './plugins/service-worker';
-import apiProxyPlugin from './plugins/api-proxy';
+import config from '../util/config';
+import logger from '../util/logger';
+import requestAuthPlugin from './requestAuthPlugin';
+import activityPlugin from './tracking/activity';
+import languagePlugin from './language';
+import serviceWorkerPlugin from './service-worker';
+import apiProxyPlugin from './api-proxy';
 
 /**
  * Hapi plugins for the dev server
