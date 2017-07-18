@@ -39,7 +39,7 @@ import {
  *   requests.
  * @return Array$ contains all API responses corresponding to the provided queries
  */
-export default request => queries => {
+export default (request: HapiRequest) => (queries: Array<Query>) => {
 	// 1. get the queries and the 'universal' `externalRequestOpts` from the request
 	const externalRequestOpts = getExternalRequestOpts(request);
 
