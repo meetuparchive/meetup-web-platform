@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import handler from './handler'; // import allows easier mocking in integration tests
 const validApiPayloadSchema = Joi.object({
 	queries: Joi.string().required(), // should be rison.encode_array-encoded
 	metadata: Joi.string(),
@@ -16,13 +17,7 @@ const getApiProxyRoutes = path => {
 	 */
 	const routeBase = {
 		path,
-		handler: (request, reply) => {
-			request.proxyApi$().subscribe(
-				responses =>
-					reply(JSON.stringify({ responses })).type('application/json'),
-				err => reply(err) // 500 error - will only be thrown on bad implementation
-			);
-		},
+		handler,
 		config: {
 			plugins: {
 				'electrode-csrf-jwt': {
