@@ -19,7 +19,7 @@ In general, application-specific code will live outside of this package.
 - [Auth flow from `requestAuthPlugin`](docs/auth.md)
 - [Analytics/tracking](docs/Tracking.md)
 - [Application state management](docs/State.md)
-- ['Query': structuring data dependencies](docs/Queries.md)
+- ['Query': structuring data requests](docs/Queries.md) - GET/POST/PATCH/DELETE requests to REST API
 - [Rendering in consumer applications](docs/Rendering.md)
 - [Caching - API and static assets](docs/Caching.md)
 
