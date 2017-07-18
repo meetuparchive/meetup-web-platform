@@ -1,14 +1,18 @@
-import url from 'url';
+// @flow
 
-const makeRedirect = originalUrl => redirectPathname =>
-	url.format({ ...originalUrl, pathname: redirectPathname });
-
-export default request => () => {
+/*
+ * create a function that, when called, will determine the desired
+ * language-prefixed path for the request. This can be used to redirect the
+ * request to the 'correct' URL.
+ * 
+ * If the current request.url.pathname is correct, it will be returned
+ * unmodified
+ */
+export default (request: HapiRequest) => (): string => {
 	const { supportedLangs } = request.server.settings.app;
 	const requestLanguage = request.getLanguage();
 	const originalPath = request.url.pathname;
 	const firstPathComponent = originalPath.split('/')[1];
-	const redirect = makeRedirect(request.url);
 	// first listed locale is default
 	if (requestLanguage === supportedLangs[0]) {
 		// ensure that we are serving from un-prefixed URL
@@ -17,7 +21,7 @@ export default request => () => {
 				['info'],
 				`Incorrect lang path prefix (${firstPathComponent}), redirecting`
 			);
-			return redirect(originalPath.replace(`/${firstPathComponent}`, ''));
+			return originalPath.replace(`/${firstPathComponent}`, '');
 		}
 	} else if (requestLanguage !== firstPathComponent) {
 		// must redirect either by correcting the lang prefix or inserting it
@@ -25,8 +29,7 @@ export default request => () => {
 			new RegExp(`^/(${supportedLangs.join('|')})/`),
 			'/'
 		);
-		const newPathname = `/${requestLanguage}${cleanOriginal}`;
-		return redirect(newPathname);
+		return `/${requestLanguage}${cleanOriginal}`;
 	}
-	return null;
+	return request.url.pathname;
 };

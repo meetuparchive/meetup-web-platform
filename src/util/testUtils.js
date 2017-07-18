@@ -66,7 +66,7 @@ export const getServer = () => {
 	);
 	server.decorate('request', 'trackApi', () => ({}));
 	server.decorate('request', 'trackSession', () => ({}));
-	server.decorate('request', 'getLanguageRedirect', () => {});
+	server.decorate('request', 'getPrefixedPath', () => {});
 	server.decorate('request', 'getLanguage', () => 'en-US');
 	server.logger = () => MOCK_LOGGER;
 	server.ext('onPreHandler', (request, reply) => {

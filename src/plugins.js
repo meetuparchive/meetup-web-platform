@@ -104,10 +104,9 @@ function getServiceWorkerPlugin() {
 	};
 }
 
-function getLanguagePlugin(options) {
+function getLanguagePlugin() {
 	return {
 		register: languagePlugin,
-		options,
 	};
 }
 

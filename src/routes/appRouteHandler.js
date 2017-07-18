@@ -1,7 +1,9 @@
+import url from 'url';
+
 export const getAppRouteHandler = renderRequestMap => (request, reply) => {
-	const redirect = request.getLanguageRedirect();
-	if (redirect) {
-		return reply.redirect(redirect);
+	const pathname = request.getPrefixedPath();
+	if (pathname !== request.url.pathname) {
+		return reply.redirect(url.format({ ...request.url, pathname }));
 	}
 	const requestLanguage = request.getLanguage();
 	const renderRequest = renderRequestMap[requestLanguage];

@@ -1,8 +1,17 @@
+// @flow
+
 import querystring from 'qs';
 import Accepts from 'accepts';
 
-export const getCookieLang = request => {
-	const { isProd, supportedLangs } = request.server.settings.app;
+type ParseRequestLang = HapiRequest => ?string | false;
+
+const getServerSettings = (request: HapiRequest) => request.server.settings.app;
+
+/*
+ * Get cookie-specified language using MEETUP_LANGUAGE cookie value
+ */
+export const getCookieLang: ParseRequestLang = (request: HapiRequest) => {
+	const { isProd, supportedLangs } = getServerSettings(request);
 	const LANGUAGE_COOKIE = isProd ? 'MEETUP_LANGUAGE' : 'MEETUP_LANGUAGE_DEV';
 
 	const cookie = request.state[LANGUAGE_COOKIE];
@@ -11,29 +20,23 @@ export const getCookieLang = request => {
 	}
 	const { language, country } = querystring.parse(cookie);
 	const cookieLang = country ? `${language}-${country}` : language;
-	if (supportedLangs) {
-		return supportedLangs.includes(cookieLang) && cookieLang;
-	}
-	return cookieLang;
+	return supportedLangs.includes(cookieLang) && cookieLang;
 };
 
-export const getUrlLang = request => {
-	const { supportedLangs } = request.server.settings.app;
+export const getUrlLang: ParseRequestLang = (request: HapiRequest) => {
+	const { supportedLangs } = getServerSettings(request);
 	const urlLang = request.url.path.split('/')[1];
 	return supportedLangs.includes(urlLang) && urlLang;
 };
 
-/**
- * @param {Object} request Hapi request from browser
- * @param {Array} supportedLangs a _sorted_ list of supported langs, with
- *   preferred languages first
- * @return {String|Boolean} language code
+/*
+ * Get browser-request language using accept-language header
  */
-export const getBrowserLang = request => {
-	const { supportedLangs } = request.server.settings.app;
+export const getBrowserLang: ParseRequestLang = (request: HapiRequest) => {
+	const { supportedLangs } = getServerSettings(request);
 	return Accepts(request).language(supportedLangs);
 };
 
-export default request => () =>
+export default (request: HapiRequest) => () =>
 	// return the first language hit in the order of preference
 	getCookieLang(request) || getUrlLang(request) || getBrowserLang(request);
