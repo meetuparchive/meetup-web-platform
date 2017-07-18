@@ -17,14 +17,15 @@ export default (request: HapiRequest) => (): string => {
 	if (requestLanguage === supportedLangs[0]) {
 		// ensure that we are serving from un-prefixed URL
 		if (supportedLangs.includes(firstPathComponent)) {
+			const prefixedPath = originalPath.replace(`/${firstPathComponent}`, '');
 			request.log(
 				['info'],
-				`Incorrect lang path prefix (${firstPathComponent}), redirecting`
+				`Unncessary lang path prefix (${firstPathComponent})`
 			);
-			return originalPath.replace(`/${firstPathComponent}`, '');
+			return prefixedPath;
 		}
 	} else if (requestLanguage !== firstPathComponent) {
-		// must redirect either by correcting the lang prefix or inserting it
+		// must correct/insert the correct lang prefix
 		const cleanOriginal = originalPath.replace(
 			new RegExp(`^/(${supportedLangs.join('|')})/`),
 			'/'
