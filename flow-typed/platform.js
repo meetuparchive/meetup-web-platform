@@ -2,6 +2,24 @@
 declare var Intl: Object;
 
 declare type Params = { [string]: string };
+declare type HapiRequestUrl = URL & {
+	path: string,
+};
+declare type HapiRequest = {
+	getLanguage: () => string,
+	getPrefixedPath: () => string,
+	log: (Array<string>, string) => void,
+	url: HapiRequestUrl,
+	server: {
+		settings: {
+			app: { isProd: boolean, supportedLangs: Array<string>, [string]: any },
+		},
+	},
+	state: {
+		[string]: string,
+	},
+	[string]: any,
+};
 
 declare type FluxStandardAction = {
 	type: string,

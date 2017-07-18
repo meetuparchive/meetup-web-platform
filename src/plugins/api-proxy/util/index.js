@@ -335,12 +335,12 @@ export function getAuthHeaders(request) {
 }
 
 export function getLanguageHeader(request) {
-	const cookieLang = request.getLanguage();
+	const requestLang = request.getLanguage();
 	const headerLang = request.headers['accept-language'];
 	const acceptLang =
-		cookieLang && headerLang
-			? `${cookieLang},${headerLang}`
-			: cookieLang || headerLang;
+		requestLang && headerLang
+			? `${requestLang},${headerLang}`
+			: requestLang || headerLang;
 	return acceptLang;
 }
 
