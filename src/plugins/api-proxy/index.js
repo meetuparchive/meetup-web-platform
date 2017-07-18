@@ -38,6 +38,7 @@ register.attributes = {
 	name: API_PROXY_PLUGIN_NAME,
 	version: '1.0.0',
 	dependencies: [
+		'requestAuth', // provides request.plugins.requestAuth.oauth_token
 		'tracking', // provides request.trackApi()
 		'electrode-csrf-jwt', // provides csrf protection for POST
 	],
