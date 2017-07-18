@@ -1,6 +1,7 @@
 import url from 'url';
 import getPrefixedPath from './getPrefixedPath';
 
+const rootPath = '/';
 const rootUrl = 'http://example.com/';
 const defaultLang = 'en-US';
 const similarToDefault = 'en-AU';
@@ -62,13 +63,13 @@ describe('redirect', () => {
 		testRedirect({
 			requestLang: defaultLang,
 			requestUrl: `${rootUrl}${defaultLang}/`,
-			expectedRedirect: rootUrl,
+			expectedRedirect: rootPath,
 		}));
 	it('calls redirect to root path when default lang requested on incorrect language path', () =>
 		testRedirect({
 			requestLang: defaultLang,
 			requestUrl: `${rootUrl}${altLang}/`,
-			expectedRedirect: rootUrl,
+			expectedRedirect: rootPath,
 		}));
 	it('calls redirect to requestLanguage path from incorrect language path', () => {
 		const requestLang = altLang;
@@ -76,7 +77,7 @@ describe('redirect', () => {
 			testRedirect({
 				requestLang,
 				requestUrl: `${rootUrl}${lang}/`,
-				expectedRedirect: `${rootUrl}${requestLang}/`,
+				expectedRedirect: `${rootPath}${requestLang}/`,
 			})
 		);
 	});
@@ -85,7 +86,7 @@ describe('redirect', () => {
 		testRedirect({
 			requestLang,
 			requestUrl: rootUrl,
-			expectedRedirect: `${rootUrl}${requestLang}/`,
+			expectedRedirect: `${rootPath}${requestLang}/`,
 		});
 	});
 	it('does not redirect if non-default language requested on correct language path', () => {
@@ -93,7 +94,7 @@ describe('redirect', () => {
 		testRedirect({
 			requestLang,
 			requestUrl: `${rootUrl}${requestLang}/`,
-			expectedRedirect: false,
+			expectedRedirect: `${rootPath}${requestLang}/`,
 		});
 	});
 	it('ignores unsupported language prefixes', () => {
@@ -101,7 +102,7 @@ describe('redirect', () => {
 		testRedirect({
 			requestLang,
 			requestUrl: `${rootUrl}${requestLang}/`,
-			expectedRedirect: false,
+			expectedRedirect: `${rootPath}${requestLang}/`,
 		});
 	});
 });

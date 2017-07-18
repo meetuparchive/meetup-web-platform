@@ -23,6 +23,9 @@ export const getCookieLang: ParseRequestLang = (request: HapiRequest) => {
 	return supportedLangs.includes(cookieLang) && cookieLang;
 };
 
+/*
+ * get the URL-specified language - check for existing language path prefixes
+ */
 export const getUrlLang: ParseRequestLang = (request: HapiRequest) => {
 	const { supportedLangs } = getServerSettings(request);
 	const urlLang = request.url.path.split('/')[1];
@@ -37,6 +40,10 @@ export const getBrowserLang: ParseRequestLang = (request: HapiRequest) => {
 	return Accepts(request).language(supportedLangs);
 };
 
+/*
+ * Get the language code determined from properties of the request (cookie,
+ * url, header)
+ */
 export default (request: HapiRequest) => () =>
 	// return the first language hit in the order of preference
 	getCookieLang(request) || getUrlLang(request) || getBrowserLang(request);
