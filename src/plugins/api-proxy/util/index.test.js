@@ -112,9 +112,7 @@ describe('injectResponseCookies', () => {
 	const request = {
 		plugins: {
 			requestAuth: {
-				reply: {
-					state() {},
-				},
+				setState() {},
 			},
 		},
 		server: getServer(),
@@ -139,7 +137,7 @@ describe('injectResponseCookies', () => {
 	});
 	it('sets the provided cookies on the reply state', () => {
 		const mockJar = externalRequest.jar();
-		spyOn(request.plugins.requestAuth.reply, 'state');
+		spyOn(request.plugins.apiProxy, 'setState');
 
 		// set up mock cookie jar with a dummy cookie for the response.request.uri
 		const key = 'foo';
@@ -147,7 +145,7 @@ describe('injectResponseCookies', () => {
 		mockJar.setCookie(`${key}=${value}`, responseObj.request.uri.href);
 
 		injectResponseCookies(request)([response, null, mockJar]);
-		expect(request.plugins.requestAuth.reply.state).toHaveBeenCalledWith(
+		expect(request.plugins.apiProxy.setState).toHaveBeenCalledWith(
 			key,
 			value,
 			jasmine.any(Object) // don't actually care about the cookie options

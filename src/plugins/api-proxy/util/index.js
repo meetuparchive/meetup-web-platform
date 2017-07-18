@@ -555,11 +555,7 @@ export const injectResponseCookies = request => ([response, _, jar]) => {
 			strictHeader: false, // Can't enforce RFC 6265 cookie validation on external services
 		};
 
-		request.plugins.requestAuth.reply.state(
-			cookie.key,
-			cookie.value,
-			cookieOptions
-		);
+		request.plugins.apiProxy.setState(cookie.key, cookie.value, cookieOptions);
 	});
 };
 
