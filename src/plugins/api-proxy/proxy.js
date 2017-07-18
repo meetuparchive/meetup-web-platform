@@ -32,14 +32,10 @@ import {
  * requests, so these are initialized in `getExternalRequestOpts`. `buildRequestArgs`
  * then curries those into a function that can accept a `query` to write the
  * query-specific options.
- *
- * @param {Request} request Hapi request object
- * @param {Array} queries (optional) queries to make requests for - used when
- *   the queries are not part of the original request, e.g. for initial render
- *   requests.
- * @return Array$ contains all API responses corresponding to the provided queries
  */
-export default (request: HapiRequest) => (queries: Array<Query>) => {
+export default (request: HapiRequest) => (
+	queries: Array<Query>
+): Observable<Array<QueryResponse>> => {
 	// 1. get the queries and the 'universal' `externalRequestOpts` from the request
 	const externalRequestOpts = getExternalRequestOpts(request);
 
@@ -54,5 +50,6 @@ export default (request: HapiRequest) => (queries: Array<Query>) => {
 		.map(makeApiRequest$(request));
 
 	// 4. zip them together to make requests in parallel and return responses in order
+	// $FlowFixMe - .zip is not currently defined in Observable static properties
 	return Observable.zip(...apiRequests$).do(request.trackApi);
 };
