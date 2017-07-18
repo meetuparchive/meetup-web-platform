@@ -9,20 +9,7 @@ import {
 	getExternalRequestOpts,
 } from './util';
 
-/**
- * Given the current request and API server host, proxy the request to the API
- * and return the responses corresponding to the provided queries.
- *
- * This module plugs in to any system that provides a `request` object with:
- * - headers
- * - method ('get'/'post')
- * - query string parameters parsed as a plain object (for GET requests)
- * - payload/body (for POST requests)
- *
- * @module ApiProxy
- */
-
-/**
+/*
  * This function transforms a single request to the application server into a
  * parallel array of requests to the API server, and then re-assembles the
  * API responses into an array of 'query responses' - i.e. API responses that
