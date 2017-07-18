@@ -1,5 +1,5 @@
 import url from 'url';
-import getLanguageRedirect from './redirect';
+import getPrefixedPath from './getPrefixedPath';
 
 const rootUrl = 'http://example.com/';
 const defaultLang = 'en-US';
@@ -27,7 +27,7 @@ const getMockRequest = override => {
 			state: {},
 			server: { settings: { app: { supportedLangs } } },
 			getLanguage: () => request.requestLang,
-			getLanguageRedirect: (...args) => getLanguageRedirect(request)(...args),
+			getPrefixedPath: (...args) => getPrefixedPath(request)(...args),
 		},
 		override
 	);
@@ -39,7 +39,7 @@ describe('redirect', () => {
 			url: url.parse(requestUrl),
 			requestLang,
 		});
-		return request.getLanguageRedirect();
+		return request.getPrefixedPath();
 	}
 	function expectRedirect(options) {
 		const actualRedirect = getRedirect(options);
