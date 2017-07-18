@@ -56,6 +56,11 @@ export const getServer = () => {
 		logger: MOCK_LOGGER,
 	};
 	server.settings.app = config;
+	server.plugins = {
+		'api-proxy': {
+			duotoneUrls: [],
+		},
+	};
 
 	// mock the anonAuthPlugin
 	server.decorate(

@@ -2,10 +2,10 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/toPromise';
 import rison from 'rison';
-import { getServer } from '../util/testUtils';
-import * as apiUtils from '../util/apiUtils';
+import { getServer } from '../../util/testUtils';
+import * as apiUtils from './util';
 import { mockQuery, MOCK_RENDERPROPS } from 'meetup-web-mocks/lib/app';
-import apiProxy$ from './api-proxy';
+import apiProxy$ from './proxy';
 
 describe('apiProxy$', () => {
 	const queries = [mockQuery(MOCK_RENDERPROPS), mockQuery(MOCK_RENDERPROPS)];
@@ -31,7 +31,7 @@ describe('apiProxy$', () => {
 			Observable.of(requestResult)
 		);
 		const expectedResults = [requestResult, requestResult];
-		return apiProxy$(getRequest)
+		return apiProxy$(getRequest)()
 			.toPromise()
 			.then(results => expect(results).toEqual(expectedResults));
 	});

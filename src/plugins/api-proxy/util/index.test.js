@@ -17,7 +17,7 @@ import {
 	MOCK_MEMBER,
 } from 'meetup-web-mocks/lib/api';
 
-import { getServer, MOCK_LOGGER } from '../util/testUtils';
+import { getServer, MOCK_LOGGER } from '../../../util/testUtils';
 
 import {
 	apiResponseToQueryResponse,
@@ -35,7 +35,7 @@ import {
 	parseVariantsHeader,
 	groupDuotoneSetter,
 	API_META_HEADER,
-} from './apiUtils';
+} from './index';
 
 describe('errorResponse$', () => {
 	it('returns the request url pathname as response.meta.endpoint', () => {

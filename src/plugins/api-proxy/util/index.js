@@ -597,7 +597,7 @@ export const injectResponseCookies = request => ([response, _, jar]) => {
  */
 export const makeApiRequest$ = request => {
 	const setApiResponseDuotones = apiResponseDuotoneSetter(
-		request.server.settings.app.duotone_urls
+		request.server.plugins['api-proxy'].duotoneUrls
 	);
 	return ([requestOpts, query]) => {
 		const request$ = query.mockResponse

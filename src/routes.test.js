@@ -1,6 +1,4 @@
-import rison from 'rison';
 import {
-	MOCK_API_RESULT,
 	MOCK_renderRequestMap,
 	MOCK_RENDER_RESULT,
 } from 'meetup-web-mocks/lib/app';
@@ -21,15 +19,4 @@ describe('routes', () => {
 		getResponse({ url: '/' }).then(response =>
 			expect(response.payload).toEqual(MOCK_RENDER_RESULT)
 		));
-	it('serves the api route', () => {
-		const validQuery = { type: 'a', ref: 'b', params: {} };
-		const queriesRison = rison.encode_array([validQuery]);
-		return getResponse({
-			url: `/mu_api?queries=${queriesRison}`,
-		}).then(response =>
-			expect(JSON.parse(response.payload)).toEqual({
-				responses: MOCK_API_RESULT,
-			})
-		);
-	});
 });

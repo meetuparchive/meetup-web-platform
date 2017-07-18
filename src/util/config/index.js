@@ -6,7 +6,6 @@ import chalk from 'chalk';
 import convict from 'convict';
 
 import buildConfig, { schema as buildSchema } from './build';
-import { duotones, getDuotoneUrls } from '../duotone';
 
 /**
  * This module provides a single source of truth for application configuration
@@ -102,9 +101,10 @@ export const config = convict({
 	app_server: {
 		protocol: {
 			format: validateProtocol,
-			default: process.env.NODE_ENV === 'production'
-				? 'http' // SSL handled by load balancer
-				: 'https',
+			default:
+				process.env.NODE_ENV === 'production'
+					? 'http' // SSL handled by load balancer
+					: 'https',
 			env: 'DEV_SERVER_PROTOCOL', // legacy naming
 		},
 		// host: '0.0.0.0', ALWAYS 0.0.0.0
@@ -145,10 +145,6 @@ export const config = convict({
 			format: String,
 			default: '',
 		},
-	},
-	duotone_urls: {
-		format: Object,
-		default: {},
 	},
 	cookie_encrypt_secret: {
 		format: validateCookieSecret,
@@ -209,11 +205,6 @@ config.load(localConfig);
 config.set(
 	'api.root_url',
 	`${config.get('api.protocol')}://${config.get('api.host')}`
-);
-
-config.set(
-	'duotone_urls',
-	getDuotoneUrls(duotones, config.get('photo_scaler_salt'))
 );
 
 config.set('isProd', config.get('env') === 'production');

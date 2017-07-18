@@ -89,7 +89,7 @@ export function getLogger(options = {}) {
 	};
 }
 
-function getActivityTrackingPlugin({ platform_agent, isProd }) {
+export function getActivityTrackingPlugin({ platform_agent, isProd }) {
 	return {
 		register: activityPlugin,
 		options: {
@@ -105,7 +105,7 @@ function getServiceWorkerPlugin() {
 	};
 }
 
-function getApiProxyPlugin() {
+export function getApiProxyPlugin() {
 	return {
 		register: apiProxyPlugin,
 	};
