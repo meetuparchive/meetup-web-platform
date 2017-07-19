@@ -5,8 +5,11 @@ import path from 'path';
 import chalk from 'chalk';
 import convict from 'convict';
 
-import buildConfig, { schema as buildSchema } from './build';
+import { env } from 'mwp-cli/src/config';
 import { duotones, getDuotoneUrls } from '../duotone';
+
+const envSchema = env.schema;
+const envConfig = env.properties;
 
 /**
  * This module provides a single source of truth for application configuration
@@ -98,13 +101,14 @@ export const validateServerHost = host => {
 };
 
 export const config = convict({
-	...buildSchema,
+	...envSchema,
 	app_server: {
 		protocol: {
 			format: validateProtocol,
-			default: process.env.NODE_ENV === 'production'
-				? 'http' // SSL handled by load balancer
-				: 'https',
+			default:
+				process.env.NODE_ENV === 'production'
+					? 'http' // SSL handled by load balancer
+					: 'https',
 			env: 'DEV_SERVER_PROTOCOL', // legacy naming
 		},
 		// host: '0.0.0.0', ALWAYS 0.0.0.0
@@ -194,7 +198,7 @@ export const config = convict({
 	},
 });
 
-config.load(buildConfig);
+config.load(envConfig);
 
 // Load environment dependent configuration
 const configPath = path.resolve(
