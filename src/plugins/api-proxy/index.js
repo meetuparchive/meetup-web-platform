@@ -7,9 +7,8 @@ const API_PROXY_PLUGIN_NAME = 'api-proxy';
 const API_ROUTE_PATH = '/mu_api';
 
 export const setPluginState = (request: HapiRequest, reply: HapiReply) => {
-	// Used for setting reply.state, not for replying to request
 	request.plugins.apiProxy = {
-		setState: reply.state,
+		setState: reply.state, // allow plugin to proxy cookies from API
 	};
 
 	return reply.continue();
@@ -20,6 +19,7 @@ export default function register(
 	options: { path?: string }, // optional api request pathname
 	next: () => void
 ) {
+	// supply duotone urls through `server.plugins['api-proxy'].duotoneUrls`
 	server.expose(
 		'duotoneUrls',
 		getDuotoneUrls(duotones, server.settings.app.photo_scaler_salt)
@@ -28,8 +28,9 @@ export default function register(
 
 	// add a method to the `request` object that can call REST API
 	server.decorate('request', 'proxyApi$', proxyApi$, { apply: true });
-	// add a route that will receive batched query requests
-	server.route(getApiProxyRoutes(options.path || API_ROUTE_PATH));
+	// add a route that will receive query requests
+	const routes = getApiProxyRoutes(options.path || API_ROUTE_PATH);
+	server.route(routes);
 
 	next();
 }

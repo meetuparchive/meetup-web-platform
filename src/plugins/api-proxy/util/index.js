@@ -361,9 +361,15 @@ export function parseRequestHeaders(request) {
 	return externalRequestHeaders;
 }
 
-/**
- * Parse request for queries and request options
- * @return {Object} { queries, externalRequestOpts }
+/*
+ * Translate the incoming Hapi request into an 'opts' object that can be used
+ * to call `request` for the REST API. This function essentially translates the
+ * app server request properties (headers, payload) into corresponding REST API
+ * request properties. The resulting value will be used as the _base_ set of
+ * options for _every_ parallel REST API request made by the platform
+ * corresponding to single incoming request.
+ * 
+ * @return {Object} externalRequestOpts
  */
 export function getExternalRequestOpts(request) {
 	const baseUrl = request.server.settings.app.api.root_url;
