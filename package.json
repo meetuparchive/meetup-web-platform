@@ -7,6 +7,11 @@
     "node": ">=7.0.0"
   },
   "main": "./lib/index.js",
+  "config": {
+    "description": "This config is used to mock a consumer app config",
+    "subdomain": "mwp-foo",
+    "agent": "MUP_WEB"
+  },
   "scripts": {
     "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps",
     "coveralls": "cat coverage/lcov.info | coveralls",
