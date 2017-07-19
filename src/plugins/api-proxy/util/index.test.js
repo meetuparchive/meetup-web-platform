@@ -9,17 +9,13 @@ import {
 	MOCK_RENDERPROPS_UTF8,
 } from 'meetup-web-mocks/lib/app';
 
-import {
-	MOCK_DUOTONE_URLS,
-	MOCK_GROUP,
-	MOCK_MEMBER,
-} from 'meetup-web-mocks/lib/api';
+import { MOCK_GROUP } from 'meetup-web-mocks/lib/api';
 
 import { getServer, MOCK_LOGGER } from '../../../util/testUtils';
 
+import { API_PROXY_PLUGIN_NAME } from '../';
 import {
 	apiResponseToQueryResponse,
-	apiResponseDuotoneSetter,
 	buildRequestArgs,
 	errorResponse$,
 	getAuthHeaders,
@@ -31,7 +27,6 @@ import {
 	parseApiValue,
 	parseMetaHeaders,
 	parseVariantsHeader,
-	groupDuotoneSetter,
 	API_META_HEADER,
 } from './index';
 
@@ -111,7 +106,7 @@ describe('getLanguageHeader', () => {
 describe('injectResponseCookies', () => {
 	const request = {
 		plugins: {
-			requestAuth: {
+			[API_PROXY_PLUGIN_NAME]: {
 				setState() {},
 			},
 		},
@@ -137,7 +132,8 @@ describe('injectResponseCookies', () => {
 	});
 	it('sets the provided cookies on the reply state', () => {
 		const mockJar = externalRequest.jar();
-		spyOn(request.plugins.apiProxy, 'setState');
+		console.log(request.plugins[API_PROXY_PLUGIN_NAME]);
+		spyOn(request.plugins[API_PROXY_PLUGIN_NAME], 'setState');
 
 		// set up mock cookie jar with a dummy cookie for the response.request.uri
 		const key = 'foo';
@@ -145,7 +141,9 @@ describe('injectResponseCookies', () => {
 		mockJar.setCookie(`${key}=${value}`, responseObj.request.uri.href);
 
 		injectResponseCookies(request)([response, null, mockJar]);
-		expect(request.plugins.apiProxy.setState).toHaveBeenCalledWith(
+		expect(
+			request.plugins[API_PROXY_PLUGIN_NAME].setState
+		).toHaveBeenCalledWith(
 			key,
 			value,
 			jasmine.any(Object) // don't actually care about the cookie options
@@ -400,84 +398,6 @@ describe('apiResponseToQueryResponse', () => {
 			expect(queryResponse).toEqual(jasmine.any(Object));
 			expect(queryResponse.ref).toEqual(refs[i]);
 		});
-	});
-});
-
-describe('groupDuotoneSetter', () => {
-	it('adds duotone url to group object', () => {
-		const group = { ...MOCK_GROUP };
-		const modifiedGroup = groupDuotoneSetter(MOCK_DUOTONE_URLS)(group);
-		const { duotoneUrl } = modifiedGroup;
-		const expectedUrl = MOCK_DUOTONE_URLS.dtaxb;
-		expect(duotoneUrl.startsWith(expectedUrl)).toBe(true);
-	});
-});
-
-describe('apiResponseDuotoneSetter', () => {
-	it('adds duotone url to type: "group" api response', () => {
-		const group = { ...MOCK_GROUP };
-		const { ref, type } = mockQuery({});
-		expect(group.duotoneUrl).toBeUndefined();
-		const groupApiResponse = {
-			ref,
-			type,
-			value: group,
-		};
-		const modifiedResponse = apiResponseDuotoneSetter(MOCK_DUOTONE_URLS)(
-			groupApiResponse
-		);
-		const { duotoneUrl } = modifiedResponse.value;
-		const expectedUrl = MOCK_DUOTONE_URLS.dtaxb;
-		expect(duotoneUrl.startsWith(expectedUrl)).toBe(true);
-	});
-	it('adds duotone url to type: "home" api response', () => {
-		// this is an awkward test because we have to mock the deeply-nested
-		// self/home endpoint and then look for a property deep inside it
-		const group = { ...MOCK_GROUP };
-		expect(group.duotoneUrl).toBeUndefined();
-		const homeApiResponse = {
-			ref: 'memberHome',
-			type: 'home',
-			value: {
-				rows: [
-					{
-						items: [
-							{
-								type: 'group',
-								group,
-							},
-						],
-					},
-				],
-			},
-		};
-		// run the function - rely on side effect in group
-		apiResponseDuotoneSetter(MOCK_DUOTONE_URLS)(homeApiResponse);
-		const expectedUrl = MOCK_DUOTONE_URLS.dtaxb;
-		expect(group.duotoneUrl.startsWith(expectedUrl)).toBe(true);
-	});
-	it("returns object unmodified when it doesn't need duotones", () => {
-		const member = { ...MOCK_MEMBER };
-		const memberResponse = {
-			ref: 'self',
-			type: 'member',
-			value: member,
-		};
-		apiResponseDuotoneSetter(MOCK_DUOTONE_URLS)(memberResponse);
-		expect(member).toEqual(MOCK_MEMBER);
-	});
-	it('returns object unmodified when it contains errors', () => {
-		const errorResponse = {
-			self: {
-				type: 'member',
-				value: {
-					error: new Error(),
-				},
-			},
-		};
-		const errorExpectedResponse = { ...errorResponse };
-		apiResponseDuotoneSetter(MOCK_DUOTONE_URLS)(errorResponse);
-		expect(errorResponse).toEqual(errorExpectedResponse);
 	});
 });
 

@@ -3,11 +3,11 @@ import { duotones, getDuotoneUrls } from './util/duotone';
 import getApiProxyRoutes from './routes';
 import proxyApi$ from './proxy';
 
-const API_PROXY_PLUGIN_NAME = 'api-proxy';
+export const API_PROXY_PLUGIN_NAME = 'api-proxy';
 const API_ROUTE_PATH = '/mu_api';
 
 export const setPluginState = (request: HapiRequest, reply: HapiReply) => {
-	request.plugins.apiProxy = {
+	request.plugins[API_PROXY_PLUGIN_NAME] = {
 		setState: reply.state, // allow plugin to proxy cookies from API
 	};
 

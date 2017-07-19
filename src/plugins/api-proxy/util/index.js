@@ -14,9 +14,10 @@ import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/timeout';
 
+import { API_PROXY_PLUGIN_NAME } from '../';
 import { coerceBool, toCamelCase } from './stringUtils';
 
-import { duotoneRef } from './duotone';
+import { apiResponseDuotoneSetter } from './duotone';
 
 export const API_META_HEADER = 'X-Meta-Request-Headers';
 
@@ -411,66 +412,6 @@ export function getExternalRequestOpts(request) {
 }
 
 /**
- * From a provided set of signed duotone URLs, create a function that injects
- * the full duotone URL into a group object with the key `duotoneUrl`.
- *
- * @param {Object} duotoneUrls map of `[duotoneRef]: url template root`
- * @param {Object} group group object from API
- * @return {Object} the mutated group object
- */
-export const groupDuotoneSetter = duotoneUrls => group => {
-	const photo = group.key_photo || {};
-	const duotoneKey =
-		group.photo_gradient &&
-		duotoneRef(
-			group.photo_gradient.light_color,
-			group.photo_gradient.dark_color
-		);
-	const duotoneUrlRoot = duotoneKey && duotoneUrls[duotoneKey];
-	if (duotoneUrlRoot && photo.id) {
-		group.duotoneUrl = `${duotoneUrlRoot}/${photo.id}.jpeg`;
-	}
-	return group;
-};
-
-/**
- * From a provided set of signed duotoneUrls, create a function that injects
- * the full duotone URL into an query response containing objects that support
- * duotoned images (anything containing group or event objects
- *
- * @param {Object} duotoneUrls map of `[duotoneRef]: url template root`
- * @param {Object} queryResponse { ref, type: <type>, value: <API object>, error? }
- * @return {Object} the modified queryResponse
- */
-export const apiResponseDuotoneSetter = duotoneUrls => {
-	const setGroupDuotone = groupDuotoneSetter(duotoneUrls);
-	return queryResponse => {
-		// inject duotone URLs into any group query response
-		const { type, value, error } = queryResponse;
-		if (!value || error) {
-			return queryResponse;
-		}
-		let groups;
-		switch (type) {
-			case 'group':
-				groups = value instanceof Array ? value : [value];
-				groups.forEach(setGroupDuotone);
-				break;
-			case 'home':
-				(value.rows || [])
-					.map(({ items }) => items)
-					.forEach(items =>
-						items
-							.filter(({ type }) => type === 'group')
-							.forEach(({ group }) => setGroupDuotone(group))
-					);
-				break;
-		}
-		return queryResponse;
-	};
-};
-
-/**
  * Fake an API request and directly return the stringified mockResponse
  */
 export const makeMockRequest = mockResponse => requestOpts =>
@@ -561,7 +502,11 @@ export const injectResponseCookies = request => ([response, _, jar]) => {
 			strictHeader: false, // Can't enforce RFC 6265 cookie validation on external services
 		};
 
-		request.plugins.apiProxy.setState(cookie.key, cookie.value, cookieOptions);
+		request.plugins[API_PROXY_PLUGIN_NAME].setState(
+			cookie.key,
+			cookie.value,
+			cookieOptions
+		);
 	});
 };
 
