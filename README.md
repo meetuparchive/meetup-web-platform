@@ -23,9 +23,10 @@ In general, application-specific code will live outside of this package.
 - [Rendering in consumer applications](docs/Rendering.md)
 - [Caching - API and static assets](docs/Caching.md)
 
-## Module docs
+## Public modules
 
 - [Routing module](router/README.md)
+- [Language plugin for Hapi](plugins/language/README.md)
 
 # Releases
 
