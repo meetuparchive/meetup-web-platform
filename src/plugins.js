@@ -1,8 +1,8 @@
 import Inert from 'inert';
 import HapiPino from 'hapi-pino';
 import CsrfPlugin from 'electrode-csrf-jwt';
+import config from 'mwp-cli/src/config';
 
-import config from './util/config';
 import logger from './util/logger';
 import requestAuthPlugin from './plugins/requestAuthPlugin';
 import activityPlugin from './plugins/tracking/activity';
@@ -87,11 +87,11 @@ export function getLogger(options = {}) {
 	};
 }
 
-function getActivityTrackingPlugin({ platform_agent, isProd }) {
+function getActivityTrackingPlugin({ agent, isProd }) {
 	return {
 		register: activityPlugin,
 		options: {
-			platform_agent,
+			agent,
 			isProd,
 		},
 	};
@@ -104,12 +104,12 @@ function getServiceWorkerPlugin() {
 }
 
 export default function getPlugins() {
-	const { platform_agent, isProd } = config;
+	const { package: { agent }, env: { properties: { isProd } } } = config;
 	return [
 		getLogger(),
 		getCsrfPlugin(),
 		getRequestAuthPlugin(),
-		getActivityTrackingPlugin({ platform_agent, isProd }),
+		getActivityTrackingPlugin({ agent, isProd }),
 		getServiceWorkerPlugin(),
 		Inert,
 	];

@@ -26,10 +26,7 @@ import { configureEnv, server } from './util/serverUtils';
  *   features in the additional routes
  * @return {Promise} the Promise returned by Hapi's `server.connection` method
  */
-export default function start(
-	renderRequestMap,
-	{ routes = [], plugins = [], platform_agent = 'consumer_name' }
-) {
+export default function start(renderRequestMap, { routes = [], plugins = [] }) {
 	// source maps make for better stack traces
 	// we might not want this in production if it makes anything slower
 	require('source-map-support').install();
@@ -62,11 +59,5 @@ export default function start(
 
 	const finalPlugins = [...plugins, ...getPlugins()];
 
-	return server(
-		finalRoutes,
-		connection,
-		finalPlugins,
-		platform_agent,
-		appConfig
-	);
+	return server(finalRoutes, connection, finalPlugins, appConfig);
 }
