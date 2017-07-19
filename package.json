@@ -7,6 +7,11 @@
     "node": ">=7.0.0"
   },
   "main": "./lib/index.js",
+  "config": {
+    "description": "This config is used to mock a consumer app config",
+    "subdomain": "mwp-foo",
+    "agent": "MUP_WEB"
+  },
   "scripts": {
     "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps",
     "coveralls": "cat coverage/lcov.info | coveralls",
@@ -61,7 +66,7 @@
     "uuid": "3.1.0"
   },
   "peerDependencies": {
-    "mwp-cli": "^1.0.92"
+    "mwp-cli": "^1.0.101"
   },
   "devDependencies": {
     "babel-cli": "6.24.1",
@@ -84,7 +89,7 @@
     "jest": "20.0.4",
     "lint-staged": "4.0.1",
     "meetup-web-mocks": "1.0.194",
-    "mwp-cli": "1.0.92",
+    "mwp-cli": "1.0.101",
     "prettier": "1.5.2",
     "react": "15.6.1",
     "react-helmet": "5.1.3",
