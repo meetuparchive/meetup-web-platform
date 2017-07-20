@@ -23,10 +23,13 @@ export default (request: HapiRequest) => {
 	const setApiResponseDuotones = apiResponseDuotoneSetter(
 		request.server.plugins[API_PROXY_PLUGIN_NAME].duotoneUrls
 	);
-	const send$ = makeSend$(request);
-	const receive = makeReceive(request);
-
 	return (queries: Array<Query>): Observable<Array<QueryResponse>> => {
+		// send$ and receive$ can only be initialized once queries have been parsed
+		// because request.state has not been initialized when the outer function
+		// is called by server.decorate
+		const send$ = makeSend$(request);
+		const receive = makeReceive(request);
+
 		const apiRequests$ = queries.map(query =>
 			send$(query).map(receive(query)).map(setApiResponseDuotones)
 		);
