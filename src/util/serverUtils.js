@@ -136,7 +136,7 @@ export function configureEnv(config) {
 /**
  * server-starting function
  */
-export function server(routes, connection, plugins, platform_agent, config) {
+export function server(routes, connection, plugins, config) {
 	const server = new Hapi.Server();
 
 	// store runtime state - must modify existing server.settings.app in order to keep

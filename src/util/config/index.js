@@ -5,7 +5,10 @@ import path from 'path';
 import chalk from 'chalk';
 import convict from 'convict';
 
-import buildConfig, { schema as buildSchema } from './build';
+import { env } from 'mwp-cli/src/config';
+
+const envSchema = env.schema;
+const envConfig = env.properties;
 
 /**
  * This module provides a single source of truth for application configuration
@@ -97,7 +100,7 @@ export const validateServerHost = host => {
 };
 
 export const config = convict({
-	...buildSchema,
+	...envSchema,
 	app_server: {
 		protocol: {
 			format: validateProtocol,
@@ -190,7 +193,7 @@ export const config = convict({
 	},
 });
 
-config.load(buildConfig);
+config.load(envConfig);
 
 // Load environment dependent configuration
 const configPath = path.resolve(

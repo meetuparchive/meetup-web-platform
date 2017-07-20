@@ -19,7 +19,6 @@ describe('server', () => {
 				jasmine.any(Array), // routes
 				jasmine.any(Object), // connection
 				jasmine.any(Array), // plugins
-				jasmine.any(String), // platform_agent
 				jasmine.any(Object), // config
 			]);
 			expect(callArgs[0].indexOf(fooRoute)).toBeGreaterThan(-1);

@@ -184,10 +184,12 @@ class GroupContainer extends React.Component {
 
 ## Tracking
 
-When starting the server, applications provide a `platform_agent` identifier,
-e.g. `'mup-web'` that is used to tag all of the automatically-generated
-tracking data produced by platform-related activity, including data requests,
-and browser sessions.
+Activity tracking happens on every HTTP request, and is tagged with
+
+```
+platform: 'WEB',
+platform_agent: <read from package.json:config.agent>
+```
 
 The platform also tracks clicks similar to Meetup classic.
 
