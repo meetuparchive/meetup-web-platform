@@ -3,11 +3,10 @@
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/zip';
 
-import {
-	buildRequestArgs,
-	makeApiRequest$,
-	getExternalRequestOpts,
-} from './util';
+import { API_PROXY_PLUGIN_NAME } from './';
+import { apiResponseDuotoneSetter } from './util/duotone';
+import { makeSend$ } from './util/send';
+import { makeReceive } from './util/receive';
 
 /*
  * This function transforms a single request to the application server into a
@@ -20,23 +19,19 @@ import {
  * then curries those into a function that can accept a `query` to write the
  * query-specific options.
  */
-export default (request: HapiRequest) => (
-	queries: Array<Query>
-): Observable<Array<QueryResponse>> => {
-	// 1. get the queries and the 'universal' `externalRequestOpts` from the request
-	const externalRequestOpts = getExternalRequestOpts(request);
+export default (request: HapiRequest) => {
+	const setApiResponseDuotones = apiResponseDuotoneSetter(
+		request.server.plugins[API_PROXY_PLUGIN_NAME].duotoneUrls
+	);
+	const send$ = makeSend$(request);
+	const receive = makeReceive(request);
 
-	// 2. curry a function that uses `externalRequestOpts` as a base from which
-	// to build the query-specific API request options object
-	const queryToRequestOpts = buildRequestArgs(externalRequestOpts);
-
-	// 3. map the queries onto an array of api request observables
-	const apiRequests$ = queries
-		.map(queryToRequestOpts)
-		.map((opts, i) => [opts, queries[i]]) // zip the query back into the opts
-		.map(makeApiRequest$(request));
-
-	// 4. zip them together to make requests in parallel and return responses in order
-	// $FlowFixMe - .zip is not currently defined in Observable static properties
-	return Observable.zip(...apiRequests$).do(request.trackApi);
+	return (queries: Array<Query>): Observable<Array<QueryResponse>> => {
+		const apiRequests$ = queries.map(query =>
+			send$(query).map(receive(query)).map(setApiResponseDuotones)
+		);
+		// 4. zip them together to make requests in parallel and return responses in order
+		// $FlowFixMe - .zip is not currently defined in Observable static properties
+		return Observable.zip(...apiRequests$).do(request.trackApi);
+	};
 };

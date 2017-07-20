@@ -14,15 +14,7 @@ import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/timeout';
 
-import { API_PROXY_PLUGIN_NAME } from '../';
-import { coerceBool, toCamelCase } from './stringUtils';
-
-import { apiResponseDuotoneSetter } from './duotone';
-
 export const API_META_HEADER = 'X-Meta-Request-Headers';
-
-// match escpaed unicode characters that are treated as newline literals in JS
-const ESCAPED_UNICODE_NEWLINES = /\\u2028|\\u2029/g;
 
 const MOCK_RESPONSE_OK = {
 	// minimal representation of http.IncomingMessage
@@ -47,25 +39,6 @@ function makeMockResponseOk(requestOpts) {
 }
 
 /**
- * Convert the X-Meetup-Variants response header into a state-ready object
- *
- * @see {@link https://meetup.atlassian.net/wiki/display/MUP/X-Meetup-Variants}
- * @returns {Object} {
- *   [experiment]: {
- *     [context (member/chapter id)]: variantName
- *   }
- * }
- */
-export const parseVariantsHeader = variantsHeader =>
-	variantsHeader.split(' ').reduce((variants, keyval) => {
-		const [experiment, val] = keyval.split('=');
-		variants[experiment] = variants[experiment] || {};
-		const [context, variant] = val.split('|');
-		variants[experiment][context] = variant || null;
-		return variants;
-	}, {});
-
-/**
  * In order to receive cookies from `externalRequest` requests, this function
  * provides a cookie jar that is specific to the request.
  *
@@ -82,135 +55,6 @@ export const createCookieJar = requestUrl => {
 		return externalRequest.jar(); // create request/url-specific cookie jar
 	}
 	return null;
-};
-
-const X_HEADERS = ['x-total-count'];
-
-export const parseMetaHeaders = headers => {
-	const meetupHeaders = Object.keys(headers)
-		.filter(h => h.startsWith('x-meetup-'))
-		.reduce((meta, h) => {
-			const key = toCamelCase(h.replace('x-meetup-', ''));
-			meta[key] = headers[h];
-			return meta;
-		}, {});
-
-	// special case handling for flags
-	if (meetupHeaders.flags) {
-		meetupHeaders.flags = querystring.parse(meetupHeaders.flags, {
-			delimiter: ', ',
-			decoder: coerceBool,
-		});
-	}
-
-	// special case handling for variants
-	if (meetupHeaders.variants) {
-		meetupHeaders.variants = parseVariantsHeader(meetupHeaders.variants);
-	}
-
-	const xHeaders = X_HEADERS.reduce((meta, h) => {
-		const key = toCamelCase(h.replace('x-', ''));
-		if (h in headers) {
-			meta[key] = headers[h];
-		}
-		return meta;
-	}, {});
-
-	const linkHeader =
-		headers.link &&
-		headers.link.split(',').reduce((links, link) => {
-			const [urlString, relString] = link.split(';');
-			const url = urlString.replace(/<|>/g, '').trim();
-			var rel = relString.replace(/rel="([^"]+)"/, '$1').trim();
-			links[rel] = url;
-			return links;
-		}, {});
-	const meta = {
-		...meetupHeaders,
-		...xHeaders,
-	};
-
-	if (linkHeader) {
-		meta.link = linkHeader;
-	}
-	return meta;
-};
-
-/**
- * Accept an Error and return an object that will be used in place of the
- * expected API return value
- * @param {Error} err the error to populate
- * @return {Object} { value, error? }
- */
-function formatApiError(err) {
-	return {
-		value: null,
-		error: err.message,
-	};
-}
-
-export const errorResponse$ = requestUrl => err =>
-	Observable.of({
-		...formatApiError(err),
-		meta: {
-			endpoint: url.parse(requestUrl).pathname,
-		},
-	});
-
-/**
- * @return {Object} { value, error? }
- */
-export const parseApiValue = ([response, body]) => {
-	// treat non-success HTTP code as an error
-	if (response.statusCode < 200 || response.statusCode > 299) {
-		return formatApiError(new Error(response.statusMessage));
-	}
-	try {
-		if (response.statusCode === 204) {
-			// NoContent response type
-			return { value: null };
-		}
-
-		// Some newline literals will not work in JS string literals - they must be
-		// converted to an escaped newline character that will work end to end ('\n')
-		const safeBody = body.replace(ESCAPED_UNICODE_NEWLINES, '\\n');
-		const value = JSON.parse(safeBody);
-		if (value && value.problem) {
-			return formatApiError(
-				new Error(`API problem: ${value.problem}: ${value.details}`)
-			);
-		}
-		return { value };
-	} catch (err) {
-		return formatApiError(err);
-	}
-};
-
-/**
- *
- * mostly error handling - any case where the API does not satisfy the
- * "api response" formatting requirement: plain object containing the requested
- * values
- *
- * This utility is specific to the response format of the API being consumed
- * @param {Array} the callback args for npm request - [response, body], where
- * `response` is an `Http.IncomingMessage` and `body` is the body text of the
- * response.
- * @return responseObj the JSON-parsed text, possibly with error info
- */
-export const parseApiResponse = requestUrl => ([response, body]) => {
-	const { value, error } = parseApiValue([response, body]);
-	const meta = {
-		...parseMetaHeaders(response.headers),
-		endpoint: url.parse(requestUrl).pathname,
-		statusCode: response.statusCode,
-	};
-
-	return {
-		value,
-		error,
-		meta,
-	};
 };
 
 /**
@@ -291,23 +135,6 @@ export const buildRequestArgs = externalRequestOpts => ({
 
 	return externalRequestOptsQuery;
 };
-
-/**
- * Format apiResponse to match expected state structure
- *
- * @param {Object} apiResponse JSON-parsed api response data
- */
-export const apiResponseToQueryResponse = query => ({
-	value,
-	error,
-	meta,
-}) => ({
-	type: query.type,
-	ref: query.ref,
-	value,
-	error,
-	meta,
-});
 
 export function getAuthHeaders(request) {
 	const oauth_token =
@@ -446,79 +273,20 @@ export const makeExternalApiRequest = request => requestOpts => {
 		.map(([response, body]) => [response, body, requestOpts.jar]);
 };
 
-export const logApiResponse = request => ([response, body]) => {
-	const {
-		elapsedTime,
-		request: { id, uri: { query, pathname, href }, method },
-		statusCode,
-	} = response;
-
-	const logger = request.server.app.logger;
-	// production logs will automatically be JSON-parsed in Stackdriver
-	const log = ((statusCode >= 400 && logger.error) ||
-		(statusCode >= 300 && logger.warn) ||
-		logger.info)
-		.bind(logger);
-
-	log(
-		{
-			type: 'response',
-			direction: 'in',
-			info: {
-				url: href,
-				query: (query || '').split('&').reduce((acc, keyval) => {
-					const [key, val] = keyval.split('=');
-					acc[key] = val;
-					return acc;
-				}, {}),
-				method,
-				id,
-				originRequestId: request.id,
-				statusCode: statusCode,
-				time: elapsedTime,
-				body: body.length > 256 ? `${body.substr(0, 256)}...` : body,
-			},
-		},
-		`Incoming response ${method.toUpperCase()} ${pathname} ${response.statusCode}`
-	);
-};
-
-/**
- * When a tough-cookie cookie jar is provided, forward the cookies along with
- * the overall /api response back to the client
- */
-export const injectResponseCookies = request => ([response, _, jar]) => {
-	if (!jar) {
-		return;
-	}
-	const requestUrl = response.toJSON().request.uri.href;
-	jar.getCookies(requestUrl).forEach(cookie => {
-		const cookieOptions = {
-			domain: cookie.domain,
-			path: cookie.path,
-			isHttpOnly: cookie.httpOnly,
-			isSameSite: false,
-			isSecure: request.server.settings.app.isProd,
-			strictHeader: false, // Can't enforce RFC 6265 cookie validation on external services
-		};
-
-		request.plugins[API_PROXY_PLUGIN_NAME].setState(
-			cookie.key,
-			cookie.value,
-			cookieOptions
-		);
-	});
-};
-
 /**
  * Make an API request and parse the response into the expected `response`
  * object shape
  */
-export const makeApiRequest$ = request => {
-	const setApiResponseDuotones = apiResponseDuotoneSetter(
-		request.server.plugins['api-proxy'].duotoneUrls
-	);
-	return ([requestOpts, query]) => {
+export const makeSend$ = request => {
+	// 1. get the queries and the 'universal' `externalRequestOpts` from the request
+	const externalRequestOpts = getExternalRequestOpts(request);
+
+	// 2. curry a function that uses `externalRequestOpts` as a base from which
+	// to build the query-specific API request options object
+	const queryToRequestOpts = buildRequestArgs(externalRequestOpts);
+
+	return query => {
+		const requestOpts = queryToRequestOpts(query);
 		const request$ = query.mockResponse
 			? makeMockRequest(query.mockResponse)
 			: makeExternalApiRequest(request);
@@ -540,13 +308,7 @@ export const makeApiRequest$ = request => {
 				`Outgoing request ${requestOpts.method.toUpperCase()} ${parsedUrl.pathname}`
 			);
 
-			return request$(requestOpts)
-				.do(logApiResponse(request)) // this will leak private info in API response
-				.do(injectResponseCookies(request))
-				.map(parseApiResponse(requestOpts.url)) // parse into plain object
-				.catch(errorResponse$(requestOpts.url))
-				.map(apiResponseToQueryResponse(query)) // convert apiResponse to app-ready queryResponse
-				.map(setApiResponseDuotones); // special duotone prop
+			return request$(requestOpts);
 		});
 	};
 };

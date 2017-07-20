@@ -14,6 +14,9 @@ declare type HapiRequest = {
 		settings: {
 			app: { isProd: boolean, supportedLangs: Array<string>, [string]: any },
 		},
+		plugins: {
+			[string]: any,
+		},
 	},
 	state: {
 		[string]: string,
