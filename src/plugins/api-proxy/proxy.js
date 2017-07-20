@@ -14,10 +14,8 @@ import { makeReceive } from './util/receive';
  * API responses into an array of 'query responses' - i.e. API responses that
  * are formatted with properties from their corresponding query (ref, type).
  *
- * Most of the `options` for the `externalRequest` are shared for all the API
- * requests, so these are initialized in `getExternalRequestOpts`. `buildRequestArgs`
- * then curries those into a function that can accept a `query` to write the
- * query-specific options.
+ * The logic for sending the requests is in './util/send' and the logic for
+ * receiving the responses is in './util/receive'
  */
 export default (request: HapiRequest) => {
 	const setApiResponseDuotones = apiResponseDuotoneSetter(
@@ -30,10 +28,12 @@ export default (request: HapiRequest) => {
 		const send$ = makeSend$(request);
 		const receive = makeReceive(request);
 
+		// create an array of in-flight API request Observables
 		const apiRequests$ = queries.map(query =>
 			send$(query).map(receive(query)).map(setApiResponseDuotones)
 		);
-		// 4. zip them together to make requests in parallel and return responses in order
+
+		// zip them together to make requests in parallel and return responses in order
 		// $FlowFixMe - .zip is not currently defined in Observable static properties
 		return Observable.zip(...apiRequests$).do(request.trackApi);
 	};

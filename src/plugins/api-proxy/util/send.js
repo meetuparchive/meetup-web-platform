@@ -273,16 +273,35 @@ export const makeExternalApiRequest = request => requestOpts => {
 		.map(([response, body]) => [response, body, requestOpts.jar]);
 };
 
-/**
+const logOutgoingRequest = (request, requestOpts) => {
+	const { method, headers } = requestOpts;
+
+	const parsedUrl = url.parse(requestOpts.url);
+	request.server.app.logger.info(
+		{
+			type: 'request',
+			direction: 'out',
+			info: {
+				headers,
+				url: parsedUrl,
+				method,
+			},
+		},
+		`Outgoing request ${requestOpts.method.toUpperCase()} ${parsedUrl.pathname}`
+	);
+};
+
+/*
  * Make an API request and parse the response into the expected `response`
  * object shape
  */
 export const makeSend$ = request => {
-	// 1. get the queries and the 'universal' `externalRequestOpts` from the request
+	// 1. get the queries and the shared `externalRequestOpts` from the request
+	//    that will be applied to all queries
 	const externalRequestOpts = getExternalRequestOpts(request);
 
-	// 2. curry a function that uses `externalRequestOpts` as a base from which
-	// to build the query-specific API request options object
+	// 2. create a function that uses `externalRequestOpts` as a base from which
+	//    to build query-specific API request options objects
 	const queryToRequestOpts = buildRequestArgs(externalRequestOpts);
 
 	return query => {
@@ -292,22 +311,7 @@ export const makeSend$ = request => {
 			: makeExternalApiRequest(request);
 
 		return Observable.defer(() => {
-			const { method, headers } = requestOpts;
-
-			const parsedUrl = url.parse(requestOpts.url);
-			request.server.app.logger.info(
-				{
-					type: 'request',
-					direction: 'out',
-					info: {
-						headers,
-						url: parsedUrl,
-						method,
-					},
-				},
-				`Outgoing request ${requestOpts.method.toUpperCase()} ${parsedUrl.pathname}`
-			);
-
+			logOutgoingRequest(request, requestOpts);
 			return request$(requestOpts);
 		});
 	};
