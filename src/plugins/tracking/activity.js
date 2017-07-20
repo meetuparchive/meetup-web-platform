@@ -21,7 +21,7 @@ export const ACTIVITY_PLUGIN_NAME = 'tracking';
  */
 
 export const getLogger: string => (Object, Object) => mixed = (
-	platform_agent: string
+	agent: string
 ) => (request: Object, trackInfo: Object) => {
 	const requestHeaders = request.headers;
 	const now: Date = new Date();
@@ -30,8 +30,8 @@ export const getLogger: string => (Object, Object) => mixed = (
 		requestId: request.id,
 		ip: requestHeaders['remote-addr'] || '',
 		agent: requestHeaders['user-agent'] || '',
-		platform: 'mup-web',
-		platformAgent: 'WEB', // TODO: set this more accurately, using allowed values from avro schema
+		platform: 'WEB',
+		platformAgent: agent,
 		mobileWeb: false,
 		referer: '', // misspelled to align with schema
 		trax: {},
@@ -50,13 +50,13 @@ export const getLogger: string => (Object, Object) => mixed = (
  * the target `request` method name
  */
 export function getTrackers(options: {
-	platform_agent: string,
+	agent: string,
 	trackIdCookieName: string,
 	sessionIdCookieName: string,
 }): { [string]: Tracker } {
-	const { platform_agent, trackIdCookieName, sessionIdCookieName } = options;
+	const { agent, trackIdCookieName, sessionIdCookieName } = options;
 
-	const log: Logger = getLogger(platform_agent);
+	const log: Logger = getLogger(agent);
 	const trackOpts: TrackOpts = {
 		log,
 		trackIdCookieName,
@@ -112,16 +112,16 @@ const getOnPreResponse = cookieConfig => (request, reply) => {
  */
 export default function register(
 	server: Object,
-	options: { platform_agent: string, isProd: boolean },
+	options: { agent: string, isProd: boolean },
 	next: () => void
 ) {
-	const { platform_agent, isProd } = options;
+	const { agent, isProd } = options;
 
 	const sessionIdCookieName: string = isProd ? 'SESSION_ID' : 'SESSION_ID_DEV';
 	const trackIdCookieName: string = isProd ? 'TRACK_ID' : 'TRACK_ID_DEV';
 
 	const trackers: { [string]: Tracker } = getTrackers({
-		platform_agent: platform_agent,
+		agent,
 		trackIdCookieName,
 		sessionIdCookieName,
 	});
