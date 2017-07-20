@@ -9,7 +9,8 @@ cache:
 
 branches:
   only:
-    - master  # (PRs to master, master merges, master pushes)
+    - master # (PRs to master, master merges, master pushes)
+    - next # consolidating branch for breaking changes - need to build PRs
 
 env:
   global:
