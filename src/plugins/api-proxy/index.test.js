@@ -10,12 +10,9 @@ import { getServer } from '../../util/testUtils';
 function getResponse(injectRequest, server = getServer()) {
 	// a Promise that returns the server instance after it has been
 	// configured with the routes being tested
-	server.register([
-		getRequestAuthPlugin(),
-		getCsrfPlugin(),
-		getApiProxyPlugin(),
-	]);
-	return server.inject(injectRequest);
+	return server
+		.register([getRequestAuthPlugin(), getCsrfPlugin(), getApiProxyPlugin()])
+		.then(() => server.inject(injectRequest));
 }
 describe('api proxy plugin', () => {
 	it('serves api responses from the configured route path', () => {
