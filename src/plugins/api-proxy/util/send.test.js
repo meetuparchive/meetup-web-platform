@@ -171,33 +171,6 @@ describe('buildRequestArgs', () => {
 });
 
 describe('getExternalRequestOpts', () => {});
-// Mock the request module with a an empty response delayed by 200ms
-jest.mock('request', () => {
-	const mock = jest.fn((requestOpts, cb) =>
-		setTimeout(
-			() =>
-				cb(
-					null,
-					{
-						headers: {},
-						statusCode: 200,
-						elapsedTime: 1234,
-						request: {
-							uri: {
-								query: 'foo=bar',
-								pathname: '/foo',
-							},
-							method: 'get',
-						},
-					},
-					'{}'
-				),
-			2
-		)
-	);
-	mock.jar = jest.fn(() => 'myMockJar');
-	return mock;
-});
 
 describe('createCookieJar', () => {
 	it('returns a cookie jar for /sessions endpoint', () => {
