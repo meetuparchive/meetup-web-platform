@@ -16,7 +16,6 @@ import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/timeout';
 
-import { getCookieLang } from './languageUtils';
 import { coerceBool, toCamelCase } from './stringUtils';
 
 import { querySchema } from './validation';
@@ -336,12 +335,12 @@ export function getAuthHeaders(request) {
 }
 
 export function getLanguageHeader(request) {
-	const cookieLang = getCookieLang(request);
+	const requestLang = request.getLanguage();
 	const headerLang = request.headers['accept-language'];
 	const acceptLang =
-		cookieLang && headerLang
-			? `${cookieLang},${headerLang}`
-			: cookieLang || headerLang;
+		requestLang && headerLang
+			? `${requestLang},${headerLang}`
+			: requestLang || headerLang;
 	return acceptLang;
 }
 

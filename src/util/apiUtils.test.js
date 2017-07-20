@@ -18,7 +18,6 @@ import {
 } from 'meetup-web-mocks/lib/api';
 
 import { getServer, MOCK_LOGGER } from '../util/testUtils';
-import { LANGUAGE_COOKIE } from './cookieUtils';
 
 import {
 	apiResponseToQueryResponse,
@@ -84,18 +83,20 @@ describe('getAuthHeaders', () => {
 });
 
 describe('getLanguageHeader', () => {
-	it('returns accept-language containing parsed MEMBER_LANGUAGE cookie', () => {
+	it('returns accept-language containing request.getLanguage()', () => {
+		const requestLang = 'fr-FR';
 		const request = {
 			headers: {},
-			state: { [LANGUAGE_COOKIE]: 'language=fr&country=FR' },
+			getLanguage: () => requestLang,
 		};
-		expect(getLanguageHeader(request)).toEqual('fr-FR');
+		expect(getLanguageHeader(request)).toEqual(requestLang);
 	});
 	it('prepends parsed MEMBER_LANGUAGE cookie on existing accepts-langauge', () => {
 		const headerLang = 'foo';
+		const requestLang = 'fr-FR';
 		const request = {
 			headers: { 'accept-language': headerLang },
-			state: { [LANGUAGE_COOKIE]: 'language=fr&country=FR' },
+			getLanguage: () => requestLang,
 		};
 		expect(getLanguageHeader(request)).toEqual(`fr-FR,${headerLang}`);
 	});
@@ -103,7 +104,7 @@ describe('getLanguageHeader', () => {
 		const headerLang = 'foo';
 		const request = {
 			headers: { 'accept-language': headerLang },
-			state: {},
+			getLanguage: () => {},
 		};
 		expect(getLanguageHeader(request)).toEqual(headerLang);
 	});
@@ -572,6 +573,7 @@ describe('parseRequest', () => {
 			state: {
 				oauth_token: 'foo',
 			},
+			getLanguage: () => 'en-US',
 			server: getServer(),
 		};
 		expect(
@@ -587,6 +589,7 @@ describe('parseRequest', () => {
 			state: {
 				oauth_token: 'foo',
 			},
+			getLanguage: () => 'en-US',
 			server: getServer(),
 		};
 		expect(
@@ -602,6 +605,7 @@ describe('parseRequest', () => {
 			state: {
 				oauth_token: 'foo',
 			},
+			getLanguage: () => 'en-US',
 			server: getServer(),
 		};
 		expect(

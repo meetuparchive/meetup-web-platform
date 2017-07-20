@@ -59,5 +59,6 @@ export default function start(renderRequestMap, { routes = [], plugins = [] }) {
 
 	const finalPlugins = [...plugins, ...getPlugins()];
 
+	appConfig.supportedLangs = Object.keys(renderRequestMap);
 	return server(finalRoutes, connection, finalPlugins, appConfig);
 }

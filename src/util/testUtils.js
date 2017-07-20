@@ -37,9 +37,10 @@ export const middlewareDispatcher = middleware => (storeData, action) => {
 };
 
 export const parseCookieHeader = cookieHeader => {
-	const cookies = cookieHeader instanceof Array
-		? cookieHeader.map(Cookie.parse)
-		: [Cookie.parse(cookieHeader)];
+	const cookies =
+		cookieHeader instanceof Array
+			? cookieHeader.map(Cookie.parse)
+			: [Cookie.parse(cookieHeader)];
 
 	return cookies.reduce(
 		(acc, cookie) => ({ ...acc, [cookie.key]: cookie.value }),
@@ -48,12 +49,13 @@ export const parseCookieHeader = cookieHeader => {
 };
 
 export const getServer = () => {
+	const config = { ...appConfig, supportedLangs: ['en-US'] };
 	const server = new Hapi.Server();
 	server.connection({ port: 0 });
 	server.app = {
 		logger: MOCK_LOGGER,
 	};
-	server.settings.app = appConfig;
+	server.settings.app = config;
 
 	// mock the anonAuthPlugin
 	server.decorate(
@@ -64,6 +66,8 @@ export const getServer = () => {
 	);
 	server.decorate('request', 'trackApi', () => ({}));
 	server.decorate('request', 'trackSession', () => ({}));
+	server.decorate('request', 'getPrefixedPath', () => '/');
+	server.decorate('request', 'getLanguage', () => 'en-US');
 	server.logger = () => MOCK_LOGGER;
 	server.ext('onPreHandler', (request, reply) => {
 		request.plugins.tracking = {};

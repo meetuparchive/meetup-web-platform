@@ -6,6 +6,7 @@ import config from 'mwp-cli/src/config';
 import logger from './util/logger';
 import requestAuthPlugin from './plugins/requestAuthPlugin';
 import activityPlugin from './plugins/tracking/activity';
+import languagePlugin from './plugins/language';
 import serviceWorkerPlugin from './plugins/service-worker';
 
 /**
@@ -103,6 +104,12 @@ function getServiceWorkerPlugin() {
 	};
 }
 
+function getLanguagePlugin() {
+	return {
+		register: languagePlugin,
+	};
+}
+
 export default function getPlugins() {
 	const { package: { agent }, env: { properties: { isProd } } } = config;
 	return [
@@ -111,6 +118,7 @@ export default function getPlugins() {
 		getRequestAuthPlugin(),
 		getActivityTrackingPlugin({ agent, isProd }),
 		getServiceWorkerPlugin(),
+		getLanguagePlugin(),
 		Inert,
 	];
 }

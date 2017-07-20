@@ -1,19 +1,11 @@
-import { getLanguage, checkLanguageRedirect } from '../util/languageUtils';
+import url from 'url';
 
 export const getAppRouteHandler = renderRequestMap => (request, reply) => {
-	const supportedLangs = Object.keys(renderRequestMap);
-	const requestLanguage = getLanguage(request, supportedLangs);
-	const redirect = checkLanguageRedirect(
-		request,
-		reply,
-		requestLanguage,
-		supportedLangs
-	);
-	if (redirect) {
-		return redirect;
+	const pathname = request.getPrefixedPath();
+	if (pathname !== request.url.pathname) {
+		return reply.redirect(url.format({ ...request.url, pathname }));
 	}
-	request.app.localeCode = requestLanguage;
-	request.app.supportedLocaleCodes = supportedLangs;
+	const requestLanguage = request.getLanguage();
 	const renderRequest = renderRequestMap[requestLanguage];
 
 	return renderRequest(request)

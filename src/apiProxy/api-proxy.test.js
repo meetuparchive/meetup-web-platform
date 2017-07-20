@@ -21,6 +21,7 @@ describe('apiProxy$', () => {
 			server: getServer(),
 			log: () => {},
 			trackApi: () => {},
+			getLanguage: () => 'en-US',
 		};
 		const requestResult = {
 			type: 'fake',
