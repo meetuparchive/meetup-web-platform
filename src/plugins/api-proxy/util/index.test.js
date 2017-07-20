@@ -111,7 +111,7 @@ describe('getLanguageHeader', () => {
 describe('injectResponseCookies', () => {
 	const request = {
 		plugins: {
-			requestAuth: {
+			apiProxy: {
 				setState() {},
 			},
 		},
