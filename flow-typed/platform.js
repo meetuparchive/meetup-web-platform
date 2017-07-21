@@ -14,12 +14,24 @@ declare type HapiRequest = {
 		settings: {
 			app: { isProd: boolean, supportedLangs: Array<string>, [string]: any },
 		},
+		plugins: {
+			[string]: any,
+		},
 	},
 	state: {
 		[string]: string,
 	},
 	[string]: any,
 };
+const HapiReplyFn = () => {};
+HapiReplyFn.continue = () => {};
+HapiReplyFn.state = (
+	key: string,
+	value: string,
+	opts: ?{ [string]: any }
+) => {};
+
+declare type HapiReply = typeof HapiReplyFn;
 
 declare type FluxStandardAction = {
 	type: string,
