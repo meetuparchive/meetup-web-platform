@@ -23,7 +23,7 @@ const MockRedirect = props => {
 		props.match.params.redirectType === 'internal'
 			? INTERNAL_REDIRECT_PATH
 			: new URL(EXTERNAL_REDIRECT_URL);
-	const permanent = Boolean(props.match.params.isPermanent);
+	const permanent = props.match.params.isPermanent;
 	return (
 		<div>
 			<Redirect to={to} permanent={permanent} />
