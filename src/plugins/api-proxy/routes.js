@@ -1,13 +1,12 @@
 import Joi from 'joi';
-import { getApiProxyRouteHandler } from './apiProxyHandler';
-
+import handler from './handler'; // import allows easier mocking in integration tests
 const validApiPayloadSchema = Joi.object({
 	queries: Joi.string().required(), // should be rison.encode_array-encoded
 	metadata: Joi.string(),
 	logout: Joi.any(),
 });
 
-const getApiProxyRoutes = (path, apiProxyFn$) => {
+const getApiProxyRoutes = path => {
 	/**
 	 * This handler converts the application-supplied queries into external API
 	 * calls, and converts the API call responses into a standard format that
@@ -18,7 +17,7 @@ const getApiProxyRoutes = (path, apiProxyFn$) => {
 	 */
 	const routeBase = {
 		path,
-		handler: getApiProxyRouteHandler(apiProxyFn$),
+		handler,
 		config: {
 			plugins: {
 				'electrode-csrf-jwt': {

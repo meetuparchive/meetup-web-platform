@@ -45,8 +45,7 @@ which happens _before_ the route handler is invoked, the `requestAuthPlugin`
       it back to the client
 2. The `MEETUP_MEMBER` cookie will be forwarded for logged-in requests, or the
 `oauth_token` cookie will be converted to an `Authorization` header
-in each request to the Meetup API - this happens in
-[`api-proxy.js:parseRequest`](../apiProxy/api-proxy.js)
+in each request to the Meetup API - this happens in the api-proxy plugin.
 3. The API proxy will also generate and send a UUID CSRF cookie and header,
 which is generated fresh for every API request. The only constraint is that the
 header and cookie must be identical.

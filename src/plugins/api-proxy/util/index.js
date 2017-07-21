@@ -5,8 +5,6 @@ import url from 'url';
 import uuid from 'uuid';
 
 import externalRequest from 'request';
-import Joi from 'joi';
-import rison from 'rison';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/observable/bindNodeCallback';
@@ -17,8 +15,6 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/timeout';
 
 import { coerceBool, toCamelCase } from './stringUtils';
-
-import { querySchema } from './validation';
 
 import { duotoneRef } from './duotone';
 
@@ -365,32 +361,17 @@ export function parseRequestHeaders(request) {
 	return externalRequestHeaders;
 }
 
-export function parseRequestQueries(request) {
-	const { method, mime, payload, query } = request;
-	const queriesRison =
-		(method === 'post' || method === 'patch') && mime !== 'multipart/form-data'
-			? payload.queries
-			: query.queries;
-
-	if (!queriesRison) {
-		return null;
-	}
-
-	const validatedQueries = Joi.validate(
-		rison.decode_array(queriesRison),
-		Joi.array().items(querySchema)
-	);
-	if (validatedQueries.error) {
-		throw validatedQueries.error;
-	}
-	return validatedQueries.value;
-}
-
-/**
- * Parse request for queries and request options
- * @return {Object} { queries, externalRequestOpts }
+/*
+ * Translate the incoming Hapi request into an 'opts' object that can be used
+ * to call `request` for the REST API. This function essentially translates the
+ * app server request properties (headers, payload) into corresponding REST API
+ * request properties. The resulting value will be used as the _base_ set of
+ * options for _every_ parallel REST API request made by the platform
+ * corresponding to single incoming request.
+ * 
+ * @return {Object} externalRequestOpts
  */
-export function parseRequest(request) {
+export function getExternalRequestOpts(request) {
 	const baseUrl = request.server.settings.app.api.root_url;
 	const externalRequestOpts = {
 		baseUrl,
@@ -426,10 +407,7 @@ export function parseRequest(request) {
 			return formData;
 		}, {});
 	}
-	return {
-		externalRequestOpts,
-		queries: parseRequestQueries(request),
-	};
+	return externalRequestOpts;
 }
 
 /**
@@ -583,11 +561,7 @@ export const injectResponseCookies = request => ([response, _, jar]) => {
 			strictHeader: false, // Can't enforce RFC 6265 cookie validation on external services
 		};
 
-		request.plugins.requestAuth.reply.state(
-			cookie.key,
-			cookie.value,
-			cookieOptions
-		);
+		request.plugins.apiProxy.setState(cookie.key, cookie.value, cookieOptions);
 	});
 };
 
@@ -597,7 +571,7 @@ export const injectResponseCookies = request => ([response, _, jar]) => {
  */
 export const makeApiRequest$ = request => {
 	const setApiResponseDuotones = apiResponseDuotoneSetter(
-		request.server.settings.app.duotone_urls
+		request.server.plugins['api-proxy'].duotoneUrls
 	);
 	return ([requestOpts, query]) => {
 		const request$ = query.mockResponse
