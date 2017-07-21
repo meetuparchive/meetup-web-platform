@@ -14,7 +14,9 @@ export const getAppRouteHandler = renderRequestMap => (request, reply) => {
 			({ redirect, result, statusCode }) => {
 				// response is sent when this function returns (`nextTick`)
 				if (redirect) {
-					return reply.redirect(redirect.url).permanent(redirect.permanent);
+					return reply
+						.redirect(redirect.url)
+						.permanent(Boolean(redirect.permanent));
 				}
 				request.trackSession();
 				return reply(result).code(statusCode);

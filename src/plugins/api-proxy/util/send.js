@@ -14,6 +14,8 @@ import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/timeout';
 
+import { API_PROXY_PLUGIN_NAME } from '../';
+
 export const API_META_HEADER = 'X-Meta-Request-Headers';
 
 const MOCK_RESPONSE_OK = {
@@ -228,7 +230,7 @@ export function getExternalRequestOpts(request) {
 						contentType: value.headers['content-type'],
 					},
 				};
-				request.app.upload = value.path;
+				request.plugins[API_PROXY_PLUGIN_NAME].uploads.push(value.path);
 			} else {
 				formData[key] = value;
 			}
