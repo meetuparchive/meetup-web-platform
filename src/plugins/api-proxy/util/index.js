@@ -400,7 +400,7 @@ export function getExternalRequestOpts(request) {
 						contentType: value.headers['content-type'],
 					},
 				};
-				request.app.upload = value.path;
+				request.plugins.apiProxy.uploads.push(value.path);
 			} else {
 				formData[key] = value;
 			}
