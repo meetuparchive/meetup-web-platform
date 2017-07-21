@@ -3,11 +3,12 @@ import HapiPino from 'hapi-pino';
 import CsrfPlugin from 'electrode-csrf-jwt';
 import config from 'mwp-cli/src/config';
 
-import logger from './util/logger';
-import requestAuthPlugin from './plugins/requestAuthPlugin';
-import activityPlugin from './plugins/tracking/activity';
-import languagePlugin from './plugins/language';
-import serviceWorkerPlugin from './plugins/service-worker';
+import logger from '../util/logger';
+import requestAuthPlugin from './requestAuthPlugin';
+import activityPlugin from './tracking/activity';
+import languagePlugin from './language';
+import serviceWorkerPlugin from './service-worker';
+import apiProxyPlugin from './api-proxy';
 
 /**
  * Hapi plugins for the dev server
@@ -88,7 +89,7 @@ export function getLogger(options = {}) {
 	};
 }
 
-function getActivityTrackingPlugin({ agent, isProd }) {
+export function getActivityTrackingPlugin({ agent, isProd }) {
 	return {
 		register: activityPlugin,
 		options: {
@@ -101,6 +102,12 @@ function getActivityTrackingPlugin({ agent, isProd }) {
 function getServiceWorkerPlugin() {
 	return {
 		register: serviceWorkerPlugin,
+	};
+}
+
+export function getApiProxyPlugin() {
+	return {
+		register: apiProxyPlugin,
 	};
 }
 
@@ -118,6 +125,7 @@ export default function getPlugins() {
 		getRequestAuthPlugin(),
 		getActivityTrackingPlugin({ agent, isProd }),
 		getServiceWorkerPlugin(),
+		getApiProxyPlugin(),
 		getLanguagePlugin(),
 		Inert,
 	];

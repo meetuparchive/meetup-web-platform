@@ -20,6 +20,15 @@ declare type HapiRequest = {
 	},
 	[string]: any,
 };
+const HapiReplyFn = () => {};
+HapiReplyFn.continue = () => {};
+HapiReplyFn.state = (
+	key: string,
+	value: string,
+	opts: ?{ [string]: any }
+) => {};
+
+declare type HapiReply = typeof HapiReplyFn;
 
 declare type FluxStandardAction = {
 	type: string,
