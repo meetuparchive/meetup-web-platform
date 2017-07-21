@@ -2,7 +2,7 @@
 import getRoute from './route';
 
 export default function register(
-	server: Object,
+	server: HapiServer,
 	options: { languageRenderers: { [string]: LanguageRenderer$ } },
 	next: () => void
 ) {

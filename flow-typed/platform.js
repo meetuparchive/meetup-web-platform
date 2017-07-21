@@ -5,19 +5,22 @@ declare type Params = { [string]: string };
 declare type HapiRequestUrl = URL & {
 	path: string,
 };
+declare type HapiRoute = Object;
+declare type HapiServer = {
+	settings: {
+		app: { isProd: boolean, supportedLangs: Array<string>, [string]: any },
+	},
+	plugins: {
+		[string]: any,
+	},
+	route: (routes: HapiRoute | Array<HapiRoute>) => Promise<HapiServer>,
+};
 declare type HapiRequest = {
 	getLanguage: () => string,
 	getPrefixedPath: () => string,
 	log: (Array<string>, string) => void,
 	url: HapiRequestUrl,
-	server: {
-		settings: {
-			app: { isProd: boolean, supportedLangs: Array<string>, [string]: any },
-		},
-		plugins: {
-			[string]: any,
-		},
-	},
+	server: HapiServer,
 	state: {
 		[string]: string,
 	},
