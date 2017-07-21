@@ -1,16 +1,15 @@
 // @flow
 import getRoute from './route';
 
+/*
+ * The server app route plugin - this applies a wildcard catch-all route that
+ * will call the server app rendering function for the correct request language.
+ */
 export default function register(
 	server: HapiServer,
 	options: { languageRenderers: { [string]: LanguageRenderer$ } },
 	next: () => void
 ) {
-	/*
-	 * Route for service worker script at top-level path. Depends on `Inert`
-	 * `path` must match client `serviceWorker.register` call - MWP provides this
-	 * in the `<ServiceWorker>` component
-	 */
 	server.route(getRoute(options.languageRenderers));
 
 	next();
