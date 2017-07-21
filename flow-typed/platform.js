@@ -14,12 +14,44 @@ declare type HapiRequest = {
 		settings: {
 			app: { isProd: boolean, supportedLangs: Array<string>, [string]: any },
 		},
+		plugins: {
+			[string]: any,
+		},
 	},
 	state: {
 		[string]: string,
 	},
 	[string]: any,
 };
+const HapiReplyFn = (reply: string | Object) => HapiReplyFn;
+HapiReplyFn.continue = () => {};
+HapiReplyFn.code = (code: number) => HapiReplyFn;
+HapiReplyFn.redirect = (url: string) => ({
+	permanent: (isPermanent: ?boolean) => HapiReplyFn,
+});
+HapiReplyFn.state = (
+	key: string,
+	value: string,
+	opts: ?{ [string]: any }
+) => {};
+
+declare type HapiReply = typeof HapiReplyFn;
+
+type RedirectResult = {|
+	redirect: {
+		url: string,
+		permanent?: boolean,
+	},
+|};
+type HTMLResult = {|
+	statusCode: number,
+	result: string,
+|};
+declare type RenderResult = RedirectResult | HTMLResult;
+
+declare type LanguageRenderer$ = (
+	request: HapiRequest
+) => rxjs$Observable<RenderResult>;
 
 declare type FluxStandardAction = {
 	type: string,

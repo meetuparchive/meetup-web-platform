@@ -1,17 +1,6 @@
 // @flow
 import getRoute from './route';
 
-type LanguageRenderer$ = (
-	request: HapiRequest
-) => Observable<{
-	redirect: {
-		url: string,
-		permanent?: boolean,
-	},
-	statusCode?: ?number,
-	result?: string,
-}>;
-
 export default function register(
 	server: Object,
 	options: { languageRenderers: { [string]: LanguageRenderer$ } },
