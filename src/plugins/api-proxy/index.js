@@ -12,7 +12,7 @@ const API_ROUTE_PATH = '/mu_api';
  * When response is sent, the plugin needs to delete any files that were
  * uploaded to the POST/PATCH endpoint
  */
-const onResponse = (request, reply) => {
+const onResponse = request => {
 	const { uploads } = request.plugins.apiProxy;
 	const { logger } = request.server.app;
 	if (uploads.length) {
@@ -48,14 +48,17 @@ export default function register(
 		'duotoneUrls',
 		getDuotoneUrls(duotones, server.settings.app.photo_scaler_salt)
 	);
-	server.ext('onPreHandler', setPluginState);
 
 	// add a method to the `request` object that can call REST API
 	server.decorate('request', 'proxyApi$', proxyApi$, { apply: true });
-	// add a route that will receive query requests
+	// plugin state must be available to all routes that use `request.proxyApi$`
+	server.ext('onRequest', setPluginState);
+	// clean up request state once response is sent
+	server.on('response', onResponse);
+
+	// add a route that will receive query requests as querystring params
 	const routes = getApiProxyRoutes(options.path || API_ROUTE_PATH);
 	server.route(routes);
-	server.on('response', onResponse);
 
 	next();
 }
