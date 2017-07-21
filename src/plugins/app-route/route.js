@@ -1,22 +1,22 @@
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
-import { getAppRouteHandler } from './appRouteHandler';
+import getHandler from './handler';
 
+/**
+ * This function processes the route response before it is sent to the client.
+ *
+ * - In dev, it transforms the generic 500 error response JSON into a full dev-
+ *   friendly rendering of the stack trace.
+ *
+ * @param {Object} request the Hapi request, _after_ a response has been
+ *   generated
+ * @param {Function} reply the Hapi reply interface
+ * @return {Object} a Hapi response
+ */
 export const onPreResponse = {
-	/**
-	 * This function processes the route response before it is sent to the client.
-	 *
-	 * - In dev, it transforms the generic 500 error response JSON into a full dev-
-	 *   friendly rendering of the stack trace.
-	 *
-	 * @param {Object} request the Hapi request, _after_ a response has been
-	 *   generated
-	 * @param {Function} reply the Hapi reply interface
-	 * @return {Object} a Hapi response
-	 */
 	method: (request, reply) => {
 		const response = request.response;
-		if (!response.isBoom || request.server.settings.app.isProd) {
+		if (!response.isBoom || process.env.NODE_ENV === 'production') {
 			return reply.continue();
 		}
 		const error = response;
@@ -46,7 +46,7 @@ export const onPreResponse = {
  *   rendering functions that return an HTML string
  * @return {Object} a Hapi route configuration object
  */
-const getApplicationRoute = renderRequestMap => ({
+export default languageRenderers => ({
 	method: 'GET',
 	path: '/{wild*}',
 	config: {
@@ -62,7 +62,5 @@ const getApplicationRoute = renderRequestMap => ({
 			failAction: 'ignore', // ignore cookie validation, just accept
 		},
 	},
-	handler: getAppRouteHandler(renderRequestMap),
+	handler: getHandler(languageRenderers),
 });
-
-export default getApplicationRoute;
