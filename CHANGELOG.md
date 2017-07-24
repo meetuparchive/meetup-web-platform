@@ -5,6 +5,13 @@
 - **Moved** `src/components/Redirect` --> `require('src/router').Redirect`
 - **Moved** `src/components/Forbidden` --> `require('src/router').Forbidden`
 
+## [5.1]
+
+- **Change** (could be considered breaking, but it's specifically for a
+  requested update to GroupCard in mup-web): `group.duotoneUrl` is now an object
+  with `small` and `large` properties - `small` has a resolution of 300x400, and
+  `large` has a resolution of 1100x800.
+
 ## [5.0]
 
 ### BREAKING CHANGE
