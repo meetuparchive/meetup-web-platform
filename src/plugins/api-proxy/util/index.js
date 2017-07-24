@@ -428,7 +428,10 @@ export const groupDuotoneSetter = duotoneUrls => group => {
 		);
 	const duotoneUrlRoot = duotoneKey && duotoneUrls[duotoneKey];
 	if (duotoneUrlRoot && photo.id) {
-		group.duotoneUrl = `${duotoneUrlRoot}/${photo.id}.jpeg`;
+		group.duotoneUrl = {
+			small: `${duotoneUrlRoot.small}/${photo.id}.jpeg`,
+			large: `${duotoneUrlRoot.large}/${photo.id}.jpeg`,
+		};
 	}
 	return group;
 };

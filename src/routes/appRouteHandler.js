@@ -1,7 +1,7 @@
 import url from 'url';
 
 export const getAppRouteHandler = renderRequestMap => (request, reply) => {
-	const pathname = request.getPrefixedPath();
+	const pathname = request.getLangPrefixPath();
 	if (pathname !== request.url.pathname) {
 		return reply.redirect(url.format({ ...request.url, pathname }));
 	}
