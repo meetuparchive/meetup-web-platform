@@ -17,7 +17,7 @@ declare type HapiServer = {
 };
 declare type HapiRequest = {
 	getLanguage: () => string,
-	getPrefixedPath: () => string,
+	getLangPrefixPath: () => string,
 	log: (Array<string>, string) => void,
 	url: HapiRequestUrl,
 	server: HapiServer,
