@@ -1,6 +1,17 @@
 // @flow
 import url from 'url';
 
+/*
+ * This is the Hapi route handler that will be applied to the React application
+ * route (usually a wildcard handling all paths).
+ *
+ * It is primarily responsible for two things:
+ * 1. Ensure that the current URL pathname matches the language specified by the
+ *    request - redirect if not
+ * 2. Render the application in the requested language
+ *
+ * It also calls the tracking plugin in order to handle session tracking.
+ */
 export default (languageRenderers: { [string]: LanguageRenderer$ }) => (
 	request: HapiRequest,
 	reply: HapiReply

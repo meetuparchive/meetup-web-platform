@@ -29,7 +29,8 @@ export const onPreResponse = {
 };
 
 /*
- * Wildcard route for all application GET requests
+ * Wildcard route for all application GET requests - see the 'handler' module
+ * for rendering details
  *
  * Route config:
  *
