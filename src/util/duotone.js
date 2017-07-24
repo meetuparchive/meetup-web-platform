@@ -70,6 +70,16 @@ export const duotones = [
  * @module duotoneServer
  */
 
+export const makeSign = (salt, ref) => rx => {
+	const spec = `event/${rx}/${ref}`;
+	const signature = crypto
+		.createHash('sha1')
+		.update(`${spec}${salt}`)
+		.digest('hex')
+		.substring(0, 10);
+	return `https://a248.e.akamai.net/secure.meetupstatic.com/photo_api/${spec}/sg${signature}`;
+};
+
 /**
  * Using a passed in *SECRET* salt, generate the photo scaler URL templates
  * in the format described by the sign/photo_transform API. Return the values
@@ -84,14 +94,12 @@ export const duotones = [
  */
 export function generateSignedDuotoneUrl(salt, [light, dark]) {
 	const ref = duotoneRef(light, dark);
-	const spec = `event/rx300x400/${ref}`;
-	const signature = crypto
-		.createHash('sha1')
-		.update(`${spec}${salt}`)
-		.digest('hex')
-		.substring(0, 10);
+	const sign = makeSign(salt, ref);
 	return {
-		[ref]: `https://a248.e.akamai.net/secure.meetupstatic.com/photo_api/${spec}/sg${signature}`,
+		[ref]: {
+			small: sign('rx300x400'),
+			large: sign('rx1100x800'),
+		},
 	};
 }
 
