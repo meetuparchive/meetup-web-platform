@@ -35,4 +35,9 @@ describe('routes', () => {
 			})
 		);
 	});
+
+	it('serves the app engine lifecycle route', () =>
+		getResponse({ url: '/_ah/start' }).then(response =>
+			expect(response.statusCode).toEqual(200)
+		));
 });
