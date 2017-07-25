@@ -17,8 +17,18 @@ export default function getRoutes(renderRequestMap, apiProxyFn$ = apiProxy$) {
 		config: { auth: false },
 	};
 
+	// simple 200 response for all lifecycle requests
+	// https://cloud.google.com/appengine/docs/flexible/python/how-instances-are-managed#health_checking
+	const appEngineLifecycleRoutes = {
+		method: 'GET',
+		path: '/_ah/{param*}',
+		config: { auth: false },
+		handler: (request, reply) => reply('OK'),
+	};
+
 	return [
 		pingRoute,
+		appEngineLifecycleRoutes,
 		...getApiProxyRoutes('/mu_api', apiProxyFn$),
 		getApplicationRoute(renderRequestMap),
 	];
