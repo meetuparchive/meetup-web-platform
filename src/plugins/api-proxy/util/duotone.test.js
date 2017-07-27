@@ -1,5 +1,6 @@
 import {
 	duotoneRef,
+	makeSign,
 	getDuotoneUrls,
 	generateSignedDuotoneUrl,
 } from './duotone';
@@ -7,17 +8,26 @@ import {
 const MOCK_SALT = 'abcd';
 const MOCK_DUOTONE = ['123456', '234567'];
 const MOCK_DUOTONE_2 = ['345678', '456789'];
+describe('makeSign', () => {
+	it('creates a function that returns a URL with the ref', () => {
+		const ref = duotoneRef(...MOCK_DUOTONE);
+		const sign = makeSign(MOCK_SALT, ref);
+		expect(sign).toEqual(expect.any(Function));
+		const signed = sign('rx100x100');
+		expect(signed.startsWith('http')).toBe(true);
+		expect(signed.indexOf(ref)).toBeGreaterThan(-1);
+	});
+});
 describe('generateSignedDuotoneUrl', () => {
 	const signedUrlMap = generateSignedDuotoneUrl(MOCK_SALT, MOCK_DUOTONE);
 	const ref = duotoneRef(...MOCK_DUOTONE);
 	it('maps a duotone ref to a string', () => {
 		expect(signedUrlMap).toEqual({
-			[ref]: jasmine.any(String),
+			[ref]: {
+				small: expect.any(String),
+				large: expect.any(String),
+			},
 		});
-	});
-	it('writes a url containing the ref', () => {
-		expect(signedUrlMap[ref].startsWith('http')).toBe(true);
-		expect(signedUrlMap[ref].indexOf(ref)).toBeGreaterThan(-1);
 	});
 });
 

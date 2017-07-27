@@ -1,8 +1,4 @@
-import apiProxy$ from '../apiProxy/api-proxy';
-
-import getApiProxyRoutes from '../apiProxy/apiProxyRoutes';
-
-export default function getRoutes(apiProxyFn$ = apiProxy$) {
+export default function getRoutes() {
 	const pingRoute = {
 		path: '/ping',
 		method: 'GET',
@@ -10,5 +6,5 @@ export default function getRoutes(apiProxyFn$ = apiProxy$) {
 		config: { auth: false },
 	};
 
-	return [pingRoute, ...getApiProxyRoutes('/mu_api', apiProxyFn$)];
+	return [pingRoute];
 }
