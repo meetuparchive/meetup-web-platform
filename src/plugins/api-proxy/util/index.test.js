@@ -408,8 +408,9 @@ describe('groupDuotoneSetter', () => {
 		const group = { ...MOCK_GROUP };
 		const modifiedGroup = groupDuotoneSetter(MOCK_DUOTONE_URLS)(group);
 		const { duotoneUrl } = modifiedGroup;
-		const expectedUrl = MOCK_DUOTONE_URLS.dtaxb;
-		expect(duotoneUrl.startsWith(expectedUrl)).toBe(true);
+		const expectedUrls = MOCK_DUOTONE_URLS.dtaxb;
+		expect(duotoneUrl.large.startsWith(expectedUrls.large)).toBe(true);
+		expect(duotoneUrl.small.startsWith(expectedUrls.small)).toBe(true);
 	});
 });
 
@@ -427,8 +428,9 @@ describe('apiResponseDuotoneSetter', () => {
 			groupApiResponse
 		);
 		const { duotoneUrl } = modifiedResponse.value;
-		const expectedUrl = MOCK_DUOTONE_URLS.dtaxb;
-		expect(duotoneUrl.startsWith(expectedUrl)).toBe(true);
+		const expectedUrls = MOCK_DUOTONE_URLS.dtaxb;
+		expect(duotoneUrl.large.startsWith(expectedUrls.large)).toBe(true);
+		expect(duotoneUrl.small.startsWith(expectedUrls.small)).toBe(true);
 	});
 	it('adds duotone url to type: "home" api response', () => {
 		// this is an awkward test because we have to mock the deeply-nested
@@ -453,8 +455,9 @@ describe('apiResponseDuotoneSetter', () => {
 		};
 		// run the function - rely on side effect in group
 		apiResponseDuotoneSetter(MOCK_DUOTONE_URLS)(homeApiResponse);
-		const expectedUrl = MOCK_DUOTONE_URLS.dtaxb;
-		expect(group.duotoneUrl.startsWith(expectedUrl)).toBe(true);
+		const expectedUrls = MOCK_DUOTONE_URLS.dtaxb;
+		expect(group.duotoneUrl.large.startsWith(expectedUrls.large)).toBe(true);
+		expect(group.duotoneUrl.small.startsWith(expectedUrls.small)).toBe(true);
 	});
 	it("returns object unmodified when it doesn't need duotones", () => {
 		const member = { ...MOCK_MEMBER };

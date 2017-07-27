@@ -4,6 +4,7 @@ import CsrfPlugin from 'electrode-csrf-jwt';
 import config from 'mwp-cli/src/config';
 
 import logger from '../util/logger';
+import appRoutePlugin from './app-route';
 import requestAuthPlugin from './requestAuthPlugin';
 import activityPlugin from './tracking/activity';
 import languagePlugin from './language';
@@ -70,6 +71,12 @@ export function getCsrfPlugin() {
 	};
 }
 
+export function getAppRoutePlugin(options) {
+	return {
+		register: appRoutePlugin,
+		options,
+	};
+}
 /**
  * configure and return the plugin that
  * allows requests to get anonymous oauth tokens
@@ -117,9 +124,10 @@ function getLanguagePlugin() {
 	};
 }
 
-export default function getPlugins() {
+export default function getPlugins({ languageRenderers }) {
 	const { package: { agent }, env: { properties: { isProd } } } = config;
 	return [
+		getAppRoutePlugin({ languageRenderers }),
 		getLogger(),
 		getCsrfPlugin(),
 		getRequestAuthPlugin(),

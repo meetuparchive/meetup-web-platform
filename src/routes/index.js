@@ -1,12 +1,4 @@
-import logger from '../util/logger';
-
-import getApplicationRoute from './appRoute';
-
-export default function getRoutes(renderRequestMap) {
-	logger.info(
-		`Supported languages:\n${Object.keys(renderRequestMap).join('\n')}`
-	);
-
+export default function getRoutes() {
 	const pingRoute = {
 		path: '/ping',
 		method: 'GET',
@@ -14,5 +6,5 @@ export default function getRoutes(renderRequestMap) {
 		config: { auth: false },
 	};
 
-	return [pingRoute, getApplicationRoute(renderRequestMap)];
+	return [pingRoute];
 }

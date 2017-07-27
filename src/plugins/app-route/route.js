@@ -1,22 +1,18 @@
+// @flow
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
-import { getAppRouteHandler } from './appRouteHandler';
+import getHandler from './handler';
 
 export const onPreResponse = {
-	/**
+	/*
 	 * This function processes the route response before it is sent to the client.
 	 *
 	 * - In dev, it transforms the generic 500 error response JSON into a full dev-
 	 *   friendly rendering of the stack trace.
-	 *
-	 * @param {Object} request the Hapi request, _after_ a response has been
-	 *   generated
-	 * @param {Function} reply the Hapi reply interface
-	 * @return {Object} a Hapi response
 	 */
-	method: (request, reply) => {
+	method: (request: HapiRequest, reply: HapiReply) => {
 		const response = request.response;
-		if (!response.isBoom || request.server.settings.app.isProd) {
+		if (!response.isBoom || process.env.NODE_ENV === 'production') {
 			return reply.continue();
 		}
 		const error = response;
@@ -32,8 +28,9 @@ export const onPreResponse = {
 	},
 };
 
-/**
- * Wildcard route for all application GET requests
+/*
+ * Wildcard route for all application GET requests - see the 'handler' module
+ * for rendering details
  *
  * Route config:
  *
@@ -41,12 +38,8 @@ export const onPreResponse = {
  * - `state`: skip cookie validation because cookies can be set by other services
  *   on the same domain and may not conform to the validation rules that are
  *   used by Hapi
- *
- * @param {Object} renderRequestMap a map of 'localeCode' strings to request-
- *   rendering functions that return an HTML string
- * @return {Object} a Hapi route configuration object
  */
-const getApplicationRoute = renderRequestMap => ({
+export default (languageRenderers: { [string]: LanguageRenderer$ }) => ({
 	method: 'GET',
 	path: '/{wild*}',
 	config: {
@@ -62,7 +55,5 @@ const getApplicationRoute = renderRequestMap => ({
 			failAction: 'ignore', // ignore cookie validation, just accept
 		},
 	},
-	handler: getAppRouteHandler(renderRequestMap),
+	handler: getHandler(languageRenderers),
 });
-
-export default getApplicationRoute;
