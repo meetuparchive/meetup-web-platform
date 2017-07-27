@@ -4820,9 +4820,9 @@ media-typer@0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/media-typer/-/media-typer-0.3.0.tgz#8710d7af0aa626f8fffa1ce00168545263255748"
 
-meetup-web-mocks@1.0.194:
-  version "1.0.194"
-  resolved "https://registry.yarnpkg.com/meetup-web-mocks/-/meetup-web-mocks-1.0.194.tgz#0f0a4526a739a0dcebacbc12c9adf4ab16fe38e0"
+meetup-web-mocks@1.0.203:
+  version "1.0.203"
+  resolved "https://registry.yarnpkg.com/meetup-web-mocks/-/meetup-web-mocks-1.0.203.tgz#6bb222fad96ff5680dc257c86c8b6f4623d9bad5"
   dependencies:
     rxjs "5.4.2"
 

@@ -77,7 +77,7 @@ export const makeSign = (salt, ref) => rx => {
 		.update(`${spec}${salt}`)
 		.digest('hex')
 		.substring(0, 10);
-	return `https://a248.e.akamai.net/secure.meetupstatic.com/photo_api/${spec}/sg${signature}`;
+	return `https://secure.meetupstatic.com/photo_api/${spec}/sg${signature}`;
 };
 
 /**
