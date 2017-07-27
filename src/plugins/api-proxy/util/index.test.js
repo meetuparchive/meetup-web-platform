@@ -1,12 +1,10 @@
 import 'rxjs/add/operator/toPromise';
 
 import externalRequest from 'request';
-import rison from 'rison';
 
 import {
 	mockQuery,
 	MOCK_API_PROBLEM,
-	MOCK_AUTH_HEADER,
 	MOCK_RENDERPROPS,
 	MOCK_RENDERPROPS_UTF8,
 } from 'meetup-web-mocks/lib/app';
@@ -17,7 +15,7 @@ import {
 	MOCK_MEMBER,
 } from 'meetup-web-mocks/lib/api';
 
-import { getServer, MOCK_LOGGER } from '../util/testUtils';
+import { getServer, MOCK_LOGGER } from '../../../util/testUtils';
 
 import {
 	apiResponseToQueryResponse,
@@ -28,14 +26,14 @@ import {
 	getLanguageHeader,
 	injectResponseCookies,
 	logApiResponse,
-	parseRequest,
+	// getExternalRequestOpts,
 	parseApiResponse,
 	parseApiValue,
 	parseMetaHeaders,
 	parseVariantsHeader,
 	groupDuotoneSetter,
 	API_META_HEADER,
-} from './apiUtils';
+} from './index';
 
 describe('errorResponse$', () => {
 	it('returns the request url pathname as response.meta.endpoint', () => {
@@ -113,10 +111,8 @@ describe('getLanguageHeader', () => {
 describe('injectResponseCookies', () => {
 	const request = {
 		plugins: {
-			requestAuth: {
-				reply: {
-					state() {},
-				},
+			apiProxy: {
+				setState() {},
 			},
 		},
 		server: getServer(),
@@ -141,7 +137,7 @@ describe('injectResponseCookies', () => {
 	});
 	it('sets the provided cookies on the reply state', () => {
 		const mockJar = externalRequest.jar();
-		spyOn(request.plugins.requestAuth.reply, 'state');
+		spyOn(request.plugins.apiProxy, 'setState');
 
 		// set up mock cookie jar with a dummy cookie for the response.request.uri
 		const key = 'foo';
@@ -149,7 +145,7 @@ describe('injectResponseCookies', () => {
 		mockJar.setCookie(`${key}=${value}`, responseObj.request.uri.href);
 
 		injectResponseCookies(request)([response, null, mockJar]);
-		expect(request.plugins.requestAuth.reply.state).toHaveBeenCalledWith(
+		expect(request.plugins.apiProxy.setState).toHaveBeenCalledWith(
 			key,
 			value,
 			jasmine.any(Object) // don't actually care about the cookie options
@@ -412,8 +408,9 @@ describe('groupDuotoneSetter', () => {
 		const group = { ...MOCK_GROUP };
 		const modifiedGroup = groupDuotoneSetter(MOCK_DUOTONE_URLS)(group);
 		const { duotoneUrl } = modifiedGroup;
-		const expectedUrl = MOCK_DUOTONE_URLS.dtaxb;
-		expect(duotoneUrl.startsWith(expectedUrl)).toBe(true);
+		const expectedUrls = MOCK_DUOTONE_URLS.dtaxb;
+		expect(duotoneUrl.large.startsWith(expectedUrls.large)).toBe(true);
+		expect(duotoneUrl.small.startsWith(expectedUrls.small)).toBe(true);
 	});
 });
 
@@ -431,8 +428,9 @@ describe('apiResponseDuotoneSetter', () => {
 			groupApiResponse
 		);
 		const { duotoneUrl } = modifiedResponse.value;
-		const expectedUrl = MOCK_DUOTONE_URLS.dtaxb;
-		expect(duotoneUrl.startsWith(expectedUrl)).toBe(true);
+		const expectedUrls = MOCK_DUOTONE_URLS.dtaxb;
+		expect(duotoneUrl.large.startsWith(expectedUrls.large)).toBe(true);
+		expect(duotoneUrl.small.startsWith(expectedUrls.small)).toBe(true);
 	});
 	it('adds duotone url to type: "home" api response', () => {
 		// this is an awkward test because we have to mock the deeply-nested
@@ -457,8 +455,9 @@ describe('apiResponseDuotoneSetter', () => {
 		};
 		// run the function - rely on side effect in group
 		apiResponseDuotoneSetter(MOCK_DUOTONE_URLS)(homeApiResponse);
-		const expectedUrl = MOCK_DUOTONE_URLS.dtaxb;
-		expect(group.duotoneUrl.startsWith(expectedUrl)).toBe(true);
+		const expectedUrls = MOCK_DUOTONE_URLS.dtaxb;
+		expect(group.duotoneUrl.large.startsWith(expectedUrls.large)).toBe(true);
+		expect(group.duotoneUrl.small.startsWith(expectedUrls.small)).toBe(true);
 	});
 	it("returns object unmodified when it doesn't need duotones", () => {
 		const member = { ...MOCK_MEMBER };
@@ -561,71 +560,4 @@ describe('logApiResponse', () => {
 	});
 });
 
-describe('parseRequest', () => {
-	const headers = { authorization: MOCK_AUTH_HEADER };
-	const queries = [mockQuery(MOCK_RENDERPROPS)];
-	it('extracts the queries provided in GET requests', () => {
-		const data = { queries: rison.encode_array(queries) };
-		const getRequest = {
-			headers,
-			method: 'get',
-			query: data,
-			state: {
-				oauth_token: 'foo',
-			},
-			getLanguage: () => 'en-US',
-			server: getServer(),
-		};
-		expect(
-			parseRequest(getRequest, 'http://dummy.api.meetup.com').queries
-		).toEqual(queries);
-	});
-	it('extracts the queries provided in POST requests', () => {
-		const data = { queries: rison.encode_array(queries) };
-		const postRequest = {
-			headers,
-			method: 'post',
-			payload: data,
-			state: {
-				oauth_token: 'foo',
-			},
-			getLanguage: () => 'en-US',
-			server: getServer(),
-		};
-		expect(
-			parseRequest(postRequest, 'http://dummy.api.meetup.com').queries
-		).toEqual(queries);
-	});
-	it('extracts the queries provided in PATCH requests', () => {
-		const data = { queries: rison.encode_array(queries) };
-		const patchRequest = {
-			headers,
-			method: 'patch',
-			payload: data,
-			state: {
-				oauth_token: 'foo',
-			},
-			getLanguage: () => 'en-US',
-			server: getServer(),
-		};
-		expect(
-			parseRequest(patchRequest, 'http://dummy.api.meetup.com').queries
-		).toEqual(queries);
-	});
-	it('throws an error for mal-formed queries', () => {
-		const notAQuery = { foo: 'bar' };
-		const data = { queries: rison.encode_array([notAQuery]) };
-		const getRequest = {
-			headers,
-			method: 'get',
-			query: data,
-			state: {
-				oauth_token: 'foo',
-			},
-			server: getServer(),
-		};
-		expect(() =>
-			parseRequest(getRequest, 'http://dummy.api.meetup.com')
-		).toThrow();
-	});
-});
+describe('getExternalRequestOpts', () => {});

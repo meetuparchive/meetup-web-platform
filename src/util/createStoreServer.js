@@ -2,7 +2,7 @@ import { applyMiddleware, createStore } from 'redux';
 import { parseQueryResponse } from './fetchUtils';
 import getEpicMiddleware from '../middleware/epic';
 import catchMiddleware from '../middleware/catch';
-import apiProxy$ from '../apiProxy/api-proxy';
+import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/toPromise';
 
 /**
@@ -14,7 +14,8 @@ import 'rxjs/add/operator/toPromise';
  *   from the REST API
  */
 export const serverFetchQueries = request => () => queries =>
-	apiProxy$(request, queries)
+	request
+		.proxyApi$(queries)
 		.map(responses => ({ responses })) // package the responses in object like the API proxy endpoint does
 		.toPromise()
 		.then(parseQueryResponse(queries));

@@ -14,7 +14,6 @@ In general, application-specific code will live outside of this package.
 
 # Docs
 
-- [API requests through api-proxy](docs/api-proxy.md)
 - [App configuration management](docs/Config.md)
 - [Auth flow from `requestAuthPlugin`](docs/auth.md)
 - [Analytics/tracking](docs/Tracking.md)
@@ -27,6 +26,7 @@ In general, application-specific code will live outside of this package.
 
 - [Routing module](router/README.md)
 - [Language plugin for Hapi](plugins/language/README.md)
+- [API proxy plugin for Hapi](docs/api-proxy.md)
 
 # Releases
 
