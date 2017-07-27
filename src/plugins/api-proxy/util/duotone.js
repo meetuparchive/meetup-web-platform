@@ -70,6 +70,16 @@ export const duotones = [
  * @module duotoneServer
  */
 
+export const makeSign = (salt, ref) => rx => {
+	const spec = `event/${rx}/${ref}`;
+	const signature = crypto
+		.createHash('sha1')
+		.update(`${spec}${salt}`)
+		.digest('hex')
+		.substring(0, 10);
+	return `https://a248.e.akamai.net/secure.meetupstatic.com/photo_api/${spec}/sg${signature}`;
+};
+
 /**
  * Using a passed in *SECRET* salt, generate the photo scaler URL templates
  * in the format described by the sign/photo_transform API. Return the values
@@ -84,14 +94,12 @@ export const duotones = [
  */
 export function generateSignedDuotoneUrl(salt, [light, dark]) {
 	const ref = duotoneRef(light, dark);
-	const spec = `event/rx300x400/${ref}`;
-	const signature = crypto
-		.createHash('sha1')
-		.update(`${spec}${salt}`)
-		.digest('hex')
-		.substring(0, 10);
+	const sign = makeSign(salt, ref);
 	return {
-		[ref]: `https://a248.e.akamai.net/secure.meetupstatic.com/photo_api/${spec}/sg${signature}`,
+		[ref]: {
+			small: sign('rx300x400'),
+			large: sign('rx1100x800'),
+		},
 	};
 }
 
@@ -109,4 +117,67 @@ export const getDuotoneUrls = (duotones, PHOTO_SCALER_SALT) => {
 		}),
 		{}
 	);
+};
+
+/**
+ * From a provided set of signed duotone URLs, create a function that injects
+ * the full duotone URL into a group object with the key `duotoneUrl`.
+ *
+ * @param {Object} duotoneUrls map of `[duotoneRef]: url template root`
+ * @param {Object} group group object from API
+ * @return {Object} the mutated group object
+ */
+export const groupDuotoneSetter = duotoneUrls => group => {
+	const photo = group.key_photo || {};
+	const duotoneKey =
+		group.photo_gradient &&
+		duotoneRef(
+			group.photo_gradient.light_color,
+			group.photo_gradient.dark_color
+		);
+	const duotoneUrlRoot = duotoneKey && duotoneUrls[duotoneKey];
+	if (duotoneUrlRoot && photo.id) {
+		group.duotoneUrl = {
+			small: `${duotoneUrlRoot.small}/${photo.id}.jpeg`,
+			large: `${duotoneUrlRoot.large}/${photo.id}.jpeg`,
+		};
+	}
+	return group;
+};
+
+/**
+ * From a provided set of signed duotoneUrls, create a function that injects
+ * the full duotone URL into an query response containing objects that support
+ * duotoned images (anything containing group or event objects
+ *
+ * @param {Object} duotoneUrls map of `[duotoneRef]: url template root`
+ * @param {Object} queryResponse { ref, type: <type>, value: <API object>, error? }
+ * @return {Object} the modified queryResponse
+ */
+export const apiResponseDuotoneSetter = duotoneUrls => {
+	const setGroupDuotone = groupDuotoneSetter(duotoneUrls);
+	return queryResponse => {
+		// inject duotone URLs into any group query response
+		const { type, value, error } = queryResponse;
+		if (!value || error) {
+			return queryResponse;
+		}
+		let groups;
+		switch (type) {
+			case 'group':
+				groups = value instanceof Array ? value : [value];
+				groups.forEach(setGroupDuotone);
+				break;
+			case 'home':
+				(value.rows || [])
+					.map(({ items }) => items)
+					.forEach(items =>
+						items
+							.filter(({ type }) => type === 'group')
+							.forEach(({ group }) => setGroupDuotone(group))
+					);
+				break;
+		}
+		return queryResponse;
+	};
 };
