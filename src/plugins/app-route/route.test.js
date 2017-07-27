@@ -1,6 +1,10 @@
 import Boom from 'boom';
-import { getServer } from '../util/testUtils';
-import { onPreResponse } from './appRoute';
+import {
+	MOCK_renderRequestMap,
+	MOCK_RENDER_RESULT,
+} from 'meetup-web-mocks/lib/app';
+import { getServer } from '../../util/testUtils';
+import getRoute, { onPreResponse } from './route';
 
 describe('onPreResponse.method', () => {
 	it('returns html containing error message', () => {
@@ -24,5 +28,12 @@ describe('onPreResponse.method', () => {
 		const errorMarkup = spyable.reply.calls.mostRecent().args[0];
 		expect(errorMarkup).toContain(errorMessage);
 		expect(replyObj.code).toHaveBeenCalledWith(errorCode);
+	});
+	it('serves the homepage route', () => {
+		const server = getServer();
+		server.route(getRoute(MOCK_renderRequestMap));
+		return server
+			.inject({ url: '/' })
+			.then(response => expect(response.payload).toEqual(MOCK_RENDER_RESULT));
 	});
 });
