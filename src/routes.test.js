@@ -14,4 +14,8 @@ describe('routes', () => {
 		getResponse({ url: '/ping' }).then(response =>
 			expect(response.statusCode).toEqual(200)
 		));
+	it('serves the app engine lifecycle route', () =>
+		getResponse({ url: '/_ah/start' }).then(response =>
+			expect(response.statusCode).toEqual(200)
+		));
 });

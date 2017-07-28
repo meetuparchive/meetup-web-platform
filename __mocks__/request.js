@@ -54,7 +54,7 @@ request.jar = actual_request.jar;
 
 request.__setMockResponse = (response, body) => {
 	mockResponse = response || mockResponse;
-	mockBody = body || body;
+	mockBody = body || mockBody;
 };
 
 module.exports = request;
