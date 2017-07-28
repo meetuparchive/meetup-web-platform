@@ -13,7 +13,7 @@ export const API_ROUTE_PATH = '/mu_api';
  * uploaded to the POST/PATCH endpoint
  */
 const onResponse = request => {
-	const { uploads } = request.plugins.apiProxy;
+	const { uploads } = request.plugins[API_PROXY_PLUGIN_NAME];
 	const { logger } = request.server.app;
 	if (uploads.length) {
 		const info = { info: uploads, req: request.raw.req };
@@ -30,7 +30,7 @@ const onResponse = request => {
 };
 
 export const setPluginState = (request: HapiRequest, reply: HapiReply) => {
-	request.plugins.apiProxy = {
+	request.plugins[API_PROXY_PLUGIN_NAME] = {
 		setState: reply.state, // allow plugin to proxy cookies from API
 		uploads: [], // keep track of any files that were uploaded
 	};
