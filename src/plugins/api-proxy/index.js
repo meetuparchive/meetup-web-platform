@@ -6,7 +6,7 @@ import getApiProxyRoutes from './routes';
 import proxyApi$ from './proxy';
 
 export const API_PROXY_PLUGIN_NAME = 'api-proxy';
-const API_ROUTE_PATH = '/mu_api';
+export const API_ROUTE_PATH = '/mu_api';
 
 /*
  * When response is sent, the plugin needs to delete any files that were
@@ -40,7 +40,7 @@ export const setPluginState = (request: HapiRequest, reply: HapiReply) => {
 
 export default function register(
 	server: Object,
-	options: { path?: string }, // optional api request pathname
+	options: void,
 	next: () => void
 ) {
 	// supply duotone urls through `server.plugins['api-proxy'].duotoneUrls`
@@ -57,7 +57,7 @@ export default function register(
 	server.on('response', onResponse);
 
 	// add a route that will receive query requests as querystring params
-	const routes = getApiProxyRoutes(options.path || API_ROUTE_PATH);
+	const routes = getApiProxyRoutes(API_ROUTE_PATH);
 	server.route(routes);
 
 	next();
