@@ -17,12 +17,12 @@ function getResponse(injectRequest, server = getServer()) {
 describe('api proxy plugin', () => {
 	it('serves api responses from the configured route path', () => {
 		const endpoint = 'foo';
+		const validQuery = { type: 'a', ref: 'b', params: {}, endpoint };
 		const expectedResponse = { foo: 'bar' };
 		require('request').__setMockResponse(
 			null,
 			JSON.stringify(expectedResponse)
 		);
-		const validQuery = { type: 'a', ref: 'b', params: {}, endpoint };
 		const queriesRison = rison.encode_array([validQuery]);
 		return getResponse({
 			url: `/mu_api?queries=${queriesRison}`,
@@ -34,7 +34,7 @@ describe('api proxy plugin', () => {
 			expect(JSON.parse(response.payload)).toMatchObject({
 				responses: [
 					expect.objectContaining({
-						meta: { statusCode: 200, endpoint: `/${endpoint}` },
+						meta: { statusCode: 200, endpoint },
 						value: expectedResponse,
 					}),
 				],

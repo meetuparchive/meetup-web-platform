@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getExternalRequestOpts returns the expected object from a vanilla request 1`] = `
+Object {
+  "agentOptions": Object {
+    "rejectUnauthorized": false,
+  },
+  "baseUrl": "https://api.dev.meetup.com",
+  "headers": Object {
+    "accept-language": "en-US",
+    "cookie": "MEETUP_CSRF=test-uuid; MEETUP_CSRF_DEV=test-uuid",
+    "csrf-token": "test-uuid",
+  },
+  "method": "get",
+  "mode": "no-cors",
+  "time": true,
+}
+`;
