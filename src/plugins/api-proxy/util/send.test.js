@@ -13,11 +13,28 @@ import {
 	makeExternalApiRequest,
 	buildRequestArgs,
 	getAuthHeaders,
+	getExternalRequestOpts,
 	getLanguageHeader,
+	// parseFormData,
+	// parseRequestHeaders,
 	API_META_HEADER,
 } from './send';
 
-const MOCK_HAPI_REQUEST = { server: getServer() };
+jest.mock('uuid', () => ({ v4: () => 'test-uuid' }));
+
+const MOCK_HAPI_REQUEST = {
+	server: getServer(),
+	method: 'get',
+	headers: {},
+	state: {},
+	plugins: {
+		'api-proxy': {
+			uploads: [],
+		},
+		requestAuth: {},
+	},
+	getLanguage: () => 'en-US',
+};
 
 describe('getAuthHeaders', () => {
 	it('returns authorization header if no member cookie and oauth_token', () => {
@@ -170,7 +187,11 @@ describe('buildRequestArgs', () => {
 	});
 });
 
-describe('getExternalRequestOpts', () => {});
+describe('getExternalRequestOpts', () => {
+	it('returns the expected object from a vanilla request', () => {
+		expect(getExternalRequestOpts(MOCK_HAPI_REQUEST)).toMatchSnapshot();
+	});
+});
 
 describe('createCookieJar', () => {
 	it('returns a cookie jar for /sessions endpoint', () => {
