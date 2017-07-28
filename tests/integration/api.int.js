@@ -3,7 +3,7 @@ import Boom from 'boom';
 import rison from 'rison';
 import { getCsrfHeaders } from '../mocks';
 import start from '../../src/server';
-import * as apiProxyHandler from '../../src/apiProxy/apiProxyHandler';
+import * as apiProxyHandler from '../../src/plugins/api-proxy/handler';
 
 const mockQuery = { type: 'foo', params: {}, ref: 'foo', endpoint: 'foo' };
 const queries = rison.encode_array([mockQuery]);
@@ -56,13 +56,9 @@ describe('API proxy GET endpoint integration tests', () => {
 			GET_RESPONSE,
 			JSON.stringify(GET_BODY)
 		);
-		const spyable = {
-			handler: (request, reply) => reply('okay'),
-		};
-		spyOn(spyable, 'handler').and.callThrough();
-		spyOn(apiProxyHandler, 'getApiProxyRouteHandler').and.callFake(
-			() => spyable.handler
-		);
+		spyOn(apiProxyHandler, 'default').and.callFake((request, reply) => {
+			reply('okay');
+		});
 		return start({}, {}).then(server => {
 			const request = {
 				method: 'get',
@@ -71,7 +67,7 @@ describe('API proxy GET endpoint integration tests', () => {
 			};
 			return server
 				.inject(request)
-				.then(response => expect(spyable.handler).toHaveBeenCalled())
+				.then(response => expect(apiProxyHandler.default).toHaveBeenCalled())
 				.then(() => server.stop());
 		});
 	});
@@ -87,7 +83,7 @@ describe('API proxy GET endpoint integration tests', () => {
 					type: 'foo',
 					value: GET_BODY,
 					meta: {
-						endpoint: '/foo',
+						endpoint: 'foo',
 						statusCode: 200,
 					},
 				},
@@ -102,9 +98,7 @@ describe('API proxy GET endpoint integration tests', () => {
 			return server
 				.inject(request)
 				.then(response =>
-					expect(JSON.parse(response.payload)).toEqual(
-						expectedResponse
-					)
+					expect(JSON.parse(response.payload)).toEqual(expectedResponse)
 				)
 				.then(() => server.stop())
 				.catch(err => {
@@ -134,9 +128,7 @@ const runMutationTest = ({ csrfHeaders, method, test, queries }) => server => {
 			const request = {
 				method,
 				url: `/mu_api${queries ? `?queries=${queries}` : ''}`,
-				payload: queries
-					? undefined
-					: querystring.stringify(mockPostPayload),
+				payload: queries ? undefined : querystring.stringify(mockPostPayload),
 				credentials: 'whatever',
 				headers,
 			};
@@ -156,13 +148,10 @@ describe('API proxy POST endpoint integration tests', () => {
 			POST_RESPONSE,
 			JSON.stringify(POST_BODY)
 		);
-		const handler = jest.fn((request, reply) => reply('okay'));
-		// use spyOn here so that mock will be cleaned up after test
-		spyOn(apiProxyHandler, 'getApiProxyRouteHandler').and.callFake(
-			() => handler
-		);
-
-		const test = response => expect(handler).toHaveBeenCalled();
+		spyOn(apiProxyHandler, 'default').and.callFake((request, reply) => {
+			reply('okay');
+		});
+		const test = response => expect(apiProxyHandler.default).toHaveBeenCalled();
 
 		return start({}, {}).then(runMutationTest({ method: 'post', test }));
 	});
@@ -178,7 +167,7 @@ describe('API proxy POST endpoint integration tests', () => {
 					type: mockQuery.type,
 					value: POST_BODY, // from the mocked `request` module
 					meta: {
-						endpoint: '/foo',
+						endpoint: 'foo',
 						statusCode: 200,
 					},
 				},
@@ -197,13 +186,9 @@ describe('API proxy POST endpoint integration tests', () => {
 		const expectedPayload = JSON.stringify(
 			Boom.create(400, 'INVALID_JWT').output.payload
 		);
-		const test = response =>
-			expect(response.payload).toEqual(expectedPayload);
+		const test = response => expect(response.payload).toEqual(expectedPayload);
 		const csrfHeaders = () =>
-			getCsrfHeaders().then(([cookieToken, headerToken]) => [
-				cookieToken,
-				'',
-			]);
+			getCsrfHeaders().then(([cookieToken, headerToken]) => [cookieToken, '']);
 
 		return start({}, {}).then(
 			runMutationTest({ method: 'post', test, csrfHeaders })
@@ -220,13 +205,10 @@ describe('API proxy PATCH endpoint integration tests', () => {
 			PATCH_RESPONSE,
 			JSON.stringify(PATCH_BODY)
 		);
-		const handler = jest.fn((request, reply) => reply('okay'));
-		// use spyOn here so that mock will be cleaned up after test
-		spyOn(apiProxyHandler, 'getApiProxyRouteHandler').and.callFake(
-			() => handler
-		);
-
-		const test = response => expect(handler).toHaveBeenCalled();
+		spyOn(apiProxyHandler, 'default').and.callFake((request, reply) => {
+			reply('okay');
+		});
+		const test = response => expect(apiProxyHandler.default).toHaveBeenCalled();
 
 		return start({}, {}).then(runMutationTest({ method: 'patch', test }));
 	});
@@ -241,13 +223,10 @@ describe('API proxy DELETE endpoint integration tests', () => {
 			DELETE_RESPONSE,
 			JSON.stringify(DELETE_BODY)
 		);
-		const handler = jest.fn((request, reply) => reply('okay'));
-		// use spyOn here so that mock will be cleaned up after test
-		spyOn(apiProxyHandler, 'getApiProxyRouteHandler').and.callFake(
-			() => handler
-		);
-
-		const test = response => expect(handler).toHaveBeenCalled();
+		spyOn(apiProxyHandler, 'default').and.callFake((request, reply) => {
+			reply('okay');
+		});
+		const test = response => expect(apiProxyHandler.default).toHaveBeenCalled();
 
 		return start({}, {}).then(
 			runMutationTest({ method: 'delete', test, queries })

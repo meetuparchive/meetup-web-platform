@@ -53,9 +53,6 @@ const MOCK_SERVER_APP = {
 	},
 	oauth: { ...MOCK_OAUTH },
 	photo_scaler_salt: 'asdfasdfasdfasdfasdfasdfasdfasdfasdf',
-	duotone_urls: {
-		foo: 'http://example.com',
-	},
 	isProd: 'false',
 	isDev: 'true',
 };
