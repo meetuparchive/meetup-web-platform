@@ -408,9 +408,9 @@ describe('groupDuotoneSetter', () => {
 		const group = { ...MOCK_GROUP };
 		const modifiedGroup = groupDuotoneSetter(MOCK_DUOTONE_URLS)(group);
 		const { duotoneUrl } = modifiedGroup;
-		const expectedUrls = MOCK_DUOTONE_URLS.dtaxb;
-		expect(duotoneUrl.large.startsWith(expectedUrls.large)).toBe(true);
-		expect(duotoneUrl.small.startsWith(expectedUrls.small)).toBe(true);
+		const expectedUrl = MOCK_DUOTONE_URLS.dtaxb;
+		expect(duotoneUrl.small.startsWith(expectedUrl.small)).toBe(true);
+		expect(duotoneUrl.large.startsWith(expectedUrl.large)).toBe(true);
 	});
 });
 
@@ -428,9 +428,9 @@ describe('apiResponseDuotoneSetter', () => {
 			groupApiResponse
 		);
 		const { duotoneUrl } = modifiedResponse.value;
-		const expectedUrls = MOCK_DUOTONE_URLS.dtaxb;
-		expect(duotoneUrl.large.startsWith(expectedUrls.large)).toBe(true);
-		expect(duotoneUrl.small.startsWith(expectedUrls.small)).toBe(true);
+		const expectedUrl = MOCK_DUOTONE_URLS.dtaxb;
+		expect(duotoneUrl.small.startsWith(expectedUrl.small)).toBe(true);
+		expect(duotoneUrl.large.startsWith(expectedUrl.large)).toBe(true);
 	});
 	it('adds duotone url to type: "home" api response', () => {
 		// this is an awkward test because we have to mock the deeply-nested
