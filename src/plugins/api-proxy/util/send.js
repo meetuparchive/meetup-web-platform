@@ -191,8 +191,17 @@ export function parseRequestHeaders(request) {
 	return externalRequestHeaders;
 }
 
-export function parseFormData(payload, uploadsList) {
-	Object.keys(payload).reduce((formData, key) => {
+/*
+ * In multipart form requests, the parsed payload includes string key-value
+ * pairs for regular inputs, and file descriptors for file upload inputs
+ * ({ filename, path, headers }). This function passes through regular input
+ * values unchanged, but converts the file descriptors to readable file streams
+ * that will be proxied to the REST API.
+ * 
+ * References to the uploaded files are stored here for cleanup later on.
+ */
+export function parseMultipart(payload, uploadsList) {
+	return Object.keys(payload).reduce((formData, key) => {
 		const value = payload[key];
 		if (value.filename) {
 			formData[key] = {
@@ -233,11 +242,8 @@ export function getExternalRequestOpts(request) {
 		},
 	};
 	if (request.mime === 'multipart/form-data') {
-		// the parsed payload includes string key-value pairs for regular inputs,
-		// and file descriptors for file upload inputs { filename, path, headers }
-		// The file descriptors can be converted to readable streams for the API
-		// request.
-		externalRequestOpts.formData = parseFormData(
+		// multipart form data needs special treatment
+		externalRequestOpts.formData = parseMultipart(
 			request.payload,
 			request.plugins[API_PROXY_PLUGIN_NAME].uploads
 		);

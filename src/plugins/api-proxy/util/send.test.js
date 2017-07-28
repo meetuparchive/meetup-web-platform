@@ -1,3 +1,4 @@
+import fs from 'fs';
 import { getServer } from '../../../util/testUtils';
 
 import 'rxjs/add/operator/toPromise';
@@ -15,8 +16,7 @@ import {
 	getAuthHeaders,
 	getExternalRequestOpts,
 	getLanguageHeader,
-	// parseFormData,
-	// parseRequestHeaders,
+	parseMultipart,
 	API_META_HEADER,
 } from './send';
 
@@ -191,6 +191,16 @@ describe('getExternalRequestOpts', () => {
 	it('returns the expected object from a vanilla request', () => {
 		expect(getExternalRequestOpts(MOCK_HAPI_REQUEST)).toMatchSnapshot();
 	});
+	it('returns the expected object from a multipart request', () => {
+		// most important difference is that multipart has a 'formData' key
+		expect(
+			getExternalRequestOpts({
+				...MOCK_HAPI_REQUEST,
+				mime: 'multipart/form-data',
+				payload: { foo: 'bar' },
+			})
+		).toMatchSnapshot();
+	});
 });
 
 describe('createCookieJar', () => {
@@ -241,5 +251,42 @@ describe('makeExternalApiRequest', () => {
 		return makeExternalApiRequest(MOCK_HAPI_REQUEST)(requestOpts)
 			.toPromise()
 			.then(([response, body, jar]) => expect(jar).toBe(requestOpts.jar));
+	});
+});
+
+describe('parseMultipart', () => {
+	it('passes through non-file data unchanged', () => {
+		const payload = { foo: 'bar', baz: 1 };
+		expect(parseMultipart(payload, [])).toEqual(payload);
+	});
+	it('converts a file descriptor to a readable stream', () => {
+		// have to mock 'fs' here rather than globally b/c jest needs a clean 'fs' module to run
+		const originalCRS = fs.createReadStream;
+		const fakeCRS = path => ({ path });
+		fs.createReadStream = jest.fn(fakeCRS);
+		const payload = {
+			foo: 'bar',
+			myfile: {
+				filename: 'baz.jpg',
+				headers: { 'content-type': 'smileyface' },
+				path: 'path/to/file.jpg',
+			},
+		};
+		const expectedFile = {
+			value: fakeCRS(payload.myfile.path),
+			options: {
+				filename: payload.myfile.filename,
+				contentType: payload.myfile.headers['content-type'],
+			},
+		};
+		const uploads = [];
+		expect(parseMultipart(payload, uploads)).toEqual({
+			...payload,
+			myfile: expectedFile,
+		});
+		expect(uploads).toHaveLength(1);
+		expect(uploads[0]).toEqual(payload.myfile.path);
+		// restore original fs.createReadStream implementation
+		fs.createReadStream = originalCRS;
 	});
 });
