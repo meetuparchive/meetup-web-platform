@@ -191,6 +191,25 @@ export function parseRequestHeaders(request) {
 	return externalRequestHeaders;
 }
 
+export function parseFormData(payload, uploadsList) {
+	Object.keys(payload).reduce((formData, key) => {
+		const value = payload[key];
+		if (value.filename) {
+			formData[key] = {
+				value: fs.createReadStream(value.path),
+				options: {
+					filename: value.filename,
+					contentType: value.headers['content-type'],
+				},
+			};
+			uploadsList.push(value.path);
+		} else {
+			formData[key] = value;
+		}
+		return formData;
+	}, {});
+}
+
 /*
  * Translate the incoming Hapi request into an 'opts' object that can be used
  * to call `request` for the REST API. This function essentially translates the
@@ -218,24 +237,10 @@ export function getExternalRequestOpts(request) {
 		// and file descriptors for file upload inputs { filename, path, headers }
 		// The file descriptors can be converted to readable streams for the API
 		// request.
-		externalRequestOpts.formData = Object.keys(
-			request.payload
-		).reduce((formData, key) => {
-			const value = request.payload[key];
-			if (value.filename) {
-				formData[key] = {
-					value: fs.createReadStream(value.path),
-					options: {
-						filename: value.filename,
-						contentType: value.headers['content-type'],
-					},
-				};
-				request.plugins[API_PROXY_PLUGIN_NAME].uploads.push(value.path);
-			} else {
-				formData[key] = value;
-			}
-			return formData;
-		}, {});
+		externalRequestOpts.formData = parseFormData(
+			request.payload,
+			request.plugins[API_PROXY_PLUGIN_NAME].uploads
+		);
 	}
 	return externalRequestOpts;
 }
