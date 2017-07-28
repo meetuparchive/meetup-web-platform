@@ -2,12 +2,12 @@ import 'rxjs/add/operator/toPromise';
 
 import { mockQuery, MOCK_RENDERPROPS } from 'meetup-web-mocks/lib/app';
 
-import { getServer } from './testUtils';
+import { getServer } from '../../../util/testUtils';
 import {
 	createCookieJar,
 	makeApiRequest$,
 	makeExternalApiRequest,
-} from './apiUtils';
+} from './index';
 
 // Mock the request module with a an empty response delayed by 200ms
 jest.mock('request', () => {

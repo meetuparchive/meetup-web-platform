@@ -59,9 +59,6 @@ The secrets in this example are dummy values and won't work in an actual app.
     "host": "beta2.dev.meetup.com",
   },
   "disable_hmr": false,
-  "duotone_urls": [
-    "http://example.com/duotone.jpg"
-  ],
   "photo_scaler_salt": "asdfasdfasdfasdfasdfasdfasdfasdf",
   "oauth": {
     "auth_url": "https://secure.dev.meetup.com/oauth2/authorize",

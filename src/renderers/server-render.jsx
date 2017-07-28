@@ -12,6 +12,7 @@ import Dom from '../components/dom';
 import { Forbidden, NotFound, Redirect } from '../router';
 import PlatformApp from '../components/PlatformApp';
 
+import { API_ROUTE_PATH } from '../plugins/api-proxy';
 import { getServerCreateStore } from '../util/createStoreServer';
 import { SERVER_RENDER } from '../actions/syncActionCreators';
 import configure from '../actions/configActionCreators';
@@ -190,7 +191,6 @@ const makeRenderer = (
 	const requestProtocol =
 		headers['x-forwarded-proto'] || connection.info.protocol;
 	const host = `${requestProtocol}://${info.host}`;
-	const apiUrl = '/mu_api';
 
 	// create the store
 	const initialState = {};
@@ -205,7 +205,7 @@ const makeRenderer = (
 	// load initial config
 	store.dispatch(
 		configure({
-			apiUrl,
+			apiUrl: API_ROUTE_PATH,
 			baseUrl: host,
 			enableServiceWorker,
 			requestLanguage,
