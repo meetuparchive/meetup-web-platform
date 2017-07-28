@@ -26,7 +26,6 @@ import {
 	getLanguageHeader,
 	injectResponseCookies,
 	logApiResponse,
-	// getExternalRequestOpts,
 	parseApiResponse,
 	parseApiValue,
 	parseMetaHeaders,
@@ -559,5 +558,3 @@ describe('logApiResponse', () => {
 		expect(loggedObject.info.body.startsWith(body300)).toBe(false);
 	});
 });
-
-describe('getExternalRequestOpts', () => {});
