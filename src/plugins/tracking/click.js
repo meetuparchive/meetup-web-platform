@@ -1,11 +1,11 @@
 // @flow
-import clickTrackingReader from './util/clickTrackingReader';
+import clickReader from './util/clickReader';
 
 export const CLICK_PLUGIN_NAME = 'mwp-click-tracking';
 
 export function onPreHandlerExtension(request: HapiRequest, reply: HapiReply) {
 	try {
-		clickTrackingReader(request, reply);
+		clickReader(request, reply);
 	} catch (err) {
 		console.error(err);
 		request.server.app.logger.error(err);
@@ -31,5 +31,7 @@ export default function register(
 register.attributes = {
 	name: CLICK_PLUGIN_NAME,
 	version: '1.0.0',
-	dependencies: ['hapi-pino'],
+	dependencies: [
+		'hapi-pino', // provides server.app.logger
+	],
 };
