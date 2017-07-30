@@ -7,6 +7,7 @@ import logger from '../util/logger';
 import appRoutePlugin from './app-route';
 import requestAuthPlugin from './requestAuthPlugin';
 import activityPlugin from './tracking/activity';
+import clickPlugin from './tracking/click';
 import languagePlugin from './language';
 import serviceWorkerPlugin from './service-worker';
 import apiProxyPlugin from './api-proxy';
@@ -106,6 +107,12 @@ export function getActivityTrackingPlugin({ agent, isProd }) {
 	};
 }
 
+export function getClickTrackingPlugin() {
+	return {
+		register: clickPlugin,
+	};
+}
+
 function getServiceWorkerPlugin() {
 	return {
 		register: serviceWorkerPlugin,
@@ -132,6 +139,7 @@ export default function getPlugins({ languageRenderers }) {
 		getCsrfPlugin(),
 		getRequestAuthPlugin(),
 		getActivityTrackingPlugin({ agent, isProd }),
+		getClickTrackingPlugin(),
 		getServiceWorkerPlugin(),
 		getApiProxyPlugin(),
 		getLanguagePlugin(),

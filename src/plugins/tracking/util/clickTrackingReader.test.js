@@ -1,4 +1,6 @@
-import processClickTracking, { clickCookieOptions } from './clickTrackingReader';
+import processClickTracking, {
+	clickCookieOptions,
+} from './clickTrackingReader';
 
 describe('processClickTracking', () => {
 	const click = { lineage: '', coords: [1, 2] };
