@@ -1,11 +1,11 @@
-import avro from '../plugins/tracking/util/avro';
-import config from './config';
-import { parseMemberCookie } from './cookieUtils';
+import avro from './avro';
+import { parseMemberCookie } from '../../../util/cookieUtils'; // TODO: provide this info through new plugin
 
+const isProd = process.env.NODE_ENV === 'production';
 export const clickCookieOptions = {
-	isSecure: config.isProd,
+	isSecure: isProd,
 	isHttpOnly: false,
-	domain: `${config.isProd ? '' : '.dev'}.meetup.com`,
+	domain: `${isProd ? '' : '.dev'}.meetup.com`,
 };
 
 export const clickToClickRecord = request => click => {
@@ -24,9 +24,8 @@ export default function processClickTracking(request, reply) {
 	const rawCookieValue = (request.state || {})['click-track'];
 	// It's possible that multiple cookies with the same value were sent, e.g.
 	// one value for .dev.meetup.com and another for .meetup.com - parse only the first
-	const cookieValue = rawCookieValue instanceof Array
-		? rawCookieValue[0]
-		: rawCookieValue;
+	const cookieValue =
+		rawCookieValue instanceof Array ? rawCookieValue[0] : rawCookieValue;
 	if (!cookieValue || cookieValue === 'undefined') {
 		return;
 	}

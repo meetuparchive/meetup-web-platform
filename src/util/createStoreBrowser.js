@@ -2,7 +2,7 @@
 import { applyMiddleware, createStore, compose } from 'redux';
 
 import { fetchQueries } from '../util/fetchUtils';
-import getClickTracker from './clickTracking';
+import getClickWriter from '../plugins/tracking/util/clickWriter';
 import getEpicMiddleware from '../middleware/epic';
 import catchMiddleware from '../middleware/catch';
 import injectPromise from '../middleware/injectPromise';
@@ -17,7 +17,7 @@ export const clickTrackEnhancer = createStore => (
 	enhancer
 ) => {
 	const store = createStore(reducer, initialState, enhancer);
-	const clickTracker = getClickTracker(store);
+	const clickTracker = getClickWriter(store);
 	document.body.addEventListener('click', clickTracker);
 	document.body.addEventListener('change', clickTracker);
 
