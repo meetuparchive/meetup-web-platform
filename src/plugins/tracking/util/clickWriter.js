@@ -1,5 +1,10 @@
-import { click } from '../actions/clickActionCreators';
+import { actions } from './clickState';
 const DATA_ATTR = 'clicktrack';
+
+/*
+ * This module provides utilities for handling browser-based click event data,
+ * including the dispatch of corresponding Redux actions
+ */
 
 function cleanTrackingUrl() {
 	// TODO: investigate and refactor to support this feature
@@ -134,7 +139,7 @@ function getTrackClick(store) {
 
 		// 2. Create click action with metadata
 		const now = new Date();
-		const clickTrackAction = click({
+		const clickTrackAction = actions.click({
 			timestamp: now.toISOString(),
 			lineage: clickLineage.join('<'),
 			linkText: linkText,
