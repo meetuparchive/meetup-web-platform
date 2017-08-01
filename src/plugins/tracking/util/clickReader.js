@@ -1,5 +1,6 @@
 import avro from './avro';
 import { parseMemberCookie } from '../../../util/cookieUtils'; // TODO: provide this info through new plugin
+import { COOKIE_NAME } from './clickState';
 
 const isProd = process.env.NODE_ENV === 'production';
 export const clickCookieOptions = {
@@ -21,7 +22,7 @@ export const clickToClickRecord = request => click => {
 };
 
 export default function processClickTracking(request, reply) {
-	const rawCookieValue = (request.state || {})['click-track'];
+	const rawCookieValue = (request.state || {})[COOKIE_NAME];
 	// It's possible that multiple cookies with the same value were sent, e.g.
 	// one value for .dev.meetup.com and another for .meetup.com - parse only the first
 	const cookieValue =
@@ -34,6 +35,6 @@ export default function processClickTracking(request, reply) {
 	const { history } = JSON.parse(cookieJSON);
 	history.map(clickToClickRecord(request)).forEach(avro.loggers.click);
 
-	reply.unstate('click-track', clickCookieOptions);
+	reply.unstate(COOKIE_NAME, clickCookieOptions);
 	return;
 }

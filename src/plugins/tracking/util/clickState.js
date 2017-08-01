@@ -1,3 +1,22 @@
+import JSCookie from 'js-cookie';
+
+export const COOKIE_NAME = 'click-track'; // must remain in sync with Meetup Classic implementation
+
+const BrowserCookies = JSCookie.withConverter({
+	read: (value, name) => value,
+	write: (value, name) =>
+		encodeURIComponent(value).replace(
+			/[!'()*]/g,
+			c => `%${c.charCodeAt(0).toString(16)}`
+		),
+});
+
+export const setClickCookie = clickTracking => {
+	const domain = window.location.host.replace(/[^.]+/, ''); // strip leading subdomain, e.g. www or beta2
+	const cookieVal = JSON.stringify(clickTracking);
+	BrowserCookies.set(COOKIE_NAME, cookieVal, { domain });
+};
+
 export const CLICK_TRACK_ACTION = 'CLICK_TRACK';
 export const CLICK_TRACK_CLEAR_ACTION = 'CLICK_TRACK_CLEAR';
 
