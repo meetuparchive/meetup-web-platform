@@ -1,5 +1,10 @@
 import JSCookie from 'js-cookie';
 
+/*
+ * This module provides utilities for managing click tracking data in Redux
+ * state an saving that data to a browser cookie
+ */
+
 export const COOKIE_NAME = 'click-track'; // must remain in sync with Meetup Classic implementation
 
 const BrowserCookies = JSCookie.withConverter({

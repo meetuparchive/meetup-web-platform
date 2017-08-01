@@ -1,6 +1,11 @@
 import { actions } from './clickState';
 const DATA_ATTR = 'clicktrack';
 
+/*
+ * This module provides utilities for handling browser-based click event data,
+ * including the dispatch of corresponding Redux actions
+ */
+
 function cleanTrackingUrl() {
 	// TODO: investigate and refactor to support this feature
 	/*

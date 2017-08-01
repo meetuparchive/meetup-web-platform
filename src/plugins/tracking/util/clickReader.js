@@ -2,6 +2,11 @@ import avro from './avro';
 import { parseMemberCookie } from '../../../util/cookieUtils'; // TODO: provide this info through new plugin
 import { COOKIE_NAME } from './clickState';
 
+/*
+ * This module provides utilities for reading click cookie data sent as part of
+ * a request to the application - it should be set up as a server plugin
+ */
+
 const isProd = process.env.NODE_ENV === 'production';
 export const clickCookieOptions = {
 	isSecure: isProd,
