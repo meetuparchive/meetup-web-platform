@@ -19,12 +19,19 @@ export class SyncContainer extends React.Component {
 	 * This container connects route changes to Redux actions. When the router
 	 * inject new props, the container determines whether or not to dispatch a
 	 * 'locationChange' action
+	 * 
+	 * In order to prevent data fetches when the hash changes, we only compare
+	 * the new pathname and querystring with the current pathname and querystring
+	 * 
 	 * @return {undefined} side effect only - dispatch
 	 */
-	componentWillReceiveProps(nextProps) {
-		if (nextProps.location !== this.props.location) {
-			this.props.dispatchLocationChange(nextProps.location);
-			if (nextProps.history.action === 'PUSH') {
+	componentWillReceiveProps({ location, history }) {
+		if (
+			location.pathname !== this.props.pathname ||
+			location.search !== this.props.search
+		) {
+			this.props.dispatchLocationChange(location);
+			if (history.action === 'PUSH') {
 				// new navigation - scroll to top
 				window.scrollTo(0, 0);
 			}
