@@ -27,8 +27,8 @@ export class SyncContainer extends React.Component {
 	 */
 	componentWillReceiveProps({ location, history }) {
 		if (
-			location.pathname !== this.props.pathname ||
-			location.search !== this.props.search
+			location.pathname !== this.props.location.pathname ||
+			location.search !== this.props.location.search
 		) {
 			this.props.dispatchLocationChange(location);
 			if (history.action === 'PUSH') {
