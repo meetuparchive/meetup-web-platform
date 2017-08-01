@@ -7,6 +7,9 @@ declare type HapiRequestUrl = URL & {
 };
 declare type HapiRoute = Object;
 declare type HapiServer = {
+	app: {
+		logger: (...args: Array<any>) => void,
+	},
 	settings: {
 		app: { isProd: boolean, supportedLangs: Array<string>, [string]: any },
 	},
