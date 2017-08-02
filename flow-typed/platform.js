@@ -1,6 +1,7 @@
 // @flow
 declare var Intl: Object;
 
+declare type NonNull = string | number | boolean | {} | [];
 declare type Params = { [string]: string | number };
 
 declare type FluxStandardAction = {
@@ -11,6 +12,8 @@ declare type FluxStandardAction = {
 };
 
 declare type Reducer = (state: ?Object, action: FluxStandardAction) => Object;
+// Selector is paramaterized by its output type
+declare type Selector<T> = (state: ?Object) => T;
 
 // API query structure
 declare type Query = {
@@ -24,9 +27,10 @@ declare type Query = {
 	},
 };
 
+declare type QueryResponseValue = Object | Array<Object>;
 declare type QueryResponse = {
 	ref: string,
-	value: Object | Array<Object>,
+	value: QueryResponseValue,
 	type?: string,
 	flags?: Array<string>,
 	meta?: Object,
@@ -62,29 +66,32 @@ declare type Match = {
 
 declare type MatchedRoute = { route: PlatformRoute, match: Match };
 declare type MatchPathOptions = {
-  path: string,
-  exact?: boolean,
-  strict?: boolean,
-}
+	path: string,
+	exact?: boolean,
+	strict?: boolean,
+};
 
 declare module 'react-router-dom/matchPath' {
-	declare function matchPath(pathname: string, options: MatchPathOptions): null | Match;
+	declare function matchPath(
+		pathname: string,
+		options: MatchPathOptions
+	): null | Match;
 	declare module.exports: typeof matchPath;
 }
 
 declare type LocationShape = {
-  pathname?: string,
-  search?: string,
-  hash?: string,
-  state?: any,
-}
+	pathname?: string,
+	search?: string,
+	hash?: string,
+	state?: any,
+};
 
 declare class RouterRedirect extends React$Component {
 	props: {
 		to: string | LocationShape,
 		push?: boolean,
-	}
+	},
 }
 declare module 'react-router-dom/Redirect' {
-	declare export default typeof RouterRedirect;
+	declare export default typeof RouterRedirect
 }
