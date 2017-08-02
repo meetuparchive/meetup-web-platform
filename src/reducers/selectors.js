@@ -5,11 +5,7 @@ import { createSelector } from 'reselect';
 export const EMPTY_OBJ = {};
 export const EMPTY_AR = [];
 
-/**
- * Checks a response object for errors and returns them
- * @param  {Object} responseValue Response value from Api
- * @return {Object} an object containing errors parsed from the response
- */
+// Checks a response object for errors and returns them
 export const processErrors = (responseValue: ?QueryResponse): Object => {
 	if (!responseValue || !responseValue.error) {
 		return {};
@@ -55,7 +51,7 @@ export const getValue = (
 	return resp.value; // the 'unwrapped' value
 };
 
-/**
+/*
  * Returns a property from response.value in state. If response.error or
  * response is empty, returns default value
  */
@@ -76,11 +72,9 @@ export const getProperty = (
 	return defaultValue;
 };
 
-/**
- * Pulls the value out of the state object provided or if error returns default value
- * @param  {Object}  defaultValue    fallback value if value is inValid
- * @param  {Object}  selector    selector to be pulled off state object
- * @return {Object}  returns selected value
+/*
+ * reads the value out of the state object provided using an optional selector,
+ * or, if response is empty, returns the provided default value
  */
 export const getSelectOrFallback = (
 	defaultValue: mixed,
@@ -106,17 +100,13 @@ export const getResponse = (
 	type: string,
 	defaultValue: mixed = EMPTY_OBJ
 ) => {
-	// empty check
 	if (!resp || isEmpty(resp)) {
 		return defaultValue;
 	}
-	// error object
+
 	if (resp.error) {
 		return {
-			error: {
-				type,
-				message: resp.error,
-			},
+			error: { type, message: resp.error },
 		};
 	}
 
