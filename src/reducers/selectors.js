@@ -3,22 +3,38 @@
 import { createSelector } from 'reselect';
 
 export const EMPTY_OBJ = {};
-export const EMPTY_AR = [];
+export const EMPTY_ARR = [];
 
-// Checks a response object for errors and returns them
-export const processErrors = (responseValue: ?QueryResponse): Object => {
-	if (!responseValue || !responseValue.error) {
-		return {};
+/*
+ * Checks a query response object for an error prop and the response if there
+ * are errors, or an empty object if no errors are found.
+ *
+ * **NOTES**
+ * - this function will _always return an object_ - use `processErrorsMaybe` or
+ *   `hasErrors` if you want a falsey return value.
+ * - There might still be errors in the `resp.value` that correspond to
+ *   particular errors in the request - those will not be flagged by this
+ *   function, only top-level errors in `resp.error`, such as a general 'Bad
+ *   Request' error message.
+ */
+export const processErrors = (
+	resp: ?QueryResponse
+): QueryResponse | typeof EMPTY_OBJ => {
+	if (!resp || !resp.error) {
+		return EMPTY_OBJ;
 	}
-	return responseValue;
+	return resp;
 };
 
+/*
+ * Similar to `processErrors`, but will return `null` if no errors are found
+ */
 export const processErrorsMaybe = (responseValue: ?QueryResponse) => {
 	const processed = processErrors(responseValue);
-	return Object.keys(processed).length ? processed : null;
+	return Object.keys(processed).length > 0 ? processed : null;
 };
 
-// Checks if object is empty
+// Checks if state argument is falsey or an empty object
 export const isEmpty: Selector<boolean> = state => {
 	if (!state) {
 		return true;
@@ -26,9 +42,9 @@ export const isEmpty: Selector<boolean> = state => {
 	return Object.keys(state).length === 0;
 };
 
-// Checks if object is has errors
+// Checks if object has errors
 export const hasErrors: Selector<boolean> = state =>
-	Object.keys(processErrors(state)).length > 0;
+	Boolean(processErrorsMaybe);
 
 // Combo check if the object is either empty or has errors
 export const hasValidValue: Selector<boolean> = state =>
@@ -37,6 +53,9 @@ export const hasValidValue: Selector<boolean> = state =>
 /*
  * returns the QueryResponse.value, or an object containing a single `error`
  * property. An empty response returns the defaultValue.
+ *
+ * TODO: clean up and clarify the behavior of this function - the mixed return
+ *       type is hard to reason about (default, unchanged resp, or resp.value).
  */
 export const getValue = (
 	resp: ?QueryResponse,
@@ -45,15 +64,18 @@ export const getValue = (
 	if (!resp || isEmpty(resp)) {
 		return defaultValue;
 	}
-	if (hasErrors(resp)) {
+	if (resp.error) {
 		return resp; // this is an object like { error, meta }
 	}
 	return resp.value; // the 'unwrapped' value
 };
 
 /*
- * Returns a property from response.value in state. If response.error or
- * response is empty, returns default value
+ * Returns a property from response.value in state if available with no errors.
+ * If response.error or response is empty, returns default value
+ *
+ * TODO: clean up and clarify the behavior of this function - the mixed return
+ *       type is hard to reason about (default, unchanged resp, or resp.value).
  */
 export const getProperty = (
 	resp: ?QueryResponse,
@@ -62,19 +84,17 @@ export const getProperty = (
 ): mixed => {
 	const value = getValue(resp, defaultValue);
 
-	if (value === defaultValue || value.error) {
-		return value;
+	if (value === defaultValue || !(value instanceof Object)) {
+		return defaultValue;
 	}
-	if (value instanceof Object && value[prop]) {
-		return value[prop];
-	}
-
-	return defaultValue;
+	return value.error ? value : value[prop] || defaultValue;
 };
 
 /*
- * reads the value out of the state object provided using an optional selector,
- * or, if response is empty, returns the provided default value
+ * creates a function that reads from the state object provided using an
+ * optional selector, or, if state is empty, returns the provided default value.
+ * 
+ * Whn no selector is provided, state will be returned directly.
  */
 export const getSelectOrFallback = (
 	defaultValue: mixed,
@@ -91,10 +111,10 @@ const getInFlightResp = state => state.api.inFlight;
 
 export const getInFlight = createSelector(
 	getInFlightResp,
-	getSelectOrFallback(EMPTY_AR, resp => resp)
+	getSelectOrFallback(EMPTY_ARR)
 );
 
-// Reads response and builds error object based on response.error
+// Reads response and builds a custom error object based on response.error
 export const getResponse = (
 	resp: ?QueryResponse,
 	type: string,

@@ -2,7 +2,7 @@ import { generateMockState } from '../util/testUtils';
 import { MOCK_EVENT } from 'meetup-web-mocks/lib/api';
 import {
 	EMPTY_OBJ,
-	EMPTY_AR,
+	EMPTY_ARR,
 	isEmpty,
 	hasErrors,
 	hasValidValue,
@@ -130,7 +130,7 @@ describe('Selector Helpers', () => {
 		});
 		it('should return default value of error response', () => {
 			const newState = getInFlight({ api: {} });
-			expect(newState).toBe(EMPTY_AR);
+			expect(newState).toBe(EMPTY_ARR);
 		});
 	});
 	describe('getResponse', () => {

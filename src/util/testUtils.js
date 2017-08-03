@@ -116,12 +116,16 @@ export function testCreateStore(createStoreFn) {
  * @param {Object} value value to use in object creation
  * @return {Object} mock object
  */
-export const generateMockState = (ref, value = { id: '🦄' }) => ({
+export const generateMockState = ({
+	ref,
+	value = { id: '🦄' },
+	meta = { statusCode: 204 },
+}) => ({
 	api: {
 		...MOCK_APP_STATE.api,
 		[ref]: {
-			ref: ref,
-			meta: { statusCode: 204 },
+			ref,
+			meta,
 			value,
 		},
 	},
