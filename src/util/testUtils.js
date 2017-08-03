@@ -37,9 +37,10 @@ export const middlewareDispatcher = middleware => (storeData, action) => {
 };
 
 export const parseCookieHeader = cookieHeader => {
-	const cookies = cookieHeader instanceof Array
-		? cookieHeader.map(Cookie.parse)
-		: [Cookie.parse(cookieHeader)];
+	const cookies =
+		cookieHeader instanceof Array
+			? cookieHeader.map(Cookie.parse)
+			: [Cookie.parse(cookieHeader)];
 
 	return cookies.reduce(
 		(acc, cookie) => ({ ...acc, [cookie.key]: cookie.value }),
@@ -108,3 +109,24 @@ export function testCreateStore(createStoreFn) {
 		basicStore.dispatch({ type: 'dummy' });
 	});
 }
+
+/**
+ * Useful function when generating fake state objects
+ * @param {String} ref Reference to use in object creation
+ * @param {Object} value value to use in object creation
+ * @return {Object} mock object
+ */
+export const generateMockState = ({
+	ref,
+	value = { id: '🦄' },
+	meta = { statusCode: 204 },
+}) => ({
+	api: {
+		...MOCK_APP_STATE.api,
+		[ref]: {
+			ref,
+			meta,
+			value,
+		},
+	},
+});
