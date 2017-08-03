@@ -10,7 +10,6 @@ import {
 	makeApiResponseToQueryResponse,
 	makeInjectResponseCookies,
 	makeLogResponse,
-	// getExternalRequestOpts,
 	makeParseApiResponse,
 	parseApiValue,
 	parseMetaHeaders,
