@@ -22,6 +22,8 @@ before_install:
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-core/.npmrc
   - npm install -g lerna
 
+install: lerna bootstrap
+
 before_script:
   - git diff --exit-code
 

@@ -15,4 +15,3 @@
   "testEnvironment": "node",
   "testRegex": "src\/.*\\.test\\.jsx?$"
 }
-
