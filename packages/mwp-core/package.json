@@ -1,6 +1,5 @@
 {
   "name": "meetup-web-platform",
-  "version": "hack",
   "description": "A collection of Node web application utilities developed for the Meetup web platform",
   "engineStrict": true,
   "engines": {
