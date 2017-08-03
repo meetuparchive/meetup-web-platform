@@ -83,7 +83,7 @@ describe('API proxy GET endpoint integration tests', () => {
 					type: 'foo',
 					value: GET_BODY,
 					meta: {
-						endpoint: '/foo',
+						endpoint: 'foo',
 						statusCode: 200,
 					},
 				},
@@ -167,7 +167,7 @@ describe('API proxy POST endpoint integration tests', () => {
 					type: mockQuery.type,
 					value: POST_BODY, // from the mocked `request` module
 					meta: {
-						endpoint: '/foo',
+						endpoint: 'foo',
 						statusCode: 200,
 					},
 				},
