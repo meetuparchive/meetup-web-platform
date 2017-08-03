@@ -19,7 +19,7 @@ env:
 
 before_install:
   - openssl aes-256-cbc -K $encrypted_ee3d73113e03_key -iv $encrypted_ee3d73113e03_iv -in '.travis/github_deploy_key.enc' -out github_deploy_key -d
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
+  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-core/.npmrc
   - npm install -g lerna
 
 before_script:
@@ -43,7 +43,7 @@ after_script:
     [ "${TRAVIS_BRANCH}" != "master" ] &&
     echo "skipping versioning" ||
     lerna run build &&
-    lerna publish --yes --skip-git --repo-version $GIT_TAG -m "Version $GIT_TAG built by Travis CI - https://travis-ci.com/$TRAVIS_REPO_SLUG/builds/$TRAVIS_JOB_ID" &&
+    lerna publish --yes --skip-git --npm-tag $NPM_TAG --repo-version $GIT_TAG -m "Version $GIT_TAG built by Travis CI - https://travis-ci.com/$TRAVIS_REPO_SLUG/builds/$TRAVIS_JOB_ID" &&
     git push --tags git@github.com:$TRAVIS_REPO_SLUG.git
 
 after_success:
