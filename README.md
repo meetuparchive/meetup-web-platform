@@ -24,9 +24,9 @@ In general, application-specific code will live outside of this package.
 
 ## Public modules
 
-- [Routing module](router/README.md)
-- [Language plugin for Hapi](plugins/language/README.md)
-- [API proxy plugin for Hapi](docs/api-proxy.md)
+- [Routing module](src/router/README.md)
+- [Language plugin for Hapi](src/plugins/language/README.md)
+- [API proxy plugin for Hapi](src/plugins/api-proxy/README.md)
 
 # Releases
 

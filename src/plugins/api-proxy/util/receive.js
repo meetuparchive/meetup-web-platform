@@ -83,34 +83,52 @@ export const parseMetaHeaders = headers => {
  * @param {Error} err the error to populate
  * @return {Object} { value, error? }
  */
-function formatApiError(err) {
+function formatApiError(err, value = null) {
 	return {
-		value: null,
+		value,
 		error: err.message,
 	};
 }
 
+const parseBody = body => {
+	if (!body) {
+		return null;
+	}
+	// Some newline literals will not work in JS string literals - they must be
+	// converted to an escaped newline character that will work end to end ('\n')
+	// treat non-success HTTP code as an error
+	const safeBody = body.replace(ESCAPED_UNICODE_NEWLINES, '\\n');
+	return JSON.parse(safeBody);
+};
+
 /**
+ * The externalRequest callback provides a `response` object and a `body` string
+ * that need to be parsed in order to determine the appropriate 'value'.
+ * 
+ * This function determines the { value, error } based on the status code and
+ * body of the response - it will always set an 'error' value when a non-2xx
+ * response is received, but it may provide additional error details that are
+ * included in the 'body' of the response - body error details will usually
+ * be JSON parsed into `value.errors`, but that is determined by the JSON
+ * returned by the REST API.
+ * 
  * @return {Object} { value, error? }
  */
 export const parseApiValue = ([response, body]) => {
-	// treat non-success (2xx) and non-redirect (3xx) HTTP code as an error
-	if (response.statusCode < 200 || response.statusCode > 399) {
-		return formatApiError(new Error(response.statusMessage));
+	if (response.statusCode === 204) {
+		// NoContent response type
+		return { value: null };
 	}
-	try {
-		if (response.statusCode === 204) {
-			// NoContent response type
-			return { value: null };
-		}
 
-		// Some newline literals will not work in JS string literals - they must be
-		// converted to an escaped newline character that will work end to end ('\n')
-		const safeBody = body.replace(ESCAPED_UNICODE_NEWLINES, '\\n');
-		const value = JSON.parse(safeBody);
+	try {
+		const value = parseBody(body);
+		if (response.statusCode < 200 || response.statusCode > 399) {
+			return formatApiError(new Error(response.statusMessage), value);
+		}
 		if (value && value.problem) {
 			return formatApiError(
-				new Error(`API problem: ${value.problem}: ${value.details}`)
+				new Error(`API problem: ${value.problem}: ${value.details}`),
+				value
 			);
 		}
 		return { value };
