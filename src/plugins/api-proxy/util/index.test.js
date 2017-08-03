@@ -157,12 +157,36 @@ describe('parseApiValue', () => {
 		headers: {},
 		statusCode: 200,
 	};
-	it('converts valid JSON into an equivalent object', () => {
+	const RESPONSE_400 = {
+		...MOCK_RESPONSE,
+		statusCode: 400,
+		statusMessage: 'Bad Request',
+	};
+	const RESPONSE_500 = {
+		...MOCK_RESPONSE,
+		statusCode: 500,
+		statusMessage: 'Internal Server Error',
+	};
+	it('converts valid JSON into an equivalent object for 200 OK response', () => {
 		const validJSON = JSON.stringify(MOCK_GROUP);
 		expect(parseApiValue([MOCK_RESPONSE, validJSON])).toEqual(
 			jasmine.any(Object)
 		);
 		expect(parseApiValue([MOCK_RESPONSE, validJSON])).toEqual({
+			value: MOCK_GROUP,
+		});
+	});
+	it('converts valid JSON into an equivalent object for 400 Bad Request response', () => {
+		const validJSON = JSON.stringify(MOCK_GROUP);
+		expect(parseApiValue([RESPONSE_400, validJSON])).toEqual({
+			error: expect.any(String),
+			value: MOCK_GROUP,
+		});
+	});
+	it('converts valid JSON into an equivalent object for 500 error response', () => {
+		const validJSON = JSON.stringify(MOCK_GROUP);
+		expect(parseApiValue([RESPONSE_500, validJSON])).toEqual({
+			error: expect.any(String),
 			value: MOCK_GROUP,
 		});
 	});
@@ -178,7 +202,7 @@ describe('parseApiValue', () => {
 			jasmine.any(String)
 		);
 	});
-	it('returns an object with a string "error" value for a not-ok response', () => {
+	it('returns an object with a null value for a 204 No Content response', () => {
 		const noContentStatus = {
 			statusCode: 204,
 			statusMessage: 'No Content',
