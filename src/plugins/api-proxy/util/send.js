@@ -182,12 +182,6 @@ export function parseRequestHeaders(request) {
 	delete externalRequestHeaders['content-length']; // original request content-length is irrelevant
 	delete externalRequestHeaders['content-type']; // the content type will be set in buildRequestArgs
 
-	// cloudflare headers we don't want to pass on
-	delete externalRequestHeaders['cf-ray'];
-	delete externalRequestHeaders['cf-ipcountry'];
-	delete externalRequestHeaders['cf-visitor'];
-	delete externalRequestHeaders['cf-connecting-ip'];
-
 	return externalRequestHeaders;
 }
 

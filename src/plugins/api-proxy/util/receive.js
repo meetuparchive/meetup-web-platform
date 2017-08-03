@@ -94,8 +94,8 @@ function formatApiError(err) {
  * @return {Object} { value, error? }
  */
 export const parseApiValue = ([response, body]) => {
-	// treat non-success HTTP code as an error
-	if (response.statusCode < 200 || response.statusCode > 299) {
+	// treat non-success (2xx) and non-redirect (3xx) HTTP code as an error
+	if (response.statusCode < 200 || response.statusCode > 399) {
 		return formatApiError(new Error(response.statusMessage));
 	}
 	try {
@@ -233,7 +233,7 @@ export const makeReceive = request => {
 		const parseApiResponse = makeParseApiResponse(query);
 		const apiResponseToQueryResponse = makeApiResponseToQueryResponse(query);
 		return response => {
-			logResponse(response); // this will leak private info in API response
+			logResponse(response); // this will leak private API response data into production logs
 			injectResponseCookies(response);
 			try {
 				return apiResponseToQueryResponse(parseApiResponse(response));
