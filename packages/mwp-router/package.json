@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "dependencies": {
+    "mwp-cli": "1.1.114",
     "mwp-core": "^6.0.1609-beta",
     "prop-types": "15.5.10",
     "react": "15.6.1",
