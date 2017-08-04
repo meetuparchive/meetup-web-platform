@@ -3,15 +3,13 @@
   "description": "React app routing components and utilities",
   "engineStrict": true,
   "engines": {
-    "node": ">=7.0.0"
+    "node": ">=8.1.0"
   },
   "main": "./lib/index.js",
   "scripts": {
     "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps",
-    "flow": "flow",
     "lint": "eslint . --ext .js,.jsx --fix",
-    "test": "yarn run flow && yarn run test:unit -- --silent --coverage && yarn run test:integration -- --silent",
-    "test:integration": "NODE_ENV=test jest --config jest.int.config.json",
+    "test": "yarn flow && yarn run test:unit -- --silent --coverage",
     "test:unit": "NODE_ENV=test jest --config jest.config.json",
     "test:watch": "yarn test:unit -- --watch"
   },
@@ -26,10 +24,8 @@
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "dependencies": {
-    "mwp-cli": "1.1.114",
-    "mwp-core": "6.0.1609-beta",
+    "mwp-core": "^6.0.1609-beta",
     "prop-types": "15.5.10",
-    "qs": "6.5.0",
     "react": "15.6.1",
     "react-dom": "15.6.1",
     "react-redux": "5.0.5",
@@ -38,10 +34,8 @@
     "redux": "3.7.1"
   },
   "devDependencies": {
-    "coveralls": "2.13.1",
     "enzyme": "2.9.1",
     "jest": "20.0.4",
-    "meetup-web-mocks": "1.0.204",
     "react-test-renderer": "15.6.1"
   }
 }
