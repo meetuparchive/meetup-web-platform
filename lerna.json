@@ -3,7 +3,7 @@
   "packages": [
     "packages/*"
   ],
-  "version": "hack",
+  "version": null,
   "command": {
     "init": {
       "exact": true
