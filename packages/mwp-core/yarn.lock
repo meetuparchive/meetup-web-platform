@@ -4845,9 +4845,9 @@ mwp-cli@1.0.101:
     webpack-stats-plugin "0.1.5"
     yargs "8.0.2"
 
-mwp-router@6.0.1604-beta:
-  version "6.0.1604-beta"
-  resolved "https://registry.yarnpkg.com/mwp-router/-/mwp-router-6.0.1604-beta.tgz#73cda60d6049d78292dfcb03cb6502bb4b804653"
+mwp-router@6.0.1608-beta:
+  version "6.0.1608-beta"
+  resolved "https://registry.yarnpkg.com/mwp-router/-/mwp-router-6.0.1608-beta.tgz#52c61e69b8df6d4db1bee4f05a25787e9bd68490"
   dependencies:
     prop-types "15.5.10"
     qs "6.5.0"

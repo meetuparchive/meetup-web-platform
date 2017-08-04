@@ -48,7 +48,7 @@
     "intl": "1.2.5",
     "joi": "10.6.0",
     "js-cookie": "2.1.4",
-    "mwp-router": "6.0.1604-beta",
+    "mwp-router": "6.0.1608-beta",
     "node-fetch": "1.7.1",
     "pino": "4.6.0",
     "prop-types": "15.5.10",
