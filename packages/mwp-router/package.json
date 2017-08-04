@@ -6,7 +6,7 @@
     "node": ">=7.0.0"
   },
   "files": [
-    "./lib"
+    "lib"
   ],
   "main": "./lib/index.js",
   "scripts": {
