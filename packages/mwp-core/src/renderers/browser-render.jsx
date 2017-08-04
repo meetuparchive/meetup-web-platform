@@ -5,7 +5,7 @@ import {
 	getInitialState,
 	getBrowserCreateStore,
 } from '../util/createStoreBrowser';
-import { getRouteResolver } from '../router/util';
+import { getRouteResolver } from 'mwp-router/lib/util';
 import BrowserApp from '../components/BrowserApp';
 
 /**

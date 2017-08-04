@@ -1,5 +1,5 @@
 {
-  "name": "meetup-web-platform",
+  "name": "mwp-core",
   "description": "A collection of Node web application utilities developed for the Meetup web platform",
   "engineStrict": true,
   "engines": {
@@ -69,8 +69,6 @@
   "devDependencies": {
     "coveralls": "2.13.1",
     "enzyme": "2.9.1",
-    "flow-bin": "0.49.1",
-    "husky": "0.14.3",
     "intl-messageformat": "2.0.0",
     "intl-relativeformat": "2.0.0",
     "iron": "4.0.5",

@@ -9,7 +9,7 @@ import ReactDOMServer from 'react-dom/server';
 import StaticRouter from 'react-router-dom/StaticRouter';
 
 import Dom from '../components/dom';
-import { Forbidden, NotFound, Redirect } from '../router';
+import { Forbidden, NotFound, Redirect } from 'mwp-router';
 import PlatformApp from '../components/PlatformApp';
 
 import { API_ROUTE_PATH } from '../plugins/api-proxy';

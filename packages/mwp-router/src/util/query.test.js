@@ -1,6 +1,6 @@
 import url from 'url';
-import { routes } from '../../../tests/mockApp';
-import asyncRoutes from '../../../tests/mockAsyncRoute';
+import { routes } from '../../tests/mockApp';
+import asyncRoutes from '../../tests/mockAsyncRoute';
 import { activeRouteQueries, decodeParams, getMatchedQueries } from './query';
 
 describe('activeRouteQueries', () => {
