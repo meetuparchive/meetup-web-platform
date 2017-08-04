@@ -1,13 +1,13 @@
 import Inert from 'inert';
 import HapiPino from 'hapi-pino';
 import CsrfPlugin from 'electrode-csrf-jwt';
+import languagePlugin from 'mwp-language-plugin';
 import config from 'mwp-cli/src/config';
 
 import logger from '../util/logger';
 import appRoutePlugin from './app-route';
 import requestAuthPlugin from './requestAuthPlugin';
 import activityPlugin from './tracking/activity';
-import languagePlugin from './language';
 import serviceWorkerPlugin from './service-worker';
 import apiProxyPlugin from './api-proxy';
 

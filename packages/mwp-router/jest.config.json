@@ -4,15 +4,14 @@
     "!**/{node_modules,lib,coverage,scripts}/**"
   ],
   "coverageDirectory": "<rootDir>/coverage",
-  "setupFiles": [
-    "<rootDir>/src/util/globals.js"
-  ],
   "moduleFileExtensions": [
     "js",
     "jsx",
     "json"
   ],
+  "setupFiles": [
+    "<rootDir>/src/util/globals.js"
+  ],
   "testEnvironment": "node",
   "testRegex": "src\/.*\\.test\\.jsx?$"
 }
-

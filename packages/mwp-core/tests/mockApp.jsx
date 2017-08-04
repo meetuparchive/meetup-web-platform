@@ -1,6 +1,6 @@
 import React from 'react';
 import makeRootReducer from '../src/reducers/platform';
-import { Redirect } from '../src/router';
+import { Redirect } from 'mwp-router';
 
 export const clientFilename = 'client.whatever.js';
 export const assetPublicPath = '//whatever';

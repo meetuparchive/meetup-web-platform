@@ -18,7 +18,7 @@ import {
 	SERVER_RENDER,
 } from '../actions/syncActionCreators';
 import { clearClick } from '../actions/clickActionCreators';
-import { getRouteResolver, getMatchedQueries } from '../router/util';
+import { getRouteResolver, getMatchedQueries } from 'mwp-router/lib/util';
 import { getDeprecatedSuccessPayload } from '../util/fetchUtils';
 
 /**
