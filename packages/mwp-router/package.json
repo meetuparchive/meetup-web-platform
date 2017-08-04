@@ -5,13 +5,9 @@
   "engines": {
     "node": ">=7.0.0"
   },
-  "files": [
-    "lib"
-  ],
   "main": "./lib/index.js",
   "scripts": {
     "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps",
-    "coveralls": "cat coverage/lcov.info | coveralls",
     "flow": "flow",
     "lint": "eslint . --ext .js,.jsx --fix",
     "test": "yarn run flow && yarn run test:unit -- --silent --coverage && yarn run test:integration -- --silent",
