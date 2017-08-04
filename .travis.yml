@@ -20,6 +20,7 @@ env:
 before_install:
   - openssl aes-256-cbc -K $encrypted_ee3d73113e03_key -iv $encrypted_ee3d73113e03_iv -in '.travis/github_deploy_key.enc' -out github_deploy_key -d
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-core/.npmrc
+  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-router/.npmrc
   - npm install -g lerna
   - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 0.27.5
   - export PATH="$HOME/.yarn/bin:$PATH"
