@@ -30,6 +30,8 @@ before_script:
   - lerna bootstrap
   - git diff --exit-code
 
+script: lerna run test
+
 after_script:
   - git config --global user.email "builds@travis-ci.com"
   - git config --global user.name "Travis CI"
