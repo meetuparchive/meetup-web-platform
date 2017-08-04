@@ -5,6 +5,9 @@
   "engines": {
     "node": ">=7.0.0"
   },
+  "files": [
+    "./lib"
+  ],
   "main": "./lib/index.js",
   "scripts": {
     "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps",
