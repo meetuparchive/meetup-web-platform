@@ -31,8 +31,8 @@ before_script:
   - lerna bootstrap
   - git diff --exit-code
 
-# script: lerna run test --stream
-script: echo 'no tests for now'
+script: lerna run test --stream
+# script: echo 'no tests so that Travis can publish new package'
 
 after_script:
   - git config --global user.email "builds@travis-ci.com"
