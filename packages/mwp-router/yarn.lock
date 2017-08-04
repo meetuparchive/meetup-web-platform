@@ -4813,9 +4813,9 @@ mwp-cli@1.1.114:
     webpack-stats-plugin "0.1.5"
     yargs "8.0.2"
 
-mwp-core@6.0.1608-beta:
-  version "6.0.1608-beta"
-  resolved "https://registry.yarnpkg.com/mwp-core/-/mwp-core-6.0.1608-beta.tgz#d783778bc330f1babc2167071d19b66d89a16387"
+mwp-core@6.0.1609-beta:
+  version "6.0.1609-beta"
+  resolved "https://registry.yarnpkg.com/mwp-core/-/mwp-core-6.0.1609-beta.tgz#7e053637b153fb3baca6857be6c75db38cf299ce"
   dependencies:
     "@alrra/travis-scripts" "3.0.1"
     "@google-cloud/pubsub" "0.13.1"
@@ -4833,7 +4833,7 @@ mwp-core@6.0.1608-beta:
     intl "1.2.5"
     joi "10.6.0"
     js-cookie "2.1.4"
-    mwp-router "6.0.1604-beta"
+    mwp-router "6.0.1608-beta"
     node-fetch "1.7.1"
     pino "4.6.0"
     prop-types "15.5.10"
@@ -4849,9 +4849,9 @@ mwp-core@6.0.1608-beta:
     url-regex "3.2.0"
     uuid "3.1.0"
 
-mwp-router@6.0.1604-beta:
-  version "6.0.1604-beta"
-  resolved "https://registry.yarnpkg.com/mwp-router/-/mwp-router-6.0.1604-beta.tgz#73cda60d6049d78292dfcb03cb6502bb4b804653"
+mwp-router@6.0.1608-beta:
+  version "6.0.1608-beta"
+  resolved "https://registry.yarnpkg.com/mwp-router/-/mwp-router-6.0.1608-beta.tgz#52c61e69b8df6d4db1bee4f05a25787e9bd68490"
   dependencies:
     prop-types "15.5.10"
     qs "6.5.0"
