@@ -13,7 +13,7 @@
     "agent": "MUP_WEB"
   },
   "scripts": {
-    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps",
+    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps --copy-files",
     "coveralls": "cat coverage/lcov.info | coveralls",
     "flow": "flow",
     "lint": "eslint . --ext .js,.jsx --fix",
