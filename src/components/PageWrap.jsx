@@ -2,30 +2,14 @@ import React from 'react';
 import Helmet from 'react-helmet';
 import PropTypes from 'prop-types';
 
-import { polyfillServiceUrl } from 'src/util/browserPolyfill';
+import { polyfillServiceUrl } from '../util/browserPolyfill';
 
 /*
  * This just imports a blob of JS that New Relic give us so we can track usage/errors from real
  * users. We should only need to upgrade it in the event New Relic makes a major change, which
  * they'll let us know about.
  */
-import { newrelicBrowserJS } from 'src/util/newrelicBrowser';
-
-/*
- * -- Require base stylesheets --
- * (includes swarm-sasstools)
- *
- * Use 4 webpack loaders to build the css file and get the bundled filename
- * 1. sass-loader - parse Sass to CSS
- * 2. css-loader - parse CSS to re-write `@import` and `url(...)` to correct
- *    relative paths
- * 3. require-loader - 'run' the module written by css-loader to get the raw
- *    css string
- * 4. file-loader - write the css string to a file and return the filename for
- *    use in this script (name of input file + 7-digit hash + .css)
- */
-const baseCSSHref = require('file-loader?name=[name].[hash:7].css!require-loader!css-loader!sass-loader!../assets/scss/main.scss');
-const webfontCSSHref = require('file-loader?name=[name].[hash:7].css!require-loader!css-loader!../assets/graphik.css');
+import { newrelicBrowserJS } from '../util/newrelicBrowser';
 
 /*
  * -- Inline SVG icon sprite --
@@ -38,12 +22,12 @@ const iconSprite = require('raw-loader!swarm-icons/dist/sprite/sprite.inc');
 /*
  * Swarm logos
  */
-const swarmFavicon = require('file-loader!src/assets/images/logos/swarm/favicon.ico');
-const swarmIcon120x120 = require('file-loader!src/assets/images/logos/swarm/m_swarm_120x120.png');
-const swarmIcon128x128 = require('file-loader!src/assets/images/logos/swarm/m_swarm_128x128.png');
-const swarmIcon152x152 = require('file-loader!src/assets/images/logos/swarm/m_swarm_152x152.png');
-const swarmIcon180x180 = require('file-loader!src/assets/images/logos/swarm/m_swarm_180x180.png');
-const swarmIcon196x196 = require('file-loader!src/assets/images/logos/swarm/m_swarm_196x196.png');
+const swarmFavicon = require('file-loader!../assets/favicon.ico');
+const swarmIcon120x120 = require('file-loader!../assets/logos/m_swarm_120x120.png');
+const swarmIcon128x128 = require('file-loader!../assets/logos/m_swarm_128x128.png');
+const swarmIcon152x152 = require('file-loader!../assets/logos/m_swarm_152x152.png');
+const swarmIcon180x180 = require('file-loader!../assets/logos/m_swarm_180x180.png');
+const swarmIcon196x196 = require('file-loader!../assets/logos/m_swarm_196x196.png');
 
 /**
  * This component wraps all pages on the website, and through [Helmet](https://github.com/nfl/react-helmet/)
@@ -71,7 +55,7 @@ class PageWrap extends React.Component {
 	 * @return {React.element} the page wrapping component
 	 */
 	render() {
-		const { localeCode } = this.props;
+		const { localeCode, baseCSSHref, webfontCSSHref } = this.props;
 
 		// Parse localeCode for ISO 639-1 languages code.
 		// (ie. 'en', 'it', etc)

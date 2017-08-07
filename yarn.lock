@@ -4916,9 +4916,9 @@ mute-stream@0.0.7:
   version "0.0.7"
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.7.tgz#3075ce93bc21b8fab43e1bc4da7e8115ed1e7bab"
 
-mwp-cli@1.0.101:
-  version "1.0.101"
-  resolved "https://registry.yarnpkg.com/mwp-cli/-/mwp-cli-1.0.101.tgz#b3fcaba8ad1d603364d2d58489845081449cd54e"
+mwp-cli@1.1.111:
+  version "1.1.111"
+  resolved "https://registry.yarnpkg.com/mwp-cli/-/mwp-cli-1.1.111.tgz#fec80bd97934258c1b0c5fe73c98ad1e817de195"
   dependencies:
     "@alrra/travis-scripts" "3.0.1"
     ajv "5"
