@@ -10,10 +10,13 @@ import {
 } from './languageUtils';
 
 const rootUrl = 'http://example.com/';
+const unsupportedLang = 'xx-XX';
 const MOCK_HAPI_REQUEST = {
 	log() {},
 	url: url.parse(rootUrl),
-	headers: {},
+	headers: {
+		'accept-language': unsupportedLang, // must test unsupported lang by default
+	},
 	state: {},
 };
 const MOCK_HAPI_REPLY = {
