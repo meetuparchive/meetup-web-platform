@@ -87,7 +87,7 @@ export function getLogger(
 		console.error(
 			JSON.stringify({
 				err,
-				res: pino.stdSerializers.asResValue(request.raw.res),
+				res: pino.stdSerializers.res(request.raw.res),
 				message: `500 Internal server error: ${err.message}`,
 			})
 		);
