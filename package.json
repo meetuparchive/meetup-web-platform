@@ -90,7 +90,7 @@
     "jest": "20.0.4",
     "lint-staged": "4.0.1",
     "meetup-web-mocks": "1.0.203",
-    "mwp-cli": "1.0.101",
+    "mwp-cli": "1.1.114",
     "prettier": "1.5.2",
     "react": "15.6.1",
     "react-helmet": "5.1.3",
