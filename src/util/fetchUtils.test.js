@@ -1,8 +1,9 @@
-import JSCookie from 'js-cookie';
 import { mockQuery } from 'meetup-web-mocks/lib/app';
 import { MOCK_GROUP } from 'meetup-web-mocks/lib/api';
 import * as fetchUtils from './fetchUtils';
 import { URLSearchParams } from 'url';
+import * as clickState from '../plugins/tracking/util/clickState';
+clickState.setClickCookie = jest.fn();
 
 global.FormData = function() {};
 global.URLSearchParams = URLSearchParams;
@@ -54,24 +55,22 @@ describe('fetchQueries', () => {
 	it('returns an object with successes and errors arrays', () => {
 		spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
-		return fetchUtils
-			.fetchQueries(API_URL.toString())(getQueries)
-			.then(response => {
-				expect(response.successes).toEqual([
-					{ query: getQueries[0], response: responses[0] },
-				]);
-				expect(response.errors).toEqual([]);
-			});
+		return fetchUtils.fetchQueries(API_URL.toString())(
+			getQueries
+		).then(response => {
+			expect(response.successes).toEqual([
+				{ query: getQueries[0], response: responses[0] },
+			]);
+			expect(response.errors).toEqual([]);
+		});
 	});
 	it('returns a promise that will reject when response contains error prop', () => {
 		spyOn(global, 'fetch').and.callFake(fakeSuccessError);
 
-		return fetchUtils
-			.fetchQueries(API_URL.toString())(getQueries)
-			.then(
-				response => expect(true).toBe(false),
-				err => expect(err).toEqual(jasmine.any(Error))
-			);
+		return fetchUtils.fetchQueries(API_URL.toString())(getQueries).then(
+			response => expect(true).toBe(false),
+			err => expect(err).toEqual(jasmine.any(Error))
+		);
 	});
 	it('calls fetch with method supplied by query', () => {
 		spyOn(global, 'fetch').and.callFake(fakeSuccess);
@@ -80,12 +79,12 @@ describe('fetchQueries', () => {
 
 		const methodTest = method => () => {
 			query.meta = { method };
-			return fetchUtils
-				.fetchQueries(API_URL.toString())(queries)
-				.then(response => {
-					const [, config] = global.fetch.calls.mostRecent().args;
-					expect(config.method).toEqual(method);
-				});
+			return fetchUtils.fetchQueries(API_URL.toString())(
+				queries
+			).then(response => {
+				const [, config] = global.fetch.calls.mostRecent().args;
+				expect(config.method).toEqual(method);
+			});
 		};
 		return methodTest('POST')()
 			.then(methodTest('PATCH'))
@@ -95,87 +94,84 @@ describe('fetchQueries', () => {
 		it('GET calls fetch with API url and queries, metadata', () => {
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
-			return fetchUtils
-				.fetchQueries(API_URL.toString())(getQueries, { ...meta })
-				.then(() => {
-					const calledWith = global.fetch.calls.mostRecent().args;
-					const url = new URL(calledWith[0]);
-					expect(url.origin).toBe(API_URL.origin);
-					expect(url.searchParams.has('queries')).toBe(true);
-					expect(url.searchParams.has('metadata')).toBe(true);
-					expect(calledWith[1].method).toEqual('GET');
-				});
+			return fetchUtils.fetchQueries(API_URL.toString())(getQueries, {
+				...meta,
+			}).then(() => {
+				const calledWith = global.fetch.calls.mostRecent().args;
+				const url = new URL(calledWith[0]);
+				expect(url.origin).toBe(API_URL.origin);
+				expect(url.searchParams.has('queries')).toBe(true);
+				expect(url.searchParams.has('metadata')).toBe(true);
+				expect(calledWith[1].method).toEqual('GET');
+			});
 		});
 
-		it('GET calls js-cookie "set" with click-track', () => {
+		it('GET calls clickState.setClickCookie', () => {
 			const clickTracking = {
 				history: [{ bar: 'foo' }],
 			};
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
-			JSCookie.set.mockClear();
 
-			return fetchUtils
-				.fetchQueries(API_URL.toString())(getQueries, {
-					...meta,
-					clickTracking,
-					logout: true,
-				})
-				.then(() => {
-					const calledWith = JSCookie.set.mock.calls[0];
-					expect(calledWith[0]).toEqual('click-track');
-				});
+			return fetchUtils.fetchQueries(API_URL.toString())(getQueries, {
+				...meta,
+				clickTracking,
+				logout: true,
+			}).then(() => {
+				expect(clickState.setClickCookie).toHaveBeenCalledWith(clickTracking);
+			});
 		});
 
 		it('GET without meta calls fetch without metadata querystring params', () => {
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
-			return fetchUtils
-				.fetchQueries(API_URL.toString())(getQueries)
-				.then(() => {
-					const calledWith = global.fetch.calls.mostRecent().args;
-					const url = new URL(calledWith[0]);
-					expect(url.origin).toBe(API_URL.origin);
-					expect(url.searchParams.has('queries')).toBe(true);
-					expect(url.searchParams.has('metadata')).toBe(false);
-					expect(calledWith[1].method).toEqual('GET');
-				});
+			return fetchUtils.fetchQueries(API_URL.toString())(
+				getQueries
+			).then(() => {
+				const calledWith = global.fetch.calls.mostRecent().args;
+				const url = new URL(calledWith[0]);
+				expect(url.origin).toBe(API_URL.origin);
+				expect(url.searchParams.has('queries')).toBe(true);
+				expect(url.searchParams.has('metadata')).toBe(false);
+				expect(calledWith[1].method).toEqual('GET');
+			});
 		});
 	});
 	describe('POST', () => {
 		it('POST calls fetch with API url; csrf header; queries and metadata body params', () => {
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
-			return fetchUtils
-				.fetchQueries(API_URL.toString())(POSTQueries, meta)
-				.then(() => {
-					const calledWith = global.fetch.calls.mostRecent().args;
-					const url = new URL(calledWith[0]);
-					const options = calledWith[1];
-					expect(url.toString()).toBe(API_URL.toString());
-					expect(options.method).toEqual('POST');
-					// build a dummy url to hold the url-encoded body as searchstring
-					const dummyUrl = new URL(`http://example.com?${options.body}`);
-					expect(dummyUrl.searchParams.has('queries')).toBe(true);
-					expect(dummyUrl.searchParams.has('metadata')).toBe(true);
-					expect(options.headers['x-csrf-jwt']).toEqual(csrfJwt);
-				});
+			return fetchUtils.fetchQueries(API_URL.toString())(
+				POSTQueries,
+				meta
+			).then(() => {
+				const calledWith = global.fetch.calls.mostRecent().args;
+				const url = new URL(calledWith[0]);
+				const options = calledWith[1];
+				expect(url.toString()).toBe(API_URL.toString());
+				expect(options.method).toEqual('POST');
+				// build a dummy url to hold the url-encoded body as searchstring
+				const dummyUrl = new URL(`http://example.com?${options.body}`);
+				expect(dummyUrl.searchParams.has('queries')).toBe(true);
+				expect(dummyUrl.searchParams.has('metadata')).toBe(true);
+				expect(options.headers['x-csrf-jwt']).toEqual(csrfJwt);
+			});
 		});
 		it('POST without meta calls fetch without metadata body params', () => {
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
-			return fetchUtils
-				.fetchQueries(API_URL.toString())(POSTQueries)
-				.then(() => {
-					const calledWith = global.fetch.calls.mostRecent().args;
-					const url = new URL(calledWith[0]);
-					const options = calledWith[1];
-					expect(url.toString()).toBe(API_URL.toString());
-					expect(options.method).toEqual('POST');
-					const dummyUrl = new URL(`http://example.com?${options.body}`);
-					expect(dummyUrl.searchParams.has('queries')).toBe(true);
-					expect(dummyUrl.searchParams.has('metadata')).toBe(false);
-					expect(options.headers['x-csrf-jwt']).toEqual(csrfJwt);
-				});
+			return fetchUtils.fetchQueries(API_URL.toString())(
+				POSTQueries
+			).then(() => {
+				const calledWith = global.fetch.calls.mostRecent().args;
+				const url = new URL(calledWith[0]);
+				const options = calledWith[1];
+				expect(url.toString()).toBe(API_URL.toString());
+				expect(options.method).toEqual('POST');
+				const dummyUrl = new URL(`http://example.com?${options.body}`);
+				expect(dummyUrl.searchParams.has('queries')).toBe(true);
+				expect(dummyUrl.searchParams.has('metadata')).toBe(false);
+				expect(options.headers['x-csrf-jwt']).toEqual(csrfJwt);
+			});
 		});
 	});
 	describe('form data', () => {
@@ -192,17 +188,17 @@ describe('fetchQueries', () => {
 			];
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
-			return fetchUtils
-				.fetchQueries(API_URL.toString())(formQueries)
-				.then(() => {
-					const calledWith = global.fetch.calls.mostRecent().args;
-					const url = new URL(calledWith[0]);
-					const options = calledWith[1];
-					expect(options.method).toEqual('POST');
-					expect(url.searchParams.has('queries')).toBe(true);
-					expect(url.searchParams.has('metadata')).toBe(false);
-					expect(options.headers['x-csrf-jwt']).toEqual(csrfJwt);
-				});
+			return fetchUtils.fetchQueries(API_URL.toString())(
+				formQueries
+			).then(() => {
+				const calledWith = global.fetch.calls.mostRecent().args;
+				const url = new URL(calledWith[0]);
+				const options = calledWith[1];
+				expect(options.method).toEqual('POST');
+				expect(url.searchParams.has('queries')).toBe(true);
+				expect(url.searchParams.has('metadata')).toBe(false);
+				expect(options.headers['x-csrf-jwt']).toEqual(csrfJwt);
+			});
 		});
 	});
 });
