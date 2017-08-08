@@ -34,7 +34,9 @@ class PageWrap extends React.Component {
 	}
 
 	renderHeadLinks(assets) {
-		return assets.map(assetProps => <link {...assetProps} />);
+		return assets.map((props, index) =>
+			<link key={`${props.rel}-${index}`} {...props} />
+		);
 	}
 
 	/**
@@ -92,7 +94,7 @@ PageWrap.propTypes = {
 	localeCode: PropTypes.string.isRequired,
 	location: PropTypes.object.isRequired,
 	self: PropTypes.object.isRequired,
-	swarmLogos: PropTypes.Array,
+	swarmLogos: PropTypes.array,
 };
 
 export default PageWrap;
