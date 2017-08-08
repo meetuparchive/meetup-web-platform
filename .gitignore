@@ -47,3 +47,6 @@ github_deploy_key
 # server config files
 config.*.json
 !config.test.json
+
+# visual studio code settings
+.vscode
