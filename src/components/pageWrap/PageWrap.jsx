@@ -33,37 +33,20 @@ class PageWrap extends React.Component {
 		);
 	}
 
+	renderHeadLinks(assets) {
+		return assets.map(assetProps => <link {...assetProps} />);
+	}
+
 	/**
 	 * @return {React.element} the page wrapping component
 	 */
 	render() {
-		const { localeCode, baseCSSHref, webfontCSSHref, iconSprite } = this.props;
+		const { localeCode, css, iconSprite, swarmLogos } = this.props;
 
 		// Parse localeCode for ISO 639-1 languages code.
 		// (ie. 'en', 'it', etc)
 		// @see https://github.com/meetup/swarm-sasstools/blob/master/scss/utils/helpers/_i18n.scss
 		const lang = localeCode.substring(0, 2);
-
-		/*
-					<link
-						rel="apple-touch-icon"
-						sizes="120x120"
-						href={swarmIcon120x120}
-					/>
-					<link rel="shortcut icon" sizes="128x128" href={swarmIcon128x128} />
-					<link rel="shortcut icon" href={swarmFavicon} />
-					<link
-						rel="apple-touch-icon"
-						sizes="152x152"
-						href={swarmIcon152x152}
-					/>
-					<link
-						rel="apple-touch-icon"
-						sizes="180x180"
-						href={swarmIcon180x180}
-					/>
-					<link rel="shortcut icon" sizes="196x196" href={swarmIcon196x196} />
-*/
 
 		return (
 			<div
@@ -72,11 +55,7 @@ class PageWrap extends React.Component {
 				style={{ minHeight: '100vh' }}
 			>
 				<Helmet defaultTitle="Meetup" titleTemplate="%s - Meetup">
-					{webfontCSSHref &&
-						<link rel="stylesheet" type="text/css" href={webfontCSSHref} />}
-
-					{baseCSSHref &&
-						<link rel="stylesheet" type="text/css" href={baseCSSHref} />}
+					{css && this.renderHeadLinks(css)}
 
 					<meta name="viewport" content="width=device-width, initial-scale=1" />
 					<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -86,6 +65,8 @@ class PageWrap extends React.Component {
 						name="verify-v1"
 						content="h5EhuAEkLFlZmMxwpH5wnRaoDEmqYCCEUE+FLcrRNvE="
 					/>
+
+					{swarmLogos && this.renderHeadLinks(swarmLogos)}
 
 					<script type="text/javascript" src={polyfillServiceUrl(localeCode)} />
 					<script type="text/javascript">
@@ -106,12 +87,12 @@ class PageWrap extends React.Component {
 }
 
 PageWrap.propTypes = {
-	localeCode: PropTypes.string.isRequired,
-	self: PropTypes.object.isRequired,
-	location: PropTypes.object.isRequired,
-	baseCSSHref: PropTypes.string,
-	webfontCSSHref: PropTypes.string,
+	css: PropTypes.array,
 	iconSprite: PropTypes.string,
+	localeCode: PropTypes.string.isRequired,
+	location: PropTypes.object.isRequired,
+	self: PropTypes.object.isRequired,
+	swarmLogos: PropTypes.Array,
 };
 
 export default PageWrap;
