@@ -42,6 +42,7 @@
     "chalk": "2.0.1",
     "convict": "4.0.0",
     "electrode-csrf-jwt": "1.2.1",
+    "enzyme": "2.9.1",
     "escape-html": "1.0.3",
     "hapi": "16.4.3",
     "hapi-pino": "1.7.0",
