@@ -33,8 +33,8 @@ class PageWrap extends React.Component {
 		);
 	}
 
-	renderHeadLinks(assets) {
-		return assets.map((props, index) =>
+	renderHeadLinks() {
+		return this.props.headLinks.map((props, index) =>
 			<link key={`${props.rel}-${index}`} {...props} />
 		);
 	}
@@ -43,7 +43,7 @@ class PageWrap extends React.Component {
 	 * @return {React.element} the page wrapping component
 	 */
 	render() {
-		const { localeCode, css, iconSprite, swarmLogos } = this.props;
+		const { localeCode, headLinks, iconSprite } = this.props;
 
 		// Parse localeCode for ISO 639-1 languages code.
 		// (ie. 'en', 'it', etc)
@@ -57,8 +57,6 @@ class PageWrap extends React.Component {
 				style={{ minHeight: '100vh' }}
 			>
 				<Helmet defaultTitle="Meetup" titleTemplate="%s - Meetup">
-					{css && this.renderHeadLinks(css)}
-
 					<meta name="viewport" content="width=device-width, initial-scale=1" />
 					<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 					<meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -68,7 +66,7 @@ class PageWrap extends React.Component {
 						content="h5EhuAEkLFlZmMxwpH5wnRaoDEmqYCCEUE+FLcrRNvE="
 					/>
 
-					{swarmLogos && this.renderHeadLinks(swarmLogos)}
+					{headLinks && this.renderHeadLinks()}
 
 					<script type="text/javascript" src={polyfillServiceUrl(localeCode)} />
 					<script type="text/javascript">
@@ -89,12 +87,11 @@ class PageWrap extends React.Component {
 }
 
 PageWrap.propTypes = {
-	css: PropTypes.array,
+	headLinks: PropTypes.array,
 	iconSprite: PropTypes.string,
 	localeCode: PropTypes.string.isRequired,
 	location: PropTypes.object.isRequired,
 	self: PropTypes.object.isRequired,
-	swarmLogos: PropTypes.array,
 };
 
 export default PageWrap;
