@@ -1,3 +1,15 @@
+## [5.2]
+
+- **Feature** `src/reducers/selectors.js` selectors that can be composed to
+  process state provided by the platform reducer. These were ported from mup-web
+  and retain most of the same interface definition, although there are two minor
+  changes:
+
+  1. `testUtils:generateMockState` takes a `{ ref, value?, meta? }` object arg
+     instead of mup-web's `(ref, value?)` signature - note the newly available
+     `meta` property override.
+  2. `EMPTY_AR` is now `EMPTY_ARR`.
+
 ## [5.1]
 
 - **Change** (could be considered breaking, but it's specifically for a

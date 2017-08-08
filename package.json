@@ -66,7 +66,8 @@
     "uuid": "3.1.0"
   },
   "peerDependencies": {
-    "mwp-cli": "^1.0.101"
+    "mwp-cli": "^1.0.101",
+    "reselect": "^3.0.1"
   },
   "devDependencies": {
     "babel-cli": "6.24.1",
@@ -98,6 +99,7 @@
     "react-router-dom": "4.1.1",
     "react-test-renderer": "15.6.1",
     "redux": "3.7.1",
+    "reselect": "3.0.1",
     "rxjs": "5.4.2",
     "tough-cookie": "2.3.2"
   },
