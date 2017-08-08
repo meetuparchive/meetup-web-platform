@@ -94,8 +94,9 @@ export function getLogger(
 	};
 	const register = (server, options, next) => {
 		server.on('request-error', onRequestError);
-		return HapiPino(server, options, next);
+		return HapiPino.register(server, options, next);
 	};
+	register.attributes = HapiPino.register.attributes;
 
 	options.instance = logger;
 	return {
