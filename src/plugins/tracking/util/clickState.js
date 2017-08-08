@@ -8,8 +8,8 @@ import JSCookie from 'js-cookie';
 export const COOKIE_NAME = 'click-track'; // must remain in sync with Meetup Classic implementation
 
 const BrowserCookies = JSCookie.withConverter({
-	read: (value, name) => value,
-	write: (value, name) =>
+	read: value => value,
+	write: value =>
 		encodeURIComponent(value).replace(
 			/[!'()*]/g,
 			c => `%${c.charCodeAt(0).toString(16)}`
