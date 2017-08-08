@@ -17,7 +17,7 @@ import { createFakeStore, epicIgnoreAction } from '../util/testUtils';
 import getSyncEpic from '../epics/sync';
 import * as api from '../actions/apiActionCreators';
 import * as syncActionCreators from '../actions/syncActionCreators';
-import { CLICK_TRACK_CLEAR_ACTION } from '../actions/clickActionCreators';
+import { CLICK_TRACK_CLEAR_ACTION } from '../plugins/tracking/util/clickState';
 
 const EMPTY_ROUTES = {};
 

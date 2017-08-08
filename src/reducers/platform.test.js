@@ -1,13 +1,15 @@
 import * as apiActions from '../actions/apiActionCreators';
-import * as clickActionCreators from '../actions/clickActionCreators';
+import {
+	actions as clickActionCreators,
+	reducer as clickTracking,
+	DEFAULT_CLICK_TRACK,
+} from '../plugins/tracking/util/clickState';
 import * as syncActionCreators from '../actions/syncActionCreators';
 import {
 	DEFAULT_API_STATE,
 	DEFAULT_APP_STATE, // DEPRECATED
-	DEFAULT_CLICK_TRACK,
 	api,
 	app, // DEPRECATED
-	clickTracking,
 } from './platform';
 
 describe('app reducer', () => {
@@ -140,7 +142,7 @@ describe('clickTracking reducer', () => {
 	});
 	it('clears click data on clear clicks', () => {
 		const initialState = { history: [{ bar: 'baz' }] };
-		const action = clickActionCreators.clearClick();
+		const action = clickActionCreators.clear();
 		expect(clickTracking(initialState, action)).toBe(DEFAULT_CLICK_TRACK);
 	});
 	it('returns unmodified state for non-click actions', () => {

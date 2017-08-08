@@ -5,10 +5,7 @@
  **/
 
 import { combineReducers } from 'redux';
-import {
-	CLICK_TRACK_ACTION,
-	CLICK_TRACK_CLEAR_ACTION,
-} from '../actions/clickActionCreators';
+import { reducer as clickTracking } from '../plugins/tracking/util/clickState';
 import {
 	API_REQ,
 	API_RESP_SUCCESS,
@@ -127,28 +124,6 @@ export function app(state = DEFAULT_APP_STATE, action = {}) {
 		default:
 			return state;
 	}
-}
-
-export const DEFAULT_CLICK_TRACK = { history: [] };
-/**
- * @param {Object} data extensible object to store click data {
- *   history: array
- * }
- * @param {Object} action the dispatched action
- * @return {Object} new state
- */
-export function clickTracking(state = DEFAULT_CLICK_TRACK, action) {
-	if (action.type === CLICK_TRACK_ACTION) {
-		const history = [...state.history, action.payload];
-		return {
-			...state,
-			history,
-		};
-	}
-	if (action.type === CLICK_TRACK_CLEAR_ACTION) {
-		return DEFAULT_CLICK_TRACK;
-	}
-	return state;
 }
 
 export function config(state = {}, action) {

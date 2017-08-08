@@ -1,4 +1,5 @@
-import processClickTracking, { clickCookieOptions } from './clickTrackingReader';
+import processClickTracking, { clickCookieOptions } from './clickReader';
+import { COOKIE_NAME } from './clickState';
 
 describe('processClickTracking', () => {
 	const click = { lineage: '', coords: [1, 2] };
@@ -7,7 +8,7 @@ describe('processClickTracking', () => {
 	};
 	const request = {
 		state: {
-			'click-track': encodeURIComponent(JSON.stringify(clickData)),
+			[COOKIE_NAME]: encodeURIComponent(JSON.stringify(clickData)),
 			MEETUP_MEMBER: 'id=1234',
 			MEETUP_MEMBER_DEV: 'id=1234',
 		},
@@ -29,10 +30,7 @@ describe('processClickTracking', () => {
 	it('calls reply.unstate for click-track cookie', () => {
 		reply.unstate.mockClear();
 		processClickTracking(request, reply);
-		expect(reply.unstate).toHaveBeenCalledWith(
-			'click-track',
-			clickCookieOptions
-		);
+		expect(reply.unstate).toHaveBeenCalledWith(COOKIE_NAME, clickCookieOptions);
 	});
 	it('does nothing with no click data', () => {
 		request.log.mockClear();

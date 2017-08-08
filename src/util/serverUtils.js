@@ -2,8 +2,6 @@ import https from 'https';
 import Hapi from 'hapi';
 import uuid from 'uuid';
 
-import clickTrackingReader from './clickTrackingReader';
-
 /**
  * determine whether a nested object of values has
  * a string that contains `.dev.meetup.`
@@ -31,16 +29,6 @@ export function onRequestExtension(request, reply) {
 		`Incoming request ${request.method.toUpperCase()} ${request.url.href}`
 	);
 
-	return reply.continue();
-}
-
-export function onPreHandlerExtension(request, reply) {
-	try {
-		clickTrackingReader(request, reply);
-	} catch (err) {
-		console.error(err);
-		request.server.app.logger.error(err);
-	}
 	return reply.continue();
 }
 
@@ -93,10 +81,6 @@ export function registerExtensionEvents(server) {
 		{
 			type: 'onRequest',
 			method: onRequestExtension,
-		},
-		{
-			type: 'onPreHandler',
-			method: onPreHandlerExtension,
 		},
 	]);
 	server.on('response', logResponse);
