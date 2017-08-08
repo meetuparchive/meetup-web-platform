@@ -28,16 +28,16 @@ export const getUrlLang = (request, supportedLangs) => {
  *   preferred languages first
  * @return {String|Boolean} language code
  */
-export const getBrowserLang = (request, supportedLangs) => {
-	return Accepts(request).language(supportedLangs);
-};
+export const getBrowserLang = (request, supportedLangs) =>
+	Accepts(request).language(supportedLangs);
 
 export const getLanguage = (request, supportedLangs) => {
 	// return the first language hit in the order of preference
 	return (
 		getCookieLang(request, supportedLangs) ||
 		getUrlLang(request, supportedLangs) ||
-		getBrowserLang(request, supportedLangs)
+		getBrowserLang(request, supportedLangs) ||
+		supportedLangs[0]
 	);
 };
 
