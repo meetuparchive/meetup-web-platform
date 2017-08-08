@@ -27,6 +27,7 @@ In general, application-specific code will live outside of this package.
 - [Routing module](src/router/README.md)
 - [Language plugin for Hapi](src/plugins/language/README.md)
 - [API proxy plugin for Hapi](src/plugins/api-proxy/README.md)
+- [Click and Activity tracking](src/plugins/tracking/README.md)
 
 # Releases
 
