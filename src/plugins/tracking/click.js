@@ -7,7 +7,6 @@ export function onPreHandlerExtension(request: HapiRequest, reply: HapiReply) {
 	try {
 		clickReader(request, reply);
 	} catch (err) {
-		console.error(err);
 		request.server.app.logger.error(err);
 	}
 	return reply.continue();
