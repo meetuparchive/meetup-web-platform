@@ -1,4 +1,5 @@
 import Inert from 'inert';
+import pino from 'pino';
 import HapiPino from 'hapi-pino';
 import CsrfPlugin from 'electrode-csrf-jwt';
 import config from 'mwp-cli/src/config';
@@ -79,10 +80,26 @@ export function getRequestAuthPlugin() {
 	};
 }
 
-export function getLogger(options = {}) {
+export function getLogger(
+	options = { logEvents: ['onPostStart', 'onPostStop', 'response'] }
+) {
+	const onRequestError = (request, err) => {
+		console.error(
+			JSON.stringify({
+				err,
+				res: pino.stdSerializers.asResValue(request.raw.res),
+				message: `500 Internal server error: ${err.message}`,
+			})
+		);
+	};
+	const register = (server, options, next) => {
+		server.on('request-error', onRequestError);
+		return HapiPino(server, options, next);
+	};
+
 	options.instance = logger;
 	return {
-		register: HapiPino,
+		register,
 		options,
 	};
 }
