@@ -217,7 +217,32 @@ describe('Full dummy app render', () => {
 			};
 			return server
 				.inject(request)
+				.then(response => {
+					expect(response.statusCode).toBe(500);
+				})
+				.then(() => server.stop())
+				.catch(err => {
+					server.stop();
+					throw err;
+				});
+		}));
+	it('returns 200 OK after a 500 error', () =>
+		start(getMockRenderRequestMap(), {}).then(server => {
+			const errorRequest = {
+				method: 'get',
+				url: '/badImplementation',
+				credentials: 'whatever',
+			};
+			const goodRequest = {
+				method: 'get',
+				url: '/foo',
+				credentials: 'whatever',
+			};
+			return server
+				.inject(errorRequest)
 				.then(response => expect(response.statusCode).toBe(500))
+				.then(() => server.inject(goodRequest))
+				.then(response => expect(response.statusCode).toBe(200))
 				.then(() => server.stop())
 				.catch(err => {
 					server.stop();

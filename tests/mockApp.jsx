@@ -1,4 +1,5 @@
 import React from 'react';
+import Helmet from 'react-helmet';
 import makeRootReducer from '../src/reducers/platform';
 import Redirect from '../src/components/Redirect';
 
@@ -14,6 +15,7 @@ const MockRootIndex = props =>
 export const FOO_INDEX_CONTENT = 'yo dawg i heard you like foo';
 const MockFooIndex = props =>
 	<div>
+		<Helmet />
 		{FOO_INDEX_CONTENT}
 	</div>;
 export const EXTERNAL_REDIRECT_URL = 'http://example.com/foo?return=foo';
@@ -65,8 +67,21 @@ export const routes = [
 			{
 				path: '/badImplementation',
 				component: () => {
-					throw new Error('your implementation is bad and you should feel bad');
-					return <div />; // eslint-disable-line no-unreachable
+					/*
+					 * the `property` prop for `meta` must be a string in order for
+					 * <Helmet> to process it correctly - this is a 'bad implementation'
+					 * that will throw an error because `property` is an object.
+					 * It's possible that 'react-helmet' will change this behavior in the
+					 * future and related tests will start failing because they expect the
+					 * error to be thrown, but this implementation exposes a tricky bug in
+					 * the platform that was fixed in WP-429 and is useful for preventing
+					 * regression
+					 */
+					return (
+						<Helmet>
+							<meta property={{}} content="foo" />
+						</Helmet>
+					);
 				},
 			},
 			{
