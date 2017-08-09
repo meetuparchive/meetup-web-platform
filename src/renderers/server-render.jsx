@@ -6,6 +6,7 @@ import 'rxjs/add/operator/first';
 import IntlPolyfill from 'intl';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
+import Helmet from 'react-helmet';
 import StaticRouter from 'react-router-dom/StaticRouter';
 
 import Dom from '../components/dom';
@@ -47,6 +48,21 @@ function getRedirect(context) {
 	};
 }
 
+/*
+ * A helper to collect react-side-effect data from all components in the
+ * application that utilize side effects
+ *
+ * Any component class that uses react-side-effect should be 'rewound' in this
+ * function to prevent memory leaks and invalid state carrying over into other
+ * requests
+ */
+const resolveSideEffects = () => ({
+	head: Helmet.rewind(),
+	redirect: Redirect.rewind(),
+	forbidden: Forbidden.rewind(),
+	notFound: NotFound.rewind(),
+});
+
 /**
  * Using the current route information and Redux store, render the app to an
  * HTML string and server response code.
@@ -67,6 +83,7 @@ function getRedirect(context) {
 type RenderResult =
 	| { result: string, statusCode: number }
 	| { redirect: { url: string, permanent?: boolean } };
+
 const getRouterRenderer = ({
 	routes,
 	store,
@@ -86,18 +103,26 @@ const getRouterRenderer = ({
 	let appMarkup;
 	const staticContext: { url?: string, permanent?: boolean } = {};
 
-	appMarkup = ReactDOMServer.renderToString(
-		<StaticRouter
-			basename={baseUrl}
-			location={location}
-			context={staticContext}
-		>
-			<PlatformApp store={store} routes={routes} />
-		</StaticRouter>
-	);
+	try {
+		appMarkup = ReactDOMServer.renderToString(
+			<StaticRouter
+				basename={baseUrl}
+				location={location}
+				context={staticContext}
+			>
+				<PlatformApp store={store} routes={routes} />
+			</StaticRouter>
+		);
+	} catch (err) {
+		// cleanup all react-side-effect components to prevent error/memory leaks
+		resolveSideEffects();
+		// now we can re-throw and let the caller handle the error
+		throw err;
+	}
 
-	// must _always_ call Redirect.rewind() to avoid memory leak
-	const externalRedirect = getRedirect(Redirect.rewind());
+	const sideEffects = resolveSideEffects();
+
+	const externalRedirect = getRedirect(sideEffects.redirect);
 	const internalRedirect = getRedirect(staticContext);
 	const redirect = internalRedirect || externalRedirect;
 	if (redirect) {
@@ -111,6 +136,7 @@ const getRouterRenderer = ({
 			baseUrl={baseUrl}
 			assetPublicPath={assetPublicPath}
 			clientFilename={clientFilename}
+			head={sideEffects.head}
 			initialState={initialState}
 			appMarkup={appMarkup}
 			scripts={scripts}
@@ -118,7 +144,7 @@ const getRouterRenderer = ({
 	);
 
 	// prioritized status code fallbacks
-	const statusCode = Forbidden.rewind() || NotFound.rewind() || 200;
+	const statusCode = sideEffects.forbidden || sideEffects.notFound || 200;
 
 	return {
 		statusCode,
@@ -221,6 +247,7 @@ const makeRenderer = (
 					baseUrl={baseUrl}
 					assetPublicPath={assetPublicPath}
 					clientFilename={clientFilename}
+					head={Helmet.rewind()}
 					initialState={store.getState()}
 					scripts={scripts}
 				/>

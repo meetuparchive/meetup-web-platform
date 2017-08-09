@@ -44,6 +44,9 @@ export const getBrowserLang: ParseRequestLang = (request: HapiRequest) => {
  * Get the language code determined from properties of the request (cookie,
  * url, header)
  */
-export default (request: HapiRequest) => () =>
+export default (request: HapiRequest) => (): string =>
 	// return the first language hit in the order of preference
-	getCookieLang(request) || getUrlLang(request) || getBrowserLang(request);
+	getCookieLang(request) ||
+	getUrlLang(request) ||
+	getBrowserLang(request) ||
+	request.server.settings.app.supportedLangs[0];

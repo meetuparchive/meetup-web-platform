@@ -13,6 +13,7 @@ const similarToDefault = 'en-AU';
 const altLang = 'fr-FR';
 const altLang2 = 'de-DE';
 const altLang3 = 'es-ES';
+const unsupportedLang = 'xx-XX';
 const supportedLangs = [
 	defaultLang,
 	similarToDefault,
@@ -23,7 +24,9 @@ const supportedLangs = [
 const MOCK_HAPI_REQUEST = {
 	log() {},
 	url: url.parse(rootUrl),
-	headers: {},
+	headers: {
+		'accept-language': unsupportedLang, // must test unsupported lang by default
+	},
 	state: {},
 	server: { settings: { app: { supportedLangs } } },
 };
@@ -42,7 +45,7 @@ describe('getCookieLang', () => {
 			...MOCK_HAPI_REQUEST,
 			state: { [LANGUAGE_COOKIE]: MEETUP_LANGUAGE },
 		};
-		const lang = getCookieLang(request, supportedLangs);
+		const lang = getCookieLang(request);
 		expect(lang).toEqual(altLang);
 	});
 });
@@ -62,7 +65,7 @@ describe('getUrlLang', () => {
 			...MOCK_HAPI_REQUEST,
 			url: url.parse(`${rootUrl}${requestLang}/`),
 		};
-		const lang = getUrlLang(request, supportedLangs);
+		const lang = getUrlLang(request);
 		expect(lang).toEqual(requestLang);
 	});
 });
@@ -73,17 +76,16 @@ describe('getBrowserLang', () => {
 			...MOCK_HAPI_REQUEST,
 			headers: { 'accept-language': acceptLang },
 		};
-		const lang = getBrowserLang(request, supportedLangs);
+		const lang = getBrowserLang(request);
 		expect(lang).toBe(false);
 	});
 	it('returns en-US instead of en-AU for "en" if en-US is preferred', () => {
 		const acceptLang = 'en';
-		const supportedLangs = ['en-US', 'en-AU']; // sorted by preference
 		const request = {
 			...MOCK_HAPI_REQUEST,
 			headers: { 'accept-language': acceptLang },
 		};
-		const lang = getBrowserLang(request, supportedLangs);
+		const lang = getBrowserLang(request);
 		expect(lang).toEqual('en-US');
 	});
 	it('returns supported language from brower "Accept-Language" header, if present', () => {
@@ -92,7 +94,7 @@ describe('getBrowserLang', () => {
 			...MOCK_HAPI_REQUEST,
 			headers: { 'accept-language': acceptLang },
 		};
-		const lang = getBrowserLang(request, supportedLangs);
+		const lang = getBrowserLang(request);
 		expect(lang).toEqual(acceptLang);
 	});
 });
