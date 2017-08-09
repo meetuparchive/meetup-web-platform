@@ -1,4 +1,5 @@
 import React from 'react';
+import Helmet from 'react-helmet';
 import makeRootReducer from '../src/reducers/platform';
 import Redirect from '../src/components/Redirect';
 
@@ -14,6 +15,7 @@ const MockRootIndex = props =>
 export const FOO_INDEX_CONTENT = 'yo dawg i heard you like foo';
 const MockFooIndex = props =>
 	<div>
+		<Helmet />
 		{FOO_INDEX_CONTENT}
 	</div>;
 export const EXTERNAL_REDIRECT_URL = 'http://example.com/foo?return=foo';
@@ -65,8 +67,12 @@ export const routes = [
 			{
 				path: '/badImplementation',
 				component: () => {
-					throw new Error('your implementation is bad and you should feel bad');
-					return <div />; // eslint-disable-line no-unreachable
+					// eslint-disable-next-line no-unreachable
+					return (
+						<Helmet>
+							<meta property={{}} content={undefined} />
+						</Helmet>
+					);
 				},
 			},
 			{

@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import Helmet from 'react-helmet';
 import escapeHtml from 'escape-html';
 
 function getInnerHTML(__html) {
@@ -35,6 +34,7 @@ const DOM = props => {
 		assetPublicPath,
 		baseUrl,
 		clientFilename,
+		head,
 		initialState = {},
 		scripts = [],
 	} = props;
@@ -50,9 +50,6 @@ const DOM = props => {
 	const initialStateJson = JSON.stringify(initialState);
 	// escape the string
 	const escapedState = escapeHtml(initialStateJson);
-
-	// Extract the `<head>` information from any page-specific `<Helmet>` components
-	const head = Helmet.rewind();
 
 	const APP_RUNTIME = {
 		baseUrl,
@@ -96,6 +93,13 @@ DOM.propTypes = {
 	assetPublicPath: PropTypes.string.isRequired,
 	baseUrl: PropTypes.string,
 	clientFilename: PropTypes.string,
+	head: PropTypes.shape({
+		// this is expected to come from Helmet.rewind()
+		title: PropTypes.shape({ toComponent: PropTypes.func }),
+		meta: PropTypes.shape({ toComponent: PropTypes.func }),
+		link: PropTypes.shape({ toComponent: PropTypes.func }),
+		script: PropTypes.shape({ toComponent: PropTypes.func }),
+	}),
 	initialState: PropTypes.object.isRequired,
 	scripts: PropTypes.array,
 };
