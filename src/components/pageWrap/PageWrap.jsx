@@ -33,12 +33,6 @@ class PageWrap extends React.Component {
 		);
 	}
 
-	renderHeadLinks() {
-		return this.props.headLinks.map((props, index) =>
-			<link key={`${props.rel}-${index}`} {...props} />
-		);
-	}
-
 	/**
 	 * @return {React.element} the page wrapping component
 	 */
