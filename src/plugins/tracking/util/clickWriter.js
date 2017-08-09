@@ -1,35 +1,10 @@
-import { click } from '../actions/clickActionCreators';
+import { actions } from './clickState';
 const DATA_ATTR = 'clicktrack';
 
-function cleanTrackingUrl() {
-	// TODO: investigate and refactor to support this feature
-	/*
-	// remove tracking information from the url to prevent bad link copying
-	// and to clean up the url field
-
-	var TRACKING_PARAM = '_xtd';
-	if ( history && history.replaceState && window.location.href.indexOf(TRACKING_PARAM) > 0) {
-
-		var baseUrl = window.location.href.split('?');
-
-		//Make sure there was actually a query param.
-		if (!baseUrl[1]) {
-			return;
-		}
-
-		var qs = baseUrl[1].split('&');
-
-		for (var i = 0, len = qs.length; i < len; i++) {
-			if (qs[i] && qs[i].split('=')[0] === TRACKING_PARAM) {
-				qs.splice(i, 1);
-				break;
-			}
-		}
-
-		history.replaceState({}, document.title, baseUrl[0] + '?' + qs.join('&'));
-	}
-	*/
-}
+/*
+ * This module provides utilities for handling browser-based click event data,
+ * including the dispatch of corresponding Redux actions
+ */
 
 // set reference to un-modified stopPropagation
 const originalStopPropagation =
@@ -134,7 +109,7 @@ function getTrackClick(store) {
 
 		// 2. Create click action with metadata
 		const now = new Date();
-		const clickTrackAction = click({
+		const clickTrackAction = actions.click({
 			timestamp: now.toISOString(),
 			lineage: clickLineage.join('<'),
 			linkText: linkText,
@@ -150,7 +125,6 @@ function getTrackClick(store) {
 	}
 
 	trackStopPropagation(trackClick);
-	cleanTrackingUrl();
 
 	return trackClick;
 }

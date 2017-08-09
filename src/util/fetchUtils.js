@@ -1,14 +1,6 @@
 import JSCookie from 'js-cookie';
 import rison from 'rison';
-
-const BrowserCookies = JSCookie.withConverter({
-	read: (value, name) => value,
-	write: (value, name) =>
-		encodeURIComponent(value).replace(
-			/[!'()*]/g,
-			c => `%${c.charCodeAt(0).toString(16)}`
-		),
-});
+import { setClickCookie } from '../plugins/tracking/util/clickState';
 
 /**
  * A module for middleware that would like to make external calls through `fetch`
@@ -99,11 +91,7 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 		} = meta;
 
 		if (clickTracking) {
-			BrowserCookies.set('click-track', JSON.stringify(clickTracking), {
-				domain: apiUrl.indexOf('.dev.') > -1
-					? '.dev.meetup.com'
-					: '.meetup.com',
-			});
+			setClickCookie(clickTracking);
 		}
 
 		// send other metadata in searchParams
@@ -122,7 +110,7 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 	}
 
 	if (hasBody || isDelete) {
-		headers[CSRF_HEADER] = BrowserCookies.get(CSRF_HEADER_COOKIE);
+		headers[CSRF_HEADER] = JSCookie.get(CSRF_HEADER_COOKIE);
 	}
 
 	const config = {

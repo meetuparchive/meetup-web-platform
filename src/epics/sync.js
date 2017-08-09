@@ -17,7 +17,7 @@ import {
 	LOCATION_CHANGE,
 	SERVER_RENDER,
 } from '../actions/syncActionCreators';
-import { clearClick } from '../actions/clickActionCreators';
+import { actions as clickActions } from '../plugins/tracking/util/clickState';
 import { getRouteResolver, getMatchedQueries } from '../router/util';
 import { getDeprecatedSuccessPayload } from '../util/fetchUtils';
 
@@ -67,7 +67,7 @@ export const getNavEpic = (routes, baseUrl) => {
 					resolveRoutes(location, baseUrl).then(getMatchedQueries(location))
 				).map(q => api.requestAll(q, requestMetadata));
 
-				const clickAction$ = Observable.of(clearClick());
+				const clickAction$ = Observable.of(clickActions.clear());
 
 				return Observable.merge(cacheAction$, apiAction$, clickAction$);
 			});
