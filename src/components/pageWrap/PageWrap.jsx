@@ -43,7 +43,7 @@ class PageWrap extends React.Component {
 	 * @return {React.element} the page wrapping component
 	 */
 	render() {
-		const { localeCode, headLinks, iconSprite } = this.props;
+		const { head, iconSprite, localeCode } = this.props;
 
 		// Parse localeCode for ISO 639-1 languages code.
 		// (ie. 'en', 'it', etc)
@@ -56,6 +56,8 @@ class PageWrap extends React.Component {
 				className={`column lang_${lang}`}
 				style={{ minHeight: '100vh' }}
 			>
+				{head}
+
 				<Helmet defaultTitle="Meetup" titleTemplate="%s - Meetup">
 					<meta name="viewport" content="width=device-width, initial-scale=1" />
 					<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -65,9 +67,6 @@ class PageWrap extends React.Component {
 						name="verify-v1"
 						content="h5EhuAEkLFlZmMxwpH5wnRaoDEmqYCCEUE+FLcrRNvE="
 					/>
-
-					{headLinks && this.renderHeadLinks()}
-
 					<script type="text/javascript" src={polyfillServiceUrl(localeCode)} />
 					<script type="text/javascript">
 						{newrelicBrowserJS}
@@ -87,7 +86,7 @@ class PageWrap extends React.Component {
 }
 
 PageWrap.propTypes = {
-	headLinks: PropTypes.array,
+	head: PropTypes.object,
 	iconSprite: PropTypes.string,
 	localeCode: PropTypes.string.isRequired,
 	location: PropTypes.object.isRequired,
