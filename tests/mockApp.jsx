@@ -67,10 +67,19 @@ export const routes = [
 			{
 				path: '/badImplementation',
 				component: () => {
-					// eslint-disable-next-line no-unreachable
+					/*
+					 * the `property` prop for `meta` must be a string in order for
+					 * <Helmet> to process it correctly - this is a 'bad implementation'
+					 * that will throw an error because `property` is an object.
+					 * It's possible that 'react-helmet' will change this behavior in the
+					 * future and related tests will start failing because they expect the
+					 * error to be thrown, but this implementation exposes a tricky bug in
+					 * the platform that was fixed in WP-429 and is useful for preventing
+					 * regression
+					 */
 					return (
 						<Helmet>
-							<meta property={{}} content={undefined} />
+							<meta property={{}} content="foo" />
 						</Helmet>
 					);
 				},
