@@ -10,7 +10,7 @@ ShallowWrapper {
   "length": 1,
   "node": <StaticRouter
     basename=""
-    context={undefined}
+    context={Object {}}
     location="/foo"
 >
     <PlatformApp
@@ -21,7 +21,7 @@ ShallowWrapper {
   "nodes": Array [
     <StaticRouter
       basename=""
-      context={undefined}
+      context={Object {}}
       location="/foo"
 >
       <PlatformApp
@@ -78,7 +78,7 @@ ShallowWrapper {
       "_renderedComponent": NoopInternalComponent {
         "_currentElement": <StaticRouter
           basename=""
-          context={undefined}
+          context={Object {}}
           location="/foo"
 >
           <PlatformApp
@@ -89,7 +89,7 @@ ShallowWrapper {
         "_debugID": 2,
         "_renderedOutput": <StaticRouter
           basename=""
-          context={undefined}
+          context={Object {}}
           location="/foo"
 >
           <PlatformApp
