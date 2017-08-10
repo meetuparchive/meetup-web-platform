@@ -1,6 +1,6 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-import { SyncContainer, RouteLayout } from '../router';
+import { SyncContainer, RouteLayout } from '../../../router'; // mwp-router
 import ServiceWorker from './ServiceWorker';
 
 /**
