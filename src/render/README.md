@@ -23,6 +23,9 @@ enable navigation-related data fetching, and shared document structure like
   phased out as a public component, and instead built into `<BrowserApp>` and
   `<ServerApp>`_
 
+  The code for `PageWrap` is organized in a directory as a standalone 'package'
+  because the relevant code is organized into a few separate 'internal' modules.
+
 - `<Dom>`
 
   A React component used on the server to get a full `<html>` document string

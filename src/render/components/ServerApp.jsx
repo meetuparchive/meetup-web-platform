@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import StaticRouter from 'react-router-dom/StaticRouter';
-import PlatformApp from '../shared/PlatformApp';
+import PlatformApp from './shared/PlatformApp';
 
 /**
  * A simple component to wrap the base PlatformApp with a StaticRouter

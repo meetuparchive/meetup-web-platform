@@ -1,12 +1,18 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import BrowserApp from './';
+import ServerApp from './ServerApp';
 
-describe('BrowserApp', function() {
+describe('ServerApp', function() {
 	const routes = [];
 	const basename = '';
 	const appWrapper = shallow(
-		<BrowserApp routes={routes} store={{}} basename={basename} />
+		<ServerApp
+			routes={routes}
+			store={{}}
+			basename={basename}
+			context={{}}
+			location="/foo"
+		/>
 	);
 	it('exists', function() {
 		expect(appWrapper).toMatchSnapshot();

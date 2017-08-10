@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import BrowserRouter from 'react-router-dom/BrowserRouter';
-import PlatformApp from '../shared/PlatformApp';
+import PlatformApp from './shared/PlatformApp';
 
 /**
  * A simple component to wrap the base PlatformApp with the BrowserRouter
