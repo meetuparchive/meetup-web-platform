@@ -9,6 +9,6 @@ describe('BrowserApp', function() {
 		<BrowserApp routes={routes} store={{}} basename={basename} />
 	);
 	it('exists', function() {
-		expect(appWrapper.exists()).toBe(true);
+		expect(appWrapper).toMatchSnapshot();
 	});
 });

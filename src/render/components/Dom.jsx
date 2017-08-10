@@ -33,10 +33,9 @@ const DOM = props => {
 		appMarkup = '',
 		assetPublicPath,
 		baseUrl,
-		clientFilename,
 		head,
 		initialState = {},
-		scripts = [],
+		scripts,
 	} = props;
 
 	/**
@@ -56,16 +55,6 @@ const DOM = props => {
 		assetPublicPath,
 		escapedState,
 	};
-
-	if (clientFilename) {
-		scripts.push(`${assetPublicPath}${clientFilename}`);
-	}
-
-	if (!scripts.length) {
-		throw new Error(
-			'No client scripts supplied - check the `makeRenderer` call in your server entry script'
-		);
-	}
 
 	return (
 		<html>
@@ -92,7 +81,6 @@ DOM.propTypes = {
 	appMarkup: PropTypes.string,
 	assetPublicPath: PropTypes.string.isRequired,
 	baseUrl: PropTypes.string,
-	clientFilename: PropTypes.string,
 	head: PropTypes.shape({
 		// this is expected to come from Helmet.rewind()
 		title: PropTypes.shape({ toComponent: PropTypes.func }),
@@ -101,7 +89,7 @@ DOM.propTypes = {
 		script: PropTypes.shape({ toComponent: PropTypes.func }),
 	}),
 	initialState: PropTypes.object.isRequired,
-	scripts: PropTypes.array,
+	scripts: PropTypes.array.isRequired,
 };
 
 export default DOM;

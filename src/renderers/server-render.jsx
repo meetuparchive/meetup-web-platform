@@ -8,7 +8,7 @@ import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import Helmet from 'react-helmet';
 
-import Dom from '../components/dom';
+import Dom from '../render/components/Dom';
 import { Forbidden, NotFound, Redirect } from '../router';
 import ServerApp from '../render/components/ServerApp';
 
@@ -88,7 +88,6 @@ const getRouterRenderer = ({
 	store,
 	location,
 	baseUrl,
-	clientFilename,
 	assetPublicPath,
 	scripts,
 }): RenderResult => {
@@ -134,7 +133,6 @@ const getRouterRenderer = ({
 		<Dom
 			baseUrl={baseUrl}
 			assetPublicPath={assetPublicPath}
-			clientFilename={clientFilename}
 			head={sideEffects.head}
 			initialState={initialState}
 			appMarkup={appMarkup}
@@ -197,10 +195,22 @@ const makeRenderer = (
 	assetPublicPath: string,
 	middleware: Array<Function> = [],
 	baseUrl: string = '',
-	scripts: Array<string>,
+	scripts: Array<string> = [],
 	enableServiceWorker: boolean
 ) => (request: Object) => {
 	middleware = middleware || [];
+
+	if (clientFilename) {
+		console.warn(
+			'`clientFilename` deprecated in favor of `scripts` array in makeRenderer'
+		);
+		scripts.push(`${assetPublicPath}${clientFilename}`);
+	}
+
+	if (!scripts.length) {
+		throw new Error('No client script assets specified');
+	}
+
 	const {
 		connection,
 		headers,
@@ -245,7 +255,6 @@ const makeRenderer = (
 				<Dom
 					baseUrl={baseUrl}
 					assetPublicPath={assetPublicPath}
-					clientFilename={clientFilename}
 					head={Helmet.rewind()}
 					initialState={store.getState()}
 					scripts={scripts}
@@ -276,7 +285,6 @@ const makeRenderer = (
 			store,
 			location: url,
 			baseUrl,
-			clientFilename,
 			assetPublicPath,
 			scripts,
 		})

@@ -22,3 +22,9 @@ enable navigation-related data fetching, and shared document structure like
   generally be used at root-level route in the passed in routes. _This could be
   phased out as a public component, and instead built into `<BrowserApp>` and
   `<ServerApp>`_
+
+- `<Dom>`
+
+  A React component used on the server to get a full `<html>` document string
+  from `ReactDOMServer.renderToString()`. The actual application markup must
+  be supplied as a raw HTML string in the `appMarkup` prop.
