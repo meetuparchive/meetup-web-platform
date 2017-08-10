@@ -6,7 +6,7 @@ import {
 	getBrowserCreateStore,
 } from '../util/createStoreBrowser';
 import { getRouteResolver } from '../router/util';
-import BrowserApp from '../components/BrowserApp';
+import BrowserApp from '../render/components/BrowserApp';
 
 /**
  * @module browser-render
