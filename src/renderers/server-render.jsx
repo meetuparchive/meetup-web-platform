@@ -7,11 +7,10 @@ import IntlPolyfill from 'intl';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import Helmet from 'react-helmet';
-import StaticRouter from 'react-router-dom/StaticRouter';
 
 import Dom from '../components/dom';
 import { Forbidden, NotFound, Redirect } from '../router';
-import PlatformApp from '../components/PlatformApp';
+import ServerApp from '../render/components/ServerApp';
 
 import { API_ROUTE_PATH } from '../plugins/api-proxy';
 import { getServerCreateStore } from '../util/createStoreServer';
@@ -105,13 +104,13 @@ const getRouterRenderer = ({
 
 	try {
 		appMarkup = ReactDOMServer.renderToString(
-			<StaticRouter
+			<ServerApp
 				basename={baseUrl}
 				location={location}
 				context={staticContext}
-			>
-				<PlatformApp store={store} routes={routes} />
-			</StaticRouter>
+				store={store}
+				routes={routes}
+			/>
 		);
 	} catch (err) {
 		// cleanup all react-side-effect components to prevent error/memory leaks
