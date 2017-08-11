@@ -19,10 +19,10 @@
 	- `del`
 
 - **Moved** `src/actions/syncActionCreators`: The action `type` constants and
-  action creators are exported from `require('src/api-state')`
+  action creators are exported from `require('src/router')`
 
-  - `LOCATION_CHANGE`
   - `SERVER_RENDER`
+  - `LOCATION_CHANGE`
   - `locationChange`
 
 - **Moved + renamed** `src/middleware/platform:getEpicMiddleware` has moved to

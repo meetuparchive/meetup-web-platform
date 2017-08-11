@@ -5,13 +5,8 @@
  **/
 
 import { combineReducers } from 'redux';
-import {
-	api,
-	app,
-	API_RESP_COMPLETE,
-	LOCATION_CHANGE,
-	SERVER_RENDER,
-} from '../api-state'; // mwp-api-state
+import { api, app, API_RESP_COMPLETE } from '../api-state'; // mwp-api-state
+import { LOCATION_CHANGE, SERVER_RENDER } from '../router'; // mwp-router
 import { reducer as clickTracking } from '../plugins/tracking/util/clickState'; // mwp-tracking/util/clickState
 
 export function config(state = {}, action) {

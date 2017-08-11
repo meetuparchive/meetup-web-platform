@@ -2,6 +2,7 @@ import 'rxjs/add/operator/toArray';
 import 'rxjs/add/operator/toPromise';
 import { ActionsObservable } from 'redux-observable';
 import { CLICK_TRACK_CLEAR_ACTION } from '../../plugins/tracking/util/clickState'; // mwp-tracking-plugin/util/clickState
+import { LOCATION_CHANGE, SERVER_RENDER } from '../../router'; // mwp-router
 import { createFakeStore, epicIgnoreAction } from '../../util/testUtils';
 
 import fetch from 'node-fetch';
@@ -30,7 +31,7 @@ describe('Sync epic', () => {
 	);
 	it('emits API_REQ and CLICK_TRACK_CLEAR for nav-related actions with matched query', function() {
 		const locationChange = {
-			type: syncActionCreators.LOCATION_CHANGE,
+			type: LOCATION_CHANGE,
 			payload: MOCK_RENDERPROPS.location,
 		};
 		const serverRender = {
@@ -55,7 +56,7 @@ describe('Sync epic', () => {
 			pathname: '/logout',
 		};
 		const locationChange = {
-			type: syncActionCreators.LOCATION_CHANGE,
+			type: LOCATION_CHANGE,
 			payload: logoutLocation,
 		};
 
@@ -77,11 +78,11 @@ describe('Sync epic', () => {
 		const pathname = '/noQuery';
 		const noMatchLocation = { ...MOCK_RENDERPROPS.location, pathname };
 		const locationChange = {
-			type: syncActionCreators.LOCATION_CHANGE,
+			type: LOCATION_CHANGE,
 			payload: noMatchLocation,
 		};
 		const serverRender = {
-			type: syncActionCreators.SERVER_RENDER,
+			type: SERVER_RENDER,
 			payload: noMatchLocation,
 		};
 
@@ -95,11 +96,11 @@ describe('Sync epic', () => {
 		const pathname = '/nullQuery';
 		const noMatchLocation = { ...MOCK_RENDERPROPS.location, pathname };
 		const locationChange = {
-			type: syncActionCreators.LOCATION_CHANGE,
+			type: LOCATION_CHANGE,
 			payload: noMatchLocation,
 		};
 		const serverRender = {
-			type: syncActionCreators.SERVER_RENDER,
+			type: SERVER_RENDER,
 			payload: noMatchLocation,
 		};
 

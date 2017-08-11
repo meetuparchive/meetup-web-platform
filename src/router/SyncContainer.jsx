@@ -3,7 +3,7 @@ import React from 'react';
 import withRouter from 'react-router-dom/withRouter';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { locationChange } from '../api-state'; // mwp-api-state
+import { locationChange } from './routeActionCreators';
 
 function mapDispatchToProps(dispatch) {
 	return {

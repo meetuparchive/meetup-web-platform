@@ -11,14 +11,13 @@ import 'rxjs/add/operator/takeUntil';
 import { combineEpics } from 'redux-observable';
 
 import { actions as clickActions } from '../../plugins/tracking/util/clickState'; // mwp-tracking-plugin/util/clickState
+import { LOCATION_CHANGE, SERVER_RENDER } from '../../router'; // mwp-router
 import { getRouteResolver, getMatchedQueries } from '../../router/util'; // mwp-router/util
 
 import * as api from './apiActionCreators';
 import {
 	apiSuccess, // DEPRECATED
 	apiError, // DEPRECATED
-	LOCATION_CHANGE,
-	SERVER_RENDER,
 } from './syncActionCreators';
 
 /**

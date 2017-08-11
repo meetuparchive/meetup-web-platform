@@ -6,11 +6,6 @@ import { postEpic, deleteEpic } from './mutate'; // DEPRECATED
 
 // export specific values of internal modules
 export {
-	LOCATION_CHANGE,
-	SERVER_RENDER,
-	locationChange,
-} from './sync/syncActionCreators';
-export {
 	API_REQ,
 	API_RESP_SUCCESS,
 	API_RESP_COMPLETE,
