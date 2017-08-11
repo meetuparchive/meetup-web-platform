@@ -1,6 +1,8 @@
 import 'rxjs/add/operator/toArray';
 import 'rxjs/add/operator/toPromise';
 import { ActionsObservable } from 'redux-observable';
+import { CLICK_TRACK_CLEAR_ACTION } from '../../plugins/tracking/util/clickState'; // mwp-tracking-plugin/util/clickState
+import { createFakeStore, epicIgnoreAction } from '../../util/testUtils';
 
 import fetch from 'node-fetch';
 global.fetch = fetch;
@@ -12,12 +14,9 @@ import {
 	MOCK_ROUTES,
 } from 'meetup-web-mocks/lib/app';
 
-import { createFakeStore, epicIgnoreAction } from '../util/testUtils';
-
-import getSyncEpic from '../epics/sync';
-import * as api from '../actions/apiActionCreators';
-import * as syncActionCreators from '../actions/syncActionCreators';
-import { CLICK_TRACK_CLEAR_ACTION } from '../plugins/tracking/util/clickState';
+import * as api from './apiActionCreators';
+import * as syncActionCreators from './syncActionCreators';
+import getSyncEpic from './';
 
 const EMPTY_ROUTES = {};
 

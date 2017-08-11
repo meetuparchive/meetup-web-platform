@@ -8,18 +8,41 @@ import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/takeUntil';
-
 import { combineEpics } from 'redux-observable';
-import * as api from '../actions/apiActionCreators';
+
+import { actions as clickActions } from '../../plugins/tracking/util/clickState'; // mwp-tracking-plugin/util/clickState
+import { getRouteResolver, getMatchedQueries } from '../../router/util'; // mwp-router/util
+
+import * as api from './apiActionCreators';
 import {
 	apiSuccess, // DEPRECATED
 	apiError, // DEPRECATED
 	LOCATION_CHANGE,
 	SERVER_RENDER,
-} from '../actions/syncActionCreators';
-import { actions as clickActions } from '../plugins/tracking/util/clickState';
-import { getRouteResolver, getMatchedQueries } from '../router/util';
-import { getDeprecatedSuccessPayload } from '../util/fetchUtils';
+} from './syncActionCreators';
+
+/**
+ * @deprecated
+ */
+export function getDeprecatedSuccessPayload(successes, errors) {
+	const allQueryResponses = [...successes, ...errors];
+	return allQueryResponses.reduce(
+		(payload, { query, response }) => {
+			if (!response) {
+				return payload;
+			}
+			const { ref, error, ...responseBody } = response;
+			if (error) {
+				// old payload expects error as a property of `value`
+				responseBody.value = { error };
+			}
+			payload.queries.push(query);
+			payload.responses.push({ [ref]: responseBody });
+			return payload;
+		},
+		{ queries: [], responses: [] }
+	);
+}
 
 /**
  * Any operations that keep the browser application in sync with the
