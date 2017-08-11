@@ -7,14 +7,14 @@ import IntlPolyfill from 'intl';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import Helmet from 'react-helmet';
+import { SERVER_RENDER } from '../api-state'; // mwp-api-state
+import { API_ROUTE_PATH } from '../plugins/api-proxy'; // mwp-api-proxy
+import { Forbidden, NotFound, Redirect } from '../router'; // mwp-router
 
 import Dom from '../render/components/Dom';
-import { Forbidden, NotFound, Redirect } from '../router';
 import ServerApp from '../render/components/ServerApp';
 
-import { API_ROUTE_PATH } from '../plugins/api-proxy';
 import { getServerCreateStore } from '../util/createStoreServer';
-import { SERVER_RENDER } from '../actions/syncActionCreators';
 import configure from '../actions/configActionCreators';
 
 // Ensure global Intl for use with FormatJS
