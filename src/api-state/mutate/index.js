@@ -1,4 +1,4 @@
-import * as api from '../actions/apiActionCreators';
+import * as api from '../sync/apiActionCreators';
 import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/filter';

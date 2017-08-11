@@ -1,6 +1,3 @@
-export const LOCATION_CHANGE = '@@router/LOCATION_CHANGE';
-export const SERVER_RENDER = '@@server/RENDER';
-
 /**
  * @deprecated
  */
@@ -38,12 +35,5 @@ export function apiError(err) {
 export function apiComplete() {
 	return {
 		type: 'API_COMPLETE',
-	};
-}
-
-export function locationChange(location) {
-	return {
-		type: LOCATION_CHANGE,
-		payload: location,
 	};
 }
