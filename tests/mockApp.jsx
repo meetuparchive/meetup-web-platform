@@ -36,7 +36,10 @@ const MockRedirect = props => {
 export const routes = [
 	{
 		path: '/',
-		component: 'div',
+		component: props =>
+			<div>
+				{props.children}
+			</div>,
 		query: () => ({
 			type: 'mock',
 			ref: 'root',
@@ -53,7 +56,10 @@ export const routes = [
 		routes: [
 			{
 				path: '/foo',
-				component: 'div',
+				component: props =>
+					<div>
+						{props.children}
+					</div>,
 				indexRoute: {
 					component: MockFooIndex,
 					query: () => ({
@@ -91,7 +97,10 @@ export const routes = [
 			{
 				// param-based route
 				path: '/:param1',
-				component: 'div',
+				component: props =>
+					<div>
+						{props.children}
+					</div>,
 				query: ({ params }) => ({
 					type: 'mock',
 					ref: 'param1',
@@ -100,7 +109,10 @@ export const routes = [
 				routes: [
 					{
 						path: '/:param2',
-						component: 'div',
+						component: props =>
+							<div>
+								{props.children}
+							</div>,
 						query: ({ params }) => ({
 							type: 'mock',
 							ref: 'param2',
