@@ -3,7 +3,7 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import { MOCK_MEMBER } from 'meetup-web-mocks/lib/api';
 
-import PageWrap from './PageWrap';
+import PageWrap from './';
 
 const PROPS = {
 	localeCode: 'en-US',
