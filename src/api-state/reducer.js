@@ -8,12 +8,6 @@ import {
 } from './sync/apiActionCreators';
 import { CACHE_SUCCESS } from './cache/cacheActionCreators';
 
-type ApiState = {
-	[string]: QueryResponse,
-	inFlight: Array<string>,
-	fail?: boolean,
-};
-
 export const DEFAULT_API_STATE: ApiState = { inFlight: [] };
 export const DEFAULT_APP_STATE = {};
 
@@ -73,7 +67,7 @@ export function api(
 		case API_RESP_FAIL:
 			return { ...state, fail: action.payload };
 		case API_RESP_COMPLETE: {
-			// allways called - clean up inFlight
+			// always called - clean up inFlight
 			const refs = (action.payload || []).map(({ ref }) => ref);
 			const inFlight = state.inFlight.filter(ref => !refs.includes(ref));
 			return {
