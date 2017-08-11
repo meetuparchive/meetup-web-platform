@@ -1,3 +1,4 @@
+// @flow
 /**
  * This function performs feature sniffing to determine whether the preferred
  * IndexedDB cache is available, otherwise it falls back to a simple
@@ -11,7 +12,13 @@
  * @returns {Object} an object with Promise-based `get`, `set`, `delete`, and
  * `clear` methods
  */
-export function makeCache() {
+type Cache = {
+	get: string => Promise<QueryResponse>,
+	set: (string, QueryResponse) => Promise<true>,
+	delete: string => Promise<true>,
+	clear: () => Promise<true>,
+};
+export function makeCache(): Cache {
 	if (typeof window === 'undefined' || !window.indexedDB) {
 		const _data = {};
 		return {
@@ -43,10 +50,12 @@ export function makeCache() {
  * @param {Object} query query for app data
  * @return {Promise} resolves with cache hit, otherwise rejects
  */
-export const cacheReader = cache => query =>
+export const cacheReader = (cache: Cache) => (
+	query: Query
+): Promise<QueryState> =>
 	cache
 		.get(JSON.stringify(query))
-		.then(response => ({ query, response }))
+		.then((response: QueryResponse) => ({ query, response }))
 		.catch(err => ({ query, response: null })); // errors don't matter - just return null
 
 /**
@@ -57,7 +66,10 @@ export const cacheReader = cache => query =>
  * @param {Object} response plain object API response for the query
  * @return {Promise}
  */
-export const cacheWriter = cache => (query, response) => {
+export const cacheWriter = (cache: Cache) => (
+	query: Query,
+	response: QueryResponse
+) => {
 	const method = (query.meta || {}).method || 'get';
 	if (method.toLowerCase() !== 'get') {
 		return Promise.resolve(true);
