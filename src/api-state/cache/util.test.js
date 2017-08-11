@@ -1,4 +1,4 @@
-import { makeCache, cacheWriter, cacheReader } from '../util/cacheUtils';
+import { makeCache, cacheWriter, cacheReader } from './util';
 
 describe('cache utils', () => {
 	it('creates a Promise-based cache', function() {
