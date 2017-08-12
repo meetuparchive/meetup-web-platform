@@ -1,8 +1,8 @@
 import { mockQuery } from 'meetup-web-mocks/lib/app';
 import { MOCK_GROUP } from 'meetup-web-mocks/lib/api';
-import * as fetchUtils from './fetchUtils';
+import * as clickState from '../../plugins/tracking/util/clickState'; // mwp-tracking/util/clickState
 import { URLSearchParams } from 'url';
-import * as clickState from '../plugins/tracking/util/clickState';
+import fetchQueries, { CSRF_HEADER_COOKIE } from './fetchQueries';
 clickState.setClickCookie = jest.fn();
 
 global.FormData = function() {};
@@ -23,7 +23,7 @@ jest.mock('js-cookie', () => {
 
 describe('fetchQueries', () => {
 	const API_URL = new URL('http://api.example.com/');
-	const csrfJwt = `${fetchUtils.CSRF_HEADER_COOKIE} value`;
+	const csrfJwt = `${CSRF_HEADER_COOKIE} value`;
 	const getQueries = [mockQuery({ params: {} })];
 	const POSTQueries = [
 		{ ...mockQuery({ params: {} }), meta: { method: 'POST' } },
@@ -55,9 +55,7 @@ describe('fetchQueries', () => {
 	it('returns an object with successes and errors arrays', () => {
 		spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
-		return fetchUtils.fetchQueries(API_URL.toString())(
-			getQueries
-		).then(response => {
+		return fetchQueries(API_URL.toString())(getQueries).then(response => {
 			expect(response.successes).toEqual([
 				{ query: getQueries[0], response: responses[0] },
 			]);
@@ -67,7 +65,7 @@ describe('fetchQueries', () => {
 	it('returns a promise that will reject when response contains error prop', () => {
 		spyOn(global, 'fetch').and.callFake(fakeSuccessError);
 
-		return fetchUtils.fetchQueries(API_URL.toString())(getQueries).then(
+		return fetchQueries(API_URL.toString())(getQueries).then(
 			response => expect(true).toBe(false),
 			err => expect(err).toEqual(jasmine.any(Error))
 		);
@@ -79,9 +77,7 @@ describe('fetchQueries', () => {
 
 		const methodTest = method => () => {
 			query.meta = { method };
-			return fetchUtils.fetchQueries(API_URL.toString())(
-				queries
-			).then(response => {
+			return fetchQueries(API_URL.toString())(queries).then(response => {
 				const [, config] = global.fetch.calls.mostRecent().args;
 				expect(config.method).toEqual(method);
 			});
@@ -94,7 +90,7 @@ describe('fetchQueries', () => {
 		it('GET calls fetch with API url and queries, metadata', () => {
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
-			return fetchUtils.fetchQueries(API_URL.toString())(getQueries, {
+			return fetchQueries(API_URL.toString())(getQueries, {
 				...meta,
 			}).then(() => {
 				const calledWith = global.fetch.calls.mostRecent().args;
@@ -112,7 +108,7 @@ describe('fetchQueries', () => {
 			};
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
-			return fetchUtils.fetchQueries(API_URL.toString())(getQueries, {
+			return fetchQueries(API_URL.toString())(getQueries, {
 				...meta,
 				clickTracking,
 				logout: true,
@@ -124,9 +120,7 @@ describe('fetchQueries', () => {
 		it('GET without meta calls fetch without metadata querystring params', () => {
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
-			return fetchUtils.fetchQueries(API_URL.toString())(
-				getQueries
-			).then(() => {
+			return fetchQueries(API_URL.toString())(getQueries).then(() => {
 				const calledWith = global.fetch.calls.mostRecent().args;
 				const url = new URL(calledWith[0]);
 				expect(url.origin).toBe(API_URL.origin);
@@ -140,10 +134,7 @@ describe('fetchQueries', () => {
 		it('POST calls fetch with API url; csrf header; queries and metadata body params', () => {
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
-			return fetchUtils.fetchQueries(API_URL.toString())(
-				POSTQueries,
-				meta
-			).then(() => {
+			return fetchQueries(API_URL.toString())(POSTQueries, meta).then(() => {
 				const calledWith = global.fetch.calls.mostRecent().args;
 				const url = new URL(calledWith[0]);
 				const options = calledWith[1];
@@ -159,9 +150,7 @@ describe('fetchQueries', () => {
 		it('POST without meta calls fetch without metadata body params', () => {
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
-			return fetchUtils.fetchQueries(API_URL.toString())(
-				POSTQueries
-			).then(() => {
+			return fetchQueries(API_URL.toString())(POSTQueries).then(() => {
 				const calledWith = global.fetch.calls.mostRecent().args;
 				const url = new URL(calledWith[0]);
 				const options = calledWith[1];
@@ -188,9 +177,7 @@ describe('fetchQueries', () => {
 			];
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
-			return fetchUtils.fetchQueries(API_URL.toString())(
-				formQueries
-			).then(() => {
+			return fetchQueries(API_URL.toString())(formQueries).then(() => {
 				const calledWith = global.fetch.calls.mostRecent().args;
 				const url = new URL(calledWith[0]);
 				const options = calledWith[1];
@@ -200,44 +187,5 @@ describe('fetchQueries', () => {
 				expect(options.headers['x-csrf-jwt']).toEqual(csrfJwt);
 			});
 		});
-	});
-});
-
-describe('tryJSON', () => {
-	const reqUrl = 'http://example.com';
-	const goodResponse = { foo: 'bar' };
-	const goodFetchResponse = {
-		text: () => Promise.resolve(JSON.stringify(goodResponse)),
-	};
-	const errorResponse = {
-		status: 400,
-		statusText: '400 Bad Request',
-		text: () => Promise.resolve('There was a problem'),
-	};
-	const badJSON = 'totally not JSON';
-	const badJSONResponse = {
-		text: () => Promise.resolve(badJSON),
-	};
-	it('returns a Promise that resolves to the parsed fetch response JSON', () => {
-		const theFetch = fetchUtils.tryJSON(reqUrl)(goodFetchResponse);
-		expect(theFetch).toEqual(jasmine.any(Promise));
-
-		return theFetch.then(response => expect(response).toEqual(goodResponse));
-	});
-	it('returns a rejected Promise with Error when response has 400+ status', () => {
-		const theFetch = fetchUtils.tryJSON(reqUrl)(errorResponse);
-		expect(theFetch).toEqual(jasmine.any(Promise));
-		return theFetch.then(
-			response => expect(true).toBe(false), // should not run - promise should be rejected
-			err => expect(err).toEqual(jasmine.any(Error))
-		);
-	});
-	it('returns a rejected Promise with Error when response fails JSON parsing', () => {
-		const theFetch = fetchUtils.tryJSON(reqUrl)(badJSONResponse);
-		expect(theFetch).toEqual(jasmine.any(Promise));
-		return theFetch.then(
-			response => expect(true).toBe(false), // should not run - promise should be rejected
-			err => expect(err).toEqual(jasmine.any(Error))
-		);
 	});
 });

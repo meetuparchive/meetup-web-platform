@@ -64,3 +64,4 @@ See the [Queries documentation](Queries.md) for more details on usage.
 - mwp-tracking-plugin/util/clickState
 - mwp-router
 - mwp-router/util
+- mwp-api-proxy-plugin
