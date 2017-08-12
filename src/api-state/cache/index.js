@@ -13,14 +13,10 @@ import 'rxjs/add/operator/reduce';
 import 'rxjs/add/operator/ignoreElements';
 import 'rxjs/add/operator/mergeMap';
 import { combineEpics } from 'redux-observable';
-import { API_REQ, API_RESP_SUCCESS } from '../actions/apiActionCreators';
-import {
-	CACHE_CLEAR,
-	CACHE_SET,
-	cacheSuccess,
-} from '../actions/cacheActionCreators';
+import { API_REQ, API_RESP_SUCCESS } from '../sync/apiActionCreators';
+import { CACHE_CLEAR, CACHE_SET, cacheSuccess } from './cacheActionCreators';
 
-import { makeCache, cacheReader, cacheWriter } from '../util/cacheUtils';
+import { makeCache, cacheReader, cacheWriter } from './util';
 
 export function checkEnable() {
 	if (typeof window !== 'undefined' && window.location) {

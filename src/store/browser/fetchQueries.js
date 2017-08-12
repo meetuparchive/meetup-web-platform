@@ -1,62 +1,11 @@
 import JSCookie from 'js-cookie';
 import rison from 'rison';
-import { setClickCookie } from '../plugins/tracking/util/clickState';
+import { setClickCookie } from '../../plugins/tracking/util/clickState'; // mwp-tracking-plugin
 
-/**
- * A module for middleware that would like to make external calls through `fetch`
- * @module fetchUtils
- */
+import { parseQueryResponse } from '../util/fetchUtils';
 
 export const CSRF_HEADER = 'x-csrf-jwt';
 export const CSRF_HEADER_COOKIE = 'x-csrf-jwt-header';
-
-/**
- * @deprecated
- */
-export function getDeprecatedSuccessPayload(successes, errors) {
-	const allQueryResponses = [...successes, ...errors];
-	return allQueryResponses.reduce(
-		(payload, { query, response }) => {
-			if (!response) {
-				return payload;
-			}
-			const { ref, error, ...responseBody } = response;
-			if (error) {
-				// old payload expects error as a property of `value`
-				responseBody.value = { error };
-			}
-			payload.queries.push(query);
-			payload.responses.push({ [ref]: responseBody });
-			return payload;
-		},
-		{ queries: [], responses: [] }
-	);
-}
-
-export const parseQueryResponse = queries => ({
-	responses,
-	error,
-	message,
-}) => {
-	if (error) {
-		throw new Error(JSON.stringify({ error, message })); // treat like an API error
-	}
-	responses = responses || [];
-	if (queries.length !== responses.length) {
-		throw new Error('Responses do not match requests');
-	}
-
-	return responses.reduce(
-		(categorized, response, i) => {
-			const targetArray = response.error
-				? categorized.errors
-				: categorized.successes;
-			targetArray.push({ response, query: queries[i] });
-			return categorized;
-		},
-		{ successes: [], errors: [] }
-	);
-};
 
 /**
  * that the request will have the required OAuth and CSRF credentials and constructs
@@ -143,7 +92,7 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
  *   click tracking data
  * @return {Promise} resolves with a `{queries, responses}` object
  */
-export const fetchQueries = apiUrl => (queries, meta) => {
+const fetchQueries = apiUrl => (queries, meta) => {
 	if (
 		typeof window === 'undefined' &&
 		typeof test === 'undefined' // not in browser // not in testing env (global set by Jest)
@@ -170,22 +119,4 @@ export const fetchQueries = apiUrl => (queries, meta) => {
 		});
 };
 
-/**
- * Attempt to JSON parse a Response object from a fetch call
- *
- * @param {String} reqUrl the URL that was requested
- * @param {Response} response the fetch Response object
- * @return {Promise} a Promise that resolves with the JSON-parsed text
- */
-export const tryJSON = reqUrl => response => {
-	const { status, statusText } = response;
-	if (status >= 400) {
-		// status always 200: bugzilla #52128
-		return Promise.reject(
-			new Error(
-				`Request to ${reqUrl} responded with error code ${status}: ${statusText}`
-			)
-		);
-	}
-	return response.text().then(text => JSON.parse(text));
-};
+export default fetchQueries;

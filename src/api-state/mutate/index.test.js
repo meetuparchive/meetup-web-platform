@@ -5,10 +5,10 @@ import 'rxjs/add/operator/toPromise';
 
 import { MOCK_POST_ACTION, MOCK_DELETE_ACTION } from 'meetup-web-mocks/lib/app';
 
-import { epicIgnoreAction } from '../util/testUtils';
+import { epicIgnoreAction } from '../../util/testUtils';
 
-import { postEpic, deleteEpic } from './mutate';
-import * as api from '../actions/apiActionCreators';
+import { postEpic, deleteEpic } from './';
+import * as api from '../sync/apiActionCreators';
 
 describe('postEpic', () => {
 	it('does not pass through arbitrary actions', epicIgnoreAction(postEpic));
