@@ -1,10 +1,6 @@
 import { createStore } from 'redux';
-import {
-	clickTrackEnhancer,
-	getInitialState,
-	getBrowserCreateStore,
-} from './createStoreBrowser';
-import { testCreateStore } from './testUtils';
+import { clickTrackEnhancer, getInitialState, getBrowserCreateStore } from './';
+import { testCreateStore } from '../../util/testUtils';
 
 const MOCK_ROUTES = {};
 const IDENTITY_REDUCER = state => state;

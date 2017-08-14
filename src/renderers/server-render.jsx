@@ -13,7 +13,7 @@ import { Forbidden, NotFound, Redirect, SERVER_RENDER } from '../router'; // mwp
 import Dom from '../render/components/Dom';
 import ServerApp from '../render/components/ServerApp';
 
-import { getServerCreateStore } from '../util/createStoreServer';
+import { getServerCreateStore } from '../store/server';
 import configure from '../actions/configActionCreators';
 
 // Ensure global Intl for use with FormatJS
