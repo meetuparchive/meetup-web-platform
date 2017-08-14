@@ -1,7 +1,4 @@
 import { applyMiddleware, createStore } from 'redux';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/toPromise';
-
 import { getApiMiddleware } from '../../api-state'; // mwp-api-state
 
 import getFetchQueries from './fetchQueries';
