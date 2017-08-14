@@ -1,9 +1,9 @@
-/**
- * @param {Object} store Redux store
- * @return {Function} the function that handles calling the next middleware
- *   with each action
- */
-const catchMiddleware = logError => store => next => action => {
+// @flow
+import type { Middleware } from 'redux';
+
+const catchMiddleware = (
+	logError: Error => void
+): Middleware<*, FluxStandardAction> => store => next => action => {
 	try {
 		return next(action);
 	} catch (err) {
