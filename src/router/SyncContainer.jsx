@@ -3,7 +3,7 @@ import React from 'react';
 import withRouter from 'react-router-dom/withRouter';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { locationChange } from '../actions/syncActionCreators';
+import { locationChange } from './routeActionCreators';
 
 function mapDispatchToProps(dispatch) {
 	return {
