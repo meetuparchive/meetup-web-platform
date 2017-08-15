@@ -43,4 +43,13 @@ describe('linkify', () => {
 			'<a class="link" href="http://www.meetup.com" title="www.meetup.com" target="" >www.meetup.com</a>';
 		expect(linkify(plainBase)).toBe(expectedLink);
 	});
+	it('should select and create a link around only the url', () => {
+		const plainText =
+			'Check out my Meetup (http://www.meetup.com/hq-faff), it is awesome.';
+		const expectedHTML =
+			'Check out my Meetup (' +
+			'<a class="link" href="http://www.meetup.com/hq-faff" title="http://www.meetup.com/hq-faff" target="" >' +
+			'http://www.meetup.com/hq-faff</a>), it is awesome.';
+		expect(linkify(plainText)).toBe(expectedHTML);
+	});
 });
