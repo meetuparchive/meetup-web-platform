@@ -30,6 +30,7 @@ In general, application-specific code will live outside of this package.
 - [API State module](src/api-state/README.md)
   - ['Query': structuring data requests](src/api-state/Queries.md) -
 	  GET/POST/PATCH/DELETE requests to REST API
+- [Redux store modules](src/store/README.md) - browser and server
 
 # Releases
 
