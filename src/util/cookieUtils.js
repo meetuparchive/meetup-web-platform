@@ -5,9 +5,6 @@ import logger from './logger';
 export const MEMBER_COOKIE = config.isProd
 	? 'MEETUP_MEMBER'
 	: 'MEETUP_MEMBER_DEV';
-export const LANGUAGE_COOKIE = config.isProd
-	? 'MEETUP_LANGUAGE'
-	: 'MEETUP_LANGUAGE_DEV';
 
 export const parseMemberCookie = state => {
 	if (!state[MEMBER_COOKIE]) {
