@@ -1,6 +1,6 @@
 // @flow
 import type { Middleware } from 'redux';
-import { API_REQ } from '../api-state'; // mwp-api-state
+import { API_REQ } from '../../api-state'; // mwp-api-state
 
 type PlatformMiddleware = Middleware<*, FluxStandardAction>;
 

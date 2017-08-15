@@ -2,7 +2,7 @@ import {
 	actions as clickActionCreators,
 	reducer as clickTracking,
 	DEFAULT_CLICK_TRACK,
-} from '../plugins/tracking/util/clickState';
+} from './clickState';
 
 describe('clickTracking reducer', () => {
 	it('appends a click action to state.clicks', () => {
