@@ -53,8 +53,8 @@ request.post = jest.fn(request);
 request.jar = actual_request.jar;
 
 request.__setMockResponse = (response, body) => {
-	mockResponse = response;
-	mockBody = body;
+	mockResponse = response || mockResponse;
+	mockBody = body || mockBody;
 };
 
 module.exports = request;
