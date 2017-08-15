@@ -6,7 +6,7 @@
 
 import { combineReducers } from 'redux';
 import { api, app, API_RESP_COMPLETE } from '../api-state'; // mwp-api-state
-import { LOCATION_CHANGE, SERVER_RENDER } from '../router'; // mwp-router
+import { routing } from '../router'; // mwp-router
 import { reducer as clickTracking } from '../plugins/tracking/util/clickState'; // mwp-tracking/util/clickState
 
 export function config(state = {}, action) {
@@ -26,20 +26,6 @@ export function config(state = {}, action) {
  */
 export function preRenderChecklist([apiDataLoaded] = [false], action) {
 	return [apiDataLoaded || action.type === API_RESP_COMPLETE];
-}
-
-/*
- * Store routing state to allow middleware to record more accurate
- * tracking info
- */
-export function routing(state = {}, action) {
-	if (action.type === LOCATION_CHANGE || action.type === SERVER_RENDER) {
-		return {
-			referrer: state.location || {},
-			location: action.payload,
-		};
-	}
-	return state;
 }
 
 const platformReducers = {
