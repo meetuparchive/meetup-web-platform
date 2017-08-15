@@ -5,8 +5,8 @@ import {
 	getInitialState,
 	getBrowserCreateStore,
 } from '../util/createStoreBrowser';
-import { getRouteResolver } from '../util/routeUtils';
-import BrowserApp from '../components/BrowserApp';
+import { getRouteResolver } from '../router/util';
+import BrowserApp from '../render/components/BrowserApp';
 
 /**
  * @module browser-render

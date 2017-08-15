@@ -1,8 +1,9 @@
 import { applyMiddleware, createStore } from 'redux';
+import { getApiMiddleware } from '../api-state'; // mwp-api-state
+
 import { parseQueryResponse } from './fetchUtils';
-import getEpicMiddleware from '../middleware/epic';
 import catchMiddleware from '../middleware/catch';
-import apiProxy$ from '../apiProxy/api-proxy';
+import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/toPromise';
 
 /**
@@ -14,7 +15,8 @@ import 'rxjs/add/operator/toPromise';
  *   from the REST API
  */
 export const serverFetchQueries = request => () => queries =>
-	apiProxy$(request, queries)
+	request
+		.proxyApi$(queries)
 		.map(responses => ({ responses })) // package the responses in object like the API proxy endpoint does
 		.toPromise()
 		.then(parseQueryResponse(queries));
@@ -31,7 +33,7 @@ export const serverFetchQueries = request => () => queries =>
 export function getServerCreateStore(routes, middleware, request, baseUrl) {
 	const middlewareToApply = [
 		catchMiddleware(err => request.server.app.logger.error(err)),
-		getEpicMiddleware(routes, serverFetchQueries(request), baseUrl),
+		getApiMiddleware(routes, serverFetchQueries(request), baseUrl),
 		...middleware,
 	];
 

@@ -1,14 +1,6 @@
 import JSCookie from 'js-cookie';
 import rison from 'rison';
-
-const BrowserCookies = JSCookie.withConverter({
-	read: (value, name) => value,
-	write: (value, name) =>
-		encodeURIComponent(value).replace(
-			/[!'()*]/g,
-			c => `%${c.charCodeAt(0).toString(16)}`
-		),
-});
+import { setClickCookie } from '../plugins/tracking/util/clickState';
 
 /**
  * A module for middleware that would like to make external calls through `fetch`
@@ -17,29 +9,6 @@ const BrowserCookies = JSCookie.withConverter({
 
 export const CSRF_HEADER = 'x-csrf-jwt';
 export const CSRF_HEADER_COOKIE = 'x-csrf-jwt-header';
-
-/**
- * @deprecated
- */
-export function getDeprecatedSuccessPayload(successes, errors) {
-	const allQueryResponses = [...successes, ...errors];
-	return allQueryResponses.reduce(
-		(payload, { query, response }) => {
-			if (!response) {
-				return payload;
-			}
-			const { ref, error, ...responseBody } = response;
-			if (error) {
-				// old payload expects error as a property of `value`
-				responseBody.value = { error };
-			}
-			payload.queries.push(query);
-			payload.responses.push({ [ref]: responseBody });
-			return payload;
-		},
-		{ queries: [], responses: [] }
-	);
-}
 
 export const parseQueryResponse = queries => ({
 	responses,
@@ -99,11 +68,7 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 		} = meta;
 
 		if (clickTracking) {
-			BrowserCookies.set('click-track', JSON.stringify(clickTracking), {
-				domain: apiUrl.indexOf('.dev.') > -1
-					? '.dev.meetup.com'
-					: '.meetup.com',
-			});
+			setClickCookie(clickTracking);
 		}
 
 		// send other metadata in searchParams
@@ -122,7 +87,7 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 	}
 
 	if (hasBody || isDelete) {
-		headers[CSRF_HEADER] = BrowserCookies.get(CSRF_HEADER_COOKIE);
+		headers[CSRF_HEADER] = JSCookie.get(CSRF_HEADER_COOKIE);
 	}
 
 	const config = {

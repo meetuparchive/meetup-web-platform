@@ -7,16 +7,13 @@ import IntlPolyfill from 'intl';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import Helmet from 'react-helmet';
-import StaticRouter from 'react-router-dom/StaticRouter';
+import { API_ROUTE_PATH } from '../plugins/api-proxy'; // mwp-api-proxy
+import { Forbidden, NotFound, Redirect, SERVER_RENDER } from '../router'; // mwp-router
 
-import Dom from '../components/dom';
-import Forbidden from '../components/Forbidden';
-import NotFound from '../components/NotFound';
-import PlatformApp from '../components/PlatformApp';
-import Redirect from '../components/Redirect';
+import Dom from '../render/components/Dom';
+import ServerApp from '../render/components/ServerApp';
 
 import { getServerCreateStore } from '../util/createStoreServer';
-import { SERVER_RENDER } from '../actions/syncActionCreators';
 import configure from '../actions/configActionCreators';
 
 // Ensure global Intl for use with FormatJS
@@ -90,7 +87,6 @@ const getRouterRenderer = ({
 	store,
 	location,
 	baseUrl,
-	clientFilename,
 	assetPublicPath,
 	scripts,
 }): RenderResult => {
@@ -106,13 +102,13 @@ const getRouterRenderer = ({
 
 	try {
 		appMarkup = ReactDOMServer.renderToString(
-			<StaticRouter
+			<ServerApp
 				basename={baseUrl}
 				location={location}
 				context={staticContext}
-			>
-				<PlatformApp store={store} routes={routes} />
-			</StaticRouter>
+				store={store}
+				routes={routes}
+			/>
 		);
 	} catch (err) {
 		// cleanup all react-side-effect components to prevent error/memory leaks
@@ -136,7 +132,6 @@ const getRouterRenderer = ({
 		<Dom
 			baseUrl={baseUrl}
 			assetPublicPath={assetPublicPath}
-			clientFilename={clientFilename}
 			head={sideEffects.head}
 			initialState={initialState}
 			appMarkup={appMarkup}
@@ -199,26 +194,37 @@ const makeRenderer = (
 	assetPublicPath: string,
 	middleware: Array<Function> = [],
 	baseUrl: string = '',
-	scripts: Array<string>,
+	scripts: Array<string> = [],
 	enableServiceWorker: boolean
 ) => (request: Object) => {
 	middleware = middleware || [];
+
+	if (clientFilename) {
+		console.warn(
+			'`clientFilename` deprecated in favor of `scripts` array in makeRenderer'
+		);
+		scripts.push(`${assetPublicPath}${clientFilename}`);
+	}
+
+	if (!scripts.length) {
+		throw new Error('No client script assets specified');
+	}
+
 	const {
-		app: { localeCode, supportedLocaleCodes },
 		connection,
 		headers,
 		info,
 		url,
-		server,
+		server: { app: { logger }, settings: { app: { supportedLangs } } },
 		raw: { req },
 	} = request;
+	const requestLanguage = request.getLanguage();
 
 	// request protocol might be different from original request that hit proxy
 	// we want to use the proxy's protocol
 	const requestProtocol =
 		headers['x-forwarded-proto'] || connection.info.protocol;
 	const host = `${requestProtocol}://${info.host}`;
-	const apiUrl = '/mu_api';
 
 	// create the store
 	const initialState = {};
@@ -233,11 +239,11 @@ const makeRenderer = (
 	// load initial config
 	store.dispatch(
 		configure({
-			apiUrl,
+			apiUrl: API_ROUTE_PATH,
 			baseUrl: host,
 			enableServiceWorker,
-			localeCode,
-			supportedLocaleCodes,
+			requestLanguage,
+			supportedLangs,
 			initialNow: new Date().getTime(),
 		})
 	);
@@ -248,7 +254,6 @@ const makeRenderer = (
 				<Dom
 					baseUrl={baseUrl}
 					assetPublicPath={assetPublicPath}
-					clientFilename={clientFilename}
 					head={Helmet.rewind()}
 					initialState={store.getState()}
 					scripts={scripts}
@@ -268,7 +273,7 @@ const makeRenderer = (
 		type: SERVER_RENDER,
 		payload: url,
 	};
-	server.app.logger.debug(
+	logger.debug(
 		{ type: 'dispatch', action, req },
 		`Dispatching RENDER for ${request.url.href}`
 	);
@@ -279,7 +284,6 @@ const makeRenderer = (
 			store,
 			location: url,
 			baseUrl,
-			clientFilename,
 			assetPublicPath,
 			scripts,
 		})

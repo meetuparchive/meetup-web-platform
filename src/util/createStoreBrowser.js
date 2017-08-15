@@ -1,9 +1,9 @@
 // @flow weak
 import { applyMiddleware, createStore, compose } from 'redux';
+import getClickWriter from '../plugins/tracking/util/clickWriter'; // mwp-tracking/util/clickWriter
+import { getApiMiddleware } from '../api-state'; // mwp-api-state
 
 import { fetchQueries } from '../util/fetchUtils';
-import getClickTracker from './clickTracking';
-import getEpicMiddleware from '../middleware/epic';
 import catchMiddleware from '../middleware/catch';
 import injectPromise from '../middleware/injectPromise';
 
@@ -17,7 +17,7 @@ export const clickTrackEnhancer = createStore => (
 	enhancer
 ) => {
 	const store = createStore(reducer, initialState, enhancer);
-	const clickTracker = getClickTracker(store);
+	const clickTracker = getClickWriter(store);
 	document.body.addEventListener('click', clickTracker);
 	document.body.addEventListener('change', clickTracker);
 
@@ -45,7 +45,7 @@ export function getBrowserCreateStore(routes, middleware = [], baseUrl) {
 	const middlewareToApply = [
 		catchMiddleware(console.error),
 		injectPromise,
-		getEpicMiddleware(routes, fetchQueries, baseUrl),
+		getApiMiddleware(routes, fetchQueries, baseUrl),
 		...middleware,
 		window.mupDevTools ? window.mupDevTools() : noopMiddleware, // must be last middleware
 	];
