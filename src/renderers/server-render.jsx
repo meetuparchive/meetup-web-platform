@@ -9,11 +9,10 @@ import ReactDOMServer from 'react-dom/server';
 import Helmet from 'react-helmet';
 import { API_ROUTE_PATH } from '../plugins/api-proxy'; // mwp-api-proxy
 import { Forbidden, NotFound, Redirect, SERVER_RENDER } from '../router'; // mwp-router
+import { getServerCreateStore } from '../store/server'; // mwp-store
+import Dom from '../render/components/Dom'; // mmwp-render/components/Dom
+import ServerApp from '../render/components/ServerApp'; // mwp-render/components/ServerApp
 
-import Dom from '../render/components/Dom';
-import ServerApp from '../render/components/ServerApp';
-
-import { getServerCreateStore } from '../store/server';
 import configure from '../actions/configActionCreators';
 
 // Ensure global Intl for use with FormatJS

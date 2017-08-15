@@ -6,7 +6,7 @@
 export const parseQueryResponse = (queries: Array<Query>) => (
 	proxyResponse: ProxyResponse
 ): ParsedQueryResponses => {
-	if (proxyResponse.error) {
+	if (!proxyResponse.responses) {
 		throw new Error(JSON.stringify(proxyResponse)); // treat like an API error
 	}
 	const { responses } = proxyResponse;
