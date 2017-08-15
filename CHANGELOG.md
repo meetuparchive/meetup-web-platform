@@ -1,3 +1,36 @@
+## [6.0]
+
+### BREAKING CHANGES
+
+- **Moved** `src/components/Redirect` --> `require('src/router').Redirect`
+- **Moved** `src/components/Forbidden` --> `require('src/router').Forbidden`
+- **Moved** `src/actions/apiActionCreators`: The action `type` constants and
+  action creators are exported from `require('src/api-state')`:
+
+  - `API_REQ`
+	- `API_RESP_SUCCESS`
+	- `API_RESP_COMPLETE`
+	- `API_RESP_ERROR`
+	- `API_RESP_FAIL`
+	- `requestAll`
+	- `get`
+	- `post`
+	- `patch`
+	- `del`
+
+- **Moved** `src/actions/syncActionCreators`: The action `type` constants and
+  action creators are exported from `require('src/router')`
+
+  - `SERVER_RENDER`
+  - `LOCATION_CHANGE`
+  - `locationChange`
+
+- **Moved + renamed** `src/middleware/platform:getEpicMiddleware` has moved to
+  `require('src/api-state').getApiMiddleware`
+
+- **Moved + renamed** `src/reducers/platform` has moved to `src/store/reducer`.
+  `makeRootReducer` is now the default export of the module.
+
 ## [5.1]
 
 - **Change** (could be considered breaking, but it's specifically for a
