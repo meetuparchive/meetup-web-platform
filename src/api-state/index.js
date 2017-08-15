@@ -17,7 +17,7 @@ export {
 	patch,
 	del,
 } from './sync/apiActionCreators';
-export { api, app } from './reducer';
+export { api, app, DEFAULT_API_STATE } from './reducer';
 
 /**
  * The middleware is exported as a getter because it needs the application's

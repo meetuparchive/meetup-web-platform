@@ -19,7 +19,10 @@
 	- `del`
 
 - **Moved** `src/actions/syncActionCreators`: The action `type` constants and
-  action creators are exported from `require('src/router')`
+  location change action creators are exported from `require('src/router')`.
+  Deprecated `apiError`, `apiSuccess`, `apiRequest` action creators can be
+  imported directly from `src/api-state/sync/syncActionCreators`, but should be
+  marked as 'deprecated' and converted to the `api-state` action creators above.
 
   - `SERVER_RENDER`
   - `LOCATION_CHANGE`
@@ -28,8 +31,17 @@
 - **Moved + renamed** `src/middleware/platform:getEpicMiddleware` has moved to
   `require('src/api-state').getApiMiddleware`
 
-- **Moved + renamed** `src/reducers/platform` has moved to `src/store/reducer`.
-  `makeRootReducer` is now the default export of the module.
+- **Moved + renamed** Parts of `src/reducers/platform` have moved to
+  `src/store/reducer`. `makeRootReducer` is now the default export of the
+  module. The `api` and `app` (deprecated) reducers are now in `src/api-state`,
+  along with `DEFAULT_API_STATE`.
+
+- **Moved** some `src/components` moved to `src/render/components`:
+
+  - `PlatformApp` - should not be used - choose `BrowserApp` or `ServerApp`
+  - `PageWrap`
+  - `BrowserApp`
+  - `ServerApp`
 
 ## [5.1]
 
