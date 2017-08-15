@@ -14,6 +14,7 @@ import register, {
 	getAnonymousCode$,
 	getAccessToken$,
 	applyRequestAuthorizer$,
+	tryJSON,
 } from './requestAuthPlugin';
 
 const MOCK_REPLY_FN = () => {};
@@ -348,6 +349,45 @@ describe('getAuthenticate', () => {
 				);
 				resolve();
 			})
+		);
+	});
+});
+
+describe('tryJSON', () => {
+	const reqUrl = 'http://example.com';
+	const goodResponse = { foo: 'bar' };
+	const goodFetchResponse = {
+		text: () => Promise.resolve(JSON.stringify(goodResponse)),
+	};
+	const errorResponse = {
+		status: 400,
+		statusText: '400 Bad Request',
+		text: () => Promise.resolve('There was a problem'),
+	};
+	const badJSON = 'totally not JSON';
+	const badJSONResponse = {
+		text: () => Promise.resolve(badJSON),
+	};
+	it('returns a Promise that resolves to the parsed fetch response JSON', () => {
+		const theFetch = tryJSON(reqUrl)(goodFetchResponse);
+		expect(theFetch).toEqual(jasmine.any(Promise));
+
+		return theFetch.then(response => expect(response).toEqual(goodResponse));
+	});
+	it('returns a rejected Promise with Error when response has 400+ status', () => {
+		const theFetch = tryJSON(reqUrl)(errorResponse);
+		expect(theFetch).toEqual(jasmine.any(Promise));
+		return theFetch.then(
+			response => expect(true).toBe(false), // should not run - promise should be rejected
+			err => expect(err).toEqual(jasmine.any(Error))
+		);
+	});
+	it('returns a rejected Promise with Error when response fails JSON parsing', () => {
+		const theFetch = tryJSON(reqUrl)(badJSONResponse);
+		expect(theFetch).toEqual(jasmine.any(Promise));
+		return theFetch.then(
+			response => expect(true).toBe(false), // should not run - promise should be rejected
+			err => expect(err).toEqual(jasmine.any(Error))
 		);
 	});
 });

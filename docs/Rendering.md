@@ -26,7 +26,7 @@ The browser entry script would typically have the following structure:
 
 ```jsx
 import { resolveAppProps } from 'meetup-web-platform/lib/renderers/browser-render';
-import makeRootReducer from 'meetup-web-platform/lib/reducers/platform';
+import makeRootReducer from 'meetup-web-platform/lib/store/reducer';
 
 const appReducers = require('./reducers'); // map of reducer keys to reducer functions
 const reducer = makeRootReducer(appReducers); // create the root reducer function

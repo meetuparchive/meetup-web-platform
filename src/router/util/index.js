@@ -1,5 +1,4 @@
 // @flow
-import type { RouterTo } from './types';
 export * from './resolve';
 export { decodeParams, getMatchedQueries } from './query';
 
