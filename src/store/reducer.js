@@ -28,7 +28,7 @@ export function preRenderChecklist([apiDataLoaded] = [false], action) {
 	return [apiDataLoaded || action.type === API_RESP_COMPLETE];
 }
 
-const platformReducers = {
+export const platformReducers = {
 	api,
 	app,
 	clickTracking,
