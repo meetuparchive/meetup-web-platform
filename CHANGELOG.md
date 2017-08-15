@@ -1,4 +1,4 @@
-## [next]
+## [6.0]
 
 ### BREAKING CHANGES
 
