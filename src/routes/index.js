@@ -23,7 +23,12 @@ export default function getRoutes(renderRequestMap, apiProxyFn$ = apiProxy$) {
 		method: 'GET',
 		path: '/_ah/{param*}',
 		config: { auth: false },
-		handler: (request, reply) => reply('OK'),
+		handler: (request, reply) => {
+			if (request.params.param === 'error') {
+				throw new Error('Simulated error via url');
+			}
+			reply('OK');
+		},
 	};
 
 	return [
