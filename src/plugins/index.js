@@ -96,7 +96,8 @@ export function getLogger(
 	const onRequestError = (request, err) => {
 		console.error(
 			JSON.stringify({
-				err,
+				err: err.stack,
+				req: pino.stdSerializers.req(request.raw.req),
 				res: pino.stdSerializers.res(request.raw.res),
 				message: `500 Internal server error: ${err.message}`,
 			})
