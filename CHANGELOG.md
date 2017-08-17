@@ -43,6 +43,9 @@
   - `BrowserApp`
   - `ServerApp`
 
+- **Moved** `state.config.localeCode` is now `state.config.requestLanguage` to
+  better describe where the locale code comes from
+
 ## [5.1]
 
 - **Change** (could be considered breaking, but it's specifically for a
