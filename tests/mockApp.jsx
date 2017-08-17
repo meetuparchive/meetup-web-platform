@@ -1,13 +1,17 @@
 import React from 'react';
 import Helmet from 'react-helmet';
-import makeRootReducer from '../src/reducers/platform';
-import Redirect from '../src/components/Redirect';
+import makeRootReducer from '../src/store/reducer';
+import { Redirect } from '../src/router';
 
 export const clientFilename = 'client.whatever.js';
 export const assetPublicPath = '//whatever';
 export const reducer = makeRootReducer();
 
 export const ROOT_INDEX_CONTENT = 'this is the life';
+const ChildWrap = props =>
+	<div>
+		{props.children}
+	</div>;
 const MockRootIndex = props =>
 	<div>
 		{ROOT_INDEX_CONTENT}
@@ -36,7 +40,7 @@ const MockRedirect = props => {
 export const routes = [
 	{
 		path: '/',
-		component: 'div',
+		component: ChildWrap,
 		query: () => ({
 			type: 'mock',
 			ref: 'root',
@@ -53,7 +57,7 @@ export const routes = [
 		routes: [
 			{
 				path: '/foo',
-				component: 'div',
+				component: ChildWrap,
 				indexRoute: {
 					component: MockFooIndex,
 					query: () => ({
@@ -91,7 +95,7 @@ export const routes = [
 			{
 				// param-based route
 				path: '/:param1',
-				component: 'div',
+				component: ChildWrap,
 				query: ({ params }) => ({
 					type: 'mock',
 					ref: 'param1',
@@ -100,7 +104,7 @@ export const routes = [
 				routes: [
 					{
 						path: '/:param2',
-						component: 'div',
+						component: ChildWrap,
 						query: ({ params }) => ({
 							type: 'mock',
 							ref: 'param2',

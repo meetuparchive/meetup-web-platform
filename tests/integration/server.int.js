@@ -1,6 +1,6 @@
 import { mockConfig } from '../mocks';
 import start from '../../src/server';
-import * as appRouteHandler from '../../src/routes/appRouteHandler';
+import * as appRouteHandler from '../../src/plugins/app-route/handler';
 
 jest.mock('../../src/plugins/tracking/util/avro'); // will spy on calls to this
 
@@ -74,9 +74,7 @@ describe('General server startup tests', () => {
 			handler: (request, reply) => reply('okay'),
 		};
 		spyOn(spyable, 'handler').and.callThrough();
-		spyOn(appRouteHandler, 'getAppRouteHandler').and.callFake(
-			() => spyable.handler
-		);
+		spyOn(appRouteHandler, 'default').and.callFake(() => spyable.handler);
 		return start({}, {}, mockConfig).then(server => {
 			const request = {
 				method: 'get',

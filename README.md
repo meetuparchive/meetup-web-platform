@@ -14,15 +14,22 @@ In general, application-specific code will live outside of this package.
 
 # Docs
 
-- [API requests through api-proxy](docs/api-proxy.md)
 - [App configuration management](docs/Config.md)
 - [Auth flow from `requestAuthPlugin`](docs/auth.md)
 - [Analytics/tracking](docs/Tracking.md)
 - [Application state management](docs/State.md)
-- ['Query': structuring data requests](docs/Queries.md) - GET/POST/PATCH/DELETE requests to REST API
 - [Rendering in consumer applications](docs/Rendering.md)
-- [Routing configuration](docs/Routing.md)
 - [Caching - API and static assets](docs/Caching.md)
+
+## Public modules
+
+- [Routing module](src/router/README.md)
+- [Language plugin for Hapi](src/plugins/language/README.md)
+- [API proxy plugin for Hapi](src/plugins/api-proxy/README.md)
+- [Click and Activity tracking](src/plugins/tracking/README.md)
+- [API State module](src/api-state/README.md)
+  - ['Query': structuring data requests](src/api-state/Queries.md) -
+	  GET/POST/PATCH/DELETE requests to REST API
 
 # Releases
 
@@ -98,57 +105,6 @@ Suggestions:
 The [server module](./src/server.js) exports a `startServer` function that consumes
 a mapping of locale codes to app-rendering Observables, plus any app-specific
 server routes and plugins. See the code comments for usage details.
-
-## Middleware/Epics
-
-The built-in middleware provides core functionality for interacting with
-API data - managing authenticated user sessions, syncing with the current
-URL location, caching data, and POSTing data to the API.
-
-Additional middleware can be passed to the `makeRenderer` function for
-each specific application's client and server entry points.
-
-### Epic middleware
-
-Based on `redux-observable`, this middleware provides the following
-functionality through "Epics":
-
-#### Sync `epics/sync.js`
-
-This epic is currently only responsible for fetching the data from the API
-server on initial render or client-side
-user navigation.
-
-**on `server/RENDER` or `LOCATION_CHANGE`**, which provide a `location` (URL):
-
-1. Match `location` to defined `routes` and extract the `renderProps` like URL
-   path and querystring params
-2. Check `routes` for `query` functions that return data needs, and process
-   them into an array
-3. Trigger `API_REQ` containing the `queries`
-
-**on `API_REQ`**, which provides `queries`:
-1. Send the queries to the application server, which will make the
-	 corresponding external API calls.
-2. When the application server returns data, trigger `API_SUCCESS` action
-   containing API response array and query array
-3. If the application server responds with an error, trigger `API_ERROR`
-
-#### Cache `epics/cache.js`
-
-See [the Caching docs](./docs/Caching.md#cache-middleware)
-
-##### Disable cache
-
-By design, the cache masks slow responses from the API and can create a 'flash'
-of stale content before the API responds with the latest data. In development,
-this behavior is not always desirable so you can disable the cache by adding
-a `__nocache` param to the query string. The cache will remain disabled until the
-the page is refreshed/reloaded without the param in the querystring.
-
-```
-http://localhost:8000/ny-tech/?__nocache
-```
 
 ## Client
 
