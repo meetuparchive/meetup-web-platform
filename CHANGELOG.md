@@ -28,6 +28,9 @@
 - **Moved + renamed** `src/middleware/platform:getEpicMiddleware` has moved to
   `require('src/api-state').getApiMiddleware`
 
+- **Moved + renamed** `src/reducers/platform` has moved to `src/store/reducer`.
+  `makeRootReducer` is now the default export of the module.
+
 ## [5.1]
 
 - **Change** (could be considered breaking, but it's specifically for a

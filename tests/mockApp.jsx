@@ -1,6 +1,6 @@
 import React from 'react';
 import Helmet from 'react-helmet';
-import makeRootReducer from '../src/reducers/platform';
+import makeRootReducer from '../src/store/reducer';
 import { Redirect } from '../src/router';
 
 export const clientFilename = 'client.whatever.js';
