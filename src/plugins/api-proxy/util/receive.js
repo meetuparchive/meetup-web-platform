@@ -186,7 +186,30 @@ export const makeLogResponse = request => ([response, body]) => {
 		request: { id, uri: { query, pathname, href }, method },
 		statusCode,
 	} = response;
+	const parsedQuery = (query || '').split('&').reduce((acc, keyval) => {
+		const [key, val] = keyval.split('=');
+		acc[key] = val;
+		return acc;
+	}, {});
 
+	if (statusCode >= 500) {
+		// use console.error to highlight these cases in Stackdriver
+		console.error(
+			JSON.stringify({
+				message: 'REST API error response',
+				info: {
+					url: href,
+					query: parsedQuery,
+					method,
+					id,
+					statusCode,
+					time: elapsedTime,
+					originRequestId: request.id,
+					body,
+				},
+			})
+		);
+	}
 	const logger = request.server.app.logger;
 	// production logs will automatically be JSON-parsed in Stackdriver
 	const log = ((statusCode >= 400 && logger.error) ||
@@ -200,15 +223,11 @@ export const makeLogResponse = request => ([response, body]) => {
 			direction: 'in',
 			info: {
 				url: href,
-				query: (query || '').split('&').reduce((acc, keyval) => {
-					const [key, val] = keyval.split('=');
-					acc[key] = val;
-					return acc;
-				}, {}),
+				query: parsedQuery,
 				method,
 				id,
 				originRequestId: request.id,
-				statusCode: statusCode,
+				statusCode,
 				time: elapsedTime,
 				body: body.length > 256 ? `${body.substr(0, 256)}...` : body,
 			},
