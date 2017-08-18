@@ -10,7 +10,7 @@ import Helmet from 'react-helmet';
 import { API_ROUTE_PATH } from '../plugins/api-proxy'; // mwp-api-proxy
 import { Forbidden, NotFound, Redirect, SERVER_RENDER } from '../router'; // mwp-router
 import { getServerCreateStore } from '../store/server'; // mwp-store
-import Dom from '../render/components/Dom'; // mmwp-render/components/Dom
+import Dom from '../render/components/Dom'; // mwp-render/components/Dom
 import ServerApp from '../render/components/ServerApp'; // mwp-render/components/ServerApp
 
 import configure from '../actions/configActionCreators';
@@ -219,11 +219,12 @@ const makeRenderer = (
 	} = request;
 	const requestLanguage = request.getLanguage();
 
-	// request protocol might be different from original request that hit proxy
-	// we want to use the proxy's protocol
+	// request protocol and host might be different from original request that hit proxy
+	// we want to use the proxy's protocol and host
 	const requestProtocol =
 		headers['x-forwarded-proto'] || connection.info.protocol;
-	const host = `${requestProtocol}://${info.host}`;
+	const domain = headers['x-forwarded-host'] || info.host;
+	const host = `${requestProtocol}://${domain}`;
 
 	// create the store
 	const initialState = {};
