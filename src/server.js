@@ -18,7 +18,7 @@ import { configureEnv, server } from './util/serverUtils';
  * route and combines the provided routes and plugins with the base routes
  * and plugins
  *
- * @param {Object} renderRequestMap A mapping of localeCodes to functions that emit
+ * @param {Object} languageRenderers A mapping of localeCodes to functions that emit
  *   the rendered HTML for the locale-specific request
  * @param {Array} routes additional routes for the app - cannot include a
  *   wildcard route
@@ -26,14 +26,17 @@ import { configureEnv, server } from './util/serverUtils';
  *   features in the additional routes
  * @return {Promise} the Promise returned by Hapi's `server.connection` method
  */
-export default function start(renderRequestMap, { routes = [], plugins = [] }) {
+export default function start(
+	languageRenderers,
+	{ routes = [], plugins = [] }
+) {
 	// source maps make for better stack traces
 	// we might not want this in production if it makes anything slower
 	require('source-map-support').install();
 
 	configureEnv(appConfig);
 
-	const baseRoutes = getRoutes(renderRequestMap);
+	const baseRoutes = getRoutes();
 	const finalRoutes = [...routes, ...baseRoutes];
 
 	const connection = {
@@ -57,7 +60,8 @@ export default function start(renderRequestMap, { routes = [], plugins = [] }) {
 		});
 	}
 
-	const finalPlugins = [...plugins, ...getPlugins()];
+	const finalPlugins = [...plugins, ...getPlugins({ languageRenderers })];
 
+	appConfig.supportedLangs = Object.keys(languageRenderers);
 	return server(finalRoutes, connection, finalPlugins, appConfig);
 }

@@ -1,15 +1,4 @@
-import logger from '../util/logger';
-
-import apiProxy$ from '../apiProxy/api-proxy';
-
-import getApiProxyRoutes from '../apiProxy/apiProxyRoutes';
-import getApplicationRoute from './appRoute';
-
-export default function getRoutes(renderRequestMap, apiProxyFn$ = apiProxy$) {
-	logger.info(
-		`Supported languages:\n${Object.keys(renderRequestMap).join('\n')}`
-	);
-
+export default function getRoutes() {
 	const pingRoute = {
 		path: '/ping',
 		method: 'GET',
@@ -26,10 +15,5 @@ export default function getRoutes(renderRequestMap, apiProxyFn$ = apiProxy$) {
 		handler: (request, reply) => reply('OK'),
 	};
 
-	return [
-		pingRoute,
-		appEngineLifecycleRoutes,
-		...getApiProxyRoutes('/mu_api', apiProxyFn$),
-		getApplicationRoute(renderRequestMap),
-	];
+	return [pingRoute, appEngineLifecycleRoutes];
 }
