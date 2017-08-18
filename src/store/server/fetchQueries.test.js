@@ -1,17 +1,5 @@
-import * as fetchUtils from './fetchUtils';
-import { testCreateStore } from './testUtils';
-import { getServerCreateStore, serverFetchQueries } from './createStoreServer';
-
-const MOCK_ROUTES = {};
-const MOCK_HAPI_REQUEST = {
-	state: {},
-	server: { app: { logger: { error: jest.fn() } } },
-};
-
-describe('getServerCreateStore', () => {
-	testCreateStore(getServerCreateStore(MOCK_ROUTES, [], MOCK_HAPI_REQUEST));
-});
-
+import * as fetchUtils from '../util/fetchUtils';
+import serverFetchQueries from './fetchQueries';
 describe('serverFetchQueries', () => {
 	// export const serverFetchQueries = request => () => queries =>
 	// 	apiProxy$(request, queries)
