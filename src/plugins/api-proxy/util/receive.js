@@ -192,7 +192,10 @@ export const makeLogResponse = request => ([response, body]) => {
 		return acc;
 	}, {});
 
-	if (statusCode >= 500) {
+	if (
+		statusCode >= 500 || // REST API had an internal error
+		(method.toLowerCase() === 'get' && statusCode >= 400) // something fishy with a GET
+	) {
 		// use console.error to highlight these cases in Stackdriver
 		console.error(
 			JSON.stringify({
