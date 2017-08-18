@@ -9,3 +9,4 @@ export {
 	SERVER_RENDER,
 	locationChange,
 } from './routeActionCreators';
+export { default as routing } from './reducer';

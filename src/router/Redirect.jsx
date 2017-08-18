@@ -4,7 +4,6 @@ import withSideEffect from 'react-side-effect';
 import RouterRedirect from 'react-router-dom/Redirect';
 import Route from 'react-router-dom/Route';
 import { testForExternal } from './util';
-import type { RouterTo } from './util/types';
 
 type RedirectProps = {
 	to: RouterTo,
