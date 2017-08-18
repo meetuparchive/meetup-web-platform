@@ -10,7 +10,7 @@ import Helmet from 'react-helmet';
 import { API_ROUTE_PATH } from '../plugins/api-proxy'; // mwp-api-proxy
 import { Forbidden, NotFound, Redirect, SERVER_RENDER } from '../router'; // mwp-router
 import { getServerCreateStore } from '../store/server'; // mwp-store
-import Dom from '../render/components/Dom'; // mmwp-render/components/Dom
+import Dom from '../render/components/Dom'; // mwp-render/components/Dom
 import ServerApp from '../render/components/ServerApp'; // mwp-render/components/ServerApp
 
 import configure from '../actions/configActionCreators';
