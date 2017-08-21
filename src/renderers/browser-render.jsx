@@ -1,12 +1,9 @@
 // @flow
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {
-	getInitialState,
-	getBrowserCreateStore,
-} from '../util/createStoreBrowser';
-import { getRouteResolver } from '../util/routeUtils';
-import BrowserApp from '../components/BrowserApp';
+import { getInitialState, getBrowserCreateStore } from '../store/browser';
+import { getRouteResolver } from '../router/util';
+import BrowserApp from '../render/components/BrowserApp';
 
 /**
  * @module browser-render

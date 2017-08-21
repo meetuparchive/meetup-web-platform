@@ -1,3 +1,51 @@
+## [6.0]
+
+### BREAKING CHANGES
+
+- **Moved** `src/components/Redirect` --> `require('src/router').Redirect`
+- **Moved** `src/components/Forbidden` --> `require('src/router').Forbidden`
+- **Moved** `src/actions/apiActionCreators`: The action `type` constants and
+  action creators are exported from `require('src/api-state')`:
+
+  - `API_REQ`
+	- `API_RESP_SUCCESS`
+	- `API_RESP_COMPLETE`
+	- `API_RESP_ERROR`
+	- `API_RESP_FAIL`
+	- `requestAll`
+	- `get`
+	- `post`
+	- `patch`
+	- `del`
+
+- **Moved** `src/actions/syncActionCreators`: The action `type` constants and
+  location change action creators are exported from `require('src/router')`.
+  Deprecated `apiError`, `apiSuccess`, `apiRequest` action creators can be
+  imported directly from `src/api-state/sync/syncActionCreators`, but should be
+  marked as 'deprecated' and converted to the `api-state` action creators above.
+
+  - `SERVER_RENDER`
+  - `LOCATION_CHANGE`
+  - `locationChange`
+
+- **Moved + renamed** `src/middleware/platform:getEpicMiddleware` has moved to
+  `require('src/api-state').getApiMiddleware`
+
+- **Moved + renamed** Parts of `src/reducers/platform` have moved to
+  `src/store/reducer`. `makeRootReducer` is now the default export of the
+  module. The `api` and `app` (deprecated) reducers are now in `src/api-state`,
+  along with `DEFAULT_API_STATE`.
+
+- **Moved** some `src/components` moved to `src/render/components`:
+
+  - `PlatformApp` - should not be used - choose `BrowserApp` or `ServerApp`
+  - `PageWrap`
+  - `BrowserApp`
+  - `ServerApp`
+
+- **Moved** `state.config.localeCode` is now `state.config.requestLanguage` to
+  better describe where the locale code comes from
+
 ## [5.1]
 
 - **Change** (could be considered breaking, but it's specifically for a

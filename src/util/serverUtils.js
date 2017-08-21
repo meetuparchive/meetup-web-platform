@@ -1,9 +1,6 @@
-import fs from 'fs';
 import https from 'https';
 import Hapi from 'hapi';
 import uuid from 'uuid';
-
-import clickTrackingReader from './clickTrackingReader';
 
 /**
  * determine whether a nested object of values has
@@ -33,30 +30,6 @@ export function onRequestExtension(request, reply) {
 	);
 
 	return reply.continue();
-}
-
-export function onPreHandlerExtension(request, reply) {
-	try {
-		clickTrackingReader(request, reply);
-	} catch (err) {
-		console.error(err);
-		request.server.app.logger.error(err);
-	}
-	return reply.continue();
-}
-
-export function onResponse(request) {
-	logResponse(request);
-	if (request.app.upload) {
-		fs.unlink(request.app.upload, err => {
-			if (err) {
-				request.server.app.logger.error(
-					{ info: request.app.upload },
-					'Could not delete uploaded file'
-				);
-			}
-		});
-	}
 }
 
 export function logResponse(request) {
@@ -109,12 +82,8 @@ export function registerExtensionEvents(server) {
 			type: 'onRequest',
 			method: onRequestExtension,
 		},
-		{
-			type: 'onPreHandler',
-			method: onPreHandlerExtension,
-		},
 	]);
-	server.on('response', onResponse);
+	server.on('response', logResponse);
 	return server;
 }
 
