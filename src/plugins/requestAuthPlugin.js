@@ -9,7 +9,6 @@ import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/map';
 
 import logger from '../util/logger';
-import { tryJSON } from '../util/fetchUtils';
 import { MEMBER_COOKIE } from '../util/cookieUtils';
 import {
 	applyAuthState,
@@ -20,6 +19,26 @@ import {
 /**
  * @module requestAuthPlugin
  */
+
+/**
+ * Attempt to JSON parse a Response object from a fetch call
+ *
+ * @param {String} reqUrl the URL that was requested
+ * @param {Response} response the fetch Response object
+ * @return {Promise} a Promise that resolves with the JSON-parsed text
+ */
+export const tryJSON = reqUrl => response => {
+	const { status, statusText } = response;
+	if (status >= 400) {
+		// status always 200: bugzilla #52128
+		return Promise.reject(
+			new Error(
+				`Request to ${reqUrl} responded with error code ${status}: ${statusText}`
+			)
+		);
+	}
+	return response.text().then(text => JSON.parse(text));
+};
 
 const verifyAuth = logger => auth => {
 	if (!Object.keys(auth).length) {
