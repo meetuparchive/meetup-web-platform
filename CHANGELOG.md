@@ -44,7 +44,8 @@
   - `ServerApp`
 
 - **Moved** `state.config.localeCode` is now `state.config.requestLanguage` to
-  better describe where the locale code comes from
+  better describe where the locale code comes from - make sure you update to the
+  latest meetup-web-mocks in order to get a valid `MOCK_APP_STATE`
 
 ## [5.1]
 

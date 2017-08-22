@@ -49,4 +49,4 @@ export default (request: HapiRequest) => (): string =>
 	getCookieLang(request) ||
 	getUrlLang(request) ||
 	getBrowserLang(request) ||
-	request.server.settings.app.supportedLangs[0];
+	getServerSettings(request).supportedLangs[0];
