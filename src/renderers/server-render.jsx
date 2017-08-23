@@ -223,7 +223,8 @@ const makeRenderer = (
 	// we want to use the proxy's protocol and host
 	const requestProtocol =
 		headers['x-forwarded-proto'] || connection.info.protocol;
-	const domain = headers['x-forwarded-host'] || info.host;
+	const domain =
+		headers['x-forwarded-host'] || headers['x-meetup-host'] || info.host;
 	const host = `${requestProtocol}://${domain}`;
 
 	// create the store
