@@ -141,7 +141,7 @@ export const config = convict({
 		},
 		timeout: {
 			format: 'int',
-			default: 8000,
+			default: 10000,
 			env: 'API_TIMEOUT',
 		},
 		root_url: {
