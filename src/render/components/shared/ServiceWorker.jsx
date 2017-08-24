@@ -3,7 +3,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 const mapStateToProps = state => ({
-	localeCode: state.config.localeCode,
+	requestLanguage: state.config.requestLanguage,
 	enableServiceWorker: state.config.enableServiceWorker,
 });
 
@@ -13,7 +13,7 @@ const mapStateToProps = state => ({
  */
 class ServiceWorker extends React.Component {
 	props: {
-		localeCode: string,
+		requestLanguage: string,
 		enableServiceWorker: boolean,
 		children: React$Element<*>,
 	};
@@ -24,7 +24,7 @@ class ServiceWorker extends React.Component {
 			process.env.NODE_ENV === 'production' // sw caching creates confusion in dev
 		) {
 			navigator.serviceWorker.register(
-				`/asset-service-worker.${this.props.localeCode}.js`
+				`/asset-service-worker.${this.props.requestLanguage}.js`
 			); // must serve from root URL path
 		}
 	}
