@@ -13,8 +13,6 @@ import { getServerCreateStore } from '../store/server'; // mwp-store
 import Dom from '../render/components/Dom'; // mwp-render/components/Dom
 import ServerApp from '../render/components/ServerApp'; // mwp-render/components/ServerApp
 
-import configure from '../actions/configActionCreators';
-
 // Ensure global Intl for use with FormatJS
 Intl.NumberFormat = IntlPolyfill.NumberFormat;
 Intl.DateTimeFormat = IntlPolyfill.DateTimeFormat;
@@ -227,8 +225,18 @@ const makeRenderer = (
 		headers['x-forwarded-host'] || headers['x-meetup-host'] || info.host;
 	const host = `${requestProtocol}://${domain}`;
 
-	// create the store
-	const initialState = {};
+	// create the store with populated `config`
+	const initialState = {
+		config: {
+			apiUrl: API_ROUTE_PATH,
+			baseUrl: host,
+			enableServiceWorker,
+			requestLanguage,
+			supportedLangs,
+			initialNow: new Date().getTime(),
+		},
+	};
+
 	const createStore = getServerCreateStore(
 		routes,
 		middleware,
@@ -237,17 +245,6 @@ const makeRenderer = (
 	);
 	const store = createStore(reducer, initialState);
 
-	// load initial config
-	store.dispatch(
-		configure({
-			apiUrl: API_ROUTE_PATH,
-			baseUrl: host,
-			enableServiceWorker,
-			requestLanguage,
-			supportedLangs,
-			initialNow: new Date().getTime(),
-		})
-	);
 	// render skeleton if requested - the store is ready
 	if ('skeleton' in request.query) {
 		return Observable.of({
