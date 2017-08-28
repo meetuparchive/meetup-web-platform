@@ -2,7 +2,7 @@
 
 ## Activity tracking
 
-Activity tracking is provided by a `request.trackApi` method, which has two
+Activity tracking is provided by a `request.trackActivity` method, which has two
 responsibilities:
 
 1. Manage tracking IDs that are passed into the request through cookies

@@ -38,7 +38,7 @@ export const getTrackApiResponses: TrackGetter = trackOpts => request => (
  * This is the core tracking handler - called on every request that generates
  * REST API call(s)
  */
-export const getTrackApi: TrackGetter = trackOpts => request => (
+export const getTrackActivity: TrackGetter = trackOpts => request => (
 	queryResponses: Array<Object>
 ) => {
 	const { method, payload, query, info: { referrer } } = request;

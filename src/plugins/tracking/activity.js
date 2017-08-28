@@ -1,6 +1,6 @@
 // @flow
 import avro from './util/avro';
-import { getTrackApi, getTrackApiResponses } from './_activityTrackers';
+import { getTrackActivity, getTrackApiResponses } from './_activityTrackers';
 
 const YEAR_IN_MS: number = 1000 * 60 * 60 * 24 * 365;
 export const ACTIVITY_PLUGIN_NAME = 'tracking';
@@ -10,10 +10,7 @@ export const ACTIVITY_PLUGIN_NAME = 'tracking';
  * particular server responses, e.g. new sesssions and navigation activity.
  *
  * Available trackers:
- * - `trackApi`
- * - `trackSession`
- * - `trackLogin`
- * - `trackLogout`
+ * - `trackActivity`
  */
 
 export const getLogger: string => (Object, Object) => mixed = (
@@ -67,7 +64,7 @@ export function getTrackers(options: {
 	};
 	// These are the tracking methods that will be set on the `request` interface
 	const trackers: { [string]: Tracker } = {
-		trackApi: getTrackApi(trackOpts),
+		trackActivity: getTrackActivity(trackOpts),
 		trackApiResponses: getTrackApiResponses(trackOpts),
 	};
 	return trackers;
@@ -86,7 +83,7 @@ const onRequest = (request, reply) => {
  * tracking cookies that need to be set using request.response.state.
  */
 const getOnPreResponse = cookieConfig => (request, reply) => {
-	const { browserIdCookieName, trackIdCookieName, isProd } = cookieConfig;
+	const { browserIdCookieName, trackIdCookieName } = cookieConfig;
 	const pluginData = request.plugins[ACTIVITY_PLUGIN_NAME];
 	const browserId = pluginData.browserIdCookieName;
 	const trackId = pluginData.trackIdCookieName;
@@ -95,7 +92,6 @@ const getOnPreResponse = cookieConfig => (request, reply) => {
 		encoding: 'none',
 		path: '/',
 		isHttpOnly: true,
-		isSecure: isProd,
 		ttl: YEAR_IN_MS * 20,
 	};
 
@@ -150,7 +146,6 @@ export default function register(
 			browserIdCookieName,
 			memberCookieName,
 			trackIdCookieName,
-			isProd,
 		})
 	);
 

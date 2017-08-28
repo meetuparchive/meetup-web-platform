@@ -12,7 +12,7 @@ describe('serverFetchQueries', () => {
 				require('rxjs/add/observable/of');
 				return Observable.of('response');
 			}),
-			trackApi: jest.fn(),
+			trackActivity: jest.fn(),
 		};
 		const queries = [];
 		const expectedParsedResponse = 'foo';
