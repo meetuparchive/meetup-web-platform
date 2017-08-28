@@ -16,16 +16,16 @@ export const updateId: UpdateId = cookieName => (
 	request: Object,
 	doRefresh: ?boolean
 ) => {
-	let id: string =
+	let cookieVal: string =
 		request.state[cookieName] || // cookie in original request
 		request.plugins[ACTIVITY_PLUGIN_NAME][cookieName]; // cookie added to outgoing response
 
-	if (!id || doRefresh) {
+	if (!cookieVal || doRefresh) {
 		// Generate a new id value and store in request. Cookie will be
 		// set in the plugin's onResponse handler
 		return newId(cookieName)(request);
 	}
-	return id;
+	return parseIdCookie(cookieVal).toString(); // toString used to satisfy Flow
 };
 
 /*
@@ -41,6 +41,10 @@ export const newId = (cookieName: string) => (request: HapiRequest): string => {
 
 export const makeIdCookie = (id: string) => `id=${id}`;
 export const parseIdCookie = (cookieVal: string, doParseInt?: boolean) => {
-	const parsed = querystring.parse(cookieVal);
-	return doParseInt ? parseInt(parsed.id, 10) || 0 : parsed.id;
+	const parsed: { id: string } = querystring.parse(cookieVal) || { id: '' };
+	parsed.id = parsed.id || '';
+	if (doParseInt) {
+		return parseInt(parsed.id, 10) || 0;
+	}
+	return parsed.id;
 };

@@ -25,9 +25,9 @@ export const getTrackApiResponses: TrackGetter = trackOpts => request => (
 	}));
 	return trackOpts.log(request, {
 		description: 'nav',
-		memberId: parseIdCookie(request.state[trackOpts.memberCookieName], true),
-		browserId: updateId(trackOpts.browserIdCookieName)(request),
-		trackId: updateId(trackOpts.trackIdCookieName)(request),
+		memberId: parseIdCookie(request.state[trackOpts.memberCookieName], true), // read memberId
+		browserId: updateId(trackOpts.browserIdCookieName)(request), // read/add browserId
+		trackId: updateId(trackOpts.trackIdCookieName)(request), // read/add trackId
 		url: url || '',
 		referer: referrer || '',
 		apiRequests,

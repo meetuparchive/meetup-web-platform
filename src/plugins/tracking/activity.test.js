@@ -29,9 +29,10 @@ describe('updateId', () => {
 	});
 	it('does not set cookiename in plugin data if already set', () => {
 		const trackId = 'foo';
+		const trackIdCookie = `id=${trackId}`;
 		const request = {
 			...getMockRequest(),
-			state: { [trackIdCookieName]: trackId },
+			state: { [trackIdCookieName]: trackIdCookie },
 		};
 		const updatedTrackId = updateId(trackIdCookieName)(request);
 		expect(updatedTrackId).toBe(trackId); // no change
