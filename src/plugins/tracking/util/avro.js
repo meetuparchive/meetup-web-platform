@@ -58,12 +58,12 @@ const click = {
 };
 
 // currently the schema is manually copied from
-// https://github.dev.meetup.com/meetup/meetup/blob/master/modules/base/src/main/versioned_avro/Activity_v5.avsc
+// https://github.com/meetup/meetup/blob/master/modules/base/src/main/versioned_avro/Activity_v6.avsc
 const activity = {
 	namespace: 'com.meetup.base.avro',
 	type: 'record',
 	name: 'Activity',
-	doc: 'v5',
+	doc: 'v6',
 	fields: [
 		{ name: 'requestId', type: 'string' },
 		{ name: 'timestamp', type: 'string' },
@@ -95,6 +95,7 @@ const activity = {
 			default: 'UNKNOWN',
 		},
 		{ name: 'isUserActivity', type: 'boolean', default: true },
+		{ name: 'browserId', type: 'string', default: '' },
 	],
 };
 

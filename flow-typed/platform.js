@@ -27,6 +27,10 @@ declare type HapiRequest = {
 	state: {
 		[string]: string,
 	},
+	info: {
+		referrer: string,
+		[string]: mixed,
+	},
 	[string]: any,
 };
 const HapiReplyFn = (reply: string | Object) => HapiReplyFn;

@@ -67,6 +67,7 @@ describe('Activity tracking', () => {
 		const expectedTrackedInfo = {
 			...trackInfo,
 			aggregratedUrl: '', // misspelled, unused field in v3 spec, default ''
+			browserId: '',
 		};
 		delete expectedTrackedInfo.sessionId; // not part of v3 spec
 		expect(recordedInfo).toEqual(expectedTrackedInfo);

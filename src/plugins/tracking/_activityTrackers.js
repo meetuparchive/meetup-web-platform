@@ -1,8 +1,7 @@
 // @flow
 import url from 'url';
 import rison from 'rison';
-import { parseMemberCookie } from '../../util/cookieUtils';
-import { updateTrackId, newSessionId } from './util/idUtils';
+import { parseIdCookie, updateId } from './util/idUtils';
 
 const parseUrl = url.parse;
 
@@ -12,32 +11,11 @@ const parseUrl = url.parse;
  * tracking record.
  */
 
-/*
- * Track the browser session. This is _independent of login_, and provides a
- * link (JOIN) between track ids pre/post login/logout, but does not carry over
- * to a new browser session
- */
-export const getTrackSession: TrackGetter = trackOpts => request => () => {
-	const { log, sessionIdCookieName } = trackOpts;
-	if (request.state[sessionIdCookieName]) {
-		// if there's already a session id, there's nothing to track
-		return null;
-	}
-	return log(request, {
-		description: 'session',
-		memberId: parseMemberCookie(request.state).id,
-		trackId: updateTrackId(trackOpts)(request),
-		sessionId: newSessionId(request),
-		url: request.url.path,
-	});
-};
-
 export const getTrackApiResponses: TrackGetter = trackOpts => request => (
 	queryResponses: Array<Object>,
-	url: string,
-	referrer: string
+	url: ?string,
+	referrer: ?string
 ) => {
-	const { log, trackIdCookieName, sessionIdCookieName } = trackOpts;
 	const apiRequests: Array<{
 		requestId: string,
 		endpoint: string,
@@ -45,11 +23,11 @@ export const getTrackApiResponses: TrackGetter = trackOpts => request => (
 		requestId: meta.requestId,
 		endpoint: meta.endpoint,
 	}));
-	return log(request, {
+	return trackOpts.log(request, {
 		description: 'nav',
-		memberId: parseMemberCookie(request.state).id,
-		trackId: request.state[trackIdCookieName] || '',
-		sessionId: request.state[sessionIdCookieName] || '',
+		memberId: parseIdCookie(request.state[trackOpts.memberCookieName], true),
+		browserId: updateId(trackOpts.browserIdCookieName)(request),
+		trackId: updateId(trackOpts.trackIdCookieName)(request),
 		url: url || '',
 		referer: referrer || '',
 		apiRequests,
@@ -57,23 +35,29 @@ export const getTrackApiResponses: TrackGetter = trackOpts => request => (
 };
 
 /*
- * get the trackApi handler - the core tracking handler for navigation and
- * login-related activity.
+ * This is the core tracking handler - called on every request that generates
+ * REST API call(s)
  */
 export const getTrackApi: TrackGetter = trackOpts => request => (
 	queryResponses: Array<Object>
 ) => {
-	const payload = request.method === 'post' ? request.payload : request.query;
+	const { method, payload, query, info: { referrer } } = request;
+	const requestReferrer = parseUrl(referrer).pathname || '';
 
-	const metadataRison = payload.metadata || rison.encode_object({});
-	const metadata = rison.decode_object(metadataRison);
-	const originUrl = request.info.referrer;
-	metadata.url = parseUrl(originUrl).pathname;
-	metadata.method = request.method;
+	const reqData = method === 'post' ? payload : query;
 
-	const { url, referrer } = metadata;
+	if (reqData.metadata) {
+		// this is an API-proxy request, so the referrer needs to be read from
+		// the reqData. The 'url' is the 'requestReferrer'
+		const metadataRison = reqData.metadata || rison.encode_object({});
+		const { referrer } = rison.decode_object(metadataRison);
+		const url = parseUrl(requestReferrer).pathname;
+		return request.trackApiResponses(queryResponses, url, referrer);
+	}
 
-	// special case - login requests need to be tracked (This needs to be
-	// redone when login/logout is fully implemented)
-	return request.trackApiResponses(queryResponses, url, referrer);
+	return request.trackApiResponses(
+		queryResponses,
+		request.url.pathname, // requested url
+		requestReferrer // referer
+	);
 };

@@ -1,8 +1,9 @@
 // @flow
+import querystring from 'qs';
 import uuid from 'uuid';
 import { ACTIVITY_PLUGIN_NAME } from '../activity';
 
-type UpdateTrackId = TrackOpts => (Object, ?boolean) => string;
+type UpdateId = string => (Object, ?boolean) => string;
 /*
  * Initialize the trackId for member or anonymous user - the longest-living id
  * we can assign to a user. Stays in place until login or logout, when it is
@@ -11,20 +12,20 @@ type UpdateTrackId = TrackOpts => (Object, ?boolean) => string;
  *  - If the user has a tracking cookie already set, do nothing.
  *  - Otherwise, generate a new uuid and set a tracking cookie.
  */
-export const updateTrackId: UpdateTrackId = (options: TrackOpts) => (
+export const updateId: UpdateId = cookieName => (
 	request: Object,
 	doRefresh: ?boolean
 ) => {
-	const { trackIdCookieName } = options;
-	let trackId: string = request.state[trackIdCookieName];
+	let id: string =
+		request.state[cookieName] || // cookie in original request
+		request.plugins[ACTIVITY_PLUGIN_NAME][cookieName]; // cookie added to outgoing response
 
-	if (!trackId || doRefresh) {
-		// Generate a new trackId value and store in request. Cookie will be
+	if (!id || doRefresh) {
+		// Generate a new id value and store in request. Cookie will be
 		// set in the plugin's onResponse handler
-		trackId = uuid.v4();
-		request.plugins[ACTIVITY_PLUGIN_NAME].trackId = trackId;
+		return newId(cookieName)(request);
 	}
-	return trackId;
+	return id;
 };
 
 /*
@@ -32,8 +33,14 @@ export const updateTrackId: UpdateTrackId = (options: TrackOpts) => (
  * A corresponding cookie will be set in the plugin's onResponse handler in
  * order to share the session cookie across browser tabs.
  */
-export const newSessionId: Object => string = request => {
-	const sessionId: string = uuid.v4();
-	request.plugins[ACTIVITY_PLUGIN_NAME].sessionId = sessionId;
-	return sessionId;
+export const newId = (cookieName: string) => (request: HapiRequest): string => {
+	const id: string = uuid.v4();
+	request.plugins[ACTIVITY_PLUGIN_NAME][cookieName] = makeIdCookie(id);
+	return id;
+};
+
+export const makeIdCookie = (id: string) => `id=${id}`;
+export const parseIdCookie = (cookieVal: string, doParseInt?: boolean) => {
+	const parsed = querystring.parse(cookieVal);
+	return doParseInt ? parseInt(parsed.id, 10) || 0 : parsed.id;
 };
