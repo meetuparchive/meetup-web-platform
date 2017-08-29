@@ -4,10 +4,10 @@ import fs from 'fs';
 import Http2 from 'spdy'; // eventually this will be a native node module
 
 import appConfig from '../util/config';
-import getPlugins from '../plugins';
-import getRoutes from './routes';
 
-import { configureEnv, server } from './util/serverUtils';
+import getPlugins from './util/getPlugins';
+import { configureEnv, server } from './util';
+import getRoutes from './routes';
 
 /**
  * @module server

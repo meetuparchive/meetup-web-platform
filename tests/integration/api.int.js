@@ -2,7 +2,7 @@ import querystring from 'querystring';
 import Boom from 'boom';
 import rison from 'rison';
 import { getCsrfHeaders } from '../mocks';
-import start from '../../src/server';
+import start from '../../src/app-server';
 import * as apiProxyHandler from '../../src/plugins/api-proxy/handler';
 
 const mockQuery = { type: 'foo', params: {}, ref: 'foo', endpoint: 'foo' };

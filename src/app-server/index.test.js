@@ -1,5 +1,5 @@
-import start from './server';
-import * as serverUtils from './util/serverUtils';
+import start from './';
+import * as serverUtils from './util';
 
 jest.mock('source-map-support');
 

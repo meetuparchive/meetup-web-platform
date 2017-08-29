@@ -1,5 +1,5 @@
 import { mockConfig } from '../mocks';
-import start from '../../src/server';
+import start from '../../src/app-server';
 import * as appRouteHandler from '../../src/plugins/app-route/handler';
 
 jest.mock('../../src/plugins/tracking/util/avro'); // will spy on calls to this
