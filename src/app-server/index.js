@@ -1,10 +1,10 @@
-import './util/globals';
+import '../util/globals';
 
 import fs from 'fs';
 import Http2 from 'spdy'; // eventually this will be a native node module
 
-import appConfig from './util/config';
-import getPlugins from './plugins';
+import appConfig from '../util/config';
+import getPlugins from '../plugins';
 import getRoutes from './routes';
 
 import { configureEnv, server } from './util/serverUtils';
