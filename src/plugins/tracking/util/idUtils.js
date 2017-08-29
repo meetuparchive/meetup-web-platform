@@ -5,12 +5,7 @@ import { ACTIVITY_PLUGIN_NAME } from '../activity';
 
 type UpdateId = string => (Object, ?boolean) => string;
 /*
- * Initialize the trackId for member or anonymous user - the longest-living id
- * we can assign to a user. Stays in place until login or logout, when it is
- * exchanged for a new trackId
- *
- *  - If the user has a tracking cookie already set, do nothing.
- *  - Otherwise, generate a new uuid and set a tracking cookie.
+ * This is a 'get or set' function for the `cookieName` passed in.
  */
 export const updateId: UpdateId = cookieName => (
 	request: Object,
@@ -29,9 +24,9 @@ export const updateId: UpdateId = cookieName => (
 };
 
 /*
- * This function creates a new browser session id and stores it in the request.
- * A corresponding cookie will be set in the plugin's onResponse handler in
- * order to share the session cookie across browser tabs.
+ * This function creates a new uuid and stores it in the request using a
+ * `cookieName` key. The actual cookie will be set in the plugin's `onResponse`
+ * handler in order to share the cookie across browser tabs.
  */
 export const newId = (cookieName: string) => (request: HapiRequest): string => {
 	const id: string = uuid.v4();
