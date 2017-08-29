@@ -3,8 +3,9 @@ declare type Logger = (Object, Object) => mixed;
 declare type Tracker = (...args: Array<any>) => mixed;
 declare type TrackOpts = {
 	log: Logger,
+	browserIdCookieName: string,
+	memberCookieName: string,
 	trackIdCookieName: string,
-	sessionIdCookieName: string,
 };
 type Request = Object;
-declare type TrackGetter = TrackOpts => Request => Tracker;
+declare type TrackGetter = (TrackOpts) => Request => Tracker;

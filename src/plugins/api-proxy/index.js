@@ -68,7 +68,7 @@ register.attributes = {
 	version: '1.0.0',
 	dependencies: [
 		'requestAuth', // provides request.plugins.requestAuth.oauth_token
-		'tracking', // provides request.trackApi()
+		'tracking', // provides request.trackActivity()
 		'electrode-csrf-jwt', // provides csrf protection for POST
 	],
 };

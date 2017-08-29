@@ -25,7 +25,7 @@ describe('apiProxy$', () => {
 			},
 			server: getServer(),
 			log: () => {},
-			trackApi: () => {},
+			trackActivity: () => {},
 			getLanguage: () => 'en-US',
 		};
 		const requestResult = {

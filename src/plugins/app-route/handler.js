@@ -30,7 +30,6 @@ export default (languageRenderers: { [string]: LanguageRenderer$ }) => (
 					.redirect(renderResult.redirect.url)
 					.permanent(Boolean(renderResult.redirect.permanent));
 			}
-			request.trackSession();
 			return reply(renderResult.result).code(renderResult.statusCode);
 		},
 		err => reply(err) // 500 error - will only be thrown on bad implementation

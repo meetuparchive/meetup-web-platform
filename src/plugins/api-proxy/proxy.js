@@ -1,5 +1,5 @@
 // @flow
-// Implicit dependency: tracking plugin providing request.trackApi method
+// Implicit dependency: tracking plugin providing request.trackActivity method
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/zip';
 
@@ -35,6 +35,6 @@ export default (request: HapiRequest) => {
 
 		// zip them together to make requests in parallel and return responses in order
 		// $FlowFixMe - .zip is not currently defined in Observable static properties
-		return Observable.zip(...apiRequests$).do(request.trackApi);
+		return Observable.zip(...apiRequests$).do(request.trackActivity);
 	};
 };
