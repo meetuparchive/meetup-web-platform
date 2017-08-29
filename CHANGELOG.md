@@ -1,3 +1,9 @@
+## [7.0]
+
+### BREAKING CHANGES
+
+- **Moved** `src/server` is now `src/app-server`
+
 ## [6.0]
 
 ### BREAKING CHANGES
