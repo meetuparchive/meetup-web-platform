@@ -16,6 +16,7 @@ import {
 	getAuthHeaders,
 	getExternalRequestOpts,
 	getLanguageHeader,
+	getClientIpHeader,
 	parseMultipart,
 	API_META_HEADER,
 } from './send';
@@ -63,6 +64,27 @@ describe('getAuthHeaders', () => {
 		expect(cookies['MEETUP_CSRF']).not.toBeUndefined();
 		expect(cookies['MEETUP_CSRF_DEV']).not.toBeUndefined();
 		expect(authHeaders['csrf-token']).toEqual(cookies['MEETUP_CSRF']);
+	});
+});
+
+describe('getClientIpHeader', () => {
+	it('returns a x-meetup-client-ip header when a fastly-client-ip header is set', () => {
+		const clientIpHeader = {
+			'X-Meetup-Client-Ip': '127.0.0.1',
+		};
+		const request = {
+			headers: {
+				'fastly-client-ip': '127.0.0.1',
+			},
+		};
+		expect(getClientIpHeader(request)).toEqual(clientIpHeader);
+	});
+
+	it('Does not set the header if fastly-client-ip is not set', () => {
+		const request = {
+			headers: {},
+		};
+		expect(getClientIpHeader(request)).toBeUndefined();
 	});
 });
 
