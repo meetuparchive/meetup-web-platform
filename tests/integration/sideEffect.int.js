@@ -18,6 +18,7 @@ const testSideEffectError = (Component, name) =>
 		return server
 			.inject(request)
 			.then(response => {
+				expect(response.statusCode === 500);
 				expect(Component.rewind).toHaveBeenCalled();
 			})
 			.then(() => server.stop())
