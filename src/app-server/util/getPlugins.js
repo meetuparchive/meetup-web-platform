@@ -4,14 +4,14 @@ import HapiPino from 'hapi-pino';
 import CsrfPlugin from 'electrode-csrf-jwt';
 import config from 'mwp-cli/src/config';
 
-import logger from '../util/logger';
-import appRoutePlugin from './app-route';
-import requestAuthPlugin from './requestAuthPlugin';
-import activityPlugin from './tracking/activity';
-import clickPlugin from './tracking/click';
-import languagePlugin from './language';
-import serviceWorkerPlugin from './service-worker';
-import apiProxyPlugin from './api-proxy';
+import logger from '../../util/logger';
+import appRoutePlugin from '../../plugins/app-route';
+import requestAuthPlugin from '../../plugins/requestAuthPlugin';
+import activityPlugin from '../../plugins/tracking/activity';
+import clickPlugin from '../../plugins/tracking/click';
+import languagePlugin from '../../plugins/language';
+import serviceWorkerPlugin from '../../plugins/service-worker';
+import apiProxyPlugin from '../../plugins/api-proxy';
 
 /**
  * Hapi plugins for the dev server

@@ -5,7 +5,7 @@ import {
 	INTERNAL_REDIRECT_PATH,
 } from '../mockApp';
 import { getMockRenderRequestMap } from '../mocks';
-import start from '../../src/server';
+import start from '../../src/app-server';
 import { fooPathContent } from '../MockContainer';
 
 // mock request just to ensure no external calls are made
