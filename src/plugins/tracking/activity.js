@@ -1,10 +1,6 @@
 // @flow
 import avro from './util/avro';
-import {
-	getTrackApi,
-	getTrackSession,
-	getTrackApiResponses,
-} from './_activityTrackers';
+import { getTrackActivity, getTrackApiResponses } from './_activityTrackers';
 
 const YEAR_IN_MS: number = 1000 * 60 * 60 * 24 * 365;
 export const ACTIVITY_PLUGIN_NAME = 'tracking';
@@ -14,10 +10,7 @@ export const ACTIVITY_PLUGIN_NAME = 'tracking';
  * particular server responses, e.g. new sesssions and navigation activity.
  *
  * Available trackers:
- * - `trackApi`
- * - `trackSession`
- * - `trackLogin`
- * - `trackLogout`
+ * - `trackActivity`
  */
 
 export const getLogger: string => (Object, Object) => mixed = (
@@ -51,21 +44,27 @@ export const getLogger: string => (Object, Object) => mixed = (
  */
 export function getTrackers(options: {
 	agent: string,
+	browserIdCookieName: string,
+	memberCookieName: string,
 	trackIdCookieName: string,
-	sessionIdCookieName: string,
 }): { [string]: Tracker } {
-	const { agent, trackIdCookieName, sessionIdCookieName } = options;
+	const {
+		agent,
+		browserIdCookieName,
+		memberCookieName,
+		trackIdCookieName,
+	} = options;
 
 	const log: Logger = getLogger(agent);
 	const trackOpts: TrackOpts = {
 		log,
+		browserIdCookieName,
+		memberCookieName,
 		trackIdCookieName,
-		sessionIdCookieName,
 	};
 	// These are the tracking methods that will be set on the `request` interface
 	const trackers: { [string]: Tracker } = {
-		trackApi: getTrackApi(trackOpts),
-		trackSession: getTrackSession(trackOpts),
+		trackActivity: getTrackActivity(trackOpts),
 		trackApiResponses: getTrackApiResponses(trackOpts),
 	};
 	return trackers;
@@ -84,23 +83,23 @@ const onRequest = (request, reply) => {
  * tracking cookies that need to be set using request.response.state.
  */
 const getOnPreResponse = cookieConfig => (request, reply) => {
-	const { sessionId, trackId } = request.plugins[ACTIVITY_PLUGIN_NAME];
-	const { sessionIdCookieName, trackIdCookieName, isProd } = cookieConfig;
-	const cookieOpts: CookieOpts = {
+	const { browserIdCookieName, trackIdCookieName } = cookieConfig;
+	const pluginData = request.plugins[ACTIVITY_PLUGIN_NAME];
+	const browserId = pluginData.browserIdCookieName;
+	const trackId = pluginData.trackIdCookieName;
+
+	const FOREVER: CookieOpts = {
 		encoding: 'none',
 		path: '/',
 		isHttpOnly: true,
-		isSecure: isProd,
+		ttl: YEAR_IN_MS * 20,
 	};
 
-	if (sessionId) {
-		request.response.state(sessionIdCookieName, sessionId, cookieOpts);
+	if (browserId) {
+		request.response.state(browserIdCookieName, browserId, FOREVER);
 	}
 	if (trackId) {
-		request.response.state(trackIdCookieName, trackId, {
-			...cookieOpts,
-			ttl: YEAR_IN_MS * 20,
-		});
+		request.response.state(trackIdCookieName, trackId, FOREVER);
 	}
 	reply.continue();
 };
@@ -117,13 +116,21 @@ export default function register(
 ) {
 	const { agent, isProd } = options;
 
-	const sessionIdCookieName: string = isProd ? 'SESSION_ID' : 'SESSION_ID_DEV';
-	const trackIdCookieName: string = isProd ? 'TRACK_ID' : 'TRACK_ID_DEV';
+	const trackIdCookieName: string = isProd
+		? 'MEETUP_TRACK'
+		: 'MEETUP_TRACK_DEV';
+	const browserIdCookieName: string = isProd
+		? 'MEETUP_BROWSER_ID'
+		: 'MEETUP_BROWSER_ID_DEV';
+	const memberCookieName: string = isProd
+		? 'MEETUP_MEMBER'
+		: 'MEETUP_MEMBER_DEV';
 
 	const trackers: { [string]: Tracker } = getTrackers({
 		agent,
+		browserIdCookieName,
+		memberCookieName,
 		trackIdCookieName,
-		sessionIdCookieName,
 	});
 
 	Object.keys(trackers).forEach((trackType: string) => {
@@ -135,7 +142,11 @@ export default function register(
 	server.ext('onRequest', onRequest);
 	server.ext(
 		'onPreResponse',
-		getOnPreResponse({ sessionIdCookieName, trackIdCookieName, isProd })
+		getOnPreResponse({
+			browserIdCookieName,
+			memberCookieName,
+			trackIdCookieName,
+		})
 	);
 
 	next();

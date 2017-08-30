@@ -2,6 +2,12 @@
 
 ## Activity tracking
 
+Activity tracking is provided by a `request.trackActivity` method, which has two
+responsibilities:
+
+1. Manage tracking IDs that are passed into the request through cookies
+2. Log the formatted, encoded tracking ID state of the request to `stdout`
+
 ## Click tracking
 
 Click tracking consists of 3 related modules:

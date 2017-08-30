@@ -69,8 +69,7 @@ export const getServer = () => {
 		request => () => Observable.of(request),
 		{ apply: true }
 	);
-	server.decorate('request', 'trackApi', () => ({}));
-	server.decorate('request', 'trackSession', () => ({}));
+	server.decorate('request', 'trackActivity', () => ({}));
 	server.decorate('request', 'getLangPrefixPath', () => '/');
 	server.decorate('request', 'getLanguage', () => 'en-US');
 	server.logger = () => MOCK_LOGGER;
