@@ -3,7 +3,7 @@ import externalRequest from 'request';
 import { MOCK_API_PROBLEM } from 'meetup-web-mocks/lib/app';
 import { MOCK_GROUP } from 'meetup-web-mocks/lib/api';
 
-import { getServer, MOCK_LOGGER } from '../../../util/testUtils';
+import { getServer, MOCK_LOGGER } from 'mwp-core/lib/util/testUtils';
 
 import { API_PROXY_PLUGIN_NAME } from '../';
 import {

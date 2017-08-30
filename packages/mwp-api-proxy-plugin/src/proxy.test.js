@@ -1,10 +1,12 @@
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/toPromise';
-import { getServer } from '../../util/testUtils';
+import { getServer } from 'mwp-core/lib/util/testUtils';
+import { mockQuery, MOCK_RENDERPROPS } from 'meetup-web-mocks/lib/app';
+
 import * as send from './util/send';
 import * as receive from './util/receive';
-import { mockQuery, MOCK_RENDERPROPS } from 'meetup-web-mocks/lib/app';
+
 import apiProxy$ from './proxy';
 
 const MOCK_HAPI_REQUEST = {

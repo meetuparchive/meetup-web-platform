@@ -1,5 +1,7 @@
 import Joi from 'joi';
+
 import handler from './handler'; // import allows easier mocking in integration tests
+
 const validApiPayloadSchema = Joi.object({
 	queries: Joi.string().required(), // should be rison.encode_array-encoded
 	metadata: Joi.string(),
