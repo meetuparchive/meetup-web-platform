@@ -1,7 +1,7 @@
 import convict from 'convict';
 import https from 'https';
-import { MOCK_LOGGER, getServer } from './testUtils';
-import * as serverUtils from './serverUtils';
+import { MOCK_LOGGER, getServer } from '../../util/testUtils';
+import * as serverUtils from './';
 
 describe('checkForDevUrl', () => {
 	it('returns true for dev URLs', () => {
