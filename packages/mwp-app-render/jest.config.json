@@ -1,0 +1,14 @@
+{
+  "collectCoverageFrom": [
+    "src/**/*.{js,jsx}",
+    "!**/{node_modules,lib,coverage,scripts}/**"
+  ],
+  "coverageDirectory": "<rootDir>/coverage",
+  "moduleFileExtensions": [
+    "js",
+    "jsx",
+    "json"
+  ],
+  "testEnvironment": "node",
+  "testRegex": "src\/.*\\.test\\.jsx?$"
+}

@@ -3,7 +3,7 @@ import {
 	getRequestAuthPlugin,
 	getApiProxyPlugin,
 	getCsrfPlugin,
-} from '../../app-server/util/getPlugins';
+} from '../../plugins';
 
 import { getServer } from '../../util/testUtils';
 

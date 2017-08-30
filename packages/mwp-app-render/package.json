@@ -1,0 +1,34 @@
+{
+  "name": "mwp-app-render",
+  "description": "MWP application rendering tools",
+  "engineStrict": true,
+  "engines": {
+    "node": ">=8.1.0"
+  },
+  "main": "./lib/index.js",
+  "scripts": {
+    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps",
+    "flow": "flow",
+    "lint": "eslint . --ext .js,.jsx --fix",
+    "test": "yarn flow && yarn run test:unit -- --silent --coverage",
+    "test:unit": "NODE_ENV=test jest --config jest.config.json",
+    "test:watch": "yarn test:unit -- --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meetup/meetup-web-platform.git"
+  },
+  "author": "Meetup",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/meetup/meetup-web-platform/issues"
+  },
+  "homepage": "https://github.com/meetup/meetup-web-platform#readme",
+  "dependencies": {
+    "mwp-core": "^6.0.1609-beta"
+  },
+  "devDependencies": {
+    "flow-bin": "0.49.1",
+    "jest": "20.0.4"
+  }
+}
