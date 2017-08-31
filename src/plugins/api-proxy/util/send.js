@@ -170,11 +170,19 @@ export function getLanguageHeader(request) {
 	return acceptLang;
 }
 
+export function getClientIpHeader(request) {
+	const clientIP = request.headers['fastly-client-ip'];
+	if (clientIP) {
+		return { 'X-Meetup-Client-Ip': clientIP };
+	}
+}
+
 export function parseRequestHeaders(request) {
 	const externalRequestHeaders = {
 		...request.headers,
 		...getAuthHeaders(request),
 		'accept-language': getLanguageHeader(request),
+		...getClientIpHeader(request),
 	};
 
 	delete externalRequestHeaders['host']; // let app server set 'host'
