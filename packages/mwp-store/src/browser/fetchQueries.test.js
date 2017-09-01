@@ -1,8 +1,11 @@
+import url from 'url';
 import { mockQuery } from 'meetup-web-mocks/lib/app';
 import { MOCK_GROUP } from 'meetup-web-mocks/lib/api';
-import * as clickState from '../../plugins/tracking/util/clickState'; // mwp-tracking/util/clickState
-import { URLSearchParams } from 'url';
+import * as clickState from 'mwp-tracking-plugin/lib/util/clickState'; // mwp-tracking/util/clickState
+
 import fetchQueries, { CSRF_HEADER_COOKIE } from './fetchQueries';
+
+const { URLSearchParams } = url;
 clickState.setClickCookie = jest.fn();
 
 global.FormData = function() {};

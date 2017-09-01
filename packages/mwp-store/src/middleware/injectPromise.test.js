@@ -1,4 +1,4 @@
-import { requestAll } from '../../api-state'; // mwp-api-state
+import { requestAll } from 'mwp-api-state'; // mwp-api-state
 import injectPromise from './injectPromise';
 
 describe('injectPromise middleware', () => {

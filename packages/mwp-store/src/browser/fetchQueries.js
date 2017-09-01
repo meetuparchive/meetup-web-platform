@@ -1,6 +1,6 @@
 import JSCookie from 'js-cookie';
 import rison from 'rison';
-import { setClickCookie } from '../../plugins/tracking/util/clickState'; // mwp-tracking-plugin
+import { setClickCookie } from 'mwp-tracking-plugin/lib/util/clickState'; // mwp-tracking-plugin
 
 import { parseQueryResponse } from '../util/fetchUtils';
 

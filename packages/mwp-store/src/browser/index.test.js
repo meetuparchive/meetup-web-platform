@@ -1,6 +1,7 @@
 import { createStore } from 'redux';
+import { testCreateStore } from 'mwp-core/lib/util/testUtils';
+
 import { clickTrackEnhancer, getInitialState, getBrowserCreateStore } from './';
-import { testCreateStore } from '../../util/testUtils';
 
 const MOCK_ROUTES = {};
 const IDENTITY_REDUCER = state => state;

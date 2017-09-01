@@ -1,4 +1,4 @@
-import { testCreateStore } from '../../util/testUtils';
+import { testCreateStore } from 'mwp-core/lib/util/testUtils';
 import { getServerCreateStore } from './';
 
 const MOCK_ROUTES = {};

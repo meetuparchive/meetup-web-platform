@@ -1,7 +1,7 @@
 // @flow weak
 import { applyMiddleware, createStore, compose } from 'redux';
-import getClickWriter from '../../plugins/tracking/util/clickWriter'; // mwp-tracking/util/clickWriter
-import { getApiMiddleware } from '../../api-state';
+import getClickWriter from 'mwp-tracking-plugin/lib/util/clickWriter'; // mwp-tracking/util/clickWriter
+import { getApiMiddleware } from 'mwp-api-state';
 
 import catchMiddleware from '../middleware/catch';
 import injectPromise from '../middleware/injectPromise';
