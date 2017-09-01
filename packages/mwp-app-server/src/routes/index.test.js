@@ -1,5 +1,5 @@
 import getRoutes from './';
-import { getServer } from '../../util/testUtils';
+import { getServer } from 'mwp-core/lib/util/testUtils';
 
 function getResponse(injectRequest, server = getServer()) {
 	// a Promise that returns the server instance after it has been

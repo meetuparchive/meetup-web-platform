@@ -1,9 +1,9 @@
-import '../util/globals';
+import 'mwp-core/lib/util/globals';
 
 import fs from 'fs';
 import Http2 from 'spdy'; // eventually this will be a native node module
 
-import appConfig from '../util/config';
+import appConfig from 'mwp-cli/lib/config/server';
 
 import getPlugins from './util/getPlugins';
 import { configureEnv, server } from './util';

@@ -1,6 +1,6 @@
 import convict from 'convict';
 import https from 'https';
-import { MOCK_LOGGER, getServer } from '../../util/testUtils';
+import { MOCK_LOGGER, getServer } from 'mwp-core/lib/util/testUtils';
 import * as serverUtils from './';
 
 describe('checkForDevUrl', () => {
