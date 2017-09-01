@@ -8,13 +8,13 @@ import 'rxjs/add/operator/timeout';
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/map';
 
-import logger from '../util/logger';
-import { MEMBER_COOKIE } from '../util/cookieUtils';
+import logger from 'mwp-core/lib/util/logger';
+import { MEMBER_COOKIE } from 'mwp-core/lib/util/cookieUtils';
 import {
 	applyAuthState,
 	configureAuthCookies,
 	setPluginState,
-} from '../util/authUtils';
+} from 'mwp-core/lib/util/authUtils';
 
 /**
  * @module requestAuthPlugin

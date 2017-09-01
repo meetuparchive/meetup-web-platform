@@ -5,8 +5,8 @@ import 'rxjs/add/observable/throw';
 import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/catch';
 
-import { MEMBER_COOKIE } from '../util/cookieUtils';
-import { MOCK_LOGGER } from '../util/testUtils';
+import { MEMBER_COOKIE } from 'mwp-core/lib/util/cookieUtils';
+import { MOCK_LOGGER } from 'mwp-core/lib/util/testUtils';
 import register, {
 	getAuthenticate,
 	oauthScheme,
@@ -15,7 +15,7 @@ import register, {
 	getAccessToken$,
 	applyRequestAuthorizer$,
 	tryJSON,
-} from './requestAuthPlugin';
+} from './';
 
 const MOCK_REPLY_FN = () => {};
 MOCK_REPLY_FN.state = () => {};
