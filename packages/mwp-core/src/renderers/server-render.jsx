@@ -7,11 +7,12 @@ import IntlPolyfill from 'intl';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import Helmet from 'react-helmet';
-import { API_ROUTE_PATH } from '../plugins/api-proxy'; // mwp-api-proxy
-import { Forbidden, NotFound, Redirect, SERVER_RENDER } from '../router'; // mwp-router
-import { getServerCreateStore } from '../store/server'; // mwp-store
-import Dom from '../render/components/Dom'; // mwp-render/components/Dom
-import ServerApp from '../render/components/ServerApp'; // mwp-render/components/ServerApp
+
+import { API_ROUTE_PATH } from 'mwp-api-proxy-plugin'; // mwp-api-proxy
+import { Forbidden, NotFound, Redirect, SERVER_RENDER } from 'mwp-router'; // mwp-router
+import { getServerCreateStore } from 'mwp-store/lib/server'; // mwp-store
+import Dom from 'mwp-app-render/lib/components/Dom'; // mwp-render/components/Dom
+import ServerApp from 'mwp-app-render/lib/components/ServerApp'; // mwp-render/components/ServerApp
 
 // Ensure global Intl for use with FormatJS
 Intl.NumberFormat = IntlPolyfill.NumberFormat;

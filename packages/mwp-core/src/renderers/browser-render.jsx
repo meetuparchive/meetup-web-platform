@@ -1,9 +1,9 @@
 // @flow
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { getInitialState, getBrowserCreateStore } from '../store/browser';
-import { getRouteResolver } from '../router/util';
-import BrowserApp from '../render/components/BrowserApp';
+import { getInitialState, getBrowserCreateStore } from 'mwp-store/lib/browser';
+import { getRouteResolver } from 'mwp-router/lib/util';
+import BrowserApp from 'mwp-app-render/lib/components/BrowserApp';
 
 /**
  * @module browser-render
