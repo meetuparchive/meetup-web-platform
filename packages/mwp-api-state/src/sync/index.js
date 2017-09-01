@@ -10,9 +10,9 @@ import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/takeUntil';
 import { combineEpics } from 'redux-observable';
 
-import { actions as clickActions } from '../../plugins/tracking/util/clickState'; // mwp-tracking-plugin/util/clickState
-import { LOCATION_CHANGE, SERVER_RENDER } from '../../router'; // mwp-router
-import { getRouteResolver, getMatchedQueries } from '../../router/util'; // mwp-router/util
+import { LOCATION_CHANGE, SERVER_RENDER } from 'mwp-router'; // mwp-router
+import { getRouteResolver, getMatchedQueries } from 'mwp-router/util'; // mwp-router/util
+import { actions as clickActions } from 'mwp-tracking-plugin/util/clickState'; // mwp-tracking-plugin/util/clickState
 
 import * as api from './apiActionCreators';
 import {

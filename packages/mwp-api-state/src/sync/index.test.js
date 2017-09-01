@@ -1,9 +1,9 @@
 import 'rxjs/add/operator/toArray';
 import 'rxjs/add/operator/toPromise';
 import { ActionsObservable } from 'redux-observable';
-import { CLICK_TRACK_CLEAR_ACTION } from '../../plugins/tracking/util/clickState'; // mwp-tracking-plugin/util/clickState
-import { LOCATION_CHANGE, SERVER_RENDER } from '../../router'; // mwp-router
-import { createFakeStore, epicIgnoreAction } from '../../util/testUtils';
+import { CLICK_TRACK_CLEAR_ACTION } from 'mwp-tracking-plugin/util/clickState'; // mwp-tracking-plugin/util/clickState
+import { LOCATION_CHANGE, SERVER_RENDER } from 'mwp-router'; // mwp-router
+import { createFakeStore, epicIgnoreAction } from 'mwp-core/lib/util/testUtils';
 
 import fetch from 'node-fetch';
 global.fetch = fetch;
