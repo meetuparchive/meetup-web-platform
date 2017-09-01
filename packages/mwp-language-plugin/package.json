@@ -25,7 +25,8 @@
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "dependencies": {
-    "mwp-core": "^6.0.1609-beta"
+    "accepts": "1.3.4",
+    "qs": "6.5.0"
   },
   "devDependencies": {
     "flow-bin": "0.49.1",
