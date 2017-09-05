@@ -1,3 +1,19 @@
+## [8.0]
+
+- **All 'internal' packages now published independently:
+   - `mwp-api-proxy-plugin`
+   - `mwp-api-state`
+   - `mwp-app-render`
+   - `mwp-app-route-plugin`
+   - `mwp-app-server`
+   - `mwp-auth-plugin`
+   - `mwp-core`
+   - `mwp-language-plugin`
+   - `mwp-router`
+   - `mwp-store`
+   - `mwp-sw-plugin`
+   - `mwp-tracking-plugin`
+
 ## [7.0]
 
 ### BREAKING CHANGES
