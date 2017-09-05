@@ -5,8 +5,7 @@ import { duotones, getDuotoneUrls } from './util/duotone';
 import getApiProxyRoutes from './routes';
 import proxyApi$ from './proxy';
 
-export const API_PROXY_PLUGIN_NAME = 'api-proxy';
-export const API_ROUTE_PATH = '/mu_api';
+import { API_ROUTE_PATH, API_PROXY_PLUGIN_NAME } from './config';
 
 /*
  * When response is sent, the plugin needs to delete any files that were

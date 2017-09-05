@@ -14,7 +14,7 @@ import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/timeout';
 
-import { API_PROXY_PLUGIN_NAME } from '../';
+import { API_PROXY_PLUGIN_NAME } from '../config';
 
 export const API_META_HEADER = 'X-Meta-Request-Headers';
 

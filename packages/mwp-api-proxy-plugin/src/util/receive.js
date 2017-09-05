@@ -1,6 +1,6 @@
 import querystring from 'qs';
 
-import { API_PROXY_PLUGIN_NAME } from '../';
+import { API_PROXY_PLUGIN_NAME } from '../config';
 import { coerceBool, toCamelCase } from './stringUtils';
 
 // match escpaed unicode characters that are treated as newline literals in JS

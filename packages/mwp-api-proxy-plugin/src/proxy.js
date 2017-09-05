@@ -3,10 +3,11 @@
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/zip';
 
-import { API_PROXY_PLUGIN_NAME } from './';
 import { apiResponseDuotoneSetter } from './util/duotone';
 import { makeSend$ } from './util/send';
 import { makeReceive } from './util/receive';
+
+import { API_PROXY_PLUGIN_NAME } from './config';
 
 /*
  * This function transforms a single request to the application server into a
