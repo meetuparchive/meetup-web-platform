@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "dependencies": {
+    "@google-cloud/pubsub": "0.13.1",
     "intl": "1.2.5",
     "joi": "10.6.0",
     "mwp-api-proxy-plugin": "6.0.1603-beta",
