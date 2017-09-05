@@ -10,10 +10,7 @@
   "scripts": {
     "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps",
     "flow": "flow",
-    "lint": "eslint . --ext .js,.jsx --fix",
-    "test": "yarn flow && yarn run test:unit -- --silent --coverage",
-    "test:unit": "NODE_ENV=test jest --config jest.config.json",
-    "test:watch": "yarn test:unit -- --watch"
+    "lint": "eslint . --ext .js,.jsx --fix"
   },
   "repository": {
     "type": "git",

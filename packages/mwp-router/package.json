@@ -11,7 +11,7 @@
     "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps",
     "flow": "flow",
     "lint": "eslint . --ext .js,.jsx --fix",
-    "test": "yarn flow && yarn run test:unit -- --silent --coverage",
+    "test": "yarn run test:unit",
     "test:unit": "NODE_ENV=test jest --config jest.config.json",
     "test:watch": "yarn test:unit -- --watch"
   },
@@ -30,6 +30,7 @@
     "react-side-effect": "1.1.3"
   },
   "devDependencies": {
+    "babel-jest": "21.0.0",
     "enzyme": "2.9.1",
     "flow-bin": "0.49.1",
     "jest": "20.0.4",
