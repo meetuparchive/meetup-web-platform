@@ -1,5 +1,6 @@
 {
   "name": "mwp-api-proxy-plugin",
+  "version": "0.0.1",
   "description": "Hapi plugin to activate the REST API proxy behavior + route",
   "engineStrict": true,
   "engines": {
@@ -29,7 +30,7 @@
   },
   "dependencies": {
     "joi": "10.6.0",
-    "mwp-core": "^latest",
+    "mwp-core": "^0.0.1",
     "qs": "6.5.0",
     "request": "2.81.0",
     "rison": "0.1.1",

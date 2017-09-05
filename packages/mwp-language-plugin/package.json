@@ -1,5 +1,6 @@
 {
   "name": "mwp-language-plugin",
+  "version": "0.0.1",
   "description": "Hapi plugin for determining the requested language for MWP apps",
   "engineStrict": true,
   "engines": {

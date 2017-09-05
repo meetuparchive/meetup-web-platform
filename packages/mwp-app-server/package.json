@@ -1,5 +1,6 @@
 {
   "name": "mwp-app-server",
+  "version": "0.0.1",
   "description": "Hapi server startup module for MWP applications",
   "engineStrict": true,
   "engines": {
@@ -29,14 +30,14 @@
     "hapi": "16.5.2",
     "hapi-pino": "1.7.0",
     "inert": "4.2.1",
-    "mwp-api-proxy-plugin": "latest",
-    "mwp-app-route-plugin": "latest",
-    "mwp-auth-plugin": "latest",
+    "mwp-api-proxy-plugin": "^0.0.1",
+    "mwp-app-route-plugin": "^0.0.1",
+    "mwp-auth-plugin": "^0.0.1",
     "mwp-cli": "1.1.123",
-    "mwp-core": "latest",
-    "mwp-language-plugin": "latest",
-    "mwp-sw-plugin": "latest",
-    "mwp-tracking-plugin": "latest",
+    "mwp-core": "^0.0.1",
+    "mwp-language-plugin": "^0.0.1",
+    "mwp-sw-plugin": "^0.0.1",
+    "mwp-tracking-plugin": "^0.0.1",
     "pino": "4.7.1",
     "spdy": "3.4.7",
     "uuid": "3.1.0"

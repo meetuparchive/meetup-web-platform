@@ -1,5 +1,6 @@
 {
   "name": "mwp-core",
+  "version": "0.0.1",
   "description": "Core utilities for MWP apps",
   "engineStrict": true,
   "engines": {
@@ -28,10 +29,10 @@
     "@google-cloud/pubsub": "0.13.1",
     "intl": "1.2.5",
     "joi": "10.6.0",
-    "mwp-api-proxy-plugin": "latest",
-    "mwp-app-render": "latest",
-    "mwp-store": "latest",
-    "mwp-router": "latest",
+    "mwp-api-proxy-plugin": "^0.0.1",
+    "mwp-app-render": "^0.0.1",
+    "mwp-store": "^0.0.1",
+    "mwp-router": "^0.0.1",
     "node-fetch": "1.7.2",
     "pino": "4.7.1",
     "qs": "6.5.0"

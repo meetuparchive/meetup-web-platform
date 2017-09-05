@@ -1,5 +1,6 @@
 {
   "name": "mwp-api-state",
+  "version": "0.0.1",
   "description": "Redux helpers to manage API data in a MWP app",
   "engineStrict": true,
   "engines": {
@@ -28,9 +29,9 @@
     "rxjs": "5.4.3"
   },
   "dependencies": {
-    "mwp-core": "latest",
-    "mwp-router": "latest",
-    "mwp-tracking-plugin": "latest",
+    "mwp-core": "^0.0.1",
+    "mwp-router": "^0.0.1",
+    "mwp-tracking-plugin": "^0.0.1",
     "redux-observable": "0.16.0"
   },
   "devDependencies": {

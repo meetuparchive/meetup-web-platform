@@ -1,5 +1,6 @@
 {
   "name": "mwp-store",
+  "version": "0.0.1",
   "description": "Redux store management for MWP apps",
   "engineStrict": true,
   "engines": {
@@ -26,9 +27,9 @@
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "dependencies": {
     "js-cookie": "2.1.4",
-    "mwp-api-state": "latest",
-    "mwp-core": "latest",
-    "mwp-tracking-plugin": "latest",
+    "mwp-api-state": "^0.0.1",
+    "mwp-core": "^0.0.1",
+    "mwp-tracking-plugin": "^0.0.1",
     "rison": "0.1.1"
   },
   "devDependencies": {

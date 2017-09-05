@@ -1,5 +1,6 @@
 {
   "name": "mwp-app-render",
+  "version": "0.0.1",
   "description": "MWP application rendering tools",
   "engineStrict": true,
   "engines": {
@@ -33,8 +34,8 @@
   },
   "dependencies": {
     "escape-html": "1.0.3",
-    "mwp-core": "latest",
-    "mwp-router": "latest"
+    "mwp-core": "^0.0.1",
+    "mwp-router": "^0.0.1"
   },
   "devDependencies": {
     "enzyme": "2.9.1",

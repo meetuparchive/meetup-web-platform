@@ -1,5 +1,6 @@
 {
   "name": "mwp-sw-plugin",
+  "version": "0.0.1",
   "description": "Hapi plugin for serving a service worker script",
   "engineStrict": true,
   "engines": {
