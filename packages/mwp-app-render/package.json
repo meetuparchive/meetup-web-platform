@@ -34,7 +34,6 @@
   },
   "dependencies": {
     "escape-html": "1.0.3",
-    "mwp-core": "^0.0.1",
     "mwp-router": "^0.0.1"
   },
   "devDependencies": {
