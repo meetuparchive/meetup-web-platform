@@ -29,8 +29,8 @@
   },
   "dependencies": {
     "mwp-core": "6.0.1609-beta",
-    "mwp-router": "6.0.1603-beta",
-    "mwp-tracking-plugin": "6.0.1603-beta",
+    "mwp-router": "8.0.1722-beta",
+    "mwp-tracking-plugin": "8.0.1722-beta",
     "redux-observable": "0.16.0"
   },
   "devDependencies": {

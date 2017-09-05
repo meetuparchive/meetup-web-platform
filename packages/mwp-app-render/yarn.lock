@@ -2380,9 +2380,9 @@ mwp-core@6.0.1609-beta:
     url-regex "3.2.0"
     uuid "3.1.0"
 
-mwp-router@6.0.1603-beta:
-  version "6.0.1603-beta"
-  resolved "https://registry.yarnpkg.com/mwp-router/-/mwp-router-6.0.1603-beta.tgz#e67c2a6589f188ceccc0ae8b5ed246e08a3c23e8"
+mwp-router@8.0.1722-beta:
+  version "8.0.1722-beta"
+  resolved "https://registry.yarnpkg.com/mwp-router/-/mwp-router-8.0.1722-beta.tgz#e67c2a6589f188ceccc0ae8b5ed246e08a3c23e8"
   dependencies:
     prop-types "15.5.10"
     qs "6.5.0"
