@@ -37,6 +37,8 @@ before_install:
   - export PATH="$HOME/.yarn/bin:$PATH"
   - yarn --version
 
+install: echo "No install so that packages can be published"
+
 before_script:
   - lerna bootstrap
   - git diff --exit-code
