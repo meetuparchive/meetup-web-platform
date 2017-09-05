@@ -1,7 +1,7 @@
 // @flow
 import querystring from 'qs';
 import uuid from 'uuid';
-import { ACTIVITY_PLUGIN_NAME } from '../activity';
+import { ACTIVITY_PLUGIN_NAME } from '../config';
 
 type UpdateId = string => (Object, ?boolean) => string;
 /*

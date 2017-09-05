@@ -1,9 +1,9 @@
 // @flow
 import avro from './util/avro';
 import { getTrackActivity, getTrackApiResponses } from './_activityTrackers';
+import { ACTIVITY_PLUGIN_NAME } from './config';
 
 const YEAR_IN_MS: number = 1000 * 60 * 60 * 24 * 365;
-export const ACTIVITY_PLUGIN_NAME = 'tracking';
 
 /*
  * This plugin provides `request.track...` methods that track events related to
