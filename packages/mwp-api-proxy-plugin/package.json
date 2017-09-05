@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "joi": "10.6.0",
-    "mwp-core": "^6.0.1609-beta",
+    "mwp-core": "^latest",
     "qs": "6.5.0",
     "request": "2.81.0",
     "rison": "0.1.1",

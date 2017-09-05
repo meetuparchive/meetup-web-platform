@@ -26,9 +26,9 @@
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "dependencies": {
     "js-cookie": "2.1.4",
-    "mwp-api-state": "6.0.1609-beta",
-    "mwp-core": "6.0.1609-beta",
-    "mwp-tracking-plugin": "6.0.1609-beta",
+    "mwp-api-state": "latest",
+    "mwp-core": "latest",
+    "mwp-tracking-plugin": "latest",
     "rison": "0.1.1"
   },
   "devDependencies": {

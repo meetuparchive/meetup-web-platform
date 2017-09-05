@@ -3,7 +3,7 @@
   "packages": [
     "packages/*"
   ],
-  "version": "6.0.1609-beta",
+  "version": "latest",
   "command": {
     "init": {
       "exact": true

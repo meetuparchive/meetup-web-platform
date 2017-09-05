@@ -33,8 +33,8 @@
   },
   "dependencies": {
     "escape-html": "1.0.3",
-    "mwp-core": "6.0.1609-beta",
-    "mwp-router": "8.0.1722-beta"
+    "mwp-core": "latest",
+    "mwp-router": "latest"
   },
   "devDependencies": {
     "enzyme": "2.9.1",
