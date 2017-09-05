@@ -19,7 +19,7 @@ register.attributes = {
 	name: 'mwp-app-route',
 	version: '1.0.0',
 	dependencies: [
-		'mwp-language', // provides `request.getPrefixedPath` and `request.getLanguage`
+		'mwp-language-plugin', // provides `request.getPrefixedPath` and `request.getLanguage`
 		'electrode-csrf-jwt', // sets CSRF jwt on initial request
 	],
 };
