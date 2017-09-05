@@ -1,5 +1,5 @@
+import { parseMemberCookie } from 'mwp-core/lib/util/cookieUtils'; // TODO: provide this info through new plugin
 import avro from './avro';
-import { parseMemberCookie } from '../../../util/cookieUtils'; // TODO: provide this info through new plugin
 import { COOKIE_NAME } from './clickState';
 
 /*

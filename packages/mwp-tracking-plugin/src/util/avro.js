@@ -1,5 +1,5 @@
 // @flow
-const log = require('../../../util/logger').default;
+const log = require('mwp-core/lib/util/logger').default;
 const avro = require('avsc');
 
 /*
