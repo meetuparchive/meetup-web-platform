@@ -1,6 +1,6 @@
 import querystring from 'qs';
 import config from './config';
-import logger from './logger';
+import { logger } from 'mwp-logger-plugin';
 
 export const MEMBER_COOKIE = config.isProd
 	? 'MEETUP_MEMBER'

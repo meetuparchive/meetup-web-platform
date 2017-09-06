@@ -3,7 +3,7 @@ import 'rxjs/add/operator/toPromise';
 import { ActionsObservable } from 'redux-observable';
 import { CLICK_TRACK_CLEAR_ACTION } from 'mwp-tracking-plugin/util/clickState'; // mwp-tracking-plugin/util/clickState
 import { LOCATION_CHANGE, SERVER_RENDER } from 'mwp-router'; // mwp-router
-import { createFakeStore, epicIgnoreAction } from 'mwp-core/lib/util/testUtils';
+import { createFakeStore, epicIgnoreAction } from 'mwp-test-utils';
 
 import fetch from 'node-fetch';
 global.fetch = fetch;

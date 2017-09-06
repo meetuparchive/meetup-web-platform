@@ -1,5 +1,5 @@
 import { createStore } from 'redux';
-import { testCreateStore } from 'mwp-core/lib/util/testUtils';
+import { testCreateStore } from 'mwp-test-utils';
 
 import { clickTrackEnhancer, getInitialState, getBrowserCreateStore } from './';
 

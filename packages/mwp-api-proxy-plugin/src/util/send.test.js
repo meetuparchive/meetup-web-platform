@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { getServer } from 'mwp-core/lib/util/testUtils';
+import { getServer } from 'mwp-test-utils';
 
 import 'rxjs/add/operator/toPromise';
 

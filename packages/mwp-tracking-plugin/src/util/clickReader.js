@@ -1,4 +1,4 @@
-import { parseMemberCookie } from 'mwp-core/lib/util/cookieUtils'; // TODO: provide this info through new plugin
+import { parseIdCookie } from './idUtils'; // TODO: provide this info through new plugin
 import avro from './avro';
 import { COOKIE_NAME } from './clickState';
 
@@ -8,6 +8,7 @@ import { COOKIE_NAME } from './clickState';
  */
 
 const isProd = process.env.NODE_ENV === 'production';
+const memberCookieName = isProd ? 'MEETUP_MEMBER' : 'MEETUP_MEMBER_DEV';
 export const clickCookieOptions = {
 	isSecure: isProd,
 	isHttpOnly: false,
@@ -18,7 +19,7 @@ export const clickToClickRecord = request => click => {
 	return {
 		timestamp: click.timestamp || new Date().toISOString(),
 		requestId: request.id,
-		memberId: parseMemberCookie(request.state).id,
+		memberId: parseIdCookie(request.state[memberCookieName], true),
 		lineage: click.lineage,
 		linkText: click.linkText || '',
 		coordX: click.coords[0],

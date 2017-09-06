@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { getServer } from './testUtils';
+import { getServer } from 'mwp-test-utils';
 import {
 	applyAuthState,
 	setPluginState,

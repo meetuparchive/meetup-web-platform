@@ -1,4 +1,4 @@
-import 'mwp-core/lib/util/globals';
+import './util/globals';
 
 import fs from 'fs';
 import Http2 from 'spdy'; // eventually this will be a native node module

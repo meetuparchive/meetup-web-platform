@@ -5,7 +5,7 @@ import {
 	getCsrfPlugin,
 } from '../../plugins'; // TODO - use plugin-specific imports
 
-import { getServer } from 'mwp-core/lib/util/testUtils';
+import { getServer } from 'mwp-test-utils';
 
 function getResponse(injectRequest, server = getServer()) {
 	// a Promise that returns the server instance after it has been

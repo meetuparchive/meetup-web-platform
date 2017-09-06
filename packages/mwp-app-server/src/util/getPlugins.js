@@ -1,10 +1,8 @@
 import Inert from 'inert';
-import pino from 'pino';
-import HapiPino from 'hapi-pino';
 import CsrfPlugin from 'electrode-csrf-jwt';
 
 import config from 'mwp-cli/src/config';
-import logger from 'mwp-core/lib/util/logger';
+import loggerPlugin from 'mwp-logger-plugin';
 import appRoutePlugin from 'mwp-app-route-plugin';
 import requestAuthPlugin from 'mwp-auth-plugin';
 import activityPlugin from 'mwp-tracking-plugin/lib/activity';
@@ -93,25 +91,8 @@ export function getRequestAuthPlugin() {
 export function getLogger(
 	options = { logEvents: ['onPostStart', 'onPostStop', 'response'] }
 ) {
-	const onRequestError = (request, err) => {
-		console.error(
-			JSON.stringify({
-				err: err.stack,
-				req: pino.stdSerializers.req(request.raw.req),
-				res: pino.stdSerializers.res(request.raw.res),
-				message: `500 Internal server error: ${err.message}`,
-			})
-		);
-	};
-	const register = (server, options, next) => {
-		server.on('request-error', onRequestError);
-		return HapiPino.register(server, options, next);
-	};
-	register.attributes = HapiPino.register.attributes;
-
-	options.instance = logger;
 	return {
-		register,
+		register: loggerPlugin,
 		options,
 	};
 }

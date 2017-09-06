@@ -8,13 +8,12 @@ import 'rxjs/add/operator/timeout';
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/map';
 
-import logger from 'mwp-core/lib/util/logger';
-import { MEMBER_COOKIE } from 'mwp-core/lib/util/cookieUtils';
+import { logger } from 'mwp-logger-plugin';
 import {
 	applyAuthState,
 	configureAuthCookies,
 	setPluginState,
-} from 'mwp-core/lib/util/authUtils';
+} from './authUtils';
 
 /**
  * @module requestAuthPlugin
@@ -53,6 +52,10 @@ const verifyAuth = logger => auth => {
 };
 
 function getAuthType(request) {
+	const MEMBER_COOKIE = request.server.settings.app.isProd
+		? 'MEETUP_MEMBER'
+		: 'MEETUP_MEMBER_DEV';
+
 	const allowedAuthTypes = [MEMBER_COOKIE, 'oauth_token'];
 	// search for a request.state cookie name that matches an allowed auth type
 	return allowedAuthTypes.reduce(

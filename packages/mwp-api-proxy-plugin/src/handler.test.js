@@ -5,7 +5,7 @@ import {
 	MOCK_AUTH_HEADER,
 	MOCK_RENDERPROPS,
 } from 'meetup-web-mocks/lib/app';
-import { getServer } from 'mwp-core/lib/util/testUtils';
+import { getServer } from 'mwp-test-utils';
 
 import { parseRequestQueries } from './handler';
 

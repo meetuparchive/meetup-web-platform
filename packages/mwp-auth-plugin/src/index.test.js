@@ -6,7 +6,7 @@ import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/catch';
 
 import { MEMBER_COOKIE } from 'mwp-core/lib/util/cookieUtils';
-import { MOCK_LOGGER } from 'mwp-core/lib/util/testUtils';
+import { MOCK_LOGGER } from 'mwp-test-utils';
 import register, {
 	getAuthenticate,
 	oauthScheme,

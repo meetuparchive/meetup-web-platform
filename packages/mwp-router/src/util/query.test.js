@@ -1,6 +1,6 @@
 import url from 'url';
-import { routes } from 'mwp-core/tests/mockApp';
-import asyncRoutes from 'mwp-core/tests/mockAsyncRoute';
+import { routes } from 'mwp-test-utils/lib/mockApp';
+import asyncRoutes from 'mwp-test-utils/lib/mockAsyncRoute';
 
 import { activeRouteQueries, decodeParams, getMatchedQueries } from './query';
 

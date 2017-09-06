@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/toPromise';
-import { getServer } from 'mwp-core/lib/util/testUtils';
+import { getServer } from 'mwp-test-utils';
 import { mockQuery, MOCK_RENDERPROPS } from 'meetup-web-mocks/lib/app';
 
 import * as send from './util/send';

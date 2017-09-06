@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import Link from 'react-router-dom/Link';
-import logger from '../src/util/logger';
+import { logger } from 'mwp-logger-plugin';
 
 export const fooPathContent = 'Looking good';
 

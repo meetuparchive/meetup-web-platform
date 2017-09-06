@@ -3,7 +3,7 @@ import {
 	MOCK_renderRequestMap,
 	MOCK_RENDER_RESULT,
 } from 'meetup-web-mocks/lib/app';
-import { getServer } from 'mwp-core/lib/util/testUtils';
+import { getServer } from 'mwp-test-utils';
 import getRoute, { onPreResponse } from './route';
 
 describe('onPreResponse.method', () => {
