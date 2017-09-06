@@ -22,4 +22,4 @@ const register = (server, options, next) => {
 register.attributes = HapiPino.register.attributes;
 
 export default register;
-export logger from './logger'; // named export for easy import
+export { default as logger } from './logger'; // named export for easy import
