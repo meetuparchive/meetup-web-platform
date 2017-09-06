@@ -5,7 +5,7 @@ import 'rxjs/add/operator/toPromise';
 
 import { MOCK_POST_ACTION, MOCK_DELETE_ACTION } from 'meetup-web-mocks/lib/app';
 
-import { epicIgnoreAction } from '../../util/testUtils';
+import { epicIgnoreAction } from 'mwp-test-utils';
 
 import { postEpic, deleteEpic } from './';
 import * as api from '../sync/apiActionCreators';

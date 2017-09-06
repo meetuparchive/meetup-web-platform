@@ -1,8 +1,9 @@
 import Iron from 'iron';
-import appConfig from '../../src/util/config';
-import { MEMBER_COOKIE } from '../../src/util/cookieUtils';
-import { getServer } from '../../src/util/testUtils';
-import requestAuthPlugin from '../../src/plugins/requestAuthPlugin';
+import { propserties as serverConfig } from 'mwp-cli/lib/config';
+import { getServer } from 'mwp-test-utils';
+import requestAuthPlugin from 'mwp-auth-plugin';
+
+const MEMBER_COOKIE = 'MEETUP_MEMBER_DEV'; // always a _DEV cookie in 'NODE_ENV=test'
 
 const cookieRequest = cookies => ({
 	method: 'get',
@@ -31,12 +32,12 @@ const expectedResponse = 'barfoo';
 
 const testAuth = (cookies, test, makeRequest = cookieRequest) => {
 	spyOn(global, 'fetch').and.callFake((url, opts) => {
-		if (url.includes(appConfig.oauth.auth_url)) {
+		if (url.includes(serverConfig.oauth.auth_url)) {
 			return makeMockFetchResponse({
 				code: 'foo',
 			});
 		}
-		if (url.includes(appConfig.oauth.access_url)) {
+		if (url.includes(serverConfig.oauth.access_url)) {
 			return makeMockFetchResponse({
 				oauth_token: expectedOauthToken,
 				refresh_token: 'whatever',
@@ -53,7 +54,7 @@ const testAuth = (cookies, test, makeRequest = cookieRequest) => {
 	return server
 		.register({
 			register: requestAuthPlugin,
-			options: appConfig,
+			options: serverConfig,
 		})
 		.then(() => server.route(fooRoute))
 		.then(() => server.auth.strategy('default', 'oauth', 'required'))

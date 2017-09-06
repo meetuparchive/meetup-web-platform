@@ -13,6 +13,7 @@
    - `mwp-store`
    - `mwp-sw-plugin`
    - `mwp-tracking-plugin`
+   - `mwp-test-utils`
 
 ## [7.0]
 
