@@ -37,7 +37,7 @@ before_install:
   - yarn --version
 
 before_script:
-  - lerna bootstrap
+  # - lerna bootstrap
   - git diff --exit-code
 
 # script: lerna run test --stream
