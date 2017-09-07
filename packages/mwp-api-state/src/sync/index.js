@@ -11,8 +11,8 @@ import 'rxjs/add/operator/takeUntil';
 import { combineEpics } from 'redux-observable';
 
 import { LOCATION_CHANGE, SERVER_RENDER } from 'mwp-router'; // mwp-router
-import { getRouteResolver, getMatchedQueries } from 'mwp-router/util'; // mwp-router/util
-import { actions as clickActions } from 'mwp-tracking-plugin/util/clickState'; // mwp-tracking-plugin/util/clickState
+import { getRouteResolver, getMatchedQueries } from 'mwp-router/lib/util'; // mwp-router/util
+import { actions as clickActions } from 'mwp-tracking-plugin/lib/util/clickState'; // mwp-tracking-plugin/util/clickState
 
 import * as api from './apiActionCreators';
 import {

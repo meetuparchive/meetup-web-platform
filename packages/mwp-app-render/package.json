@@ -30,7 +30,8 @@
     "react": "15.6.1",
     "react-helmet": "5.2.0",
     "react-redux": "5.0.6",
-    "react-router-dom": "4.2.2"
+    "react-router-dom": "4.2.2",
+    "redux": "3.7.2"
   },
   "dependencies": {
     "escape-html": "1.0.3",
@@ -44,8 +45,11 @@
     "meetup-web-mocks": "1.0.206",
     "prop-types": "15.5.10",
     "react": "15.6.1",
+    "react-dom": "15.6.1",
     "react-helmet": "5.2.0",
     "react-redux": "5.0.6",
-    "react-router-dom": "4.2.2"
+    "react-router-dom": "4.2.2",
+    "react-test-renderer": "15.6.1",
+    "redux": "3.7.2"
   }
 }

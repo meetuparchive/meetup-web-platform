@@ -29,14 +29,16 @@
     "rxjs": "5.4.3"
   },
   "dependencies": {
-    "mwp-router": ">=*.*.*",
-    "mwp-tracking-plugin": ">=*.*.*",
+    "mwp-router": "^0.0.1",
+    "mwp-tracking-plugin": "^0.0.1",
     "redux-observable": "0.16.0"
   },
   "devDependencies": {
     "flow-bin": "0.49.1",
     "jest": "20.0.4",
-    "mwp-test-utils": ">=*.*.*",
+    "mwp-test-utils": "^0.0.1",
+    "meetup-web-mocks": "1.0.206",
+    "node-fetch": "1.7.2",
     "rxjs": "5.4.3"
   }
 }

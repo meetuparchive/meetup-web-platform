@@ -1,9 +1,7 @@
 import rison from 'rison';
-import {
-	getRequestAuthPlugin,
-	getApiProxyPlugin,
-	getCsrfPlugin,
-} from '../../plugins'; // TODO - use plugin-specific imports
+import requestAuthPlugin from 'mwp-auth-plugin';
+import apiProxyPlugin from 'mwp-api-proxy-plugin';
+import CsrfPlugin from 'electrode-csrf-jwt';
 
 import { getServer } from 'mwp-test-utils';
 
@@ -11,7 +9,11 @@ function getResponse(injectRequest, server = getServer()) {
 	// a Promise that returns the server instance after it has been
 	// configured with the routes being tested
 	return server
-		.register([getRequestAuthPlugin(), getCsrfPlugin(), getApiProxyPlugin()])
+		.register([
+			requestAuthPlugin,
+			{ register: CsrfPlugin, options: { secret: 'asfd' } },
+			apiProxyPlugin,
+		])
 		.then(() => server.inject(injectRequest));
 }
 describe('api proxy plugin', () => {

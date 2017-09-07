@@ -9,6 +9,9 @@
     "jsx",
     "json"
   ],
+  "setupFiles": [
+    "<rootDir>/src/util/globals.js"
+  ],
   "testEnvironment": "node",
   "testRegex": "src\/.*\\.test\\.jsx?$"
 }
