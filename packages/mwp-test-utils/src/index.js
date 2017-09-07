@@ -10,7 +10,7 @@ import {
 	MOCK_MEANINGLESS_ACTION,
 	MOCK_APP_STATE,
 } from 'meetup-web-mocks/lib/app';
-import { properties as serverConfig } from 'mwp-cli/lib/util/server';
+import { properties as serverConfig } from 'mwp-cli/src/config/server';
 
 export const MOCK_LOGGER = {
 	debug: jest.fn(),

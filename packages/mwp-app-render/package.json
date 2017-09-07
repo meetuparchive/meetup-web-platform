@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "escape-html": "1.0.3",
-    "mwp-router": "^0.0.1"
+    "mwp-router": ">=*.*.*"
   },
   "devDependencies": {
     "enzyme": "2.9.1",

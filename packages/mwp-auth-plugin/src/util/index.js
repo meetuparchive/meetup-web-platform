@@ -1,5 +1,4 @@
 import Joi from 'joi';
-import { MEMBER_COOKIE } from './cookieUtils';
 
 /**
  * @module authUtils
@@ -72,6 +71,9 @@ export function validateSecret(secret) {
  * apply default cookie options for auth-related cookies
  */
 export const configureAuthCookies = server => {
+	const MEMBER_COOKIE = server.settings.app.isProd
+		? 'MEETUP_MEMBER'
+		: 'MEETUP_MEMBER_DEV';
 	const password = validateSecret(server.settings.app.cookie_encrypt_secret);
 	const isSecure = server.settings.app.isProd;
 	const authCookieOptions = {

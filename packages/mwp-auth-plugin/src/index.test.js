@@ -5,7 +5,6 @@ import 'rxjs/add/observable/throw';
 import 'rxjs/add/operator/toPromise';
 import 'rxjs/add/operator/catch';
 
-import { MEMBER_COOKIE } from 'mwp-core/lib/util/cookieUtils';
 import { MOCK_LOGGER } from 'mwp-test-utils';
 import register, {
 	getAuthenticate,
@@ -17,6 +16,7 @@ import register, {
 	tryJSON,
 } from './';
 
+const MEMBER_COOKIE = 'MEETUP_MEMBER_DEV';
 const MOCK_REPLY_FN = () => {};
 MOCK_REPLY_FN.state = () => {};
 MOCK_REPLY_FN.continue = () => {};
@@ -54,8 +54,8 @@ const MOCK_SERVER_APP = {
 	},
 	oauth: { ...MOCK_OAUTH },
 	photo_scaler_salt: 'asdfasdfasdfasdfasdfasdfasdfasdfasdf',
-	isProd: 'false',
-	isDev: 'true',
+	isProd: false,
+	isDev: true,
 };
 
 const MOCK_SERVER = {
@@ -223,7 +223,9 @@ describe('applyRequestAuthorizer$', () => {
 	const requestAuthorizer$ = getRequestAuthorizer$(MOCK_SERVER_APP);
 	const authorizeRequest$ = applyRequestAuthorizer$(requestAuthorizer$);
 	it('does not try to fetch when provided a request with oauth_token in state', () => {
-		spyOn(global, 'fetch').and.callFake(() => Promise.resolve());
+		spyOn(global, 'fetch').and.callFake(() =>
+			Promise.resolve(GOOD_MOCK_FETCH_RESULT)
+		);
 
 		return authorizeRequest$({
 			...MOCK_REQUEST,
@@ -238,7 +240,9 @@ describe('applyRequestAuthorizer$', () => {
 	});
 
 	it('does not try to fetch when provided a request with [MEMBER_COOKIE] in state', () => {
-		spyOn(global, 'fetch').and.callFake(() => Promise.resolve());
+		spyOn(global, 'fetch').and.callFake(() =>
+			Promise.resolve(GOOD_MOCK_FETCH_RESULT)
+		);
 		const promise = authorizeRequest$({
 			...MOCK_REQUEST,
 			state: {
@@ -246,12 +250,9 @@ describe('applyRequestAuthorizer$', () => {
 			},
 		}).toPromise();
 
-		return promise.then(
-			request => {
-				expect(global.fetch).not.toHaveBeenCalled();
-			},
-			err => console.warn(err)
-		);
+		return promise.then(request => {
+			expect(global.fetch).not.toHaveBeenCalled();
+		});
 	});
 
 	it('calls fetch when provided a request without an oauth token in state', () => {

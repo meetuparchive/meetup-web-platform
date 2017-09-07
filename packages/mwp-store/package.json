@@ -27,14 +27,14 @@
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "dependencies": {
     "js-cookie": "2.1.4",
-    "mwp-api-state": "^0.0.1",
-    "mwp-tracking-plugin": "^0.0.1",
+    "mwp-api-state": ">=*.*.*",
+    "mwp-tracking-plugin": ">=*.*.*",
     "rison": "0.1.1"
   },
   "devDependencies": {
     "flow-bin": "0.49.1",
     "jest": "20.0.4",
-    "mwp-test-utils": "^0.0.1",
+    "mwp-test-utils": ">=*.*.*",
     "redux": "3.7.2",
     "rxjs": "5.4.3"
   },

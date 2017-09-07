@@ -9,11 +9,7 @@ import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/map';
 
 import { logger } from 'mwp-logger-plugin';
-import {
-	applyAuthState,
-	configureAuthCookies,
-	setPluginState,
-} from './authUtils';
+import { applyAuthState, configureAuthCookies, setPluginState } from './util';
 
 /**
  * @module requestAuthPlugin

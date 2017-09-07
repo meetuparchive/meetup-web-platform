@@ -5,7 +5,7 @@ import {
 	setPluginState,
 	configureAuthState,
 	configureAuthCookies,
-} from './authUtils';
+} from './';
 
 describe('configureAuthCookies', () => {
 	const plugins = { requestAuth: {} };
