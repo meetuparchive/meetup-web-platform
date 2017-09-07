@@ -1,7 +1,7 @@
 import React from 'react';
 import Helmet from 'react-helmet';
-import makeRootReducer from '../src/store/reducer';
-import { Redirect } from '../src/router';
+import makeRootReducer from 'mwp-store/lib/reducer';
+import { Redirect } from 'mwp-router';
 
 export const clientFilename = 'client.whatever.js';
 export const assetPublicPath = '//whatever';
