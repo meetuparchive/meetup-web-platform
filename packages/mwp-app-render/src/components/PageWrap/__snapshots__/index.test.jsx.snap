@@ -19,6 +19,7 @@ ShallowWrapper {
 >
     <HelmetWrapper
         defaultTitle="Meetup"
+        defer={true}
         encodeSpecialCharacters={true}
         titleTemplate="%s - Meetup"
     >
@@ -87,6 +88,7 @@ ShallowWrapper {
 >
       <HelmetWrapper
             defaultTitle="Meetup"
+            defer={true}
             encodeSpecialCharacters={true}
             titleTemplate="%s - Meetup"
       >
@@ -228,6 +230,7 @@ ShallowWrapper {
 >
           <HelmetWrapper
                     defaultTitle="Meetup"
+                    defer={true}
                     encodeSpecialCharacters={true}
                     titleTemplate="%s - Meetup"
           >
@@ -296,6 +299,7 @@ ShallowWrapper {
 >
           <HelmetWrapper
                     defaultTitle="Meetup"
+                    defer={true}
                     encodeSpecialCharacters={true}
                     titleTemplate="%s - Meetup"
           >

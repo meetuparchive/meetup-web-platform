@@ -25,7 +25,7 @@ const EMPTY_ROUTES = {};
  * @module SyncEpicTest
  */
 describe('Sync epic', () => {
-	it(
+	it.only(
 		'does not pass through arbitrary actions',
 		epicIgnoreAction(getSyncEpic(MOCK_ROUTES))
 	);

@@ -8,7 +8,7 @@ import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/takeUntil';
-import { combineEpics } from 'redux-observable';
+import { ActionsObservable, combineEpics } from 'redux-observable';
 
 import { LOCATION_CHANGE, SERVER_RENDER } from 'mwp-router'; // mwp-router
 import { getRouteResolver, getMatchedQueries } from 'mwp-router/lib/util'; // mwp-router/util
@@ -67,8 +67,9 @@ export function getDeprecatedSuccessPayload(successes, errors) {
  */
 export const getNavEpic = (routes, baseUrl) => {
 	const resolveRoutes = getRouteResolver(routes, baseUrl);
-	return (action$, store) =>
-		action$
+	return (action$, store) => {
+		console.log(action$ instanceof ActionsObservable, action$);
+		return action$
 			.ofType(LOCATION_CHANGE, SERVER_RENDER)
 			.mergeMap(({ payload: location }) => {
 				// note that this function executes _downstream_ of reducers, so the
@@ -93,6 +94,7 @@ export const getNavEpic = (routes, baseUrl) => {
 
 				return Observable.merge(cacheAction$, apiAction$, clickAction$);
 			});
+	};
 };
 
 /**
