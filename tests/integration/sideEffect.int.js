@@ -1,6 +1,6 @@
 import Helmet from 'react-helmet';
 import { getMockRenderRequestMap } from '../mocks';
-import start from '../../src/server';
+import start from '../../src/app-server';
 import { Forbidden, NotFound, Redirect } from '../../src/router';
 
 Forbidden.rewind = jest.fn(Forbidden.rewind);
