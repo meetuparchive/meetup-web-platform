@@ -5019,9 +5019,9 @@ mute-stream@0.0.7:
   version "0.0.7"
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.7.tgz#3075ce93bc21b8fab43e1bc4da7e8115ed1e7bab"
 
-mwp-cli@1.1.114:
-  version "1.1.114"
-  resolved "https://registry.yarnpkg.com/mwp-cli/-/mwp-cli-1.1.114.tgz#0cefc90faf3b9fce2cce9a4dc444189406fccdcf"
+mwp-cli@1.1.126:
+  version "1.1.126"
+  resolved "https://registry.yarnpkg.com/mwp-cli/-/mwp-cli-1.1.126.tgz#0c408660e5d2595cc8d3c4dd2294d617473b24b8"
   dependencies:
     "@alrra/travis-scripts" "3.0.1"
     ajv "5"
@@ -5050,7 +5050,7 @@ mwp-cli@1.1.114:
     rxjs "5.4.2"
     style-loader "0.18.2"
     sw-precache-webpack-plugin "0.11.4"
-    transifex "1.4.6"
+    transifex "1.5.0"
     webpack "3.2.0"
     webpack-dev-server "2.5.1"
     webpack-manifest-plugin "1.1.2"
@@ -7257,9 +7257,9 @@ tr46@~0.0.3:
   version "0.0.3"
   resolved "https://registry.yarnpkg.com/tr46/-/tr46-0.0.3.tgz#8184fd347dac9cdc185992f3a6622e14b9d9ab6a"
 
-transifex@1.4.6:
-  version "1.4.6"
-  resolved "https://registry.yarnpkg.com/transifex/-/transifex-1.4.6.tgz#5a9e420ffc0a89b6a59f14f1e57049c500594eeb"
+transifex@1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/transifex/-/transifex-1.5.0.tgz#ff1c4530f477fd8de234fc968add322953d45cf4"
   dependencies:
     commander "^2.9.0"
     lodash "^4.17.1"
