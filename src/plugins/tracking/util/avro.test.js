@@ -40,6 +40,28 @@ describe('serializers.avro', () => {
 	});
 });
 
+describe('deserializers.avro', () => {
+	it('decodes an encoded record of provided schema', () => {
+		const schema = {
+			type: 'record',
+			fields: [
+				{ name: 'requestId', type: 'string' },
+				{ name: 'timestamp', type: 'string' },
+			],
+		};
+		const data = {
+			requestId: 'foo',
+			timestamp: new Date().getTime().toString(),
+		};
+
+		const serializer = avro.serializers.avro(schema);
+		const deserializer = avro.deserializers.avro(schema);
+		const serialized = serializer(data);
+		const deserialized = deserializer(serialized);
+		expect(deserialized).toEqual(data);
+	});
+});
+
 describe('Activity tracking', () => {
 	const request = {
 		id: 'foo',
