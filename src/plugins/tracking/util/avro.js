@@ -37,6 +37,8 @@ const getPlatformAnalyticsLog = (
 };
 
 const analyticsLog = getPlatformAnalyticsLog();
+const debugLog = deserializedRecord =>
+	console.log(JSON.stringify(deserializedRecord));
 
 // currently the schema is manually copied from
 // https://github.dev.meetup.com/meetup/meetup/blob/master/modules/base/src/main/versioned_avro/Click_v2.avsc
@@ -100,6 +102,7 @@ const activity = {
 };
 
 type Serializer = Object => string;
+type Deserializer = string => Object;
 
 const avroSerializer: Object => Serializer = schema => data => {
 	const record = avro.parse(schema).toBuffer(data);
@@ -113,9 +116,19 @@ const avroSerializer: Object => Serializer = schema => data => {
 	return JSON.stringify(analytics);
 };
 
-const logger = (serializer: Serializer) => (record: Object) => {
+const avroDeserializer: Object => Deserializer = schema => serialized => {
+	const { record } = JSON.parse(serialized);
+	const avroBuffer = new Buffer(record, 'base64');
+	return avro.parse(schema).fromBuffer(avroBuffer);
+};
+
+const logger = (serializer: Serializer, deserializer: Deserializer) => (
+	record: Object
+) => {
 	const serializedRecord = serializer(record);
+	const deserializedRecord = deserializer(serializedRecord);
 	analyticsLog(serializedRecord);
+	debugLog(deserializedRecord);
 };
 
 const schemas = {
@@ -127,9 +140,14 @@ const serializers = {
 	activity: avroSerializer(schemas.activity),
 	click: avroSerializer(schemas.click),
 };
+const deserializers = {
+	avro: avroSerializer,
+	activity: avroDeserializer(schemas.activity),
+	click: avroDeserializer(schemas.click),
+};
 const loggers = {
-	activity: logger(serializers.activity),
-	click: logger(serializers.click),
+	activity: logger(serializers.activity, deserializers.activity),
+	click: logger(serializers.click, deserializers.click),
 };
 
 module.exports = {
@@ -137,5 +155,6 @@ module.exports = {
 	getPlatformAnalyticsLog,
 	schemas,
 	serializers,
+	deserializers,
 	loggers,
 };
