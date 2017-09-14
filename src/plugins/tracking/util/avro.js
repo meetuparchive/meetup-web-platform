@@ -141,7 +141,7 @@ const serializers = {
 	click: avroSerializer(schemas.click),
 };
 const deserializers = {
-	avro: avroSerializer,
+	avro: avroDeserializer,
 	activity: avroDeserializer(schemas.activity),
 	click: avroDeserializer(schemas.click),
 };
