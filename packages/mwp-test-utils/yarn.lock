@@ -4302,9 +4302,9 @@ mute-stream@0.0.7:
   version "0.0.7"
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.7.tgz#3075ce93bc21b8fab43e1bc4da7e8115ed1e7bab"
 
-mwp-cli@1.1.124:
-  version "1.1.124"
-  resolved "https://registry.yarnpkg.com/mwp-cli/-/mwp-cli-1.1.124.tgz#3f3859af7f73c886a292b1422ae74cefcf0ae2df"
+mwp-cli@1.1.129:
+  version "1.1.129"
+  resolved "https://registry.yarnpkg.com/mwp-cli/-/mwp-cli-1.1.129.tgz#a0f1159c92ceb76685575193ff0c40c60c8e0e28"
   dependencies:
     "@alrra/travis-scripts" "3.0.1"
     ajv "5"
@@ -4330,7 +4330,6 @@ mwp-cli@1.1.124:
     mkdirp "0.5.1"
     prettier "1.5.2"
     react-dev-utils "3.0.2"
-    rxjs "5.4.2"
     style-loader "0.18.2"
     sw-precache-webpack-plugin "0.11.4"
     transifex "1.5.0"
