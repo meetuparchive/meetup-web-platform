@@ -18,7 +18,9 @@ const getPlatformAnalyticsLog = (
 	isGAE: ?string = process.env.GAE_INSTANCE
 ): (string => void) => {
 	if (isGAE) {
-		const pubsub = require('@google-cloud/pubsub')();
+		const pubsub = require('@google-cloud/pubsub')({
+			projectId: 'meetup-prod',
+		});
 		const analyticsLog = pubsub.topic('analytics-log-json');
 		return (serializedRecord: string) => {
 			analyticsLog.publish(serializedRecord).then(
