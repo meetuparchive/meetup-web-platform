@@ -1,7 +1,7 @@
 import React from 'react';
 import Helmet from 'react-helmet';
 import makeRootReducer from 'mwp-store/lib/reducer';
-import { Redirect } from 'mwp-router';
+import { Forbidden, NotFound, Redirect } from 'mwp-router';
 
 export const clientFilename = 'client.whatever.js';
 export const assetPublicPath = '//whatever';
@@ -70,7 +70,35 @@ export const routes = [
 			},
 			{
 				path: '/badImplementation',
-				component: () => {
+				component: props => {
+					// use querystring to render 'bad' implementations
+					if (props.location.search.endsWith('forbidden')) {
+						// multiple child components not allowed
+						return (
+							<Forbidden>
+								<div />
+								<div />
+							</Forbidden>
+						);
+					}
+					if (props.location.search.endsWith('redirect')) {
+						// multiple child components not allowed
+						return (
+							<Redirect>
+								<div />
+								<div />
+							</Redirect>
+						);
+					}
+					if (props.location.search.endsWith('notfound')) {
+						// multiple child components not allowed
+						return (
+							<NotFound>
+								<div />
+								<div />
+							</NotFound>
+						);
+					}
 					/*
 					 * the `property` prop for `meta` must be a string in order for
 					 * <Helmet> to process it correctly - this is a 'bad implementation'

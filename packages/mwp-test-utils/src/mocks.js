@@ -39,10 +39,11 @@ export const getMockRenderRequestMap = () => {
 	const renderRequest$ = makeRenderer(
 		routes,
 		reducer,
-		clientFilename,
+		undefined,
 		assetPublicPath,
 		[],
-		basename
+		basename,
+		[`${assetPublicPath}${clientFilename}`]
 	);
 
 	return {
