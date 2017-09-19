@@ -197,6 +197,13 @@ export const makeLogResponse = request => ([response, body]) => {
 		(method.toLowerCase() === 'get' && statusCode >= 400) // something fishy with a GET
 	) {
 		// use console.error to highlight these cases in Stackdriver
+		if (
+			statusCode === 400 &&
+			(pathname === '/members/self' || pathname === '/members/home')
+		) {
+			console.info(`swallowing 400 error for ${pathname}`);
+			return;
+		}
 		console.error(
 			JSON.stringify({
 				message: 'REST API error response',
