@@ -44,7 +44,7 @@
     "intl-messageformat": "2.1.0",
     "intl-relativeformat": "2.0.0",
     "jest": "20.0.4",
-    "meetup-web-mocks": "1.0.206",
+    "meetup-web-mocks": "1.0.217",
     "react": "15.6.1",
     "react-dom": "15.6.1",
     "react-intl": "2.3.0",

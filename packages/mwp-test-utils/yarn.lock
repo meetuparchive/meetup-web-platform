@@ -4121,11 +4121,9 @@ media-typer@0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/media-typer/-/media-typer-0.3.0.tgz#8710d7af0aa626f8fffa1ce00168545263255748"
 
-meetup-web-mocks@1.0.206:
-  version "1.0.206"
-  resolved "https://registry.yarnpkg.com/meetup-web-mocks/-/meetup-web-mocks-1.0.206.tgz#762bf831974d2a3b40e1fdf7ed1de5e989de2baf"
-  dependencies:
-    rxjs "5.4.2"
+meetup-web-mocks@1.0.217:
+  version "1.0.217"
+  resolved "https://registry.yarnpkg.com/meetup-web-mocks/-/meetup-web-mocks-1.0.217.tgz#a3bd6d458ab8a8b9c38fa96a2125c5b5e74b5330"
 
 mem@^1.1.0:
   version "1.1.0"
@@ -5599,12 +5597,6 @@ rx-lite-aggregates@^4.0.8:
 rx-lite@*, rx-lite@^4.0.8:
   version "4.0.8"
   resolved "https://registry.yarnpkg.com/rx-lite/-/rx-lite-4.0.8.tgz#0b1e11af8bc44836f04a6407e92da42467b79444"
-
-rxjs@5.4.2:
-  version "5.4.2"
-  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-5.4.2.tgz#2a3236fcbf03df57bae06fd6972fd99e5c08fcf7"
-  dependencies:
-    symbol-observable "^1.0.1"
 
 rxjs@5.4.3, rxjs@^5.0.0-beta.11:
   version "5.4.3"

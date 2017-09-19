@@ -68,7 +68,13 @@ export function getDeprecatedSuccessPayload(successes, errors) {
 export const getNavEpic = (routes, baseUrl) => {
 	const resolveRoutes = getRouteResolver(routes, baseUrl);
 	return (action$, store) => {
-		console.log(action$ instanceof ActionsObservable, action$);
+		console.log(
+			action$ instanceof ActionsObservable,
+			action$,
+			ActionsObservable.prototype.mergeMap,
+			ActionsObservable.prototype.toArray,
+			action$.toArray
+		);
 		return action$
 			.ofType(LOCATION_CHANGE, SERVER_RENDER)
 			.mergeMap(({ payload: location }) => {

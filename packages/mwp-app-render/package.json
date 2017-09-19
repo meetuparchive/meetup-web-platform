@@ -42,7 +42,7 @@
     "flow-bin": "0.49.1",
     "jest": "20.0.4",
     "joi": "10.6.0",
-    "meetup-web-mocks": "1.0.206",
+    "meetup-web-mocks": "1.0.217",
     "prop-types": "15.5.10",
     "react": "15.6.1",
     "react-dom": "15.6.1",
