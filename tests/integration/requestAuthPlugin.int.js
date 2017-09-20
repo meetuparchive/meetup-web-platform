@@ -1,5 +1,5 @@
 import Iron from 'iron';
-import { propserties as serverConfig } from 'mwp-cli/lib/config';
+import { propserties as serverConfig } from 'mwp-cli/src/config';
 import { getServer } from 'mwp-test-utils';
 import requestAuthPlugin from 'mwp-auth-plugin';
 

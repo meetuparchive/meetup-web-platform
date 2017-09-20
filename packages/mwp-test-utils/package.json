@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "dependencies": {
+    "electrode-csrf-jwt": "1.2.1",
     "hapi": "16.5.2",
     "inert": "4.2.1",
     "meetup-web-mocks": "1.0.217",

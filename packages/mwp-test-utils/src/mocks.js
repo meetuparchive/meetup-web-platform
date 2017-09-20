@@ -5,7 +5,12 @@ import config from 'mwp-cli/src/config';
 import makeRenderer from 'mwp-core/lib/server-render';
 const appConfig = config.getServer().properties;
 
-import { assetPublicPath, clientFilename, routes, reducer } from './mockApp';
+import {
+	assetPublicPath,
+	clientFilename,
+	routes,
+	reducer,
+} from 'mwp-test-utils/lib/mockApp';
 
 export const getMockFetch = (
 	mockResponseValue = { responses: [{}] },
