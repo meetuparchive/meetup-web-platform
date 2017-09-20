@@ -23,6 +23,6 @@ export default function register(
 }
 
 register.attributes = {
-	name: 'mwp-language',
+	name: 'mwp-language-plugin',
 	version: '1.0.0',
 };

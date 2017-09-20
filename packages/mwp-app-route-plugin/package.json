@@ -40,6 +40,6 @@
   },
   "peerDependencies": {
     "electrode-csrf-jwt": "1.2.1",
-    "mwp-language-plugin": "6.0.1617-beta"
+    "mwp-language-plugin": ">=0.0.1"
   }
 }
