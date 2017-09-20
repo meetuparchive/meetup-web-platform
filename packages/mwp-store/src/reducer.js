@@ -5,9 +5,9 @@
  **/
 
 import { combineReducers } from 'redux';
-import { api, app, API_RESP_COMPLETE } from 'mwp-api-state'; // mwp-api-state
-import { routing } from 'mwp-router'; // mwp-router
-import { reducer as clickTracking } from 'mwp-tracking-plugin/lib/util/clickState'; // mwp-tracking/util/clickState
+import { api, app, API_RESP_COMPLETE } from 'mwp-api-state';
+import { routing } from 'mwp-router';
+import { reducer as clickTracking } from 'mwp-tracking-plugin/lib/util/clickState';
 
 export function config(state = {}, action) {
 	if (action.type === 'CONFIGURE') {

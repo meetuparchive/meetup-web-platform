@@ -27,13 +27,16 @@
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "dependencies": {
     "mwp-core": ">=0.0.1",
-    "react-dom": "15.6.1"
+    "react": "15.6.1",
+    "react-dom": "15.6.1",
+    "redbox-react": "1.4.3"
   },
   "devDependencies": {
     "boom": "5.2.0",
     "flow-bin": "0.49.1",
     "jest": "20.0.4",
-    "meetup-web-mocks": "1.0.217"
+    "meetup-web-mocks": "1.0.217",
+    "mwp-test-utils": ">=0.0.1"
   },
   "peerDependencies": {
     "electrode-csrf-jwt": "1.2.1",

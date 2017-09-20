@@ -1,5 +1,5 @@
 import { applyMiddleware, createStore } from 'redux';
-import { getApiMiddleware } from '../../api-state'; // mwp-api-state
+import { getApiMiddleware } from 'mwp-api-state';
 
 import getFetchQueries from './fetchQueries';
 import catchMiddleware from '../middleware/catch';

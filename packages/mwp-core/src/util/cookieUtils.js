@@ -1,8 +1,9 @@
 import querystring from 'qs';
-import config from './config';
+import config from 'mwp-cli/src/config';
 import { logger } from 'mwp-logger-plugin';
+const appConfig = config.getServer().properties;
 
-export const MEMBER_COOKIE = config.isProd
+export const MEMBER_COOKIE = appConfig.isProd
 	? 'MEETUP_MEMBER'
 	: 'MEETUP_MEMBER_DEV';
 

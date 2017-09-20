@@ -3,7 +3,8 @@ import './util/globals';
 import fs from 'fs';
 import Http2 from 'spdy'; // eventually this will be a native node module
 
-import appConfig from 'mwp-cli/lib/config/server';
+import config from 'mwp-cli/src/config';
+const appConfig = config.getServer().properties;
 
 import getPlugins from './util/getPlugins';
 import { configureEnv, server } from './util';

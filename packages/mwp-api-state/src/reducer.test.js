@@ -4,7 +4,7 @@ import {
 	api,
 	app, // DEPRECATED
 } from './reducer';
-import { apiRequest } from './sync/syncActionCreators'; // mwp-api-state
+import { apiRequest } from './sync/syncActionCreators';
 import * as apiActions from './sync/apiActionCreators';
 
 describe('app reducer', () => {

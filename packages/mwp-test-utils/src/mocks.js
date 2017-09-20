@@ -1,8 +1,9 @@
 import csrf from 'electrode-csrf-jwt/lib/csrf';
 import uuid from 'uuid';
 
-import appConfig from '../src/util/config';
-import makeRenderer from '../src/renderers/server-render';
+import config from 'mwp-cli/src/config';
+import makeRenderer from 'mwp-core/lib/server-render';
+const appConfig = config.getServer().properties;
 
 import { assetPublicPath, clientFilename, routes, reducer } from './mockApp';
 

@@ -1,7 +1,7 @@
 import url from 'url';
 import { mockQuery } from 'meetup-web-mocks/lib/app';
 import { MOCK_GROUP } from 'meetup-web-mocks/lib/api';
-import * as clickState from 'mwp-tracking-plugin/lib/util/clickState'; // mwp-tracking/util/clickState
+import * as clickState from 'mwp-tracking-plugin/lib/util/clickState';
 
 import fetchQueries, { CSRF_HEADER_COOKIE } from './fetchQueries';
 
