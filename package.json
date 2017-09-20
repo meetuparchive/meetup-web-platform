@@ -17,7 +17,7 @@
     "flow": "flow",
     "lint": "eslint . --ext .js,.jsx --fix",
     "precommit": "lint-staged",
-    "test": "yarn run flow && lerna run test --stream && yarn run test:integration -- --silent",
+    "test": "yarn run flow && lerna run test --stream",
     "test:integration": "NODE_ENV=test jest --config jest.int.config.json"
   },
   "repository": {
