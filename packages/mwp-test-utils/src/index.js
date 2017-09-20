@@ -2,14 +2,6 @@ import Hapi from 'hapi';
 import Cookie from 'tough-cookie';
 
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/do';
-import { ActionsObservable } from 'redux-observable';
-
-import {
-	MOCK_MEANINGLESS_ACTION,
-	MOCK_APP_STATE,
-} from 'meetup-web-mocks/lib/app';
 import { properties as serverConfig } from 'mwp-cli/src/config/server';
 
 export const MOCK_LOGGER = {
@@ -78,25 +70,6 @@ export const getServer = () => {
 		reply.continue();
 	});
 	return server;
-};
-
-export const epicIgnoreAction = (
-	epic,
-	action = MOCK_MEANINGLESS_ACTION,
-	store = createFakeStore(MOCK_APP_STATE)
-) => () => {
-	const spyable = {
-		notCalled: () => {},
-	};
-	spyOn(spyable, 'notCalled');
-	const action$ = ActionsObservable.of(action);
-	return epic(action$, store)
-		.do(
-			spyable.notCalled,
-			null,
-			expect(spyable.notCalled).not.toHaveBeenCalled()
-		)
-		.toPromise();
 };
 
 const IDENTITY_REDUCER = state => state;

@@ -7,7 +7,7 @@ import {
 	MOCK_API_RESULT,
 } from 'meetup-web-mocks/lib/app';
 
-import { epicIgnoreAction } from 'mwp-test-utils';
+import { epicIgnoreAction } from '../util/testUtils';
 import * as api from '../sync/apiActionCreators';
 
 import { makeCache } from './util';
