@@ -36,6 +36,7 @@ const DOM = props => {
 		head,
 		initialState = {},
 		scripts,
+		cssLinks,
 	} = props;
 
 	/**
@@ -63,6 +64,10 @@ const DOM = props => {
 				{head.meta.toComponent()}
 				{head.link.toComponent()}
 				{head.script.toComponent()}
+				{cssLinks &&
+					cssLinks.map((href, key) =>
+						<link rel="stylesheet" type="text/css" href={href} key={key} />
+					)}
 			</head>
 			<body>
 				<div id="outlet" dangerouslySetInnerHTML={getInnerHTML(appMarkup)} />
@@ -90,6 +95,7 @@ DOM.propTypes = {
 	}),
 	initialState: PropTypes.object.isRequired,
 	scripts: PropTypes.array.isRequired,
+	cssLinks: PropTypes.arrayOf(PropTypes.string),
 };
 
 export default DOM;

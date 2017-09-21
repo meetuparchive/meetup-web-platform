@@ -15,6 +15,19 @@
    - `mwp-tracking-plugin`
    - `mwp-test-utils`
 
+## [7.1]
+
+- **Feature**: Pass in an array of string `cssLinks` to `makeServerRenderer$` in
+  order to add static CSS `<link>` tags to the document `<head>`. These tags
+  will not be affected by `<link>`s defined within `<Helmet>` tags of the
+  application, and therefore will not be subject to being clobbered by
+  client-side rendering that will cause a FOUC (as described in
+  [this react-helmet issue](https://github.com/nfl/react-helmet/issues/98)).
+
+  **Important**: The consumer application must ensure that the CSS _files_ are
+  bundled with the browser application script as well, even though the links
+  themselves are not required by the browser app renderer.
+
 ## [7.0]
 
 ### BREAKING CHANGES

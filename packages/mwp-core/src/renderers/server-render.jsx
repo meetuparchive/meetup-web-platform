@@ -87,6 +87,7 @@ const getRouterRenderer = ({
 	baseUrl,
 	assetPublicPath,
 	scripts,
+	cssLinks,
 }): RenderResult => {
 	// pre-render the app-specific markup, this is the string of markup that will
 	// be managed by React on the client.
@@ -134,6 +135,7 @@ const getRouterRenderer = ({
 			initialState={initialState}
 			appMarkup={appMarkup}
 			scripts={scripts}
+			cssLinks={cssLinks}
 		/>
 	);
 
@@ -154,6 +156,7 @@ const makeRenderer$ = (renderConfig: {
 	baseUrl: string,
 	scripts: Array<string>,
 	enableServiceWorker: boolean,
+	cssLinks: ?Array<string>,
 }) =>
 	makeRenderer(
 		renderConfig.routes,
@@ -163,7 +166,8 @@ const makeRenderer$ = (renderConfig: {
 		renderConfig.middleware,
 		renderConfig.baseUrl,
 		renderConfig.scripts,
-		renderConfig.enableServiceWorker
+		renderConfig.enableServiceWorker,
+		renderConfig.cssLinks
 	);
 
 /**
@@ -193,7 +197,8 @@ const makeRenderer = (
 	middleware: Array<Function> = [],
 	baseUrl: string = '',
 	scripts: Array<string> = [],
-	enableServiceWorker: boolean
+	enableServiceWorker: boolean,
+	cssLinks: ?Array<string>
 ) => (request: Object) => {
 	middleware = middleware || [];
 
@@ -256,6 +261,7 @@ const makeRenderer = (
 					head={Helmet.rewind()}
 					initialState={store.getState()}
 					scripts={scripts}
+					cssLinks={cssLinks}
 				/>
 			),
 			statusCode: 200,
@@ -285,6 +291,7 @@ const makeRenderer = (
 			baseUrl,
 			assetPublicPath,
 			scripts,
+			cssLinks,
 		})
 	);
 };
