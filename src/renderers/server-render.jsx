@@ -86,6 +86,7 @@ const getRouterRenderer = ({
 	baseUrl,
 	assetPublicPath,
 	scripts,
+	globalHead,
 }): RenderResult => {
 	// pre-render the app-specific markup, this is the string of markup that will
 	// be managed by React on the client.
@@ -133,6 +134,7 @@ const getRouterRenderer = ({
 			initialState={initialState}
 			appMarkup={appMarkup}
 			scripts={scripts}
+			globalHead={globalHead}
 		/>
 	);
 
@@ -153,6 +155,7 @@ const makeRenderer$ = (renderConfig: {
 	baseUrl: string,
 	scripts: Array<string>,
 	enableServiceWorker: boolean,
+	globalHead: ?Array<React$Element>,
 }) =>
 	makeRenderer(
 		renderConfig.routes,
@@ -162,7 +165,8 @@ const makeRenderer$ = (renderConfig: {
 		renderConfig.middleware,
 		renderConfig.baseUrl,
 		renderConfig.scripts,
-		renderConfig.enableServiceWorker
+		renderConfig.enableServiceWorker,
+		renderConfig.globalHead
 	);
 
 /**
@@ -192,7 +196,8 @@ const makeRenderer = (
 	middleware: Array<Function> = [],
 	baseUrl: string = '',
 	scripts: Array<string> = [],
-	enableServiceWorker: boolean
+	enableServiceWorker: boolean,
+	globalHead: ?Array<React$Element>
 ) => (request: Object) => {
 	middleware = middleware || [];
 
@@ -255,6 +260,7 @@ const makeRenderer = (
 					head={Helmet.rewind()}
 					initialState={store.getState()}
 					scripts={scripts}
+					globalHead={globalHead}
 				/>
 			),
 			statusCode: 200,
@@ -284,6 +290,7 @@ const makeRenderer = (
 			baseUrl,
 			assetPublicPath,
 			scripts,
+			globalHead,
 		})
 	);
 };

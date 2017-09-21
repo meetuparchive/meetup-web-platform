@@ -36,6 +36,7 @@ const DOM = props => {
 		head,
 		initialState = {},
 		scripts,
+		globalHead,
 	} = props;
 
 	/**
@@ -59,6 +60,7 @@ const DOM = props => {
 	return (
 		<html>
 			<head>
+				{globalHead}
 				{head.title.toComponent()}
 				{head.meta.toComponent()}
 				{head.link.toComponent()}
@@ -90,6 +92,7 @@ DOM.propTypes = {
 	}),
 	initialState: PropTypes.object.isRequired,
 	scripts: PropTypes.array.isRequired,
+	globalHead: PropTypes.arrayOf(PropTypes.node),
 };
 
 export default DOM;
