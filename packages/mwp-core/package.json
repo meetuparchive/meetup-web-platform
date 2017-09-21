@@ -49,7 +49,6 @@
     "react": "15.6.1",
     "react-dom": "15.6.1",
     "react-intl": "2.3.0",
-    "redux-observable": "0.16.0",
     "rxjs": "5.4.3",
     "tough-cookie": "2.3.2"
   },
