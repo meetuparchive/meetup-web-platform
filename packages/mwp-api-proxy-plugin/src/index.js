@@ -6,6 +6,7 @@ import getApiProxyRoutes from './routes';
 import proxyApi$ from './proxy';
 
 import { API_ROUTE_PATH, API_PROXY_PLUGIN_NAME } from './config';
+export { API_ROUTE_PATH } from './config';
 
 /*
  * When response is sent, the plugin needs to delete any files that were
