@@ -21,6 +21,8 @@ import {
 	API_META_HEADER,
 } from './send';
 
+import { API_PROXY_PLUGIN_NAME } from '../config';
+
 jest.mock('uuid', () => ({ v4: () => 'test-uuid' }));
 
 const MOCK_HAPI_REQUEST = {
@@ -29,7 +31,7 @@ const MOCK_HAPI_REQUEST = {
 	headers: {},
 	state: {},
 	plugins: {
-		'api-proxy': {
+		[API_PROXY_PLUGIN_NAME]: {
 			uploads: [],
 		},
 		requestAuth: {},

@@ -49,7 +49,7 @@ export const getServer = () => {
 	};
 	server.settings.app = config;
 	server.plugins = {
-		'api-proxy': {
+		'mwp-api-proxy-plugin': {
 			duotoneUrls: [],
 		},
 	};

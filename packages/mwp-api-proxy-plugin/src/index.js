@@ -43,7 +43,7 @@ export default function register(
 	options: void,
 	next: () => void
 ) {
-	// supply duotone urls through `server.plugins['api-proxy'].duotoneUrls`
+	// supply duotone urls through `server.plugins['mwp-api-proxy-plugin'].duotoneUrls`
 	server.expose(
 		'duotoneUrls',
 		getDuotoneUrls(duotones, server.settings.app.photo_scaler_salt)
