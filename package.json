@@ -1,6 +1,6 @@
 {
   "name": "meetup-web-platform",
-  "version": "0.0.0",
+  "version": "7.1.1766",
   "description": "A collection of Node web application utilities developed for the Meetup web platform",
   "engineStrict": true,
   "engines": {
