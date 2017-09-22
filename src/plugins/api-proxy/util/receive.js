@@ -122,12 +122,8 @@ export const parseApiValue = ([response, body]) => {
 
 	try {
 		const value = parseBody(body);
-		if (response.statusCode < 200 || response.statusCode >= 500) {
+		if (response.statusCode < 200 || response.statusCode >= 400) {
 			return formatApiError(new Error(response.statusMessage), value);
-		}
-		if (response.statusCode >= 400) {
-			// Don't throw an error for 400s for now (maybe forever?)
-			return formatApiError({ message: response.statusMessage }, value);
 		}
 		if (value && value.problem) {
 			return formatApiError(
