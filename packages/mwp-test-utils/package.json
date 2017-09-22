@@ -1,0 +1,47 @@
+{
+  "name": "mwp-test-utils",
+  "version": "0.0.1",
+  "description": "Helpers for running unit tests in MWP apps",
+  "engineStrict": true,
+  "engines": {
+    "node": ">=8.1.0"
+  },
+  "main": "./lib/index.js",
+  "scripts": {
+    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps",
+    "flow": "flow",
+    "lint": "eslint . --ext .js,.jsx --fix",
+    "test": "yarn run test:unit",
+    "test:unit": "NODE_ENV=test jest --config jest.config.json",
+    "test:watch": "yarn test:unit -- --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meetup/meetup-web-platform.git"
+  },
+  "author": "Meetup",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/meetup/meetup-web-platform/issues"
+  },
+  "homepage": "https://github.com/meetup/meetup-web-platform#readme",
+  "dependencies": {
+    "electrode-csrf-jwt": "1.2.1",
+    "hapi": "16.5.2",
+    "inert": "4.2.1",
+    "meetup-web-mocks": "1.0.217",
+    "mwp-cli": "1.1.129",
+    "mwp-core": ">=0.0.1",
+    "mwp-store": ">=0.0.1",
+    "mwp-router": ">=0.0.1",
+    "mwp-logger-plugin": ">=0.0.1",
+    "react-helmet": "5.2.0",
+    "redux": "3.7.2",
+    "rxjs": "5.4.3",
+    "tough-cookie": "2.3.2"
+  },
+  "devDependencies": {
+    "flow-bin": "0.49.1",
+    "jest": "20.0.4"
+  }
+}

@@ -1,9 +1,9 @@
 import querystring from 'querystring';
 import Boom from 'boom';
 import rison from 'rison';
-import { getCsrfHeaders } from '../mocks';
-import start from '../../src/app-server';
-import * as apiProxyHandler from '../../src/plugins/api-proxy/handler';
+import { getCsrfHeaders } from 'mwp-test-utils/lib/mocks';
+import start from 'mwp-app-server';
+import * as apiProxyHandler from 'mwp-api-proxy/lib/handler';
 
 const mockQuery = { type: 'foo', params: {}, ref: 'foo', endpoint: 'foo' };
 const queries = rison.encode_array([mockQuery]);

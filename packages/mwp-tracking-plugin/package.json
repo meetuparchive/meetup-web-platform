@@ -1,0 +1,43 @@
+{
+  "name": "mwp-tracking-plugin",
+  "version": "0.0.1",
+  "description": "Data collection for MWP apps, including activity and click tracking",
+  "engineStrict": true,
+  "engines": {
+    "node": ">=8.1.0"
+  },
+  "main": "./lib/index.js",
+  "scripts": {
+    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps",
+    "lint": "eslint . --ext .js,.jsx --fix",
+    "test": "yarn run test:unit",
+    "test:unit": "NODE_ENV=test jest --config jest.config.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meetup/meetup-web-platform.git"
+  },
+  "author": "Meetup",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/meetup/meetup-web-platform/issues"
+  },
+  "homepage": "https://github.com/meetup/meetup-web-platform#readme",
+  "dependencies": {
+    "@google-cloud/pubsub": "0.14.0",
+    "avsc": "5.0.5",
+    "js-cookie": "2.1.4",
+    "mwp-logger-plugin": ">=0.0.1",
+    "qs": "6.5.0",
+    "rison": "0.1.1",
+    "url": "0.11.0",
+    "uuid": "3.1.0"
+  },
+  "devDependencies": {
+    "flow-bin": "0.49.1",
+    "jest": "20.0.4"
+  },
+  "peerDependencies": {
+    "hapi-pino": "1.7.0"
+  }
+}
