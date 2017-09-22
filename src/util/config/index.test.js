@@ -45,13 +45,6 @@ describe('validateServerHost', () => {
 		expect(() => validateServerHost('foo.bar.com')).not.toThrow();
 		process.env.NODE_ENV = _env; // restore original env value
 	});
-	it('throws error for dev in prod', () => {
-		const _env = process.env.NODE_ENV; // cache the 'real' value to restore later
-		process.env.NODE_ENV = 'development';
-		expect(() => validateServerHost('foo.dev.bar.com')).not.toThrow();
-		expect(() => validateServerHost('foo.bar.com')).toThrow();
-		process.env.NODE_ENV = _env; // restore original env value
-	});
 });
 
 describe('config', () => {
