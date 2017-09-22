@@ -197,26 +197,23 @@ export const makeLogResponse = request => ([response, body]) => {
 		(method.toLowerCase() === 'get' && statusCode >= 400) // something fishy with a GET
 	) {
 		// use console.error or console.warn to highlight these cases in Stackdriver
-		const errorMessageString = JSON.stringify({
-			message: 'REST API error response',
-			info: {
-				url: href,
-				query: parsedQuery,
-				method,
-				id,
-				statusCode,
-				time: elapsedTime,
-				originRequestId: request.id,
-				body,
-			},
-		});
-
 		// Only want to warn about 400s for now (maybe forever?)
-		if (statusCode < 500) {
-			console.warn(errorMessageString);
-		} else {
-			console.error(errorMessageString);
-		}
+		const logError = statusCode < 500 ? console.warn : console.error;
+		logError(
+			JSON.stringify({
+				message: 'REST API error response',
+				info: {
+					url: href,
+					query: parsedQuery,
+					method,
+					id,
+					statusCode,
+					time: elapsedTime,
+					originRequestId: request.id,
+					body,
+				},
+			})
+		);
 	}
 	const logger = request.server.app.logger;
 	// production logs will automatically be JSON-parsed in Stackdriver
