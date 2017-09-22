@@ -1,0 +1,55 @@
+{
+  "name": "mwp-app-render",
+  "version": "0.0.1",
+  "description": "MWP application rendering tools",
+  "engineStrict": true,
+  "engines": {
+    "node": ">=8.1.0"
+  },
+  "main": "./lib/index.js",
+  "scripts": {
+    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps",
+    "flow": "flow",
+    "lint": "eslint . --ext .js,.jsx --fix",
+    "test": "yarn run test:unit",
+    "test:unit": "NODE_ENV=test jest --config jest.config.json",
+    "test:watch": "yarn test:unit -- --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meetup/meetup-web-platform.git"
+  },
+  "author": "Meetup",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/meetup/meetup-web-platform/issues"
+  },
+  "homepage": "https://github.com/meetup/meetup-web-platform#readme",
+  "peerDependencies": {
+    "prop-types": "15.5.10",
+    "react": "15.6.1",
+    "react-helmet": "5.2.0",
+    "react-redux": "5.0.6",
+    "react-router-dom": "4.2.2",
+    "redux": "3.7.2"
+  },
+  "dependencies": {
+    "escape-html": "1.0.3",
+    "mwp-router": ">=*.*.*"
+  },
+  "devDependencies": {
+    "enzyme": "2.9.1",
+    "flow-bin": "0.49.1",
+    "jest": "20.0.4",
+    "joi": "10.6.0",
+    "meetup-web-mocks": "1.0.217",
+    "prop-types": "15.5.10",
+    "react": "15.6.1",
+    "react-dom": "15.6.1",
+    "react-helmet": "5.2.0",
+    "react-redux": "5.0.6",
+    "react-router-dom": "4.2.2",
+    "react-test-renderer": "15.6.1",
+    "redux": "3.7.2"
+  }
+}

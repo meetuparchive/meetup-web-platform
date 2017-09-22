@@ -1,8 +1,8 @@
-import { mockConfig } from '../mocks';
-import start from '../../src/app-server';
-import * as appRouteHandler from '../../src/plugins/app-route/handler';
+import { mockConfig } from 'mwp-test-utils';
+import start from 'mwp-app-server';
+import * as appRouteHandler from 'mwp-app-route/lib/handler';
 
-jest.mock('../../src/plugins/tracking/util/avro'); // will spy on calls to this
+jest.mock('mwp-tracking-plugin/lib/util/avro'); // will spy on calls to this
 
 describe('General server startup tests', () => {
 	it('starts the server', () => {
@@ -114,7 +114,7 @@ describe('Cookie setting', () => {
 		const routes = [fooRoute];
 		// spyOn(config, 'default').and.returnValue(Promise.resolve({}));
 		return start({}, { routes }, mockConfig).then(server => {
-			const avro = require('../../src/plugins/tracking/util/avro');
+			const avro = require('mwp-tracking-plugin/lib/util/avro');
 			avro.loggers.click.mockReturnValue('mocked clicktracking log');
 			const request = {
 				method: 'get',

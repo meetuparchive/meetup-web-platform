@@ -1,3 +1,20 @@
+## [8.0]
+
+- **All 'internal' packages now published independently:
+   - `mwp-api-proxy-plugin`
+   - `mwp-api-state`
+   - `mwp-app-render`
+   - `mwp-app-route-plugin`
+   - `mwp-app-server`
+   - `mwp-auth-plugin`
+   - `mwp-core`
+   - `mwp-language-plugin`
+   - `mwp-router`
+   - `mwp-store`
+   - `mwp-sw-plugin`
+   - `mwp-tracking-plugin`
+   - `mwp-test-utils`
+
 ## [7.1]
 
 - **Feature**: Pass in an array of string `cssLinks` to `makeServerRenderer$` in
