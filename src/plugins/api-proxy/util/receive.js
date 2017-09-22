@@ -122,7 +122,7 @@ export const parseApiValue = ([response, body]) => {
 
 	try {
 		const value = parseBody(body);
-		if (response.statusCode < 200 || response.statusCode > 399) {
+		if (response.statusCode < 200 || response.statusCode >= 400) {
 			return formatApiError(new Error(response.statusMessage), value);
 		}
 		if (value && value.problem) {
@@ -196,12 +196,10 @@ export const makeLogResponse = request => ([response, body]) => {
 		statusCode >= 500 || // REST API had an internal error
 		(method.toLowerCase() === 'get' && statusCode >= 400) // something fishy with a GET
 	) {
-		if (statusCode === 400) {
-			console.info(`swallowing 400 error for ${pathname}`);
-			return;
-		}
-		// use console.error to highlight these cases in Stackdriver
-		console.error(
+		// use console.error or console.warn to highlight these cases in Stackdriver
+		// Only want to warn about 400s for now (maybe forever?)
+		const logError = statusCode < 500 ? console.warn : console.error;
+		logError(
 			JSON.stringify({
 				message: 'REST API error response',
 				info: {
@@ -219,8 +217,8 @@ export const makeLogResponse = request => ([response, body]) => {
 	}
 	const logger = request.server.app.logger;
 	// production logs will automatically be JSON-parsed in Stackdriver
-	const log = ((statusCode >= 400 && logger.error) ||
-		(statusCode >= 300 && logger.warn) ||
+	const log = ((statusCode >= 500 && logger.error) ||
+		(statusCode >= 400 && logger.warn) ||
 		logger.info)
 		.bind(logger);
 
