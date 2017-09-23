@@ -1,12 +1,10 @@
-import bunyan from 'bunyan';
 import logger from './logger';
 
 const onRequestError = (request, err) => {
 	logger.error(
 		{
-			err: err.stack,
-			req: bunyan.stdSerializers.req(request.raw.req),
-			res: bunyan.stdSerializers.res(request.raw.res),
+			err,
+			...request.raw,
 		},
 		`500 Internal server error: ${err.message}`
 	);
