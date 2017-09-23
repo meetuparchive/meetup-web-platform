@@ -25,10 +25,6 @@ const testServer = test => {
 describe('mwp logger', () => {
 	it('sets server.app.logger', () => {
 		testServer(response => {
-			response.request.server.app.logger.info({ foo: 'bar' }, 'asdfasd');
-			response.request.server.app.logger.info(response.request.raw, 'asdfasd');
-			response.request.server.app.logger.error(new Error('asdfasd'), 'asdfasd');
-			response.request.server.app.logger.debug({ foo: 'bar' }, 'asdfasd');
 			expect(response.request.server.app.logger).toBeDefined();
 		});
 	});
