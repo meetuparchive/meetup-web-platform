@@ -1,25 +1,28 @@
-import pino from 'pino';
-import HapiPino from 'hapi-pino';
+import bunyan from 'bunyan';
 import logger from './logger';
 
 const onRequestError = (request, err) => {
-	console.error(
-		JSON.stringify({
+	logger.error(
+		{
 			err: err.stack,
-			req: pino.stdSerializers.req(request.raw.req),
-			res: pino.stdSerializers.res(request.raw.res),
-			message: `500 Internal server error: ${err.message}`,
-		})
+			req: bunyan.stdSerializers.req(request.raw.req),
+			res: bunyan.stdSerializers.res(request.raw.res),
+		},
+		`500 Internal server error: ${err.message}`
 	);
 };
 
-const register = (server, options, next) => {
-	options = options || { logEvents: ['onPostStart', 'onPostStop', 'response'] };
-	options.instance = logger;
+export default function register(server, options, next) {
+	// options = options || { logEvents: ['onPostStart', 'onPostStop', 'response'] };
 	server.on('request-error', onRequestError);
-	return HapiPino.register(server, options, next);
-};
-register.attributes = HapiPino.register.attributes;
+	server.app.logger = logger;
 
-export default register;
+	next();
+}
+
+register.attributes = {
+	name: 'mwp-logger-plugin',
+	version: '1.0.0',
+};
+
 export { default as logger } from './logger'; // named export for easy import
