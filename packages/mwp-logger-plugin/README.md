@@ -1,17 +1,10 @@
 # Logging
 
-We use [Pino](https://github.com/pinojs/pino) for server-side logging in the
-platform, which provides nicely formatted logs in development and JSON-encoded
-logs for production.
+We use [Bunyan](https://github.com/trentm/node-bunyan) for server-side logging
+in the platform, which provides JSON-encoded logs for production and a pretty-
+printing CLI for dev.
 
 ## Usage
-
-**Do not use in browser-loaded modules** - use `console.log/warn/error` instead.
-
-Basic usage is described in the [Pino usage
-docs](https://github.com/pinojs/pino#usage), but the tl;dr is that the basic
-[Log4j log levels](https://en.wikipedia.org/wiki/Log4j#Log4j_log_levels) are all
-supported with corresponding `logger[level]` methods.
 
 In general, server code should prefer to access the logger through the Hapi
 server instance at `server.app.logger`.
@@ -38,10 +31,9 @@ instance can also be imported directly at the cost of function purity and
 slightly more complex unit testing configuration to mock the logger module.
 
 ```js
-import logger from '../util/logger';
+import logger from 'mwp-logger-plugin/lib/logger';
 
 function doStuff() {
   logger.info('Hello stuff');
 }
 ```
-
