@@ -1,9 +1,4 @@
 {
-  "collectCoverageFrom": [
-    "src/**/*.{js,jsx}",
-    "!**/{node_modules,lib,coverage,scripts}/**"
-  ],
-  "coverageDirectory": "<rootDir>/coverage",
   "moduleFileExtensions": [
     "js",
     "jsx",
