@@ -11,7 +11,8 @@ const onRequestError = (request, err) => {
 };
 
 export default function register(server, options, next) {
-	// options = options || { logEvents: ['onPostStart', 'onPostStop', 'response'] };
+	// might also want to add default logging for 'onPostStart', 'onPostStop',
+	//'response' in the future
 	server.on('request-error', onRequestError);
 	server.app.logger = logger;
 
