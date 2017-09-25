@@ -9,6 +9,12 @@ import * as receive from './util/receive';
 
 import apiProxy$ from './proxy';
 
+jest.mock('mwp-cli/src/config', () => {
+	const config = require.requireActual('mwp-cli/src/config');
+	config.package = { agent: 'TEST_AGENT ' };
+	return config;
+});
+
 const MOCK_HAPI_REQUEST = {
 	headers: {},
 	state: { oauth_token: 'asdfasd' },

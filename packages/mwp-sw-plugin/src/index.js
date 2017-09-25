@@ -1,4 +1,5 @@
 // @flow
+// $FlowFixMe
 const buildPaths = require('mwp-cli/src/config').paths;
 const path = require('path');
 

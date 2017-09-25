@@ -5,6 +5,12 @@ import CsrfPlugin from 'electrode-csrf-jwt';
 
 import { getServer } from 'mwp-test-utils';
 
+jest.mock('mwp-cli/src/config', () => {
+	const config = require.requireActual('mwp-cli/src/config');
+	config.package = { agent: 'TEST_AGENT ' };
+	return config;
+});
+
 function getResponse(injectRequest, server = getServer()) {
 	// a Promise that returns the server instance after it has been
 	// configured with the routes being tested
