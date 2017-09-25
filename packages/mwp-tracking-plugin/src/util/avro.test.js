@@ -7,7 +7,9 @@ jest.mock('@google-cloud/pubsub', () => {
 	const publish = jest.fn(() => Promise.resolve('okay!'));
 	const main = jest.fn(() => ({
 		topic: jest.fn(() => ({
-			publish,
+			publisher: () => ({
+				publish,
+			}),
 		})),
 	}));
 	main.publish = publish; // hook to make publish calls visible to calling test
