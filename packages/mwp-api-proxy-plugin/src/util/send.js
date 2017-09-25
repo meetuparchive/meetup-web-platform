@@ -14,6 +14,8 @@ import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/timeout';
 
+import config from 'mwp-cli/src/config';
+
 import { API_PROXY_PLUGIN_NAME } from '../config';
 
 export const API_META_HEADER = 'X-Meta-Request-Headers';
@@ -183,6 +185,7 @@ export function parseRequestHeaders(request) {
 		...getAuthHeaders(request),
 		'accept-language': getLanguageHeader(request),
 		...getClientIpHeader(request),
+		'x-meetup-agent': config.package.agent,
 	};
 
 	delete externalRequestHeaders['host']; // let app server set 'host'
