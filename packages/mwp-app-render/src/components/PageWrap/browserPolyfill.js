@@ -4,18 +4,13 @@
  */
 export function polyfillServiceUrl(localeCode) {
 	const features = [
+		'default-3.6',
 		'fetch', // IE, Safari
 		'Intl',
 		`Intl.~locale.${localeCode}`,
-		'Promise',
-		'URL',
 		'Array.prototype.find', // IE
 		'Array.prototype.includes', // IE
-		'Array.from', // IE
 		'Object.values', // IE, Safari
-		'String.prototype.endsWith', // IE
-		'String.prototype.startsWith', // IE
-		'String.prototype.includes', // IE
 	];
 	const flags = [
 		'gated', // use feature detection in addition to user agent test
