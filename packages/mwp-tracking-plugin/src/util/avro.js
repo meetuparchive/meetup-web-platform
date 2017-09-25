@@ -21,9 +21,9 @@ const getPlatformAnalyticsLog = (
 		const pubsub = require('@google-cloud/pubsub')({
 			projectId: 'meetup-prod',
 		});
-		const analyticsLog = pubsub.topic('analytics-log-json');
+		const publisher = pubsub.topic('analytics-log-json').publisher();
 		return (serializedRecord: string) => {
-			analyticsLog.publish(serializedRecord).then(
+			publisher.publish(new Buffer(serializedRecord)).then(
 				(messageIds, apiResponse) => {
 					if (messageIds) {
 						log.info({ messageIds }, 'GAE PubSub');
