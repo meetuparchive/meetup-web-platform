@@ -30,7 +30,7 @@
     "hapi": "16.5.2",
     "inert": "4.2.1",
     "meetup-web-mocks": "1.0.217",
-    "mwp-cli": "1.1.129",
+    "mwp-cli": "1.1.130",
     "mwp-core": ">=0.0.1",
     "mwp-store": ">=0.0.1",
     "mwp-router": ">=0.0.1",
