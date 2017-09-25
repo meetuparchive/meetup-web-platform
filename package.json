@@ -14,10 +14,9 @@
   },
   "scripts": {
     "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps",
-    "flow": "flow",
     "lint": "eslint . --ext .js,.jsx --fix",
     "precommit": "lint-staged",
-    "test": "yarn run flow && lerna run test --stream",
+    "test": "lerna run flow && lerna run test --stream",
     "test:integration": "NODE_ENV=test jest --config jest.int.config.json"
   },
   "repository": {
@@ -54,7 +53,7 @@
     "iron": "4.0.5",
     "jest": "20.0.4",
     "lint-staged": "4.0.1",
-    "mwp-cli": "1.1.129",
+    "mwp-cli": "1.1.130",
     "node-fetch": "1.7.2",
     "prettier": "1.5.2",
     "querystring": "0.2.0",

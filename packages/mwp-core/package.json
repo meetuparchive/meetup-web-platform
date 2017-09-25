@@ -31,7 +31,7 @@
     "joi": "10.6.0",
     "mwp-api-proxy-plugin": ">=*.*.*",
     "mwp-app-render": ">=*.*.*",
-    "mwp-cli": "1.1.129",
+    "mwp-cli": "1.1.130",
     "mwp-logger-plugin": ">=*.*.*",
     "mwp-store": ">=*.*.*",
     "mwp-router": ">=*.*.*",
