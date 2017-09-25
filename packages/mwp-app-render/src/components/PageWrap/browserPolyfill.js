@@ -12,6 +12,7 @@ export function polyfillServiceUrl(localeCode) {
 		'Array.prototype.find', // IE
 		'Array.prototype.includes', // IE
 		'Array.from', // IE
+		'Object.values', // IE, Safari
 		'String.prototype.endsWith', // IE
 		'String.prototype.startsWith', // IE
 		'String.prototype.includes', // IE
