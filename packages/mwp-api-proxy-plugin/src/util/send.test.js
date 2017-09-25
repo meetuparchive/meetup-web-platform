@@ -24,6 +24,11 @@ import {
 import { API_PROXY_PLUGIN_NAME } from '../config';
 
 jest.mock('uuid', () => ({ v4: () => 'test-uuid' }));
+jest.mock('mwp-cli/src/config', () => {
+	const config = require.requireActual('mwp-cli/src/config');
+	config.package = { agent: 'TEST_AGENT ' };
+	return config;
+});
 
 const MOCK_HAPI_REQUEST = {
 	server: getServer(),
