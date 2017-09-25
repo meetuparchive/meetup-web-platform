@@ -17,15 +17,15 @@ export const getLogger: string => (Object, Object) => mixed = (
 	agent: string
 ) => (request: Object, trackInfo: Object) => {
 	const requestHeaders = request.headers;
-	
+
 	// Takes in desired time to convert and applies offset
-	const offset: String = new Date().getTimezoneOffset() * 60000; // gets detected timezone + converts to milliseconds
-	const nowUTC: Date = new Date(Date.now() + offset);
+	const offset = new Date().getTimezoneOffset() * 60000; // gets detected timezone + converts to milliseconds
+	const nowUTC = new Date(Date.now() + offset);
 
 	// generates new date object taking the time in milliseconds and
 	// adds the runtime environment's timezone offset
-	const NY_OFFSET: String = -14400000;
-	const newNow: Date = new Date(nowUTC.getTime() - NY_OFFSET);
+	const NY_OFFSET = -14400000;
+	const newNow = new Date(nowUTC.getTime() - NY_OFFSET);
 
 	const record = {
 		timestamp: newNow.toISOString(),
