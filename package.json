@@ -16,7 +16,7 @@
     "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps",
     "lint": "eslint . --ext .js,.jsx --fix",
     "precommit": "lint-staged",
-    "test": "lerna run flow && lerna run test --stream",
+    "test": "lerna bootstrap && lerna run build && lerna run flow && lerna run test --stream",
     "test:integration": "NODE_ENV=test jest --config jest.int.config.json"
   },
   "repository": {
