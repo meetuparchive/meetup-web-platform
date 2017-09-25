@@ -1,7 +1,7 @@
 import Helmet from 'react-helmet';
-import { getMockRenderRequestMap } from '../mocks';
-import start from '../../src/app-server';
-import { Forbidden, NotFound, Redirect } from '../../src/router';
+import { getMockRenderRequestMap } from 'mwp-test-utils/lib/mocks';
+import start from 'mwp-app-server';
+import { Forbidden, NotFound, Redirect } from 'mwp-router';
 
 Forbidden.rewind = jest.fn(Forbidden.rewind);
 NotFound.rewind = jest.fn(NotFound.rewind);

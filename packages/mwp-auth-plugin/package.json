@@ -1,0 +1,42 @@
+{
+  "name": "mwp-auth-plugin",
+  "version": "0.0.1",
+  "description": "Hapi plugin providing user authentication for MWP apps",
+  "engineStrict": true,
+  "engines": {
+    "node": ">=8.1.0"
+  },
+  "main": "./lib/index.js",
+  "scripts": {
+    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps",
+    "flow": "flow",
+    "lint": "eslint . --ext .js,.jsx --fix",
+    "test": "yarn run test:unit",
+    "test:unit": "NODE_ENV=test jest --config jest.config.json",
+    "test:watch": "yarn test:unit -- --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meetup/meetup-web-platform.git"
+  },
+  "author": "Meetup",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/meetup/meetup-web-platform/issues"
+  },
+  "homepage": "https://github.com/meetup/meetup-web-platform#readme",
+  "peerDependencies": {
+    "rxjs": "5.4.3"
+  },
+  "dependencies": {
+    "mwp-logger-plugin": ">=*.*.*",
+    "joi": "10.6.0"
+  },
+  "devDependencies": {
+    "flow-bin": "0.49.1",
+    "jest": "20.0.4",
+    "mwp-test-utils": ">=*.*.*",
+    "node-fetch": "1.7.2",
+    "rxjs": "5.4.3"
+  }
+}

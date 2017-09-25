@@ -1,0 +1,61 @@
+{
+  "name": "mwp-core",
+  "version": "0.0.1",
+  "description": "Core utilities for MWP apps",
+  "engineStrict": true,
+  "engines": {
+    "node": ">=8.1.0"
+  },
+  "main": "./lib/index.js",
+  "scripts": {
+    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps",
+    "flow": "flow",
+    "lint": "eslint . --ext .js,.jsx --fix",
+    "test": "yarn run test:unit",
+    "test:unit": "NODE_ENV=test jest --config jest.config.json",
+    "test:watch": "yarn test:unit -- --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meetup/meetup-web-platform.git"
+  },
+  "author": "Meetup",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/meetup/meetup-web-platform/issues"
+  },
+  "homepage": "https://github.com/meetup/meetup-web-platform#readme",
+  "dependencies": {
+    "@google-cloud/pubsub": "0.13.1",
+    "intl": "1.2.5",
+    "joi": "10.6.0",
+    "mwp-api-proxy-plugin": ">=*.*.*",
+    "mwp-app-render": ">=*.*.*",
+    "mwp-cli": "1.1.130",
+    "mwp-logger-plugin": ">=*.*.*",
+    "mwp-store": ">=*.*.*",
+    "mwp-router": ">=*.*.*",
+    "node-fetch": "1.7.2",
+    "pino": "4.7.1",
+    "qs": "6.5.0"
+  },
+  "devDependencies": {
+    "flow-bin": "0.49.1",
+    "hapi": "16.5.2",
+    "intl-messageformat": "2.1.0",
+    "intl-relativeformat": "2.0.0",
+    "jest": "20.0.4",
+    "meetup-web-mocks": "1.0.217",
+    "react": "15.6.1",
+    "react-dom": "15.6.1",
+    "react-intl": "2.3.0",
+    "rxjs": "5.4.3",
+    "tough-cookie": "2.3.2"
+  },
+  "peerDependencies": {
+    "react": "15.6.1",
+    "react-dom": "15.6.1",
+    "react-helmet": "5.2.0",
+    "react-intl": "2.3.0"
+  }
+}

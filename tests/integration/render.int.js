@@ -3,10 +3,10 @@ import {
 	FOO_INDEX_CONTENT,
 	EXTERNAL_REDIRECT_URL,
 	INTERNAL_REDIRECT_PATH,
-} from '../mockApp';
-import { getMockRenderRequestMap } from '../mocks';
-import start from '../../src/app-server';
-import { fooPathContent } from '../MockContainer';
+} from 'mwp-test-utils/lib/mockApp';
+import { getMockRenderRequestMap } from 'mwp-test-utils/lib/mocks';
+import start from 'mwp-app-server';
+import { fooPathContent } from 'mwp-test-utils/lib/MockContainer';
 
 // mock request just to ensure no external calls are made
 // ** Use getMockFetch to mock an API endpoint response **
