@@ -31,6 +31,6 @@ register.attributes = {
 	name: CLICK_PLUGIN_NAME,
 	version: '1.0.0',
 	dependencies: [
-		'hapi-pino', // provides server.app.logger
+		'mwp-logger-plugin', // provides server.app.logger
 	],
 };

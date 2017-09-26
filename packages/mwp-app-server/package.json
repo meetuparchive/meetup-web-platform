@@ -28,7 +28,6 @@
   "dependencies": {
     "electrode-csrf-jwt": "1.2.1",
     "hapi": "16.5.2",
-    "hapi-pino": "1.7.0",
     "inert": "4.2.1",
     "mwp-api-proxy-plugin": ">=*.*.*",
     "mwp-app-route-plugin": ">=*.*.*",
