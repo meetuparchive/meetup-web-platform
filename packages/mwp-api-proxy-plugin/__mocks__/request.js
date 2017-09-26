@@ -51,6 +51,7 @@ const request = jest.fn((requestOpts, cb) => {
 });
 request.post = jest.fn(request);
 request.jar = actual_request.jar;
+request.defaults = actual_request.defaults;
 
 request.__setMockResponse = (response, body) => {
 	mockResponse = response || mockResponse;
