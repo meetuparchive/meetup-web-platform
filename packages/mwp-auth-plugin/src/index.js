@@ -138,7 +138,7 @@ export function getAnonymousCode$(serverAppConfig, redirect_uri) {
 						info: {
 							url: serverAppConfig.oauth.auth_url,
 							method: 'get',
-							responseTime: new Date() - startTime,
+							elapsedTime: new Date() - startTime,
 						},
 					},
 					`Incoming response GET ${serverAppConfig.oauth.auth_url}`
@@ -228,7 +228,7 @@ export const getAccessToken$ = (serverAppConfig, redirect_uri) => {
 							info: {
 								url: serverAppConfig.oauth.access_url,
 								method: 'get',
-								responseTime: new Date() - startTime,
+								elapsedTime: new Date() - startTime,
 							},
 						},
 						`Incoming response GET ${serverAppConfig.oauth

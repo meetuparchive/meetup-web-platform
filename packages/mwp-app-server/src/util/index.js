@@ -61,7 +61,7 @@ export function logResponse(request) {
 			method,
 			referrer: info.referrer,
 			remoteAddress: info.remoteAddress,
-			time: info.responded - info.received,
+			elapsedTime: info.responded - info.received,
 			href: url.href,
 		},
 		`Outgoing response ${method.toUpperCase()} ${url.pathname} ${response.statusCode}`
