@@ -44,7 +44,7 @@ ShallowWrapper {
             name="verify-v1"
         />
         <script
-            src="https://cdn.polyfill.io/v2/polyfill.min.js?features=fetch,Intl,Intl.~locale.en-US,Promise,URL,Array.prototype.find,Array.prototype.includes,Array.from,String.prototype.endsWith,String.prototype.startsWith,String.prototype.includes&flags=gated"
+            src="https://cdn.polyfill.io/v2/polyfill.min.js?features=default-3.6,fetch,Intl,Intl.~locale.en-US,Array.prototype.find,Array.prototype.includes,Object.values&flags=gated"
             type="text/javascript"
         />
         <script
@@ -113,7 +113,7 @@ ShallowWrapper {
                   name="verify-v1"
             />
             <script
-                  src="https://cdn.polyfill.io/v2/polyfill.min.js?features=fetch,Intl,Intl.~locale.en-US,Promise,URL,Array.prototype.find,Array.prototype.includes,Array.from,String.prototype.endsWith,String.prototype.startsWith,String.prototype.includes&flags=gated"
+                  src="https://cdn.polyfill.io/v2/polyfill.min.js?features=default-3.6,fetch,Intl,Intl.~locale.en-US,Array.prototype.find,Array.prototype.includes,Object.values&flags=gated"
                   type="text/javascript"
             />
             <script
@@ -255,7 +255,7 @@ ShallowWrapper {
                               name="verify-v1"
                     />
                     <script
-                              src="https://cdn.polyfill.io/v2/polyfill.min.js?features=fetch,Intl,Intl.~locale.en-US,Promise,URL,Array.prototype.find,Array.prototype.includes,Array.from,String.prototype.endsWith,String.prototype.startsWith,String.prototype.includes&flags=gated"
+                              src="https://cdn.polyfill.io/v2/polyfill.min.js?features=default-3.6,fetch,Intl,Intl.~locale.en-US,Array.prototype.find,Array.prototype.includes,Object.values&flags=gated"
                               type="text/javascript"
                     />
                     <script
@@ -324,7 +324,7 @@ ShallowWrapper {
                               name="verify-v1"
                     />
                     <script
-                              src="https://cdn.polyfill.io/v2/polyfill.min.js?features=fetch,Intl,Intl.~locale.en-US,Promise,URL,Array.prototype.find,Array.prototype.includes,Array.from,String.prototype.endsWith,String.prototype.startsWith,String.prototype.includes&flags=gated"
+                              src="https://cdn.polyfill.io/v2/polyfill.min.js?features=default-3.6,fetch,Intl,Intl.~locale.en-US,Array.prototype.find,Array.prototype.includes,Object.values&flags=gated"
                               type="text/javascript"
                     />
                     <script
