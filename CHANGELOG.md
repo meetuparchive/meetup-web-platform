@@ -1,6 +1,10 @@
+## [8.1]
+
+- `mwp-log` now contains nicely-formatted logs
+
 ## [8.0]
 
-- **All 'internal' packages now published independently:
+- **All 'internal' packages now published independently**:
    - `mwp-api-proxy-plugin`
    - `mwp-api-state`
    - `mwp-app-render`
