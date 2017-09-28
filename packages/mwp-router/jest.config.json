@@ -9,6 +9,9 @@
     "jsx",
     "json"
   ],
+  "snapshotSerializers": [
+    "enzyme-to-json/serializer"
+  ],
   "setupFiles": [
     "<rootDir>/src/util/globals.js"
   ],

@@ -31,10 +31,11 @@
   "devDependencies": {
     "babel-jest": "21.0.0",
     "enzyme": "2.9.1",
+    "enzyme-to-json": "2.0.1",
     "flow-bin": "0.49.1",
     "jest": "20.0.4",
-    "mwp-test-utils": ">=*.*.*",
     "mwp-auth-plugin": ">=*.*.*",
+    "mwp-test-utils": ">=*.*.*",
     "prop-types": "15.5.10",
     "react": "15.6.1",
     "react-dom": "15.6.1",

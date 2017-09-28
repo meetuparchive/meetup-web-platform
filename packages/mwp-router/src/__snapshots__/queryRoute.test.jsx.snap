@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`QueryRoute renders child when querystring contains param with specified value 1`] = `<Dummy />`;
+
+exports[`QueryRoute renders child when querystring contains param with specified value 2`] = `<Dummy />`;
+
+exports[`QueryRoute renders child when querystring contains param, no value specified 1`] = `<Dummy />`;
+
+exports[`QueryRoute renders child when querystring contains param, no value specified 2`] = `<Dummy />`;
+
+exports[`QueryRoute renders child when querystring contains param, no value specified 3`] = `<Dummy />`;
