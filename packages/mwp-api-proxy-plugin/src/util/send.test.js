@@ -34,7 +34,7 @@ const MOCK_HAPI_REQUEST = {
 	server: getServer(),
 	method: 'get',
 	headers: {},
-	params: {},
+	query: {},
 	state: {},
 	plugins: {
 		[API_PROXY_PLUGIN_NAME]: {
@@ -84,7 +84,7 @@ describe('getClientIpHeader', () => {
 			headers: {
 				'fastly-client-ip': '127.0.0.1',
 			},
-			params: {},
+			query: {},
 		};
 		expect(getClientIpHeader(request)).toEqual(clientIpHeader);
 	});
@@ -93,7 +93,7 @@ describe('getClientIpHeader', () => {
 			'X-Meetup-Client-Ip': '127.0.0.2',
 		};
 		const request = {
-			params: {
+			query: {
 				_set_geoip: '127.0.0.2',
 			},
 			headers: {},
@@ -104,7 +104,7 @@ describe('getClientIpHeader', () => {
 	it('Does not set the header if fastly-client-ip or query param is not set', () => {
 		const request = {
 			headers: {},
-			params: {},
+			query: {},
 		};
 		expect(getClientIpHeader(request)).toBeUndefined();
 	});
@@ -169,7 +169,7 @@ describe('buildRequestArgs', () => {
 		const query = {
 			endpoint: 'foo',
 			type: 'bar',
-			params: {
+			query: {
 				foo: 'bar',
 			},
 			flags: ['asdf'],
@@ -186,7 +186,7 @@ describe('buildRequestArgs', () => {
 		const query = {
 			endpoint: 'foo',
 			type: 'bar',
-			params: {
+			query: {
 				foo: 'bar',
 			},
 			meta: {
