@@ -169,7 +169,7 @@ describe('buildRequestArgs', () => {
 		const query = {
 			endpoint: 'foo',
 			type: 'bar',
-			query: {
+			param: {
 				foo: 'bar',
 			},
 			flags: ['asdf'],
@@ -186,7 +186,7 @@ describe('buildRequestArgs', () => {
 		const query = {
 			endpoint: 'foo',
 			type: 'bar',
-			query: {
+			param: {
 				foo: 'bar',
 			},
 			meta: {
