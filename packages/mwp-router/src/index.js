@@ -4,6 +4,7 @@ export { default as NotFound } from './NotFound';
 export { default as Redirect } from './Redirect';
 export { default as RouteLayout } from './RouteLayout';
 export { default as SyncContainer } from './SyncContainer';
+export { default as QueryRoute } from './QueryRoute';
 export {
 	LOCATION_CHANGE,
 	SERVER_RENDER,
