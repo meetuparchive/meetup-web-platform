@@ -17,6 +17,7 @@ jest.mock('mwp-cli/src/config', () => {
 
 const MOCK_HAPI_REQUEST = {
 	headers: {},
+	query: {},
 	state: { oauth_token: 'asdfasd' },
 	server: getServer(),
 	getLanguage: () => 'en-US',
@@ -27,6 +28,7 @@ describe('apiProxy$', () => {
 	it('returns an observable that emits an array of results', () => {
 		const getRequest = {
 			headers: {},
+			query: {},
 			method: 'get',
 			state: {
 				oauth_token: 'foo',
