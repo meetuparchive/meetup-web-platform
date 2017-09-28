@@ -85,7 +85,8 @@ export const buildRequestArgs = externalRequestOpts => ({
 }) => {
 	const dataParams = querystring.stringify(params);
 	const headers = { ...externalRequestOpts.headers };
-	let url = encodeURI(`/${endpoint}`);
+	// endpoint may or may not be URI-encoded, so we decode before encoding
+	let url = encodeURI(`/${decodeURI(endpoint)}`);
 	let body;
 	const jar = createCookieJar(url);
 

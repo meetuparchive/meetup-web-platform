@@ -205,7 +205,6 @@ describe('buildRequestArgs', () => {
 	});
 
 	const testQueryResults_utf8 = mockQuery(MOCK_RENDERPROPS_UTF8);
-
 	it('Properly encodes the URL', () => {
 		const method = 'get';
 		const getArgs = buildRequestArgs({ ...options, method })(
@@ -213,6 +212,16 @@ describe('buildRequestArgs', () => {
 		);
 		const { pathname } = require('url').parse(getArgs.url);
 		expect(/^[\x00-\xFF]*$/.test(pathname)).toBe(true); // eslint-disable-line no-control-regex
+	});
+	it('Does not double-encode the URL', () => {
+		const method = 'get';
+		const decodedQuery = {
+			endpoint: encodeURI('バ-京'), // 'pre-encode' the endpoint
+			params: {},
+		};
+		const getArgs = buildRequestArgs({ ...options, method })(decodedQuery);
+		const { pathname } = require('url').parse(getArgs.url);
+		expect(pathname).toBe(`/${decodedQuery.endpoint}`); // eslint-disable-line no-control-regex
 	});
 });
 
