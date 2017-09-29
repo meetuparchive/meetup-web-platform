@@ -92,6 +92,7 @@ if (!NODE_ENV || NODE_ENV === 'development') {
 if (GAE_INSTANCE) {
 	streams.push(
 		LoggingBunyan({
+			logName: 'mwp-log',
 			resource: {
 				type: 'gae_app',
 				labels: {
@@ -114,7 +115,6 @@ if (
 
 const logger = bunyan.createLogger({
 	name: 'mwp-logger',
-	logName: 'mwp-log',
 	serializers,
 	streams,
 });
