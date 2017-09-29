@@ -62,4 +62,7 @@ register.attributes = {
 	version: '1.0.0',
 };
 
-export { default as logger } from './logger'; // named export for easy import
+export {
+	default as logger,
+	httpRequestSerializers as serializers,
+} from './logger'; // named export for easy import
