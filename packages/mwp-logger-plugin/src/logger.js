@@ -1,3 +1,4 @@
+import http from 'http';
 import bunyan from 'bunyan';
 import bunyanDebugStream from 'bunyan-debug-stream';
 import LoggingBunyan from '@google-cloud/logging-bunyan';
@@ -22,28 +23,55 @@ const serializers = {
 	...bunyan.stdSerializers,
 };
 
+export const httpRequestSerializers = {
+	hapi: request => {
+		const requestInfo = {
+			requestMethod: request.method.toUpperCase(),
+			requestUrl: request.url.href,
+			requestSize: request.headers['content-length'],
+			userAgent: request.headers['user-agent'],
+			remoteIp: request.info.remoteAddress,
+			serverIp: request.server.info.address, // internal IP
+			referer: request.info.referrer,
+		};
+		if (request.response) {
+			requestInfo.responseSize = request.response.headers['content-length'];
+			requestInfo.status = request.response.statusCode;
+			requestInfo.latency = formatDuration(
+				request.info.responded - request.info.received
+			);
+		}
+		return requestInfo;
+	},
+	incomingMessage: message => {
+		const messageInfo = {
+			requestMethod: message.method.toUpperCase(),
+			requestUrl: message.url,
+			responseSize: message.headers['content-length'],
+			status: message.statusCode,
+			latency: message.elapsedTime && formatDuration(message.elapsedTime),
+			userAgent: message.headers['user-agent'],
+			remoteIp:
+				message.headers['x_forwarded_for'] || message.headers['remote_addr'],
+			referer: message.headers['referer'],
+		};
+		return messageInfo;
+	},
+};
 /*
  * Format a Hapi request object as a Stackdriver httpRequest for pretty logging
  * https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry#httprequest
  */
 serializers.httpRequest = request => {
-	const requestInfo = {
-		requestMethod: request.method.toUpperCase(),
-		requestUrl: request.url.href,
-		requestSize: request.headers['content-length'],
-		userAgent: request.headers['user-agent'],
-		remoteIp: request.info.remoteAddress,
-		serverIp: request.server.info.address, // internal IP
-		referer: request.info.referrer,
-	};
-	if (request.response) {
-		requestInfo.responseSize = request.response.headers['content-length'];
-		requestInfo.status = request.response.statusCode;
-		requestInfo.latency = formatDuration(
-			request.info.responded - request.info.received
-		);
+	const { hapi, incomingMessage } = httpRequestSerializers;
+	if (request.server) {
+		// assume a Hapi request
+		return hapi(request);
 	}
-	return requestInfo;
+	if (request instanceof http.IncomingMessage) {
+		return incomingMessage(request);
+	}
+	return request;
 };
 
 const streams = []; // stdout by default
