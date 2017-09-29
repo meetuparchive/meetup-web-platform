@@ -1,4 +1,5 @@
 import querystring from 'qs';
+import { logger, serializers } from 'mwp-logger-plugin';
 
 import { API_PROXY_PLUGIN_NAME } from '../config';
 import { coerceBool, toCamelCase } from './stringUtils';
@@ -181,7 +182,6 @@ export const makeApiResponseToQueryResponse = query => ({
 });
 
 export const makeLogResponse = request => ([response, body]) => {
-	const { logger } = request.server.app;
 	const { method, statusCode } = response;
 	const logBase = {
 		httpRequest: response,
@@ -205,6 +205,9 @@ export const makeLogResponse = request => ([response, body]) => {
 		logError({
 			...logBase,
 			err: new Error(errorMessage),
+			context: {
+				httpRequest: serializers.hapi(request),
+			},
 		});
 		return;
 	}

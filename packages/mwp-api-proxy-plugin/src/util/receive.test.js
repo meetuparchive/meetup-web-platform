@@ -16,6 +16,12 @@ import {
 	parseVariantsHeader,
 } from './receive';
 
+jest.mock('mwp-logger-plugin', () => {
+	return {
+		logger: require('mwp-test-utils').MOCK_LOGGER,
+	};
+});
+
 describe('makeInjectResponseCookies', () => {
 	const request = {
 		plugins: {
