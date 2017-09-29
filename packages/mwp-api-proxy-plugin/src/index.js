@@ -16,16 +16,10 @@ const onResponse = request => {
 	const { uploads } = request.plugins[API_PROXY_PLUGIN_NAME];
 	const { logger } = request.server.app;
 	if (uploads.length) {
-		const info = { info: uploads, req: request.raw.req };
 		// $FlowFixMe - promisify not yet defined in flow-typed
-		Promise.all(uploads.map(util.promisify(fs.unlink))).then(
-			() => {
-				logger.info(info, 'Deleted uploaded file(s)');
-			},
-			err => {
-				logger.error(info, 'Could not delete uploaded file(s)');
-			}
-		);
+		Promise.all(uploads.map(util.promisify(fs.unlink))).catch(err => {
+			logger.error({ err, uploads, ...request.raw });
+		});
 	}
 };
 

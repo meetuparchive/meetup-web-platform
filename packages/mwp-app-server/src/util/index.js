@@ -23,51 +23,8 @@ export function checkForDevUrl(value) {
 }
 
 export function onRequestExtension(request, reply) {
-	request.id = uuid.v4();
-
-	request.server.app.logger.info(
-		`Incoming request ${request.method.toUpperCase()} ${request.url.href}`
-	);
-
+	request.id = uuid.v4(); // provide uuid for request instead of default Hapi id
 	return reply.continue();
-}
-
-export function logResponse(request) {
-	const {
-		method,
-		response,
-		id,
-		info,
-		server: { app: { logger } },
-		url,
-	} = request;
-
-	if (response.isBoom) {
-		// response is an Error object
-		logger.error(`Internal error ${response.message} ${url.pathname}`, {
-			error: response.stack,
-		});
-	}
-
-	const log = ((response.statusCode >= 400 && logger.error) ||
-		(response.statusCode >= 300 && logger.warn) ||
-		logger.info)
-		.bind(logger);
-
-	log(
-		{
-			headers: response.headers,
-			id,
-			method,
-			referrer: info.referrer,
-			remoteAddress: info.remoteAddress,
-			elapsedTime: info.responded - info.received,
-			href: url.href,
-		},
-		`Outgoing response ${method.toUpperCase()} ${url.pathname} ${response.statusCode}`
-	);
-
-	return;
 }
 
 /**
@@ -83,7 +40,6 @@ export function registerExtensionEvents(server) {
 			method: onRequestExtension,
 		},
 	]);
-	server.on('response', logResponse);
 	return server;
 }
 

@@ -48,6 +48,9 @@ export default function start(
 				'electrode-csrf-jwt': {
 					enabled: false,
 				},
+				'mwp-logger-plugin': {
+					enabled: true,
+				},
 			},
 		},
 	};
