@@ -277,16 +277,11 @@ export const makeExternalApiRequest = request => requestOpts => {
 			// log errors
 			null,
 			err => {
-				console.error(
-					JSON.stringify({
-						err: err.stack,
-						message: 'REST API request error',
-						request: {
-							id: request.id,
-						},
-						context: requestOpts,
-					})
-				);
+				request.server.app.logger.error({
+					err,
+					externalRequest: requestOpts,
+					...request.raw,
+				});
 			}
 		)
 		.timeout(request.server.settings.app.api.timeout)
