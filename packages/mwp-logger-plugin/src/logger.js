@@ -2,9 +2,16 @@ import bunyan from 'bunyan';
 import bunyanDebugStream from 'bunyan-debug-stream';
 import LoggingBunyan from '@google-cloud/logging-bunyan';
 
+/*
+ * convert a millisecond value into a 'Duration' object, defined as
+ * `{ seconds, nanos }`, where `nanos` is the nanosecond component of the
+ * time
+ * 
+ * https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#google.protobuf.Duration
+ */
 const formatDuration = ms => {
-	const seconds = Math.floor(ms / 1000);
-	const nanos = ms % 1000 * 1000 * 1000;
+	const seconds = Math.floor(ms / 1000); // whole seconds
+	const nanos = ms % 1000 * 1000 * 1000; // remainder milliseconds in nanoseconds (= ms * 1,000,000)
 	return {
 		seconds,
 		nanos,
@@ -14,6 +21,11 @@ const formatDuration = ms => {
 const serializers = {
 	...bunyan.stdSerializers,
 };
+
+/*
+ * Format a Hapi request object as a Stackdriver httpRequest for pretty logging
+ * https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry#httprequest
+ */
 serializers.httpRequest = request => {
 	const requestInfo = {
 		requestMethod: request.method.toUpperCase(),
