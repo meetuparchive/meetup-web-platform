@@ -83,35 +83,4 @@ describe('onRequestExtension', () => {
 		serverUtils.onRequestExtension(request, reply);
 		expect(reply.continue).toHaveBeenCalled();
 	});
-
-	it('calls console.log with request headers and id', () => {
-		const reply = {
-			continue: () => {},
-		};
-		MOCK_LOGGER.info.mockClear();
-		serverUtils.onRequestExtension(request, reply);
-		const calledWith = MOCK_LOGGER.info.mock.calls[0][0];
-		expect(calledWith).toEqual(expect.stringContaining(request.url.href));
-	});
-});
-
-describe('logResponse', () => {
-	const request = {
-		headers: 'foo',
-		id: 'bar',
-		method: 'get',
-		info: {},
-		url: {},
-		response: {
-			headers: { foo: 'bar' },
-		},
-		server: getServer(),
-	};
-
-	it('calls console.log with response headers and request id', () => {
-		MOCK_LOGGER.info.mockClear();
-		serverUtils.logResponse(request);
-		const [data] = MOCK_LOGGER.info.mock.calls[0];
-		expect(data).toEqual(expect.any(Object));
-	});
 });
