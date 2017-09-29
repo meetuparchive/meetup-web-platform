@@ -35,6 +35,7 @@ const MOCK_RESPONSE_OK = {
 function makeMockResponseOk(requestOpts) {
 	return {
 		...MOCK_RESPONSE_OK,
+		method: requestOpts.method || 'get',
 		request: {
 			uri: url.parse(requestOpts.url),
 			method: requestOpts.method || 'get',
@@ -288,24 +289,6 @@ export const makeExternalApiRequest = request => requestOpts => {
 		.map(([response, body]) => [response, body, requestOpts.jar]);
 };
 
-const logOutgoingRequest = (request, requestOpts) => {
-	const { method, headers } = requestOpts;
-
-	const parsedUrl = url.parse(requestOpts.url);
-	request.server.app.logger.info(
-		{
-			type: 'request',
-			direction: 'out',
-			info: {
-				headers,
-				url: parsedUrl,
-				method,
-			},
-		},
-		`Outgoing request ${requestOpts.method.toUpperCase()} ${parsedUrl.pathname}`
-	);
-};
-
 /*
  * Make an API request and parse the response into the expected `response`
  * object shape
@@ -325,9 +308,6 @@ export const makeSend$ = request => {
 			? makeMockRequest(query.mockResponse)
 			: makeExternalApiRequest(request);
 
-		return Observable.defer(() => {
-			logOutgoingRequest(request, requestOpts);
-			return request$(requestOpts);
-		});
+		return Observable.defer(() => request$(requestOpts));
 	};
 };

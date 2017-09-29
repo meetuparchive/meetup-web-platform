@@ -23,14 +23,9 @@ const getPlatformAnalyticsLog = (
 		});
 		const publisher = pubsub.topic('analytics-log-json').publisher();
 		return (serializedRecord: string) => {
-			publisher.publish(new Buffer(serializedRecord)).then(
-				(messageIds, apiResponse) => {
-					if (messageIds) {
-						log.info({ messageIds }, 'GAE PubSub');
-					}
-				},
-				err => log.error(err)
-			);
+			publisher
+				.publish(new Buffer(serializedRecord))
+				.catch(err => log.error(err));
 		};
 	}
 	return (serializedRecord: string) => {
