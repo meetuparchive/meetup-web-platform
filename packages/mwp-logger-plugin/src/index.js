@@ -25,6 +25,7 @@ export function logResponse(request) {
 	return;
 }
 
+// this might be redundant with the `logResponse` behavior
 const onRequestError = (request, err) => {
 	logger.error({
 		err,
@@ -32,17 +33,17 @@ const onRequestError = (request, err) => {
 	});
 };
 
-export default function register(server, options, next) {
-	// might also want to add default logging for 'onPostStart', 'onPostStop',
-	//'response' in the future
-	const onRequestExtension = (request, reply) => {
-		logger.debug({
-			httpRequest: request,
-			...request.raw,
-		});
-		return reply.continue();
-	};
+const onRequestExtension = (request, reply) => {
+	// log at debug level to make it easy to filter out
+	logger.debug({
+		httpRequest: request,
+		...request.raw,
+	});
+	return reply.continue();
+};
 
+export default function register(server, options, next) {
+	// might also want to add default logging for 'onPostStart', 'onPostStop'
 	server.ext([
 		{
 			type: 'onRequest',
