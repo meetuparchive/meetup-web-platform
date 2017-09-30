@@ -23,6 +23,12 @@ const serializers = {
 	...bunyan.stdSerializers,
 };
 
+/*
+ * These serializers correspond to the 2 major types of 'request'/'response'
+ * objects that are used in MWP apps - Hapi requests and http.IncomingMessage
+ * responses that are returned from the `request` library for server-to-server
+ * requests.
+ */
 export const httpRequestSerializers = {
 	hapi: request => {
 		const requestInfo = {
@@ -64,6 +70,7 @@ export const httpRequestSerializers = {
  */
 serializers.httpRequest = request => {
 	const { hapi, incomingMessage } = httpRequestSerializers;
+	// choose the serializer based on the type of the object
 	if (request.server) {
 		// assume a Hapi request
 		return hapi(request);
