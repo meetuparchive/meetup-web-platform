@@ -4,7 +4,7 @@
  */
 export function polyfillServiceUrl(localeCode) {
 	const features = [
-		'default-3.6',
+		'default-3.6', // This includes a _lot_ of common polyfils - check https://polyfill.io/v2/docs/features/
 		'fetch', // IE, Safari
 		'Intl',
 		`Intl.~locale.${localeCode}`,
