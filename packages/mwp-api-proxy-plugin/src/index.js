@@ -1,6 +1,5 @@
 // @flow
 import fs from 'fs';
-import util from 'util';
 import { duotones, getDuotoneUrls } from './util/duotone';
 import getApiProxyRoutes from './routes';
 import proxyApi$ from './proxy';
@@ -15,12 +14,11 @@ export { API_ROUTE_PATH } from './config';
 const onResponse = request => {
 	const { uploads } = request.plugins[API_PROXY_PLUGIN_NAME];
 	const { logger } = request.server.app;
-	if (uploads.length) {
-		// $FlowFixMe - promisify not yet defined in flow-typed
-		Promise.all(uploads.map(util.promisify(fs.unlink))).catch(err => {
-			logger.error({ err, uploads, ...request.raw });
-		});
-	}
+	uploads.forEach(f =>
+		fs.unlink(f, err => {
+			logger.error({ err, f, ...request.raw });
+		})
+	);
 };
 
 export const setPluginState = (request: HapiRequest, reply: HapiReply) => {
