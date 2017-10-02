@@ -1,4 +1,5 @@
 import querystring from 'qs';
+import { logger, serializers } from 'mwp-logger-plugin';
 
 import { API_PROXY_PLUGIN_NAME } from '../config';
 import { coerceBool, toCamelCase } from './stringUtils';
@@ -181,64 +182,37 @@ export const makeApiResponseToQueryResponse = query => ({
 });
 
 export const makeLogResponse = request => ([response, body]) => {
-	const {
-		elapsedTime,
-		request: { id, uri: { query, pathname, href }, method },
-		statusCode,
-	} = response;
-	const parsedQuery = (query || '').split('&').reduce((acc, keyval) => {
-		const [key, val] = keyval.split('=');
-		acc[key] = val;
-		return acc;
-	}, {});
+	const { method, statusCode } = response;
+	const logBase = {
+		httpRequest: response,
+		body: body.length > 256 ? `${body.substr(0, 256)}...` : body,
+		...request.raw,
+	};
 
 	if (
 		statusCode >= 500 || // REST API had an internal error
 		(method.toLowerCase() === 'get' && statusCode >= 400) // something fishy with a GET
 	) {
-		// use console.error or console.warn to highlight these cases in Stackdriver
-		// Only want to warn about 400s for now (maybe forever?)
-		const logError = statusCode < 500 ? console.warn : console.error;
-		logError(
-			JSON.stringify({
-				message: 'REST API error response',
-				info: {
-					url: href,
-					query: parsedQuery,
-					method,
-					id,
-					statusCode,
-					elapsedTime,
-					originRequestId: request.id,
-					body,
-				},
-			})
-		);
-	}
-	const logger = request.server.app.logger;
-	// production logs will automatically be JSON-parsed in Stackdriver
-	const log = ((statusCode >= 500 && logger.error) ||
-		(statusCode >= 400 && logger.warn) ||
-		logger.info)
-		.bind(logger);
-
-	log(
-		{
-			type: 'response',
-			direction: 'in',
-			info: {
-				url: href,
-				query: parsedQuery,
-				method,
-				id,
-				originRequestId: request.id,
-				statusCode,
-				elapsedTime,
-				body: body.length > 256 ? `${body.substr(0, 256)}...` : body,
+		const logError = statusCode < 500 ? logger.warn : logger.error;
+		let errorMessage;
+		try {
+			// well-behaved API errors return a JSON object with an `errors` array
+			errorMessage = JSON.parse(body).errors[0].message;
+		} catch (err) {
+			// probably not JSON, could be an HTML response
+			errorMessage = 'REST API error';
+		}
+		logError({
+			...logBase,
+			err: new Error(errorMessage),
+			context: {
+				httpRequest: serializers.hapi(request),
 			},
-		},
-		`Incoming response ${method.toUpperCase()} ${pathname} ${response.statusCode}`
-	);
+		});
+		return;
+	}
+	// not an error response
+	logger.info(logBase);
 };
 
 /**

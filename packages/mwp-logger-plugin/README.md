@@ -31,7 +31,7 @@ instance can also be imported directly at the cost of function purity and
 slightly more complex unit testing configuration to mock the logger module.
 
 ```js
-import logger from 'mwp-logger-plugin/lib/logger';
+import { logger } from 'mwp-logger-plugin';
 
 function doStuff() {
   logger.info('Hello stuff');

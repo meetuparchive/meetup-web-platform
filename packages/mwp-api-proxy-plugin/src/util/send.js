@@ -35,6 +35,7 @@ const MOCK_RESPONSE_OK = {
 function makeMockResponseOk(requestOpts) {
 	return {
 		...MOCK_RESPONSE_OK,
+		method: requestOpts.method || 'get',
 		request: {
 			uri: url.parse(requestOpts.url),
 			method: requestOpts.method || 'get',
@@ -85,7 +86,8 @@ export const buildRequestArgs = externalRequestOpts => ({
 }) => {
 	const dataParams = querystring.stringify(params);
 	const headers = { ...externalRequestOpts.headers };
-	let url = encodeURI(`/${endpoint}`);
+	// endpoint may or may not be URI-encoded, so we decode before encoding
+	let url = encodeURI(`/${decodeURI(endpoint)}`);
 	let body;
 	const jar = createCookieJar(url);
 
@@ -173,7 +175,8 @@ export function getLanguageHeader(request) {
 }
 
 export function getClientIpHeader(request) {
-	const clientIP = request.headers['fastly-client-ip'];
+	const clientIP =
+		request.query['_set_geoip'] || request.headers['fastly-client-ip'];
 	if (clientIP) {
 		return { 'X-Meetup-Client-Ip': clientIP };
 	}
@@ -275,38 +278,15 @@ export const makeExternalApiRequest = request => requestOpts => {
 			// log errors
 			null,
 			err => {
-				console.error(
-					JSON.stringify({
-						err: err.stack,
-						message: 'REST API request error',
-						request: {
-							id: request.id,
-						},
-						context: requestOpts,
-					})
-				);
+				request.server.app.logger.error({
+					err,
+					externalRequest: requestOpts,
+					...request.raw,
+				});
 			}
 		)
 		.timeout(request.server.settings.app.api.timeout)
 		.map(([response, body]) => [response, body, requestOpts.jar]);
-};
-
-const logOutgoingRequest = (request, requestOpts) => {
-	const { method, headers } = requestOpts;
-
-	const parsedUrl = url.parse(requestOpts.url);
-	request.server.app.logger.info(
-		{
-			type: 'request',
-			direction: 'out',
-			info: {
-				headers,
-				url: parsedUrl,
-				method,
-			},
-		},
-		`Outgoing request ${requestOpts.method.toUpperCase()} ${parsedUrl.pathname}`
-	);
 };
 
 /*
@@ -328,9 +308,6 @@ export const makeSend$ = request => {
 			? makeMockRequest(query.mockResponse)
 			: makeExternalApiRequest(request);
 
-		return Observable.defer(() => {
-			logOutgoingRequest(request, requestOpts);
-			return request$(requestOpts);
-		});
+		return Observable.defer(() => request$(requestOpts));
 	};
 };

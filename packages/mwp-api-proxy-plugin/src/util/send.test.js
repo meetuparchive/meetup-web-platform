@@ -34,6 +34,7 @@ const MOCK_HAPI_REQUEST = {
 	server: getServer(),
 	method: 'get',
 	headers: {},
+	query: {},
 	state: {},
 	plugins: {
 		[API_PROXY_PLUGIN_NAME]: {
@@ -83,13 +84,27 @@ describe('getClientIpHeader', () => {
 			headers: {
 				'fastly-client-ip': '127.0.0.1',
 			},
+			query: {},
+		};
+		expect(getClientIpHeader(request)).toEqual(clientIpHeader);
+	});
+	it('returns a x-meetup-client-ip header when _set_geoip header is set', () => {
+		const clientIpHeader = {
+			'X-Meetup-Client-Ip': '127.0.0.2',
+		};
+		const request = {
+			query: {
+				_set_geoip: '127.0.0.2',
+			},
+			headers: {},
 		};
 		expect(getClientIpHeader(request)).toEqual(clientIpHeader);
 	});
 
-	it('Does not set the header if fastly-client-ip is not set', () => {
+	it('Does not set the header if fastly-client-ip or query param is not set', () => {
 		const request = {
 			headers: {},
+			query: {},
 		};
 		expect(getClientIpHeader(request)).toBeUndefined();
 	});
@@ -205,7 +220,6 @@ describe('buildRequestArgs', () => {
 	});
 
 	const testQueryResults_utf8 = mockQuery(MOCK_RENDERPROPS_UTF8);
-
 	it('Properly encodes the URL', () => {
 		const method = 'get';
 		const getArgs = buildRequestArgs({ ...options, method })(
@@ -213,6 +227,16 @@ describe('buildRequestArgs', () => {
 		);
 		const { pathname } = require('url').parse(getArgs.url);
 		expect(/^[\x00-\xFF]*$/.test(pathname)).toBe(true); // eslint-disable-line no-control-regex
+	});
+	it('Does not double-encode the URL', () => {
+		const method = 'get';
+		const decodedQuery = {
+			endpoint: encodeURI('バ-京'), // 'pre-encode' the endpoint
+			params: {},
+		};
+		const getArgs = buildRequestArgs({ ...options, method })(decodedQuery);
+		const { pathname } = require('url').parse(getArgs.url);
+		expect(pathname).toBe(`/${decodedQuery.endpoint}`); // eslint-disable-line no-control-regex
 	});
 });
 
