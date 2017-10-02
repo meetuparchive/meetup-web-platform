@@ -25,6 +25,7 @@ const actual_request = require.requireActual('request');
  * @module mockRequest
  */
 let mockResponse = {
+	method: 'get',
 	headers: {},
 	statusCode: 200,
 	elapsedTime: 2,
