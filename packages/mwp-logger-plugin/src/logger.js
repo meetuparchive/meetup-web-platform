@@ -51,15 +51,16 @@ export const httpRequestSerializers = {
 	},
 	incomingMessage: message => {
 		const messageInfo = {
-			requestMethod: message.method.toUpperCase(),
-			requestUrl: message.url,
-			responseSize: message.headers['content-length'],
+			requestMethod: message.request.method.toUpperCase(),
+			requestUrl: message.request.uri.href,
+			responseSize: message.body.length,
 			status: message.statusCode,
 			latency: message.elapsedTime && formatDuration(message.elapsedTime),
-			userAgent: message.headers['user-agent'],
+			userAgent: message.request.headers['user-agent'],
 			remoteIp:
-				message.headers['x_forwarded_for'] || message.headers['remote_addr'],
-			referer: message.headers['referer'],
+				message.request.headers['x_forwarded_for'] ||
+				message.request.headers['remote_addr'],
+			referer: message.request.headers['referer'],
 		};
 		return messageInfo;
 	},
