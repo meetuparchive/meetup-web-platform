@@ -142,6 +142,21 @@ if (!NODE_ENV || NODE_ENV === 'development') {
 }
 
 if (GAE_INSTANCE) {
+	const GAELogger = LoggingBunyan({
+		logName: 'mwp_log',
+		resource: {
+			type: 'gae_app',
+			labels: {
+				project_id: GCLOUD_PROJECT,
+				module_id: GAE_SERVICE,
+				version_id: GAE_VERSION,
+			},
+		},
+	}).stream();
+	GAELogger.on('error', err =>
+		console.error({ logName: 'mwp_log', payload: { message: err.stack } })
+	);
+
 	streams.push(
 		LoggingBunyan({
 			logName: 'mwp_log',
