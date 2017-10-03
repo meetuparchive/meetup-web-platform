@@ -205,9 +205,7 @@ export const makeLogResponse = request => ([response, body]) => {
 		logError({
 			...logBase,
 			err: new Error(errorMessage),
-			context: {
-				httpRequest: serializers.hapi(request),
-			},
+			context: response,
 		});
 		return;
 	}
