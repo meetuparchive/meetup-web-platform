@@ -144,7 +144,7 @@ if (!NODE_ENV || NODE_ENV === 'development') {
 if (GAE_INSTANCE) {
 	streams.push(
 		LoggingBunyan({
-			logName: 'mwp-log',
+			logName: 'mwp_log',
 			resource: {
 				type: 'gae_app',
 				labels: {
