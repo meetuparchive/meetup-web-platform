@@ -256,11 +256,15 @@ describe('makeLogResponse', () => {
 	const request = { server: getServer() };
 	const MOCK_INCOMINGMESSAGE_GET = {
 		elapsedTime: 1234,
-		method: 'get',
+		request: {
+			method: 'get',
+		},
 	};
 	const MOCK_INCOMINGMESSAGE_POST = {
 		elapsedTime: 2345,
-		method: 'post',
+		request: {
+			method: 'post',
+		},
 	};
 	it('emits parsed request and response data for GET request', () => {
 		MOCK_LOGGER.info.mockClear();
