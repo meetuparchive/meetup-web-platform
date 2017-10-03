@@ -65,6 +65,50 @@ export const httpRequestSerializers = {
 		return messageInfo;
 	},
 };
+
+/*
+ * Parse an http.IncomingMessage instance from `request` into an error `context`
+ * object defined by https://cloud.google.com/error-reporting/docs/formatting-error-messages
+ */
+const errorContextSerializers = {
+	hapi: request => ({
+		httpRequest: {
+			method: request.method.toUpperCase(),
+			url: request.url.href,
+			userAgent: request.headers['user-agent'],
+			referrer: request.headers['referer'],
+			responseStatusCode: (request.response || {}).statusCode || 500,
+			remoteIp:
+				request.headers['x_forwarded_for'] || request.headers['remote_addr'],
+		},
+	}),
+	incomingMessage: response => ({
+		httpRequest: {
+			method: response.request.method.toUpperCase(),
+			url: response.request.uri.href,
+			userAgent: response.request.headers['user-agent'],
+			referrer: response.request.headers['referer'],
+			responseStatusCode: response.statusCode,
+			remoteIp:
+				response.request.headers['x_forwarded_for'] ||
+				response.request.headers['remote_addr'],
+		},
+	}),
+};
+
+serializers.errorContext = request => {
+	const { hapi, incomingMessage } = errorContextSerializers;
+	// choose the serializer based on the type of the object
+	if (request.server) {
+		// assume a Hapi request
+		return hapi(request);
+	}
+	if (request instanceof http.IncomingMessage) {
+		return incomingMessage(request);
+	}
+	logger.warn(request, 'Unsupported error context object');
+	return {}; // unknown
+};
 /*
  * Format a Hapi request object as a Stackdriver httpRequest for pretty logging
  * https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry#httprequest
@@ -79,7 +123,8 @@ serializers.httpRequest = request => {
 	if (request instanceof http.IncomingMessage) {
 		return incomingMessage(request);
 	}
-	return request;
+	logger.warn(request, 'Unsupported httpRequest object');
+	return {};
 };
 
 const streams = []; // stdout by default
