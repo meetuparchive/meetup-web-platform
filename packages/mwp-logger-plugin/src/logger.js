@@ -96,7 +96,7 @@ const errorContextSerializers = {
 	}),
 };
 
-serializers.errorContext = request => {
+serializers.context = request => {
 	const { hapi, incomingMessage } = errorContextSerializers;
 	// choose the serializer based on the type of the object
 	if (request.server) {
@@ -106,8 +106,7 @@ serializers.errorContext = request => {
 	if (request instanceof http.IncomingMessage) {
 		return incomingMessage(request);
 	}
-	logger.warn(request, 'Unsupported error context object');
-	return {}; // unknown
+	return request;
 };
 /*
  * Format a Hapi request object as a Stackdriver httpRequest for pretty logging
