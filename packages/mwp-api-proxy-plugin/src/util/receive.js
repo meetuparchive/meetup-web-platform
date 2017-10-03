@@ -182,7 +182,7 @@ export const makeApiResponseToQueryResponse = query => ({
 });
 
 export const makeLogResponse = request => ([response, body]) => {
-	const { method, statusCode } = response;
+	const { request: { method }, statusCode } = response;
 	const logBase = {
 		httpRequest: response,
 		body: body.length > 256 ? `${body.substr(0, 256)}...` : body,
