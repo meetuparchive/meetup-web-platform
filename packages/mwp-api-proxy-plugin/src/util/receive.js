@@ -197,14 +197,15 @@ export const makeLogResponse = request => ([response, body]) => {
 		let errorMessage;
 		try {
 			// well-behaved API errors return a JSON object with an `errors` array
-			errorMessage = JSON.parse(body).errors[0].message;
+			const info = JSON.parse(body);
+			errorMessage = JSON.stringify(info.errors[0]) || body;
 		} catch (err) {
 			// probably not JSON, could be an HTML response
 			errorMessage = 'REST API error';
 		}
 		logError({
 			...logBase,
-			err: new Error(errorMessage),
+			err: new Error(`REST API error ${errorMessage}`),
 			context: response,
 		});
 		return;

@@ -16,7 +16,9 @@ const onResponse = request => {
 	const { logger } = request.server.app;
 	uploads.forEach(f =>
 		fs.unlink(f, err => {
-			logger.error({ err, f, ...request.raw });
+			if (err) {
+				logger.error({ err, f, ...request.raw });
+			}
 		})
 	);
 };
