@@ -53,7 +53,7 @@ export const httpRequestSerializers = {
 		const messageInfo = {
 			requestMethod: message.request.method.toUpperCase(),
 			requestUrl: message.request.uri.href,
-			responseSize: message.body.length,
+			responseSize: (message.body || '').length,
 			status: message.statusCode,
 			latency: message.elapsedTime && formatDuration(message.elapsedTime),
 			userAgent: message.request.headers['user-agent'],
