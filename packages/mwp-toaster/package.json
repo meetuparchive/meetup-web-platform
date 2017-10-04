@@ -27,13 +27,15 @@
   "devDependencies": {
     "babel-jest": "21.0.0",
     "jest": "20.0.4",
-    "react": ">15.0.0",
-    "reselect": "^3.0.1",
     "meetup-web-components": "^3.0.1281",
+    "react": ">15.0.0",
+    "react-router-dom": "4.2.2",
+    "reselect": "^3.0.1"
   },
   "peerDependencies": {
     "meetup-web-components": "^3.0.1281",
     "react": ">15.0.0",
+    "react-router-dom": "4.2.2",
     "reselect": "^3.0.1"
   }
 }

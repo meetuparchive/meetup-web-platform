@@ -7,13 +7,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import withRouter from 'react-router-dom/withRouter';
 import Toaster from 'meetup-web-components/lib/Toaster';
 import Toast from 'meetup-web-components/lib/Toast';
-import { showToasts } from './actions';
+import { makeToast, showToasts } from './actions';
 import { getReadyToasts } from './selectors';
 
 const mapStateToProps = state => ({ ready: getReadyToasts(state) });
-const mapDispatchToProps = { showToasts };
+const mapDispatchToProps = { makeToast, showToasts };
 
 /*
  * This component does *not* support server-rendered toasts. It must mount before
@@ -28,6 +29,23 @@ export class ToastContainer extends React.Component {
 	componentDidUpdate() {
 		this.props.showToasts(); // dispatch action to tell app that toasts are shown
 	}
+	/*
+	 * When mounting on the client, check the current querystring params to
+	 * determine whether there is a 'sysmsg' that should be displayed
+	 * 
+	 * This only needs to run on mount because it is only used for full-page
+	 * renders linked from chapstick
+	 */
+	componentDidMount() {
+		const { location: { search }, sysmsgsKey, sysmsgs } = this.props;
+		if (search) {
+			const searchParams = new URLSearchParams(search);
+			const sysmsgToast = sysmsgs[searchParams.get(sysmsgsKey)];
+			if (sysmsgToast) {
+				this.props.makeToast(sysmsgToast);
+			}
+		}
+	}
 	render() {
 		return (
 			<Toaster
@@ -39,6 +57,14 @@ export class ToastContainer extends React.Component {
 
 ToastContainer.propTyes = {
 	ready: PropTypes.arrayOf(PropTypes.object),
+	sysmsgs: PropTypes.object.isRequired, // map of sysmsg to <Toast> props
+	sysmsgsKey: PropTypes.string.isRequired,
+};
+ToastContainer.defaultProps = {
+	sysmsgsKey: 'sysmsg', // e.g. ?sysmsg=account_suspended
+	sysmsgs: {},
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(ToastContainer);
+export default connect(mapStateToProps, mapDispatchToProps)(
+	withRouter(ToastContainer)
+);
