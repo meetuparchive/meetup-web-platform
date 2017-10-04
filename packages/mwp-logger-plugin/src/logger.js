@@ -53,7 +53,7 @@ export const httpRequestSerializers = {
 		const messageInfo = {
 			requestMethod: message.request.method.toUpperCase(),
 			requestUrl: message.request.uri.href,
-			responseSize: message.body.length,
+			responseSize: (message.body || '').length,
 			status: message.statusCode,
 			latency: message.elapsedTime && formatDuration(message.elapsedTime),
 			userAgent: message.request.headers['user-agent'],
@@ -133,6 +133,7 @@ const {
 	GCLOUD_PROJECT,
 	GAE_VERSION,
 	GAE_SERVICE,
+	DISABLE_GAE_LOG,
 } = process.env;
 if (!NODE_ENV || NODE_ENV === 'development') {
 	streams.push({
@@ -141,7 +142,7 @@ if (!NODE_ENV || NODE_ENV === 'development') {
 	});
 }
 
-if (GAE_INSTANCE) {
+if (GAE_INSTANCE && !DISABLE_GAE_LOG) {
 	const GAELogger = LoggingBunyan({
 		logName: 'mwp_log',
 		resource: {
@@ -152,24 +153,12 @@ if (GAE_INSTANCE) {
 				version_id: GAE_VERSION,
 			},
 		},
-	}).stream();
+	});
 	GAELogger.on('error', err =>
 		console.error({ logName: 'mwp_log', payload: { message: err.stack } })
 	);
 
-	streams.push(
-		LoggingBunyan({
-			logName: 'mwp_log',
-			resource: {
-				type: 'gae_app',
-				labels: {
-					project_id: GCLOUD_PROJECT,
-					module_id: GAE_SERVICE,
-					version_id: GAE_VERSION,
-				},
-			},
-		}).stream()
-	);
+	streams.push(GAELogger.stream());
 }
 
 if (

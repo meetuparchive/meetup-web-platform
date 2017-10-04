@@ -1,3 +1,4 @@
+import http from 'http';
 import fs from 'fs';
 
 import querystring from 'qs';
@@ -33,14 +34,19 @@ const MOCK_RESPONSE_OK = {
  * When an API response is being mocked (dev only), this response will be used
  */
 function makeMockResponseOk(requestOpts) {
-	return {
+	const mockResponse = new http.IncomingMessage();
+
+	return Object.assign(mockResponse, {
 		...MOCK_RESPONSE_OK,
 		method: requestOpts.method || 'get',
 		request: {
 			uri: url.parse(requestOpts.url),
 			method: requestOpts.method || 'get',
+			headers: {
+				'user-agent': 'query mockResponse',
+			},
 		},
-	};
+	});
 }
 
 /**
@@ -285,7 +291,11 @@ export const makeExternalApiRequest = request => requestOpts => {
 				});
 			}
 		)
-		.timeout(request.server.settings.app.api.timeout)
+		.timeout(
+			requestOpts.formData
+				? 60 * 1000 // 60sec upload timeout
+				: request.server.settings.app.api.timeout // shorter timeout otherwise
+		)
 		.map(([response, body]) => [response, body, requestOpts.jar]);
 };
 

@@ -7,6 +7,7 @@ export function logResponse(request) {
 		// response is an Error object
 		logger.error({
 			err: response,
+			context: request,
 			...request.raw,
 		});
 	}
