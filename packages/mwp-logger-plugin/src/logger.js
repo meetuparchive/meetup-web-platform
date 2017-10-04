@@ -133,6 +133,7 @@ const {
 	GCLOUD_PROJECT,
 	GAE_VERSION,
 	GAE_SERVICE,
+	DISABLE_GAE_LOG,
 } = process.env;
 if (!NODE_ENV || NODE_ENV === 'development') {
 	streams.push({
@@ -141,7 +142,7 @@ if (!NODE_ENV || NODE_ENV === 'development') {
 	});
 }
 
-if (GAE_INSTANCE) {
+if (GAE_INSTANCE && !DISABLE_GAE_LOG) {
 	const GAELogger = LoggingBunyan({
 		logName: 'mwp_log',
 		resource: {
