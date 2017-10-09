@@ -8,10 +8,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import withRouter from 'react-router-dom/withRouter';
-import Toaster from 'meetup-web-components/lib/Toaster';
-import Toast from 'meetup-web-components/lib/Toast';
+import Toaster from 'meetup-web-components/lib/interactive/Toaster';
+import Toast from 'meetup-web-components/lib/interactive/Toast';
 import { makeToast, showToasts } from './actions';
-import { getReadyToasts } from './selectors';
+import { getReadyToasts } from './reducer';
 
 const mapStateToProps = state => ({ ready: getReadyToasts(state) });
 const mapDispatchToProps = { makeToast, showToasts };
@@ -37,6 +37,7 @@ export class ToastContainer extends React.Component {
 	 * renders linked from chapstick
 	 */
 	componentDidMount() {
+		this.props.showToasts(); // dispatch action to tell app that toasts are shown
 		const { location: { search }, sysmsgsKey, sysmsgs } = this.props;
 		if (search) {
 			const searchParams = new URLSearchParams(search);
@@ -56,9 +57,12 @@ export class ToastContainer extends React.Component {
 }
 
 ToastContainer.propTyes = {
-	ready: PropTypes.arrayOf(PropTypes.object),
+	makeToast: PropTypes.func.isRequired, // provided by `mapDispatchToProps`
+	ready: PropTypes.arrayOf(PropTypes.object), // array of Toast props from `mapStateToProps`
 	sysmsgs: PropTypes.object.isRequired, // map of sysmsg to <Toast> props
-	sysmsgsKey: PropTypes.string.isRequired,
+	sysmsgsKey: PropTypes.string.isRequired, // querystring param key
+	showToasts: PropTypes.func.isRequired, // provided by `mapDispatchToProps`
+	location: PropTypes.object.isRequired, // provided by `withRouter`
 };
 ToastContainer.defaultProps = {
 	sysmsgsKey: 'sysmsg', // e.g. ?sysmsg=account_suspended
