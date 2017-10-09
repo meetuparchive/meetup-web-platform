@@ -193,7 +193,9 @@ export const makeLogResponse = request => ([response, body]) => {
 		statusCode >= 500 || // REST API had an internal error
 		(method.toLowerCase() === 'get' && statusCode >= 400) // something fishy with a GET
 	) {
-		const logError = statusCode < 500 ? logger.warn : logger.error;
+		const logError = (statusCode < 500 ? logger.warn : logger.error).bind(
+			logger
+		);
 		let errorMessage;
 		try {
 			// well-behaved API errors return a JSON object with an `errors` array
