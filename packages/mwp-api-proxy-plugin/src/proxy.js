@@ -35,7 +35,6 @@ export default (request: HapiRequest) => {
 		);
 
 		// zip them together to make requests in parallel and return responses in order
-		// $FlowFixMe - .zip is not currently defined in Observable static properties
 		return Observable.zip(...apiRequests$).do(request.trackActivity);
 	};
 };

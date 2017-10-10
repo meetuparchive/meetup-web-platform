@@ -90,6 +90,7 @@ declare type QueryResponse = {
 	type?: string,
 	flags?: Array<string>,
 	meta?: Object,
+	query?: Query,
 };
 
 declare type QueryFunction = (location: { [string]: mixed }) => Query;

@@ -1,3 +1,4 @@
+import { LOCATION_CHANGE } from 'mwp-router';
 import {
 	DEFAULT_API_STATE,
 	DEFAULT_APP_STATE, // DEPRECATED
@@ -57,6 +58,29 @@ describe('api reducer', () => {
 			inFlight: [ref],
 		});
 	});
+	it('clears refs corresponding to non-GET queries', () => {
+		const bar = {
+			query: {
+				meta: {
+					method: 'post',
+				},
+			},
+		};
+		const baz = {
+			query: {
+				meta: {
+					method: 'get',
+				},
+			},
+		};
+		const populatedState = {
+			...DEFAULT_API_STATE,
+			bar,
+			baz,
+		};
+		const action = { type: LOCATION_CHANGE };
+		expect(api(populatedState, action)).toEqual({ ...DEFAULT_API_STATE, baz });
+	});
 	it('clears refs corresponding to new requests', function() {
 		const ref = 'foobar';
 		const populatedState = {
@@ -74,15 +98,16 @@ describe('api reducer', () => {
 		});
 	});
 	it('adds success response to state tree', () => {
-		const API_RESP_SUCCESS = apiActions.success({
+		const resp = {
 			query: {},
 			response: { ref: 'bing', value: 'baz' },
-		});
+		};
+		const API_RESP_SUCCESS = apiActions.success(resp);
 		expect(
 			api({ ...DEFAULT_API_STATE, foo: 'bar' }, API_RESP_SUCCESS)
 		).toEqual({
 			foo: 'bar',
-			bing: { ref: 'bing', value: 'baz' },
+			bing: { ref: 'bing', value: 'baz', query: resp.query },
 			inFlight: [],
 		});
 	});
