@@ -1,7 +1,7 @@
 {
-  "name": "mwp-logger-plugin",
+  "name": "mwp-toaster",
   "version": "0.0.1",
-  "description": "Hapi logging plugin for MWP apps",
+  "description": "Toast UI controller for MWP apps",
   "engineStrict": true,
   "engines": {
     "node": ">=8.1.0"
