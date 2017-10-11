@@ -25,14 +25,14 @@
     "url": "https://github.com/meetup/meetup-web-platform/issues"
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
-  "dependencies": {
-    "mwp-cli": "1.1.130"
-  },
+  "dependencies": {},
   "devDependencies": {
     "flow-bin": "0.49.1",
-    "jest": "20.0.4"
+    "jest": "20.0.4",
+    "mwp-cli": "1.1.268"
   },
   "peerDependencies": {
-    "inert": "4.2.1"
+    "inert": "4.2.1",
+    "mwp-cli": "^1.1.268"
   }
 }

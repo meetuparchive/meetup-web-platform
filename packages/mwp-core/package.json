@@ -31,10 +31,9 @@
     "joi": "10.6.0",
     "mwp-api-proxy-plugin": ">=*.*.*",
     "mwp-app-render": ">=*.*.*",
-    "mwp-cli": "1.1.130",
     "mwp-logger-plugin": ">=*.*.*",
-    "mwp-store": ">=*.*.*",
     "mwp-router": ">=*.*.*",
+    "mwp-store": ">=*.*.*",
     "node-fetch": "1.7.2",
     "pino": "4.7.1",
     "qs": "6.5.0"
@@ -46,6 +45,7 @@
     "intl-relativeformat": "2.0.0",
     "jest": "20.0.4",
     "meetup-web-mocks": "1.0.217",
+    "mwp-cli": "1.1.268",
     "react": "15.6.1",
     "react-dom": "15.6.1",
     "react-intl": "2.4.0",
@@ -53,6 +53,7 @@
     "tough-cookie": "2.3.2"
   },
   "peerDependencies": {
+    "mwp-cli": "^1.1.268",
     "react": "15.6.1",
     "react-dom": "15.6.1",
     "react-helmet": "5.2.0",
