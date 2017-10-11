@@ -8,9 +8,6 @@
  * ObjectStore equivalents
  *
  * {@link https://developer.mozilla.org/en-US/docs/Web/API/IDBObjectStore}
- *
- * @returns {Object} an object with Promise-based `get`, `set`, `delete`, and
- * `clear` methods
  */
 type Cache = {
 	get: string => Promise<QueryResponse>,
@@ -45,10 +42,6 @@ export function makeCache(): Cache {
 
 /**
  * Generates a function that can read queries and return hits in the supplied cache
- *
- * @param {Object} cache the persistent cache containing query-able data
- * @param {Object} query query for app data
- * @return {Promise} resolves with cache hit, otherwise rejects
  */
 export const cacheReader = (cache: Cache) => (
 	query: Query
@@ -60,18 +53,17 @@ export const cacheReader = (cache: Cache) => (
 
 /**
  * Generates a function that can write query-response values into cache
- *
- * @param {Object} cache the persistent cache containing query-able data
- * @param {Object} query query for app data
- * @param {Object} response plain object API response for the query
- * @return {Promise}
+ * 
+ * It will ignore non-GET responses and any responses to queries that have
+ * opted-out of caching with `query.meta.noCache`
  */
 export const cacheWriter = (cache: Cache) => (
 	query: Query,
 	response: QueryResponse
 ) => {
 	const method = (query.meta || {}).method || 'get';
-	if (method.toLowerCase() !== 'get') {
+	if (method.toLowerCase() !== 'get' || (query.meta && query.meta.noCache)) {
+		// skip cache writing
 		return Promise.resolve(true);
 	}
 	return cache.set(JSON.stringify(query), response);

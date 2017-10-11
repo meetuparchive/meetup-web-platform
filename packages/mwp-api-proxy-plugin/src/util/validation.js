@@ -14,6 +14,7 @@ export const querySchema = Joi.object({
 	type: Joi.string(),
 	meta: Joi.object({
 		method: Joi.string().valid('get', 'post', 'delete', 'patch').insensitive(),
+		noCache: Joi.bool(),
 		flags: Joi.array(),
 		variants: Joi.object().pattern(/\w+/, stringOrArray),
 		metaRequestHeaders: Joi.array(),
