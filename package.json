@@ -1,7 +1,7 @@
 {
   "name": "meetup-web-platform",
   "version": "0.0.1",
-  "description": "A collection of Node web application utilities developed for the Meetup web platform",
+  "description": "A collection of Node web application utilities for the Meetup web platform",
   "engineStrict": true,
   "engines": {
     "node": ">=7.0.0"
@@ -53,7 +53,7 @@
     "iron": "4.0.5",
     "jest": "20.0.4",
     "lint-staged": "4.0.1",
-    "mwp-cli": "1.1.130",
+    "mwp-cli": "1.1.268",
     "node-fetch": "1.7.2",
     "prettier": "1.5.2",
     "querystring": "0.2.0",
