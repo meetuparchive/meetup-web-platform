@@ -81,6 +81,7 @@ declare type Query = {
 	meta?: {
 		flags?: Array<string>,
 		method?: string,
+		noCache?: boolean,
 	},
 };
 
