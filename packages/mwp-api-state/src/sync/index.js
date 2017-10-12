@@ -98,9 +98,6 @@ export const getNavEpic = (routes, baseUrl) => {
 						return newQueries;
 					})
 				).map(q => api.requestAll(q, requestMetadata));
-				// if requestAll included instructions about which refs to retain,
-				// the reducer could ignore those refs when it would otherwise
-				// clear them in the platform reducer line 49
 
 				const clickAction$ = Observable.of(clickActions.clear());
 
