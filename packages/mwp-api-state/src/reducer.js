@@ -12,16 +12,17 @@ export const DEFAULT_API_STATE: ApiState = { inFlight: [] };
 export const DEFAULT_APP_STATE = {};
 
 type ObjectFilter = (Object, ...args?: Array<any>) => Object;
-const filterKeys: ObjectFilter = (obj: ApiState, keys: Array<string>) =>
-	Object.keys(obj).reduce(
-		(newObj: ApiState, key: string) => {
-			if (!keys.includes(key)) {
-				newObj[key] = obj[key];
-			}
-			return newObj;
-		},
-		{ ...DEFAULT_API_STATE }
-	);
+export const filterKeys: ObjectFilter = (
+	obj: Object,
+	whitelist: Array<string>,
+	keys: Array<string>
+) =>
+	Object.keys(obj).reduce((newObj: Object, key: string) => {
+		if (!keys.includes(key) || whitelist.includes(key)) {
+			newObj[key] = obj[key];
+		}
+		return newObj;
+	}, {});
 
 export const responseToState = (
 	response: QueryResponse
@@ -47,8 +48,11 @@ export function api(
 			}
 
 			// remove any `ref`s that are being refreshed - eliminate stale data
+			// however, keep any refs whose values are not expected to change
+			const refWhitelist = (action.meta || {}).retainRefs || [];
 			const newState = {
-				...filterKeys(state, requestRefs),
+				...DEFAULT_API_STATE,
+				...filterKeys(state, refWhitelist, requestRefs),
 				inFlight,
 			};
 
