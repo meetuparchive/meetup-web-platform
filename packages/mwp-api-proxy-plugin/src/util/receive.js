@@ -1,5 +1,5 @@
 import querystring from 'qs';
-import { logger, serializers } from 'mwp-logger-plugin';
+import { logger } from 'mwp-logger-plugin';
 
 import { API_PROXY_PLUGIN_NAME } from '../config';
 import { coerceBool, toCamelCase } from './stringUtils';
@@ -184,7 +184,6 @@ export const makeApiResponseToQueryResponse = query => ({
 export const makeLogResponse = request => ([response, body]) => {
 	const { request: { method }, statusCode } = response;
 	const logBase = {
-		httpRequest: response,
 		body: body.length > 256 ? `${body.substr(0, 256)}...` : body,
 		...request.raw,
 	};
@@ -203,17 +202,21 @@ export const makeLogResponse = request => ([response, body]) => {
 			errorMessage = JSON.stringify(info.errors[0]) || body;
 		} catch (err) {
 			// probably not JSON, could be an HTML response
-			errorMessage = 'REST API error';
+			const titleContent = /<title>(.+?)<\/title>/.exec(body);
+			errorMessage = titleContent ? titleContent[1] : 'REST API error';
 		}
 		logError({
 			...logBase,
-			err: new Error(`REST API error ${errorMessage}`),
+			err: new Error(errorMessage),
 			context: response,
 		});
 		return;
 	}
 	// not an error response
-	logger.info(logBase);
+	logger.info({
+		...logBase,
+		httpRequest: response,
+	});
 };
 
 /**

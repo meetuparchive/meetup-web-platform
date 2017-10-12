@@ -298,4 +298,21 @@ describe('makeLogResponse', () => {
 		expect(loggedObject.body.startsWith(body300.substr(0, 256))).toBe(true);
 		expect(loggedObject.body.startsWith(body300)).toBe(false);
 	});
+	it('logs error on non-JSON error', () => {
+		const body = 'This is not JSON';
+		const responseErr = { ...MOCK_INCOMINGMESSAGE_GET, statusCode: 500 };
+		MOCK_LOGGER.error.mockClear();
+		makeLogResponse(request)([responseErr, body]);
+		expect(MOCK_LOGGER.error).toHaveBeenCalled();
+	});
+	it('logs html <title> content on HTML error', () => {
+		const title = 'Doom doom ruin';
+		const body = `<html><head><title>${title}</title></head></html>`;
+		const responseErr = { ...MOCK_INCOMINGMESSAGE_GET, statusCode: 500 };
+		MOCK_LOGGER.error.mockClear();
+		makeLogResponse(request)([responseErr, body]);
+		expect(MOCK_LOGGER.error).toHaveBeenCalled();
+		const loggedObject = MOCK_LOGGER.error.mock.calls[0][0];
+		expect(loggedObject.err.message).toBe(title);
+	});
 });
