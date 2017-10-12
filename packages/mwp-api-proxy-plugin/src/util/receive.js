@@ -184,7 +184,6 @@ export const makeApiResponseToQueryResponse = query => ({
 export const makeLogResponse = request => ([response, body]) => {
 	const { request: { method }, statusCode } = response;
 	const logBase = {
-		httpRequest: response,
 		body: body.length > 256 ? `${body.substr(0, 256)}...` : body,
 		...request.raw,
 	};
@@ -214,7 +213,10 @@ export const makeLogResponse = request => ([response, body]) => {
 		return;
 	}
 	// not an error response
-	logger.info(logBase);
+	logger.info({
+		logBase,
+		httpRequest: response,
+	});
 };
 
 /**
