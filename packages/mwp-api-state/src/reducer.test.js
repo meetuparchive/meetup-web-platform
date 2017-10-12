@@ -2,6 +2,7 @@ import {
 	DEFAULT_API_STATE,
 	DEFAULT_APP_STATE, // DEPRECATED
 	api,
+	filterKeys,
 	app, // DEPRECATED
 } from './reducer';
 import { apiRequest } from './sync/syncActionCreators';
@@ -124,5 +125,18 @@ describe('api reducer', () => {
 			completeAction
 		);
 		expect(apiState).toMatchObject({ inFlight: expectedInFlightState });
+	});
+});
+describe('filterKeys', () => {
+	it('returns an object with all specified keys removed', () => {
+		const orig = { foo: 'bar', baz: 'qux', so: 'what' };
+		expect(filterKeys(orig, [], ['foo', 'so'])).toEqual({ baz: 'qux' });
+	});
+	it('does not remove whitelisted keys when specified', () => {
+		const orig = { foo: 'bar', baz: 'qux', so: 'what' };
+		expect(filterKeys(orig, ['foo'], ['foo', 'so'])).toEqual({
+			foo: 'bar',
+			baz: 'qux',
+		});
 	});
 });
