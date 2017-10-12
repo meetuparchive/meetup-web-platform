@@ -214,7 +214,7 @@ export const makeLogResponse = request => ([response, body]) => {
 	}
 	// not an error response
 	logger.info({
-		logBase,
+		...logBase,
 		httpRequest: response,
 	});
 };
