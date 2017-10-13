@@ -8,7 +8,7 @@ import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/takeUntil';
-import { ActionsObservable, combineEpics } from 'redux-observable';
+import { combineEpics } from 'redux-observable';
 
 import { LOCATION_CHANGE, SERVER_RENDER } from 'mwp-router';
 import { getRouteResolver, getMatchedQueries } from 'mwp-router/lib/util';
@@ -74,11 +74,13 @@ export const getNavEpic = (routes, baseUrl) => {
 				// note that this function executes _downstream_ of reducers, so the
 				// new `routing` data has already been populated in `state`
 				const state = store.getState();
+				const { referrer = {} } = state.routing;
 				// inject request metadata from context, including `store.getState()`
 				const requestMetadata = {
-					referrer: (state.routing.referrer || {}).pathname || '',
+					referrer: referrer.pathname || '',
 					logout: location.pathname.endsWith('logout'), // assume logout route ends with logout
 					clickTracking: state.clickTracking,
+					retainRefs: [],
 				};
 
 				const cacheAction$ = requestMetadata.logout
@@ -86,7 +88,15 @@ export const getNavEpic = (routes, baseUrl) => {
 					: Observable.empty();
 
 				const apiAction$ = Observable.fromPromise(
-					resolveRoutes(location, baseUrl).then(getMatchedQueries(location))
+					Promise.all([
+						resolveRoutes(location, baseUrl).then(getMatchedQueries(location)),
+						resolveRoutes(referrer, baseUrl).then(getMatchedQueries(referrer)),
+					]).then(([newQueries, previousQueries]) => {
+						// determine which refs are _new_ relative to the previous location,
+						// and set `retainRefs` in order to avoid clearing the 'stable' refs
+						requestMetadata.retainRefs = previousQueries.map(q => q.ref);
+						return newQueries;
+					})
 				).map(q => api.requestAll(q, requestMetadata));
 
 				const clickAction$ = Observable.of(clickActions.clear());
