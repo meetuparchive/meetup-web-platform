@@ -87,10 +87,16 @@ export const getNavEpic = (routes, baseUrl) => {
 					? Observable.of({ type: 'CACHE_CLEAR' })
 					: Observable.empty();
 
+				const resolvePrevQueries = referrer.pathname
+					? resolveRoutes(referrer, baseUrl).then(getMatchedQueries(referrer))
+					: Promise.resolve([]);
+				const resolveNewQueries = resolveRoutes(location, baseUrl).then(
+					getMatchedQueries(location)
+				);
 				const apiAction$ = Observable.fromPromise(
 					Promise.all([
-						resolveRoutes(location, baseUrl).then(getMatchedQueries(location)),
-						resolveRoutes(referrer, baseUrl).then(getMatchedQueries(referrer)),
+						resolveNewQueries,
+						resolvePrevQueries,
 					]).then(([newQueries, previousQueries]) => {
 						// determine which refs are _new_ relative to the previous location,
 						// and set `retainRefs` in order to avoid clearing the 'stable' refs
