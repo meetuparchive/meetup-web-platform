@@ -1,4 +1,5 @@
 // @flow
+import { LOCATION_CHANGE } from 'mwp-router';
 import {
 	API_REQ,
 	API_RESP_SUCCESS,
@@ -23,9 +24,12 @@ const filterKeys: ObjectFilter = (obj: ApiState, keys: Array<string>) =>
 		{ ...DEFAULT_API_STATE }
 	);
 
-export const responseToState = (
-	response: QueryResponse
-): { [string]: QueryResponse } => ({ [response.ref]: response });
+export const responseToState = (resp: {
+	response: QueryResponse,
+	query: Query,
+}): { [string]: QueryResponse } => ({
+	[resp.response.ref]: { ...resp.response, query: resp.query },
+});
 
 /*
  * The primary reducer for data provided by the API
@@ -35,6 +39,18 @@ export function api(
 	action: FluxStandardAction
 ): ApiState {
 	switch (action.type) {
+		case LOCATION_CHANGE: {
+			return Object.keys(state).reduce((cleanState, ref) => {
+				// throw out data from queries that are not 'GET' - it should not be kept in state
+				if (state[ref].query && state[ref].query.meta.method !== 'get') {
+					return cleanState;
+				}
+				return {
+					...cleanState,
+					[ref]: state[ref],
+				};
+			}, {});
+		}
 		case API_REQ: {
 			const requestRefs = (action.payload || []).map(({ ref }) => ref);
 			const inFlight = state.inFlight
@@ -62,7 +78,7 @@ export function api(
 			delete state.fail; // if there are any values, the API is not failing
 			return {
 				...state,
-				...responseToState((action.payload || {}).response),
+				...responseToState(action.payload || {}),
 			};
 		case API_RESP_FAIL:
 			return { ...state, fail: action.payload };
