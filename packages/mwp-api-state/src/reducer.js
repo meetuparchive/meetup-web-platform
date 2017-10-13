@@ -43,7 +43,9 @@ export function api(
 		case LOCATION_CHANGE: {
 			return Object.keys(state).reduce((cleanState, ref) => {
 				// throw out data from queries that are not 'GET' - it should not be kept in state
-				if (state[ref].query && state[ref].query.meta.method !== 'get') {
+				const queryMethod =
+					((state[ref].query || {}).meta || {}).method || 'get';
+				if (queryMethod !== 'get') {
 					return cleanState;
 				}
 				return {
