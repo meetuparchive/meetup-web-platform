@@ -107,7 +107,7 @@ export const buildRequestArgs = externalRequestOpts => ({
 
 	if (meta.variants) {
 		headers['X-Meetup-Variants'] = Object.keys(
-			meta.variants
+			meta.variants,
 		).reduce((header, experiment) => {
 			const context = meta.variants[experiment];
 			const contexts = context instanceof Array ? context : [context];
@@ -151,10 +151,13 @@ export const buildRequestArgs = externalRequestOpts => ({
 export function getAuthHeaders(request) {
 	const oauth_token =
 		request.state.oauth_token || request.plugins.requestAuth.oauth_token; // browser-based requests // internal server requests
-	if (!request.state.MEETUP_MEMBER && oauth_token) {
-		return {
-			authorization: `Bearer ${oauth_token}`,
-		};
+	if (!request.state.MEETUP_MEMBER) {
+		request.state.MEETUP_MEMBER =
+			'"id=0&status=1&timestamp=1508006947&bs=0&tz=US%2FEastern&zip=&country=us&city=&state=&lat=0.0&lon=0.0&ql=false&s=52ce67cbcf8605fbf0b76d211c9823186a4d8f9b&scope=ALL"';
+	}
+	if (!request.state.MEETUP_MEMBER_DEV) {
+		request.state.MEETUP_MEMBER_DEV =
+			'"id=0&status=1&timestamp=1507844219&bs=0&tz=US%2FEastern&zip=&country=us&city=&state=&lat=0.0&lon=0.0&ql=false&s=699f3e240b35d570acc91114fc7b023a18dfef0c&scope=ALL"';
 	}
 	const cookies = { ...request.state };
 	const csrf = uuid.v4();
@@ -173,10 +176,9 @@ export function getAuthHeaders(request) {
 export function getLanguageHeader(request) {
 	const requestLang = request.getLanguage();
 	const headerLang = request.headers['accept-language'];
-	const acceptLang =
-		requestLang && headerLang
-			? `${requestLang},${headerLang}`
-			: requestLang || headerLang;
+	const acceptLang = requestLang && headerLang
+		? `${requestLang},${headerLang}`
+		: requestLang || headerLang;
 	return acceptLang;
 }
 
@@ -259,7 +261,7 @@ export function getExternalRequestOpts(request) {
 		// multipart form data needs special treatment
 		externalRequestOpts.formData = parseMultipart(
 			request.payload,
-			request.plugins[API_PROXY_PLUGIN_NAME].uploads
+			request.plugins[API_PROXY_PLUGIN_NAME].uploads,
 		);
 	}
 	return externalRequestOpts;
@@ -289,12 +291,12 @@ export const makeExternalApiRequest = request => requestOpts => {
 					externalRequest: requestOpts,
 					...request.raw,
 				});
-			}
+			},
 		)
 		.timeout(
 			requestOpts.formData
 				? 60 * 1000 // 60sec upload timeout
-				: request.server.settings.app.api.timeout // shorter timeout otherwise
+				: request.server.settings.app.api.timeout, // shorter timeout otherwise
 		)
 		.map(([response, body]) => [response, body, requestOpts.jar]);
 };
