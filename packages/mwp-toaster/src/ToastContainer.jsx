@@ -58,13 +58,14 @@ export class ToastContainer extends React.Component {
 
 ToastContainer.propTyes = {
 	makeToast: PropTypes.func.isRequired, // provided by `mapDispatchToProps`
-	ready: PropTypes.arrayOf(PropTypes.object), // array of Toast props from `mapStateToProps`
+	ready: PropTypes.arrayOf(PropTypes.object).isRequired, // array of Toast props from `mapStateToProps`
 	sysmsgs: PropTypes.object.isRequired, // map of sysmsg to <Toast> props
 	sysmsgsKey: PropTypes.string.isRequired, // querystring param key
 	showToasts: PropTypes.func.isRequired, // provided by `mapDispatchToProps`
 	location: PropTypes.object.isRequired, // provided by `withRouter`
 };
 ToastContainer.defaultProps = {
+	ready: [],
 	sysmsgsKey: 'sysmsg', // e.g. ?sysmsg=account_suspended
 	sysmsgs: {},
 };
