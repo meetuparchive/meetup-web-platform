@@ -11,5 +11,8 @@ export default (toastState = DEFAULT_TOAST_STATE, action) => {
 		case TOAST_SHOW: {
 			return { ready: [] };
 		}
+		default: {
+			return toastState;
+		}
 	}
 };
