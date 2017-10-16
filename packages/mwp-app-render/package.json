@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "peerDependencies": {
+    "mwp-router": ">=*.*.*",
     "prop-types": "15.5.10",
     "react": "15.6.1",
     "react-helmet": "5.2.0",
@@ -34,8 +35,7 @@
     "redux": "3.7.2"
   },
   "dependencies": {
-    "escape-html": "1.0.3",
-    "mwp-router": ">=*.*.*"
+    "escape-html": "1.0.3"
   },
   "devDependencies": {
     "enzyme": "2.9.1",
@@ -43,6 +43,7 @@
     "jest": "20.0.4",
     "joi": "10.6.0",
     "meetup-web-mocks": "1.0.217",
+    "mwp-router": ">=*.*.*",
     "prop-types": "15.5.10",
     "react": "15.6.1",
     "react-dom": "15.6.1",

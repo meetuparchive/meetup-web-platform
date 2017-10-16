@@ -25,6 +25,10 @@
     "url": "https://github.com/meetup/meetup-web-platform/issues"
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
+  "peerDependencies": {
+    "mwp-cli": "^1.1.268",
+    "mwp-router": ">=*.*.*"
+  },
   "dependencies": {
     "electrode-csrf-jwt": "1.2.1",
     "hapi": "16.5.2",
@@ -32,7 +36,6 @@
     "meetup-web-mocks": "1.0.217",
     "mwp-core": ">=0.0.1",
     "mwp-logger-plugin": ">=0.0.1",
-    "mwp-router": ">=0.0.1",
     "mwp-store": ">=0.0.1",
     "react-helmet": "5.2.0",
     "redux": "3.7.2",
@@ -42,9 +45,7 @@
   "devDependencies": {
     "flow-bin": "0.49.1",
     "jest": "20.0.4",
-    "mwp-cli": "1.1.268"
-  },
-  "peerDependencies": {
-    "mwp-cli": "^1.1.268"
+    "mwp-cli": "1.1.268",
+    "mwp-router": ">=0.0.1"
   }
 }
