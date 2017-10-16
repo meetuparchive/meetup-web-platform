@@ -192,9 +192,10 @@ export function parseRequestHeaders(request) {
 	const externalRequestHeaders = {
 		...request.headers,
 		...getAuthHeaders(request),
-		'accept-language': getLanguageHeader(request),
 		...getClientIpHeader(request),
+		'accept-language': getLanguageHeader(request),
 		'x-meetup-agent': config.package.agent,
+		'x-meeetup-parent-request-id': request.id,
 	};
 
 	delete externalRequestHeaders['host']; // let app server set 'host'
@@ -248,7 +249,7 @@ export function getExternalRequestOpts(request) {
 	const externalRequestOpts = {
 		baseUrl,
 		method: request.method,
-		headers: parseRequestHeaders(request), // make a copy to be immutable
+		headers: parseRequestHeaders(request),
 		mode: 'no-cors',
 		time: true, // time the request for logging
 		agentOptions: {
