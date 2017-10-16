@@ -31,6 +31,7 @@ jest.mock('mwp-cli/src/config', () => {
 });
 
 const MOCK_HAPI_REQUEST = {
+	id: 'mock-uuid-1234',
 	server: getServer(),
 	method: 'get',
 	headers: {},
