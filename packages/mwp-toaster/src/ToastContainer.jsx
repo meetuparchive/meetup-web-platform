@@ -40,8 +40,13 @@ export class ToastContainer extends React.Component {
 	 * renders linked from chapstick
 	 */
 	componentDidMount() {
-		this.props.showToasts(); // dispatch action to tell app that toasts are shown
-		const { location: { search }, sysmsgsKey, sysmsgs } = this.props;
+		const {
+			showToasts,
+			location: { search },
+			sysmsgsKey,
+			sysmsgs,
+		} = this.props;
+		showToasts(); // dispatch action to tell app that toasts are shown
 		if (search) {
 			const searchParams = new URLSearchParams(search);
 			const sysmsgToast = sysmsgs[searchParams.get(sysmsgsKey)];
@@ -54,6 +59,7 @@ export class ToastContainer extends React.Component {
 		return (
 			<Toaster
 				toasts={this.props.readyToasts.map((t, i) => <Toast {...t} key={i} />)}
+				className={this.props.className}
 			/>
 		);
 	}
