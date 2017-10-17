@@ -10,7 +10,7 @@ describe('ToastContainer', () => {
 		bar: toastProps,
 	};
 	const props = {
-		ready: [toastProps],
+		readyToasts: [toastProps],
 		sysmsgs,
 		sysmsgsKey: 'key',
 		makeToast: jest.fn(),
@@ -21,7 +21,9 @@ describe('ToastContainer', () => {
 		const wrapper = shallow(<ToastContainer {...props} />);
 		const toasterWrapper = wrapper.find(Toaster);
 		expect(toasterWrapper.exists()).toBe(true);
-		expect(toasterWrapper.prop('toasts')).toHaveLength(props.ready.length);
+		expect(toasterWrapper.prop('toasts')).toHaveLength(
+			props.readyToasts.length
+		);
 	});
 	it('calls makeToast in componentDidMount when querystring param matches a sysmsg', () => {
 		jest.clearAllMocks();
@@ -54,16 +56,16 @@ describe('ToastContainer', () => {
 		expect(props.showToasts).toHaveBeenCalled();
 	});
 
-	it('only updates when `ready` contains new toasts (shouldComponentUpdate)', () => {
-		const newReady = { ...props, ready: [...props.ready] };
-		const noReady = { ...props, ready: [] };
+	it('only updates when `readyToasts` contains new toasts (shouldComponentUpdate)', () => {
+		const newReady = { ...props, readyToasts: [...props.readyToasts] };
+		const noReady = { ...props, readyToasts: [] };
 		const wrapper = shallow(<ToastContainer {...props} />);
 		const instance = wrapper.instance();
 		// test 'no change' props
 		expect(instance.shouldComponentUpdate(props)).toBe(false);
-		// test 'new `ready` prop'
+		// test 'new `readyToasts` prop'
 		expect(instance.shouldComponentUpdate(newReady)).toBe(true);
-		// test 'no `ready` prop`
+		// test 'no `readyToasts` prop`
 		expect(instance.shouldComponentUpdate(noReady)).toBe(false);
 	});
 });
