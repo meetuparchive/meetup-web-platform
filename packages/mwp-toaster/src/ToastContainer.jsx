@@ -1,8 +1,8 @@
 /*
  * 1. Creating toasts should _always_ be a Redux action, e.g. TOAST_MAKE
- * 2. TOAST_MAKE will go through the platform reducer to populate an array in {{state.toast.ready}}
- * 3. When the ToastMaster is instantiated, it will consume {{state.toast.ready}} and dispatch a new action TOAST_SHOW
- * 4. TOAST_SHOW will _clear_ {{state.toast.ready}}
+ * 2. TOAST_MAKE will go through the platform reducer to populate an array in {{state.toast.readyToasts}}
+ * 3. When the ToastMaster is instantiated, it will consume {{state.toast.readyToasts}} and dispatch a new action TOAST_SHOW
+ * 4. TOAST_SHOW will _clear_ {{state.toast.readyToasts}}
  */
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -13,7 +13,7 @@ import Toast from 'meetup-web-components/lib/interactive/Toast';
 import { makeToast, showToasts } from './actions';
 import { getReadyToasts } from './reducer';
 
-const mapStateToProps = state => ({ ready: getReadyToasts(state) });
+const mapStateToProps = state => ({ readyToasts: getReadyToasts(state) });
 const mapDispatchToProps = { makeToast, showToasts };
 
 /*
@@ -24,7 +24,10 @@ export class ToastContainer extends React.Component {
 	// Custom 'shouldComponentUpdate' in order to avoid re-rendering when there are
 	// no new toasts
 	shouldComponentUpdate(nextProps) {
-		return nextProps.ready.length > 0 && nextProps.ready !== this.props.ready;
+		return (
+			nextProps.readyToasts.length > 0 &&
+			nextProps.readyToasts !== this.props.readyToasts
+		);
 	}
 	componentDidUpdate() {
 		this.props.showToasts(); // dispatch action to tell app that toasts are shown
@@ -50,7 +53,7 @@ export class ToastContainer extends React.Component {
 	render() {
 		return (
 			<Toaster
-				toasts={this.props.ready.map((t, i) => <Toast {...t} key={i} />)}
+				toasts={this.props.readyToasts.map((t, i) => <Toast {...t} key={i} />)}
 			/>
 		);
 	}
@@ -58,14 +61,14 @@ export class ToastContainer extends React.Component {
 
 ToastContainer.propTyes = {
 	makeToast: PropTypes.func.isRequired, // provided by `mapDispatchToProps`
-	ready: PropTypes.arrayOf(PropTypes.object).isRequired, // array of Toast props from `mapStateToProps`
+	readyToasts: PropTypes.arrayOf(PropTypes.object).isRequired, // array of Toast props from `mapStateToProps`
 	sysmsgs: PropTypes.object.isRequired, // map of sysmsg to <Toast> props
 	sysmsgsKey: PropTypes.string.isRequired, // querystring param key
 	showToasts: PropTypes.func.isRequired, // provided by `mapDispatchToProps`
 	location: PropTypes.object.isRequired, // provided by `withRouter`
 };
 ToastContainer.defaultProps = {
-	ready: [],
+	readyToasts: [],
 	sysmsgsKey: 'sysmsg', // e.g. ?sysmsg=account_suspended
 	sysmsgs: {},
 };
