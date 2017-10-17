@@ -56,10 +56,19 @@ export class ToastContainer extends React.Component {
 		}
 	}
 	render() {
+		const {
+			makeToast, // eslint-disable-line no-unused-vars
+			readyToasts,
+			sysmsgs, // eslint-disable-line no-unused-vars
+			sysmsgsKey, // eslint-disable-line no-unused-vars
+			showToasts, // eslint-disable-line no-unused-vars
+			location, // eslint-disable-line no-unused-vars
+			...other
+		} = this.props; // support for injecting HTML attributes
 		return (
 			<Toaster
-				toasts={this.props.readyToasts.map((t, i) => <Toast {...t} key={i} />)}
-				className={this.props.className}
+				toasts={readyToasts.map((t, i) => <Toast {...t} key={i} />)}
+				{...other}
 			/>
 		);
 	}
