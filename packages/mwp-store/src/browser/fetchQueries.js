@@ -2,11 +2,7 @@ import JSCookie from 'js-cookie';
 import rison from 'rison';
 import { setClickCookie } from 'mwp-tracking-plugin/lib/util/clickState';
 
-import {
-	parseQueryResponse,
-	MEMBER_COOKIE_NAME,
-	getValidQueries,
-} from '../util/fetchUtils';
+import { parseQueryResponse } from '../util/fetchUtils';
 
 export const CSRF_HEADER = 'x-csrf-jwt';
 export const CSRF_HEADER_COOKIE = 'x-csrf-jwt-header';
@@ -24,6 +20,20 @@ export const CSRF_HEADER_COOKIE = 'x-csrf-jwt-header';
  * @return {Object} { url, config } arguments for a fetch call
  */
 export const getFetchArgs = (apiUrl, queries, meta) => {
+	if (process.env.NODE_ENV !== 'production') {
+		// basic query validation for dev. This block will be stripped out by
+		// minification in prod bundle.
+		try {
+			rison.encode_array(queries);
+		} catch (err) {
+			console.error(err);
+			console.error(
+				'Problem encoding queries',
+				'- please ensure that there are no undefined params',
+				JSON.stringify(queries, null, 2)
+			);
+		}
+	}
 	const headers = {};
 	const method = ((queries[0].meta || {}).method || 'GET') // fallback to 'get'
 		.toUpperCase(); // must be upper case - requests can fail silently otherwise
@@ -82,6 +92,26 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 	};
 };
 
+const _fetchQueryResponse = (apiUrl, queries, meta) => {
+	if (queries.length === 0) {
+		// no queries => no responses (no need to fetch)
+		return Promise.resolve({ responses: [] });
+	}
+
+	const { url, config } = getFetchArgs(apiUrl, queries, meta);
+	return fetch(url, config)
+		.then(queryResponse => queryResponse.json())
+		.catch(err => {
+			console.error(
+				JSON.stringify({
+					err: err.stack,
+					message: 'App server API fetch error',
+					context: config,
+				})
+			);
+			throw err; // handle the error upstream
+		});
+};
 /**
  * Wrapper around `fetch` to send an array of queries to the server and organize
  * the responses.
@@ -103,25 +133,10 @@ const fetchQueries = apiUrl => (queries, meta) => {
 	) {
 		throw new Error('fetchQueries was called on server - cannot continue');
 	}
-	const memberCookie = JSCookie.get(MEMBER_COOKIE_NAME);
-	const validQueries = getValidQueries(memberCookie)(queries);
-	const { url, config } = getFetchArgs(apiUrl, validQueries, meta);
 
-	return fetch(url, config)
-		.then(queryResponse => queryResponse.json())
-		.then(queryJSON => ({
-			...parseQueryResponse(validQueries)(queryJSON),
-		}))
-		.catch(err => {
-			console.error(
-				JSON.stringify({
-					err: err.stack,
-					message: 'App server API fetch error',
-					context: config,
-				})
-			);
-			throw err; // handle the error upstream
-		});
+	return _fetchQueryResponse(apiUrl, queries, meta).then(queryResponse => ({
+		...parseQueryResponse(queries)(queryResponse),
+	}));
 };
 
 export default fetchQueries;
