@@ -2,7 +2,11 @@ import JSCookie from 'js-cookie';
 import rison from 'rison';
 import { setClickCookie } from 'mwp-tracking-plugin/lib/util/clickState';
 
-import { parseQueryResponse } from '../util/fetchUtils';
+import {
+	parseQueryResponse,
+	MEMBER_COOKIE_NAME,
+	getValidQueries,
+} from '../util/fetchUtils';
 
 export const CSRF_HEADER = 'x-csrf-jwt';
 export const CSRF_HEADER_COOKIE = 'x-csrf-jwt-header';
@@ -99,13 +103,14 @@ const fetchQueries = apiUrl => (queries, meta) => {
 	) {
 		throw new Error('fetchQueries was called on server - cannot continue');
 	}
-
-	const { url, config } = getFetchArgs(apiUrl, queries, meta);
+	const memberCookie = JSCookie.get(MEMBER_COOKIE_NAME);
+	const validQueries = getValidQueries(memberCookie)(queries);
+	const { url, config } = getFetchArgs(apiUrl, validQueries, meta);
 
 	return fetch(url, config)
 		.then(queryResponse => queryResponse.json())
 		.then(queryJSON => ({
-			...parseQueryResponse(queries)(queryJSON),
+			...parseQueryResponse(validQueries)(queryJSON),
 		}))
 		.catch(err => {
 			console.error(
