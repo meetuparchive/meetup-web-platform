@@ -11,7 +11,7 @@ export const getValidQueries = memberCookie => (
 ): Array<Query> => {
 	const isLoggedIn = getIsLoggedIn(memberCookie);
 	return queries.filter(
-		q => isLoggedIn || !q.endpoint.contains('members/self') // remove members/self call for logged-out
+		q => isLoggedIn || !q.endpoint.includes('members/self') // remove members/self call for logged-out
 	);
 };
 /**

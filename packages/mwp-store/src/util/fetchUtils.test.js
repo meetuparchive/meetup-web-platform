@@ -42,7 +42,7 @@ describe('getValidQueries', () => {
 		params: {},
 	};
 	const loggedIn = 'id=1234&other=data';
-	const loggedOut = 'id=0'; // 'undefined' also considered logged-out
+	const loggedOut = 'id=0&other=data'; // 'undefined' also considered logged-out
 	it('filters "members/self" for logged-out users', () => {
 		expect(getValidQueries(loggedOut)([memberSelfQuery])).toHaveLength(0);
 		expect(getValidQueries(loggedOut)([memberSelfQuery, fooQuery])).toEqual([
