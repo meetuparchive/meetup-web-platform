@@ -13,6 +13,7 @@ describe('serverFetchQueries', () => {
 				return Observable.of('response');
 			}),
 			trackActivity: jest.fn(),
+			state: {},
 		};
 		const queries = [];
 		const expectedParsedResponse = 'foo';

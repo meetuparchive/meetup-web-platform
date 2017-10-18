@@ -1,4 +1,4 @@
-import { parseQueryResponse } from './fetchUtils';
+import { parseQueryResponse, getValidQueries } from './fetchUtils';
 
 describe('parseQueryResponse', () => {
 	it('categorizes query responses into success and failure arrays of [query, response] tuples', () => {
@@ -29,5 +29,29 @@ describe('parseQueryResponse', () => {
 		expect(() => parseQueryResponse(queries)(proxyResponse)).toThrowError(
 			/do not match/
 		);
+	});
+});
+
+describe('getValidQueries', () => {
+	const memberSelfQuery = {
+		endpoint: 'members/self',
+		params: {},
+	};
+	const fooQuery = {
+		endpoint: 'foo/bar',
+		params: {},
+	};
+	const loggedIn = 'id=1234&other=data';
+	const loggedOut = 'id=0&other=data'; // 'undefined' also considered logged-out
+	it('filters "members/self" for logged-out users', () => {
+		expect(getValidQueries(loggedOut)([memberSelfQuery])).toHaveLength(0);
+		expect(getValidQueries(loggedOut)([memberSelfQuery, fooQuery])).toEqual([
+			fooQuery,
+		]);
+		expect(getValidQueries(undefined)([memberSelfQuery])).toHaveLength(0);
+	});
+	it('does not filter "members/self" for logged-in users', () => {
+		const queries = [memberSelfQuery, fooQuery];
+		expect(getValidQueries(loggedIn)(queries)).toEqual(queries);
 	});
 });
