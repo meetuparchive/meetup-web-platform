@@ -1,3 +1,13 @@
+## [9.0]
+
+### BREAKING CHANGES
+
+- **Removed** Queries specifying REST API endpoints that do not support
+  logged-out members will no longer produce responses. Specifically,
+  `members/self` will not be called, meaning that `state.api.self` can not be
+  assumed to have a value throughout the application - a selector function
+  should be used to provide a reasonable default value in your components.
+
 ## [8.1]
 
 - `mwp-log` now contains nicely-formatted logs
