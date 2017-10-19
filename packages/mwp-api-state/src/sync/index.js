@@ -98,9 +98,16 @@ export const getNavEpic = (routes, baseUrl) => {
 						resolveNewQueries,
 						resolvePrevQueries,
 					]).then(([newQueries, previousQueries]) => {
-						// determine which refs are _new_ relative to the previous location,
-						// and set `retainRefs` in order to avoid clearing the 'stable' refs
-						requestMetadata.retainRefs = previousQueries.map(q => q.ref);
+						// perform a fast comparison of previous route's serialized queries
+						// with the new route's serialized queries. All state refs for
+						// _shared_ queries should be retained
+						const serializedNew = newQueries.map(JSON.stringify);
+						const serializedPrev = previousQueries.map(JSON.stringify);
+						const sharedRefs = serializedPrev
+							.filter(qJSON => serializedNew.includes(qJSON))
+							.map(JSON.parse)
+							.map(q => q.ref);
+						requestMetadata.retainRefs = sharedRefs;
 						return newQueries;
 					})
 				).map(q => api.requestAll(q, requestMetadata));
