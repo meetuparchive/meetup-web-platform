@@ -4,15 +4,14 @@ export const MEMBER_COOKIE_NAME = isProd
 	? 'MEETUP_MEMBER'
 	: 'MEETUP_MEMBER_DEV';
 const getIsLoggedIn = (memberCookie: ?string) => {
-	return memberCookie && !/id=0&/.test(memberCookie);
+	return Boolean(memberCookie) && !/id=0&/.test(memberCookie);
 };
-export const getValidQueries = memberCookie => (
-	queries: Array<Query>
-): Array<Query> => {
+// Higher order function that provides a filtering function for queries based
+// on logged-in status
+export const getAuthedQueryFilter = memberCookie => {
 	const isLoggedIn = getIsLoggedIn(memberCookie);
-	return queries.filter(
-		q => isLoggedIn || !q.endpoint.includes('members/self') // remove members/self call for logged-out
-	);
+	return (q: Query): boolean =>
+		isLoggedIn || !q.endpoint.includes('members/self');
 };
 /**
  * A module for middleware that would like to make external calls through `fetch`

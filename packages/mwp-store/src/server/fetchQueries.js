@@ -4,7 +4,7 @@ import 'rxjs/add/operator/toPromise';
 import {
 	parseQueryResponse,
 	MEMBER_COOKIE_NAME,
-	getValidQueries,
+	getAuthedQueryFilter,
 } from '../util/fetchUtils';
 
 /**
@@ -15,7 +15,8 @@ export default (request: HapiRequest) => () => (
 	queries: Array<Query>
 ): Promise<ParsedQueryResponses> => {
 	const memberCookie = request.state[MEMBER_COOKIE_NAME];
-	const validQueries = getValidQueries(memberCookie)(queries);
+	const authedQueries = getAuthedQueryFilter(memberCookie);
+	const validQueries = queries.filter(authedQueries);
 	return request
 		.proxyApi$(validQueries)
 		.map(responses => ({ responses })) // package the responses in object like the API proxy endpoint does
