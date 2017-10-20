@@ -1,6 +1,6 @@
 {
   "collectCoverageFrom": [
-    "src/**/*.{js,jsx}",
+    "packages/**/*.{js,jsx}",
     "!**/{node_modules,lib,coverage,scripts}/**"
   ],
   "coverageDirectory": "<rootDir>/coverage",
@@ -10,7 +10,7 @@
     "json"
   ],
   "setupFiles": [
-    "<rootDir>/src/util/globals.js"
+    "<rootDir>/tests/util/globals.js"
   ],
   "testEnvironment": "node",
   "testRegex": "src\/.*\\.test\\.jsx?$"
