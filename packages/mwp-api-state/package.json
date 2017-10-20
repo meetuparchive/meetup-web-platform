@@ -26,13 +26,16 @@
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "peerDependencies": {
-    "rxjs": "5.4.3",
+    "mwp-router": ">=0.0.1",
     "redux-observable": "0.16.0",
-    "mwp-router": ">=0.0.1"
+    "rxjs": "^5.4.3"
   },
   "dependencies": {
     "idb-keyval": "2.3.0",
     "mwp-tracking-plugin": ">=0.0.1"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "mwp-router": ">=0.0.1",
+    "mwp-test-utils": ">=0.0.1"
+  }
 }

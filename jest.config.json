@@ -10,7 +10,7 @@
     "json"
   ],
   "setupFiles": [
-    "<rootDir>/tests/util/globals.js"
+    "<rootDir>/tests/util/setupTest.js"
   ],
   "testEnvironment": "node",
   "testRegex": "src\/.*\\.test\\.jsx?$"
