@@ -67,7 +67,6 @@
     "meetup-web-mocks": "1.0.217",
     "mwp-cli": "1.1.268",
     "mwp-router": ">=0.0.1",
-    "mwp-test-utils": ">=*.*.*",
     "node-fetch": "1.7.2",
     "prettier": "1.5.2",
     "prop-types": "15.5.10",
