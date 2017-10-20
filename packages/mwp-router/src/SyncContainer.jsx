@@ -26,13 +26,12 @@ export class SyncContainer extends React.Component {
 	 * @return {undefined} side effect only - dispatch
 	 */
 	componentWillReceiveProps({ location, history }) {
-		if (
-			location.pathname !== this.props.location.pathname ||
-			location.search !== this.props.location.search
-		) {
+		const isPathChange = location.pathname !== this.props.location.pathname;
+		const isSearchChange = location.search !== this.props.location.search;
+		if (isPathChange || isSearchChange) {
 			this.props.dispatchLocationChange(location);
-			if (history.action === 'PUSH') {
-				// new navigation - scroll to top
+			if (history.action === 'PUSH' && isPathChange) {
+				// new page - scroll to top
 				window.scrollTo(0, 0);
 			}
 			// eventually we might want to try setting up some scroll logic for 'POP'
