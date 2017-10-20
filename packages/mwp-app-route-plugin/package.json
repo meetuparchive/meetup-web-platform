@@ -28,12 +28,14 @@
   "dependencies": {
     "redbox-react": "1.4.3"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "mwp-test-utils": ">=0.0.1"
+  },
   "peerDependencies": {
-    "mwp-core": ">=0.0.1",
-    "react": "15.6.1",
-    "react-dom": "15.6.1",
     "electrode-csrf-jwt": "1.2.1",
-    "mwp-language-plugin": ">=0.0.1"
+    "mwp-core": ">=0.0.1",
+    "mwp-language-plugin": ">=0.0.1",
+    "react": "15.6.1",
+    "react-dom": "15.6.1"
   }
 }

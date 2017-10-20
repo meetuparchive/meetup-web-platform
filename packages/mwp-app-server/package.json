@@ -30,19 +30,21 @@
     "electrode-csrf-jwt": "1.2.1",
     "hapi": "16.5.2",
     "inert": "4.2.1",
-    "mwp-api-proxy-plugin": ">=*.*.*",
-    "mwp-app-route-plugin": ">=*.*.*",
-    "mwp-auth-plugin": ">=*.*.*",
-    "mwp-core": ">=*.*.*",
-    "mwp-language-plugin": ">=*.*.*",
-    "mwp-logger-plugin": ">=*.*.*",
-    "mwp-sw-plugin": ">=*.*.*",
-    "mwp-tracking-plugin": ">=*.*.*",
+    "mwp-api-proxy-plugin": ">=0.0.1",
+    "mwp-app-route-plugin": ">=0.0.1",
+    "mwp-auth-plugin": ">=0.0.1",
+    "mwp-core": ">=0.0.1",
+    "mwp-language-plugin": ">=0.0.1",
+    "mwp-logger-plugin": ">=0.0.1",
+    "mwp-sw-plugin": ">=0.0.1",
+    "mwp-tracking-plugin": ">=0.0.1",
     "pino": "4.7.1",
     "spdy": "3.4.7",
     "uuid": "3.1.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "mwp-test-utils": ">=0.0.1"
+  },
   "peerDependencies": {
     "mwp-cli": "^1.1.268"
   }

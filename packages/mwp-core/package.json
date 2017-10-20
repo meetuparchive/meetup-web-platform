@@ -27,20 +27,20 @@
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "peerDependencies": {
     "mwp-cli": "^1.1.268",
-    "mwp-router": ">=*.*.*",
-    "react": "15.6.1",
-    "react-dom": "15.6.1",
-    "react-helmet": "5.2.0",
-    "react-intl": "2.4.0"
+    "mwp-router": ">=0.0.1",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "react-helmet": "^5.2.0",
+    "react-intl": "^2.4.0"
   },
   "dependencies": {
     "@google-cloud/pubsub": "0.13.1",
     "intl": "1.2.5",
     "joi": "10.6.0",
-    "mwp-api-proxy-plugin": ">=*.*.*",
-    "mwp-app-render": ">=*.*.*",
-    "mwp-logger-plugin": ">=*.*.*",
-    "mwp-store": ">=*.*.*",
+    "mwp-api-proxy-plugin": ">=0.0.1",
+    "mwp-app-render": ">=0.0.1",
+    "mwp-logger-plugin": ">=0.0.1",
+    "mwp-store": ">=0.0.1",
     "node-fetch": "1.7.2",
     "pino": "4.7.1",
     "qs": "6.5.0"
