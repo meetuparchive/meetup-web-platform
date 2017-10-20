@@ -26,13 +26,13 @@
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "dependencies": {
-    "mwp-core": ">=0.0.1",
-    "react": "15.6.1",
-    "react-dom": "15.6.1",
     "redbox-react": "1.4.3"
   },
   "devDependencies": {},
   "peerDependencies": {
+    "mwp-core": ">=0.0.1",
+    "react": "15.6.1",
+    "react-dom": "15.6.1",
     "electrode-csrf-jwt": "1.2.1",
     "mwp-language-plugin": ">=0.0.1"
   }

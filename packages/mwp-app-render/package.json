@@ -27,7 +27,6 @@
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "peerDependencies": {
     "mwp-router": ">=*.*.*",
-    "prop-types": "15.5.10",
     "react": "15.6.1",
     "react-helmet": "5.2.0",
     "react-redux": "5.0.6",
