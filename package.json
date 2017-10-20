@@ -33,11 +33,11 @@
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "dependencies": {
     "@alrra/travis-scripts": "3.0.1",
-    "enzyme-adapter-react-15": "1.0.2",
     "lerna": "2.1.2"
   },
   "devDependencies": {
     "babel-cli": "6.24.1",
+    "babel-core": "6.26.0",
     "babel-eslint": "7.2.3",
     "babel-jest": "21.0.0",
     "babel-plugin-dynamic-import-node": "1.0.2",
@@ -48,6 +48,7 @@
     "boom": "5.2.0",
     "electrode-csrf-jwt": "1.2.1",
     "enzyme": "3.1.0",
+    "enzyme-adapter-react-15": "1.0.2",
     "eslint": "4.2.0",
     "eslint-config-prettier": "2.3.0",
     "eslint-plugin-flowtype": "2.34.1",
