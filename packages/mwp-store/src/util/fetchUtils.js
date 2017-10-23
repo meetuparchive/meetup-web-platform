@@ -1,15 +1,9 @@
 // @flow
-const isProd = process.env.NODE_ENV === 'production';
-export const MEMBER_COOKIE_NAME = isProd
-	? 'MEETUP_MEMBER'
-	: 'MEETUP_MEMBER_DEV';
-const getIsLoggedIn = (memberCookie: ?string) => {
-	return Boolean(memberCookie) && !/id=0&/.test(memberCookie);
-};
+const getIsLoggedIn = (member: ?Object) => Boolean((member || {}).id);
 // Higher order function that provides a filtering function for queries based
 // on logged-in status
-export const getAuthedQueryFilter = memberCookie => {
-	const isLoggedIn = getIsLoggedIn(memberCookie);
+export const getAuthedQueryFilter = (member: ?Object) => {
+	const isLoggedIn = getIsLoggedIn(member);
 	return (q: Query): boolean =>
 		isLoggedIn || !q.endpoint.includes('members/self');
 };

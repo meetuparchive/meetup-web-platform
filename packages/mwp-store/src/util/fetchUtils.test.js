@@ -37,8 +37,8 @@ describe('getAuthedQueryFilter', () => {
 		endpoint: 'members/self',
 		params: {},
 	};
-	const loggedIn = 'id=1234&other=data';
-	const loggedOut = 'id=0&other=data'; // 'undefined' also considered logged-out
+	const loggedIn = { id: 1234 };
+	const loggedOut = { id: 0 }; // 'undefined' also considered logged-out
 	it('returns false for "members/self" query for logged-out users', () => {
 		expect(getAuthedQueryFilter(loggedOut)(memberSelfQuery)).toBe(false);
 		expect(getAuthedQueryFilter(undefined)(memberSelfQuery)).toBe(false);

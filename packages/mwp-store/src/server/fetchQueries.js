@@ -1,21 +1,16 @@
 // @flow
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/toPromise';
-import {
-	parseQueryResponse,
-	MEMBER_COOKIE_NAME,
-	getAuthedQueryFilter,
-} from '../util/fetchUtils';
+import { parseQueryResponse, getAuthedQueryFilter } from '../util/fetchUtils';
 
 /**
  * on the server, we can proxy the API requests directly without making a
  * request to the server's own API proxy endpoint
  */
-export default (request: HapiRequest) => () => (
+export default (request: HapiRequest) => (apiUrl, member) => (
 	queries: Array<Query>
 ): Promise<ParsedQueryResponses> => {
-	const memberCookie = request.state[MEMBER_COOKIE_NAME];
-	const authedQueries = getAuthedQueryFilter(memberCookie);
+	const authedQueries = getAuthedQueryFilter(member);
 	const validQueries = queries.filter(authedQueries);
 	return request
 		.proxyApi$(validQueries)
