@@ -2,11 +2,7 @@ import JSCookie from 'js-cookie';
 import rison from 'rison';
 import { setClickCookie } from 'mwp-tracking-plugin/lib/util/clickState';
 
-import {
-	parseQueryResponse,
-	MEMBER_COOKIE_NAME,
-	getAuthedQueryFilter,
-} from '../util/fetchUtils';
+import { parseQueryResponse, getAuthedQueryFilter } from '../util/fetchUtils';
 
 export const CSRF_HEADER = 'x-csrf-jwt';
 export const CSRF_HEADER_COOKIE = 'x-csrf-jwt-header';
@@ -130,7 +126,7 @@ const _fetchQueryResponse = (apiUrl, queries, meta) => {
  *   click tracking data
  * @return {Promise} resolves with a `{queries, responses}` object
  */
-const fetchQueries = apiUrl => (queries, meta) => {
+const fetchQueries = (apiUrl, member) => (queries, meta) => {
 	if (
 		typeof window === 'undefined' &&
 		typeof test === 'undefined' // not in browser // not in testing env (global set by Jest)
@@ -138,8 +134,7 @@ const fetchQueries = apiUrl => (queries, meta) => {
 		throw new Error('fetchQueries was called on server - cannot continue');
 	}
 
-	const memberCookie = JSCookie.get(MEMBER_COOKIE_NAME);
-	const authedQueries = getAuthedQueryFilter(memberCookie);
+	const authedQueries = getAuthedQueryFilter(member);
 	const validQueries = queries.filter(authedQueries);
 	return _fetchQueryResponse(
 		apiUrl,
