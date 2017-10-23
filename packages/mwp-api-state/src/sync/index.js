@@ -160,8 +160,8 @@ export const apiRequestToApiReq = action$ =>
 export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 	action$.ofType(api.API_REQ).mergeMap(({ payload: queries, meta }) => {
 		// set up the fetch call to the app server
-		const { config } = store.getState();
-		const fetchQueries = fetchQueriesFn(config.apiUrl);
+		const { config, api: { self } } = store.getState();
+		const fetchQueries = fetchQueriesFn(config.apiUrl, (self || {}).value);
 		return Observable.fromPromise(fetchQueries(queries, meta)) // call fetch
 			.takeUntil(action$.ofType(LOCATION_CHANGE)) // cancel this fetch when nav happens
 			.mergeMap(({ successes = [], errors = [] }) => {
