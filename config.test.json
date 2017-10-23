@@ -6,7 +6,7 @@
     "port": 0
   },
   "api": {
-    "timeout": 10
+    "timeout": 100
   },
   "csrf_secret": "asdfasdfasdfasdfasdfasdfasdfasdf",
   "cookie_encrypt_secret": "asdfasdfasdfasdfasdfasdfasdfasdf",
