@@ -63,6 +63,9 @@ export class ToastContainer extends React.Component {
 			sysmsgsKey, // eslint-disable-line no-unused-vars
 			showToasts, // eslint-disable-line no-unused-vars
 			location, // eslint-disable-line no-unused-vars
+			match, // eslint-disable-line no-unused-vars
+			staticContext, // eslint-disable-line no-unused-vars
+			history, // eslint-disable-line no-unused-vars
 			...other
 		} = this.props; // support for injecting HTML attributes
 		return (
@@ -81,6 +84,9 @@ ToastContainer.propTyes = {
 	sysmsgsKey: PropTypes.string.isRequired, // querystring param key
 	showToasts: PropTypes.func.isRequired, // provided by `mapDispatchToProps`
 	location: PropTypes.object.isRequired, // provided by `withRouter`
+	history: PropTypes.object.isRequired, // provided by `withRouter`
+	match: PropTypes.object, // provided by `withRouter`
+	staticContext: PropTypes.object, // provided by `withRouter`
 };
 ToastContainer.defaultProps = {
 	readyToasts: [],
