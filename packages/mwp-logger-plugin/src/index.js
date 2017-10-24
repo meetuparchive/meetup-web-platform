@@ -1,7 +1,7 @@
 import logger from './logger';
 
 export function logResponse(request) {
-	const { response, id, server: { app: { logger } } } = request;
+	const { response, route, id, server: { app: { logger } } } = request;
 
 	if (response.isBoom) {
 		// response is an Error object
@@ -12,16 +12,19 @@ export function logResponse(request) {
 		});
 	}
 
+	const routePluginSettings = route.settings.plugins['mwp-logger-plugin'];
+
+	if (routePluginSettings && !routePluginSettings.enabled) {
+		// short circuit the normal logs for routes that opt-out
+		return;
+	}
+
 	const log = ((response.statusCode >= 500 && logger.error) ||
 		(response.statusCode >= 400 && logger.warn) ||
 		logger.info)
 		.bind(logger);
 
-	const routePluginSettings =
-		request.route.settings.plugins['mwp-logger-plugin'];
-	if (!routePluginSettings || routePluginSettings.enabled) {
-		log({ httpRequest: request, id });
-	}
+	log({ httpRequest: request, id, ...request.raw });
 
 	return;
 }

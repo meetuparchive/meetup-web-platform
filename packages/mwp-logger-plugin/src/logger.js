@@ -71,17 +71,26 @@ export const httpRequestSerializers = {
  * object defined by https://cloud.google.com/error-reporting/docs/formatting-error-messages
  */
 const errorContextSerializers = {
-	hapi: request => ({
-		httpRequest: {
-			method: request.method.toUpperCase(),
-			url: request.url.href,
-			userAgent: request.headers['user-agent'],
-			referrer: request.headers['referer'],
-			responseStatusCode: (request.response || {}).statusCode || 500,
-			remoteIp:
-				request.headers['x_forwarded_for'] || request.headers['remote_addr'],
-		},
-	}),
+	hapi: request => {
+		const context = {
+			httpRequest: {
+				method: request.method.toUpperCase(),
+				url: request.url.href,
+				userAgent: request.headers['user-agent'],
+				referrer: request.headers['referer'],
+				responseStatusCode: (request.response || {}).statusCode || 500,
+				remoteIp:
+					request.headers['x_forwarded_for'] || request.headers['remote_addr'],
+			},
+		};
+		const memberId = request.headers['x-member'];
+		if (memberId !== '0') {
+			// Stackdriver Error Reporting specifically does not want this field for
+			// logged-out users
+			context.user = memberId;
+		}
+		return context;
+	},
 	incomingMessage: response => ({
 		httpRequest: {
 			method: response.request.method.toUpperCase(),
@@ -152,6 +161,10 @@ if (GAE_INSTANCE && !DISABLE_GAE_LOG) {
 				module_id: GAE_SERVICE,
 				version_id: GAE_VERSION,
 			},
+		},
+		serviceContext: {
+			service: GAE_SERVICE,
+			version: GAE_VERSION,
 		},
 	});
 	GAELogger.on('error', err =>

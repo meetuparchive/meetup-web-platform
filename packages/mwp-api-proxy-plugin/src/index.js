@@ -17,7 +17,12 @@ const onResponse = request => {
 	uploads.forEach(f =>
 		fs.unlink(f, err => {
 			if (err) {
-				logger.error({ err, f, ...request.raw });
+				logger.error({
+					err,
+					context: request,
+					f,
+					...request.raw,
+				});
 			}
 		})
 	);
