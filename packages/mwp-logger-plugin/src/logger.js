@@ -84,7 +84,7 @@ const errorContextSerializers = {
 			},
 		};
 		const memberId = request.headers['x-member'];
-		if (memberId !== '0') {
+		if (memberId && memberId !== '0') {
 			// Stackdriver Error Reporting specifically does not want this field for
 			// logged-out users
 			context.user = memberId;
