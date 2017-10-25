@@ -14,7 +14,13 @@ import catchMiddleware from '../middleware/catch';
  */
 export function getServerCreateStore(routes, middleware, request, baseUrl) {
 	const middlewareToApply = [
-		catchMiddleware(err => request.server.app.logger.error(err)),
+		catchMiddleware(err =>
+			request.server.app.logger.error({
+				err,
+				context: request,
+				...request.raw,
+			})
+		),
 		getApiMiddleware(routes, getFetchQueries(request), baseUrl),
 		...middleware,
 	];
