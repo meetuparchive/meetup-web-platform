@@ -167,9 +167,7 @@ if (GAE_INSTANCE && !DISABLE_GAE_LOG) {
 			version: GAE_VERSION,
 		},
 	});
-	GAELogger.on('error', err =>
-		console.error({ logName: 'mwp_log', payload: { message: err.stack } })
-	);
+	GAELogger.on('error', err => console.error(err));
 
 	streams.push(GAELogger.stream());
 }
@@ -187,5 +185,14 @@ const logger = bunyan.createLogger({
 	serializers,
 	streams,
 });
+
+logger.info(
+	{
+		GAE_SERVICE,
+		GAE_VERSION,
+		GAE_INSTANCE,
+	},
+	'GAE logging initialized'
+);
 
 export default logger;
