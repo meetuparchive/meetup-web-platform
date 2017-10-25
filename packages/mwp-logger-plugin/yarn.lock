@@ -39,9 +39,9 @@
     string-format-obj "^1.1.0"
     through2 "^2.0.3"
 
-"@google-cloud/logging-bunyan@0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@google-cloud/logging-bunyan/-/logging-bunyan-0.5.0.tgz#ddd69d5589a4958cf24b12be10556c3bca36aaab"
+"@google-cloud/logging-bunyan@0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@google-cloud/logging-bunyan/-/logging-bunyan-0.6.0.tgz#45b4b17cfa57f2702427b8ed7fff1a2d1e21d720"
   dependencies:
     "@google-cloud/logging" "^1.0.0"
     extend "^3.0.0"

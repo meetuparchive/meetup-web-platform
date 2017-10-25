@@ -28,8 +28,8 @@
   "peerDependencies": {
     "mwp-cli": "^1.1.268",
     "mwp-router": ">=0.0.1",
-    "react": "^15.6.1",
-    "react-dom": "^15.6.1",
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0",
     "react-helmet": "^5.2.0",
     "react-intl": "^2.4.0"
   },
