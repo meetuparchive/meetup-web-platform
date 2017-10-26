@@ -186,13 +186,11 @@ const logger = bunyan.createLogger({
 	streams,
 });
 
-logger.info(
-	{
-		GAE_SERVICE,
-		GAE_VERSION,
-		GAE_INSTANCE,
-	},
-	'GAE logging initialized'
-);
+if (GAE_INSTANCE && !DISABLE_GAE_LOG) {
+	logger.info(
+		{ GAE_SERVICE, GAE_VERSION, GAE_INSTANCE },
+		'GAE logging initialized'
+	);
+}
 
 export default logger;
