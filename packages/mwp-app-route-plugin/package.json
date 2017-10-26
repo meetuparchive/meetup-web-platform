@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "dependencies": {
-    "redbox-react": "1.4.3"
+    "redbox-react": "1.5.0"
   },
   "devDependencies": {
     "mwp-test-utils": ">=0.0.1"
