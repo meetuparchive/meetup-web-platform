@@ -33,6 +33,7 @@ export function logResponse(request) {
 const onRequestError = (request, err) => {
 	logger.error({
 		err,
+		context: request,
 		...request.raw,
 	});
 };
