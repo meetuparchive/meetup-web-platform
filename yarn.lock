@@ -7844,9 +7844,9 @@ sw-toolbox@^3.4.0:
     path-to-regexp "^1.0.1"
     serviceworker-cache-polyfill "^4.0.0"
 
-"swarm-animation@https://github.com/meetup/swarm-animation.git":
+"swarm-animation@git+https://github.com/meetup/swarm-animation.git":
   version "0.0.1"
-  resolved "https://github.com/meetup/swarm-animation.git#81a070a49a54f2e3ef78aec2f16a82778ae49f16"
+  resolved "git+https://github.com/meetup/swarm-animation.git#81a070a49a54f2e3ef78aec2f16a82778ae49f16"
   dependencies:
     autoprefixer "^7.1.1"
     jasmine-jquery "^2.1.1"
