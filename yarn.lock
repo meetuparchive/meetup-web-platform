@@ -3893,11 +3893,7 @@ hoek@5.x.x:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/hoek/-/hoek-5.0.0.tgz#b88953e0fec8e58082e4abd223ed20915d535831"
 
-hoist-non-react-statics@^1.0.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/hoist-non-react-statics/-/hoist-non-react-statics-1.2.0.tgz#aa448cf0986d55cc40773b17174b7dd066cb7cfb"
-
-hoist-non-react-statics@^2.2.1, hoist-non-react-statics@^2.3.0:
+hoist-non-react-statics@^2.2.1, hoist-non-react-statics@^2.3.0, hoist-non-react-statics@^2.3.1:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/hoist-non-react-statics/-/hoist-non-react-statics-2.3.1.tgz#343db84c6018c650778898240135a1420ee22ce0"
 
@@ -5343,15 +5339,15 @@ media-typer@0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/media-typer/-/media-typer-0.3.0.tgz#8710d7af0aa626f8fffa1ce00168545263255748"
 
-meetup-web-components@3.2.1568:
-  version "3.2.1568"
-  resolved "https://registry.yarnpkg.com/meetup-web-components/-/meetup-web-components-3.2.1568.tgz#91e88070313e4c695a6b09b28e9c89e7d3d6665c"
+meetup-web-components@3.2.1577:
+  version "3.2.1577"
+  resolved "https://registry.yarnpkg.com/meetup-web-components/-/meetup-web-components-3.2.1577.tgz#3b7b70d4948546dec36f44cb47e999c366b79c20"
   dependencies:
     autosize "3.0.21"
     base64-image-loader "1.2.0"
     flatpickr "3.0.6"
-    prop-types "15.5.10"
-    recompose "0.24.0"
+    prop-types "15.6.0"
+    recompose "0.26.0"
     swarm-animation "https://github.com/meetup/swarm-animation.git"
     swarm-sasstools "2.0.282"
 
@@ -6521,7 +6517,7 @@ prop-types@15.5.10:
     fbjs "^0.8.9"
     loose-envify "^1.3.1"
 
-prop-types@^15.5.10, prop-types@^15.5.4, prop-types@^15.5.8, prop-types@^15.6.0:
+prop-types@15.6.0, prop-types@^15.5.10, prop-types@^15.5.4, prop-types@^15.5.8, prop-types@^15.6.0:
   version "15.6.0"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.6.0.tgz#ceaf083022fc46b4a35f69e13ef75aed0d639856"
   dependencies:
@@ -6881,13 +6877,13 @@ readdirp@^2.0.0:
     readable-stream "^2.0.2"
     set-immediate-shim "^1.0.1"
 
-recompose@0.24.0:
-  version "0.24.0"
-  resolved "https://registry.yarnpkg.com/recompose/-/recompose-0.24.0.tgz#262e93f974439eb17e7779824d88cce90492a5dd"
+recompose@0.26.0:
+  version "0.26.0"
+  resolved "https://registry.yarnpkg.com/recompose/-/recompose-0.26.0.tgz#9babff039cb72ba5bd17366d55d7232fbdfb2d30"
   dependencies:
     change-emitter "^0.1.2"
     fbjs "^0.8.1"
-    hoist-non-react-statics "^1.0.0"
+    hoist-non-react-statics "^2.3.1"
     symbol-observable "^1.0.4"
 
 recursive-readdir@2.2.1:
