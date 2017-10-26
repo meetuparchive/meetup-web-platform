@@ -27,9 +27,9 @@
   "devDependencies": {},
   "peerDependencies": {
     "meetup-web-components": "^3.0.1281",
-    "react": ">15.0.0",
-    "react-router-dom": "4.2.2",
-    "react-transition-group": "2.2.1",
+    "react": "^16.0.0",
+    "react-router-dom": "^4.2.2",
+    "react-transition-group": "^2.2.1",
     "reselect": "^3.0.1"
   }
 }
