@@ -17,3 +17,17 @@ export const parseMemberCookie = state => {
 	member.id = parseInt(member.id, 10) || 0;
 	return member;
 };
+
+/*
+ * Some variant settings can be passed in from MEETUP_VARIANT_XXX cookies. This
+ * function reads those cookie values from `state` and returns a map of values
+ */
+export const getVariants = state =>
+	Object.keys(state).reduce((variants, cookieName) => {
+		const isEnvCookie = !(appConfig.isProd ^ !cookieName.endsWith('_DEV')); // XNOR - both conditions or neither condition
+		if (cookieName.startsWith('MEETUP_VARIANT_') && isEnvCookie) {
+			variants[cookieName.replace(/^MEETUP_VARIANT_|_DEV$/g, '')] =
+				state[cookieName];
+		}
+		return variants;
+	}, {});

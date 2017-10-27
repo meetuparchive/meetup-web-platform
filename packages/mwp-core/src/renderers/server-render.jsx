@@ -14,6 +14,8 @@ import { getServerCreateStore } from 'mwp-store/lib/server';
 import Dom from 'mwp-app-render/lib/components/Dom';
 import ServerApp from 'mwp-app-render/lib/components/ServerApp';
 
+import { getVariants } from '../util/cookieUtils';
+
 // Ensure global Intl for use with FormatJS
 Intl.NumberFormat = IntlPolyfill.NumberFormat;
 Intl.DateTimeFormat = IntlPolyfill.DateTimeFormat;
@@ -220,6 +222,7 @@ const makeRenderer = (
 		url,
 		server: { app: { logger }, settings: { app: { supportedLangs } } },
 		raw: { req },
+		state,
 	} = request;
 	const requestLanguage = request.getLanguage();
 
@@ -240,6 +243,7 @@ const makeRenderer = (
 			requestLanguage,
 			supportedLangs,
 			initialNow: new Date().getTime(),
+			variants: getVariants(state),
 		},
 	};
 

@@ -1,4 +1,4 @@
-import { MEMBER_COOKIE, parseMemberCookie } from './cookieUtils';
+import { MEMBER_COOKIE, parseMemberCookie, getVariants } from './cookieUtils';
 
 describe('parseMemberCookie', () => {
 	it('returns the parsed cookie', () => {
@@ -35,5 +35,23 @@ describe('parseMemberCookie', () => {
 	});
 	it('returns {id:0} for no-cookie case', () => {
 		expect(parseMemberCookie({})).toEqual({ id: 0 });
+	});
+});
+
+describe('getVariants', () => {
+	it('creates an object', () => {
+		expect(getVariants({})).toEqual(expect.any(Object));
+		expect(getVariants({ foo: 'bar' })).toEqual(expect.any(Object));
+		expect(getVariants({ MEETUP_VARIANT_FOO_DEV: 'bar' })).toEqual(
+			expect.any(Object)
+		);
+	});
+	it('extracts prefix-free key from MEETUP_VARIANT_XXX', () => {
+		const val = 'bar';
+		expect(getVariants({ MEETUP_VARIANT_FOO_DEV: val }).FOO).toEqual(val);
+	});
+	it('extracts suffix-free key from MEETUP_VARIANT_XXX_DEV', () => {
+		const val = 'bar';
+		expect(getVariants({ MEETUP_VARIANT_FOO_DEV: val }).FOO).toEqual(val);
 	});
 });
