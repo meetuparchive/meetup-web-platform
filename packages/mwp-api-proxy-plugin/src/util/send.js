@@ -195,7 +195,7 @@ export function parseRequestHeaders(request) {
 		...getClientIpHeader(request),
 		'accept-language': getLanguageHeader(request),
 		'x-meetup-agent': config.package.agent,
-		'x-meeetup-parent-request-id': request.id,
+		'x-meetup-parent-request-id': request.id,
 	};
 
 	delete externalRequestHeaders['host']; // let app server set 'host'
