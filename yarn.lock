@@ -5339,9 +5339,9 @@ media-typer@0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/media-typer/-/media-typer-0.3.0.tgz#8710d7af0aa626f8fffa1ce00168545263255748"
 
-meetup-web-components@3.2.1577:
-  version "3.2.1577"
-  resolved "https://registry.yarnpkg.com/meetup-web-components/-/meetup-web-components-3.2.1577.tgz#3b7b70d4948546dec36f44cb47e999c366b79c20"
+meetup-web-components@3.2.1580:
+  version "3.2.1580"
+  resolved "https://registry.yarnpkg.com/meetup-web-components/-/meetup-web-components-3.2.1580.tgz#922351eb7b5461a60ba03316fc1b97ce09f06c4b"
   dependencies:
     autosize "3.0.21"
     base64-image-loader "1.2.0"

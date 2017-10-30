@@ -1,3 +1,7 @@
+## [9.1]
+
+- Support for reading `MEETUP_VARIANT_...` cookies into `state.config.variants`
+
 ## [9.0]
 
 ### BREAKING CHANGES
