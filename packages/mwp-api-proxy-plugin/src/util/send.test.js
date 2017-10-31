@@ -279,21 +279,25 @@ describe('makeExternalApiRequest', () => {
 			.then(() => require('request').mock.calls.pop()[0])
 			.then(arg => expect(arg).toBe(requestOpts));
 	});
-	it('throws an error when the API times out', () => {
-		const API_TIMEOUT = 1;
+	it('Returns an ETIMEDOUT error object for timeouts', () => {
+		const err = new Error('ETIMEDOUT');
+		err.code = 'ETIMEDOUT';
 		const requestOpts = {
 			foo: 'bar',
 			url: 'http://example.com',
+			err,
 		};
+
 		return makeExternalApiRequest({
 			server: {
-				settings: { app: { api: { timeout: API_TIMEOUT } } },
+				app: { logger: { error: () => {} } },
+				settings: { app: { api: { timeout: 100 } } },
 			},
+			raw: {},
 		})(requestOpts)
 			.toPromise()
-			.then(
-				() => expect(true).toBe(false), // should not be called
-				err => expect(err).toEqual(jasmine.any(Error))
+			.then(([resp, body]) =>
+				expect(JSON.parse(body).errors[0].code).toBe('ETIMEDOUT')
 			);
 	});
 	it('returns the requestOpts jar at array index 2', () => {
