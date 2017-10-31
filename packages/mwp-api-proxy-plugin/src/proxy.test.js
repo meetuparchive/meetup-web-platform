@@ -75,7 +75,7 @@ describe('apiProxy$', () => {
 			{
 				ref: query.ref,
 				meta: {
-					requestId: 'mock request',
+					requestId: 'mock-request',
 					endpoint,
 					statusCode: 200,
 				},

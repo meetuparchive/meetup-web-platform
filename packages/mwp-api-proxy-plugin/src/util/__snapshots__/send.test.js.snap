@@ -19,6 +19,7 @@ Object {
   "method": "get",
   "mode": "no-cors",
   "time": true,
+  "timeout": 100,
 }
 `;
 
@@ -38,5 +39,6 @@ Object {
   "method": "get",
   "mode": "no-cors",
   "time": true,
+  "timeout": 100,
 }
 `;
