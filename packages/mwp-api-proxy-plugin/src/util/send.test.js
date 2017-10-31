@@ -1,4 +1,3 @@
-import request from 'request';
 import fs from 'fs';
 import { getServer } from 'mwp-test-utils';
 
