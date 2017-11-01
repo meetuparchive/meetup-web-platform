@@ -6,6 +6,37 @@ import { ACTIVITY_PLUGIN_NAME } from './config';
 const YEAR_IN_MS: number = 1000 * 60 * 60 * 24 * 365;
 
 /*
+ * Get a date object that is shifted by the offset of the supplied timezone
+ */
+const fakeUTCinTimezone = (timezone: string) => {
+	const formatOptions = {
+		year: 'numeric',
+		month: 'numeric',
+		day: 'numeric',
+		hour: 'numeric',
+		minute: 'numeric',
+		second: 'numeric',
+		timeZone: timezone,
+		hour12: false,
+	};
+	const formatter = new Intl.DateTimeFormat('en-US', formatOptions);
+
+	return (date: ?Date) => {
+		if (!date) {
+			date = new Date();
+		}
+		const { year, month, day, hour, minute, second } = formatter
+			.formatToParts(date)
+			.reduce((parts, part) => {
+				parts[part.type] = parseInt(part.value, 10);
+				return parts;
+			}, {});
+
+		return new Date(Date.UTC(year, month, day, hour, minute, second));
+	};
+};
+
+/*
  * This plugin provides `request.track...` methods that track events related to
  * particular server responses, e.g. new sesssions and navigation activity.
  *
@@ -15,46 +46,32 @@ const YEAR_IN_MS: number = 1000 * 60 * 60 * 24 * 365;
 
 export const getLogger: string => (Object, Object) => mixed = (
 	agent: string
-) => (request: Object, trackInfo: Object) => {
-	const requestHeaders = request.headers;
+) => {
+	// activity record wants an ISO 8601 timestamp in the New York timezone,
+	// so we have to fake a UTC date object shifted into NYC's timezone before
+	// calling `toISOString()`
+	const getTime = fakeUTCinTimezone('America/New_York');
 
-	// get an iso8601 timestamp that represents the time in 'America/New York'
-	// instead of the default UTC
-	const formatOptions = {
-		year: 'numeric',
-		month: 'numeric',
-		day: 'numeric',
-		hour: 'numeric',
-		minute: 'numeric',
-		second: 'numeric',
-		timeZone: 'America/New_York',
-		hour12: false,
+	return (request: Object, trackInfo: Object) => {
+		const requestHeaders = request.headers;
+
+		const record = {
+			timestamp: getTime().toISOString(),
+			requestId: request.id,
+			ip: requestHeaders['remote-addr'] || '',
+			agent: requestHeaders['user-agent'] || '',
+			platform: 'WEB',
+			platformAgent: agent,
+			mobileWeb: false,
+			referer: '', // misspelled to align with schema
+			trax: {},
+			isUserActivity: true,
+			...trackInfo,
+		};
+
+		avro.loggers.activity(record);
+		return record;
 	};
-	const nycFormatter = new Intl.DateTimeFormat('en-US', formatOptions);
-	const { year, month, day, hour, minute, second } = nycFormatter
-		.formatToParts(new Date())
-		.reduce((parts, part) => {
-			parts[part.type] = parseInt(part.value, 10);
-			return parts;
-		}, {});
-	const fakeUTC = new Date(Date.UTC(year, month, day, hour, minute, second));
-
-	const record = {
-		timestamp: fakeUTC.toISOString(),
-		requestId: request.id,
-		ip: requestHeaders['remote-addr'] || '',
-		agent: requestHeaders['user-agent'] || '',
-		platform: 'WEB',
-		platformAgent: agent,
-		mobileWeb: false,
-		referer: '', // misspelled to align with schema
-		trax: {},
-		isUserActivity: true,
-		...trackInfo,
-	};
-
-	avro.loggers.activity(record);
-	return record;
 };
 
 /*
