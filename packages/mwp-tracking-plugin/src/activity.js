@@ -18,17 +18,29 @@ export const getLogger: string => (Object, Object) => mixed = (
 ) => (request: Object, trackInfo: Object) => {
 	const requestHeaders = request.headers;
 
-	// Takes in desired time to convert and applies offset
-	const offset = new Date().getTimezoneOffset() * 60000; // gets detected timezone + converts to milliseconds
-	const nowUTC = new Date(Date.now() + offset);
-
-	// generates new date object taking the time in milliseconds and
-	// adds the runtime environment's timezone offset
-	const NY_OFFSET = -14400000;
-	const newNow = new Date(nowUTC.getTime() - NY_OFFSET);
+	// get an iso8601 timestamp that represents the time in 'America/New York'
+	// instead of the default UTC
+	const formatOptions = {
+		year: 'numeric',
+		month: 'numeric',
+		day: 'numeric',
+		hour: 'numeric',
+		minute: 'numeric',
+		second: 'numeric',
+		timeZone: 'America/New_York',
+		hour12: false,
+	};
+	const nycFormatter = new Intl.DateTimeFormat('en-US', formatOptions);
+	const { year, month, day, hour, minute, second } = nycFormatter
+		.formatToParts(new Date())
+		.reduce((parts, part) => {
+			parts[part.type] = parseInt(part.value, 10);
+			return parts;
+		}, {});
+	const fakeUTC = new Date(Date.UTC(year, month, day, hour, minute, second));
 
 	const record = {
-		timestamp: newNow.toISOString(),
+		timestamp: fakeUTC.toISOString(),
 		requestId: request.id,
 		ip: requestHeaders['remote-addr'] || '',
 		agent: requestHeaders['user-agent'] || '',
