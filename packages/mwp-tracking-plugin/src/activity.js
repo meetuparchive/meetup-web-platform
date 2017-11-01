@@ -8,7 +8,7 @@ const YEAR_IN_MS: number = 1000 * 60 * 60 * 24 * 365;
 /*
  * Get a date object that is shifted by the offset of the supplied timezone
  */
-const fakeUTCinTimezone = (timezone: string) => {
+export const fakeUTCinTimezone = (timezone: string) => {
 	const formatOptions = {
 		year: 'numeric',
 		month: 'numeric',
@@ -32,7 +32,7 @@ const fakeUTCinTimezone = (timezone: string) => {
 				return parts;
 			}, {});
 
-		return new Date(Date.UTC(year, month, day, hour, minute, second));
+		return new Date(Date.UTC(year, month - 1, day, hour, minute, second));
 	};
 };
 

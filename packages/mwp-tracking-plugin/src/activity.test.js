@@ -1,3 +1,4 @@
+import { fakeUTCinTimezone } from './activity';
 import { updateId } from './util/idUtils';
 // RegEx to verify UUID
 const UUID_V4_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -18,6 +19,17 @@ const getMockRequest = () => ({
 	plugins: { tracking: {} },
 });
 
+describe('fakeUTCinTimezone', () => {
+	const fakeTime = new Date(Date.UTC(2017, 6, 4)); // midnight July 4th in UTC
+	it('shifts the time correctly', () => {
+		expect(fakeUTCinTimezone('America/New_York')(fakeTime).toISOString()).toBe(
+			'2017-07-03T20:00:00.000Z' // 10PM July 3rd in NYC
+		);
+		expect(fakeUTCinTimezone('Pacific/Auckland')(fakeTime).toISOString()).toBe(
+			'2017-07-04T12:00:00.000Z' // noon July 4th in New Zealand
+		);
+	});
+});
 describe('updateId', () => {
 	it('sets cookiename if not set', () => {
 		const requestWithoutTrackId = getMockRequest();
