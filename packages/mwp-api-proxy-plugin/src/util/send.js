@@ -25,26 +25,32 @@ const MOCK_RESPONSE_OK = {
 	// minimal representation of http.IncomingMessage
 	statusCode: 200,
 	statusMessage: 'OK',
-	headers: {
-		'x-meetup-request-id': 'mock request',
-	},
 };
+const API_TIMEOUT_RESPONSE = {
+	statusCode: 408,
+	statusMessage: 'API Request Timeout',
+};
+const makeAPIErrorResponse = err => ({
+	statusCode: 500,
+	statusMessage: err.message,
+});
 
 /*
  * When an API response is being mocked (dev only), this response will be used
  */
-function makeMockResponseOk(requestOpts) {
+function makeMockResponse(requestOpts, response = MOCK_RESPONSE_OK) {
 	const mockResponse = new http.IncomingMessage();
 
 	return Object.assign(mockResponse, {
-		...MOCK_RESPONSE_OK,
+		...response,
+		headers: {
+			'x-meetup-request-id': 'mock-request',
+		},
 		method: requestOpts.method || 'get',
 		request: {
 			uri: url.parse(requestOpts.url),
 			method: requestOpts.method || 'get',
-			headers: {
-				'user-agent': 'query mockResponse',
-			},
+			headers: requestOpts.headers,
 		},
 	});
 }
@@ -138,6 +144,9 @@ export const buildRequestArgs = externalRequestOpts => ({
 		headers,
 		jar,
 		url,
+		timeout: externalRequestOpts.formData
+			? 60 * 1000 // 60sec upload timeout
+			: externalRequestOpts.timeout,
 	};
 
 	// only add body if defined
@@ -245,15 +254,16 @@ export function parseMultipart(payload, uploadsList) {
  * @return {Object} externalRequestOpts
  */
 export function getExternalRequestOpts(request) {
-	const baseUrl = request.server.settings.app.api.root_url;
+	const { api } = request.server.settings.app;
 	const externalRequestOpts = {
-		baseUrl,
+		baseUrl: api.root_url,
 		method: request.method,
 		headers: parseRequestHeaders(request),
 		mode: 'no-cors',
 		time: true, // time the request for logging
+		timeout: api.timeout,
 		agentOptions: {
-			rejectUnauthorized: baseUrl.indexOf('.dev') === -1,
+			rejectUnauthorized: api.root_url.indexOf('.dev') === -1,
 		},
 	};
 	if (request.mime === 'multipart/form-data') {
@@ -269,11 +279,14 @@ export function getExternalRequestOpts(request) {
 /**
  * Fake an API request and directly return the stringified mockResponse
  */
-export const makeMockRequest = mockResponse => requestOpts =>
+export const makeMockRequest = (
+	mockResponseContent,
+	responseMeta
+) => requestOpts =>
 	Observable.of([
-		makeMockResponseOk(requestOpts),
-		JSON.stringify(mockResponse),
-	]).do(() => console.log(`MOCKING response to ${requestOpts.url}`));
+		makeMockResponse(requestOpts),
+		JSON.stringify(mockResponseContent),
+	]);
 
 const externalRequest$ = Observable.bindNodeCallback(externalRequest);
 /**
@@ -281,22 +294,18 @@ const externalRequest$ = Observable.bindNodeCallback(externalRequest);
  */
 export const makeExternalApiRequest = request => requestOpts => {
 	return externalRequest$(requestOpts)
-		.do(
-			// log errors
-			null,
-			err => {
+		.catch(err => {
+			const errorObj = { errors: [err] };
+			if (err.code === 'ETIMEDOUT') {
 				request.server.app.logger.error({
 					err,
 					externalRequest: requestOpts,
 					...request.raw,
 				});
+				return makeMockRequest(errorObj, API_TIMEOUT_RESPONSE)(requestOpts);
 			}
-		)
-		.timeout(
-			requestOpts.formData
-				? 60 * 1000 // 60sec upload timeout
-				: request.server.settings.app.api.timeout // shorter timeout otherwise
-		)
+			return makeMockRequest(errorObj, makeAPIErrorResponse(err))(requestOpts);
+		})
 		.map(([response, body]) => [response, body, requestOpts.jar]);
 };
 

@@ -46,7 +46,7 @@ const request = jest.fn((requestOpts, cb) => {
 		requestOpts.url
 	);
 	return setTimeout(
-		() => cb(null, mockResponse, mockBody),
+		() => cb(requestOpts.err, mockResponse, mockBody),
 		mockResponse.elapsedTime
 	);
 });
