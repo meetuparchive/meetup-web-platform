@@ -201,7 +201,7 @@ const makeRenderer = (
 	scripts: Array<string> = [],
 	enableServiceWorker: boolean,
 	cssLinks: ?Array<string>
-) => (request: Object) => {
+) => (request: HapiRequest, reply: HapiReply) => {
 	middleware = middleware || [];
 
 	if (clientFilename) {
