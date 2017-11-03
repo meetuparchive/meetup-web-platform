@@ -222,7 +222,6 @@ export function parseRequestHeaders(request) {
 	delete externalRequestHeaders['accept-encoding']; // let app server set 'accept'
 	delete externalRequestHeaders['content-length']; // original request content-length is irrelevant
 	delete externalRequestHeaders['content-type']; // the content type will be set in buildRequestArgs
-	console.log(JSON.stringify(externalRequestHeaders, null, 2));
 
 	return externalRequestHeaders;
 }
