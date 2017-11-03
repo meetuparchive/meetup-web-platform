@@ -165,7 +165,18 @@ export function getAuthHeaders(request) {
 			authorization: `Bearer ${oauth_token}`,
 		};
 	}
+
+	// Cookie + CSRF auth: need have matching UUID in MEETUP_CSRF cookie and 'csrf-token' header
 	const cookies = { ...request.state };
+	const csrfCookie =
+		process.env.NODE_ENV === 'production'
+			? cookies.MEETUP_CSRF
+			: cookies.MEETUP_CSRF_DEV;
+	if (csrfCookie) {
+		// use existing cookie val in header
+		return { 'csrf-token': csrfCookie };
+	}
+	// create a new cookie + header
 	const csrf = uuid.v4();
 	cookies.MEETUP_CSRF = csrf;
 	cookies.MEETUP_CSRF_DEV = csrf;

@@ -209,6 +209,7 @@ export const makeLogResponse = request => ([response, body]) => {
 			...logBase,
 			err: new Error(errorMessage),
 			context: response,
+			httpRequest: response,
 		});
 		return;
 	}
