@@ -182,10 +182,13 @@ export const makeApiResponseToQueryResponse = query => ({
 });
 
 export const makeLogResponse = request => ([response, body]) => {
-	const { request: { method }, statusCode } = response;
+	const {
+		request: { headers, method, uri: { href: url } },
+		statusCode,
+	} = response;
 	const logBase = {
-		body: body.length > 256 ? `${body.substr(0, 256)}...` : body,
-		...request.raw,
+		...request.raw, // request to /mu_api
+		apiRequest: { headers, method, url }, // request to https://api.meetup.com/
 	};
 
 	if (
@@ -207,8 +210,9 @@ export const makeLogResponse = request => ([response, body]) => {
 		}
 		logError({
 			...logBase,
+			body: body.length > 512 ? `${body.substr(0, 512)}...` : body,
 			err: new Error(errorMessage),
-			context: response,
+			context: response, // this will provide limited info - check apiRequest for more detail
 		});
 		return;
 	}
