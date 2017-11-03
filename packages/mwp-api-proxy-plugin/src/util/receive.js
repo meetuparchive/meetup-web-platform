@@ -187,7 +187,6 @@ export const makeLogResponse = request => ([response, body]) => {
 		statusCode,
 	} = response;
 	const logBase = {
-		body: body.length > 256 ? `${body.substr(0, 512)}...` : body,
 		...request.raw, // request to /mu_api
 		apiRequest: { headers, method, url }, // request to https://api.meetup.com/
 	};
@@ -211,6 +210,7 @@ export const makeLogResponse = request => ([response, body]) => {
 		}
 		logError({
 			...logBase,
+			body: body.length > 512 ? `${body.substr(0, 512)}...` : body,
 			err: new Error(errorMessage),
 			context: response, // this will provide limited info - check apiRequest for more detail
 		});
