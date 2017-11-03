@@ -173,7 +173,7 @@ export function getAuthHeaders(request) {
 			? cookies.MEETUP_CSRF
 			: cookies.MEETUP_CSRF_DEV;
 	if (csrfCookie) {
-		// use existing cookie val in header
+		// only need to set csrf-token - existing cookie header will be passed in unmodified
 		return { 'csrf-token': csrfCookie };
 	}
 	// create a new cookie + header
