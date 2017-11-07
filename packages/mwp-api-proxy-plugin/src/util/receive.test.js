@@ -258,12 +258,14 @@ describe('makeLogResponse', () => {
 		elapsedTime: 1234,
 		request: {
 			method: 'get',
+			uri: {},
 		},
 	};
 	const MOCK_INCOMINGMESSAGE_POST = {
 		elapsedTime: 2345,
 		request: {
 			method: 'post',
+			uri: {},
 		},
 	};
 	it('emits parsed request and response data for GET request', () => {
