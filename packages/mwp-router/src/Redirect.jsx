@@ -76,6 +76,10 @@ class Redirect extends React.Component {
 const reducePropsToState = (
 	propsList: Array<RedirectProps>
 ): ?RedirectState => {
+	if (propsList.length === 0) {
+		// all Redirect instances have unmounted
+		return;
+	}
 	const { to, permanent } = propsList.pop();
 	if (to instanceof URL) {
 		// return the external URL as a string
