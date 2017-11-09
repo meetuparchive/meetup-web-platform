@@ -306,13 +306,15 @@ const externalRequest$ = Observable.bindNodeCallback(externalRequest);
 export const makeExternalApiRequest = request => requestOpts => {
 	return externalRequest$(requestOpts)
 		.catch(err => {
+			request.server.app.logger.error({
+				err,
+				externalRequest: requestOpts, // for detailed debugging, including headers
+				context: requestOpts, // for error report context
+				...request.raw,
+			});
+
 			const errorObj = { errors: [err] };
 			if (err.code === 'ETIMEDOUT') {
-				request.server.app.logger.error({
-					err,
-					externalRequest: requestOpts,
-					...request.raw,
-				});
 				return makeMockRequest(errorObj, API_TIMEOUT_RESPONSE)(requestOpts);
 			}
 			return makeMockRequest(errorObj, makeAPIErrorResponse(err))(requestOpts);
