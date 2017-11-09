@@ -40,7 +40,7 @@ function getRedirect(context) {
 	}
 	return {
 		redirect: {
-			url: context.url,
+			url: encodeURI(decodeURI(context.url)), // ensure that the url is encoded for the redirect header
 			permanent: context.permanent,
 		},
 	};
