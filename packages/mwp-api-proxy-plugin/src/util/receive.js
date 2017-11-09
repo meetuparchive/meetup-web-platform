@@ -188,7 +188,7 @@ export const makeLogResponse = request => ([response, body]) => {
 	} = response;
 	const logBase = {
 		...request.raw, // request to /mu_api
-		apiRequest: { headers, method, url }, // request to https://api.meetup.com/
+		externalRequest: { headers, method, url }, // request to https://api.meetup.com/
 	};
 
 	if (

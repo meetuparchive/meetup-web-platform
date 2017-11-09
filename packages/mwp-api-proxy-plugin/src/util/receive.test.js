@@ -282,24 +282,6 @@ describe('makeLogResponse', () => {
 		const loggedObject = MOCK_LOGGER.info.mock.calls[0][0];
 		expect(loggedObject).toEqual(jasmine.any(Object));
 	});
-	it('returns the full body of the response if less than 256 characters', () => {
-		const body = 'foo';
-		MOCK_LOGGER.info.mockClear();
-		makeLogResponse(request)([MOCK_INCOMINGMESSAGE_GET, body]);
-		expect(MOCK_LOGGER.info).toHaveBeenCalled();
-		const loggedObject = MOCK_LOGGER.info.mock.calls[0][0];
-		expect(loggedObject.body).toEqual(body);
-	});
-	it('returns a truncated response body if more than 256 characters', () => {
-		const body300 =
-			'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean egestas viverra sem vel congue. Cras vitae malesuada justo. Fusce ut finibus felis, at sagittis leo. Morbi nec velit dignissim, viverra tellus at, pretium nisi. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla turpis duis.';
-		MOCK_LOGGER.info.mockClear();
-		makeLogResponse(request)([MOCK_INCOMINGMESSAGE_GET, body300]);
-		expect(MOCK_LOGGER.info).toHaveBeenCalled();
-		const loggedObject = MOCK_LOGGER.info.mock.calls[0][0];
-		expect(loggedObject.body.startsWith(body300.substr(0, 256))).toBe(true);
-		expect(loggedObject.body.startsWith(body300)).toBe(false);
-	});
 	it('logs error on non-JSON error', () => {
 		const body = 'This is not JSON';
 		const responseErr = { ...MOCK_INCOMINGMESSAGE_GET, statusCode: 500 };
