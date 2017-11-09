@@ -103,10 +103,22 @@ const errorContextSerializers = {
 				response.request.headers['remote_addr'],
 		},
 	}),
+	requestOpts: requestOpts => ({
+		httpRequest: {
+			method: requestOpts.method.toUpperCase(),
+			url: requestOpts.url,
+			userAgent: requestOpts.headers['user-agent'],
+			referrer: requestOpts.headers['referer'],
+			responseStatusCode: 500, // only used when logging request errors
+			remoteIp:
+				requestOpts.headers['x_forwarded_for'] ||
+				requestOpts.headers['remote_addr'],
+		},
+	}),
 };
 
 serializers.context = request => {
-	const { hapi, incomingMessage } = errorContextSerializers;
+	const { hapi, incomingMessage, requestOpts } = errorContextSerializers;
 	// choose the serializer based on the type of the object
 	if (request.server) {
 		// assume a Hapi request
@@ -114,6 +126,9 @@ serializers.context = request => {
 	}
 	if (request instanceof http.IncomingMessage) {
 		return incomingMessage(request);
+	}
+	if (request.agentOptions) {
+		return requestOpts(request);
 	}
 	return request;
 };
