@@ -1,4 +1,5 @@
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/concat';
 import 'rxjs/add/observable/empty';
 import 'rxjs/add/observable/from';
 import 'rxjs/add/observable/fromPromise';
@@ -162,7 +163,7 @@ export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 		// set up the fetch call to the app server
 		const { config, api: { self } } = store.getState();
 		const fetchQueries = fetchQueriesFn(config.apiUrl, (self || {}).value);
-		return Observable.fromPromise(fetchQueries(queries, meta)) // call fetch
+		const queryFetcher$ = Observable.fromPromise(fetchQueries(queries, meta)) // call fetch
 			.takeUntil(action$.ofType(LOCATION_CHANGE)) // cancel this fetch when nav happens
 			.mergeMap(({ successes = [], errors = [] }) => {
 				// meta contains a Promise that must be resolved
@@ -179,7 +180,6 @@ export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 					...successes.map(api.success), // send the successes to success
 					...errors.map(api.error), // send errors to error
 					...deprecatedActions,
-					api.complete(queries),
 				];
 				return Observable.of(...actions);
 			})
@@ -190,12 +190,13 @@ export const getFetchQueriesEpic = fetchQueriesFn => (action$, store) =>
 				if (meta && meta.onError) {
 					deprecatedActions.push(meta.onError(err));
 				}
-				return Observable.of(
-					api.fail(err),
-					...deprecatedActions,
-					api.complete(queries)
-				);
+				return Observable.of(api.fail(err), ...deprecatedActions);
 			});
+
+		return Observable.concat(
+			queryFetcher$,
+			Observable.of(api.complete(queries))
+		);
 	});
 
 export default function getSyncEpic(routes, fetchQueries, baseUrl) {
