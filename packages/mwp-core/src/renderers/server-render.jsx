@@ -3,7 +3,6 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/first';
 
-import IntlPolyfill from 'intl';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import Helmet from 'react-helmet';
@@ -15,10 +14,6 @@ import Dom from 'mwp-app-render/lib/components/Dom';
 import ServerApp from 'mwp-app-render/lib/components/ServerApp';
 
 import { getVariants } from '../util/cookieUtils';
-
-// Ensure global Intl for use with FormatJS
-Intl.NumberFormat = IntlPolyfill.NumberFormat;
-Intl.DateTimeFormat = IntlPolyfill.DateTimeFormat;
 
 const DOCTYPE = '<!DOCTYPE html>';
 
