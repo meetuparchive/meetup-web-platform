@@ -1,3 +1,9 @@
+## [10.0]
+
+- Removed polyfill for `Intl.NumberFormat` and `Intl.DateTimeFormat` - consumers
+  should instead use the `full-icu` package and follow its instructions to
+  ensure that Node will load all required locale data when it starts.
+
 ## [9.1]
 
 - Support for reading `MEETUP_VARIANT_...` cookies into `state.config.variants`
