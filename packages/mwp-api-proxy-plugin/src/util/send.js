@@ -295,7 +295,7 @@ export const makeMockRequest = (
 	responseMeta
 ) => requestOpts =>
 	Observable.of([
-		makeMockResponse(requestOpts),
+		makeMockResponse(requestOpts, responseMeta),
 		JSON.stringify(mockResponseContent),
 	]);
 
