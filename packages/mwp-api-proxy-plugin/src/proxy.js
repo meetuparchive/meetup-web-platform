@@ -34,7 +34,10 @@ export default (request: HapiRequest) => {
 			send$(query).map(receive(query)).map(setApiResponseDuotones)
 		);
 
-		// zip them together to make requests in parallel and return responses in order
-		return Observable.zip(...apiRequests$).do(request.trackActivity);
+		// Zip them together to make requests in parallel and return responses in order.
+		// This call uses `.first()` to guarantee a single response because WP-596
+		// indicated there were sporadic duplicate activity tracking logs, possibly
+		// related to request errors
+		return Observable.zip(...apiRequests$).first().do(request.trackActivity);
 	};
 };
