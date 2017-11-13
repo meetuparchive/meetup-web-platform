@@ -87,6 +87,9 @@
     "swarm-icons": "1.3.259",
     "tough-cookie": "2.3.2"
   },
+  "peerDependencies": {
+    "mwp-cli": "^1.1.268 || ^2.0.0"
+  },
   "lint-staged": {
     "{src,tests,__mocks__}/**/*.{js,jsx}": [
       "prettier --write --single-quote --use-tabs --trailing-comma es5",
