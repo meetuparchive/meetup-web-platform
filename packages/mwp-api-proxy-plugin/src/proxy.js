@@ -2,6 +2,8 @@
 // Implicit dependency: tracking plugin providing request.trackActivity method
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/zip';
+import 'rxjs/add/operator/first';
+import 'rxjs/add/operator/do';
 
 import { apiResponseDuotoneSetter } from './util/duotone';
 import { makeSend$ } from './util/send';
