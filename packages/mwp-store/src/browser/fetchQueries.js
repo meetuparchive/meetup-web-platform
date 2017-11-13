@@ -50,6 +50,8 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 			clickTracking,
 			onSuccess, // eslint-disable-line no-unused-vars
 			onError, // eslint-disable-line no-unused-vars
+			promise, // eslint-disable-line no-unused-vars
+			request, // eslint-disable-line no-unused-vars
 			...metadata
 		} = meta;
 

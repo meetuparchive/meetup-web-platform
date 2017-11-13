@@ -78,7 +78,7 @@ export const getNavEpic = (routes, baseUrl) => {
 				const { referrer = {} } = state.routing;
 				// inject request metadata from context, including `store.getState()`
 				const requestMetadata = {
-					referrer: referrer.pathname || '',
+					referrer: referrer.pathname || state.config.entryPath || '',
 					logout: location.pathname.endsWith('logout'), // assume logout route ends with logout
 					clickTracking: state.clickTracking,
 					retainRefs: [],

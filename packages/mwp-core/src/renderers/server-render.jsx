@@ -239,6 +239,7 @@ const makeRenderer = (
 			supportedLangs,
 			initialNow: new Date().getTime(),
 			variants: getVariants(state),
+			entryPath: url.pathname, // the path that the user entered the app on
 		},
 	};
 
