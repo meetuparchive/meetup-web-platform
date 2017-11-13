@@ -22,6 +22,9 @@ import getSyncEpic, { getFetchQueriesEpic } from './';
 
 const EMPTY_ROUTES = {};
 
+MOCK_APP_STATE.config = {};
+MOCK_APP_STATE.routing = {};
+
 /**
  * @module SyncEpicTest
  */
@@ -40,7 +43,7 @@ describe('Sync epic', () => {
 			payload: MOCK_RENDERPROPS.location,
 		};
 
-		const fakeStore = createFakeStore({ routing: {} });
+		const fakeStore = createFakeStore(MOCK_APP_STATE);
 		const action$ = ActionsObservable.of(locationChange, serverRender);
 		return getSyncEpic(MOCK_ROUTES)(action$, fakeStore)
 			.toArray()
@@ -61,7 +64,7 @@ describe('Sync epic', () => {
 			payload: logoutLocation,
 		};
 
-		const fakeStore = createFakeStore({ routing: {} });
+		const fakeStore = createFakeStore(MOCK_APP_STATE);
 		const action$ = ActionsObservable.of(locationChange);
 		return getSyncEpic(MOCK_ROUTES)(action$, fakeStore)
 			.toArray()
