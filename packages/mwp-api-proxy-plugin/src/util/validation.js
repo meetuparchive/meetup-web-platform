@@ -9,7 +9,7 @@ export const querySchema = Joi.object({
 	endpoint: Joi.string().required(),
 	ref: Joi.string().required(),
 	flags: Joi.array(),
-	mockResponse: Joi.object(),
+	mockResponse: [Joi.object(), Joi.array()],
 	params: Joi.object(), // can be FormData
 	type: Joi.string(),
 	meta: Joi.object({
