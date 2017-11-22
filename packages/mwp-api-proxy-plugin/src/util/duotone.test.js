@@ -61,10 +61,29 @@ describe('groupDuotoneSetter', () => {
 		expect(duotoneUrl.small.startsWith(expectedUrl.small)).toBe(true);
 	});
 });
-
 describe('apiResponseDuotoneSetter', () => {
-	it('adds duotone url to type: "group" api response', () => {
+	it('adds duotone url to type: "group" api response with key_photo', () => {
 		const group = { ...MOCK_GROUP, duotoneUrl: undefined };
+		const { ref, type } = mockQuery({});
+		const groupApiResponse = {
+			ref,
+			type,
+			value: group,
+		};
+		const modifiedResponse = apiResponseDuotoneSetter(MOCK_DUOTONE_URLS)(
+			groupApiResponse
+		);
+		const { duotoneUrl } = modifiedResponse.value;
+		const expectedUrl = MOCK_DUOTONE_URLS.dtaxb;
+		expect(duotoneUrl.large.startsWith(expectedUrl.large)).toBe(true);
+		expect(duotoneUrl.small.startsWith(expectedUrl.small)).toBe(true);
+	});
+	it('adds duotone url to type: "group" api response with only group_photo and no key_photo', () => {
+		const group = {
+			...MOCK_GROUP,
+			key_photo: undefined,
+			duotoneUrl: undefined,
+		};
 		const { ref, type } = mockQuery({});
 		const groupApiResponse = {
 			ref,
