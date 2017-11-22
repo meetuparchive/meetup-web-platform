@@ -22,6 +22,7 @@ before_install:
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-app-server/.npmrc
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-app-route-plugin/.npmrc
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-api-proxy-plugin/.npmrc
+  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-consumer/.npmrc
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-language-plugin/.npmrc
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-sw-plugin/.npmrc
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-tracking-plugin/.npmrc
