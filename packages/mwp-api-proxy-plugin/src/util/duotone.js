@@ -128,7 +128,7 @@ export const getDuotoneUrls = (duotones, PHOTO_SCALER_SALT) => {
  * @return {Object} the mutated group object
  */
 export const groupDuotoneSetter = duotoneUrls => group => {
-	const photo = group.key_photo || {};
+	const photo = group.key_photo || group.group_photo || {};
 	const duotoneKey =
 		group.photo_gradient &&
 		duotoneRef(
