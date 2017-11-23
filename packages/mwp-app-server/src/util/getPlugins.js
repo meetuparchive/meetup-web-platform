@@ -135,14 +135,14 @@ export default function getPlugins({ languageRenderers }) {
 	const { package: { agent }, env: { properties: { isProd } } } = config;
 	return [
 		getAppRoutePlugin({ languageRenderers }),
+		getApiProxyPlugin(),
+		getLanguagePlugin(),
 		getLogger(),
 		getCsrfPlugin(),
 		getRequestAuthPlugin(),
 		getActivityTrackingPlugin({ agent, isProd }),
 		getClickTrackingPlugin(),
 		getServiceWorkerPlugin(),
-		getApiProxyPlugin(),
-		getLanguagePlugin(),
 		Inert,
 	];
 }

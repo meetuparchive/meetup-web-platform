@@ -1,6 +1,29 @@
+const memwatch = require('memwatch-next');
+memwatch.on('leak', (info) => {
+  console.error('GC HAPPENED Memory leak detected:\n', info);
+});
+memwatch.on('stats', stats => console.log('GC HAPPENED', JSON.stringify(stats)));
 // run directly by node, no babel
 const startServer = require('mwp-app-server').default;
 
+const routes = [
+	{
+		method: 'GET',
+		path: `/favicon.ico`,
+		handler: (request, reply) => reply(''),
+	},
+	{
+		method: 'GET',
+		path: `/app.js`,
+		config: {
+			auth: false,
+			cache: {
+				expiresIn: 1000 * 60 * 60 * 24 * 365, // one year
+			},
+		},
+		handler: (request, reply) => reply(''),
+	},
+];
 /**
  * The actual configure-and-start function. Sets up the arguments for the
  * platform `startServer` function. The map of localeCodes to server-app
@@ -17,7 +40,7 @@ module.exports = function main(appMap) {
 	}
 	const plugins = []; // for serving the favicon
 
-	return startServer(appMap, { plugins }).catch(err => {
+	return startServer(appMap, { plugins, routes }).catch(err => {
 		// catch because otherwise Node swallows errors in Promises
 		throw err;
 	});
