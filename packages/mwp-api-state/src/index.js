@@ -1,3 +1,4 @@
+import { compose } from 'redux';
 import {
 	combineEpics,
 	createEpicMiddleware as createEpicMiddlewareRO,
@@ -23,6 +24,9 @@ export {
 } from './sync/apiActionCreators';
 export { api, app, DEFAULT_API_STATE } from './reducer';
 
+const composeMiddleware = (...middleware) => store =>
+	compose(...middleware.map(m => m(store)));
+
 /**
  * The middleware is exported as a getter because it needs the application's
  * routes in order to set up the nav-related epic(s) that are part of the
@@ -32,14 +36,15 @@ export { api, app, DEFAULT_API_STATE } from './reducer';
  * order to render the application. We may want to write a server-specific
  * middleware that doesn't include the other epics if performance is an issue
  */
-export const getApiMiddleware = (routes, baseUrl) =>
-	createEpicMiddlewareRO(
-		combineEpics(
-			getSyncEpic(routes, baseUrl),
-			getCacheEpic(),
-			postEpic, // DEPRECATED
-			deleteEpic // DEPRECATED
-		)
+export const getApiMiddleware = (routes, fetchQueriesFn, baseUrl) =>
+	composeMiddleware(
+		createEpicMiddlewareRO(
+			combineEpics(
+				getSyncEpic(routes, baseUrl),
+				getCacheEpic(),
+				postEpic, // DEPRECATED
+				deleteEpic // DEPRECATED
+			)
+		),
+		createEpicMiddleware(getFetchQueriesEpic(fetchQueriesFn))
 	);
-export const getFetchQueriesMiddleware = fetchQueriesFn =>
-	createEpicMiddleware(getFetchQueriesEpic(fetchQueriesFn));
