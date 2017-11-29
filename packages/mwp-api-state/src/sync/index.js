@@ -21,7 +21,6 @@ import {
 	apiSuccess, // DEPRECATED
 	apiError, // DEPRECATED
 } from './syncActionCreators';
-import { currentId } from 'async_hooks';
 
 /**
  * @deprecated
@@ -216,8 +215,8 @@ export const getFetchQueriesEpic = fetchQueriesFn => {
 					}
 					return [api.fail(err), ...deprecatedActions];
 				})
-				.then(actions => [...actions, api.complete(queries)])
 				.then(ignoreIfLocationChange(locationIndex))
+				.then(actions => [...actions, api.complete(queries)])
 		);
 	};
 };
