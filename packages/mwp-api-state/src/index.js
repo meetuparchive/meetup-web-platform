@@ -1,6 +1,10 @@
-import { combineEpics, createEpicMiddleware } from 'redux-observable';
+import {
+	combineEpics,
+	createEpicMiddleware as createEpicMiddlewareRO,
+} from 'redux-observable';
+import { createEpicMiddleware } from './redux-promise-epic';
 
-import getSyncEpic from './sync';
+import getSyncEpic, { getFetchQueriesEpic } from './sync';
 import getCacheEpic from './cache';
 import { postEpic, deleteEpic } from './mutate'; // DEPRECATED
 
@@ -28,12 +32,14 @@ export { api, app, DEFAULT_API_STATE } from './reducer';
  * order to render the application. We may want to write a server-specific
  * middleware that doesn't include the other epics if performance is an issue
  */
-export const getApiMiddleware = (routes, fetchQueries, baseUrl) =>
-	createEpicMiddleware(
+export const getApiMiddleware = (routes, baseUrl) =>
+	createEpicMiddlewareRO(
 		combineEpics(
-			getSyncEpic(routes, fetchQueries, baseUrl),
+			getSyncEpic(routes, baseUrl),
 			getCacheEpic(),
 			postEpic, // DEPRECATED
 			deleteEpic // DEPRECATED
 		)
 	);
+export const getFetchQueriesMiddleware = fetchQueriesFn =>
+	createEpicMiddleware(getFetchQueriesEpic(fetchQueriesFn));
