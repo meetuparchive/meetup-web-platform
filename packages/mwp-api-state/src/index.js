@@ -44,7 +44,6 @@ export const getApiMiddleware = (routes, fetchQueriesFn, baseUrl) =>
 	composeMiddleware(
 		createEpicMiddlewareRO(
 			combineEpicsRO(
-				getSyncEpic(),
 				getCacheEpic(),
 				postEpic, // DEPRECATED
 				deleteEpic // DEPRECATED
