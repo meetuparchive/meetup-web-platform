@@ -1,16 +1,4 @@
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/concat';
-import 'rxjs/add/observable/empty';
-import 'rxjs/add/observable/from';
-import 'rxjs/add/observable/fromPromise';
-import 'rxjs/add/observable/merge';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/operator/first';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/mergeMap';
-import 'rxjs/add/operator/takeUntil';
-import { combineEpics } from 'redux-observable';
+import { combineEpics } from '../redux-promise-epic';
 
 import { LOCATION_CHANGE, SERVER_RENDER } from 'mwp-router';
 import { getRouteResolver, getMatchedQueries } from 'mwp-router/lib/util';
@@ -69,80 +57,69 @@ export function getDeprecatedSuccessPayload(successes, errors) {
  */
 export const getNavEpic = (routes, baseUrl) => {
 	const resolveRoutes = getRouteResolver(routes, baseUrl);
-	return (action$, store) => {
-		return action$
-			.ofType(LOCATION_CHANGE, SERVER_RENDER)
-			.mergeMap(({ payload: location }) => {
-				// note that this function executes _downstream_ of reducers, so the
-				// new `routing` data has already been populated in `state`
-				const state = store.getState();
-				const { referrer = {} } = state.routing;
-				// inject request metadata from context, including `store.getState()`
-				const requestMetadata = {
-					referrer: referrer.pathname || state.config.entryPath || '',
-					logout: location.pathname.endsWith('logout'), // assume logout route ends with logout
-					clickTracking: state.clickTracking,
-					retainRefs: [],
-				};
+	return (action, store) => {
+		if (![LOCATION_CHANGE, SERVER_RENDER].some(type => type === action.type)) {
+			return Promise.resolve([]);
+		}
+		const { payload: location } = action;
+		const state = store.getState();
+		const { referrer = {} } = state.routing;
+		// inject request metadata from context, including `store.getState()`
+		const requestMetadata = {
+			referrer: referrer.pathname || state.config.entryPath || '',
+			logout: location.pathname.endsWith('logout'), // assume logout route ends with logout
+			clickTracking: state.clickTracking,
+			retainRefs: [],
+		};
+		// note that this function executes _downstream_ of reducers, so the
+		// new `routing` data has already been populated in `state`
 
-				const cacheAction$ = requestMetadata.logout
-					? Observable.of({ type: 'CACHE_CLEAR' })
-					: Observable.empty();
+		const cacheAction = requestMetadata.logout && { type: 'CACHE_CLEAR' };
 
-				const resolvePrevQueries = referrer.pathname
-					? resolveRoutes(referrer, baseUrl).then(getMatchedQueries(referrer))
-					: Promise.resolve([]);
-				const resolveNewQueries = resolveRoutes(location, baseUrl).then(
-					getMatchedQueries(location)
-				);
-				const apiAction$ = Observable.fromPromise(
-					Promise.all([
-						resolveNewQueries,
-						resolvePrevQueries,
-					]).then(([newQueries, previousQueries]) => {
-						// perform a fast comparison of previous route's serialized queries
-						// with the new route's serialized queries. All state refs for
-						// _shared_ queries should be retained
-						const serializedNew = newQueries.map(JSON.stringify);
-						const serializedPrev = previousQueries.map(JSON.stringify);
-						const sharedRefs = serializedPrev
-							.filter(qJSON => serializedNew.includes(qJSON))
-							.map(JSON.parse)
-							.map(q => q.ref);
-						requestMetadata.retainRefs = sharedRefs;
-						return newQueries;
-					})
-				).map(q => api.requestAll(q, requestMetadata));
+		const resolvePrevQueries = referrer.pathname
+			? resolveRoutes(referrer, baseUrl).then(getMatchedQueries(referrer))
+			: Promise.resolve([]);
+		const resolveNewQueries = resolveRoutes(location, baseUrl).then(
+			getMatchedQueries(location)
+		);
 
-				const clickAction$ = Observable.of(clickActions.clear());
-
-				return Observable.merge(cacheAction$, apiAction$, clickAction$);
-			});
+		return Promise.all([
+			resolveNewQueries,
+			resolvePrevQueries,
+		]).then(([newQueries, previousQueries]) => {
+			if (newQueries.filter(q => q).length === 0) {
+				// no valid queries - ignore
+				return [];
+			}
+			// perform a fast comparison of previous route's serialized queries
+			// with the new route's serialized queries. All state refs for
+			// _shared_ queries should be retained
+			const serializedNew = newQueries.map(JSON.stringify);
+			const serializedPrev = previousQueries.map(JSON.stringify);
+			const sharedRefs = serializedPrev
+				.filter(qJSON => serializedNew.includes(qJSON))
+				.map(JSON.parse)
+				.map(q => q.ref);
+			requestMetadata.retainRefs = sharedRefs;
+			return [
+				cacheAction,
+				api.requestAll(newQueries, requestMetadata),
+				clickActions.clear(),
+			].filter(a => a);
+		});
 	};
 };
-
-/**
- * Any action that should reload the API data should be handled here, e.g.
- * LOGIN_SUCCESS, which should force the app to reload in an 'authorized'
- * state
- *
- * Note: this action is only possible in the browser, not the server, so
- * `browserHistory` is safe to use here.
- */
-export const locationSyncEpic = (action$, store) =>
-	action$
-		.ofType('LOGIN_SUCCESS')
-		.ignoreElements() // TODO: push window.location into history without querystring
-		.map(() => ({ type: LOCATION_CHANGE, payload: window.location }));
 
 /**
  * Old apiRequest maps directly onto new api.requestAll
  * @deprecated
  */
-export const apiRequestToApiReq = action$ =>
-	action$
-		.ofType('API_REQUEST')
-		.map(action => api.requestAll(action.payload, action.meta));
+export const apiRequestToApiReq = action =>
+	Promise.resolve(
+		action.type === 'API_REQUEST'
+			? [api.requestAll(action.payload, action.meta)]
+			: []
+	);
 
 /**
  * Listen for API_REQ and generate response actions from fetch results
@@ -220,10 +197,9 @@ export const getFetchQueriesEpic = fetchQueriesFn => {
 		);
 	};
 };
-export default function getSyncEpic(routes, baseUrl) {
-	return combineEpics(
+export default (routes, fetchQueriesFn, baseUrl) =>
+	combineEpics(
 		getNavEpic(routes, baseUrl),
-		// locationSyncEpic, // OLD, not needed
-		apiRequestToApiReq // TODO: remove in v3 - apiRequest is deprecated
+		getFetchQueriesEpic(fetchQueriesFn),
+		apiRequestToApiReq
 	);
-}
