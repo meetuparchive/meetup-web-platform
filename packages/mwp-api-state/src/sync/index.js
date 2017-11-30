@@ -52,6 +52,9 @@ export function getDeprecatedSuccessPayload(successes, errors) {
  * metadata about the navigation action can also be sent to the `apiRequest`
  * here.
  *
+ * note that this function executes _downstream_ of reducers, so the
+ * new `routing` data has already been populated in `state`
+ *
  * @param {Object} routes The application's React Router routes
  * @returns {Function} an Epic function that emits an API_REQUEST action
  */
@@ -71,9 +74,6 @@ export const getNavEpic = (routes, baseUrl) => {
 			clickTracking: state.clickTracking,
 			retainRefs: [],
 		};
-		// note that this function executes _downstream_ of reducers, so the
-		// new `routing` data has already been populated in `state`
-
 		const cacheAction = requestMetadata.logout && { type: 'CACHE_CLEAR' };
 
 		const resolvePrevQueries = referrer.pathname
