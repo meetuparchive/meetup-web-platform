@@ -7,3 +7,7 @@ export const createEpicMiddleware = epic => {
 		return next(action);
 	};
 };
+
+const flattenArray = arrays => [].concat.apply([], arrays);
+export const combineEpics = (...epics) => (action, store) =>
+	Promise.all(epics.map(e => e(action, store))).then(flattenArray);
