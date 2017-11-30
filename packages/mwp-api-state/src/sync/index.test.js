@@ -113,118 +113,121 @@ describe('Sync epic', () => {
 		);
 	});
 
-	it('emits API_RESP_SUCCESS and API_RESP_COMPLETE on successful API_REQ', function() {
-		const mockFetchQueries = () => () => Promise.resolve({ successes: [{}] });
+	describe('getFetchQueriesEpic', () => {
+		it('emits API_RESP_SUCCESS and API_RESP_COMPLETE on successful API_REQ', function() {
+			const mockFetchQueries = () => () => Promise.resolve({ successes: [{}] });
 
-		const queries = [mockQuery({})];
-		const apiRequest = api.requestAll(queries);
-		const action$ = ActionsObservable.of(apiRequest);
-		const fakeStore = createFakeStore(MOCK_APP_STATE);
-		return getSyncEpic(EMPTY_ROUTES, mockFetchQueries)(action$, fakeStore)
-			.toArray()
-			.toPromise()
-			.then(actions => {
+			const queries = [mockQuery({})];
+			const apiRequest = api.requestAll(queries);
+			const fakeStore = createFakeStore(MOCK_APP_STATE);
+			const fqEpic = getFetchQueriesEpic(mockFetchQueries);
+			// kick off the fetch
+			const doFetch = fqEpic(apiRequest, fakeStore);
+			return doFetch.then(actions => {
 				expect(actions.map(({ type }) => type)).toEqual([
 					api.API_RESP_SUCCESS,
 					'API_SUCCESS',
 					api.API_RESP_COMPLETE,
 				]);
 			});
-	});
+		});
+		it('does not emit API_RESP_SUCCESS when API_REQ is interrupted by LOCATION_CHANGE', () => {
+			// mock that takes 10ms to return (allows time for LOCATION_CHANGE to interrupt)
+			const mockFetchQueries = () => () =>
+				new Promise((resolve, reject) =>
+					setTimeout(() => resolve({ successes: [{}] }), 10)
+				);
 
-	it('does not emit API_RESP_SUCCESS when API_REQ is interrupted by LOCATION_CHANGE', () => {
-		const mockFetchQueries = () => () =>
-			new Promise((resolve, reject) =>
-				setTimeout(() => resolve({ successes: [{}] }), 10)
-			);
+			const queries = [mockQuery({})];
+			const apiRequest = api.requestAll(queries);
+			const fakeStore = createFakeStore(MOCK_APP_STATE);
+			const fqEpic = getFetchQueriesEpic(mockFetchQueries);
 
-		const queries = [mockQuery({})];
-		const apiRequest = api.requestAll(queries);
-		const action$ = ActionsObservable.of(apiRequest, { type: LOCATION_CHANGE }); // request immediately followed by LOCATION_CHANGE
-		const fakeStore = createFakeStore(MOCK_APP_STATE);
-		return getFetchQueriesEpic(mockFetchQueries)(action$, fakeStore)
-			.toArray()
-			.toPromise()
-			.then(actions => {
+			// kick off the fetch
+			const doFetch = fqEpic(apiRequest, fakeStore);
+			// immediately trigger a location change
+			fqEpic({ type: LOCATION_CHANGE }, fakeStore);
+
+			return doFetch.then(actions => {
 				expect(actions.map(({ type }) => type)).not.toContain(
 					api.API_RESP_SUCCESS
 				);
 			});
-	});
-	it('emits API_RESP_COMPLETE when API_REQ is interrupted by LOCATION_CHANGE', function() {
-		const mockFetchQueries = () => () =>
-			new Promise((resolve, reject) =>
-				setTimeout(() => resolve({ successes: [{}] }), 10)
-			);
+		});
+		it('emits API_RESP_COMPLETE when API_REQ is interrupted by LOCATION_CHANGE', function() {
+			// mock that takes 10ms to return (allows time for LOCATION_CHANGE to interrupt)
+			const mockFetchQueries = () => () =>
+				new Promise((resolve, reject) =>
+					setTimeout(() => resolve({ successes: [{}] }), 10)
+				);
 
-		const queries = [mockQuery({})];
-		const apiRequest = api.requestAll(queries);
-		const action$ = ActionsObservable.of(apiRequest, {
-			type: LOCATION_CHANGE,
-		}); // request immediately followed by LOCATION_CHANGE
-		const fakeStore = createFakeStore(MOCK_APP_STATE);
-		return getFetchQueriesEpic(mockFetchQueries)(action$, fakeStore)
-			.toArray()
-			.toPromise()
-			.then(actions => {
+			const queries = [mockQuery({})];
+			const apiRequest = api.requestAll(queries);
+			const fakeStore = createFakeStore(MOCK_APP_STATE);
+			const fqEpic = getFetchQueriesEpic(mockFetchQueries);
+
+			// kick off the fetch
+			const doFetch = fqEpic(apiRequest, fakeStore);
+			// immediately trigger a location change
+			fqEpic({ type: LOCATION_CHANGE }, fakeStore);
+
+			return doFetch.then(actions => {
 				expect(actions.map(({ type }) => type)).toContain(
 					api.API_RESP_COMPLETE
 				);
 			});
-	});
+		});
 
-	it('calls action.meta.resolve successful API_REQ', function() {
-		const expectedSuccesses = [{}];
-		const mockFetchQueries = () => () =>
-			Promise.resolve({ successes: expectedSuccesses });
+		it('calls action.meta.resolve successful API_REQ', function() {
+			const expectedSuccesses = [{}];
+			const mockFetchQueries = () => () =>
+				Promise.resolve({ successes: expectedSuccesses });
 
-		const queries = [mockQuery({})];
-		const apiRequest = api.requestAll(queries);
-		apiRequest.meta.resolve = jest.fn();
-		const action$ = ActionsObservable.of(apiRequest);
-		const fakeStore = createFakeStore(MOCK_APP_STATE);
-		return getSyncEpic(EMPTY_ROUTES, mockFetchQueries)(action$, fakeStore)
-			.toArray()
-			.toPromise()
-			.then(actions => {
+			const queries = [mockQuery({})];
+			const apiRequest = api.requestAll(queries);
+			apiRequest.meta.resolve = jest.fn();
+			const fakeStore = createFakeStore(MOCK_APP_STATE);
+			return getFetchQueriesEpic(mockFetchQueries)(
+				apiRequest,
+				fakeStore
+			).then(actions => {
 				expect(apiRequest.meta.resolve).toHaveBeenCalledWith(expectedSuccesses);
 			});
-	});
+		});
 
-	it('emits API_RESP_FAIL on failed API_REQ', function() {
-		const mockFetchQueries = () => () =>
-			Promise.reject(new Error('mock error'));
+		it('emits API_RESP_FAIL on failed API_REQ', function() {
+			const mockFetchQueries = () => () =>
+				Promise.reject(new Error('mock error'));
 
-		const queries = [mockQuery({})];
-		const apiRequest = api.requestAll(queries);
-		const action$ = ActionsObservable.of(apiRequest);
-		const fakeStore = createFakeStore(MOCK_APP_STATE);
-		return getSyncEpic(EMPTY_ROUTES, mockFetchQueries)(action$, fakeStore)
-			.toArray()
-			.toPromise()
-			.then(actions => {
+			const queries = [mockQuery({})];
+			const apiRequest = api.requestAll(queries);
+			const fakeStore = createFakeStore(MOCK_APP_STATE);
+			return getFetchQueriesEpic(mockFetchQueries)(
+				apiRequest,
+				fakeStore
+			).then(actions => {
 				expect(actions.map(a => a.type)).toEqual([
 					api.API_RESP_FAIL,
 					'API_ERROR',
 					api.API_RESP_COMPLETE, // DO NOT REMOVE - must _ALWAYS_ be called in order to clean up inFlight state
 				]);
 			});
-	});
-	it('calls action.meta.reject on failed API_REQ', function() {
-		const expectedError = new Error();
-		const mockFetchQueries = () => () => Promise.reject(expectedError);
+		});
+		it('calls action.meta.reject on failed API_REQ', function() {
+			const expectedError = new Error();
+			const mockFetchQueries = () => () => Promise.reject(expectedError);
 
-		const queries = [mockQuery({})];
-		const apiRequest = api.requestAll(queries);
-		apiRequest.meta.reject = jest.fn();
-		const action$ = ActionsObservable.of(apiRequest);
-		const fakeStore = createFakeStore(MOCK_APP_STATE);
-		return getSyncEpic(EMPTY_ROUTES, mockFetchQueries)(action$, fakeStore)
-			.toArray()
-			.toPromise()
-			.then(actions =>
+			const queries = [mockQuery({})];
+			const apiRequest = api.requestAll(queries);
+			apiRequest.meta.reject = jest.fn();
+			const fakeStore = createFakeStore(MOCK_APP_STATE);
+			return getFetchQueriesEpic(mockFetchQueries)(
+				apiRequest,
+				fakeStore
+			).then(actions =>
 				expect(apiRequest.meta.reject).toHaveBeenCalledWith(expectedError)
 			);
+		});
 	});
 });
 
