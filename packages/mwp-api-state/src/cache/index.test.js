@@ -1,16 +1,13 @@
-import { ActionsObservable } from 'redux-observable';
-import 'rxjs/add/operator/toPromise';
-
 import {
 	mockQuery,
 	MOCK_RENDERPROPS,
 	MOCK_API_RESULT,
 } from 'meetup-web-mocks/lib/app';
 
-import { epicIgnoreAction } from '../util/testUtils';
 import * as api from '../sync/apiActionCreators';
 
 import { makeCache } from './util';
+import { CACHE_CLEAR } from './cacheActionCreators';
 import getCacheEpic from './';
 
 const MOCK_QUERY = mockQuery(MOCK_RENDERPROPS);
@@ -25,31 +22,27 @@ function makeCacheEpic() {
 }
 function populateCacheEpic(CacheEpic) {
 	// set the cache with API_SUCCESS
-	const apiSuccessAction$ = ActionsObservable.of(MOCK_SUCCESS_ACTION);
-	return CacheEpic(apiSuccessAction$).toPromise().then(() => CacheEpic);
+	return CacheEpic(MOCK_SUCCESS_ACTION).then(() => CacheEpic);
 }
 
 function clearCacheEpic(CacheEpic) {
 	// clear the cache with CACHE_CLEAR
-	const clearAction$ = ActionsObservable.of({ type: 'CACHE_CLEAR' });
-	return CacheEpic(clearAction$).toPromise().then(() => CacheEpic);
+	return CacheEpic({ type: CACHE_CLEAR }).then(() => CacheEpic);
 }
 
 const testForEmptyCache = (action = apiRequestAction) => CacheEpic =>
-	epicIgnoreAction(CacheEpic, action)();
+	CacheEpic(action).then(actions => expect(actions).toHaveLength(0));
 
-const testForPopulatedCache = (action = apiRequestAction) => CacheEpic => {
-	const testAction$ = ActionsObservable.of(action);
-	return CacheEpic(testAction$)
-		.do(action => expect(action.type).toEqual('CACHE_SUCCESS'))
-		.toPromise();
-};
+const testForPopulatedCache = (action = apiRequestAction) => CacheEpic =>
+	CacheEpic(action).then(actions =>
+		expect(actions.map(({ type }) => type)).toContain('CACHE_SUCCESS')
+	);
 
 describe('getCacheEpic', () => {
-	it(
-		'does not pass through arbitrary actions',
-		epicIgnoreAction(getCacheEpic())
-	);
+	it('does not pass through arbitrary actions', () =>
+		getCacheEpic()({ type: 'asdf' }).then(actions =>
+			expect(actions).toHaveLength(0)
+		));
 	it('does not emit CACHE_SUCCESS when no cache hit from API_REQ', () =>
 		makeCacheEpic().then(testForEmptyCache()));
 
