@@ -59,8 +59,6 @@ See the [Queries documentation](Queries.md) for more details on usage.
 
 ## Dependencies
 
-- redux-observable
-- rxjs
 - mwp-tracking-plugin/util/clickState
 - mwp-router
 - mwp-router/util
