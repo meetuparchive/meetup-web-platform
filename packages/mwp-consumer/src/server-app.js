@@ -7,7 +7,7 @@ import routes from './app/routes';
 // the react application with the full HTML response markup, including `<html>`,
 // `<head>` and its contents, and the `<script>` tag required to load the app
 // in the browser
-const renderRequest$ = makeServerRenderer$({
+const renderRequest = makeServerRenderer$({
 	routes,
 	reducer: makeRootReducer(),
 	scripts: ['/app.js'], // don't care about serving scripts to browser, but have to specify something
@@ -17,4 +17,4 @@ const renderRequest$ = makeServerRenderer$({
 	cssLinks: [], // don't care
 });
 
-export default renderRequest$;
+export default renderRequest;
