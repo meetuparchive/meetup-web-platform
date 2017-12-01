@@ -30,6 +30,7 @@
 		"mwp-app-server": ">=0.0.1",
 		"mwp-cli": ">=2",
 		"mwp-core": ">=0.0.1",
+		"mwp-store": ">=0.0.1",
 		"mwp-router": ">=0.0.1",
 		"mwp-toaster": ">=0.0.1",
 		"prop-types": "15.6.0",
