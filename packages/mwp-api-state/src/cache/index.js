@@ -4,15 +4,7 @@
  *
  * @module CacheMiddleware
  */
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/from';
-import 'rxjs/add/operator/zip';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/filter';
-import 'rxjs/add/operator/reduce';
-import 'rxjs/add/operator/ignoreElements';
-import 'rxjs/add/operator/mergeMap';
-import { combineEpics } from 'redux-observable';
+import { combineEpics } from '../redux-promise-epic';
 import { API_REQ, API_RESP_SUCCESS } from '../sync/apiActionCreators';
 import { CACHE_CLEAR, CACHE_SET, cacheSuccess } from './cacheActionCreators';
 
@@ -31,11 +23,12 @@ export function checkEnable() {
  *
  * Note that this will clear the cache without emitting an action
  */
-export const cacheClearEpic = cache => action$ =>
-	action$
-		.ofType(CACHE_CLEAR)
-		.mergeMap(() => cache.clear()) // wait for cache to clear before continuing
-		.ignoreElements();
+export const cacheClearEpic = cache => action => {
+	if (action.type !== CACHE_CLEAR) {
+		return Promise.resolve([]);
+	}
+	return cache.clear().then(() => []);
+};
 
 /**
  * Listen for any action that should set cached state with a
@@ -47,13 +40,13 @@ export const cacheClearEpic = cache => action$ =>
  *
  * Not that this will set the cache without emitting an action
  */
-export const cacheSetEpic = cache => action$ =>
-	action$
-		.ofType(API_RESP_SUCCESS, CACHE_SET)
-		.mergeMap(({ payload: { query, response } }) =>
-			cacheWriter(cache)(query, response)
-		)
-		.ignoreElements();
+export const cacheSetEpic = cache => action => {
+	if (![API_RESP_SUCCESS, CACHE_SET].some(type => action.type === type)) {
+		return Promise.resolve([]);
+	}
+	const { payload: { query, response } } = action;
+	cacheWriter(cache)(query, response).then(() => []);
+};
 
 /**
  * Listen for any action that should query the cache using a payload of queries
@@ -63,16 +56,15 @@ export const cacheSetEpic = cache => action$ =>
  * the results are collated into a single response object containing the cache
  * hits.
  */
-export const cacheQueryEpic = cache => action$ =>
-	action$
-		.ofType(API_REQ)
-		.mergeMap(
-			({ payload }) =>
-				Observable.from(payload) // fan out
-					.mergeMap(cacheReader(cache)) // look for a cache hit
-					.filter(({ query, response }) => response) // ignore misses
-		)
-		.map(cacheSuccess);
+export const cacheQueryEpic = cache => action => {
+	if (action.type !== API_REQ) {
+		return Promise.resolve([]);
+	}
+	const { payload: queries } = action;
+	return Promise.all(queries.map(cacheReader(cache))) // read cache for all queries
+		.then(responses => responses.filter(({ query, response }) => response)) // filter out the misses
+		.then(hits => hits.map(cacheSuccess)); // map the hits onto cacheSuccess actions
+};
 
 const getCacheEpic = (cache = makeCache()) =>
 	checkEnable()
@@ -81,6 +73,6 @@ const getCacheEpic = (cache = makeCache()) =>
 				cacheSetEpic(cache),
 				cacheQueryEpic(cache)
 			)
-		: action$ => action$.ignoreElements();
+		: action => Promise.resolve([]);
 
 export default getCacheEpic;
