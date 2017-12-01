@@ -1,3 +1,9 @@
+## [10.1]
+
+- `mwp-api-state` refactored to remove redux-observable + rxjs dependencies -
+  those are no longer peerDependencies. `redux-observable` is not currently used
+  by any other MWP package and can be removed from consumer apps
+
 ## [10.0]
 
 - Removed polyfill for `Intl.NumberFormat` and `Intl.DateTimeFormat` - consumers

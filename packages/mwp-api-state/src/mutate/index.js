@@ -35,32 +35,30 @@ import 'rxjs/add/operator/filter';
  * request method properties
  * @deprecated
  */
-const _getMethodEpic = method => action$ =>
-	action$
-		.filter(
-			({ type }) =>
-				type.endsWith(`_${method.toUpperCase()}`) ||
-				type.startsWith(`${method.toUpperCase()}_`)
-		)
-		.do(({ type }) => {
-			// Webpack will make sure process.env.NODE_ENV is populated on client
-			if (process.env.NODE_ENV !== 'production') {
-				// using a dev endpoint, render a deprecation warning
-				console.warn(
-					`This application is using Post/Delete middleware through ${type}.
-See the platform Queries Recipes docs for refactoring options:
-https://github.com/meetup/meetup-web-platform/blob/master/docs/Queries.md#recipes`
-				);
-			}
-		})
-		.map(({ payload: { query, onSuccess, onError } }) => ({
-			query,
-			meta: { onSuccess, onError },
-		}))
-		.map(({ query, meta }) => {
-			const actionCreator = method === 'delete' ? 'del' : method;
-			return api[actionCreator](query, meta);
-		});
+const _getMethodEpic = method => {
+	const matchAction = ({ type }) =>
+		type.endsWith(`_${method.toUpperCase()}`) ||
+		type.startsWith(`${method.toUpperCase()}_`);
+
+	return action => {
+		if (!matchAction(action)) {
+			return Promise.resolve([]);
+		}
+		const { type, payload: { query, onSuccess, onError } } = action;
+		// Webpack will make sure process.env.NODE_ENV is populated on client
+		if (process.env.NODE_ENV !== 'production') {
+			// using a dev endpoint, render a deprecation warning
+			console.warn(
+				`This application is using Post/Delete middleware through ${type}.
+	See the platform Queries Recipes docs for refactoring options:
+	https://github.com/meetup/meetup-web-platform/blob/master/docs/Queries.md#recipes`
+			);
+		}
+		const actionCreator = method === 'delete' ? 'del' : method;
+		const meta = { onSuccess, onError };
+		return Promise.resolve([api[actionCreator](query, meta)]);
+	};
+};
 
 export const postEpic = _getMethodEpic('post');
 export const deleteEpic = _getMethodEpic('delete');
