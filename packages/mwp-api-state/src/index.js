@@ -3,7 +3,7 @@ import {
 	combineEpics as combineEpicsRO,
 	createEpicMiddleware as createEpicMiddlewareRO,
 } from 'redux-observable';
-import { createEpicMiddleware } from './redux-promise-epic';
+import { createEpicMiddleware, combineEpics } from './redux-promise-epic';
 
 import getSyncEpic from './sync';
 import getCacheEpic from './cache';
