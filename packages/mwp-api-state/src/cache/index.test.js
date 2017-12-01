@@ -7,6 +7,7 @@ import {
 import * as api from '../sync/apiActionCreators';
 
 import { makeCache } from './util';
+import { CACHE_CLEAR } from './cacheActionCreators';
 import getCacheEpic from './';
 
 const MOCK_QUERY = mockQuery(MOCK_RENDERPROPS);
@@ -26,7 +27,7 @@ function populateCacheEpic(CacheEpic) {
 
 function clearCacheEpic(CacheEpic) {
 	// clear the cache with CACHE_CLEAR
-	return CacheEpic({ type: 'CACHE_CLEAR' }).then(() => CacheEpic);
+	return CacheEpic({ type: CACHE_CLEAR }).then(() => CacheEpic);
 }
 
 const testForEmptyCache = (action = apiRequestAction) => CacheEpic =>
