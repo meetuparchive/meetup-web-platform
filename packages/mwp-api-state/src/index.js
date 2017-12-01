@@ -1,11 +1,11 @@
 import { compose } from 'redux';
 import {
-	combineEpics,
+	combineEpics as combineEpicsRO,
 	createEpicMiddleware as createEpicMiddlewareRO,
 } from 'redux-observable';
-import { createEpicMiddleware } from './redux-promise-epic';
+import { createEpicMiddleware, combineEpics } from './redux-promise-epic';
 
-import getSyncEpic, { getFetchQueriesEpic } from './sync';
+import getSyncEpic from './sync';
 import getCacheEpic from './cache';
 import { postEpic, deleteEpic } from './mutate'; // DEPRECATED
 
@@ -39,12 +39,12 @@ const composeMiddleware = (...middleware) => store =>
 export const getApiMiddleware = (routes, fetchQueriesFn, baseUrl) =>
 	composeMiddleware(
 		createEpicMiddlewareRO(
-			combineEpics(
-				getSyncEpic(routes, baseUrl),
-				getCacheEpic(),
+			combineEpicsRO(
 				postEpic, // DEPRECATED
 				deleteEpic // DEPRECATED
 			)
 		),
-		createEpicMiddleware(getFetchQueriesEpic(fetchQueriesFn))
+		createEpicMiddleware(
+			combineEpics(getCacheEpic(), getSyncEpic(routes, fetchQueriesFn, baseUrl))
+		)
 	);
