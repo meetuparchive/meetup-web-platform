@@ -3,13 +3,9 @@ import {
 	combineEpics as combineEpicsRO,
 	createEpicMiddleware as createEpicMiddlewareRO,
 } from 'redux-observable';
-import { createEpicMiddleware, combineEpics } from './redux-promise-epic';
+import { createEpicMiddleware } from './redux-promise-epic';
 
-import getSyncEpic, {
-	getFetchQueriesEpic,
-	getNavEpic,
-	apiRequestToApiReq,
-} from './sync';
+import getSyncEpic from './sync';
 import getCacheEpic from './cache';
 import { postEpic, deleteEpic } from './mutate'; // DEPRECATED
 
