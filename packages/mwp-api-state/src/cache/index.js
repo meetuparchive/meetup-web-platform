@@ -45,7 +45,7 @@ export const cacheSetEpic = cache => action => {
 		return Promise.resolve([]);
 	}
 	const { payload: { query, response } } = action;
-	cacheWriter(cache)(query, response).then(() => []);
+	return cacheWriter(cache)(query, response).then(() => []);
 };
 
 /**
