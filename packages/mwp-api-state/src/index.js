@@ -1,8 +1,3 @@
-import { compose } from 'redux';
-import {
-	combineEpics as combineEpicsRO,
-	createEpicMiddleware as createEpicMiddlewareRO,
-} from 'redux-observable';
 import { createEpicMiddleware, combineEpics } from './redux-promise-epic';
 
 import getSyncEpic from './sync';
@@ -24,9 +19,6 @@ export {
 } from './sync/apiActionCreators';
 export { api, app, DEFAULT_API_STATE } from './reducer';
 
-const composeMiddleware = (...middleware) => store =>
-	compose(...middleware.map(m => m(store)));
-
 /**
  * The middleware is exported as a getter because it needs the application's
  * routes in order to set up the nav-related epic(s) that are part of the
@@ -37,14 +29,11 @@ const composeMiddleware = (...middleware) => store =>
  * middleware that doesn't include the other epics if performance is an issue
  */
 export const getApiMiddleware = (routes, fetchQueriesFn, baseUrl) =>
-	composeMiddleware(
-		createEpicMiddlewareRO(
-			combineEpicsRO(
-				postEpic, // DEPRECATED
-				deleteEpic // DEPRECATED
-			)
-		),
-		createEpicMiddleware(
-			combineEpics(getCacheEpic(), getSyncEpic(routes, fetchQueriesFn, baseUrl))
+	createEpicMiddleware(
+		combineEpics(
+			getCacheEpic(),
+			getSyncEpic(routes, fetchQueriesFn, baseUrl),
+			postEpic, // DEPRECATED
+			deleteEpic // DEPRECATED
 		)
 	);
