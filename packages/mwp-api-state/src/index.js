@@ -44,10 +44,11 @@ export const getApiMiddleware = (routes, fetchQueriesFn, baseUrl) =>
 	composeMiddleware(
 		createEpicMiddlewareRO(
 			combineEpicsRO(
-				getCacheEpic(),
 				postEpic, // DEPRECATED
 				deleteEpic // DEPRECATED
 			)
 		),
-		createEpicMiddleware(getSyncEpic(routes, fetchQueriesFn, baseUrl))
+		createEpicMiddleware(
+			combineEpics(getCacheEpic(), getSyncEpic(routes, fetchQueriesFn, baseUrl))
+		)
 	);
