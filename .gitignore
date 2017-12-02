@@ -41,6 +41,7 @@ jspm_packages
 .node_repl_history
 
 lib
+build
 
 github_deploy_key
 
