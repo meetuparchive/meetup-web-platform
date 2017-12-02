@@ -1,8 +1,5 @@
 import Boom from 'boom';
-import {
-	MOCK_renderRequestMap,
-	MOCK_RENDER_RESULT,
-} from 'meetup-web-mocks/lib/app';
+import { MOCK_RENDER_RESULT } from 'meetup-web-mocks/lib/app';
 import { getServer } from 'mwp-test-utils';
 import getRoute, { onPreResponse } from './route';
 
@@ -31,9 +28,14 @@ describe('onPreResponse.method', () => {
 	});
 	it('serves the homepage route', () => {
 		const server = getServer();
-		server.route(getRoute(MOCK_renderRequestMap));
+		const result = 'ok';
+		server.route(
+			getRoute({
+				'en-US': () => Promise.resolve({ statusCode: 200, result }),
+			})
+		);
 		return server
 			.inject({ url: '/' })
-			.then(response => expect(response.payload).toEqual(MOCK_RENDER_RESULT));
+			.then(response => expect(response.payload).toEqual(result));
 	});
 });
