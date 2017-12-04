@@ -269,24 +269,29 @@ const makeRenderer = (
 	}
 
 	// otherwise render using the API and React router
-	const storeIsReady$ = Observable.create(obs => {
-		obs.next(store.getState());
-		return store.subscribe(() => obs.next(store.getState()));
-	}).first(state => state.preRenderChecklist.every(isReady => isReady)); // take the first ready state
+	const checkReady = state =>
+		state.preRenderChecklist.every(isReady => isReady);
 
-	const action = {
-		type: SERVER_RENDER,
-		payload: url,
-	};
-	logger.debug(
-		{ type: 'dispatch', action, req },
-		`Dispatching RENDER for ${request.url.href}`
-	);
-	store.dispatch(action);
-	return storeIsReady$.map(() =>
+	const initializeStore = new Promise((resolve, reject) => {
+		// dispatch SERVER_RENDER to kick off API middleware
+		store.dispatch({ type: SERVER_RENDER, payload: url });
+
+		if (checkReady(store.getState())) {
+			resolve(store);
+			return;
+		}
+		const unsubscribe = store.subscribe(() => {
+			if (checkReady(store.getState())) {
+				resolve(store);
+				unsubscribe();
+			}
+		});
+	});
+
+	return initializeStore.then(initializedStore =>
 		getRouterRenderer({
 			routes,
-			store,
+			store: initializedStore,
 			location: url,
 			baseUrl,
 			assetPublicPath,
