@@ -23,7 +23,7 @@ export default (languageRenderers: { [string]: LanguageRenderer$ }) => (
 	const requestLanguage = request.getLanguage();
 	const renderRequest = languageRenderers[requestLanguage];
 
-	renderRequest(request, reply).subscribe(
+	renderRequest(request, reply).then(
 		(renderResult: RenderResult) => {
 			if (renderResult.redirect) {
 				return reply

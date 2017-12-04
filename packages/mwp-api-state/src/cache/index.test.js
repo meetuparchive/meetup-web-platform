@@ -7,7 +7,7 @@ import {
 import * as api from '../sync/apiActionCreators';
 
 import { makeCache } from './util';
-import { CACHE_CLEAR } from './cacheActionCreators';
+import { CACHE_CLEAR, CACHE_SUCCESS } from './cacheActionCreators';
 import getCacheEpic from './';
 
 const MOCK_QUERY = mockQuery(MOCK_RENDERPROPS);
@@ -35,7 +35,7 @@ const testForEmptyCache = (action = apiRequestAction) => CacheEpic =>
 
 const testForPopulatedCache = (action = apiRequestAction) => CacheEpic =>
 	CacheEpic(action).then(actions =>
-		expect(actions.map(({ type }) => type)).toContain('CACHE_SUCCESS')
+		expect(actions.map(({ type }) => type)).toContain(CACHE_SUCCESS)
 	);
 
 describe('getCacheEpic', () => {

@@ -12,6 +12,7 @@ import {
 	MOCK_ROUTES,
 } from 'meetup-web-mocks/lib/app';
 
+import { CACHE_CLEAR } from '../cache/cacheActionCreators';
 import * as api from './apiActionCreators';
 import * as syncActionCreators from './syncActionCreators';
 import getSyncEpic, {
@@ -72,7 +73,7 @@ describe('Sync epic', () => {
 			).then(actions => {
 				const types = actions.map(a => a.type);
 				expect(types).toContain(api.API_REQ);
-				expect(types.includes('CACHE_CLEAR')).toBe(true);
+				expect(types.includes(CACHE_CLEAR)).toBe(true);
 				expect(types.includes(CLICK_TRACK_CLEAR_ACTION)).toBe(true);
 			});
 		});
