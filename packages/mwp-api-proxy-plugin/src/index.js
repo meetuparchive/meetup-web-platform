@@ -66,7 +66,7 @@ register.attributes = {
 	name: API_PROXY_PLUGIN_NAME,
 	version: '1.0.0',
 	dependencies: [
-		'mwp-auth', // provides request.auth.credentials (member cookie)
+		'mwp-auth', // provides request.auth.credentials ({ memberCookie, csrfToken })
 		'tracking', // provides request.trackActivity()
 		'electrode-csrf-jwt', // provides csrf protection for POST
 	],
