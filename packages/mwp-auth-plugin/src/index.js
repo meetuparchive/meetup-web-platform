@@ -8,7 +8,8 @@ const CSRF_COOKIE_NAME =
 const mockCookies = {
 	MEETUP_MEMBER:
 		'"id=0&status=1&timestamp=1512421401&bs=0&tz=US%2FEastern&zip=&country=us&city=&state=&lat=0.0&lon=0.0&ql=false&s=6e59e217276406a3391fed92744dbb08d356bc34&scope=ALL"',
-	MEETUP_MEMBER_DEV: 'asdf_dev',
+	MEETUP_MEMBER_DEV:
+		'"id=0&status=1&timestamp=1512434160&bs=0&tz=US%2FEastern&zip=&country=us&city=&state=&lat=0.0&lon=0.0&ql=false&s=2006a4cfd308fcc675fddf9e2d4247ff29a187a3&scope=ALL"',
 };
 
 /**
