@@ -23,7 +23,6 @@ import {
 
 import { API_PROXY_PLUGIN_NAME } from '../config';
 
-jest.mock('uuid', () => ({ v4: () => 'test-uuid' }));
 jest.mock('mwp-cli/src/config', () => {
 	const config = require.requireActual('mwp-cli/src/config');
 	config.package = { agent: 'TEST_AGENT ' };
@@ -31,6 +30,9 @@ jest.mock('mwp-cli/src/config', () => {
 });
 
 const MOCK_HAPI_REQUEST = {
+	auth: {
+		credentials: { memberCookie: 'foo member', csrfToken: 'bar token' },
+	},
 	id: 'mock-uuid-1234',
 	server: getServer(),
 	method: 'get',
@@ -41,26 +43,16 @@ const MOCK_HAPI_REQUEST = {
 		[API_PROXY_PLUGIN_NAME]: {
 			uploads: [],
 		},
-		requestAuth: {},
 	},
 	getLanguage: () => 'en-US',
 };
 
 describe('getAuthHeaders', () => {
-	it('returns authorization header if no member cookie and oauth_token', () => {
-		const oauth_token = 'foo';
-		const authHeaders = getAuthHeaders({
-			state: { oauth_token },
-			plugins: { requestAuth: {} },
-		});
-		expect(authHeaders.authorization.startsWith('Bearer ')).toBe(true);
-		expect(authHeaders.authorization.endsWith(oauth_token)).toBe(true);
-	});
 	it('sets MEETUP_CSRF', () => {
-		const MEETUP_MEMBER = 'foo';
 		const authHeaders = getAuthHeaders({
-			state: { MEETUP_MEMBER },
-			plugins: { requestAuth: {} },
+			auth: {
+				credentials: { memberCookie: 'foo member', csrfToken: 'bar token' },
+			},
 		});
 		const cookies = authHeaders.cookie.split('; ').reduce((cookies, pair) => {
 			const [name, ...value] = pair.split('=');
@@ -70,9 +62,8 @@ describe('getAuthHeaders', () => {
 			};
 		}, {});
 
-		expect(cookies['MEETUP_CSRF']).not.toBeUndefined();
 		expect(cookies['MEETUP_CSRF_DEV']).not.toBeUndefined();
-		expect(authHeaders['csrf-token']).toEqual(cookies['MEETUP_CSRF']);
+		expect(authHeaders['csrf-token']).toEqual(cookies['MEETUP_CSRF_DEV']);
 	});
 });
 

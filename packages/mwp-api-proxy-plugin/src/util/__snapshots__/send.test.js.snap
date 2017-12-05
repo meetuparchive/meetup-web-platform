@@ -11,8 +11,8 @@ Object {
   },
   "headers": Object {
     "accept-language": "en-US",
-    "cookie": "MEETUP_CSRF=test-uuid; MEETUP_CSRF_DEV=test-uuid",
-    "csrf-token": "test-uuid",
+    "cookie": "MEETUP_CSRF_DEV=bar token; MEETUP_MEMBER_DEV=foo member",
+    "csrf-token": "bar token",
     "x-meetup-agent": "TEST_AGENT ",
     "x-meetup-parent-request-id": "mock-uuid-1234",
   },
@@ -31,8 +31,8 @@ Object {
   "baseUrl": "https://api.dev.meetup.com",
   "headers": Object {
     "accept-language": "en-US",
-    "cookie": "MEETUP_CSRF=test-uuid; MEETUP_CSRF_DEV=test-uuid",
-    "csrf-token": "test-uuid",
+    "cookie": "MEETUP_CSRF_DEV=bar token; MEETUP_MEMBER_DEV=foo member",
+    "csrf-token": "bar token",
     "x-meetup-agent": "TEST_AGENT ",
     "x-meetup-parent-request-id": "mock-uuid-1234",
   },
