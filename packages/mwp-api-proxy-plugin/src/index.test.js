@@ -24,7 +24,7 @@ function getResponse(injectRequest, server = getServer()) {
 		.then(() => server.inject(injectRequest));
 }
 describe('api proxy plugin', () => {
-	it.only('serves api responses from the configured route path', () => {
+	it('serves api responses from the configured route path', () => {
 		const endpoint = 'foo';
 		const validQuery = { type: 'a', ref: 'b', params: {}, endpoint };
 		const expectedResponse = { foo: 'bar' };
