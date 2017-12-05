@@ -54,13 +54,6 @@ export const getServer = () => {
 		},
 	};
 
-	// mock the anonAuthPlugin
-	server.decorate(
-		'request',
-		'authorize',
-		request => () => Observable.of(request),
-		{ apply: true }
-	);
 	server.decorate('request', 'trackActivity', () => ({}));
 	server.decorate('request', 'getLangPrefixPath', () => '/');
 	server.decorate('request', 'getLanguage', () => 'en-US');
