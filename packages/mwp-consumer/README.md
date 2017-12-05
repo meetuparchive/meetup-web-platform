@@ -16,11 +16,11 @@ Mock MWP consumer app for platform testing
 4. Watch the server logs - you should see periodic "GC HAPPENED" output, and
    eventually something that looks like
 
-   ```
-   GC HAPPENED Memory leak detected:
-   { growth: 8509368,
-    reason: 'heap growth over 5 consecutive GCs (33s) - 885.29 mb/hr' }
-  ```
+    ```
+    GC HAPPENED Memory leak detected:
+    { growth: 8509368,
+     reason: 'heap growth over 5 consecutive GCs (33s) - 885.29 mb/hr' }
+    ```
 
 5. **Important** If you are making changes to files, you must _re-build_ and
    _restart_ the dev server with `lerna run build && yarn start | grep "GC HAPPENED"`  
