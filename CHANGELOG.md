@@ -1,3 +1,10 @@
+## [10.2]
+
+- **Removed** Oauth authentication for no-cookie requests. This means we no
+  longer need `MUPWEB_OAUTH_TOKEN` and `MUPWEB_OAUTH_SECRET` env vars. Consumer
+  applications should not need to change any of their code, but deployments
+  can be cleaned up
+
 ## [10.1]
 
 - `mwp-api-state` refactored to remove redux-observable + rxjs dependencies -

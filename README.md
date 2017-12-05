@@ -15,7 +15,6 @@ In general, application-specific code will live outside of this package.
 # Docs
 
 - [App configuration management](docs/Config.md)
-- [Auth flow from `requestAuthPlugin`](docs/auth.md)
 - [Analytics/tracking](docs/Tracking.md)
 - [Application state management](docs/State.md)
 - [Rendering in consumer applications](docs/Rendering.md)
@@ -23,14 +22,15 @@ In general, application-specific code will live outside of this package.
 
 ## Public modules
 
-- [Routing module](src/router/README.md)
-- [Language plugin for Hapi](src/plugins/language/README.md)
-- [API proxy plugin for Hapi](src/plugins/api-proxy/README.md)
-- [Click and Activity tracking](src/plugins/tracking/README.md)
-- [API State module](src/api-state/README.md)
-  - ['Query': structuring data requests](src/api-state/Queries.md) -
+- [Auth plugin](packages/mwp-auth-plugin/README.md)
+- [Routing module](packages/mwp-router/README.md)
+- [Language plugin for Hapi](packages/mwp-language-plugin/README.md)
+- [API proxy plugin for Hapi](packages/mwp-api-proxy-plugin/README.md)
+- [Click and Activity tracking](packages/mwp-tracking-plugin/README.md)
+- [API State module](packages/mwp-api-state/README.md)
+  - ['Query': structuring data requests](packages/mwp-api-state/Queries.md) -
 	  GET/POST/PATCH/DELETE requests to REST API
-- [Redux store modules](src/store/README.md) - browser and server
+- [Redux store modules](packages/mwp-store/README.md) - browser and server
 
 # Releases
 

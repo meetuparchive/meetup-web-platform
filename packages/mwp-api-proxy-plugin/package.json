@@ -34,10 +34,7 @@
     "mwp-logger-plugin": ">=0.0.1",
     "qs": "6.5.0",
     "request": "2.81.0",
-    "rison": "0.1.1",
-    "uuid": "3.1.0"
+    "rison": "0.1.1"
   },
-  "devDependencies": {
-    "mwp-test-utils": ">=0.0.1"
-  }
+  "devDependencies": {}
 }

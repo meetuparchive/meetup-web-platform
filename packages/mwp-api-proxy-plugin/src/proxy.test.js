@@ -16,6 +16,7 @@ jest.mock('mwp-cli/src/config', () => {
 });
 
 const MOCK_HAPI_REQUEST = {
+	auth: { credentials: { memberCookie: 'foo member', csrfToken: 'bar token' } },
 	headers: {},
 	query: {},
 	state: { oauth_token: 'asdfasd' },
@@ -27,6 +28,9 @@ describe('apiProxy$', () => {
 	const queries = [mockQuery(MOCK_RENDERPROPS), mockQuery(MOCK_RENDERPROPS)];
 	it('returns an observable that emits an array of results', () => {
 		const getRequest = {
+			auth: {
+				credentials: { memberCookie: 'foo member', csrfToken: 'bar token' },
+			},
 			headers: {},
 			query: {},
 			method: 'get',
