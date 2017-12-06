@@ -20,6 +20,7 @@ function getResponse(injectRequest, server = getServer()) {
 			{ register: CsrfPlugin, options: { secret: 'asfd' } },
 			apiProxyPlugin,
 		])
+		.then(() => server.auth.strategy('default', 'mwp', true))
 		.then(() => server.inject(injectRequest));
 }
 describe('api proxy plugin', () => {
@@ -34,9 +35,6 @@ describe('api proxy plugin', () => {
 		const queriesRison = rison.encode_array([validQuery]);
 		return getResponse({
 			url: `/mu_api?queries=${queriesRison}`,
-			headers: {
-				cookie: 'oauth_token=asdf',
-			},
 		}).then(response => {
 			expect(response.statusCode).toBe(200);
 			expect(JSON.parse(response.payload)).toMatchObject({

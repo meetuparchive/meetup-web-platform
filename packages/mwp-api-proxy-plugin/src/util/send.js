@@ -3,7 +3,6 @@ import fs from 'fs';
 
 import querystring from 'qs';
 import url from 'url';
-import uuid from 'uuid';
 
 import externalRequest from 'request';
 import { Observable } from 'rxjs/Observable';
@@ -20,6 +19,10 @@ import config from 'mwp-cli/src/config';
 import { API_PROXY_PLUGIN_NAME } from '../config';
 
 export const API_META_HEADER = 'X-Meta-Request-Headers';
+const MEMBER_COOKIE_NAME =
+	process.env.NODE_ENV === 'production' ? 'MEETUP_MEMBER' : 'MEETUP_MEMBER_DEV';
+const CSRF_COOKIE_NAME =
+	process.env.NODE_ENV === 'production' ? 'MEETUP_CSRF' : 'MEETUP_CSRF_DEV';
 
 const MOCK_RESPONSE_OK = {
 	// minimal representation of http.IncomingMessage
@@ -158,35 +161,22 @@ export const buildRequestArgs = externalRequestOpts => ({
 };
 
 export function getAuthHeaders(request) {
-	const oauth_token =
-		request.state.oauth_token || request.plugins.requestAuth.oauth_token; // browser-based requests // internal server requests
-	if (!request.state.MEETUP_MEMBER && oauth_token) {
-		return {
-			authorization: `Bearer ${oauth_token}`,
-		};
-	}
-
 	// Cookie + CSRF auth: need have matching UUID in MEETUP_CSRF cookie and 'csrf-token' header
+	// Valid cookie and CSRF are supplied by mwp-auth-plugin in request.auth.credentials
 	const cookies = { ...request.state };
-	const csrfCookie =
-		process.env.NODE_ENV === 'production'
-			? cookies.MEETUP_CSRF
-			: cookies.MEETUP_CSRF_DEV;
-	if (csrfCookie) {
-		// only need to set csrf-token - existing cookie header will be passed in unmodified
-		return { 'csrf-token': csrfCookie };
-	}
-	// create a new cookie + header
-	const csrf = uuid.v4();
-	cookies.MEETUP_CSRF = csrf;
-	cookies.MEETUP_CSRF_DEV = csrf;
+	const { memberCookie, csrfToken } = request.auth.credentials; // set by mwp-auth plugin
+
+	cookies[CSRF_COOKIE_NAME] = csrfToken;
+	cookies[MEMBER_COOKIE_NAME] = memberCookie;
+
+	// rebuild a cookie header string from the parsed `cookies` object
 	const cookie = Object.keys(cookies)
 		.map(name => `${name}=${cookies[name]}`)
 		.join('; ');
 
 	return {
 		cookie,
-		'csrf-token': csrf,
+		'csrf-token': csrfToken,
 	};
 }
 

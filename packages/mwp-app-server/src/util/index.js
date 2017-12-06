@@ -73,7 +73,7 @@ export function server(routes, connection, plugins, config) {
 	return appConnection
 		.register(plugins)
 		.then(() => registerExtensionEvents(server))
-		.then(() => server.auth.strategy('default', 'oauth', true))
+		.then(() => server.auth.strategy('default', 'mwp', true))
 		.then(() => appConnection.route(routes))
 		.then(() => server.start())
 		.then(() => server);
