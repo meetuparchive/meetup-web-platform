@@ -5,6 +5,7 @@ const MEMBER_COOKIE_NAME =
 const CSRF_COOKIE_NAME =
 	process.env.NODE_ENV === 'production' ? 'MEETUP_CSRF' : 'MEETUP_CSRF_DEV';
 
+// hardcoded logged-out cookies with valid signatures that can be used for any logged-out API request
 const mockCookies = {
 	MEETUP_MEMBER:
 		'"id=0&status=1&timestamp=1512421401&bs=0&tz=US%2FEastern&zip=&country=us&city=&state=&lat=0.0&lon=0.0&ql=false&s=6e59e217276406a3391fed92744dbb08d356bc34&scope=ALL"',
