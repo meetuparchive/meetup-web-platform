@@ -25,14 +25,9 @@
     "url": "https://github.com/meetup/meetup-web-platform/issues"
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
-  "peerDependencies": {
-    "rxjs": "^5.4.3"
-  },
+  "peerDependencies": {},
   "dependencies": {
-    "joi": "10.6.0",
-    "mwp-logger-plugin": ">=0.0.1"
+    "uuid": "3.1.0"
   },
-  "devDependencies": {
-    "mwp-test-utils": ">=0.0.1"
-  }
+  "devDependencies": {}
 }
