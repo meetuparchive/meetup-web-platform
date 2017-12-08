@@ -16,6 +16,12 @@ export default (request: HapiRequest) => (): string => {
 	const firstPathComponent = originalPath.split('/')[1];
 	// Languages in beta that we don't want to redirect yet.
 	// first listed locale is default
+	request.log(
+		['info'],
+		`Request language: ${requestLanguage}, isBeta? ${isBetaLang(
+			requestLanguage
+		)})`
+	);
 	if (requestLanguage === supportedLangs[0]) {
 		// ensure that we are serving from un-prefixed URL
 		if (supportedLangs.includes(firstPathComponent)) {
