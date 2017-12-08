@@ -1,7 +1,6 @@
 import Hapi from 'hapi';
 import Cookie from 'tough-cookie';
 
-import { Observable } from 'rxjs/Observable';
 import { properties as serverConfig } from 'mwp-cli/src/config/server';
 
 export const MOCK_LOGGER = {

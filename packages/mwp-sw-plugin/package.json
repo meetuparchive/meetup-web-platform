@@ -29,6 +29,6 @@
   "devDependencies": {},
   "peerDependencies": {
     "inert": "4.2.1",
-    "mwp-cli": "^1.1.268 || ^2.0.0"
+    "mwp-cli": ">=2"
   }
 }

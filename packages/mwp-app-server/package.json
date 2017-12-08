@@ -46,6 +46,6 @@
     "mwp-test-utils": ">=0.0.1"
   },
   "peerDependencies": {
-    "mwp-cli": "^1.1.268 || ^2.0.0"
+    "mwp-cli": ">=2"
   }
 }
