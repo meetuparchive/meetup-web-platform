@@ -102,10 +102,10 @@ type Serializer = Object => string;
 type Deserializer = string => Object;
 
 const avroSerializer: Object => Serializer = schema => {
-	const parsed = avro.parse(schema);
+	const parser = avro.parse(schema);
 	const schemaPath = `gs://meetup-logs/avro_schemas/${schema.name}_${schema.doc}.avsc`;
 	return data => {
-		const record = parsed.toBuffer(data);
+		const record = parser.toBuffer(data);
 		// data.timestamp _must_ be ISOString if it exists
 		const timestamp = data.timestamp || new Date().toISOString();
 		const analytics = {
@@ -118,11 +118,11 @@ const avroSerializer: Object => Serializer = schema => {
 };
 
 const avroDeserializer: Object => Deserializer = schema => {
-	const parsed = avro.parse(schema);
+	const parser = avro.parse(schema);
 	return serialized => {
 		const { record } = JSON.parse(serialized);
 		const avroBuffer = new Buffer(record, 'base64');
-		return parsed.fromBuffer(avroBuffer);
+		return parser.fromBuffer(avroBuffer);
 	};
 };
 
