@@ -191,9 +191,9 @@ asynckit@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
 
-avsc@5.0.5:
-  version "5.0.5"
-  resolved "https://registry.yarnpkg.com/avsc/-/avsc-5.0.5.tgz#00f1fab7ea797f1737322ee8f8ea53898b9157da"
+avsc@5.1.1:
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/avsc/-/avsc-5.1.1.tgz#45cf97b44cfcb9c6e707b209a99b76a7d637d139"
 
 aws-sign2@~0.6.0:
   version "0.6.0"
@@ -578,12 +578,12 @@ graceful-fs@^4.1.2:
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.1.11.tgz#0e8bdfe4d1ddb8854d64e04ea7c00e2a026e5658"
 
 grpc@^1.2, grpc@^1.7.1:
-  version "1.7.2"
-  resolved "https://registry.yarnpkg.com/grpc/-/grpc-1.7.2.tgz#f3f31e96c1752e1587f940758bb2374f5c13478e"
+  version "1.7.3"
+  resolved "https://registry.yarnpkg.com/grpc/-/grpc-1.7.3.tgz#c9d034324e2ec8a06cfaa577a044a116f96c8c90"
   dependencies:
     arguejs "^0.2.3"
     lodash "^4.15.0"
-    nan "^2.8.0"
+    nan "^2.0.0"
     node-pre-gyp "^0.6.39"
     protobufjs "^5.0.0"
 
@@ -837,7 +837,7 @@ ms@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
 
-nan@^2.8.0:
+nan@^2.0.0:
   version "2.8.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.8.0.tgz#ed715f3fe9de02b57a5e6252d90a96675e1f085a"
 

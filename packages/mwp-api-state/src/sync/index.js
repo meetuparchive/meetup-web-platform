@@ -88,8 +88,8 @@ export const getNavEpic = (routes, baseUrl) => {
 			resolvePrevQueries,
 		]).then(([newQueries, previousQueries]) => {
 			if (newQueries.filter(q => q).length === 0) {
-				// no valid queries - ignore
-				return [];
+				// no valid queries - jump straight to 'complete'
+				return [api.complete([])];
 			}
 			// perform a fast comparison of previous route's serialized queries
 			// with the new route's serialized queries. All state refs for
