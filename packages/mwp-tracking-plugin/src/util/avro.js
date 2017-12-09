@@ -101,22 +101,29 @@ const activity = {
 type Serializer = Object => string;
 type Deserializer = string => Object;
 
-const avroSerializer: Object => Serializer = schema => data => {
-	const record = avro.parse(schema).toBuffer(data);
-	// data.timestamp _must_ be ISOString if it exists
-	const timestamp = data.timestamp || new Date().toISOString();
-	const analytics = {
-		record: record.toString('base64'),
-		schema: `gs://meetup-logs/avro_schemas/${schema.name}_${schema.doc}.avsc`,
-		date: timestamp.substr(0, 10), // YYYY-MM-DD
+const avroSerializer: Object => Serializer = schema => {
+	const parsed = avro.parse(schema);
+	const schemaPath = `gs://meetup-logs/avro_schemas/${schema.name}_${schema.doc}.avsc`;
+	return data => {
+		const record = parsed.toBuffer(data);
+		// data.timestamp _must_ be ISOString if it exists
+		const timestamp = data.timestamp || new Date().toISOString();
+		const analytics = {
+			record: record.toString('base64'),
+			schema: schemaPath,
+			date: timestamp.substr(0, 10), // YYYY-MM-DD
+		};
+		return JSON.stringify(analytics);
 	};
-	return JSON.stringify(analytics);
 };
 
-const avroDeserializer: Object => Deserializer = schema => serialized => {
-	const { record } = JSON.parse(serialized);
-	const avroBuffer = new Buffer(record, 'base64');
-	return avro.parse(schema).fromBuffer(avroBuffer);
+const avroDeserializer: Object => Deserializer = schema => {
+	const parsed = avro.parse(schema);
+	return serialized => {
+		const { record } = JSON.parse(serialized);
+		const avroBuffer = new Buffer(record, 'base64');
+		return parsed.fromBuffer(avroBuffer);
+	};
 };
 
 const logger = (serializer: Serializer, deserializer: Deserializer) => (
