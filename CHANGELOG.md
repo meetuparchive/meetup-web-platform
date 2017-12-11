@@ -1,3 +1,8 @@
+## [10.3]
+
+- **New package** `mwp-config` - a dedicated 'config' package that can be freely
+  imported to other MWP packages and consumers.
+
 ## [10.2]
 
 - **Removed** Oauth authentication for no-cookie requests. This means we no

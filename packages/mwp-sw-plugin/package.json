@@ -28,7 +28,6 @@
   "dependencies": {},
   "devDependencies": {},
   "peerDependencies": {
-    "inert": "4.2.1",
-    "mwp-cli": ">=2"
+    "inert": "4.2.1"
   }
 }

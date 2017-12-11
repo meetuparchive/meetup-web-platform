@@ -26,7 +26,6 @@
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "peerDependencies": {
-    "mwp-cli": ">=2",
     "mwp-router": ">=0.0.1"
   },
   "dependencies": {
