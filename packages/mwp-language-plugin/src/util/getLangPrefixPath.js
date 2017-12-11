@@ -1,4 +1,4 @@
-import isBetaLang from './isBetaLang';
+import { isBetaLang } from './betaLangs';
 // @flow
 
 /*

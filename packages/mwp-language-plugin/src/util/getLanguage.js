@@ -2,7 +2,7 @@
 
 import querystring from 'qs';
 import Accepts from 'accepts';
-import isBetaLang from './isBetaLang';
+import { getNotBetaLangs } from './betaLangs';
 
 type ParseRequestLang = HapiRequest => ?string | false;
 
@@ -30,7 +30,7 @@ export const getCookieLang: ParseRequestLang = (request: HapiRequest) => {
 export const getUrlLang: ParseRequestLang = (request: HapiRequest) => {
 	const { supportedLangs } = getServerSettings(request);
 	const urlLang = request.url.path.split('/')[1];
-	return supportedLangs.includes(urlLang) && !isBetaLang(urlLang) && urlLang;
+	return supportedLangs.includes(urlLang) && urlLang;
 };
 
 /*
@@ -38,7 +38,7 @@ export const getUrlLang: ParseRequestLang = (request: HapiRequest) => {
  */
 export const getBrowserLang: ParseRequestLang = (request: HapiRequest) => {
 	const { supportedLangs } = getServerSettings(request);
-	return Accepts(request).language(supportedLangs);
+	return Accepts(request).language(getNotBetaLangs(supportedLangs));
 };
 
 /*
