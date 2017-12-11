@@ -1,7 +1,7 @@
 import Hapi from 'hapi';
 import Cookie from 'tough-cookie';
 
-import { properties as serverConfig } from 'mwp-cli/src/config/server';
+import { properties as serverConfig } from 'mwp-config/server';
 
 export const MOCK_LOGGER = {
 	debug: jest.fn(),
