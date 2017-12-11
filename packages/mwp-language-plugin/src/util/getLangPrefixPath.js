@@ -1,3 +1,4 @@
+import isBetaLang from './isBetaLang';
 // @flow
 
 /*
@@ -13,7 +14,14 @@ export default (request: HapiRequest) => (): string => {
 	const requestLanguage = request.getLanguage();
 	const originalPath = request.url.pathname;
 	const firstPathComponent = originalPath.split('/')[1];
+	// Languages in beta that we don't want to redirect yet.
 	// first listed locale is default
+	request.log(
+		['info'],
+		`Request language: ${requestLanguage}, isBeta? ${isBetaLang(
+			requestLanguage
+		)})`
+	);
 	if (requestLanguage === supportedLangs[0]) {
 		// ensure that we are serving from un-prefixed URL
 		if (supportedLangs.includes(firstPathComponent)) {
@@ -24,7 +32,10 @@ export default (request: HapiRequest) => (): string => {
 			);
 			return prefixedPath;
 		}
-	} else if (requestLanguage !== firstPathComponent) {
+	} else if (
+		requestLanguage !== firstPathComponent &&
+		!isBetaLang(requestLanguage)
+	) {
 		// must correct/insert the correct lang prefix
 		const cleanOriginal = originalPath.replace(
 			new RegExp(`^/(${supportedLangs.join('|')})/`),
