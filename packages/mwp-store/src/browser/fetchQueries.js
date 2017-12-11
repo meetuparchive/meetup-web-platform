@@ -7,6 +7,36 @@ import { parseQueryResponse, getAuthedQueryFilter } from '../util/fetchUtils';
 export const CSRF_HEADER = 'x-csrf-jwt';
 export const CSRF_HEADER_COOKIE = 'x-csrf-jwt-header';
 
+/*
+ * rison serialization fails for unserializable data, including params with
+ * `undefined` values. This if/else will log an error in the browser in dev
+ * in order to catch mistakes, and force-clean the data in prod to avoid
+ * client app crashes. In many cases, `undefined` params will not result in
+ * invalid return values, but they should be cleaned up to avoid uncertainty
+ *
+ * This if/else will be simplified to only contain the correct block in the
+ * production bundle
+ */
+const makeSerializable = queries => {
+	if (process.env.NODE_ENV === 'production') {
+		// quick-and-cheap object cleanup for serialization. This will remove
+		// undefined and unserializable values (e.g. functions)
+		return JSON.parse(JSON.stringify(queries));
+	} else {
+		try {
+			rison.encode_array(queries);
+		} catch (err) {
+			console.error(err);
+			console.error(
+				'Problem encoding queries',
+				'- please ensure that there are no undefined params',
+				JSON.stringify(queries, null, 2)
+			);
+		}
+	}
+	return queries;
+};
+
 /**
  * that the request will have the required CSRF credentials and constructs
  * the `fetch` call arguments based on the request method. It also records the
@@ -20,30 +50,6 @@ export const CSRF_HEADER_COOKIE = 'x-csrf-jwt-header';
  * @return {Object} { url, config } arguments for a fetch call
  */
 export const getFetchArgs = (apiUrl, queries, meta) => {
-	// rison serialization fails for unserializable data, including params with
-	// `undefined` values. This if/else will log an error in the browser in dev
-	// in order to catch mistakes, and force-clean the data in prod to avoid
-	// client app crashes. In many cases, `undefined` params will not result in
-	// invalid return values, but they should be cleaned up to avoid uncertainty
-	//
-	// This if/else will be simplified to only contain the correct block in the
-	// production bundle
-	if (process.env.NODE_ENV === 'production') {
-		// quick-and-cheap object cleanup for serialization. This will remove
-		// undefined and unserializable values (e.g. functions)
-		queries = JSON.parse(JSON.stringify(queries));
-	} else {
-		try {
-			rison.encode_array(queries);
-		} catch (err) {
-			console.error(err);
-			console.error(
-				'Problem encoding queries',
-				'- please ensure that there are no undefined params',
-				JSON.stringify(queries, null, 2)
-			);
-		}
-	}
 	const headers = {};
 	const method = ((queries[0].meta || {}).method || 'GET') // fallback to 'get'
 		.toUpperCase(); // must be upper case - requests can fail silently otherwise
@@ -53,7 +59,7 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 	const isDelete = method === 'DELETE';
 
 	const searchParams = new URLSearchParams();
-	searchParams.append('queries', rison.encode_array(queries));
+	searchParams.append('queries', rison.encode_array(makeSerializable(queries)));
 
 	if (meta) {
 		const {
