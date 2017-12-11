@@ -20,6 +20,7 @@ import getSyncEpic, {
 	getNavEpic,
 	apiRequestToApiReq,
 } from './';
+import { API_RESP_COMPLETE } from '../../lib/sync/apiActionCreators';
 
 MOCK_APP_STATE.config = {};
 MOCK_APP_STATE.routing = {};
@@ -77,7 +78,7 @@ describe('Sync epic', () => {
 				expect(types.includes(CLICK_TRACK_CLEAR_ACTION)).toBe(true);
 			});
 		});
-		it('does not emit for nav-related actions without matched query', () => {
+		it('emits API_COMPLETE for nav-related actions without matched query', () => {
 			const pathname = '/noQuery';
 			const noMatchLocation = { ...MOCK_RENDERPROPS.location, pathname };
 			const locationChange = {
@@ -96,11 +97,11 @@ describe('Sync epic', () => {
 				navEpic(serverRender, fakeStore),
 			]).then(actionArrays => {
 				actionArrays.forEach(actions => {
-					expect(actions).toHaveLength(0);
+					expect(actions.map(({ type }) => type)).toEqual([API_RESP_COMPLETE]);
 				});
 			});
 		});
-		it('does not emit for nav-related actions with query functions that return null', () => {
+		it('emits API_COMPLETE for nav-related actions with query functions that return null', () => {
 			const pathname = '/nullQuery';
 			const noMatchLocation = { ...MOCK_RENDERPROPS.location, pathname };
 			const locationChange = {
@@ -121,7 +122,7 @@ describe('Sync epic', () => {
 				navEpic(serverRender, fakeStore),
 			]).then(actionArrays => {
 				actionArrays.forEach(actions => {
-					expect(actions).toHaveLength(0);
+					expect(actions.map(({ type }) => type)).toEqual([API_RESP_COMPLETE]);
 				});
 			});
 		});
