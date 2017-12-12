@@ -20,7 +20,20 @@ export const API_RESP_FAIL = 'API_RESP_FAIL';
  * @param {Object} meta metadata about the request, e.g. 'logout', 'clickTracking'
  * @return {Object} an API_REQ action
  */
-export function requestAll(queries: Array<Query>, meta: ?Object) {
+function _requestAll(queries: Array<Query>, meta: ?Object) {
+	if (process.env.NODE_ENV !== 'production') {
+		// check queries have valid 'meta.method' value
+		const method = queries[0].meta.method;
+		queries.forEach(q => {
+			if (!q.meta.method || q.meta.method !== method) {
+				// meta.method must be set and must be the same for all queries
+				console.error(
+					'_requestAll should not be called directly',
+					'use a method-specific API request action creator'
+				);
+			}
+		});
+	}
 	meta = meta || {};
 	meta.request = new Promise((resolve, reject) => {
 		meta = meta || {};
@@ -34,19 +47,14 @@ export function requestAll(queries: Array<Query>, meta: ?Object) {
 	};
 }
 
-const _applyMethod = method => (query: Query, meta: ?Object) => {
-	query.meta = {
-		...(query.meta || {}),
-		method,
-	};
-	// delegate to `requestAll`
-	const requestAction = requestAll([query], meta);
-	// modify the promise to automatically pull out the single response
-	// corresponding to the single query
-	requestAction.meta.promise = requestAction.meta.request.then(
-		responses => responses[0]
-	);
-	return requestAction;
+const setMethod = method => (q: Query) => ({
+	...q,
+	meta: { ...(q.meta || {}), method },
+});
+const _applyMethod = method => (query: Query | Array<Query>, meta: ?Object) => {
+	const queries = query instanceof Array ? query : [query];
+	// delegate to `_requestAll`
+	return _requestAll(queries.map(setMethod(method)), meta);
 };
 
 export const get = _applyMethod('get');

@@ -1,8 +1,8 @@
-import { requestAll } from 'mwp-api-state';
+import { get } from 'mwp-api-state';
 import injectPromise from './injectPromise';
 
 describe('injectPromise middleware', () => {
-	const getAction = () => requestAll([]);
+	const getAction = () => get({});
 	const processAction = injectPromise(undefined)(() => {});
 	test('modifies API_REQ with a meta.request Promise', () => {
 		const action = getAction();
