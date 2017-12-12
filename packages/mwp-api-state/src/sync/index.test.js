@@ -132,7 +132,7 @@ describe('Sync epic', () => {
 			const mockFetchQueries = () => () => Promise.resolve({ successes: [{}] });
 
 			const queries = [mockQuery({})];
-			const apiRequest = api.requestAll(queries);
+			const apiRequest = api.get(queries);
 			const fakeStore = createFakeStore(MOCK_APP_STATE);
 			const fqEpic = getFetchQueriesEpic(mockFetchQueries);
 			// kick off the fetch
@@ -153,7 +153,7 @@ describe('Sync epic', () => {
 				);
 
 			const queries = [mockQuery({})];
-			const apiRequest = api.requestAll(queries);
+			const apiRequest = api.get(queries);
 			const fakeStore = createFakeStore(MOCK_APP_STATE);
 			const fqEpic = getFetchQueriesEpic(mockFetchQueries);
 
@@ -176,7 +176,7 @@ describe('Sync epic', () => {
 				);
 
 			const queries = [mockQuery({})];
-			const apiRequest = api.requestAll(queries);
+			const apiRequest = api.get(queries);
 			const fakeStore = createFakeStore(MOCK_APP_STATE);
 			const fqEpic = getFetchQueriesEpic(mockFetchQueries);
 
@@ -198,7 +198,7 @@ describe('Sync epic', () => {
 				Promise.resolve({ successes: expectedSuccesses });
 
 			const queries = [mockQuery({})];
-			const apiRequest = api.requestAll(queries);
+			const apiRequest = api.get(queries);
 			apiRequest.meta.resolve = jest.fn();
 			const fakeStore = createFakeStore(MOCK_APP_STATE);
 			return getFetchQueriesEpic(mockFetchQueries)(
@@ -214,7 +214,7 @@ describe('Sync epic', () => {
 				Promise.reject(new Error('mock error'));
 
 			const queries = [mockQuery({})];
-			const apiRequest = api.requestAll(queries);
+			const apiRequest = api.get(queries);
 			const fakeStore = createFakeStore(MOCK_APP_STATE);
 			return getFetchQueriesEpic(mockFetchQueries)(
 				apiRequest,
@@ -232,7 +232,7 @@ describe('Sync epic', () => {
 			const mockFetchQueries = () => () => Promise.reject(expectedError);
 
 			const queries = [mockQuery({})];
-			const apiRequest = api.requestAll(queries);
+			const apiRequest = api.get(queries);
 			apiRequest.meta.reject = jest.fn();
 			const fakeStore = createFakeStore(MOCK_APP_STATE);
 			return getFetchQueriesEpic(mockFetchQueries)(
