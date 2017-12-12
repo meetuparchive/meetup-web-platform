@@ -47,10 +47,25 @@ function _requestAll(queries: Array<Query>, meta: ?Object) {
 	};
 }
 
-const setMethod = method => (q: Query) => ({
-	...q,
-	meta: { ...(q.meta || {}), method },
-});
+const setMethod = method => (q: Query) => {
+	if (process.env.NODE_ENV !== 'production') {
+		// just some dev debug niceties that will be stripped out in prod
+		const methodValue = (q.meta || {}).method;
+		if (methodValue) {
+			console.error(JSON.stringify(q));
+			console.error('Query objects should not specify a `meta.method`');
+			if (methodValue !== method) {
+				throw new TypeError(
+					'query.meta.method does not match API action creator method'
+				);
+			}
+		}
+	}
+	return {
+		...q,
+		meta: { ...(q.meta || {}), method },
+	};
+};
 const _applyMethod = method => (query: Query | Array<Query>, meta: ?Object) => {
 	const queries = query instanceof Array ? query : [query];
 	// delegate to `_requestAll`
