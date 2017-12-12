@@ -1,3 +1,10 @@
+## [11.0]
+
+- **Removed** `api.requestAll` is no longer exported - use the method-specific
+  action creators with the following enhancement:
+- **New feature** `api.get/post/patch/del` can now be called with an array of
+  queries in order to make a batched API request
+
 ## [10.2]
 
 - **Removed** Oauth authentication for no-cookie requests. This means we no
