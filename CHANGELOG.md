@@ -7,6 +7,10 @@
   the `meta.request` Promise instead, which will return an array of responses.
   E.g. instead of `api.post(...).meta.promise.then(response => ...)`, use
   `api.post(...).meta.request.then(([response]) => ...)`
+- **Removed** `api.requestAll` is no longer exported - use the method-specific
+  action creators with the following enhancement:
+- **New feature** `api.get/post/patch/del` can now be called with an array of
+  queries in order to make a batched API request
 
 ## [10.2]
 
