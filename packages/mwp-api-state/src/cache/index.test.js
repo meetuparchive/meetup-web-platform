@@ -12,7 +12,7 @@ import getCacheEpic from './';
 
 const MOCK_QUERY = mockQuery(MOCK_RENDERPROPS);
 const MOCK_SUCCESS_ACTION = api.success({
-	query: MOCK_QUERY,
+	query: api.get(MOCK_QUERY).payload[0],
 	response: MOCK_API_RESULT[0],
 });
 const apiRequestAction = api.get(MOCK_QUERY);
