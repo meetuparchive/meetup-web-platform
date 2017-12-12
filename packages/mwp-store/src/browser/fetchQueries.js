@@ -23,6 +23,12 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 	if (process.env.NODE_ENV !== 'production') {
 		// basic query validation for dev. This block will be stripped out by
 		// minification in prod bundle.
+		if (queries.length > 1 && queries[0].params instanceof FormData) {
+			throw new Error(
+				'POST queries with FormData cannot be batched',
+				'- dispatch each one individually'
+			);
+		}
 		try {
 			rison.encode_array(queries);
 		} catch (err) {

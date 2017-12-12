@@ -103,7 +103,7 @@ export const getNavEpic = (routes, baseUrl) => {
 			requestMetadata.retainRefs = sharedRefs;
 			return [
 				cacheAction,
-				api.requestAll(newQueries, requestMetadata),
+				api.get(newQueries, requestMetadata),
 				clickActions.clear(),
 			].filter(a => a);
 		});
@@ -111,14 +111,12 @@ export const getNavEpic = (routes, baseUrl) => {
 };
 
 /**
- * Old apiRequest maps directly onto new api.requestAll
+ * Old apiRequest maps directly onto new api.get
  * @deprecated
  */
 export const apiRequestToApiReq = action =>
 	Promise.resolve(
-		action.type === 'API_REQUEST'
-			? [api.requestAll(action.payload, action.meta)]
-			: []
+		action.type === 'API_REQUEST' ? [api.get(action.payload, action.meta)] : []
 	);
 
 /**

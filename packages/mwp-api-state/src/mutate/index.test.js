@@ -11,7 +11,7 @@ describe('postEpic', () => {
 	it('returns an api.post(query) action', () => {
 		return postEpic(MOCK_POST_ACTION).then(([action]) => {
 			const { query, onSuccess, onError } = MOCK_POST_ACTION.payload;
-			const expectedAction = api.del(query, { onSuccess, onError });
+			const expectedAction = api.post(query, { onSuccess, onError });
 			// make the expected functions generic
 			expectedAction.meta.request = expect.any(Promise);
 			expectedAction.meta.resolve = expect.any(Function);

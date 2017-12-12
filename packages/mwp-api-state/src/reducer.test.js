@@ -51,7 +51,7 @@ describe('api reducer', () => {
 	});
 	it('re-sets api state on logout API_REQ, with inFlight query', function() {
 		const ref = 'foobar';
-		const logoutRequest = apiActions.requestAll([{ ref }], {
+		const logoutRequest = apiActions.get([{ ref }], {
 			logout: true,
 		});
 		expect(api({ ...DEFAULT_API_STATE }, logoutRequest)).toEqual({
@@ -92,7 +92,7 @@ describe('api reducer', () => {
 			...populatedState,
 			[ref]: 'not empty',
 		};
-		const action = apiActions.requestAll([{ ref }]);
+		const action = apiActions.get([{ ref }]);
 		expect(api(populatedStateWithRef, action)).toEqual({
 			...populatedState,
 			inFlight: [ref],
@@ -131,7 +131,7 @@ describe('api reducer', () => {
 	});
 	it('adds query ref to inFlight array on API_REQ', () => {
 		const ref = 'foobar';
-		const API_REQ = apiActions.requestAll([{ ref }]);
+		const API_REQ = apiActions.get([{ ref }]);
 		const apiState = api({ ...DEFAULT_API_STATE }, API_REQ);
 		expect(apiState).toMatchObject({ inFlight: [ref] });
 	});
