@@ -1,3 +1,8 @@
+## [11.1]
+
+- **New package** `mwp-config` - a dedicated 'config' package that can be freely
+  imported to other MWP packages and consumers.
+
 ## [11.0]
 
 - **Removed** `api.requestAll` action creator is now a private function.

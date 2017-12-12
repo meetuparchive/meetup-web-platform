@@ -1,0 +1,16 @@
+module.exports = [
+	'en-US',
+	'de-DE',
+	'en-AU',
+	'es',
+	'es-ES',
+	'fr-FR',
+	'it-IT',
+	'ja-JP',
+	'ko-KR',
+	'nl-NL',
+	'pt-BR',
+	'pl-PL',
+	'th-TH',
+	'tr-TR',
+];

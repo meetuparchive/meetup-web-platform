@@ -1,7 +1,7 @@
 import Inert from 'inert';
 import CsrfPlugin from 'electrode-csrf-jwt';
 
-import config from 'mwp-cli/src/config';
+import config from 'mwp-config';
 import loggerPlugin from 'mwp-logger-plugin';
 import appRoutePlugin from 'mwp-app-route-plugin';
 import requestAuthPlugin from 'mwp-auth-plugin';
