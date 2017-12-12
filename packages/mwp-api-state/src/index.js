@@ -11,7 +11,6 @@ export {
 	API_RESP_COMPLETE,
 	API_RESP_ERROR,
 	API_RESP_FAIL,
-	requestAll,
 	get,
 	post,
 	patch,

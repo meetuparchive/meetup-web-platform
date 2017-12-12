@@ -156,32 +156,9 @@ generate responses that are applied to Redux state.
 
 ### Action creation
 
-You should always use the action creators in `apiActionCreators` to create
-actions for queries.
-
-#### `requestAll`
-
-All API action creators delegate to this action creator, which produces an
-`API_REQ` action with the queries as the action `payload`, and additional
-context automatically supplied to a `meta` property.
-
-You should _only_ use `requestAll` directly if you need to send multiple queries
-simultaneously using the same request method (GET/POST/PATCH/DELETE).
-Otherwise, use the method-specific single-query action creators documented below.
-
-```js
-import * as api from 'meetup-web-platform/lib/actions/apiActionCreators';
-
-const query1 = {
-  endpoint: 'ny-tech/members',
-  ref: 'members',
-};
-const query2 = {
-  endpoint: 'ny-tech/events',
-  ref: 'events',
-};
-const requestAllAction = api.requestAll([query1, query2]);
-```
+You should always use the action creators in `apiActionCreators` to dispatch
+API requests. Each action creator takes a single query or an array of queries
+as its first argument, and an optional `meta` argument
 
 #### `get`
 

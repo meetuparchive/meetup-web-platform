@@ -4,7 +4,6 @@ import getClickWriter from 'mwp-tracking-plugin/lib/util/clickWriter';
 import { getApiMiddleware } from 'mwp-api-state';
 
 import catchMiddleware from '../middleware/catch';
-import injectPromise from '../middleware/injectPromise';
 import fetchQueries from './fetchQueries';
 
 declare var document: Object; // ignore 'potentially null' document.body
@@ -44,7 +43,6 @@ export const getInitialState = (APP_RUNTIME: {
 export function getBrowserCreateStore(routes, middleware = [], baseUrl) {
 	const middlewareToApply = [
 		catchMiddleware(console.error),
-		injectPromise,
 		getApiMiddleware(routes, fetchQueries, baseUrl),
 		...middleware,
 		window.mupDevTools ? window.mupDevTools() : noopMiddleware, // must be last middleware

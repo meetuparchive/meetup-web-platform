@@ -1,7 +1,21 @@
-## [10.3]
+## [11.1]
 
 - **New package** `mwp-config` - a dedicated 'config' package that can be freely
   imported to other MWP packages and consumers.
+
+## [11.0]
+
+- **Removed** `api.requestAll` action creator is now a private function.
+  Consumers _must_ use the method-specific API request action creators, which
+  now accept arrays of queries in addition to single query
+- **Removed** The `meta.promise` property of API actions has been removed - use
+  the `meta.request` Promise instead, which will return an array of responses.
+  E.g. instead of `api.post(...).meta.promise.then(response => ...)`, use
+  `api.post(...).meta.request.then(([response]) => ...)`
+- **Removed** `api.requestAll` is no longer exported - use the method-specific
+  action creators with the following enhancement:
+- **New feature** `api.get/post/patch/del` can now be called with an array of
+  queries in order to make a batched API request
 
 ## [10.2]
 
