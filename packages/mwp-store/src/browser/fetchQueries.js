@@ -44,9 +44,8 @@ const makeSerializable = queries => {
 };
 
 /**
- * that the request will have the required CSRF credentials and constructs
- * the `fetch` call arguments based on the request method. It also records the
- * CSRF header value in a cookie for use as a CSRF header in future fetches.
+ * Build the arguments for the `fetch` call to the app server that will
+ * contain the batched queries
  *
  * @param {String} apiUrl the general-purpose endpoint for API calls to the
  *   application server
