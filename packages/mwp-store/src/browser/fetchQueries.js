@@ -23,7 +23,10 @@ const makeSerializable = queries => {
 		// undefined and unserializable values (e.g. functions)
 		return JSON.parse(JSON.stringify(queries));
 	} else {
-		if (queries.length > 1 && queries[0].params instanceof FormData) {
+		if (
+			queries.length > 1 &&
+			queries.some(({ params }) => params instanceof FormData)
+		) {
 			throw new Error(
 				'POST queries with FormData cannot be batched',
 				'- dispatch each one individually'
