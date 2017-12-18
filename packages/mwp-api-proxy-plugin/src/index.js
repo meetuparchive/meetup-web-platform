@@ -1,5 +1,4 @@
 // @flow
-import fs from 'fs';
 import { duotones, getDuotoneUrls } from './util/duotone';
 import getApiProxyRoutes from './routes';
 import proxyApi$ from './proxy';
