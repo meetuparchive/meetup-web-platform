@@ -33,7 +33,8 @@
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "dependencies": {
     "@alrra/travis-scripts": "3.0.1",
-    "lerna": "2.1.2"
+    "lerna": "2.1.2",
+    "mobile-detect": "false1.4.0"
   },
   "devDependencies": {
     "babel-cli": "6.24.1",
