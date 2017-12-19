@@ -219,16 +219,16 @@ export function parseRequestHeaders(request) {
 
 /*
  * In multipart form requests, the parsed payload includes string key-value
- * pairs for regular inputs, and file descriptors for file upload inputs
- * ({ filename, path, headers }). This function passes through regular input
- * values unchanged, but converts the file descriptors to readable file streams
- * that will be proxied to the REST API.
+ * pairs for regular inputs, and raw Buffer objects for file uploads
  * 
- * References to the uploaded files are stored here for cleanup later on.
+ * This function passes through regular input values unchanged, but formats the
+ * file buffers into a { value, options } object that can be used in request
+ * formData
+ * @see https://www.npmjs.com/package/request#multipartform-data-multipart-form-uploads
  */
-export const parseMultipart = request =>
-	Object.keys(request.payload).reduce((formData, key) => {
-		const value = request.payload[key];
+export const parseMultipart = payload =>
+	Object.keys(payload).reduce((formData, key) => {
+		const value = payload[key];
 		formData[key] =
 			value instanceof Buffer
 				? { value, options: { filename: 'upload' } }
@@ -261,7 +261,7 @@ export function getExternalRequestOpts(request) {
 	};
 	if (request.mime === 'multipart/form-data') {
 		// multipart form data needs special treatment
-		externalRequestOpts.formData = parseMultipart(request);
+		externalRequestOpts.formData = parseMultipart(request.payload);
 	}
 	return externalRequestOpts;
 }

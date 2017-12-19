@@ -51,16 +51,21 @@ describe('getAuthHeaders', () => {
 	it('sets MEETUP_CSRF', () => {
 		const authHeaders = getAuthHeaders({
 			auth: {
-				credentials: { memberCookie: 'foo member', csrfToken: 'bar token' },
+				credentials: {
+					memberCookie: 'foo member',
+					csrfToken: 'bar token',
+				},
 			},
 		});
-		const cookies = authHeaders.cookie.split('; ').reduce((cookies, pair) => {
-			const [name, ...value] = pair.split('=');
-			return {
-				...cookies,
-				[name]: value.join('='),
-			};
-		}, {});
+		const cookies = authHeaders.cookie
+			.split('; ')
+			.reduce((cookies, pair) => {
+				const [name, ...value] = pair.split('=');
+				return {
+					...cookies,
+					[name]: value.join('='),
+				};
+			}, {});
 
 		expect(cookies['MEETUP_CSRF_DEV']).not.toBeUndefined();
 		expect(authHeaders['csrf-token']).toEqual(cookies['MEETUP_CSRF_DEV']);
@@ -143,9 +148,13 @@ describe('buildRequestArgs', () => {
 
 	it('Converts an api config to arguments for a node-request call', () => {
 		let method = 'get';
-		const getArgs = buildRequestArgs({ ...options, method })(testQueryResults);
+		const getArgs = buildRequestArgs({ ...options, method })(
+			testQueryResults
+		);
 		method = 'post';
-		const postArgs = buildRequestArgs({ ...options, method })(testQueryResults);
+		const postArgs = buildRequestArgs({ ...options, method })(
+			testQueryResults
+		);
 		expect(getArgs).toEqual(jasmine.any(Object));
 		expect(getArgs.url).toMatch(/\?.+/); // get requests will add querystring
 		expect(getArgs.hasOwnProperty('body')).toBe(false); // get requests will not have a body
@@ -168,7 +177,9 @@ describe('buildRequestArgs', () => {
 		};
 		const getArgs = buildRequestArgs({ ...options, method: 'get' })(query);
 		expect(getArgs.headers['X-Meetup-Request-Flags']).not.toBeUndefined();
-		const postArgs = buildRequestArgs({ ...options, method: 'post' })(query);
+		const postArgs = buildRequestArgs({ ...options, method: 'post' })(
+			query
+		);
 		expect(postArgs.headers['X-Meetup-Request-Flags']).not.toBeUndefined();
 	});
 
@@ -191,7 +202,9 @@ describe('buildRequestArgs', () => {
 		expect(getArgs.headers['X-Meetup-Variants']).toEqual(
 			`${experiment}=${context}`
 		);
-		const postArgs = buildRequestArgs({ ...options, method: 'post' })(query);
+		const postArgs = buildRequestArgs({ ...options, method: 'post' })(
+			query
+		);
 		expect(postArgs.headers['X-Meetup-Variants']).toEqual(
 			`${experiment}=${context}`
 		);
@@ -203,12 +216,16 @@ describe('buildRequestArgs', () => {
 			type: 'bar',
 			meta: { metaRequestHeaders: ['foo', 'bar'] },
 		};
-		const requestArgs = buildRequestArgs({ ...options, method: 'get' })(query);
+		const requestArgs = buildRequestArgs({ ...options, method: 'get' })(
+			query
+		);
 		const requestHeaders = Object.keys(requestArgs.headers);
 		const expectedApiMetaHeader = 'foo,bar';
 
 		expect(requestHeaders).toContain(API_META_HEADER);
-		expect(requestArgs.headers[API_META_HEADER]).toBe(expectedApiMetaHeader);
+		expect(requestArgs.headers[API_META_HEADER]).toBe(
+			expectedApiMetaHeader
+		);
 	});
 
 	const testQueryResults_utf8 = mockQuery(MOCK_RENDERPROPS_UTF8);
@@ -306,36 +323,23 @@ describe('makeExternalApiRequest', () => {
 describe('parseMultipart', () => {
 	it('passes through non-file data unchanged', () => {
 		const payload = { foo: 'bar', baz: 1 };
-		expect(parseMultipart(payload, [])).toEqual(payload);
+		expect(parseMultipart(payload)).toEqual(payload);
 	});
-	it('converts a file descriptor to a readable stream', () => {
-		// have to mock 'fs' here rather than globally b/c jest needs a clean 'fs' module to run
-		const originalCRS = fs.createReadStream;
-		const fakeCRS = path => ({ path });
-		fs.createReadStream = jest.fn(fakeCRS);
+	it('converts a Buffer to a { value, options: { filename } } object', () => {
+		const myfile = new Buffer(10);
 		const payload = {
 			foo: 'bar',
-			myfile: {
-				filename: 'baz.jpg',
-				headers: { 'content-type': 'smileyface' },
-				path: 'path/to/file.jpg',
-			},
+			myfile,
 		};
 		const expectedFile = {
-			value: fakeCRS(payload.myfile.path),
+			value: myfile,
 			options: {
-				filename: payload.myfile.filename,
-				contentType: payload.myfile.headers['content-type'],
+				filename: expect.any(String),
 			},
 		};
-		const uploads = [];
-		expect(parseMultipart(payload, uploads)).toEqual({
+		expect(parseMultipart(payload)).toEqual({
 			...payload,
 			myfile: expectedFile,
 		});
-		expect(uploads).toHaveLength(1);
-		expect(uploads[0]).toEqual(payload.myfile.path);
-		// restore original fs.createReadStream implementation
-		fs.createReadStream = originalCRS;
 	});
 });
