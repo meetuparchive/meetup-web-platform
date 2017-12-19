@@ -1,5 +1,4 @@
 import http from 'http';
-import fs from 'fs';
 
 import querystring from 'qs';
 import url from 'url';
@@ -20,7 +19,9 @@ import { API_PROXY_PLUGIN_NAME } from '../config';
 
 export const API_META_HEADER = 'X-Meta-Request-Headers';
 const MEMBER_COOKIE_NAME =
-	process.env.NODE_ENV === 'production' ? 'MEETUP_MEMBER' : 'MEETUP_MEMBER_DEV';
+	process.env.NODE_ENV === 'production'
+		? 'MEETUP_MEMBER'
+		: 'MEETUP_MEMBER_DEV';
 const CSRF_COOKIE_NAME =
 	process.env.NODE_ENV === 'production' ? 'MEETUP_CSRF' : 'MEETUP_CSRF_DEV';
 
@@ -218,31 +219,22 @@ export function parseRequestHeaders(request) {
 
 /*
  * In multipart form requests, the parsed payload includes string key-value
- * pairs for regular inputs, and file descriptors for file upload inputs
- * ({ filename, path, headers }). This function passes through regular input
- * values unchanged, but converts the file descriptors to readable file streams
- * that will be proxied to the REST API.
+ * pairs for regular inputs, and raw Buffer objects for file uploads
  * 
- * References to the uploaded files are stored here for cleanup later on.
+ * This function passes through regular input values unchanged, but formats the
+ * file buffers into a { value, options } object that can be used in request
+ * formData
+ * @see https://www.npmjs.com/package/request#multipartform-data-multipart-form-uploads
  */
-export function parseMultipart(payload, uploadsList) {
-	return Object.keys(payload).reduce((formData, key) => {
+export const parseMultipart = payload =>
+	Object.keys(payload).reduce((formData, key) => {
 		const value = payload[key];
-		if (value.filename) {
-			formData[key] = {
-				value: fs.createReadStream(value.path),
-				options: {
-					filename: value.filename,
-					contentType: value.headers['content-type'],
-				},
-			};
-			uploadsList.push(value.path);
-		} else {
-			formData[key] = value;
-		}
+		formData[key] =
+			value instanceof Buffer
+				? { value, options: { filename: 'upload' } }
+				: value;
 		return formData;
 	}, {});
-}
 
 /*
  * Translate the incoming Hapi request into an 'opts' object that can be used
@@ -269,10 +261,7 @@ export function getExternalRequestOpts(request) {
 	};
 	if (request.mime === 'multipart/form-data') {
 		// multipart form data needs special treatment
-		externalRequestOpts.formData = parseMultipart(
-			request.payload,
-			request.plugins[API_PROXY_PLUGIN_NAME].uploads
-		);
+		externalRequestOpts.formData = parseMultipart(request.payload);
 	}
 	return externalRequestOpts;
 }
@@ -305,9 +294,13 @@ export const makeExternalApiRequest = request => requestOpts => {
 
 			const errorObj = { errors: [err] };
 			if (err.code === 'ETIMEDOUT') {
-				return makeMockRequest(errorObj, API_TIMEOUT_RESPONSE)(requestOpts);
+				return makeMockRequest(errorObj, API_TIMEOUT_RESPONSE)(
+					requestOpts
+				);
 			}
-			return makeMockRequest(errorObj, makeAPIErrorResponse(err))(requestOpts);
+			return makeMockRequest(errorObj, makeAPIErrorResponse(err))(
+				requestOpts
+			);
 		})
 		.map(([response, body]) => [response, body, requestOpts.jar]);
 };
