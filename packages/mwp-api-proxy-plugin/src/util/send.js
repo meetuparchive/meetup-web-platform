@@ -13,7 +13,7 @@ import 'rxjs/add/operator/do';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/timeout';
 
-import config from 'mwp-cli/src/config';
+import config from 'mwp-config';
 
 import { API_PROXY_PLUGIN_NAME } from '../config';
 
