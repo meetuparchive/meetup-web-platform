@@ -12,14 +12,18 @@ export const onPreResponse = {
 	 */
 	method: (request: HapiRequest, reply: HapiReply) => {
 		const response = request.response;
-		if (true) {
-			//!response.isBoom || process.env.NODE_ENV === "production") {
+		if (!response.isBoom || process.env.NODE_ENV === "production") {
 			return reply.continue();
 		}
 		const error = response;
+		// #TODO: if dev we want redboxerror plugin
 		// const { RedBoxError } = require("redbox-react");
 		// const errorMarkup = ReactDOMServer.renderToString(
 		// 	React.createElement(RedBoxError, { error })
+		// );
+
+		// const errorResponse = reply(
+		// 	`<!DOCTYPE html><html><body>${errorMarkup}</body></html>`
 		// );
 		const errorResponse = reply(
 			`
