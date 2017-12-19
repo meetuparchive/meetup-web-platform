@@ -1,5 +1,48 @@
 # Tracking
 
+## Overview
+
+## Logging
+
+The tracking logs are Avro-encoded and serialized to JSON according to the
+[Analytics Logging](https://meetup.atlassian.net/wiki/display/MUP/Analytics+Logging) spec.
+
+In Google App Engine, we use [Google Pub/Sub](https://googlecloudplatform.github.io/google-cloud-node/#/docs/pubsub/0.9.0/pubsub/topic?method=Topic)
+to publish tracking data to a pre-defined 'topic'.
+
+The Pub/Sub configuration will only activate when the `GAE_INSTANCE` environment
+variable is set. In addition, the environment must be configured to
+automatically authenticate with Google Cloud.
+
+In production, Pub/Sub authentication is handled automatically by the runtime
+environment.
+
+### Logging development activity
+
+In development, you will need to use the `gcloud SDK` to configure
+your environment to send activity logs to Google Pub/Sub with the following
+command:
+
+```
+$ gcloud auth application-default login
+```
+
+Once set up, you can run the application in 'GAE' mode with
+
+```
+$ GAE_INSTANCE=foo yarn start
+```
+
+or an equivalent startup command. Tracking data from this dev instance should
+then be consumed by an analytics back end, although you will need to work with
+the data team to find the records it produces - they are not shown in the Google
+App Engine web console.
+
+Note that we do not currently have a unique place to store tracking data from
+dev, so any tracking data that you produce will be merged into production
+tracking data. For small amounts of data, this shouldn't significantly affect
+analytics.
+ 
 ## Activity tracking
 
 Activity tracking is provided by a `request.trackActivity` method, which has two

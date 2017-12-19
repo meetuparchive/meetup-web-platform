@@ -23,8 +23,8 @@ import {
 
 import { API_PROXY_PLUGIN_NAME } from '../config';
 
-jest.mock('mwp-cli/src/config', () => {
-	const config = require.requireActual('mwp-cli/src/config');
+jest.mock('mwp-config', () => {
+	const config = require.requireActual('mwp-config');
 	config.package = { agent: 'TEST_AGENT ' };
 	return config;
 });
