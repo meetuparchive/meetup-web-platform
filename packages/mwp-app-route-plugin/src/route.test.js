@@ -26,6 +26,25 @@ describe('onPreResponse.method', () => {
 		expect(errorMarkup).toContain(errorMessage);
 		expect(replyObj.code).toHaveBeenCalledWith(errorCode);
 	});
+	it('returns 500 page', () => {
+		const request = {
+			response: Boom.create(500, 'foobar'),
+			route: {},
+			server: getServer(),
+		};
+		const replyObj = {
+			code() {},
+		};
+		const spyable = {
+			reply: () => replyObj,
+		};
+		spyOn(replyObj, 'code');
+		spyOn(spyable, 'reply').and.callThrough();
+		const errorResponse = onPreResponse.method(request, spyable.reply);
+		expect(errorResponse).toBe(replyObj);
+		const errorMarkup = spyable.reply.calls.mostRecent().args[0];
+		expect(errorMarkup).toMatchSnapshot();
+	});
 	it('serves the homepage route', () => {
 		const server = getServer();
 		const result = 'ok';
