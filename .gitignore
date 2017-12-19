@@ -51,3 +51,5 @@ config.*.json
 
 # visual studio code settings
 .vscode
+
+.DS_Store

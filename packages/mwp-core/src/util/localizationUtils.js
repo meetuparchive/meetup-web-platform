@@ -16,6 +16,7 @@ import LocaleDataNL from 'react-intl/locale-data/nl';
 import LocaleDataPL from 'react-intl/locale-data/pl';
 import LocaleDataTH from 'react-intl/locale-data/th';
 import LocaleDataTR from 'react-intl/locale-data/tr';
+import LocaleDataRU from 'react-intl/locale-data/ru';
 
 import { addLocaleData } from 'react-intl';
 
@@ -55,6 +56,9 @@ const localeMap: { [string]: { data?: Object } } = {
 	},
 	'pt-BR': {
 		data: LocaleDataPT,
+	},
+	'ru-RU': {
+		data: LocaleDataRU,
 	},
 	'th-TH': {
 		data: LocaleDataTH,

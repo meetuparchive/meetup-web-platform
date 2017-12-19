@@ -7,23 +7,26 @@ import { parseQueryResponse, getAuthedQueryFilter } from '../util/fetchUtils';
 export const CSRF_HEADER = 'x-csrf-jwt';
 export const CSRF_HEADER_COOKIE = 'x-csrf-jwt-header';
 
-/**
- * that the request will have the required OAuth and CSRF credentials and constructs
- * the `fetch` call arguments based on the request method. It also records the
- * CSRF header value in a cookie for use as a CSRF header in future fetches.
+/*
+ * rison serialization fails for unserializable data, including params with
+ * `undefined` values. This if/else will log an error in the browser in dev
+ * in order to catch mistakes, and force-clean the data in prod to avoid
+ * client app crashes. In many cases, `undefined` params will not result in
+ * invalid return values, but they should be cleaned up to avoid uncertainty
  *
- * @param {String} apiUrl the general-purpose endpoint for API calls to the
- *   application server
- * @param {Array} queries the queries to send - must all use the same `method`
- * @param {Object} meta additional characteristics of the request, e.g.
- *   click tracking data
- * @return {Object} { url, config } arguments for a fetch call
+ * This if/else will be simplified to only contain the correct block in the
+ * production bundle
  */
-export const getFetchArgs = (apiUrl, queries, meta) => {
-	if (process.env.NODE_ENV !== 'production') {
-		// basic query validation for dev. This block will be stripped out by
-		// minification in prod bundle.
-		if (queries.length > 1 && queries[0].params instanceof FormData) {
+const makeSerializable = queries => {
+	if (process.env.NODE_ENV === 'production') {
+		// quick-and-cheap object cleanup for serialization. This will remove
+		// undefined and unserializable values (e.g. functions)
+		return JSON.parse(JSON.stringify(queries));
+	} else {
+		if (
+			queries.length > 1 &&
+			queries.some(({ params }) => params instanceof FormData)
+		) {
 			throw new Error(
 				'POST queries with FormData cannot be batched',
 				'- dispatch each one individually'
@@ -40,6 +43,21 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 			);
 		}
 	}
+	return queries;
+};
+
+/**
+ * Build the arguments for the `fetch` call to the app server that will
+ * contain the batched queries
+ *
+ * @param {String} apiUrl the general-purpose endpoint for API calls to the
+ *   application server
+ * @param {Array} queries the queries to send - must all use the same `method`
+ * @param {Object} meta additional characteristics of the request, e.g.
+ *   click tracking data
+ * @return {Object} { url, config } arguments for a fetch call
+ */
+export const getFetchArgs = (apiUrl, queries, meta) => {
 	const headers = {};
 	const method = ((queries[0].meta || {}).method || 'GET') // fallback to 'get'
 		.toUpperCase(); // must be upper case - requests can fail silently otherwise
@@ -49,7 +67,7 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 	const isDelete = method === 'DELETE';
 
 	const searchParams = new URLSearchParams();
-	searchParams.append('queries', rison.encode_array(queries));
+	searchParams.append('queries', rison.encode_array(makeSerializable(queries)));
 
 	if (meta) {
 		const {
