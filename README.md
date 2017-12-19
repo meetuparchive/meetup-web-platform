@@ -14,7 +14,6 @@ In general, application-specific code will live outside of this package.
 
 # Docs
 
-- [App configuration management](docs/Config.md)
 - [Analytics/tracking](docs/Tracking.md)
 - [Application state management](docs/State.md)
 - [Rendering in consumer applications](docs/Rendering.md)
@@ -22,6 +21,7 @@ In general, application-specific code will live outside of this package.
 
 ## Public modules
 
+- [App configuration](packages/mwp-config/README.md)
 - [Auth plugin](packages/mwp-auth-plugin/README.md)
 - [Routing module](packages/mwp-router/README.md)
 - [Language plugin for Hapi](packages/mwp-language-plugin/README.md)

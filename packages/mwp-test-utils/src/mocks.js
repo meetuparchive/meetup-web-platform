@@ -1,7 +1,7 @@
 import csrf from 'electrode-csrf-jwt/lib/csrf';
 import uuid from 'uuid';
 
-import config from 'mwp-cli/src/config';
+import config from 'mwp-config';
 import makeRenderer from 'mwp-core/lib/server-render';
 const appConfig = config.getServer().properties;
 
