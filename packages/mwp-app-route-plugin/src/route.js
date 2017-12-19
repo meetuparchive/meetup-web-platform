@@ -13,6 +13,12 @@ export const onPreResponse = {
 	method: (request: HapiRequest, reply: HapiReply) => {
 		const response = request.response;
 		if (!response.isBoom || process.env.NODE_ENV === 'production') {
+			return reply.continue();
+		}
+
+		const error = response;
+
+		if (error.output.statusCode === 500 && process.env.NODE_ENV === 'production') {
 			return reply(`
 <!DOCTYPE html>
 <html data-reactroot="">
@@ -242,7 +248,7 @@ export const onPreResponse = {
 </html>`);
 			// end of production 500 page
 		}
-		const error = response;
+
 		const { RedBoxError } = require('redbox-react');
 		const errorMarkup = ReactDOMServer.renderToString(
 			React.createElement(RedBoxError, { error })
@@ -283,5 +289,5 @@ export default (languageRenderers: { [string]: LanguageRenderer$ }) => ({
 			failAction: 'ignore', // ignore cookie validation, just accept
 		},
 	},
-	handler: getHandler(languageRenderers),
+	handler: getHandler(languageRenderers)
 });
