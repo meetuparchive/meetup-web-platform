@@ -12,13 +12,10 @@ export const onPreResponse = {
 	 */
 	method: (request: HapiRequest, reply: HapiReply) => {
 		const response = request.response;
-		if (!response.isBoom || process.env.NODE_ENV === 'production') {
-			return reply.continue();
-		}
 
 		const error = response;
 
-		if (error.output.statusCode === 500 && process.env.NODE_ENV === 'production') {
+		if ((error.output || {}).statusCode === 500 && process.env.NODE_ENV === 'production') {
 			return reply(`
 <!DOCTYPE html>
 <html data-reactroot="">
@@ -247,6 +244,11 @@ export const onPreResponse = {
 
 </html>`);
 			// end of production 500 page
+		}
+
+		// is not 4xx error 
+		if (!response.isBoom || process.env.NODE_ENV === 'production') {
+			return reply.continue();
 		}
 
 		const { RedBoxError } = require('redbox-react');
