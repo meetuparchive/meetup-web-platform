@@ -1,5 +1,5 @@
 import querystring from 'qs';
-import config from 'mwp-cli/src/config';
+import config from 'mwp-config';
 import { logger } from 'mwp-logger-plugin';
 const appConfig = config.getServer().properties;
 

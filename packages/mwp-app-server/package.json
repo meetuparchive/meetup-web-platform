@@ -34,6 +34,7 @@
     "mwp-app-route-plugin": ">=0.0.1",
     "mwp-auth-plugin": ">=0.0.1",
     "mwp-core": ">=0.0.1",
+    "mwp-config": ">=0.0.1",
     "mwp-language-plugin": ">=0.0.1",
     "mwp-logger-plugin": ">=0.0.1",
     "mwp-sw-plugin": ">=0.0.1",
@@ -44,8 +45,5 @@
   },
   "devDependencies": {
     "mwp-test-utils": ">=0.0.1"
-  },
-  "peerDependencies": {
-    "mwp-cli": ">=2"
   }
 }
