@@ -11,6 +11,7 @@ module.exports = [
 	'nl-NL',
 	'pt-BR',
 	'pl-PL',
+	'ru-RU',
 	'th-TH',
 	'tr-TR',
 ];
