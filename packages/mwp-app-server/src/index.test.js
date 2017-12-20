@@ -2,8 +2,8 @@ import start from './';
 import * as serverUtils from './util';
 
 jest.mock('source-map-support');
-jest.mock('mwp-cli/src/config', () => {
-	const config = require.requireActual('mwp-cli/src/config');
+jest.mock('mwp-config', () => {
+	const config = require.requireActual('mwp-config');
 	config.package = { agent: 'TEST_AGENT ' };
 	return config;
 });
