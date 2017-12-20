@@ -21,51 +21,21 @@ import LocaleDataRU from 'react-intl/locale-data/ru';
 import { addLocaleData } from 'react-intl';
 
 const localeMap: { [string]: { data?: Object } } = {
-	'en-US': {
-		// Use built-in locale-data for en
-	},
-	'en-AU': {
-		// Use built-in locale-data for en
-	},
-	es: {
-		data: LocaleDataES,
-	},
-	'es-ES': {
-		data: LocaleDataES,
-	},
-	'fr-FR': {
-		data: LocaleDataFR,
-	},
-	'de-DE': {
-		data: LocaleDataDE,
-	},
-	'it-IT': {
-		data: LocaleDataIT,
-	},
-	'ja-JP': {
-		data: LocaleDataJA,
-	},
-	'ko-KR': {
-		data: LocaleDataKO,
-	},
-	'nl-NL': {
-		data: LocaleDataNL,
-	},
-	'pl-PL': {
-		data: LocaleDataPL,
-	},
-	'pt-BR': {
-		data: LocaleDataPT,
-	},
-	'ru-RU': {
-		data: LocaleDataRU,
-	},
-	'th-TH': {
-		data: LocaleDataTH,
-	},
-	'tr-TR': {
-		data: LocaleDataTR,
-	},
+	'en-US': {}, // Use built-in locale-data for en
+	'en-AU': {}, // Use built-in locale-data for en
+	es: { data: LocaleDataES },
+	'es-ES': { data: LocaleDataES },
+	'fr-FR': { data: LocaleDataFR },
+	'de-DE': { data: LocaleDataDE },
+	'it-IT': { data: LocaleDataIT },
+	'ja-JP': { data: LocaleDataJA },
+	'ko-KR': { data: LocaleDataKO },
+	'nl-NL': { data: LocaleDataNL },
+	'pl-PL': { data: LocaleDataPL },
+	'pt-BR': { data: LocaleDataPT },
+	'ru-RU': { data: LocaleDataRU },
+	'th-TH': { data: LocaleDataTH },
+	'tr-TR': { data: LocaleDataTR },
 };
 
 /*
