@@ -64,6 +64,13 @@ const resolveSideEffects = () => ({
  * @return {Object}     Object of which category the devices falls within
  */
 const getDeviceType = uas => {
+	// we may be re-writing the uas in fastly for caching purposes, so check that first
+	if (uas === 'mobile' || uas === 'desktop') {
+		return {
+			isMobile: uas === 'mobile',
+			isDesktop: uas === 'desktop',
+		}
+	}
 	// parses user agent string to determine if user is on mobile / tablet / desktop device
 	const md = new MobileDetect(uas);
 	const isMobile = md.mobile() !== null && md.phone() !== null;
