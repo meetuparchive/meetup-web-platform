@@ -73,7 +73,7 @@ const connectedWithMatchMedia = WrappedComponent => {
 	
 	/* connect to redux state */
 	const ConnectedComponent = connect(mapStateToProps)(ConnectedWithMatchMedia);
-	/* return wrapped component withMatchMedia */
+	/* return connected wrapped component withMatchMedia */
 	return withMatchMedia(ConnectedComponent);
 };
 

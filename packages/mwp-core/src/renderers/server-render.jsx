@@ -255,7 +255,6 @@ const makeRenderer = (
 		headers["x-forwarded-host"] || headers["x-meetup-host"] || info.host;
 	const host = `${requestProtocol}://${domain}`;
 
-	// #TODO: https://developers.google.com/search/mobile-sites/mobile-seo/dynamic-serving
 	// create the store with populated `config`
 	const initialState = {
 		config: {
