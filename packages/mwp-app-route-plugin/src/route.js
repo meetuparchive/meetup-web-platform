@@ -12,6 +12,11 @@ export const onPreResponse = {
 	 */
 	method: (request: HapiRequest, reply: HapiReply) => {
 		const response = request.response;
+
+		if (response && response.header) {
+			response.header('vary', 'User-Agent')
+		}
+
 		if (!response.isBoom || process.env.NODE_ENV === 'production') {
 			return reply.continue();
 		}
