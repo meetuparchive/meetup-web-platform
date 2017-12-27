@@ -1,4 +1,5 @@
 // @flow
+import type { Reducer } from 'redux';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { getInitialState, getBrowserCreateStore } from 'mwp-store/lib/browser';
@@ -21,7 +22,7 @@ type AppProps = {
  */
 export function resolveAppProps(
 	routes: Array<PlatformRoute>,
-	reducer: Reducer,
+	reducer: Reducer<MWPState, FluxStandardAction>,
 	middleware: Array<Object> = []
 ): Promise<AppProps> {
 	const basename = window.APP_RUNTIME.baseUrl || '';
@@ -45,15 +46,16 @@ export function resolveAppProps(
  */
 function makeRenderer(
 	routes: Array<PlatformRoute>,
-	reducer: Reducer,
+	reducer: Reducer<MWPState, FluxStandardAction>,
 	middleware: Array<Object> = []
 ) {
 	return (rootElId: string = 'outlet') => {
+		const rootEl = document.getElementById(rootElId);
+		if (!rootEl) {
+			throw new Error(`React root element ${rootElId} does not exist`);
+		}
 		resolveAppProps(routes, reducer, middleware).then(props => {
-			ReactDOM.render(
-				<BrowserApp {...props} />,
-				document.getElementById(rootElId)
-			);
+			ReactDOM.render(<BrowserApp {...props} />, rootEl);
 			return props.store;
 		});
 	};

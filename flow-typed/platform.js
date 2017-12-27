@@ -1,6 +1,20 @@
 // @flow
 declare var Intl: Object;
 
+declare type MWPState = {
+	api: ApiState,
+	config: {
+		apiUrl: string,
+		baseUrl: string,
+		enableServiceWorker: boolean,
+		requestLanguage: string,
+		supportedLangs: Array<string>,
+		initialNow: number,
+		variants: mixed,
+		entryPath: string,
+	},
+};
+
 declare type Params = { [string]: string };
 declare type HapiRequestUrl = URL & {
 	path: string,
@@ -29,7 +43,11 @@ declare type HapiRequest = {
 	},
 	info: {
 		referrer: string,
+		host: string,
 		[string]: mixed,
+	},
+	headers: {
+		[string]: string,
 	},
 	[string]: any,
 };
@@ -59,9 +77,10 @@ type HTMLResult = {|
 |};
 declare type RenderResult = RedirectResult | HTMLResult;
 
-declare type LanguageRenderer$ = (
-	request: HapiRequest
-) => rxjs$Observable<RenderResult>;
+declare type LanguageRenderer = (
+	request: HapiRequest,
+	reply: ?HapiReply
+) => Promise<RenderResult>;
 
 declare type FluxStandardAction = {
 	type: string,
@@ -69,8 +88,6 @@ declare type FluxStandardAction = {
 	meta?: any,
 	error?: boolean,
 };
-
-declare type Reducer = (state: ?Object, action: FluxStandardAction) => Object;
 
 // API query structure
 declare type Query = {
@@ -97,7 +114,7 @@ declare type QueryResponse = {
 declare type QueryFunction = (location: { [string]: mixed }) => Query;
 
 declare type PlatformRoute = {
-	component: ReactClass<*>,
+	component: React$ComponentType<*>,
 	getNestedRoutes?: () => Promise<Array<PlatformRoute>>,
 	getIndexRoute?: () => Promise<PlatformRoute>,
 	path?: string,

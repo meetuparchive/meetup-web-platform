@@ -60,7 +60,7 @@ export const cacheReader = (cache: Cache) => (
 export const cacheWriter = (cache: Cache) => (
 	query: Query,
 	response: QueryResponse
-) => {
+): Promise<boolean> => {
 	const method = (query.meta || {}).method || 'get';
 	if (method.toLowerCase() !== 'get' || (query.meta && query.meta.noCache)) {
 		// skip cache writing

@@ -1,8 +1,9 @@
 // @flow
 import React from 'react';
 import { connect } from 'react-redux';
+import type { MapStateToProps } from 'react-redux';
 
-const mapStateToProps = state => ({
+const mapStateToProps: MapStateToProps<*, *, *> = (state: MWPState) => ({
 	requestLanguage: state.config.requestLanguage,
 	enableServiceWorker: state.config.enableServiceWorker,
 });
@@ -11,7 +12,7 @@ const mapStateToProps = state => ({
  * A lifecycle-only component that registers the platform service worker when
  * the component mounts on the client.
  */
-class ServiceWorker extends React.Component {
+class ServiceWorker extends React.Component<*> {
 	props: {
 		requestLanguage: string,
 		enableServiceWorker: boolean,
