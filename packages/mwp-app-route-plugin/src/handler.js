@@ -12,7 +12,7 @@ import url from 'url';
  *
  * It also calls the tracking plugin in order to handle session tracking.
  */
-export default (languageRenderers: { [string]: LanguageRenderer$ }) => (
+export default (languageRenderers: { [string]: LanguageRenderer }) => (
 	request: HapiRequest,
 	reply: HapiReply
 ) => {
@@ -23,7 +23,7 @@ export default (languageRenderers: { [string]: LanguageRenderer$ }) => (
 	const requestLanguage = request.getLanguage();
 	const renderRequest = languageRenderers[requestLanguage];
 
-	renderRequest(request, reply).then(
+	renderRequest(request).then(
 		(renderResult: RenderResult) => {
 			if (renderResult.redirect) {
 				return reply

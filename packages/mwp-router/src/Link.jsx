@@ -8,8 +8,7 @@ type LinkProps = {
 	replace?: boolean,
 	children?: React$Element<*>,
 };
-export default class Link extends React.PureComponent {
-	props: LinkProps;
+export default class Link extends React.PureComponent<LinkProps> {
 	render() {
 		const { to, children, ...props } = this.props;
 		if (to instanceof URL || testForExternal(to)) {

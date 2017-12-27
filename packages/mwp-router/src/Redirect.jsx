@@ -47,8 +47,7 @@ type RedirectState = {
  * <Router to='http://example.com' permanent />
  * ```
  */
-class Redirect extends React.Component {
-	props: RedirectProps;
+class Redirect extends React.Component<RedirectProps> {
 	render() {
 		const { to, push, permanent } = this.props;
 		if (to instanceof URL || testForExternal(to)) {
