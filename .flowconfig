@@ -1,7 +1,6 @@
 [ignore]
 .*/node_modules/jest-validate/*
 .*/node_modules/protobufjs/*
-.*/node_modules/mwp-*
 .*/build/*
 .*/coverage/*
 
