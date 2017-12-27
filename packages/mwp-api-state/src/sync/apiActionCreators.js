@@ -20,12 +20,18 @@ export const API_RESP_FAIL = 'API_RESP_FAIL';
  * @param {Object} meta metadata about the request, e.g. 'logout', 'clickTracking'
  * @return {Object} an API_REQ action
  */
-function _requestAll(queries: Array<Query>, meta: ?Object) {
+type RequestMeta = {
+	request?: Promise<Array<QueryResponse>>,
+	reject?: any => void,
+	resolve?: (Array<QueryResponse>) => void,
+	[string]: string,
+};
+function _requestAll(queries: Array<Query>, meta: ?RequestMeta) {
 	if (process.env.NODE_ENV !== 'production') {
 		// check queries have valid 'meta.method' value
-		const method = queries[0].meta.method;
+		const method = queries[0].meta && queries[0].meta.method;
 		queries.forEach(q => {
-			if (!q.meta.method || q.meta.method !== method) {
+			if (!q.meta || q.meta.method || q.meta.method !== method) {
 				// meta.method must be set and must be the same for all queries
 				console.error(
 					'_requestAll should not be called directly',

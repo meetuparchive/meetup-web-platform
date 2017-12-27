@@ -45,10 +45,15 @@ export function loadLocale(localeCode: ?string) {
 	if (!localeCode) {
 		return;
 	}
-	if (!(localeCode in localeMap)) {
+	const locale = localeMap[localeCode];
+	if (!locale) {
 		console.warn(`${localeCode} not supported`);
+		return;
 	}
-	const locale = localeMap[localeCode] || {};
+	if (!locale.data) {
+		// locale is supported but no special config will be loaded
+		return;
+	}
 	addLocaleData(locale.data);
 }
 

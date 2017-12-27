@@ -41,18 +41,21 @@ export function api(
 ): ApiState {
 	switch (action.type) {
 		case LOCATION_CHANGE: {
-			return Object.keys(state).reduce((cleanState, ref) => {
-				// throw out data from queries that are not 'GET' - it should not be kept in state
-				const queryMethod =
-					((state[ref].query || {}).meta || {}).method || 'get';
-				if (queryMethod !== 'get') {
-					return cleanState;
-				}
-				return {
-					...cleanState,
-					[ref]: state[ref],
-				};
-			}, {});
+			const { inFlight, fail, ...refs } = state;
+			return Object.keys(refs).reduce(
+				(cleanState, ref) => {
+					// throw out data from queries that are not 'GET' - it should not be kept in state
+					const queryMethod = (state[ref].query.meta || {}).method;
+					if (queryMethod && queryMethod !== 'get') {
+						return cleanState;
+					}
+					return {
+						...cleanState,
+						[ref]: state[ref],
+					};
+				},
+				{ inFlight, fail }
+			);
 		}
 		case API_REQ: {
 			const requestRefs = (action.payload || []).map(({ ref }) => ref);
@@ -79,12 +82,17 @@ export function api(
 		case API_RESP_SUCCESS: // fall though
 		case API_RESP_ERROR:
 		case CACHE_SUCCESS: // fall through
+			if (!action.payload) {
+				throw new Error(
+					`${action.type} dispatched without required payload`
+				);
+			}
 			// each of these actions provides an API response that should go into app
 			// state - error responses will contain error info
 			delete state.fail; // if there are any values, the API is not failing
 			return {
 				...state,
-				...responseToState(action.payload || {}),
+				...responseToState(action.payload),
 			};
 		case API_RESP_FAIL:
 			return { ...state, fail: action.payload };
