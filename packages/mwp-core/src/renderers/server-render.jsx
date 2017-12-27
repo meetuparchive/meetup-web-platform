@@ -1,22 +1,22 @@
 // @flow
-import { Observable } from "rxjs/Observable";
-import "rxjs/add/observable/of";
-import "rxjs/add/operator/first";
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/of';
+import 'rxjs/add/operator/first';
 
-import React from "react";
-import ReactDOMServer from "react-dom/server";
-import Helmet from "react-helmet";
-import MobileDetect from "mobile-detect";
+import React from 'react';
+import ReactDOMServer from 'react-dom/server';
+import Helmet from 'react-helmet';
+import MobileDetect from 'mobile-detect';
 
-import { API_ROUTE_PATH } from "mwp-api-proxy-plugin";
-import { Forbidden, NotFound, Redirect, SERVER_RENDER } from "mwp-router";
-import { getServerCreateStore } from "mwp-store/lib/server";
-import Dom from "mwp-app-render/lib/components/Dom";
-import ServerApp from "mwp-app-render/lib/components/ServerApp";
+import { API_ROUTE_PATH } from 'mwp-api-proxy-plugin';
+import { Forbidden, NotFound, Redirect, SERVER_RENDER } from 'mwp-router';
+import { getServerCreateStore } from 'mwp-store/lib/server';
+import Dom from 'mwp-app-render/lib/components/Dom';
+import ServerApp from 'mwp-app-render/lib/components/ServerApp';
 
-import { getVariants } from "../util/cookieUtils";
+import { getVariants } from '../util/cookieUtils';
 
-const DOCTYPE = "<!DOCTYPE html>";
+const DOCTYPE = '<!DOCTYPE html>';
 
 /**
  * An async module that renders the full app markup for a particular URL/location
@@ -37,8 +37,8 @@ function getRedirect(context) {
 	return {
 		redirect: {
 			url: encodeURI(decodeURI(context.url)), // ensure that the url is encoded for the redirect header
-			permanent: context.permanent
-		}
+			permanent: context.permanent,
+		},
 	};
 }
 
@@ -54,7 +54,7 @@ const resolveSideEffects = () => ({
 	head: Helmet.rewind(),
 	redirect: Redirect.rewind(),
 	forbidden: Forbidden.rewind(),
-	notFound: NotFound.rewind()
+	notFound: NotFound.rewind(),
 });
 
 /**
@@ -69,7 +69,7 @@ const getDeviceType = uas => {
 		return {
 			isMobile: uas === 'mobile',
 			isDesktop: uas === 'desktop',
-		}
+		};
 	}
 	// parses user agent string to determine if user is on mobile / tablet / desktop device
 	const md = new MobileDetect(uas);
@@ -78,7 +78,7 @@ const getDeviceType = uas => {
 	return {
 		isMobile,
 		isTablet,
-		isDesktop: !isMobile && !isTablet
+		isDesktop: !isMobile && !isTablet,
 	};
 };
 
@@ -110,7 +110,7 @@ const getRouterRenderer = ({
 	baseUrl,
 	assetPublicPath,
 	scripts,
-	cssLinks
+	cssLinks,
 }): RenderResult => {
 	// pre-render the app-specific markup, this is the string of markup that will
 	// be managed by React on the client.
@@ -167,7 +167,7 @@ const getRouterRenderer = ({
 
 	return {
 		statusCode,
-		result
+		result,
 	};
 };
 
@@ -179,7 +179,7 @@ const makeRenderer$ = (renderConfig: {
 	baseUrl: string,
 	scripts: Array<string>,
 	enableServiceWorker: boolean,
-	cssLinks: ?Array<string>
+	cssLinks: ?Array<string>,
 }) =>
 	makeRenderer(
 		renderConfig.routes,
@@ -218,7 +218,7 @@ const makeRenderer = (
 	clientFilename: ?string,
 	assetPublicPath: string,
 	middleware: Array<Function> = [],
-	baseUrl: string = "",
+	baseUrl: string = '',
 	scripts: Array<string> = [],
 	enableServiceWorker: boolean,
 	cssLinks: ?Array<string>
@@ -227,13 +227,13 @@ const makeRenderer = (
 
 	if (clientFilename) {
 		console.warn(
-			"`clientFilename` deprecated in favor of `scripts` array in makeRenderer"
+			'`clientFilename` deprecated in favor of `scripts` array in makeRenderer'
 		);
 		scripts.push(`${assetPublicPath}${clientFilename}`);
 	}
 
 	if (!scripts.length) {
-		throw new Error("No client script assets specified");
+		throw new Error('No client script assets specified');
 	}
 
 	const {
@@ -243,16 +243,16 @@ const makeRenderer = (
 		url,
 		server: { app: { logger }, settings: { app: { supportedLangs } } },
 		raw: { req },
-		state
+		state,
 	} = request;
 	const requestLanguage = request.getLanguage();
 
 	// request protocol and host might be different from original request that hit proxy
 	// we want to use the proxy's protocol and host
 	const requestProtocol =
-		headers["x-forwarded-proto"] || connection.info.protocol;
+		headers['x-forwarded-proto'] || connection.info.protocol;
 	const domain =
-		headers["x-forwarded-host"] || headers["x-meetup-host"] || info.host;
+		headers['x-forwarded-host'] || headers['x-meetup-host'] || info.host;
 	const host = `${requestProtocol}://${domain}`;
 
 	// create the store with populated `config`
@@ -266,9 +266,9 @@ const makeRenderer = (
 			initialNow: new Date().getTime(),
 			variants: getVariants(state),
 			entryPath: url.pathname, // the path that the user entered the app on
-			uas: headers["user-agent"],
-			device: getDeviceType(headers["user-agent"])
-		}
+			uas: headers['user-agent'],
+			device: getDeviceType(headers['user-agent']),
+		},
 	};
 
 	const createStore = getServerCreateStore(
@@ -280,7 +280,7 @@ const makeRenderer = (
 	const store = createStore(reducer, initialState);
 
 	// render skeleton if requested - the store is ready
-	if ("skeleton" in request.query) {
+	if ('skeleton' in request.query) {
 		return Observable.of({
 			result: getHtml(
 				<Dom
@@ -292,7 +292,7 @@ const makeRenderer = (
 					cssLinks={cssLinks}
 				/>
 			),
-			statusCode: 200
+			statusCode: 200,
 		});
 	}
 
@@ -324,7 +324,7 @@ const makeRenderer = (
 			baseUrl,
 			assetPublicPath,
 			scripts,
-			cssLinks
+			cssLinks,
 		})
 	);
 };
