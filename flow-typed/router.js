@@ -29,12 +29,10 @@ declare type LocationShape = {
 	state?: any,
 };
 
-declare class RouterRedirect extends React$Component {
-	props: {
-		to: string | LocationShape,
-		push?: boolean,
-	},
-}
+declare class RouterRedirect extends React$Component<{
+	to: string | LocationShape,
+	push?: boolean,
+}> {}
 declare module 'react-router-dom/Redirect' {
 	declare export default typeof RouterRedirect
 }

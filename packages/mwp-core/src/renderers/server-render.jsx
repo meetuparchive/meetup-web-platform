@@ -1,8 +1,5 @@
 // @flow
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/first';
-
+import type { Reducer } from 'redux';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import Helmet from 'react-helmet';
@@ -173,7 +170,7 @@ const getRouterRenderer = ({
 
 const makeRenderer$ = (renderConfig: {
 	routes: Array<Object>,
-	reducer: Reducer,
+	reducer: Reducer<MWPState, FluxStandardAction>,
 	assetPublicPath: string,
 	middleware: Array<Function>,
 	baseUrl: string,
@@ -199,22 +196,10 @@ const makeRenderer$ = (renderConfig: {
  *
  * The outer function takes app-specific information about the routes,
  * reducer, and optional additional middleware
- *
- * @param {Object} routes the React Router routes object
- * @param {Function} reducer the root Redux reducer for the app
- * @param {Function} middleware (optional) any app-specific middleware that
- *   should be applied to the store
- *
- * @return {Function}
- *
- * -- Returned Fn --
- * @param {Request} request The request to render - must already have an
- * `oauth_token` in `state`
- * @return {Observable}
  */
 const makeRenderer = (
 	routes: Array<Object>,
-	reducer: Reducer,
+	reducer: Reducer<MWPState, FluxStandardAction>,
 	clientFilename: ?string,
 	assetPublicPath: string,
 	middleware: Array<Function> = [],
@@ -222,7 +207,7 @@ const makeRenderer = (
 	scripts: Array<string> = [],
 	enableServiceWorker: boolean,
 	cssLinks: ?Array<string>
-) => (request: HapiRequest, reply: HapiReply) => {
+) => (request: HapiRequest, reply: HapiReply): Promise<RenderResult> => {
 	middleware = middleware || [];
 
 	if (clientFilename) {
@@ -241,8 +226,7 @@ const makeRenderer = (
 		headers,
 		info,
 		url,
-		server: { app: { logger }, settings: { app: { supportedLangs } } },
-		raw: { req },
+		server: { settings: { app: { supportedLangs } } },
 		state,
 	} = request;
 	const requestLanguage = request.getLanguage();
@@ -251,7 +235,7 @@ const makeRenderer = (
 	// we want to use the proxy's protocol and host
 	const requestProtocol =
 		headers['x-forwarded-proto'] || connection.info.protocol;
-	const domain =
+	const domain: string =
 		headers['x-forwarded-host'] || headers['x-meetup-host'] || info.host;
 	const host = `${requestProtocol}://${domain}`;
 
@@ -281,7 +265,7 @@ const makeRenderer = (
 
 	// render skeleton if requested - the store is ready
 	if ('skeleton' in request.query) {
-		return Observable.of({
+		return Promise.resolve({
 			result: getHtml(
 				<Dom
 					baseUrl={baseUrl}

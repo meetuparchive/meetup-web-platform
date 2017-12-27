@@ -44,7 +44,7 @@ export const onPreResponse = {
  *   on the same domain and may not conform to the validation rules that are
  *   used by Hapi
  */
-export default (languageRenderers: { [string]: LanguageRenderer$ }) => ({
+export default (languageRenderers: { [string]: LanguageRenderer }) => ({
 	method: 'GET',
 	path: '/{wild*}',
 	config: {

@@ -15,8 +15,6 @@ import 'rxjs/add/operator/timeout';
 
 import config from 'mwp-config';
 
-import { API_PROXY_PLUGIN_NAME } from '../config';
-
 export const API_META_HEADER = 'X-Meta-Request-Headers';
 const MEMBER_COOKIE_NAME =
 	process.env.NODE_ENV === 'production'
