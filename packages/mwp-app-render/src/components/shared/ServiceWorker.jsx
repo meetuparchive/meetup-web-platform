@@ -34,4 +34,4 @@ class ServiceWorker extends React.Component<*> {
 	}
 }
 
-export default connect(mapStateToProps, null)(ServiceWorker);
+export default connect(mapStateToProps)(ServiceWorker);

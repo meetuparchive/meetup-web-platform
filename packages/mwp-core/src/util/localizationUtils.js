@@ -48,6 +48,7 @@ export function loadLocale(localeCode: ?string) {
 	const locale = localeMap[localeCode];
 	if (!locale) {
 		console.warn(`${localeCode} not supported`);
+		return;
 	}
 	if (!locale.data) {
 		// locale is supported but no special config will be loaded
