@@ -10,18 +10,17 @@ type Props = {
 	location: URL,
 	history: RouterHistory,
 };
+type State = {
+	childRoutes: Array<PlatformRoute>,
+	_routesCache: { [string]: Array<PlatformRoute> },
+};
 
 /**
  * Route rendering component that will render nested routes asynchronously
  * The nested routes are cached so that the async data is not re-requested
  * each time a route is re-rendered.
  */
-class AsyncRoute extends React.Component {
-	state: {
-		childRoutes: Array<PlatformRoute>,
-		_routesCache: { [string]: Array<PlatformRoute> },
-	};
-	props: Props;
+class AsyncRoute extends React.Component<Props, State> {
 	constructor(props: Props) {
 		super(props);
 		const { match, route } = props;
@@ -91,7 +90,10 @@ class AsyncRoute extends React.Component {
 		return (
 			<Component {...props} route={route} match={{ ...match, params }}>
 				{childRoutes.length > 0 &&
-					<RouteLayout routes={childRoutes} matchedPath={match.path} />}
+					<RouteLayout
+						routes={childRoutes}
+						matchedPath={match.path}
+					/>}
 			</Component>
 		);
 	}
