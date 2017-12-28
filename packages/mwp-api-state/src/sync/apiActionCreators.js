@@ -31,7 +31,7 @@ function _requestAll(queries: Array<Query>, meta: ?RequestMeta) {
 		// check queries have valid 'meta.method' value
 		const method = queries[0].meta && queries[0].meta.method;
 		queries.forEach(q => {
-			if (!q.meta || q.meta.method || q.meta.method !== method) {
+			if (!q.meta || !q.meta.method || q.meta.method !== method) {
 				// meta.method must be set and must be the same for all queries
 				console.error(
 					'_requestAll should not be called directly',
