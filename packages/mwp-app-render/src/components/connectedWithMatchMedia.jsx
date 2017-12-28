@@ -1,79 +1,44 @@
-import React from 'react';
+//@flow
+import * as React from 'react';
 import { connect } from 'react-redux';
+import type { MapStateToProps } from 'react-redux';
 import { createStructuredSelector, createSelector } from 'reselect';
 import withMatchMedia from 'meetup-web-components/lib/utils/components/withMatchMedia';
 
-/**
- * getConfig
- * @param  {Object} state
- * @return {Object} the config from state
- */
-const getConfig = state => state.config || {};
-
-/**
- * Checks if object is empty
- * @param  {Object} object
- * @return {Boolean} whether object is empty
- */
-const isEmpty = object => object === undefined || Object.keys(object).length === 0;
-
-/**
- * @param {Object} device - object containing device information
- * @returns {Object} - default media object for `withMatchMedia`
- */
-const getMediaOrDefault = (media, device) => {
-	if (!isEmpty(media)) {
-		return media;
-	}
-	if ( !isEmpty(device) ) {
-		const {isMobile, isTablet, isDesktop} = device;
-		const isTabletOrDesktop = isTablet || isDesktop;
-		return {
-			isAtSmallUp: Boolean(isMobile || isTabletOrDesktop),
-			isAtMediumUp: Boolean(isTabletOrDesktop),
-			isAtLargeUp: Boolean(isDesktop),
-		}
-	}
-	return {};
-};
-
-const mapStateToProps = createStructuredSelector({
-	device: createSelector(getConfig, config => (config.device || {})),
+const mapStateToProps: MapStateToProps<*, *, *> = (state: MWPState) => ({
+	defaultMedia: state.config.media,
 });
 
 /**
  * connectedWithMatchMediaComponent
- * HOC that provides a default based on `device` in state.config
- * if withMatchMedia has not yet detected the media
+ * HOC that provides a default based on `media` in state.config which is determined by user agent
+ * because withMatchMedia cannot detect the media until after initial render.
  *
- * `device` prop is provided from redux state in config.
- * `media` prop is provided to the wrapped component in render().
- *
- * @returns {React.element}
+ * `defaultMedia` prop is an alias for `media` provided from redux state in config.
+ * `media` prop is passed from `withMatchMedia`.
+ * component determines whether to use defaultMedia, or media from withMatchMedia.
  */
-const connectedWithMatchMedia = WrappedComponent => {
-
-	/**
-	 * @module ConnectedWithMatchMedia
-	 */
-
-	class ConnectedWithMatchMedia extends React.Component {
-
-		render() {
-			const {device, media: currentMedia } = this.props;
-			const media = getMediaOrDefault(currentMedia, device);
-			return <WrappedComponent {...this.props} media={media}/>;
-		}
+const connectedWithMatchMedia = <Props: {}>(
+	WrappedComponent: React.ComponentType<Props>
+): React.ComponentType<Props> => {
+	const ConnectedWithMatchMedia = ({ defaultMedia, media, ...props }) => {
+		const useDefault = Object.keys(media || {}).length === 0;
+		return (
+			<WrappedComponent
+				{...props}
+				media={useDefault ? defaultMedia : media}
+			/>
+		);
 	};
 	const wrappedComponentName =
 		WrappedComponent.displayName || WrappedComponent.name || 'Component';
 
-	ConnectedWithMatchMedia.WrappedComponent = WrappedComponent;
 	ConnectedWithMatchMedia.displayName = `ConnectedWithMatchMedia(${wrappedComponentName})`;
-	
-	/* connect to redux state */
-	const ConnectedComponent = connect(mapStateToProps)(ConnectedWithMatchMedia);
-	/* return connected wrapped component withMatchMedia */
+
+	const ConnectedComponent = connect(mapStateToProps)(
+		ConnectedWithMatchMedia
+	);
+
 	return withMatchMedia(ConnectedComponent);
 };
 
