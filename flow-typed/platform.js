@@ -12,6 +12,7 @@ declare type MWPState = {
 		initialNow: number,
 		variants: mixed,
 		entryPath: string,
+		media: {[string]: string},
 	},
 };
 
