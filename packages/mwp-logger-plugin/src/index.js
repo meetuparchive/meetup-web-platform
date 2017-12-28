@@ -6,6 +6,7 @@ export function logResponse(request) {
 	if (!response) {
 		// client hung up
 		logger.info({ httpRequest: request, id, ...request.raw });
+		return;
 	}
 	if (response.isBoom) {
 		// response is an Error object
