@@ -33,11 +33,11 @@ async@2.6.0:
     lodash "^4.14.0"
 
 autoprefixer@^7.1.1:
-  version "7.2.2"
-  resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-7.2.2.tgz#082293b964be00602efacc59aa4aa7df5158bb6e"
+  version "7.2.3"
+  resolved "https://registry.yarnpkg.com/autoprefixer/-/autoprefixer-7.2.3.tgz#c2841e38b7940c2d0a9bbffd72c75f33637854f8"
   dependencies:
     browserslist "^2.10.0"
-    caniuse-lite "^1.0.30000780"
+    caniuse-lite "^1.0.30000783"
     normalize-range "^0.1.2"
     num2fraction "^1.2.2"
     postcss "^6.0.14"
@@ -77,9 +77,9 @@ browserslist@^2.10.0:
     caniuse-lite "^1.0.30000780"
     electron-to-chromium "^1.3.28"
 
-caniuse-lite@^1.0.30000780:
-  version "1.0.30000782"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000782.tgz#5b82b8c385f25348745c471ca51320afb1b7f254"
+caniuse-lite@^1.0.30000780, caniuse-lite@^1.0.30000783:
+  version "1.0.30000784"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000784.tgz#129ced74e9a1280a441880b6cd2bce30ef59e6c0"
 
 chain-function@^1.0.0:
   version "1.0.0"
@@ -128,12 +128,18 @@ deep-equal@^1.0.1:
   resolved "https://registry.yarnpkg.com/deep-equal/-/deep-equal-1.0.1.tgz#f5d260292b660e084eff4cdbc9f08ad3247448b5"
 
 dom-helpers@^3.2.0:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/dom-helpers/-/dom-helpers-3.2.1.tgz#3203e07fed217bd1f424b019735582fc37b2825a"
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/dom-helpers/-/dom-helpers-3.3.1.tgz#fc1a4e15ffdf60ddde03a480a9c0fece821dd4a6"
+
+electron-releases@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/electron-releases/-/electron-releases-2.1.0.tgz#c5614bf811f176ce3c836e368a0625782341fd4e"
 
 electron-to-chromium@^1.3.28:
-  version "1.3.28"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.28.tgz#8dd4e6458086644e9f9f0a1cf32e2a1f9dffd9ee"
+  version "1.3.30"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.30.tgz#9666f532a64586651fc56a72513692e820d06a80"
+  dependencies:
+    electron-releases "^2.1.0"
 
 encoding@^0.1.11:
   version "0.1.12"

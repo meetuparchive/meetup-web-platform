@@ -102,8 +102,8 @@
   resolved "https://registry.yarnpkg.com/@types/long/-/long-3.0.32.tgz#f4e5af31e9e9b196d8e5fca8a5e2e20aa3d60b69"
 
 "@types/node@^8.0.53":
-  version "8.0.58"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.0.58.tgz#5b3881c0be3a646874803fee3197ea7f1ed6df90"
+  version "8.5.2"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-8.5.2.tgz#83b8103fa9a2c2e83d78f701a9aa7c9539739aa5"
 
 abbrev@1:
   version "1.1.1"
@@ -117,8 +117,8 @@ ajv@^4.9.1:
     json-stable-stringify "^1.0.1"
 
 ajv@^5.1.0:
-  version "5.5.1"
-  resolved "https://registry.yarnpkg.com/ajv/-/ajv-5.5.1.tgz#b38bb8876d9e86bee994956a04e721e88b248eb2"
+  version "5.5.2"
+  resolved "https://registry.yarnpkg.com/ajv/-/ajv-5.5.2.tgz#73b5eeca3fab653e3d3f9422b341ad42205dc965"
   dependencies:
     co "^4.6.0"
     fast-deep-equal "^1.0.0"
@@ -578,14 +578,14 @@ graceful-fs@^4.1.2:
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.1.11.tgz#0e8bdfe4d1ddb8854d64e04ea7c00e2a026e5658"
 
 grpc@^1.2, grpc@^1.7.1:
-  version "1.7.3"
-  resolved "https://registry.yarnpkg.com/grpc/-/grpc-1.7.3.tgz#c9d034324e2ec8a06cfaa577a044a116f96c8c90"
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/grpc/-/grpc-1.8.0.tgz#9d49f1b05c19c4a35c480bd14c632386de6bf664"
   dependencies:
     arguejs "^0.2.3"
-    lodash "^4.15.0"
-    nan "^2.0.0"
+    lodash "^4.17.4"
+    nan "^2.8.0"
     node-pre-gyp "^0.6.39"
-    protobufjs "^5.0.0"
+    protobufjs "^5.0.2"
 
 gtoken@^1.2.1:
   version "1.2.3"
@@ -779,7 +779,7 @@ lodash.noop@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/lodash.noop/-/lodash.noop-3.0.1.tgz#38188f4d650a3a474258439b96ec45b32617133c"
 
-lodash@^4.14.0, lodash@^4.15.0, lodash@^4.17.2:
+lodash@^4.14.0, lodash@^4.17.2, lodash@^4.17.4:
   version "4.17.4"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.4.tgz#78203a4d1c328ae1d86dca6460e369b57f4055ae"
 
@@ -837,7 +837,7 @@ ms@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
 
-nan@^2.0.0:
+nan@^2.8.0:
   version "2.8.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.8.0.tgz#ed715f3fe9de02b57a5e6252d90a96675e1f085a"
 
@@ -954,7 +954,7 @@ process-nextick-args@^1.0.7, process-nextick-args@~1.0.6:
   version "1.0.7"
   resolved "https://registry.yarnpkg.com/process-nextick-args/-/process-nextick-args-1.0.7.tgz#150e20b756590ad3f91093f25a4f2ad8bff30ba3"
 
-protobufjs@^5.0.0:
+protobufjs@^5.0.2:
   version "5.0.2"
   resolved "https://registry.yarnpkg.com/protobufjs/-/protobufjs-5.0.2.tgz#59748d7dcf03d2db22c13da9feb024e16ab80c91"
   dependencies:
@@ -1081,8 +1081,8 @@ request@^2.72.0, request@^2.74.0, request@^2.79.0, request@^2.81.0:
     uuid "^3.1.0"
 
 retry-request@^3.0.0:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/retry-request/-/retry-request-3.3.0.tgz#ea28cfa47c9d1fa1eeaa3b1c968eecb18103b084"
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/retry-request/-/retry-request-3.3.1.tgz#fb71276235a617e97551e9be737ab5b91591fb9e"
   dependencies:
     request "^2.81.0"
     through2 "^2.0.0"

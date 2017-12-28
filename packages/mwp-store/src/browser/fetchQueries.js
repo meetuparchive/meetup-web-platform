@@ -67,7 +67,10 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 	const isDelete = method === 'DELETE';
 
 	const searchParams = new URLSearchParams();
-	searchParams.append('queries', rison.encode_array(makeSerializable(queries)));
+	searchParams.append(
+		'queries',
+		rison.encode_array(makeSerializable(queries))
+	);
 
 	if (meta) {
 		const {
@@ -126,17 +129,18 @@ const _fetchQueryResponse = (apiUrl, queries, meta) => {
 
 	const { url, config } = getFetchArgs(apiUrl, queries, meta);
 	return fetch(url, config)
-		.then(queryResponse => queryResponse.json())
 		.catch(err => {
-			console.error(
-				JSON.stringify({
-					err: err.stack,
-					message: 'App server API fetch error',
-					context: config,
-				})
-			);
+			console.error(err);
+			console.error('App server API fetch error');
 			throw err; // handle the error upstream
-		});
+		})
+		.then(queryResponse =>
+			queryResponse.json().catch(err => {
+				console.error(err);
+				console.error('App server API response JSON error');
+				throw err; // handle the error upstream
+			})
+		);
 };
 /**
  * Wrapper around `fetch` to send an array of queries to the server and organize

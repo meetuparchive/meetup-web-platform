@@ -3,6 +3,10 @@ import logger from './logger';
 export function logResponse(request) {
 	const { response, route, id, server: { app: { logger } } } = request;
 
+	if (!response) {
+		// client hung up
+		logger.info({ httpRequest: request, id, ...request.raw });
+	}
 	if (response.isBoom) {
 		// response is an Error object
 		logger.error({
