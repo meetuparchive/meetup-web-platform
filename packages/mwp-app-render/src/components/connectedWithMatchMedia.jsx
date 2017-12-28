@@ -18,10 +18,13 @@ const mapStateToProps: MapStateToProps<*, *, *> = (state: MWPState) => ({
  * `media` prop is passed from `withMatchMedia`.
  * component determines whether to use defaultMedia, or media from withMatchMedia.
  */
-const connectedWithMatchMedia = <Props: {}>( WrappedComponent: React.ComponentType<Props>): ConnectedComponentClass<*,*> => {
-
+const connectedWithMatchMedia = <Props: {}>(
+	WrappedComponent: React.ComponentType<Props>
+): ConnectedComponentClass<*, *> => {
 	const MediaWrappedComponent = withMatchMedia(WrappedComponent);
-	const ConnectedWithMatchMedia = props => <MediaWrappedComponent {...props} initialMedia={props.media} />
+	const ConnectedWithMatchMedia = props => (
+		<MediaWrappedComponent {...props} initialMedia={props.media} />
+	);
 	//
 	const wrappedComponentName =
 		WrappedComponent.displayName || WrappedComponent.name || 'Component';

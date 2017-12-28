@@ -34,7 +34,7 @@ describe('connectedWithMatchMedia', () => {
 	console.log('hi');
 	const connectedWithMatchMedia = shallow(
 		<TestComponentConnectedWithMatchMedia />,
-		{context: {store: mockStore}}
+		{ context: { store: mockStore } }
 	);
 	it('exists', () => {
 		expect(connectedWithMatchMedia).toMatchSnapshot();
