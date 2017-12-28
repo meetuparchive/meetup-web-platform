@@ -4,7 +4,7 @@ global.document = doc;
 global.window = doc.defaultView;
 
 import React from 'react';
-import { mount } from 'enzyme';
+import { shallow } from 'enzyme';
 import { Provider } from 'react-redux';
 import connectedWithMatchMedia from './connectedWithMatchMedia';
 
@@ -16,8 +16,10 @@ export const createFakeStore = fakeData => ({
 	subscribe() {},
 });
 
-const TestComponent = () => (<div>Hello World</div>);
-const TestComponentConnectedWithMatchMedia = connectedWithMatchMedia(TestComponent);
+const TestComponent = () => <div>Hello World</div>;
+const TestComponentConnectedWithMatchMedia = connectedWithMatchMedia(
+	TestComponent
+);
 
 const MATCH_MEDIA_FN_MOCK = mq => ({
 	matches: false,
@@ -26,11 +28,13 @@ const MATCH_MEDIA_FN_MOCK = mq => ({
 });
 
 describe('connectedWithMatchMedia', () => {
-	const mockStore = createFakeStore({config: {device: {isMobile: true} } })
-	const connectedWithMatchMedia = mount(
-		<Provider store={mockStore}>
-			<TestComponentConnectedWithMatchMedia />
-		</Provider>
+	const mockStore = createFakeStore({
+		config: { media: { isAtSmallUp: true } },
+	});
+	console.log('hi');
+	const connectedWithMatchMedia = shallow(
+		<TestComponentConnectedWithMatchMedia />,
+		{context: {store: mockStore}}
 	);
 	it('exists', () => {
 		expect(connectedWithMatchMedia).toMatchSnapshot();

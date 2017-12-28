@@ -1,12 +1,12 @@
 //@flow
 import * as React from 'react';
 import { connect } from 'react-redux';
-import type { MapStateToProps } from 'react-redux';
+import type { MapStateToProps, ConnectedComponentClass } from 'react-redux';
 import { createStructuredSelector, createSelector } from 'reselect';
 import withMatchMedia from 'meetup-web-components/lib/utils/components/withMatchMedia';
 
 const mapStateToProps: MapStateToProps<*, *, *> = (state: MWPState) => ({
-	defaultMedia: state.config.media,
+	media: state.config.media,
 });
 
 /**
@@ -18,28 +18,17 @@ const mapStateToProps: MapStateToProps<*, *, *> = (state: MWPState) => ({
  * `media` prop is passed from `withMatchMedia`.
  * component determines whether to use defaultMedia, or media from withMatchMedia.
  */
-const connectedWithMatchMedia = <Props: {}>(
-	WrappedComponent: React.ComponentType<Props>
-): React.ComponentType<Props> => {
-	const ConnectedWithMatchMedia = ({ defaultMedia, media, ...props }) => {
-		const useDefault = Object.keys(media || {}).length === 0;
-		return (
-			<WrappedComponent
-				{...props}
-				media={useDefault ? defaultMedia : media}
-			/>
-		);
-	};
+const connectedWithMatchMedia = <Props: {}>( WrappedComponent: React.ComponentType<Props>): ConnectedComponentClass<*,*> => {
+
+	const MediaWrappedComponent = withMatchMedia(WrappedComponent);
+	const ConnectedWithMatchMedia = props => <MediaWrappedComponent {...props} initialMedia={props.media} />
+	//
 	const wrappedComponentName =
 		WrappedComponent.displayName || WrappedComponent.name || 'Component';
 
 	ConnectedWithMatchMedia.displayName = `ConnectedWithMatchMedia(${wrappedComponentName})`;
 
-	const ConnectedComponent = connect(mapStateToProps)(
-		ConnectedWithMatchMedia
-	);
-
-	return withMatchMedia(ConnectedComponent);
+	return connect(mapStateToProps)(ConnectedWithMatchMedia);
 };
 
 export default connectedWithMatchMedia;
