@@ -11,12 +11,10 @@ const mapStateToProps: MapStateToProps<*, *, *> = (state: MWPState) => ({
 
 /**
  * connectedWithMatchMediaComponent
- * HOC that provides a default based on `media` in state.config which is determined by user agent
+ * HOC that provides an `initialMedia` prop based on `media` in state.config which is determined by user agent
  * because withMatchMedia cannot detect the media until after initial render.
  *
- * `defaultMedia` prop is an alias for `media` provided from redux state in config.
- * `media` prop is passed from `withMatchMedia`.
- * component determines whether to use defaultMedia, or media from withMatchMedia.
+ * `media` prop is provided from redux state in config.
  */
 const connectedWithMatchMedia = <Props: {}>(
 	WrappedComponent: React.ComponentType<Props>
