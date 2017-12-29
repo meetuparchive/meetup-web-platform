@@ -72,7 +72,7 @@ const getMedia = (userAgent: string) => {
 			userAgent === 'mobilebot' ||
 			userAgent === 'mobile';
 		isTablet = userAgent === 'tablet';
-	}
+	};
 	return {
 		isAtSmallUp,
 		isAtMediumUp: isTablet || !isMobile,
@@ -240,7 +240,7 @@ const makeRenderer = (
 		headers['x-forwarded-host'] || headers['x-meetup-host'] || info.host;
 	const host = `${requestProtocol}://${domain}`;
 	const userAgent =
-		process.env.NODE_ENV !== 'production'
+		process.env.NODE_ENV === 'production'
 			? headers['x-ua-device']
 			: headers['user-agent'];
 
