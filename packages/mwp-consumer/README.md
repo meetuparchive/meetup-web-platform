@@ -2,7 +2,9 @@ Mock MWP consumer app for platform testing
 
 # Setup
 
-1. Go to the `meetup-web-platform` repo root and run `lerna bootstrap`
+1. Go to the `meetup-web-platform` repo root and run `lerna bootstrap`. You
+   may need to first install lerna if you haven't already
+   `npm install --global lerna`
 2. Go to the `meetup-web-platform/packages/mwp-consumer/` directory and run
    `lerna run build && yarn start | grep "GC HAPPENED"`
 3. In a new terminal window, run Apache Bench with a valid member cookie env

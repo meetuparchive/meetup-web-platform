@@ -3,6 +3,7 @@ import type { Reducer } from 'redux';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import Helmet from 'react-helmet';
+import MobileDetect from 'mobile-detect';
 
 import { API_ROUTE_PATH } from 'mwp-api-proxy-plugin';
 import { Forbidden, NotFound, Redirect, SERVER_RENDER } from 'mwp-router';
@@ -52,6 +53,32 @@ const resolveSideEffects = () => ({
 	forbidden: Forbidden.rewind(),
 	notFound: NotFound.rewind(),
 });
+
+/**
+ * Get media from X-UA-Device header set by Fastly which parses the user agent string
+ */
+const getMedia = (userAgent: string) => {
+	const isAtSmallUp = true;
+	let isMobile = true;
+	let isTablet = false;
+	// In development, parse user agent string to determine media by device
+	if (process.env.NODE_ENV !== 'production') {
+		const device = new MobileDetect(userAgent);
+		isMobile = Boolean(device.phone());
+		isTablet = Boolean(device.tablet());
+	} else {
+		isMobile =
+			userAgent === 'smartPhone' ||
+			userAgent === 'mobilebot' ||
+			userAgent === 'mobile';
+		isTablet = userAgent === 'tablet';
+	};
+	return {
+		isAtSmallUp,
+		isAtMediumUp: isTablet || !isMobile,
+		isAtLargeUp: !isMobile && !isTablet,
+	};
+};
 
 /**
  * Using the current route information and Redux store, render the app to an
@@ -212,6 +239,10 @@ const makeRenderer = (
 	const domain: string =
 		headers['x-forwarded-host'] || headers['x-meetup-host'] || info.host;
 	const host = `${requestProtocol}://${domain}`;
+	const userAgent =
+		process.env.NODE_ENV === 'production'
+			? headers['x-ua-device']
+			: headers['user-agent'];
 
 	// create the store with populated `config`
 	const initialState = {
@@ -224,6 +255,7 @@ const makeRenderer = (
 			initialNow: new Date().getTime(),
 			variants: getVariants(state),
 			entryPath: url.pathname, // the path that the user entered the app on
+			media: getMedia(userAgent),
 		},
 	};
 
