@@ -1,6 +1,13 @@
 // @flow
 declare var Intl: Object;
 
+
+declare type MatchMedia = {
+  isAtSmallUp: boolean,
+  isAtMediumUp: boolean,
+  isAtLargeUp: boolean,
+}
+
 declare type MWPState = {
 	api: ApiState,
 	config: {
@@ -12,7 +19,7 @@ declare type MWPState = {
 		initialNow: number,
 		variants: mixed,
 		entryPath: string,
-		media: {[string]: string},
+		media: MatchMedia,
 	},
 };
 

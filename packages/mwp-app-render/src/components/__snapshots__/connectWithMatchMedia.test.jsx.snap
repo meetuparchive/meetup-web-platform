@@ -1,10 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`connectedWithMatchMedia exists 1`] = `
+exports[`connectWithMatchMedia exists 1`] = `
 ShallowWrapper {
   "length": 1,
   Symbol(enzyme.__root__): [Circular],
-  Symbol(enzyme.__unrendered__): <Connect(ConnectedWithMatchMedia(TestComponent)) />,
+  Symbol(enzyme.__unrendered__): <Connect(ConnectWithMatchMedia(TestComponent)) />,
   Symbol(enzyme.__renderer__): Object {
     "batchedUpdates": [Function],
     "getNode": [Function],

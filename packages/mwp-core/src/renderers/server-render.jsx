@@ -55,26 +55,21 @@ const resolveSideEffects = () => ({
 });
 
 /**
- * Using the User agent string + an external library called Mobile-Device we detect if the user
- * is attempting to render the page on the server using a mobile, tablet, or desktop device
- * @param  {String} userAgent User agent string detected from headers
- * @return {Object} Object of which category the devices falls within
+ * Get media from X-UA-Device header set by Fastly which parses the user agent string
  */
 const getMedia = (userAgent: string ) => {
 	const isAtSmallUp = true;
-	// we may be re-writing the User-Agent header in Fastly for caching purposes, so check that first
-	if (userAgent === 'mobile' || userAgent === 'desktop') {
-		return {
-			isAtSmallUp,
-			isAtMediumUp: userAgent !== 'mobile',
-			isAtLargeUp: userAgent === 'desktop'
-		};
-	}
-	// parses user agent string to determine if user is on mobile / tablet / desktop device
-	const device = new MobileDetect(userAgent);
-	const isMobile = device.mobile() !== null && device.phone() !== null;
-	const isTablet = device.tablet() !== null;
-	
+	let isMobile = true;
+	let isTablet = false;
+	// In development, parse user agent string to determine media by device
+	if (process.env.NODE_ENV !== 'production') {
+		const device = new MobileDetect(userAgent);
+		isMobile = Boolean(device.phone());
+		isTablet = Boolean(device.tablet());
+	} else {
+		isMobile = userAgent === 'smartPhone' || userAgent === 'mobilebot' || userAgent === 'mobile';
+		isTablet = userAgent === 'tablet';
+	};
 	return {
 		isAtSmallUp,
 		isAtMediumUp: isTablet || !isMobile,
@@ -241,6 +236,7 @@ const makeRenderer = (
 	const domain: string =
 		headers['x-forwarded-host'] || headers['x-meetup-host'] || info.host;
 	const host = `${requestProtocol}://${domain}`;
+	const userAgent = process.env.NODE_ENV !== 'production' ? headers['x-ua-device'] : headers['user-agent']
 
 	// create the store with populated `config`
 	const initialState = {
@@ -253,7 +249,7 @@ const makeRenderer = (
 			initialNow: new Date().getTime(),
 			variants: getVariants(state),
 			entryPath: url.pathname, // the path that the user entered the app on
-			media: getMedia(headers['user-agent']),
+			media: getMedia(userAgent),
 		},
 	};
 

@@ -10,26 +10,26 @@ const mapStateToProps: MapStateToProps<*, *, *> = (state: MWPState) => ({
 });
 
 /**
- * connectedWithMatchMediaComponent
+ * connectWithMatchMediaComponent
  * HOC that provides an `initialMedia` prop based on `media` in state.config which is determined by user agent
  * because withMatchMedia cannot detect the media until after initial render.
  *
  * `media` prop is provided from redux state in config.
  */
-const connectedWithMatchMedia = <Props: {}>(
-	WrappedComponent: React.ComponentType<Props>
-): ConnectedComponentClass<*, *> => {
+const connectWithMatchMedia = <Props: {}>(
+	WrappedComponent: React.ComponentType<Props>,
+): ConnectedComponentClass<*,$Diff<{ initialMedia: MatchMedia }, Props>> => {
 	const MediaWrappedComponent = withMatchMedia(WrappedComponent);
-	const ConnectedWithMatchMedia = props => (
+	const ConnectWithMatchMedia = (props: $Diff<{ media: MatchMedia }, Props>) => (
 		<MediaWrappedComponent {...props} initialMedia={props.media} />
 	);
-	//
+
 	const wrappedComponentName =
 		WrappedComponent.displayName || WrappedComponent.name || 'Component';
 
-	ConnectedWithMatchMedia.displayName = `ConnectedWithMatchMedia(${wrappedComponentName})`;
+	ConnectWithMatchMedia.displayName = `ConnectWithMatchMedia(${wrappedComponentName})`;
 
-	return connect(mapStateToProps)(ConnectedWithMatchMedia);
+	return connect(mapStateToProps)(ConnectWithMatchMedia);
 };
 
-export default connectedWithMatchMedia;
+export default connectWithMatchMedia;

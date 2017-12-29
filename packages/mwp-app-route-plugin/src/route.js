@@ -13,7 +13,11 @@ export const onPreResponse = {
 	method: (request: HapiRequest, reply: HapiReply) => {
 		const response = request.response;
 
-		response.header('vary', 'User-Agent')
+		// Set 'Vary' header in order to cache based on device type in header
+		// If 'X-UA-Device' is present, after caching, Fastly rewrites
+		// the Vary header to 'User-Agent', in order for the google bots
+		// to crawl mobile and desktop versions of the site
+		response.header('vary', 'X-UA-Device')
 
 		if (!response.isBoom || process.env.NODE_ENV === 'production') {
 			return reply.continue();
