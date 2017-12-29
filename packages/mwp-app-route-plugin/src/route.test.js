@@ -5,10 +5,14 @@ import getRoute, { onPreResponse } from './route';
 
 describe('onPreResponse.method', () => {
 	it('returns html containing error message', () => {
+
 		const errorMessage = 'foobar';
 		const errorCode = 432;
+		const response = Boom.create(errorCode, errorMessage);
+		response.header = ((key,val) =>val)
+
 		const request = {
-			response: Boom.create(errorCode, errorMessage),
+			response,
 			route: {},
 			server: getServer(),
 		};
