@@ -10,7 +10,11 @@ class ServerApp extends React.Component {
 	render() {
 		const { basename, location, context, store, routes } = this.props;
 		return (
-			<StaticRouter basename={basename} location={location} context={context}>
+			<StaticRouter
+				basename={basename}
+				location={location}
+				context={context}
+			>
 				<PlatformApp store={store} routes={routes} />
 			</StaticRouter>
 		);
@@ -21,7 +25,8 @@ ServerApp.propTypes = {
 	routes: PropTypes.array.isRequired,
 	store: PropTypes.object.isRequired,
 	basename: PropTypes.string.isRequired,
-	location: PropTypes.string.isRequired,
+	location: PropTypes.oneOfType(PropTypes.object, PropTypes.string)
+		.isRequired,
 	context: PropTypes.object.isRequired,
 };
 ServerApp.defaultProps = {
