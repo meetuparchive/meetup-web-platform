@@ -59,7 +59,7 @@ export const getLogger: string => (Object, Object) => mixed = (
 			timestamp: getTime().toISOString(),
 			requestId: request.id,
 			ip: requestHeaders['remote-addr'] || '',
-			agent: requestHeaders['x-original-user-agent'] || requestHeaders['user-agent'] || '',
+			agent: requestHeaders['user-agent'] || '',
 			platform: 'WEB',
 			platformAgent: agent,
 			mobileWeb: false,
