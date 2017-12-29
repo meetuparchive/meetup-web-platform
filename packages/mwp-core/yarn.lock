@@ -872,6 +872,10 @@ minimist@^1.2.0:
   dependencies:
     minimist "0.0.8"
 
+mobile-detect@1.4.1:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/mobile-detect/-/mobile-detect-1.4.1.tgz#f4b67c49bb84bf0437f72e3067deb1c60ad7b23c"
+
 modelo@^4.2.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/modelo/-/modelo-4.2.0.tgz#3b4b420023a66ca7e32bdba16e710937e14d1b0b"
