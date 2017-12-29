@@ -241,8 +241,8 @@ const makeRenderer = (
 	const host = `${requestProtocol}://${domain}`;
 	const userAgent =
 		process.env.NODE_ENV === 'production'
-			? headers['x-ua-device']
-			: headers['user-agent'];
+			? headers['x-ua-device'] // set by fastly
+			: headers['user-agent']; // fallback to the real ua
 
 	// create the store with populated `config`
 	const initialState = {

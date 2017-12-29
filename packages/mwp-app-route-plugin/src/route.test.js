@@ -12,7 +12,7 @@ describe('onPreResponse.method', () => {
 		response.header = ((key,val) =>val)
 
 		const request = {
-			response: response,
+			response,
 			route: {},
 			server: getServer(),
 		};
