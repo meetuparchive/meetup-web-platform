@@ -57,7 +57,7 @@ const resolveSideEffects = () => ({
 /**
  * Get media from X-UA-Device header set by Fastly which parses the user agent string
  */
-const getMedia = (userAgent: string ) => {
+const getMedia = (userAgent: string) => {
 	const isAtSmallUp = true;
 	let isMobile = true;
 	let isTablet = false;
@@ -67,9 +67,12 @@ const getMedia = (userAgent: string ) => {
 		isMobile = Boolean(device.phone());
 		isTablet = Boolean(device.tablet());
 	} else {
-		isMobile = userAgent === 'smartPhone' || userAgent === 'mobilebot' || userAgent === 'mobile';
+		isMobile =
+			userAgent === 'smartPhone' ||
+			userAgent === 'mobilebot' ||
+			userAgent === 'mobile';
 		isTablet = userAgent === 'tablet';
-	};
+	}
 	return {
 		isAtSmallUp,
 		isAtMediumUp: isTablet || !isMobile,
@@ -236,7 +239,10 @@ const makeRenderer = (
 	const domain: string =
 		headers['x-forwarded-host'] || headers['x-meetup-host'] || info.host;
 	const host = `${requestProtocol}://${domain}`;
-	const userAgent = process.env.NODE_ENV !== 'production' ? headers['x-ua-device'] : headers['user-agent']
+	const userAgent =
+		process.env.NODE_ENV !== 'production'
+			? headers['x-ua-device']
+			: headers['user-agent'];
 
 	// create the store with populated `config`
 	const initialState = {
