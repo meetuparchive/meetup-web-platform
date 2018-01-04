@@ -68,7 +68,7 @@ const getMedia = (userAgent: string) => {
 		isTablet = Boolean(device.tablet());
 	} else {
 		isMobile =
-			userAgent === 'smartPhone' ||
+			userAgent === 'smartphone' ||
 			userAgent === 'mobilebot' ||
 			userAgent === 'mobile';
 		isTablet = userAgent === 'tablet';
