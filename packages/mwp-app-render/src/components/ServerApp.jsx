@@ -25,7 +25,7 @@ ServerApp.propTypes = {
 	routes: PropTypes.array.isRequired,
 	store: PropTypes.object.isRequired,
 	basename: PropTypes.string.isRequired,
-	location: PropTypes.oneOfType(PropTypes.object, PropTypes.string)
+	location: PropTypes.oneOfType([PropTypes.object, PropTypes.string])
 		.isRequired,
 	context: PropTypes.object.isRequired,
 };
