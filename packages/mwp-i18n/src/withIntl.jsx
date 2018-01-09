@@ -5,7 +5,8 @@ import { IntlProvider, injectIntl } from 'react-intl';
 
 type Messages = { [string]: string };
 type Props = { __locale?: string, [string]: any };
-/**
+
+/*
  * A HOC function that applies the necessary context to the component that is
  * passed in. It will always wrap the component in `<IntlProvider>` in order
  * to make the translated `messages` available for consumption in the component.
@@ -22,20 +23,16 @@ export default (messages: Messages, doInjectIntl?: boolean) => (
 	if (doInjectIntl) {
 		WrappedComponent = injectIntl(WrappedComponent);
 	}
-	/**
-	 * A HOC that wraps the component in the context required for trn rendering
-	 */
+
 	const WithIntl = (props: Props) => {
-		const {
-			__locale, // optional 'forced' locale value for the wrapper
-			...other
-		} = props;
+		const { __locale, ...other } = props;
 
 		const providerProps: typeof IntlProvider.propTypes = {
 			defaultLocale: 'en-US',
 			messages,
 		};
 
+		// optional prop to force the locale for the wrapper - useful for tests
 		if (__locale) {
 			providerProps.locale = __locale;
 		}
@@ -49,5 +46,6 @@ export default (messages: Messages, doInjectIntl?: boolean) => (
 	const wrappedComponentName =
 		WrappedComponent.displayName || WrappedComponent.name || 'Component';
 	WithIntl.displayName = `WithIntl(${wrappedComponentName})`;
+
 	return WithIntl;
 };
