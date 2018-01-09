@@ -76,3 +76,18 @@ The overall workflow is:
 3. Get the version string from the build logs under `GIT_TAG`
 4. (if needed) Push changes to your `meetup-web-platform` branch
 5. Repeat steps 2-3
+
+## Adding a new package
+
+1. Create a new mwp-* directory in `/packages/`
+2. Add a new `package.json` file in the new package
+3. Add a line to `.travis.yml` `before_install` to create a `.npmrc` file that
+   will enable NPM publishing
+4. Increment the version number (a point release is usually okay since a new
+   package is not a breaking change of existing packages)
+5. Add a line to the `CHANGELOG.md`
+
+If other MWP packages will depend on the new package, you'll need to first
+publish the package without updating dependencies in other packages, and then
+make a new release that updates the other packages with the new dependency - the
+dependency must _exist_ in NPM before it can be specified as a dependency.

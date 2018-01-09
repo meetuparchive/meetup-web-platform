@@ -18,23 +18,24 @@ env:
 
 before_install:
   - openssl aes-256-cbc -K $encrypted_ee3d73113e03_key -iv $encrypted_ee3d73113e03_iv -in '.travis/github_deploy_key.enc' -out github_deploy_key -d
+  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-api-proxy-plugin/.npmrc
+  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-api-state/.npmrc
+  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-app-render/.npmrc
+  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-app-route-plugin/.npmrc
+  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-app-server/.npmrc
+  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-auth-plugin/.npmrc
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-core/.npmrc
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-config/.npmrc
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-app-server/.npmrc
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-app-route-plugin/.npmrc
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-api-proxy-plugin/.npmrc
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-consumer/.npmrc
+  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-i18n/.npmrc
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-language-plugin/.npmrc
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-sw-plugin/.npmrc
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-tracking-plugin/.npmrc
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-auth-plugin/.npmrc
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-router/.npmrc
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-app-render/.npmrc
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-api-state/.npmrc
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-store/.npmrc
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-test-utils/.npmrc
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-logger-plugin/.npmrc
+  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-router/.npmrc
+  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-store/.npmrc
+  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-sw-plugin/.npmrc
+  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-test-utils/.npmrc
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-toaster/.npmrc
+  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-tracking-plugin/.npmrc
   - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.3.2
   - export PATH=$HOME/.yarn/bin:$PATH
   - yarn --version
