@@ -1,3 +1,10 @@
+## [12.0]
+
+- **Moved** `mwp-core/lib/localizationUtils` is now part of `mwp-i18n`, renamed
+  to `loadLocaleData`
+- **New package** `mwp-i18n`, which currently contains the `withIntl` HOC and
+  `loadLocaleData`
+
 ## [11.1]
 
 - **New package** `mwp-config` - a dedicated 'config' package that can be freely
