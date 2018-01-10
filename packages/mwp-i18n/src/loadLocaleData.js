@@ -41,7 +41,7 @@ const localeMap: { [string]: { data?: Object } } = {
 /*
  * Load data for given localeCode into ReactIntl
  */
-export function loadLocale(localeCode: ?string) {
+export default function loadLocaleData(localeCode: ?string) {
 	if (!localeCode) {
 		return;
 	}
@@ -55,16 +55,4 @@ export function loadLocale(localeCode: ?string) {
 		return;
 	}
 	addLocaleData(locale.data);
-}
-
-/*
- * Get locale code and for given member
- *
- * Note:
- * The api currently returns locale codes with underscores
- * instead of dashes, so this method supports both until fixed.
- */
-export function getLocaleCode(self: { lang?: string, [string]: Object }) {
-	// Retreive locale code from state (api response)
-	return ((self && self.lang) || 'en-US').replace('_', '-');
 }
