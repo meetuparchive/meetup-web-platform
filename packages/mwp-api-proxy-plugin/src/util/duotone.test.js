@@ -103,17 +103,12 @@ describe('apiResponseDuotoneSetter', () => {
 		// self/home endpoint and then look for a property deep inside it
 		const group = { ...MOCK_GROUP, duotoneUrl: undefined };
 		const homeApiResponse = {
-			ref: 'memberHome',
+			ref: 'exploreHome',
 			type: 'home',
 			value: {
-				rows: [
+				most_popular: [
 					{
-						items: [
-							{
-								type: 'group',
-								group,
-							},
-						],
+						group,
 					},
 				],
 			},
