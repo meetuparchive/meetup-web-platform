@@ -169,13 +169,7 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
 				groups.forEach(setGroupDuotone);
 				break;
 			case 'home':
-				(value.rows || [])
-					.map(({ items }) => items)
-					.forEach(items =>
-						items
-							.filter(({ type }) => type === 'group')
-							.forEach(({ group }) => setGroupDuotone(group))
-					);
+				(value.most_popular || []).map(event => setGroupDuotone(event.group || {}));
 				break;
 		}
 		return queryResponse;
