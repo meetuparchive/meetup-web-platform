@@ -13,11 +13,12 @@
     "agent": "MUP_WEB"
   },
   "scripts": {
-    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps",
+    "bootstrap": "lerna bootstrap",
+    "build": "lerna run build",
     "lint": "eslint . --ext .js,.jsx --fix",
     "precommit": "lint-staged",
     "typecheck": "flow",
-    "test": "lerna bootstrap && lerna run build && yarn test:unit",
+    "test": "yarn bootstrap && yarn build && yarn test:unit",
     "test:unit": "jest --config jest.config.json",
     "test:integration": "NODE_ENV=test jest --config jest.int.config.json"
   },
@@ -49,6 +50,7 @@
     "electrode-csrf-jwt": "1.2.1",
     "enzyme": "3.1.0",
     "enzyme-adapter-react-16": "1.0.2",
+    "enzyme-to-json": "3.3.1",
     "eslint": "4.2.0",
     "eslint-config-prettier": "2.3.0",
     "eslint-plugin-flowtype": "2.34.1",
