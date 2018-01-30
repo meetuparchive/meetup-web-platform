@@ -2,9 +2,18 @@
 import React from 'react';
 import type { ComponentType } from 'react';
 import { IntlProvider, injectIntl } from 'react-intl';
+import { connect } from 'react-redux';
+import type { MapStateToProps } from 'react-redux';
 
-type Messages = { [string]: string };
-type Props = { __locale?: string, [string]: any };
+const DEFAULT_LOCALE = 'en-US';
+type TRNSource = { [string]: string };
+// Messages must support 'en-US'
+type Messages = { 'en-US': TRNSource, [string]: TRNSource };
+type Props = { requestLanguage: string, __locale?: string, [string]: any };
+
+const mapStateToProps: MapStateToProps<*, *, *> = (state: MWPState) => ({
+	requestLanguage: state.config.requestLanguage,
+});
 
 /*
  * A HOC function that applies the necessary context to the component that is
@@ -25,11 +34,16 @@ export default (messages: Messages, doInjectIntl?: boolean) => (
 	}
 
 	const WithIntl = (props: Props) => {
-		const { __locale, ...other } = props;
+		const {
+			__locale,
+			requestLanguage,
+			dispatch, // eslint-disable-line no-unused-vars
+			...wrappedProps
+		} = props;
 
 		const providerProps: typeof IntlProvider.propTypes = {
-			defaultLocale: 'en-US',
-			messages,
+			defaultLocale: DEFAULT_LOCALE,
+			messages: messages[requestLanguage] || messages[DEFAULT_LOCALE],
 		};
 
 		// optional prop to force the locale for the wrapper - useful for tests
@@ -39,13 +53,17 @@ export default (messages: Messages, doInjectIntl?: boolean) => (
 
 		return (
 			<IntlProvider {...providerProps}>
-				<WrappedComponent {...other} />
+				<WrappedComponent {...wrappedProps} />
 			</IntlProvider>
 		);
 	};
+	const ConnectedWithIntl = connect(mapStateToProps)(WithIntl);
+
+	// modify display name to hide internal 'connect' implementation
 	const wrappedComponentName =
 		WrappedComponent.displayName || WrappedComponent.name || 'Component';
-	WithIntl.displayName = `WithIntl(${wrappedComponentName})`;
 
-	return WithIntl;
+	ConnectedWithIntl.displayName = `WithIntl(${wrappedComponentName})`;
+
+	return ConnectedWithIntl;
 };
