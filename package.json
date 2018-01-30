@@ -13,11 +13,12 @@
     "agent": "MUP_WEB"
   },
   "scripts": {
-    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps",
+    "bootstrap": "lerna bootstrap",
+    "build": "lerna run build",
     "lint": "eslint . --ext .js,.jsx --fix",
     "precommit": "lint-staged",
     "typecheck": "flow",
-    "test": "lerna bootstrap && lerna run build && yarn test:unit",
+    "test": "yarn bootstrap && yarn build && yarn test:unit",
     "test:unit": "jest --config jest.config.json",
     "test:integration": "NODE_ENV=test jest --config jest.int.config.json"
   },
