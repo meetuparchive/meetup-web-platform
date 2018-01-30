@@ -22,7 +22,8 @@
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "peerDependencies": {
     "react": "^16.0.0 || ^15.0.0",
-    "react-intl": "2.4.0"
+    "react-intl": "2.4.0",
+    "react-redux": ">=5"
   },
   "devDependencies": {}
 }

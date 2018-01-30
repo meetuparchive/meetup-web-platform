@@ -1,3 +1,9 @@
+## [12.1]
+
+- **Refactor** `mwp-i18n/lib/withIntl` now expects a map of
+  `{ [localeCode]: messages }` in its `messages` arg. `mwp-cli` has been updated
+  to provide this TRN source structure automatically.
+
 ## [12.0]
 
 - **Moved** `mwp-core/lib/localizationUtils` is now part of `mwp-i18n`, renamed
