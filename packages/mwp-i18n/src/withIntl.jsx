@@ -34,7 +34,12 @@ export default (messages: Messages, doInjectIntl?: boolean) => (
 	}
 
 	const WithIntl = (props: Props) => {
-		const { __locale, requestLanguage, ...other } = props;
+		const {
+			__locale,
+			requestLanguage,
+			dispatch, // eslint-disable-line no-unused-vars
+			...wrappedProps
+		} = props;
 
 		const providerProps: typeof IntlProvider.propTypes = {
 			defaultLocale: DEFAULT_LOCALE,
@@ -48,7 +53,7 @@ export default (messages: Messages, doInjectIntl?: boolean) => (
 
 		return (
 			<IntlProvider {...providerProps}>
-				<WrappedComponent {...other} />
+				<WrappedComponent {...wrappedProps} />
 			</IntlProvider>
 		);
 	};
