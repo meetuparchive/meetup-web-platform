@@ -6,36 +6,23 @@ const messages = { 'en-US': { foo: 'bar' }, 'fr-FR': { baz: 'qux' } };
 const Dummy = () => <div />;
 const DummyIntl = withIntl(messages)(Dummy);
 
-export const createFakeStore = fakeData => ({
-	getState() {
-		return fakeData;
-	},
-	dispatch() {},
-	subscribe() {},
-});
-
 it('renders an IntlProvider-wrapped component', () => {
-	const mockStore = createFakeStore({
-		config: { requestLanguage: 'en-US' },
-	});
-	const wrapper = shallow(<DummyIntl />, { context: { store: mockStore } });
-	expect(wrapper.dive()).toMatchSnapshot();
+	const wrapper = shallow(<DummyIntl />);
+	expect(wrapper).toMatchSnapshot();
 });
 it('passes messages[requestLanguage] as a prop to IntlProvider wrapper', () => {
 	Object.keys(messages).forEach(requestLanguage => {
-		const mockStore = createFakeStore({
-			config: { requestLanguage },
-		});
-		const wrapper = shallow(<DummyIntl />, {
-			context: { store: mockStore },
-		});
-		expect(wrapper.dive().prop('messages')).toBe(messages[requestLanguage]);
+		const wrapper = shallow(
+			<DummyIntl requestLanguage={requestLanguage} />
+		);
+		expect(wrapper.prop('messages')).toBe(messages[requestLanguage]);
 	});
 });
 it('passes messages["en-US"] as a prop to IntlProvider wrapper for unsupported requestLanguage', () => {
-	const mockStore = createFakeStore({
-		config: { requestLanguage: 'fo-BA' },
-	});
-	const wrapper = shallow(<DummyIntl />, { context: { store: mockStore } });
-	expect(wrapper.dive().prop('messages')).toBe(messages['en-US']);
+	const wrapper = shallow(<DummyIntl requestLanguage="fo-BA" />);
+	expect(wrapper.prop('messages')).toBe(messages['en-US']);
+});
+it('passes messages["en-US"] as a prop to IntlProvider wrapper for missing requestLanguage', () => {
+	const wrapper = shallow(<DummyIntl />);
+	expect(wrapper.prop('messages')).toBe(messages['en-US']);
 });

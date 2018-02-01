@@ -26,9 +26,10 @@ const mapStateToProps: MapStateToProps<*, *, *> = (state: MWPState) => ({
  *
  * @see {@link https://github.com/yahoo/react-intl/wiki/API#injectintl}
  */
-export default (messages: Messages, doInjectIntl?: boolean) => (
-	WrappedComponent: ComponentType<any>
-): ComponentType<*> => {
+export default (
+	messages: Messages = { [DEFAULT_LOCALE]: {} },
+	doInjectIntl?: boolean
+) => (WrappedComponent: ComponentType<any>): ComponentType<*> => {
 	if (doInjectIntl) {
 		WrappedComponent = injectIntl(WrappedComponent);
 	}
@@ -57,7 +58,10 @@ export default (messages: Messages, doInjectIntl?: boolean) => (
 			</IntlProvider>
 		);
 	};
-	const ConnectedWithIntl = connect(mapStateToProps)(WithIntl);
+	const ConnectedWithIntl =
+		process.env.NODE_ENV === 'test' // avoid Redux context dependency in tests
+			? WithIntl
+			: connect(mapStateToProps)(WithIntl);
 
 	// modify display name to hide internal 'connect' implementation
 	const wrappedComponentName =
