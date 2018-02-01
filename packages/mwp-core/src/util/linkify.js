@@ -16,7 +16,7 @@ var urlRegex = new RegExp(
 const createLink = (options: Object) => (href: string): string => {
 	const target = options.target || '';
 	const targetAttr = `target="${target}"`;
-	const relAttr = target === '_blank' ? 'rel="noopener noreferrer"' : '';
+	const relAttr = target === '_blank' ? 'rel="nofollow noopener noreferrer"' : '';
 	const hasProtocolRE = /^(?:https?:|ws:|ftp:)?\/\//;
 	const link = hasProtocolRE.test(href) ? href : `http://${href}`;
 
