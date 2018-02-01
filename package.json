@@ -19,7 +19,7 @@
     "precommit": "lint-staged",
     "typecheck": "flow",
     "test": "yarn bootstrap && yarn build && yarn test:unit",
-    "test:unit": "jest --config jest.config.json",
+    "test:unit": "NODE_ENV=test jest --config jest.config.json",
     "test:integration": "NODE_ENV=test jest --config jest.int.config.json"
   },
   "repository": {
