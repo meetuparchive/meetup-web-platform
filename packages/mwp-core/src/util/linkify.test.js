@@ -19,13 +19,13 @@ describe('linkify', () => {
 			'<a class="link" href="http://www.meetup.com" title="http://www.meetup.com" target="foo" >http://www.meetup.com</a>';
 		expect(linkify(httpBase, { target: 'foo' })).toBe(targetLink);
 	});
-	it('should turn a link text with a `_blank` target into an HTML anchor with `rel="noopener noreferrer"`', () => {
+	it('should turn a link text with a `_blank` target into an HTML anchor with `rel="nofollow noopener noreferrer"`', () => {
 		expect(linkify(httpBase, { target: '_blank' })).toContain(
-			'rel="noopener noreferrer"'
+			'rel="nofollow noopener noreferrer"'
 		);
 	});
-	it('should turn a link text without a `_blank` target into an HTML anchor without `rel="noopener noreferrer"`', () => {
-		expect(linkify(httpBase)).not.toContain('rel="noopener noreferrer"');
+	it('should turn a link text without a `_blank` target into an HTML anchor without `rel="nofollow noopener noreferrer"`', () => {
+		expect(linkify(httpBase)).not.toContain('rel="nofollow noopener noreferrer"');
 	});
 	it('should not turn a text without a link into text with an HTML anchor', () => {
 		const noLinkText = 'This is not a link.';
