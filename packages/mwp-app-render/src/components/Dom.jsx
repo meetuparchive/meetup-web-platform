@@ -39,6 +39,8 @@ const DOM = props => {
 		cssLinks,
 	} = props;
 
+	const htmlLang = initialState.config.requestLanguage.split('-')[0];
+
 	/**
 	 * `initialState` has untrusted user-generated content that needs to be
 	 * written into the DOM inside a <script> tag.
@@ -58,7 +60,7 @@ const DOM = props => {
 	};
 
 	return (
-		<html>
+		<html lang={htmlLang}>
 			<head>
 				{head.title.toComponent()}
 				{head.meta.toComponent()}
