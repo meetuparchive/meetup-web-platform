@@ -31,7 +31,7 @@ export default function register(
 	server.ext('onRequest', setPluginState);
 
 	// add a route that will receive query requests as querystring params
-	const routes = getApiProxyRoutes(API_ROUTE_PATH);
+	const routes = getApiProxyRoutes(`${API_ROUTE_PATH}{page*}`);
 	server.route(routes);
 
 	next();

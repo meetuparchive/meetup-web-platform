@@ -40,10 +40,10 @@ export const getInitialState = (APP_RUNTIME: {
 	return JSON.parse(unescapedStateJSON);
 };
 
-export function getBrowserCreateStore(routes, middleware = [], baseUrl) {
+export function getBrowserCreateStore(resolveRoutes, middleware = []) {
 	const middlewareToApply = [
 		catchMiddleware(console.error),
-		getApiMiddleware(routes, fetchQueries, baseUrl),
+		getApiMiddleware(resolveRoutes, fetchQueries),
 		...middleware,
 		window.mupDevTools ? window.mupDevTools() : noopMiddleware, // must be last middleware
 	];
