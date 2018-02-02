@@ -1,7 +1,7 @@
 import { combineEpics } from '../redux-promise-epic';
 
 import { LOCATION_CHANGE, SERVER_RENDER } from 'mwp-router';
-import { getRouteResolver, getMatchedQueries } from 'mwp-router/lib/util';
+import { getMatchedQueries } from 'mwp-router/lib/util';
 import { actions as clickActions } from 'mwp-tracking-plugin/lib/util/clickState';
 
 import * as api from './apiActionCreators';
@@ -58,56 +58,53 @@ export function getDeprecatedSuccessPayload(successes, errors) {
  * @param {Object} routes The application's React Router routes
  * @returns {Function} an Epic function that emits an API_REQUEST action
  */
-export const getNavEpic = (routes, baseUrl) => {
-	const resolveRoutes = getRouteResolver(routes, baseUrl);
-	return (action, store) => {
-		if (![LOCATION_CHANGE, SERVER_RENDER].some(type => type === action.type)) {
-			return Promise.resolve([]);
-		}
-		const { payload: location } = action;
-		const state = store.getState();
-		const { referrer = {} } = state.routing;
-		// inject request metadata from context, including `store.getState()`
-		const requestMetadata = {
-			referrer: referrer.pathname || state.config.entryPath || '',
-			logout: location.pathname.endsWith('logout'), // assume logout route ends with logout - not currently implemented in any app
-			clickTracking: state.clickTracking,
-			retainRefs: [],
-		};
-		const cacheAction = requestMetadata.logout && { type: 'CACHE_CLEAR' };
-
-		const resolvePrevQueries = referrer.pathname
-			? resolveRoutes(referrer, baseUrl).then(getMatchedQueries(referrer))
-			: Promise.resolve([]);
-		const resolveNewQueries = resolveRoutes(location, baseUrl).then(
-			getMatchedQueries(location)
-		);
-
-		return Promise.all([
-			resolveNewQueries,
-			resolvePrevQueries,
-		]).then(([newQueries, previousQueries]) => {
-			if (newQueries.filter(q => q).length === 0) {
-				// no valid queries - jump straight to 'complete'
-				return [api.complete([])];
-			}
-			// perform a fast comparison of previous route's serialized queries
-			// with the new route's serialized queries. All state refs for
-			// _shared_ queries should be retained
-			const serializedNew = newQueries.map(JSON.stringify);
-			const serializedPrev = previousQueries.map(JSON.stringify);
-			const sharedRefs = serializedPrev
-				.filter(qJSON => serializedNew.includes(qJSON))
-				.map(JSON.parse)
-				.map(q => q.ref);
-			requestMetadata.retainRefs = sharedRefs;
-			return [
-				cacheAction,
-				api.get(newQueries, requestMetadata),
-				clickActions.clear(),
-			].filter(a => a);
-		});
+export const getNavEpic = resolveRoutes => (action, store) => {
+	if (![LOCATION_CHANGE, SERVER_RENDER].some(type => type === action.type)) {
+		return Promise.resolve([]);
+	}
+	const { payload: location } = action;
+	const state = store.getState();
+	const { referrer = {} } = state.routing;
+	// inject request metadata from context, including `store.getState()`
+	const requestMetadata = {
+		referrer: referrer.pathname || state.config.entryPath || '',
+		logout: location.pathname.endsWith('logout'), // assume logout route ends with logout - not currently implemented in any app
+		clickTracking: state.clickTracking,
+		retainRefs: [],
 	};
+	const cacheAction = requestMetadata.logout && { type: 'CACHE_CLEAR' };
+
+	const resolvePrevQueries = referrer.pathname
+		? resolveRoutes(referrer).then(getMatchedQueries(referrer))
+		: Promise.resolve([]);
+	const resolveNewQueries = resolveRoutes(location).then(
+		getMatchedQueries(location)
+	);
+
+	return Promise.all([
+		resolveNewQueries,
+		resolvePrevQueries,
+	]).then(([newQueries, previousQueries]) => {
+		if (newQueries.filter(q => q).length === 0) {
+			// no valid queries - jump straight to 'complete'
+			return [api.complete([])];
+		}
+		// perform a fast comparison of previous route's serialized queries
+		// with the new route's serialized queries. All state refs for
+		// _shared_ queries should be retained
+		const serializedNew = newQueries.map(JSON.stringify);
+		const serializedPrev = previousQueries.map(JSON.stringify);
+		const sharedRefs = serializedPrev
+			.filter(qJSON => serializedNew.includes(qJSON))
+			.map(JSON.parse)
+			.map(q => q.ref);
+		requestMetadata.retainRefs = sharedRefs;
+		return [
+			cacheAction,
+			api.get(newQueries, requestMetadata),
+			clickActions.clear(),
+		].filter(a => a);
+	});
 };
 
 /**
@@ -116,7 +113,9 @@ export const getNavEpic = (routes, baseUrl) => {
  */
 export const apiRequestToApiReq = action =>
 	Promise.resolve(
-		action.type === 'API_REQUEST' ? [api.get(action.payload, action.meta)] : []
+		action.type === 'API_REQUEST'
+			? [api.get(action.payload, action.meta)]
+			: []
 	);
 
 /**
@@ -171,9 +170,13 @@ export const getFetchQueriesEpic = fetchQueriesFn => {
 						successes,
 						errors
 					);
-					const deprecatedActions = [apiSuccess(deprecatedSuccessPayload)];
+					const deprecatedActions = [
+						apiSuccess(deprecatedSuccessPayload),
+					];
 					if (meta && meta.onSuccess) {
-						deprecatedActions.push(meta.onSuccess(deprecatedSuccessPayload));
+						deprecatedActions.push(
+							meta.onSuccess(deprecatedSuccessPayload)
+						);
 					}
 					return [
 						...successes.map(api.success), // send the successes to success
@@ -195,9 +198,9 @@ export const getFetchQueriesEpic = fetchQueriesFn => {
 		);
 	};
 };
-export default (routes, fetchQueriesFn, baseUrl) =>
+export default (routeResolver, fetchQueriesFn) =>
 	combineEpics(
-		getNavEpic(routes, baseUrl),
+		getNavEpic(routeResolver),
 		getFetchQueriesEpic(fetchQueriesFn),
 		apiRequestToApiReq
 	);
