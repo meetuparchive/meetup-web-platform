@@ -133,7 +133,7 @@ export const apiRequestToApiReq = action =>
  * - API_ERROR  // deprecated
  * - API_COMPLETE
  */
-export const getFetchQueriesEpic = (fetchQueriesFn, resolveRoutes) => {
+export const getFetchQueriesEpic = (resolveRoutes, fetchQueriesFn) => {
 	// keep track of location changes - will first be set by SERVER_RENDER
 	let currentLocation = {};
 
@@ -211,6 +211,6 @@ export const getFetchQueriesEpic = (fetchQueriesFn, resolveRoutes) => {
 export default (fetchQueriesFn, resolveRoutes) =>
 	combineEpics(
 		getNavEpic(resolveRoutes),
-		getFetchQueriesEpic(fetchQueriesFn, resolveRoutes),
+		getFetchQueriesEpic(resolveRoutes, fetchQueriesFn),
 		apiRequestToApiReq
 	);
