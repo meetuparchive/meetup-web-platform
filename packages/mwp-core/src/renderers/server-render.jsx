@@ -7,6 +7,7 @@ import MobileDetect from 'mobile-detect';
 
 import { API_ROUTE_PATH } from 'mwp-api-proxy-plugin';
 import { Forbidden, NotFound, Redirect, SERVER_RENDER } from 'mwp-router';
+import { getRouteResolver } from 'mwp-router/lib/util';
 import { getServerCreateStore } from 'mwp-store/lib/server';
 import Dom from 'mwp-app-render/lib/components/Dom';
 import ServerApp from 'mwp-app-render/lib/components/ServerApp';
@@ -62,17 +63,17 @@ const getMedia = (userAgent: string) => {
 	let isMobile = true;
 	let isTablet = false;
 	// In development, parse user agent string to determine media by device
-	if (process.env.NODE_ENV !== 'production') {
-		const device = new MobileDetect(userAgent);
-		isMobile = Boolean(device.phone());
-		isTablet = Boolean(device.tablet());
-	} else {
+	if (process.env.NODE_ENV === 'production') {
 		isMobile =
 			userAgent === 'smartphone' ||
 			userAgent === 'mobilebot' ||
 			userAgent === 'mobile';
 		isTablet = userAgent === 'tablet';
-	};
+	} else {
+		const device = new MobileDetect(userAgent);
+		isMobile = Boolean(device.phone());
+		isTablet = Boolean(device.tablet());
+	}
 	return {
 		isAtSmallUp,
 		isAtMediumUp: isTablet || !isMobile,
@@ -260,10 +261,9 @@ const makeRenderer = (
 	};
 
 	const createStore = getServerCreateStore(
-		routes,
+		getRouteResolver(routes, baseUrl),
 		middleware,
-		request,
-		baseUrl
+		request
 	);
 	const store = createStore(reducer, initialState);
 
