@@ -198,9 +198,9 @@ export const getFetchQueriesEpic = fetchQueriesFn => {
 		);
 	};
 };
-export default (routeResolver, fetchQueriesFn) =>
+export default (resolveRoutes, fetchQueriesFn) =>
 	combineEpics(
-		getNavEpic(routeResolver),
+		getNavEpic(resolveRoutes),
 		getFetchQueriesEpic(fetchQueriesFn),
 		apiRequestToApiReq
 	);

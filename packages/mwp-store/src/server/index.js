@@ -12,7 +12,7 @@ import catchMiddleware from '../middleware/catch';
  * @param {Array} middleware additional middleware to inject into store
  * @param {Object} request the Hapi request for this store
  */
-export function getServerCreateStore(routeResolver, middleware, request) {
+export function getServerCreateStore(resolveRoutes, middleware, request) {
 	const middlewareToApply = [
 		catchMiddleware(err =>
 			request.server.app.logger.error({
@@ -21,7 +21,7 @@ export function getServerCreateStore(routeResolver, middleware, request) {
 				...request.raw,
 			})
 		),
-		getApiMiddleware(routeResolver, getFetchQueries(request)),
+		getApiMiddleware(resolveRoutes, getFetchQueries(request)),
 		...middleware,
 	];
 
