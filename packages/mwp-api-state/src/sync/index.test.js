@@ -24,6 +24,8 @@ import { API_RESP_COMPLETE } from '../../lib/sync/apiActionCreators';
 
 MOCK_APP_STATE.config = {};
 MOCK_APP_STATE.routing = {};
+const MAKE_MOCK_RESOLVE_ROUTES = (queryFn = () => ({ params: {} })) => () =>
+	Promise.resolve([{ route: { query: queryFn }, match: { params: {} } }]);
 
 /**
  * @module SyncEpicTest
@@ -45,7 +47,7 @@ describe('Sync epic', () => {
 			};
 
 			const fakeStore = createFakeStore(MOCK_APP_STATE);
-			const navEpic = getNavEpic(MOCK_ROUTES);
+			const navEpic = getNavEpic(MAKE_MOCK_RESOLVE_ROUTES());
 			return Promise.all([
 				navEpic(locationChange, fakeStore),
 				navEpic(serverRender, fakeStore),
@@ -68,7 +70,7 @@ describe('Sync epic', () => {
 			};
 
 			const fakeStore = createFakeStore(MOCK_APP_STATE);
-			return getNavEpic(MOCK_ROUTES)(
+			return getNavEpic(MAKE_MOCK_RESOLVE_ROUTES())(
 				locationChange,
 				fakeStore
 			).then(actions => {
@@ -91,13 +93,15 @@ describe('Sync epic', () => {
 			};
 
 			const fakeStore = createFakeStore(MOCK_APP_STATE);
-			const navEpic = getNavEpic(MOCK_ROUTES);
+			const navEpic = getNavEpic(MAKE_MOCK_RESOLVE_ROUTES(null));
 			return Promise.all([
 				navEpic(locationChange, fakeStore),
 				navEpic(serverRender, fakeStore),
 			]).then(actionArrays => {
 				actionArrays.forEach(actions => {
-					expect(actions.map(({ type }) => type)).toEqual([API_RESP_COMPLETE]);
+					expect(actions.map(({ type }) => type)).toEqual([
+						API_RESP_COMPLETE,
+					]);
 				});
 			});
 		});
@@ -114,22 +118,23 @@ describe('Sync epic', () => {
 			};
 
 			const fakeStore = createFakeStore(MOCK_APP_STATE);
-			const navEpic = getNavEpic([
-				{ path: pathname, component: () => {}, query: () => null },
-			]);
+			const navEpic = getNavEpic(MAKE_MOCK_RESOLVE_ROUTES(() => null));
 			return Promise.all([
 				navEpic(locationChange, fakeStore),
 				navEpic(serverRender, fakeStore),
 			]).then(actionArrays => {
 				actionArrays.forEach(actions => {
-					expect(actions.map(({ type }) => type)).toEqual([API_RESP_COMPLETE]);
+					expect(actions.map(({ type }) => type)).toEqual([
+						API_RESP_COMPLETE,
+					]);
 				});
 			});
 		});
 	});
 	describe('getFetchQueriesEpic', () => {
 		it('emits API_RESP_SUCCESS and API_RESP_COMPLETE on successful API_REQ', function() {
-			const mockFetchQueries = () => () => Promise.resolve({ successes: [{}] });
+			const mockFetchQueries = () => () =>
+				Promise.resolve({ successes: [{}] });
 
 			const queries = [mockQuery({})];
 			const apiRequest = api.get(queries);
@@ -205,7 +210,9 @@ describe('Sync epic', () => {
 				apiRequest,
 				fakeStore
 			).then(actions => {
-				expect(apiRequest.meta.resolve).toHaveBeenCalledWith(expectedSuccesses);
+				expect(apiRequest.meta.resolve).toHaveBeenCalledWith(
+					expectedSuccesses
+				);
 			});
 		});
 
@@ -239,7 +246,9 @@ describe('Sync epic', () => {
 				apiRequest,
 				fakeStore
 			).then(actions =>
-				expect(apiRequest.meta.reject).toHaveBeenCalledWith(expectedError)
+				expect(apiRequest.meta.reject).toHaveBeenCalledWith(
+					expectedError
+				)
 			);
 		});
 	});

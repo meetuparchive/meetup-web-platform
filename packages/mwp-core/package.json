@@ -35,6 +35,7 @@
     "mwp-api-proxy-plugin": ">=0.0.1",
     "mwp-app-render": ">=0.0.1",
     "mwp-logger-plugin": ">=0.0.1",
+    "mwp-router": ">=0.0.1",
     "mwp-store": ">=0.0.1",
     "node-fetch": "1.7.2",
     "pino": "4.7.1",
