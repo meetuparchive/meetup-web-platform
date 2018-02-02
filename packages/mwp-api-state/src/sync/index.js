@@ -164,8 +164,7 @@ export const getFetchQueriesEpic = (resolveRoutes, fetchQueriesFn) => {
 
 		// first get the current route 'match' data
 		return resolveRoutes(location)
-			.then(matchedRoutes => matchedRoutes.pop())
-			.then(({ match }) => match.path.replace(/:/g, ''))
+			.then(matched => matched.pop().match.path.replace(/:/g, ''))
 			.then(apiPath => {
 				// construct the fetch call using match.path
 				const fetchUrl = `${config.apiUrl}${apiPath}`;
