@@ -208,7 +208,7 @@ export const getFetchQueriesEpic = (resolveRoutes, fetchQueriesFn) => {
 			.then(actions => [...actions, api.complete(queries)]);
 	};
 };
-export default (fetchQueriesFn, resolveRoutes) =>
+export default (resolveRoutes, fetchQueriesFn) =>
 	combineEpics(
 		getNavEpic(resolveRoutes),
 		getFetchQueriesEpic(resolveRoutes, fetchQueriesFn),

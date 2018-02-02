@@ -26,10 +26,10 @@ export function resolveAppProps(
 	middleware: Array<Object> = []
 ): Promise<AppProps> {
 	const basename = window.APP_RUNTIME.baseUrl || '';
-	const routeResolver = getRouteResolver(routes, basename);
-	const createStore = getBrowserCreateStore(routeResolver, middleware);
+	const resolveRoutes = getRouteResolver(routes, basename);
+	const createStore = getBrowserCreateStore(resolveRoutes, middleware);
 	const store = createStore(reducer, getInitialState(window.APP_RUNTIME));
-	return routeResolver(window.location).then(() => ({
+	return resolveRoutes(window.location).then(() => ({
 		routes,
 		store,
 		basename,
