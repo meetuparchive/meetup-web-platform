@@ -25,7 +25,12 @@ import { API_RESP_COMPLETE } from '../../lib/sync/apiActionCreators';
 MOCK_APP_STATE.config = {};
 MOCK_APP_STATE.routing = {};
 const MAKE_MOCK_RESOLVE_ROUTES = (queryFn = () => ({ params: {} })) => () =>
-	Promise.resolve([{ route: { query: queryFn }, match: { params: {} } }]);
+	Promise.resolve([
+		{
+			route: { path: '/', query: queryFn },
+			match: { path: '/', params: {} },
+		},
+	]);
 
 /**
  * @module SyncEpicTest
