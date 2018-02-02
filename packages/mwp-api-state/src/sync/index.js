@@ -1,7 +1,7 @@
 import { combineEpics } from '../redux-promise-epic';
 
 import { LOCATION_CHANGE, SERVER_RENDER } from 'mwp-router';
-import { getRouteResolver, getMatchedQueries } from 'mwp-router/lib/util';
+import { getMatchedQueries } from 'mwp-router/lib/util';
 import { actions as clickActions } from 'mwp-tracking-plugin/lib/util/clickState';
 
 import * as api from './apiActionCreators';
@@ -58,10 +58,11 @@ export function getDeprecatedSuccessPayload(successes, errors) {
  * @param {Object} routes The application's React Router routes
  * @returns {Function} an Epic function that emits an API_REQUEST action
  */
-export const getNavEpic = (routes, baseUrl) => {
-	const resolveRoutes = getRouteResolver(routes, baseUrl);
+export const getNavEpic = resolveRoutes => {
 	return (action, store) => {
-		if (![LOCATION_CHANGE, SERVER_RENDER].some(type => type === action.type)) {
+		if (
+			![LOCATION_CHANGE, SERVER_RENDER].some(type => type === action.type)
+		) {
 			return Promise.resolve([]);
 		}
 		const { payload: location } = action;
@@ -77,9 +78,9 @@ export const getNavEpic = (routes, baseUrl) => {
 		const cacheAction = requestMetadata.logout && { type: 'CACHE_CLEAR' };
 
 		const resolvePrevQueries = referrer.pathname
-			? resolveRoutes(referrer, baseUrl).then(getMatchedQueries(referrer))
+			? resolveRoutes(referrer).then(getMatchedQueries(referrer))
 			: Promise.resolve([]);
-		const resolveNewQueries = resolveRoutes(location, baseUrl).then(
+		const resolveNewQueries = resolveRoutes(location).then(
 			getMatchedQueries(location)
 		);
 
@@ -116,7 +117,9 @@ export const getNavEpic = (routes, baseUrl) => {
  */
 export const apiRequestToApiReq = action =>
 	Promise.resolve(
-		action.type === 'API_REQUEST' ? [api.get(action.payload, action.meta)] : []
+		action.type === 'API_REQUEST'
+			? [api.get(action.payload, action.meta)]
+			: []
 	);
 
 /**
@@ -171,9 +174,13 @@ export const getFetchQueriesEpic = fetchQueriesFn => {
 						successes,
 						errors
 					);
-					const deprecatedActions = [apiSuccess(deprecatedSuccessPayload)];
+					const deprecatedActions = [
+						apiSuccess(deprecatedSuccessPayload),
+					];
 					if (meta && meta.onSuccess) {
-						deprecatedActions.push(meta.onSuccess(deprecatedSuccessPayload));
+						deprecatedActions.push(
+							meta.onSuccess(deprecatedSuccessPayload)
+						);
 					}
 					return [
 						...successes.map(api.success), // send the successes to success
@@ -195,9 +202,9 @@ export const getFetchQueriesEpic = fetchQueriesFn => {
 		);
 	};
 };
-export default (routes, fetchQueriesFn, baseUrl) =>
+export default (routeResolver, fetchQueriesFn) =>
 	combineEpics(
-		getNavEpic(routes, baseUrl),
+		getNavEpic(routeResolver),
 		getFetchQueriesEpic(fetchQueriesFn),
 		apiRequestToApiReq
 	);
