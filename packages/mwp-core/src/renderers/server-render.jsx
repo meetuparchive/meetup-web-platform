@@ -72,7 +72,7 @@ const getMedia = (userAgent: string) => {
 			userAgent === 'mobilebot' ||
 			userAgent === 'mobile';
 		isTablet = userAgent === 'tablet';
-	};
+	}
 	return {
 		isAtSmallUp,
 		isAtMediumUp: isTablet || !isMobile,

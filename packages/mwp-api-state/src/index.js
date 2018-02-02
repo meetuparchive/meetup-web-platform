@@ -1,4 +1,5 @@
 import { createEpicMiddleware, combineEpics } from './redux-promise-epic';
+import { getRouteResolver } from 'mwp-router/lib/util';
 
 import getSyncEpic from './sync';
 import getCacheEpic from './cache';
@@ -27,12 +28,14 @@ export { api, app, DEFAULT_API_STATE } from './reducer';
  * order to render the application. We may want to write a server-specific
  * middleware that doesn't include the other epics if performance is an issue
  */
-export const getApiMiddleware = (routes, fetchQueriesFn, baseUrl) =>
+export const getApiMiddleware = (routes, fetchQueriesFn, baseUrl) => {
+	const resolveRoutes = getRouteResolver(routes, baseUrl);
 	createEpicMiddleware(
 		combineEpics(
 			getCacheEpic(),
-			getSyncEpic(routes, fetchQueriesFn, baseUrl),
+			getSyncEpic(fetchQueriesFn, resolveRoutes),
 			postEpic, // DEPRECATED
 			deleteEpic // DEPRECATED
 		)
 	);
+};
