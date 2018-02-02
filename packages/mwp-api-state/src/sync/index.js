@@ -135,21 +135,19 @@ export const apiRequestToApiReq = action =>
  */
 export const getFetchQueriesEpic = (resolveRoutes, fetchQueriesFn) => {
 	// keep track of location changes - will first be set by SERVER_RENDER
-	let currentLocation = {};
+	let locationIndex = 0;
 
 	// set up a closure that will compare the partially-applied location to the current value
-	// of `currentLocation` - if `currentLocation` has changed since `initialLocation`
+	// of `locationIndex` - if `locationIndex` has changed since `currentLocation`
 	// was passed in, return an empty array instead of the supplied actions array
 	// This is a way of ignoring API return values that happen after a location change
-	const ignoreIfLocationChange = initialLocation => actions =>
-		initialLocation == currentLocation ? actions : [];
+	const ignoreIfLocationChange = currentLocation => actions =>
+		currentLocation === locationIndex ? actions : [];
 
 	// return the epic
 	return (action, store) => {
-		if (
-			[LOCATION_CHANGE, SERVER_RENDER].some(type => type === action.type)
-		) {
-			currentLocation = action; // { type, payload: location, meta: { match } }
+		if (action.type === LOCATION_CHANGE) {
+			locationIndex = locationIndex + 1;
 		}
 		if (action.type !== api.API_REQ) {
 			return Promise.resolve([]);
@@ -204,7 +202,7 @@ export const getFetchQueriesEpic = (resolveRoutes, fetchQueriesFn) => {
 				}
 				return [api.fail(err), ...deprecatedActions];
 			})
-			.then(ignoreIfLocationChange(currentLocation))
+			.then(ignoreIfLocationChange(locationIndex))
 			.then(actions => [...actions, api.complete(queries)]);
 	};
 };
