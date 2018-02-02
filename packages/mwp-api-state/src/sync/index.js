@@ -133,74 +133,84 @@ export const apiRequestToApiReq = action =>
  * - API_ERROR  // deprecated
  * - API_COMPLETE
  */
-export const getFetchQueriesEpic = fetchQueriesFn => {
-	let locationIndex = 0; // keep track of location changes
+export const getFetchQueriesEpic = (resolveRoutes, fetchQueriesFn) => {
+	// keep track of location changes - will first be set by SERVER_RENDER
+	let currentLocation = {};
 
-	// set up a closure that will compare a passed-in index to the current value
-	// of `locationIndex` - if `locationIndex` has changed since `currentLocation`
+	// set up a closure that will compare the partially-applied location to the current value
+	// of `currentLocation` - if `currentLocation` has changed since `initialLocation`
 	// was passed in, return an empty array instead of the supplied actions array
 	// This is a way of ignoring API return values that happen after a location change
-	const ignoreIfLocationChange = currentLocation => actions => {
-		if (currentLocation !== locationIndex) {
-			return [];
-		}
-		return actions;
-	};
+	const ignoreIfLocationChange = initialLocation => actions =>
+		initialLocation == currentLocation ? actions : [];
 
 	// return the epic
 	return (action, store) => {
-		if (action.type === LOCATION_CHANGE) {
-			locationIndex = locationIndex + 1;
+		if (
+			[LOCATION_CHANGE, SERVER_RENDER].some(type => type === action.type)
+		) {
+			currentLocation = action; // { type, payload: location, meta: { match } }
 		}
 		if (action.type !== api.API_REQ) {
 			return Promise.resolve([]);
 		}
 		const { payload: queries, meta } = action;
 		// set up the fetch call to the app server
-		const { config, api: { self } } = store.getState();
-		const fetchQueries = fetchQueriesFn(config.apiUrl, (self || {}).value);
+		const {
+			config,
+			api: { self },
+			routing: { location },
+		} = store.getState();
 
-		return (
-			fetchQueries(queries, meta) // call fetch
-				// .takeUntil(action$.ofType(LOCATION_CHANGE)) // cancel this fetch when nav happens
-				.then(({ successes = [], errors = [] }) => {
-					// meta contains a Promise that must be resolved
-					meta.resolve([...successes, ...errors]);
-					const deprecatedSuccessPayload = getDeprecatedSuccessPayload(
-						successes,
-						errors
+		// first get the current route 'match' data
+		return resolveRoutes(location)
+			.then(matched => matched.pop().match.path.replace(/:/g, ''))
+			.then(apiPath => {
+				// construct the fetch call using match.path
+				const fetchUrl = `${config.apiUrl}${apiPath}`;
+				const fetchQueries = fetchQueriesFn(
+					fetchUrl,
+					(self || {}).value
+				);
+				return fetchQueries(queries, meta); // call fetch
+			})
+			.then(({ successes = [], errors = [] }) => {
+				// meta contains a Promise that must be resolved
+				meta.resolve([...successes, ...errors]);
+				const deprecatedSuccessPayload = getDeprecatedSuccessPayload(
+					successes,
+					errors
+				);
+				const deprecatedActions = [
+					apiSuccess(deprecatedSuccessPayload),
+				];
+				if (meta && meta.onSuccess) {
+					deprecatedActions.push(
+						meta.onSuccess(deprecatedSuccessPayload)
 					);
-					const deprecatedActions = [
-						apiSuccess(deprecatedSuccessPayload),
-					];
-					if (meta && meta.onSuccess) {
-						deprecatedActions.push(
-							meta.onSuccess(deprecatedSuccessPayload)
-						);
-					}
-					return [
-						...successes.map(api.success), // send the successes to success
-						...errors.map(api.error), // send errors to error
-						...deprecatedActions,
-					];
-				})
-				.catch(err => {
-					// meta contains a Promise that must be rejected
-					meta.reject(err);
-					const deprecatedActions = [apiError(err)];
-					if (meta && meta.onError) {
-						deprecatedActions.push(meta.onError(err));
-					}
-					return [api.fail(err), ...deprecatedActions];
-				})
-				.then(ignoreIfLocationChange(locationIndex))
-				.then(actions => [...actions, api.complete(queries)])
-		);
+				}
+				return [
+					...successes.map(api.success), // send the successes to success
+					...errors.map(api.error), // send errors to error
+					...deprecatedActions,
+				];
+			})
+			.catch(err => {
+				// meta contains a Promise that must be rejected
+				meta.reject(err);
+				const deprecatedActions = [apiError(err)];
+				if (meta && meta.onError) {
+					deprecatedActions.push(meta.onError(err));
+				}
+				return [api.fail(err), ...deprecatedActions];
+			})
+			.then(ignoreIfLocationChange(currentLocation))
+			.then(actions => [...actions, api.complete(queries)]);
 	};
 };
 export default (resolveRoutes, fetchQueriesFn) =>
 	combineEpics(
 		getNavEpic(resolveRoutes),
-		getFetchQueriesEpic(fetchQueriesFn),
+		getFetchQueriesEpic(resolveRoutes, fetchQueriesFn),
 		apiRequestToApiReq
 	);
