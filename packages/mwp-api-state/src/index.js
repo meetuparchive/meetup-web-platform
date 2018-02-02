@@ -1,5 +1,4 @@
 import { createEpicMiddleware, combineEpics } from './redux-promise-epic';
-import { getRouteResolver } from 'mwp-router/lib/util';
 
 import getSyncEpic from './sync';
 import getCacheEpic from './cache';
@@ -37,4 +36,3 @@ export const getApiMiddleware = (resolveRoutes, fetchQueriesFn) =>
 			deleteEpic // DEPRECATED
 		)
 	);
-};
