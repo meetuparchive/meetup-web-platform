@@ -1,9 +1,9 @@
 import rison from 'rison';
 import requestAuthPlugin from 'mwp-auth-plugin';
-import apiProxyPlugin from 'mwp-api-proxy-plugin';
 import CsrfPlugin from 'electrode-csrf-jwt';
 
 import { getServer } from 'mwp-test-utils';
+import apiProxyPlugin from './';
 
 jest.mock('mwp-config', () => {
 	const config = require.requireActual('mwp-config');
@@ -33,18 +33,22 @@ describe('api proxy plugin', () => {
 			JSON.stringify(expectedResponse)
 		);
 		const queriesRison = rison.encode_array([validQuery]);
-		return getResponse({
-			url: `/mu_api?queries=${queriesRison}`,
-		}).then(response => {
-			expect(response.statusCode).toBe(200);
-			expect(JSON.parse(response.payload)).toMatchObject({
-				responses: [
-					expect.objectContaining({
-						meta: { statusCode: 200, endpoint },
-						value: expectedResponse,
-					}),
-				],
+
+		// little helper function to test various matchable proxy URLs
+		const testUrl = url =>
+			getResponse({ url }).then(response => {
+				expect(response.statusCode).toBe(200);
+				expect(JSON.parse(response.payload)).toMatchObject({
+					responses: [
+						expect.objectContaining({
+							meta: { statusCode: 200, endpoint },
+							value: expectedResponse,
+						}),
+					],
+				});
 			});
-		});
+		return testUrl(`/mu_api?queries=${queriesRison}`).then(() =>
+			testUrl(`/mu_api/another/arbitrary/path/?queries=${queriesRison}`)
+		);
 	});
 });
