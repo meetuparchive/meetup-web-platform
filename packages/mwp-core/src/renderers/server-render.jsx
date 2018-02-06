@@ -63,16 +63,16 @@ const getMedia = (userAgent: string) => {
 	let isMobile = true;
 	let isTablet = false;
 	// In development, parse user agent string to determine media by device
-	if (process.env.NODE_ENV !== 'production') {
-		const device = new MobileDetect(userAgent);
-		isMobile = Boolean(device.phone());
-		isTablet = Boolean(device.tablet());
-	} else {
+	if (process.env.NODE_ENV === 'production') {
 		isMobile =
 			userAgent === 'smartphone' ||
 			userAgent === 'mobilebot' ||
 			userAgent === 'mobile';
 		isTablet = userAgent === 'tablet';
+	} else {
+		const device = new MobileDetect(userAgent);
+		isMobile = Boolean(device.phone());
+		isTablet = Boolean(device.tablet());
 	}
 	return {
 		isAtSmallUp,
