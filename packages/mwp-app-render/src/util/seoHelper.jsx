@@ -1,9 +1,18 @@
 import React from 'react';
 import locales from 'mwp-config/locales';
-import { getSocialLinks } from 'src/util/socialHelper';
-import { FB_APP_ID } from 'src/util/fbHelper';
+// TODO
+// import { getSocialLinks } from 'src/util/socialHelper';
 
-import { convertToLocalTime } from 'src/app/group/groupDateConversionUtils';
+// TODO
+// import { FB_APP_ID } from 'src/util/fbHelper';
+
+// TODO
+// import { convertToLocalTime } from 'src/app/group/groupDateConversionUtils';
+
+// TODO
+// Update mup-web to import this?
+export const FB_APP_ID =
+        process.env.NODE_ENV === 'production' ? '2403839689' : '36212898404';
 
 export const SCHEMA_ORG = 'http://schema.org';
 export const YANDEX_META = {
@@ -206,7 +215,9 @@ export const generateCanonicalUrlMetaTags = (baseUrl, localeCode, route) => {
  * @return {Object} accumulated json object
  */
 export const generateOrganizationLdJson = (baseUrl, localeCode, route) => {
-	const socialLinks = getSocialLinks(localeCode);
+	// TODO
+	// const socialLinks = getSocialLinks(localeCode);
+	const socialLinks = {};
 	const url = generateCanonicalUrl(baseUrl, localeCode, route);
 	return {
 		'@type': 'Organization',
@@ -281,9 +292,13 @@ export const generateFeeLdJson = fee => {
  * @return {Object} accumulated json object
  */
 export const generateEventLdJson = eventInfo => {
+	/*
 	const startDate =
 		eventInfo.time &&
 		convertToLocalTime(eventInfo.time, eventInfo.utc_offset).toISOString();
+	*/
+	// TODO
+	const startDate = 'TODO-START-DATE';
 	const offers = eventInfo.fee ? generateFeeLdJson(eventInfo.fee) : {};
 	const location = eventInfo.venue ? generateLocationLdJson(eventInfo.venue) : {};
 
