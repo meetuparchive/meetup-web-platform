@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Dom renders with mock props 1`] = `
+<html
+  lang="fr"
+>
+  <head>
+    <link
+      href="style.css"
+      key="0"
+      rel="stylesheet"
+      type="text/css"
+    />
+  </head>
+  <body>
+    <div
+      dangerouslySetInnerHTML={
+        Object {
+          "__html": "<div>mock app markup</div>",
+        }
+      }
+      id="outlet"
+    />
+    <script
+      dangerouslySetInnerHTML={
+        Object {
+          "__html": "window.APP_RUNTIME={\\"baseUrl\\":\\"https://www.mock-base-url.com\\",\\"assetPublicPath\\":\\"/mock/asset/public/path\\",\\"escapedState\\":\\"{&quot;config&quot;:{&quot;requestLanguage&quot;:&quot;fr-FR&quot;}}\\"};",
+        }
+      }
+    />
+    <script
+      key="0"
+      src="script.js"
+    />
+  </body>
+</html>
+`;
