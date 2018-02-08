@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Helmet from 'react-helmet';
-import { defineMessages } from 'react-intl';
 
 import {
 	DEFAULT_TITLE,
@@ -10,34 +9,8 @@ import {
 	generateMetaTags,
 } from 'src/util/seoHelper';
 
-/** i18n utils */
-import withIntl from 'mwp-i18n/lib/withIntl';
-import messages from 'trns/components/SEOHead.json';
-
 export const DEFAULT_IMAGE_URL =
 	'https://secure.meetupstatic.com/s/img/286374644891845767035/logo/meetup-logo-script-1200x630.png';
-
-export const TWITTER_DEFAULT_IMAGE_URL =
-	'https://secure.meetupstatic.com/s/img/786824251364989575000/logo/swarm/m_swarm_630x630.png';
-
-const trns = defineMessages({
-	defaultPageDescription: {
-		id: 'SEOHead.defaultPageDescription',
-		defaultMessage:
-			'Find Meetups and meet people in your local community who share your interests.',
-		description: {
-			jira: 'MW-2106',
-		},
-	},
-	defaultPageKeywords: {
-		id: 'SEOHead.defaultMetaKeywords',
-		defaultMessage: 'group,club,event,community,local,networking,meet,sharing,Meetup',
-		description: {
-			jira: 'MW-2106',
-		},
-	},
-});
-
 /**
  * Generates SEO Helmet object
  * Note: props passed to SEOHead should *not* be html-escaped because this is handled by Helmet
@@ -57,12 +30,11 @@ export const SEOHeadComponent = ({
 	route,
 	pageMeta,
 	imageUrl,
-	intl,
 }) => {
 	const meta = generateMetaData({
 		title: pageTitle,
-		description: pageDescription || intl.formatMessage(trns.defaultPageDescription),
-		keywords: pageKeywords || intl.formatMessage(trns.defaultPageKeywords),
+		description: pageDescription,
+		keywords: pageKeywords,
 		ogTitle,
 		ogDescription,
 		baseUrl,
@@ -118,7 +90,6 @@ SEOHeadComponent.propTypes = {
 	ogDescription: PropTypes.string,
 	robots: PropTypes.bool,
 	route: PropTypes.string.isRequired,
-	intl: PropTypes.object.isRequired,
 };
 
 SEOHeadComponent.defaultProps = {
@@ -130,4 +101,4 @@ SEOHeadComponent.defaultProps = {
 	imageUrl: DEFAULT_IMAGE_URL,
 };
 
-export default withIntl(messages, true)(SEOHeadComponent);
+export default SEOHeadComponent;
