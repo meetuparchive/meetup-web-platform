@@ -3,14 +3,13 @@ import PropTypes from 'prop-types';
 import Helmet from 'react-helmet';
 
 import {
+	DEFAULT_IMAGE_URL,
 	DEFAULT_TITLE,
 	generateMetaData,
 	generateCanonicalUrlMetaTags,
 	generateMetaTags,
 } from '../util/seoHelper';
 
-export const DEFAULT_IMAGE_URL =
-	'https://secure.meetupstatic.com/s/img/286374644891845767035/logo/meetup-logo-script-1200x630.png';
 /**
  * Generates SEO Helmet object
  * Note: props passed to SEOHead should *not* be html-escaped because this is handled by Helmet
