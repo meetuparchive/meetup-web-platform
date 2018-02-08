@@ -24,7 +24,7 @@ exports[`Dom renders with mock props 1`] = `
     <script
       dangerouslySetInnerHTML={
         Object {
-          "__html": "window.APP_RUNTIME={\\"baseUrl\\":\\"https://www.mock-base-url.com\\",\\"assetPublicPath\\":\\"/mock/asset/public/path\\",\\"escapedState\\":\\"{&quot;config&quot;:{&quot;apiUrl&quot;:&quot;https://www.mock-api-url.com&quot;,&quot;baseUrl&quot;:&quot;https://www.mock-base-url.com&quot;,&quot;enableServiceWorker&quot;:true,&quot;requestLanguage&quot;:&quot;fr-FR&quot;,&quot;supportedLangs&quot;:[&quot;en-US&quot;,&quot;de-De&quot;,&quot;es-ES&quot;],&quot;initialNow&quot;:&quot;1517589465414&quot;,&quot;variants&quot;:&quot;mock-variants&quot;,&quot;entryPath&quot;:&quot;/ny-tech&quot;,&quot;media&quot;:&quot;mobile&quot;}}\\"};",
+          "__html": "window.APP_RUNTIME={\\"baseUrl\\":\\"https://www.mock-base-url.com\\",\\"assetPublicPath\\":\\"/mock/asset/public/path\\",\\"escapedState\\":\\"{&quot;config&quot;:{&quot;requestLanguage&quot;:&quot;fr-FR&quot;}}\\"};",
         }
       }
     />

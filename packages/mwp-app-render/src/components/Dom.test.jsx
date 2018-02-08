@@ -16,15 +16,7 @@ const MOCK_PROPS = {
 	},
 	initialState: {
 		config: {
-			apiUrl: 'https://www.mock-api-url.com',
-			baseUrl: MOCK_BASE_URL,
-			enableServiceWorker: true,
 			requestLanguage: 'fr-FR',
-			supportedLangs: ['en-US', 'de-De', 'es-ES'],
-			initialNow: '1517589465414',
-			variants: 'mock-variants',
-			entryPath: '/ny-tech',
-			media: 'mobile',
 		},
 	}, 
 	scripts: ['script.js'],
@@ -32,10 +24,7 @@ const MOCK_PROPS = {
 };
 
 describe('Dom', function() {
-	const domComponent = shallow(
-		<Dom {...MOCK_PROPS} />
-	);
 	it('renders with mock props', function() {
-		expect(domComponent).toMatchSnapshot();
+		expect(shallow(<Dom {...MOCK_PROPS} />)).toMatchSnapshot();
 	});
 });
