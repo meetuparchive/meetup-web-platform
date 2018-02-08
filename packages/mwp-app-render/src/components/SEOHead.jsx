@@ -7,7 +7,7 @@ import {
 	generateMetaData,
 	generateCanonicalUrlMetaTags,
 	generateMetaTags,
-} from 'src/util/seoHelper';
+} from '../util/seoHelper';
 
 export const DEFAULT_IMAGE_URL =
 	'https://secure.meetupstatic.com/s/img/286374644891845767035/logo/meetup-logo-script-1200x630.png';
