@@ -5,12 +5,15 @@ import url from 'url';
  * This is the Hapi route handler that will be applied to the React application
  * route (usually a wildcard handling all paths).
  *
- * It is primarily responsible for two things:
- * 1. Ensure that the current URL pathname matches the language specified by the
- *    request - redirect if not
- * 2. Render the application in the requested language
+ * It is primarily responsible for:
  *
- * It also calls the tracking plugin in order to handle session tracking.
+ * 1. Ensuring that the current URL pathname matches the language specified by
+ *    the request - redirect if not
+ * 2. Render the application in the requested language
+ * 3. Set 'Vary' header in order to cache based on device type in header.
+ *    If 'X-UA-Device' is present, after caching, Fastly rewrites
+ *    the Vary header to 'User-Agent', in order for the google bots
+ *    to crawl mobile and desktop versions of the site
  */
 export default (languageRenderers: { [string]: LanguageRenderer }) => (
 	request: HapiRequest,
@@ -30,7 +33,9 @@ export default (languageRenderers: { [string]: LanguageRenderer }) => (
 					.redirect(renderResult.redirect.url)
 					.permanent(Boolean(renderResult.redirect.permanent));
 			}
-			return reply(renderResult.result).code(renderResult.statusCode);
+			return reply(renderResult.result)
+				.code(renderResult.statusCode)
+				.header('vary', 'X-UA-Device'); // set by fastly
 		},
 		err => reply(err) // 500 error - will only be thrown on bad implementation
 	);
