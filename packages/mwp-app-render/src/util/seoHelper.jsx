@@ -1,11 +1,8 @@
 import React from 'react';
 import locales from 'mwp-config/locales';
 
-// TODO
-// import { getSocialLinks } from 'src/util/socialHelper';
+import { getSocialLinks } from 'mwp-app-render/src/util/socialHelper';
 
-// TODO
-// Update mup-web to import this?
 export const FB_APP_ID =
         process.env.NODE_ENV === 'production' ? '2403839689' : '36212898404';
 
@@ -26,7 +23,6 @@ export const MEETUP_SWARM_LOGO_URL =
 	'https://secure.meetupstatic.com/s/img/786824251364989575000/logo/swarm/m_swarm_630x630.png';
 
 export const DEFAULT_TITLE = 'Meetup';
-
 
 /**
  * NOTE: This was lifted from mup-web's src/app/group/groupDateConversionUtils.js
@@ -234,9 +230,7 @@ export const generateCanonicalUrlMetaTags = (baseUrl, localeCode, route) => {
  * @return {Object} accumulated json object
  */
 export const generateOrganizationLdJson = (baseUrl, localeCode, route) => {
-	// TODO
-	// const socialLinks = getSocialLinks(localeCode);
-	const socialLinks = {};
+	const socialLinks = getSocialLinks(localeCode);
 	const url = generateCanonicalUrl(baseUrl, localeCode, route);
 	return {
 		'@type': 'Organization',
