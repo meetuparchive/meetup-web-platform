@@ -1,13 +1,8 @@
 import React from 'react';
 import locales from 'mwp-config/locales';
+
 // TODO
 // import { getSocialLinks } from 'src/util/socialHelper';
-
-// TODO
-// import { FB_APP_ID } from 'src/util/fbHelper';
-
-// TODO
-// import { convertToLocalTime } from 'src/app/group/groupDateConversionUtils';
 
 // TODO
 // Update mup-web to import this?
@@ -24,13 +19,37 @@ export const BING_META = {
 	value: '386E470199B7059A6A790A75D5A03B31',
 };
 export const TWITTER_APP_ID = '375990038';
+
+export const DEFAULT_IMAGE_URL =
+        'https://secure.meetupstatic.com/s/img/286374644891845767035/logo/meetup-logo-script-1200x630.png';
 export const MEETUP_SWARM_LOGO_URL =
 	'https://secure.meetupstatic.com/s/img/786824251364989575000/logo/swarm/m_swarm_630x630.png';
+
 export const DEFAULT_TITLE = 'Meetup';
+
+
+/**
+ * NOTE: This was lifted from mup-web's src/app/group/groupDateConversionUtils.js
+ * Returns a Date object that offsets the supplied UTC time, correcting for the runtime environment's current UTC offset.
+ * @param  {Number} time   millisecond value of event time stored relative to the servers time (which is nyc)
+ * @param  {Number} offset millisecond value of offset of chapters location also provided in milliseconds
+ * @return {Date} date object which has applied utc offset to generate "local" time
+ */
+export const convertToLocalTime = (time, offset = 0) => {
+        // Takes in desired date to convert and applies offset
+        const eventTime = new Date(time + offset);
+        // generates new date object taking the time in milliseconds and
+        // adds the runtime environment's timezone offset
+        const localDate = new Date(
+                eventTime.getTime() + eventTime.getTimezoneOffset() * 60000
+        );
+
+        return localDate;
+};
 
 /**
  * Strips new lines and tabs from string + truncates provided
- * @param  {String} str     String to strip
+ * @param  {String} str  String to strip
  * @param  {Number} charLen Number of char to truncate string by
  * @return {String} new string
  */
@@ -292,13 +311,9 @@ export const generateFeeLdJson = fee => {
  * @return {Object} accumulated json object
  */
 export const generateEventLdJson = eventInfo => {
-	/*
 	const startDate =
 		eventInfo.time &&
 		convertToLocalTime(eventInfo.time, eventInfo.utc_offset).toISOString();
-	*/
-	// TODO
-	const startDate = 'TODO-START-DATE';
 	const offers = eventInfo.fee ? generateFeeLdJson(eventInfo.fee) : {};
 	const location = eventInfo.venue ? generateLocationLdJson(eventInfo.venue) : {};
 
