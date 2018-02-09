@@ -1,4 +1,5 @@
 import logger from './logger';
+import MetricLogging from './metric';
 
 export function logResponse(request) {
 	const { response, route, id, server: { app: { logger } } } = request;
@@ -75,4 +76,5 @@ register.attributes = {
 export {
 	default as logger,
 	httpRequestSerializers as serializers,
+	MetricLogging,
 } from './logger'; // named export for easy import
