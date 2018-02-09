@@ -1,5 +1,21 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`SEOHead Custom Open Graph data renders custom open graph description 1`] = `
+<meta
+  content="mock custom open graph description"
+  key="meta-6"
+  property="og:description"
+/>
+`;
+
+exports[`SEOHead Custom Open Graph data renders pageDescription as open graph description 1`] = `
+<meta
+  content="mock description"
+  key="meta-6"
+  property="og:description"
+/>
+`;
+
 exports[`SEOHead imageUrl prop usage link image_src tag falls back to meetup script logo when imageUrl is undefined 1`] = `
 <link
   href="https://secure.meetupstatic.com/s/img/286374644891845767035/logo/meetup-logo-script-1200x630.png"
@@ -321,4 +337,25 @@ exports[`SEOHead renders component markup 1`] = `
     {"bar":"MOCK_LD_JSON"}
   </script>
 </HelmetWrapper>
+`;
+
+exports[`SEOHead robots defaults to robots "on" 1`] = `
+<meta
+  content="index, follow"
+  name="robots"
+/>
+`;
+
+exports[`SEOHead robots explicity turns robots "on" 1`] = `
+<meta
+  content="index, follow"
+  name="robots"
+/>
+`;
+
+exports[`SEOHead robots turns robots "off" 1`] = `
+<meta
+  content="noindex, nofollow"
+  name="robots"
+/>
 `;
