@@ -1,0 +1,68 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`generateEventLdJson should generate a ld+json object for event 1`] = `
+Object {
+  "@context": "http://schema.org",
+  "@type": "Event",
+  "description": "The coolest event in the world during which we will run and dance and sing
+	<script>alert(\\"bad time\\")</script>, 😊, &lt;blink&gt;what what&lt;blink&gt; this is getting
+	longer than it needs to be why am I still typing omg",
+  "location": Object {
+    "@type": "Place",
+    "address": Object {
+      "@type": "PostalAddress",
+      "addressCountry": "usa",
+      "addressLocality": "city name",
+      "addressRegion": "NY",
+      "postalCode": "00000",
+      "streetAddress": "address 1 address 2 address 3",
+    },
+    "geo": Object {
+      "@type": "GeoCoordinates",
+      "latitude": undefined,
+      "longitude": undefined,
+    },
+    "name": "some place",
+  },
+  "name": "So much fun",
+  "offers": Object {
+    "@type": "Offer",
+    "price": 11,
+    "priceCurrency": "USD",
+  },
+  "startDate": "1970-01-18T16:01:24.510Z",
+  "url": undefined,
+}
+`;
+
+exports[`generateFeeLdJson should generate a ld+json object for offers 1`] = `
+Object {
+  "offers": Object {
+    "@type": "Offer",
+    "price": 11,
+    "priceCurrency": "USD",
+  },
+}
+`;
+
+exports[`generateLocationLdJson should generate a ld+json object for location 1`] = `
+Object {
+  "location": Object {
+    "@type": "Place",
+    "address": Object {
+      "@type": "PostalAddress",
+      "addressCountry": "usa",
+      "addressLocality": "city name",
+      "addressRegion": "NY",
+      "postalCode": "00000",
+      "streetAddress": "address 1 address 2 address 3",
+    },
+    "geo": Object {
+      "@type": "GeoCoordinates",
+      "latitude": undefined,
+      "longitude": undefined,
+    },
+    "name": "some place",
+  },
+}
+`;
