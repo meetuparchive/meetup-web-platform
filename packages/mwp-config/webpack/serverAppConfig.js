@@ -21,7 +21,11 @@ const rules = require('./rules');
  * imported by the server and used to render requests to the app route.
  */
 function getConfig(localeCode) {
-	const baseWebfontDir = path.resolve(paths.src.server.app, 'assets', 'fonts');
+	const baseWebfontDir = path.resolve(
+		paths.src.server.app,
+		'assets',
+		'fonts'
+	);
 	const webfontDir =
 		localeCode === 'ru-RU'
 			? path.resolve(baseWebfontDir, localeCode)
@@ -51,15 +55,16 @@ function getConfig(localeCode) {
 			new webpack.DefinePlugin({
 				// server bundles must reference _browser_ bundle public path
 				// - inject it as a 'global variable' here
-				WEBPACK_BASE_URL: JSON.stringify(
-					localeCode === 'en-US' ? '' : `/${localeCode}`
-				),
 				WEBPACK_ASSET_PUBLIC_PATH: JSON.stringify(publicPath),
 				VENDOR_MANIFEST_PATH: JSON.stringify(
 					path.resolve(paths.output.browser, 'manifest.json')
 				),
 				BROWSER_MANIFEST_PATH: JSON.stringify(
-					path.resolve(paths.output.browser, localeCode, 'manifest.json')
+					path.resolve(
+						paths.output.browser,
+						localeCode,
+						'manifest.json'
+					)
 				),
 			}),
 			new StatsPlugin({ fields: null }), // null means 'all fields in stats file'
@@ -69,7 +74,9 @@ function getConfig(localeCode) {
 
 		externals: [
 			nodeExternals({
-				modulesDir: process.env.NODE_PATH ? process.env.NODE_PATH : null,
+				modulesDir: process.env.NODE_PATH
+					? process.env.NODE_PATH
+					: null,
 				whitelist: [
 					/^meetup-web-components/,
 					/^swarm-icons\/dist\/sprite\/sprite\.inc$/,

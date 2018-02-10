@@ -32,7 +32,7 @@ const DOM = props => {
 	const {
 		appMarkup = '',
 		assetPublicPath,
-		baseUrl,
+		basename,
 		head,
 		initialState = {},
 		scripts,
@@ -54,7 +54,7 @@ const DOM = props => {
 	const escapedState = escapeHtml(initialStateJson);
 
 	const APP_RUNTIME = {
-		baseUrl,
+		basename,
 		assetPublicPath,
 		escapedState,
 	};
@@ -68,11 +68,19 @@ const DOM = props => {
 				{head.script.toComponent()}
 				{cssLinks &&
 					cssLinks.map((href, key) =>
-						<link rel="stylesheet" type="text/css" href={href} key={key} />
+						<link
+							rel="stylesheet"
+							type="text/css"
+							href={href}
+							key={key}
+						/>
 					)}
 			</head>
 			<body>
-				<div id="outlet" dangerouslySetInnerHTML={getInnerHTML(appMarkup)} />
+				<div
+					id="outlet"
+					dangerouslySetInnerHTML={getInnerHTML(appMarkup)}
+				/>
 				<script
 					dangerouslySetInnerHTML={getInnerHTML(
 						`window.APP_RUNTIME=${JSON.stringify(APP_RUNTIME)};`
@@ -87,7 +95,7 @@ const DOM = props => {
 DOM.propTypes = {
 	appMarkup: PropTypes.string,
 	assetPublicPath: PropTypes.string.isRequired,
-	baseUrl: PropTypes.string,
+	basename: PropTypes.string,
 	head: PropTypes.shape({
 		// this is expected to come from Helmet.rewind()
 		title: PropTypes.shape({ toComponent: PropTypes.func }),

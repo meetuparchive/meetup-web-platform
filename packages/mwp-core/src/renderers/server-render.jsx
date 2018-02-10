@@ -106,7 +106,7 @@ const getRouterRenderer = ({
 	routes,
 	store,
 	location,
-	baseUrl,
+	basename,
 	assetPublicPath,
 	scripts,
 	cssLinks,
@@ -124,7 +124,7 @@ const getRouterRenderer = ({
 	try {
 		appMarkup = ReactDOMServer.renderToString(
 			<ServerApp
-				basename={baseUrl}
+				basename={basename}
 				location={location}
 				context={staticContext}
 				store={store}
@@ -151,7 +151,7 @@ const getRouterRenderer = ({
 	// so go ahead and assemble the full response body
 	const result = getHtml(
 		<Dom
-			baseUrl={baseUrl}
+			basename={basename}
 			assetPublicPath={assetPublicPath}
 			head={sideEffects.head}
 			initialState={initialState}
@@ -175,7 +175,6 @@ const makeRenderer$ = (renderConfig: {
 	reducer: Reducer<MWPState, FluxStandardAction>,
 	assetPublicPath: string,
 	middleware: Array<Function>,
-	baseUrl: string,
 	scripts: Array<string>,
 	enableServiceWorker: boolean,
 	cssLinks: ?Array<string>,
@@ -186,7 +185,6 @@ const makeRenderer$ = (renderConfig: {
 		null,
 		renderConfig.assetPublicPath,
 		renderConfig.middleware,
-		renderConfig.baseUrl,
 		renderConfig.scripts,
 		renderConfig.enableServiceWorker,
 		renderConfig.cssLinks
@@ -205,7 +203,6 @@ const makeRenderer = (
 	clientFilename: ?string,
 	assetPublicPath: string,
 	middleware: Array<Function> = [],
-	baseUrl: string = '',
 	scripts: Array<string> = [],
 	enableServiceWorker: boolean,
 	cssLinks: ?Array<string>
@@ -232,6 +229,8 @@ const makeRenderer = (
 		state,
 	} = request;
 	const requestLanguage = request.getLanguage();
+	// basename is the 'base path' for the application - usually a localeCode
+	const basename = requestLanguage === 'en-US' ? '' : `/${requestLanguage}`;
 
 	// request protocol and host might be different from original request that hit proxy
 	// we want to use the proxy's protocol and host
@@ -261,7 +260,7 @@ const makeRenderer = (
 	};
 
 	const createStore = getServerCreateStore(
-		getRouteResolver(routes, baseUrl),
+		getRouteResolver(routes, basename),
 		middleware,
 		request
 	);
@@ -272,7 +271,7 @@ const makeRenderer = (
 		return Promise.resolve({
 			result: getHtml(
 				<Dom
-					baseUrl={baseUrl}
+					basename={basename}
 					assetPublicPath={assetPublicPath}
 					head={Helmet.rewind()}
 					initialState={store.getState()}
@@ -309,7 +308,7 @@ const makeRenderer = (
 			routes,
 			store: initializedStore,
 			location: url,
-			baseUrl,
+			basename,
 			assetPublicPath,
 			scripts,
 			cssLinks,
