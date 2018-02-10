@@ -1,3 +1,8 @@
+## [12.2]
+
+- **Simplified** `makeServerRenderer$` no longer requires a `baseUrl` param - it
+  will be determined from the request directly
+
 ## [12.1]
 
 - **Refactor** `mwp-i18n/lib/withIntl` now expects a map of
