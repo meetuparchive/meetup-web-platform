@@ -110,13 +110,13 @@ const _resolveRouteMatches = (
 };
 
 /*
- * An curried interface into `_resolveRouteMatches`, using `baseUrl`
+ * An curried interface into `_resolveRouteMatches`, using `basename`
  * + `location` instead of `path`
  */
 export const getRouteResolver = (
 	routes: Array<PlatformRoute>,
-	baseUrl: string
+	basename: string
 ) => (location: URL): Promise<Array<MatchedRoute>> => {
-	const path = location.pathname.replace(baseUrl, '');
+	const path = location.pathname.replace(basename, '');
 	return _resolveRouteMatches(routes, path);
 };

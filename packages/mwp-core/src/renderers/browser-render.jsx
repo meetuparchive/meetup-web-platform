@@ -25,7 +25,7 @@ export function resolveAppProps(
 	reducer: Reducer<MWPState, FluxStandardAction>,
 	middleware: Array<Object> = []
 ): Promise<AppProps> {
-	const basename = window.APP_RUNTIME.baseUrl || '';
+	const basename = window.APP_RUNTIME.basename || '';
 	const resolveRoutes = getRouteResolver(routes, basename);
 	const createStore = getBrowserCreateStore(resolveRoutes, middleware);
 	const store = createStore(reducer, getInitialState(window.APP_RUNTIME));
