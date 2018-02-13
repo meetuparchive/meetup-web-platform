@@ -19,7 +19,7 @@ export const generateOrganizationLdJson = (baseUrl, localeCode, route) => {
 	return {
 		'@type': 'Organization',
 		'@context': SCHEMA_ORG,
-		url: url,
+		url,
 		name: DEFAULT_TITLE,
 		logo: MEETUP_SWARM_LOGO_URL,
 		sameAs: [
@@ -72,15 +72,14 @@ export const generateLocationLdJson = venue => {
  * @param {Object} fee Fee data associated with event
  * @return {Object} accumulated json object
  */
-export const generateFeeLdJson = fee => {
-	return {
+export const generateFeeLdJson = fee =>
+	({
 		offers: {
 			'@type': 'Offer',
 			price: fee.amount,
 			priceCurrency: fee.currency,
 		},
-	};
-};
+	});
 
 /**
  * Generated Object of LD-JSON used for search engines to read data on page

@@ -11,14 +11,14 @@ import {
 } from './metaTags';
 
 const MOCK_META = {
-	title: 'mock title',
-	description: 'mock description',
-	keywords: 'mock keywords',
-	baseUrl: 'https://mock-base-url.com',
-	route: '/mock/preview/path',
 	appPath: '/mock/app/path',
+	baseUrl: 'https://mock-base-url.com',
 	imageUrl: 'https://www.meetup.com/mock-default-image.jpg',
 	localeCode: 'fr-FR',
+	pageTitle: 'mock title',
+	pageDescription: 'mock description',
+	pageKeywords: 'mock keywords',
+	route: '/mock/preview/path',
 };
 
 describe('generateMetaData', () => {
@@ -26,7 +26,7 @@ describe('generateMetaData', () => {
 
 	it('should set the title', () => {
 		const titleMeta = metaData.filter(
-			obj => obj.content === MOCK_META.title && obj.property === 'og:title'
+			obj => obj.content === MOCK_META.pageTitle && obj.property === 'og:title'
 		);
 		expect(titleMeta).toHaveLength(1);
 	});
@@ -34,7 +34,7 @@ describe('generateMetaData', () => {
 	it('should set the description', () => {
 		const descriptionMeta = metaData.filter(
 			obj =>
-				obj.content === MOCK_META.description &&
+				obj.content === MOCK_META.pageDescription &&
 				(obj.property === 'og:description' || obj.name === 'description')
 		);
 		expect(descriptionMeta).toHaveLength(2);
@@ -42,7 +42,7 @@ describe('generateMetaData', () => {
 
 	it('should set the keywords', () => {
 		const keywordsMeta = metaData.filter(
-			obj => obj.content === MOCK_META.keywords && obj.name === 'keywords'
+			obj => obj.content === MOCK_META.pageKeywords && obj.name === 'keywords'
 		);
 		expect(keywordsMeta).toHaveLength(1);
 	});
