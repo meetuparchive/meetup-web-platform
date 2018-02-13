@@ -1,0 +1,361 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SEOHead Custom Open Graph data renders custom open graph description 1`] = `
+<meta
+  content="mock custom open graph description"
+  key="meta-6"
+  property="og:description"
+/>
+`;
+
+exports[`SEOHead Custom Open Graph data renders pageDescription as open graph description 1`] = `
+<meta
+  content="mock description"
+  key="meta-6"
+  property="og:description"
+/>
+`;
+
+exports[`SEOHead imageUrl prop usage link image_src tag falls back to meetup script logo when imageUrl is undefined 1`] = `
+<link
+  href="https://secure.meetupstatic.com/s/img/286374644891845767035/logo/meetup-logo-script-1200x630.png"
+  rel="image_src"
+/>
+`;
+
+exports[`SEOHead imageUrl prop usage link image_src tag renders imageUrl 1`] = `
+<link
+  href="https://www.mock-image-url.com/"
+  rel="image_src"
+/>
+`;
+
+exports[`SEOHead imageUrl prop usage og:image tag falls back to meetup script logo when imageUrl is undefined 1`] = `
+<meta
+  content="https://secure.meetupstatic.com/s/img/286374644891845767035/logo/meetup-logo-script-1200x630.png"
+  key="meta-8"
+  property="og:image"
+/>
+`;
+
+exports[`SEOHead imageUrl prop usage og:image tag renders imageUrl 1`] = `
+<meta
+  content="https://www.mock-image-url.com/"
+  key="meta-8"
+  property="og:image"
+/>
+`;
+
+exports[`SEOHead imageUrl prop usage twitter:image tag falls back to meetup script logo when imageUrl is undefined 1`] = `
+<meta
+  content="https://secure.meetupstatic.com/s/img/286374644891845767035/logo/meetup-logo-script-1200x630.png"
+  key="meta-19"
+  property="twitter:image"
+/>
+`;
+
+exports[`SEOHead imageUrl prop usage twitter:image tag renders imageUrl 1`] = `
+<meta
+  content="https://www.mock-image-url.com/"
+  key="meta-19"
+  property="twitter:image"
+/>
+`;
+
+exports[`SEOHead renders component markup 1`] = `
+<HelmetWrapper
+  defaultTitle="Meetup"
+  defer={true}
+  encodeSpecialCharacters={true}
+  titleTemplate="%s | Meetup"
+>
+  <title>
+    mock-page-title
+  </title>
+  <link
+    href="https://www.mock-image-url.com/"
+    rel="image_src"
+  />
+  <meta
+    content="noindex, nofollow"
+    name="robots"
+  />
+  <meta
+    content="mock description"
+    key="meta-0"
+    name="description"
+  />
+  <meta
+    content="mock keywords"
+    key="meta-1"
+    name="keywords"
+  />
+  <meta
+    content="36212898404"
+    key="meta-2"
+    property="fb:app_id"
+  />
+  <meta
+    content="Meetup"
+    key="meta-3"
+    property="og:site_name"
+  />
+  <meta
+    content="article"
+    key="meta-4"
+    property="og:type"
+  />
+  <meta
+    content="mock-page-title"
+    key="meta-5"
+    property="og:title"
+  />
+  <meta
+    content="mock description"
+    key="meta-6"
+    property="og:description"
+  />
+  <meta
+    content="https://baseUrl.com/es-ES/mock/preview/route"
+    key="meta-7"
+    property="og:url"
+  />
+  <meta
+    content="https://www.mock-image-url.com/"
+    key="meta-8"
+    property="og:image"
+  />
+  <meta
+    content="Meetup"
+    key="meta-9"
+    property="al:android:app_name"
+  />
+  <meta
+    content="com.meetup"
+    key="meta-10"
+    property="al:android:package"
+  />
+  <meta
+    content="375990038"
+    key="meta-11"
+    property="al:ios:app_store_id"
+  />
+  <meta
+    content="Meetup"
+    key="meta-12"
+    property="al:ios:app_name"
+  />
+  <meta
+    content="true"
+    key="meta-13"
+    property="al:web:should_fallback"
+  />
+  <meta
+    content="meetup://mock/preview/route"
+    key="meta-14"
+    property="al:android:url"
+  />
+  <meta
+    content="meetup://mock/preview/route"
+    key="meta-15"
+    property="al:ios:url"
+  />
+  <meta
+    content="https://baseUrl.com/es-ES/mock/preview/route"
+    key="meta-16"
+    property="al:web:url"
+  />
+  <meta
+    content="summary_large_image"
+    key="meta-17"
+    property="twitter:card"
+  />
+  <meta
+    content="@meetup"
+    key="meta-18"
+    property="twitter:site"
+  />
+  <meta
+    content="https://www.mock-image-url.com/"
+    key="meta-19"
+    property="twitter:image"
+  />
+  <meta
+    content="mock description"
+    key="meta-20"
+    property="twitter:description"
+  />
+  <meta
+    content="375990038"
+    key="meta-21"
+    property="twitter:app:id:iphone"
+  />
+  <meta
+    content="Meetup"
+    key="meta-22"
+    property="twitter:app:name:iphone"
+  />
+  <meta
+    content="375990038"
+    key="meta-23"
+    property="twitter:app:id:ipad"
+  />
+  <meta
+    content="Meetup"
+    key="meta-24"
+    property="twitter:app:name:ipad"
+  />
+  <meta
+    content="com.meetup"
+    key="meta-25"
+    property="twitter:app:id:googleplay"
+  />
+  <meta
+    content="Meetup"
+    key="meta-26"
+    property="twitter:app:name:googleplay"
+  />
+  <meta
+    key="meta-27"
+    mock="meta"
+  />
+  <meta
+    key="meta-28"
+    more="mock"
+  />
+  <link
+    href="https://baseUrl.com/mock/preview/route"
+    hrefLang="en"
+    key="en-US"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/de-DE/mock/preview/route"
+    hrefLang="de-DE"
+    key="de-DE"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/en-AU/mock/preview/route"
+    hrefLang="en-AU"
+    key="en-AU"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/es/mock/preview/route"
+    hrefLang="es"
+    key="es"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/es-ES/mock/preview/route"
+    hrefLang="es-ES"
+    key="es-ES"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/fr-FR/mock/preview/route"
+    hrefLang="fr-FR"
+    key="fr-FR"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/it-IT/mock/preview/route"
+    hrefLang="it-IT"
+    key="it-IT"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/ja-JP/mock/preview/route"
+    hrefLang="ja-JP"
+    key="ja-JP"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/ko-KR/mock/preview/route"
+    hrefLang="ko-KR"
+    key="ko-KR"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/nl-NL/mock/preview/route"
+    hrefLang="nl-NL"
+    key="nl-NL"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/pt-BR/mock/preview/route"
+    hrefLang="pt-BR"
+    key="pt-BR"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/pl-PL/mock/preview/route"
+    hrefLang="pl-PL"
+    key="pl-PL"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/ru-RU/mock/preview/route"
+    hrefLang="ru-RU"
+    key="ru-RU"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/th-TH/mock/preview/route"
+    hrefLang="th-TH"
+    key="th-TH"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/tr-TR/mock/preview/route"
+    hrefLang="tr-TR"
+    key="tr-TR"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/mock/preview/route"
+    hrefLang="x-default"
+    key="default"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/es-ES/mock/preview/route"
+    key="canonical"
+    rel="canonical"
+  />
+  <script
+    key="ldjson-0"
+    type="application/ld+json"
+  >
+    {"foo":"MOCK_LD_JSON"}
+  </script>
+  <script
+    key="ldjson-1"
+    type="application/ld+json"
+  >
+    {"bar":"MOCK_LD_JSON"}
+  </script>
+</HelmetWrapper>
+`;
+
+exports[`SEOHead robots defaults to robots "on" 1`] = `
+<meta
+  content="index, follow"
+  name="robots"
+/>
+`;
+
+exports[`SEOHead robots explicity turns robots "on" 1`] = `
+<meta
+  content="index, follow"
+  name="robots"
+/>
+`;
+
+exports[`SEOHead robots turns robots "off" 1`] = `
+<meta
+  content="noindex, nofollow"
+  name="robots"
+/>
+`;
