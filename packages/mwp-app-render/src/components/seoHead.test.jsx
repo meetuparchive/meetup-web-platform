@@ -48,52 +48,16 @@ describe('SEOHead', () => {
 			expect(renderComponent(props).find(ogDescriptionSelector)).toMatchSnapshot();
 		});
 	});
-	describe('imageUrl prop usage', () => {
-		describe('og:image tag', () => {
-			it('renders imageUrl', () => {
-				expect(
-					renderComponent().find('meta[property="og:image"]')
-				).toMatchSnapshot();
-			});
-			it('falls back to meetup script logo when imageUrl is undefined', () => {
-				const props = {
-					...MOCK_PROPS,
-					imageUrl: undefined,
-				};
-				expect(
-					renderComponent(props).find('meta[property="og:image"]')
-				).toMatchSnapshot();
-			});
+	describe('imageUrl', () => {
+		it('applies provided imageUrl to og:image, twitter:image and img_src tags', () => {
+			expect(renderComponent()).toMatchSnapshot();
 		});
-		describe('twitter:image tag', () => {
-			it('renders imageUrl', () => {
-				expect(
-					renderComponent().find('meta[property="twitter:image"]')
-				).toMatchSnapshot();
-			});
-			it('falls back to meetup script logo when imageUrl is undefined', () => {
-				const props = {
-					...MOCK_PROPS,
-					imageUrl: undefined,
-				};
-				expect(
-					renderComponent(props).find('meta[property="twitter:image"]')
-				).toMatchSnapshot();
-			});
-		});
-		describe('link image_src tag', () => {
-			it('renders imageUrl', () => {
-				expect(renderComponent().find('link[rel="image_src"]')).toMatchSnapshot();
-			});
-			it('falls back to meetup script logo when imageUrl is undefined', () => {
-				const props = {
-					...MOCK_PROPS,
-					imageUrl: undefined,
-				};
-				expect(
-					renderComponent(props).find('link[rel="image_src"]')
-				).toMatchSnapshot();
-			});
+		it('applies meet script logo to og:image, twitter:image and img_src tags when imageUrl is not provided', () => {
+			const props = {
+				...MOCK_PROPS,
+				imageUrl: undefined,
+			};
+			expect(renderComponent(props)).toMatchSnapshot();
 		});
 	});
 });
