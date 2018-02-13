@@ -31,7 +31,7 @@ user navigation.
 
 ### Cache `/cache.js`
 
-See [the Caching docs](./docs/Caching.md#cache-middleware)
+See [the Caching docs](https://meetup.atlassian.net/wiki/spaces/WEG/pages/243499188/Caching)
 
 #### Disable cache
 
