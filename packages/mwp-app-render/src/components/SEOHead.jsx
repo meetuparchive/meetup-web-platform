@@ -46,14 +46,14 @@ export const SEOHeadComponent = ({
 	const metaData = generateMetaData({
 		appPath: `meetup:/${route}`,
 		baseUrl,
-		description: pageDescription,
+		pageDescription,
 		imageUrl,
 		localeCode,
-		keywords: pageKeywords,
+		pageKeywords,
 		ogTitle,
 		ogDescription,
 		route,
-		title: pageTitle,
+		pageTitle,
 	});
 
 	const metaTags = generateMetaTags([...metaData, ...pageMeta]);
@@ -71,17 +71,9 @@ export const SEOHeadComponent = ({
 		<Helmet defaultTitle="Meetup" titleTemplate="%s | Meetup">
 			<title>{pageTitle}</title>
 			<link rel="image_src" href={imageUrl} />
-
-			{robots ? (
-				<meta name="robots" content="index, follow" />
-			) : (
-				<meta name="robots" content="noindex, nofollow" />
-			)}
-
+			<meta name="robots" content={robots ? 'index, follow' : 'noindex, nofollow'} />
 			{metaTags}
-
 			{canonicalUrlMetaTags}
-
 			{ldJsonTags}
 		</Helmet>
 	);

@@ -32,13 +32,6 @@ const stripAndTruncate = (str = '', charLen = 200) =>
 		.substr(0, charLen);
 
 /**
- * Generates array of just topic names based on array of topic objects passed in
- * @param {Array} topics array of topics
- * @return {Array} simplified array of topic names
- */
-export const getTopicNames = topics => topics.map(topic => topic.name);
-
-/**
  * Generates array of properties off of object based on array of keys passed
  * @param {Object} item object to get values from
  * @param {Array} keys keys to pull values with
@@ -54,7 +47,7 @@ export const getKeywordsByProperties = (item, keys) =>
  */
 export const getGroupKeywords = group => {
 	const topics = group.topics || [];
-	const topicKeywords = getTopicNames(topics);
+	const topicKeywords = topics => topics.map(topic => topic.name);
 	const groupKeys = ['name', 'city', 'state', 'country'];
 	return [...topicKeywords, ...getKeywordsByProperties(group, groupKeys)].join(',');
 };
@@ -64,40 +57,40 @@ export const generateMetaTags = tags =>
 
 /**
  * Generates array of basic common meta data for all pages
- * @param {String} options.title title for the current page
- * @param {String} options.description description for the current page
- * @param {String} options.ogTitle title for og:title
- * @param {String} options.ogDescription title for og:description
- * @param {String} options.ogImageUrl path to image for og:image
- * @param {String} options.twitterImageUrl path to twitter image for sharing
- * @param {String} options.keywords keywords for the current page
- * @param {String} options.baseUrl base url of the current page
- * @param {String} options.url path of the current page
  * @param {String} options.appPath current pages path in apps
+ * @param {String} options.baseUrl base url of the current page
+ * @param {String} imageUrl An image url that will be applied to several meta tags
+ * @param {String} localCode The current localeCode
+ * @param {String} options.ogDescription title for og:description
+ * @param {String} options.ogTitle title for og:title
+ * @param {String} options.pageDescription pageDescription for the current page
+ * @param {String} options.pageKeywords pageKeywords for the current page
+ * @param {String} options.pageTitle pageTitle for the current page
+ * @param {String} route The current route
  * @return {Array} array of meta objects or use by Helmet
  */
 export const generateMetaData = ({
-	title,
-	description,
-	ogTitle,
-	ogDescription,
-	imageUrl,
-	keywords,
-	baseUrl,
-	route,
 	appPath,
+	baseUrl,
+	imageUrl,
 	localeCode,
+	ogDescription,
+	ogTitle,
+	pageDescription,
+	pageKeywords,
+	pageTitle,
+	route,
 }) => {
-	const desc = stripAndTruncate(description);
+	const desc = stripAndTruncate(pageDescription);
 	const ogDesc = stripAndTruncate(ogDescription);
 
 	return [
 		{ name: 'description', content: desc },
-		{ name: 'keywords', content: keywords },
+		{ name: 'keywords', content: pageKeywords },
 		{ property: 'fb:app_id', content: FB_APP_ID },
 		{ property: 'og:site_name', content: 'Meetup' },
 		{ property: 'og:type', content: 'article' },
-		{ property: 'og:title', content: ogTitle || title },
+		{ property: 'og:title', content: ogTitle || pageTitle },
 		{ property: 'og:description', content: ogDesc || desc },
 		baseUrl && {
 			property: 'og:url',
