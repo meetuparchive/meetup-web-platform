@@ -1,3 +1,5 @@
+import React from 'react';
+import { shallow } from 'enzyme';
 import locales from 'mwp-config/locales'
 
 import {
@@ -5,50 +7,27 @@ import {
 } from './links';
 
 describe('generateCanonicalUrlMetaTags', () => {
+	const MOCK_BASE_URL = 'http://www.mock-base-url.com';
+	const MOCK_ROUTE = '/mockroute';
+	const MOCK_LOCALE_CODE = 'fr-FR';
+
 	it('should generate locale <link />s for all locales', () => {
-		const baseUrl = 'http://www.amaraisthecutest.cat',
-			route = '/samsonite-incorporated';
-		const canonicalUrls = generateCanonicalUrlMetaTags(baseUrl, '', route);
-		// + 2 for default canonical links
-		expect(canonicalUrls).toHaveLength(locales.length + 2);
+		const canonicalUrlMetaTags = generateCanonicalUrlMetaTags(MOCK_BASE_URL, 'en-US', MOCK_ROUTE);
+		expect(canonicalUrlMetaTags).toMatchSnapshot();
 	});
 
-	it('should generate a canonical url with locale if *not* en-US', () => {
-		const baseUrl = 'http://www.amaraisthecutest.cat',
-			localeCode = 'fr-FR',
-			route = '/samsonite-incorporated';
-		const processedObj = generateCanonicalUrlMetaTags(baseUrl, localeCode, route);
-		const filterArr = processedObj.filter(
-			element =>
-				element.props.rel === 'canonical' &&
-				element.props.href === `${baseUrl}/${localeCode}${route}`
-		);
-		expect(filterArr).toHaveLength(1);
+	it('should generate a canonical link tag with locale if *not* en-US', () => {
+		const canonicalUrlMetaTags = generateCanonicalUrlMetaTags(MOCK_BASE_URL, MOCK_LOCALE_CODE, MOCK_ROUTE);
+		expect(canonicalUrlMetaTags.filter(el => el.props.rel === 'canonical')).toMatchSnapshot();
 	});
 
-	it('should generate a canonical url without locale if en-US', () => {
-		const baseUrl = 'http://www.amaraisthecutest.cat',
-			localeCode = 'en-US',
-			route = '/samsonite-incorporated';
-		const processedObj = generateCanonicalUrlMetaTags(baseUrl, localeCode, route);
-		const filterArr = processedObj.filter(
-			element =>
-				element.props.rel === 'canonical' &&
-				element.props.href === `${baseUrl}${route}`
-		);
-		expect(filterArr).toHaveLength(1);
+	it('should generate a canonical link tag without locale if en-US', () => {
+		const canonicalUrlMetaTags = generateCanonicalUrlMetaTags(MOCK_BASE_URL, 'en-US', MOCK_ROUTE);
+		expect(canonicalUrlMetaTags.filter(el => el.props.rel === 'canonical')).toMatchSnapshot();
 	});
 
-	it('should generate a x-default url', () => {
-		const baseUrl = 'http://www.amaraisthecutest.cat',
-			localeCode = 'fr-FR',
-			route = '/samsonite-incorporated';
-		const processedObj = generateCanonicalUrlMetaTags(baseUrl, localeCode, route);
-		const filterArr = processedObj.filter(
-			element =>
-				element.props.hrefLang === 'x-default' &&
-				element.props.href === `${baseUrl}${route}`
-		);
-		expect(filterArr).toHaveLength(1);
+	it('should generate a x-default url that is baseUrl + route', () => {
+		const canonicalUrlMetaTags = generateCanonicalUrlMetaTags(MOCK_BASE_URL, MOCK_LOCALE_CODE, MOCK_ROUTE);
+		expect(canonicalUrlMetaTags.filter(el => el.props.hrefLang === 'x-default')).toMatchSnapshot();
 	});
 });
