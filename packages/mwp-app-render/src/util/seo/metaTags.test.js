@@ -3,23 +3,37 @@ import { shallow } from 'enzyme';
 
 import {
 	generateMetaData,
+	generateMetaTags,
 	generateGeoMetaData,
 } from './metaTags';
 
+const MOCK_META = {
+	appPath: '/mock/app/path',
+	baseUrl: 'https://mock-base-url.com',
+	imageUrl: 'https://www.meetup.com/mock-default-image.jpg',
+	localeCode: 'fr-FR',
+	pageTitle: 'mock title',
+	pageDescription: 'mock description',
+	pageKeywords: 'mock,keywords,comma,separated',
+	route: '/mock/preview/path',
+};
+
 describe('generateMetaData', () => {
 	it('matches snap', () => {
-		const MOCK_META = {
-			appPath: '/mock/app/path',
-			baseUrl: 'https://mock-base-url.com',
-			imageUrl: 'https://www.meetup.com/mock-default-image.jpg',
-			localeCode: 'fr-FR',
-			pageTitle: 'mock title',
-			pageDescription: 'mock description',
-			pageKeywords: 'mock,keywords,comma,separated',
-			route: '/mock/preview/path',
-		};
 		const metaData = generateMetaData(MOCK_META);
 		expect(metaData).toMatchSnapshot();
+	});
+	it('should exlude meta entries with missing content', () => {
+		const emptyMetaData = generateMetaData([{property: 'mockProp2', content: undefined}, {property: 'mockProp2', content: ''}]);
+		expect(emptyMetaData).toMatchSnapshot();
+	});
+});
+
+describe('generateMetaTags', () => {
+	it('matches snapshot', () => {
+		const metaData = generateMetaData(MOCK_META);
+		const metaTags = generateMetaTags(metaData);
+		expect(metaTags).toMatchSnapshot();
 	});
 });
 
