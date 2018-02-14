@@ -119,7 +119,7 @@ export const generateMetaData = ({
 		{ property: 'twitter:app:name:ipad', content: 'Meetup' },
 		{ property: 'twitter:app:id:googleplay', content: 'com.meetup' },
 		{ property: 'twitter:app:name:googleplay', content: 'Meetup' },
-	].filter(metaEntry => metaEntry !== undefined && metaEntry !== '');
+	].filter(metaEntry => metaEntry && metaEntry.content);
 };
 
 /**
@@ -132,12 +132,10 @@ export const generateMetaData = ({
  * @return {Array} array of meta objects for use by Helmet
  */
 export const generateGeoMetaData = ({ lat, lon, city, state, country }) => {
-	const place = [city, state, country]
-		.filter(k => k !== '' && k !== undefined)
-		.join(', ');
+	const place = [city, state, country].filter(place => place).join(', ');
 	return [
 		lat && lon && { property: 'geo.position', content: `${lat};${lon}` }, // MUP coordinates
 		{ property: 'geo.placename', content: place },
 		{ property: 'geo.region', content: country },
-	].filter(metaEntry => metaEntry !== undefined && metaEntry !== '');
+	].filter(metaEntry => metaEntry && metaEntry.content);
 };
