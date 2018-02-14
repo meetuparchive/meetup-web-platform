@@ -1,0 +1,118 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`generateCanonicalUrlMetaTags should generate a canonical link tag with locale if *not* en-US 1`] = `
+Array [
+  <link
+    href="http://www.mock-base-url.com/fr-FR/mockroute"
+    rel="canonical"
+/>,
+]
+`;
+
+exports[`generateCanonicalUrlMetaTags should generate a canonical link tag without locale if en-US 1`] = `
+Array [
+  <link
+    href="http://www.mock-base-url.com/mockroute"
+    rel="canonical"
+/>,
+]
+`;
+
+exports[`generateCanonicalUrlMetaTags should generate a x-default url that is baseUrl + route 1`] = `
+Array [
+  <link
+    href="http://www.mock-base-url.com/mockroute"
+    hrefLang="x-default"
+    rel="alternate"
+/>,
+]
+`;
+
+exports[`generateCanonicalUrlMetaTags should generate locale <link />s for all locales 1`] = `
+Array [
+  <link
+    href="http://www.mock-base-url.com/mockroute"
+    hrefLang="en"
+    rel="alternate"
+/>,
+  <link
+    href="http://www.mock-base-url.com/de-DE/mockroute"
+    hrefLang="de-DE"
+    rel="alternate"
+/>,
+  <link
+    href="http://www.mock-base-url.com/en-AU/mockroute"
+    hrefLang="en-AU"
+    rel="alternate"
+/>,
+  <link
+    href="http://www.mock-base-url.com/es/mockroute"
+    hrefLang="es"
+    rel="alternate"
+/>,
+  <link
+    href="http://www.mock-base-url.com/es-ES/mockroute"
+    hrefLang="es-ES"
+    rel="alternate"
+/>,
+  <link
+    href="http://www.mock-base-url.com/fr-FR/mockroute"
+    hrefLang="fr-FR"
+    rel="alternate"
+/>,
+  <link
+    href="http://www.mock-base-url.com/it-IT/mockroute"
+    hrefLang="it-IT"
+    rel="alternate"
+/>,
+  <link
+    href="http://www.mock-base-url.com/ja-JP/mockroute"
+    hrefLang="ja-JP"
+    rel="alternate"
+/>,
+  <link
+    href="http://www.mock-base-url.com/ko-KR/mockroute"
+    hrefLang="ko-KR"
+    rel="alternate"
+/>,
+  <link
+    href="http://www.mock-base-url.com/nl-NL/mockroute"
+    hrefLang="nl-NL"
+    rel="alternate"
+/>,
+  <link
+    href="http://www.mock-base-url.com/pt-BR/mockroute"
+    hrefLang="pt-BR"
+    rel="alternate"
+/>,
+  <link
+    href="http://www.mock-base-url.com/pl-PL/mockroute"
+    hrefLang="pl-PL"
+    rel="alternate"
+/>,
+  <link
+    href="http://www.mock-base-url.com/ru-RU/mockroute"
+    hrefLang="ru-RU"
+    rel="alternate"
+/>,
+  <link
+    href="http://www.mock-base-url.com/th-TH/mockroute"
+    hrefLang="th-TH"
+    rel="alternate"
+/>,
+  <link
+    href="http://www.mock-base-url.com/tr-TR/mockroute"
+    hrefLang="tr-TR"
+    rel="alternate"
+/>,
+  <link
+    href="http://www.mock-base-url.com/mockroute"
+    hrefLang="x-default"
+    rel="alternate"
+/>,
+  <link
+    href="http://www.mock-base-url.com/mockroute"
+    rel="canonical"
+/>,
+]
+`;
