@@ -23,7 +23,7 @@ export const generateCanonicalUrl = (baseUrl, localeCode, route) => {
  * @param  {String} route   redux'd route to the current page
  * @return {Array}  array of React.element's
  */
-export const generateCanonicalUrlMetaTags = (baseUrl, localeCode, route) => {
+export const generateCanonicalUrlLinkTags = (baseUrl, localeCode, route) => {
 	const localeLinks = locales.map(locale => (
 		<link
 			rel="alternate"

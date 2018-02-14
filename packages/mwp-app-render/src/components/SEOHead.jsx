@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Helmet from 'react-helmet';
 
 import { DEFAULT_TITLE } from 'mwp-app-render/src/util/seo/ldJson';
-import { generateCanonicalUrlMetaTags } from 'mwp-app-render/src/util/seo/links';
+import { generateCanonicalUrlLinkTags } from 'mwp-app-render/src/util/seo/links';
 import {
 	DEFAULT_IMAGE_URL,
 	generateMetaData,
@@ -58,7 +58,7 @@ export const SEOHeadComponent = ({
 
 	const metaTags = generateMetaTags([...metaData, ...pageMeta]);
 
-	const canonicalUrlMetaTags = generateCanonicalUrlMetaTags(baseUrl, localeCode, route);
+	const canonicalUrlLinkTags = generateCanonicalUrlLinkTags(baseUrl, localeCode, route);
 
 	const ldJsonTags = ldJson.map((jsonObj, index) => (
 		// eslint-disable-next-line react/no-array-index-key
@@ -73,7 +73,7 @@ export const SEOHeadComponent = ({
 			<link rel="image_src" href={imageUrl} />
 			<meta name="robots" content={robots ? 'index, follow' : 'noindex, nofollow'} />
 			{metaTags}
-			{canonicalUrlMetaTags}
+			{canonicalUrlLinkTags}
 			{ldJsonTags}
 		</Helmet>
 	);
