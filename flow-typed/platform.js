@@ -1,12 +1,11 @@
 // @flow
 declare var Intl: Object;
 
-
 declare type MatchMedia = {
-  isAtSmallUp: boolean,
-  isAtMediumUp: boolean,
-  isAtLargeUp: boolean,
-}
+	isAtSmallUp: boolean,
+	isAtMediumUp: boolean,
+	isAtLargeUp: boolean,
+};
 
 declare type MWPState = {
 	api: ApiState,
@@ -65,11 +64,9 @@ HapiReplyFn.code = (code: number) => HapiReplyFn;
 HapiReplyFn.redirect = (url: string) => ({
 	permanent: (isPermanent: ?boolean) => HapiReplyFn,
 });
-HapiReplyFn.state = (
-	key: string,
-	value: string,
-	opts: ?{ [string]: any }
-) => {};
+HapiReplyFn.state = (key: string, value: string, opts: ?{ [string]: any }) =>
+	HapiReplyFn;
+HapiReplyFn.header = (key: string, value: string) => HapiReplyFn;
 
 declare type HapiReply = typeof HapiReplyFn;
 
