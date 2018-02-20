@@ -1,6 +1,11 @@
 import { MOCK_EVENT } from 'meetup-web-mocks/lib/api';
 
-import * as ldJson from './ldJson';
+import {
+	generateFeeLdJson,
+	generateLocationLdJson,
+	generateOrganizationLdJson,
+	generateEventLdJson,
+} from './ldJson';
 
 const MOCK_VENUE = {
 	name: 'some place',
@@ -19,18 +24,16 @@ const MOCK_FEE = {
 	currency: 'USD',
 };
 
-ldJson.convertToLocalTime = jest.fn(() => new Date('2027-01-31T04:20:12.142Z'));
-
 describe('generateFeeLdJson', () => {
 	it('should generate a ld+json object for offers', () => {
-		const processedObj = ldJson.generateFeeLdJson(MOCK_FEE);
+		const processedObj = generateFeeLdJson(MOCK_FEE);
 		expect(processedObj).toMatchSnapshot();
 	});
 });
 
 describe('generateLocationLdJson', () => {
 	it('should generate a ld+json object for location', () => {
-		const processedObj = ldJson.generateLocationLdJson(MOCK_VENUE);
+		const processedObj = generateLocationLdJson(MOCK_VENUE);
 		expect(processedObj).toMatchSnapshot();
 	});
 });
@@ -43,7 +46,7 @@ describe('generateEventLdJson', () => {
 			MOCK_VENUE,
 			MOCK_FEE,
 		};
-		const processedObj = ldJson.generateEventLdJson(event);
+		const processedObj = generateEventLdJson(event);
 		expect(processedObj).toMatchSnapshot();
 	});
 });
@@ -53,7 +56,7 @@ describe('generateOrganizationLdJson', () => {
 		const baseUrl = 'http://www.craaazyurl.com';
 		const localeCode = 'es';
 		const route = '/woooo';
-		const json = ldJson.generateOrganizationLdJson(baseUrl, localeCode, route);
+		const json = generateOrganizationLdJson(baseUrl, localeCode, route);
 		expect(json).toHaveProperty('@type');
 		expect(json).toHaveProperty('@context');
 		expect(json).toHaveProperty('url');
@@ -67,7 +70,7 @@ describe('generateOrganizationLdJson', () => {
 		const baseUrl = 'http://www.craaazyurl.com';
 		const localeCode = 'fr-FR';
 		const route = '/woooo';
-		const json = ldJson.generateOrganizationLdJson(baseUrl, localeCode, route);
+		const json = generateOrganizationLdJson(baseUrl, localeCode, route);
 		const facebookLink = json.sameAs[0];
 		const twitterLink = json.sameAs[1];
 		expect(json.url).toBe(`${baseUrl}/${localeCode}${route}`);

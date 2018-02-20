@@ -88,9 +88,11 @@ export const generateFeeLdJson = fee =>
  * @return {Object} accumulated json object
  */
 export const generateEventLdJson = eventInfo => {
-	const startDate =
-		eventInfo.time &&
-		convertToLocalTime(eventInfo.time, eventInfo.utc_offset).toISOString();
+	const eventDate = eventInfo.time && new Date(eventInfo.time);
+	// strip second/millisecond/timezone info, replace with explicit zero-offset
+	// this will create a startDate in this format 2018-02-23T18:00+00:00
+	const startDate = eventDate && eventDate.toISOString().replace(/:[^:]+$/, '+00:00');
+
 	const offers = eventInfo.fee ? generateFeeLdJson(eventInfo.fee) : {};
 	const location = eventInfo.venue ? generateLocationLdJson(eventInfo.venue) : {};
 
@@ -111,23 +113,4 @@ export const generateEventLdJson = eventInfo => {
 		...location,
 		...offers,
 	};
-};
-
-/**
- * NOTE: This was lifted from mup-web's src/app/group/groupDateConversionUtils.js and should probably not reside in both repos for long
- * Returns a Date object that offsets the supplied UTC time, correcting for the runtime environment's current UTC offset.
- * @param {Number} time millisecond value of event time stored relative to the servers time (which is nyc)
- * @param {Number} offset millisecond value of offset of chapters location also provided in milliseconds
- * @return {Date} date object which has applied utc offset to generate "local" time
- */
-export const convertToLocalTime = (time, offset = 0) => {
-        // Takes in desired date to convert and applies offset
-        const eventTime = new Date(time + offset);
-        // generates new date object taking the time in milliseconds and
-        // adds the runtime environment's timezone offset
-        const localDate = new Date(
-                eventTime.getTime() + eventTime.getTimezoneOffset() * 60000
-        );
-
-        return localDate;
 };
