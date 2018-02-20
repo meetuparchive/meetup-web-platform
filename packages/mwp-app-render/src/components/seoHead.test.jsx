@@ -39,19 +39,12 @@ describe('SEOHead', () => {
 		});
 	});
 	describe('Custom Open Graph data', () => {
-		const ogDescriptionSelector = 'meta[property="og:description"]';
-		it('renders pageDescription as open graph description', () => {
-			expect(renderComponent().find(ogDescriptionSelector)).toMatchSnapshot();
-		});
 		it('renders custom open graph description', () => {
 			const props = {...MOCK_PROPS, ogDescription: 'mock custom open graph description' };
-			expect(renderComponent(props).find(ogDescriptionSelector)).toMatchSnapshot();
+			expect(renderComponent(props).find('meta[property="og:description"]')).toMatchSnapshot();
 		});
 	});
 	describe('imageUrl', () => {
-		it('applies provided imageUrl to og:image, twitter:image and img_src tags', () => {
-			expect(renderComponent()).toMatchSnapshot();
-		});
 		it('applies meet script logo to og:image, twitter:image and img_src tags when imageUrl is not provided', () => {
 			const props = {
 				...MOCK_PROPS,
