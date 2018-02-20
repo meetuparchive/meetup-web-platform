@@ -17,19 +17,6 @@ Array [
 ]
 `;
 
-exports[`generateGeoMetaData should *not* set geo.position when lat or lon are missing 1`] = `
-Array [
-  Object {
-    "content": "mock-city, mock-state, mock-country",
-    "property": "geo.placename",
-  },
-  Object {
-    "content": "mock-country",
-    "property": "geo.region",
-  },
-]
-`;
-
 exports[`generateGeoMetaData should exclude state and country from geo.placename when not provided 1`] = `
 Array [
   Object {

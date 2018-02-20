@@ -53,7 +53,11 @@ describe('generateGeoMetaData', () => {
 		const mockGeo = { ...MOCK_GEO };
 		delete mockGeo.lat;
 		const geoMetaData = generateGeoMetaData(mockGeo);
-		expect(geoMetaData).toMatchSnapshot();
+		expect(geoMetaData).not.toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({property: 'geo.postion'})
+			])
+		);
 	});
 	it('should exclude state and country from geo.placename when not provided', () => {
 		const mockGeo = { ...MOCK_GEO };
