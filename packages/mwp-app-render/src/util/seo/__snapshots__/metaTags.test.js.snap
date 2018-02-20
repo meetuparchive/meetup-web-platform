@@ -1,0 +1,343 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`generateGeoMetaData matches snap 1`] = `
+Array [
+  Object {
+    "content": "mock-lat;mock-lon",
+    "property": "geo.position",
+  },
+  Object {
+    "content": "mock-city, mock-state, mock-country",
+    "property": "geo.placename",
+  },
+  Object {
+    "content": "mock-country",
+    "property": "geo.region",
+  },
+]
+`;
+
+exports[`generateGeoMetaData should exclude state and country from geo.placename when not provided 1`] = `
+Array [
+  Object {
+    "content": "mock-lat;mock-lon",
+    "property": "geo.position",
+  },
+  Object {
+    "content": "mock-city",
+    "property": "geo.placename",
+  },
+]
+`;
+
+exports[`generateGeoMetaData should exclude state from geo.placename when not provided 1`] = `
+Array [
+  Object {
+    "content": "mock-lat;mock-lon",
+    "property": "geo.position",
+  },
+  Object {
+    "content": "mock-city, mock-country",
+    "property": "geo.placename",
+  },
+  Object {
+    "content": "mock-country",
+    "property": "geo.region",
+  },
+]
+`;
+
+exports[`generateMetaData matches snap 1`] = `
+Array [
+  Object {
+    "content": "mock description",
+    "name": "description",
+  },
+  Object {
+    "content": "mock,keywords,comma,separated",
+    "name": "keywords",
+  },
+  Object {
+    "content": "36212898404",
+    "property": "fb:app_id",
+  },
+  Object {
+    "content": "Meetup",
+    "property": "og:site_name",
+  },
+  Object {
+    "content": "article",
+    "property": "og:type",
+  },
+  Object {
+    "content": "mock title",
+    "property": "og:title",
+  },
+  Object {
+    "content": "mock description",
+    "property": "og:description",
+  },
+  Object {
+    "content": "https://mock-base-url.com/fr-FR/mock/preview/path",
+    "property": "og:url",
+  },
+  Object {
+    "content": "https://www.meetup.com/mock-default-image.jpg",
+    "property": "og:image",
+  },
+  Object {
+    "content": "Meetup",
+    "property": "al:android:app_name",
+  },
+  Object {
+    "content": "com.meetup",
+    "property": "al:android:package",
+  },
+  Object {
+    "content": "375990038",
+    "property": "al:ios:app_store_id",
+  },
+  Object {
+    "content": "Meetup",
+    "property": "al:ios:app_name",
+  },
+  Object {
+    "content": "true",
+    "property": "al:web:should_fallback",
+  },
+  Object {
+    "content": "/mock/app/path",
+    "property": "al:android:url",
+  },
+  Object {
+    "content": "/mock/app/path",
+    "property": "al:ios:url",
+  },
+  Object {
+    "content": "https://mock-base-url.com/fr-FR/mock/preview/path",
+    "property": "al:web:url",
+  },
+  Object {
+    "content": "summary_large_image",
+    "property": "twitter:card",
+  },
+  Object {
+    "content": "@meetup",
+    "property": "twitter:site",
+  },
+  Object {
+    "content": "https://www.meetup.com/mock-default-image.jpg",
+    "property": "twitter:image",
+  },
+  Object {
+    "content": "mock description",
+    "property": "twitter:description",
+  },
+  Object {
+    "content": "375990038",
+    "property": "twitter:app:id:iphone",
+  },
+  Object {
+    "content": "Meetup",
+    "property": "twitter:app:name:iphone",
+  },
+  Object {
+    "content": "375990038",
+    "property": "twitter:app:id:ipad",
+  },
+  Object {
+    "content": "Meetup",
+    "property": "twitter:app:name:ipad",
+  },
+  Object {
+    "content": "com.meetup",
+    "property": "twitter:app:id:googleplay",
+  },
+  Object {
+    "content": "Meetup",
+    "property": "twitter:app:name:googleplay",
+  },
+]
+`;
+
+exports[`generateMetaData should exlude meta entries with missing content 1`] = `
+Array [
+  Object {
+    "content": "36212898404",
+    "property": "fb:app_id",
+  },
+  Object {
+    "content": "Meetup",
+    "property": "og:site_name",
+  },
+  Object {
+    "content": "article",
+    "property": "og:type",
+  },
+  Object {
+    "content": "Meetup",
+    "property": "al:android:app_name",
+  },
+  Object {
+    "content": "com.meetup",
+    "property": "al:android:package",
+  },
+  Object {
+    "content": "375990038",
+    "property": "al:ios:app_store_id",
+  },
+  Object {
+    "content": "Meetup",
+    "property": "al:ios:app_name",
+  },
+  Object {
+    "content": "true",
+    "property": "al:web:should_fallback",
+  },
+  Object {
+    "content": "summary_large_image",
+    "property": "twitter:card",
+  },
+  Object {
+    "content": "@meetup",
+    "property": "twitter:site",
+  },
+  Object {
+    "content": "375990038",
+    "property": "twitter:app:id:iphone",
+  },
+  Object {
+    "content": "Meetup",
+    "property": "twitter:app:name:iphone",
+  },
+  Object {
+    "content": "375990038",
+    "property": "twitter:app:id:ipad",
+  },
+  Object {
+    "content": "Meetup",
+    "property": "twitter:app:name:ipad",
+  },
+  Object {
+    "content": "com.meetup",
+    "property": "twitter:app:id:googleplay",
+  },
+  Object {
+    "content": "Meetup",
+    "property": "twitter:app:name:googleplay",
+  },
+]
+`;
+
+exports[`generateMetaTags matches snapshot 1`] = `
+Array [
+  <meta
+    content="mock description"
+    name="description"
+/>,
+  <meta
+    content="mock,keywords,comma,separated"
+    name="keywords"
+/>,
+  <meta
+    content="36212898404"
+    property="fb:app_id"
+/>,
+  <meta
+    content="Meetup"
+    property="og:site_name"
+/>,
+  <meta
+    content="article"
+    property="og:type"
+/>,
+  <meta
+    content="mock title"
+    property="og:title"
+/>,
+  <meta
+    content="mock description"
+    property="og:description"
+/>,
+  <meta
+    content="https://mock-base-url.com/fr-FR/mock/preview/path"
+    property="og:url"
+/>,
+  <meta
+    content="https://www.meetup.com/mock-default-image.jpg"
+    property="og:image"
+/>,
+  <meta
+    content="Meetup"
+    property="al:android:app_name"
+/>,
+  <meta
+    content="com.meetup"
+    property="al:android:package"
+/>,
+  <meta
+    content="375990038"
+    property="al:ios:app_store_id"
+/>,
+  <meta
+    content="Meetup"
+    property="al:ios:app_name"
+/>,
+  <meta
+    content="true"
+    property="al:web:should_fallback"
+/>,
+  <meta
+    content="/mock/app/path"
+    property="al:android:url"
+/>,
+  <meta
+    content="/mock/app/path"
+    property="al:ios:url"
+/>,
+  <meta
+    content="https://mock-base-url.com/fr-FR/mock/preview/path"
+    property="al:web:url"
+/>,
+  <meta
+    content="summary_large_image"
+    property="twitter:card"
+/>,
+  <meta
+    content="@meetup"
+    property="twitter:site"
+/>,
+  <meta
+    content="https://www.meetup.com/mock-default-image.jpg"
+    property="twitter:image"
+/>,
+  <meta
+    content="mock description"
+    property="twitter:description"
+/>,
+  <meta
+    content="375990038"
+    property="twitter:app:id:iphone"
+/>,
+  <meta
+    content="Meetup"
+    property="twitter:app:name:iphone"
+/>,
+  <meta
+    content="375990038"
+    property="twitter:app:id:ipad"
+/>,
+  <meta
+    content="Meetup"
+    property="twitter:app:name:ipad"
+/>,
+  <meta
+    content="com.meetup"
+    property="twitter:app:id:googleplay"
+/>,
+  <meta
+    content="Meetup"
+    property="twitter:app:name:googleplay"
+/>,
+]
+`;
