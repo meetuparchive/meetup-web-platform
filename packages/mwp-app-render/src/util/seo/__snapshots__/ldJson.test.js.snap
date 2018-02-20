@@ -30,7 +30,7 @@ Object {
     "price": 10,
     "priceCurrency": "USD",
   },
-  "startDate": "1970-01-18T16:01:24.510Z",
+  "startDate": "1970-01-18T09:01+00:00",
   "url": undefined,
 }
 `;
