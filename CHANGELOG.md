@@ -1,3 +1,7 @@
+## [12.3]
+
+- **New feature** `SEOHead` a component for rendering SEO content in the document head. Also adds related utils under `src/util/seo`. [WP-532](https://meetup.atlassian.net/browse/WP-532)
+
 ## [12.2]
 
 - **Simplified** `makeServerRenderer$` no longer requires a `baseUrl` param - it
