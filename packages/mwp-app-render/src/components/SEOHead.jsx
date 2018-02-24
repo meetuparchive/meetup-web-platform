@@ -2,13 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Helmet from 'react-helmet';
 
-import { DEFAULT_TITLE } from 'mwp-app-render/src/util/seo/ldJson';
-import { generateCanonicalUrlLinkTags } from 'mwp-app-render/src/util/seo/links';
+import { DEFAULT_TITLE } from '../util/seo/ldJson';
+import { generateCanonicalUrlLinkTags } from '../util/seo/links';
 import {
 	DEFAULT_IMAGE_URL,
 	generateMetaData,
 	generateMetaTags,
-} from 'mwp-app-render/src/util/seo/metaTags';
+} from '../util/seo/metaTags';
 
 /**
  * Component for rendering SEO content in the document's head
