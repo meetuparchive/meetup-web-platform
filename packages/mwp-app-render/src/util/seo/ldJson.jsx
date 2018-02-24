@@ -1,5 +1,5 @@
 import { generateCanonicalUrl } from './links';
-import { getSocialLinks } from 'mwp-app-render/src/util/socialHelper';
+import { getSocialLinks } from '../../util/socialHelper';
 
 export const DEFAULT_TITLE = 'Meetup';
 export const SCHEMA_ORG = 'http://schema.org';
