@@ -1,5 +1,5 @@
 import React from 'react';
-import { getSocialLinks } from 'mwp-app-render/src/util/socialHelper';
+import { getSocialLinks } from '../../util/socialHelper';
 import { generateCanonicalUrl } from './links';
 
 export const FB_APP_ID =
