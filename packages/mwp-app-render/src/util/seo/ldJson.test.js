@@ -5,6 +5,7 @@ import {
 	generateLocationLdJson,
 	generateOrganizationLdJson,
 	generateEventLdJson,
+	generateEventDateForSeo,
 } from './ldJson';
 
 const MOCK_VENUE = {
@@ -76,5 +77,39 @@ describe('generateOrganizationLdJson', () => {
 		expect(json.url).toBe(`${baseUrl}/${localeCode}${route}`);
 		expect(facebookLink).toBe('https://www.facebook.com/MeetupFR/');
 		expect(twitterLink).toBe('https://twitter.com/MeetupFR/');
+	});
+});
+
+describe('generateEventDateForSeo', () => {
+	it('should generate date to Google SEO specs', () => {
+		const timeUTC = 1559752200000; // fixed millisecond value
+		const offset = -18000000; // Eastern Time
+
+		const formattedDate = generateEventDateForSeo(timeUTC, offset);
+		expect(formattedDate).toBe('2019-06-05T11:30-05:00');
+	});
+
+	it('should generate date with a default of +00:00 timezone if offset is undefined', () => {
+		const timeUTC = 1559752200000; // fixed millisecond value
+		const offset = undefined;
+
+		const formattedDate = generateEventDateForSeo(timeUTC, offset);
+		expect(formattedDate).toBe('2019-06-05T16:30+00:00');
+	});
+
+	it('should generate date correctly for 30 min off timezones', () => {
+		const timeUTC = 1559752200000; // fixed millisecond value
+		const offset = 19800000; // India + Sri Lanka
+
+		const formattedDate = generateEventDateForSeo(timeUTC, offset);
+		expect(formattedDate).toBe('2019-06-05T22:00+05:30');
+	});
+
+	it('should generate date correctly for 45 min off timezones', () => {
+		const timeUTC = 1559752200000; // fixed millisecond value
+		const offset = 31500000; // Australia/Eucla
+
+		const formattedDate = generateEventDateForSeo(timeUTC, offset);
+		expect(formattedDate).toBe('2019-06-06T01:15+08:45');
 	});
 });
