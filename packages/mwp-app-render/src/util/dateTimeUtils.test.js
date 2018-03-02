@@ -40,7 +40,7 @@ describe('convertToLocalTime', () => {
 		const expectedTime = timeUTC + eventOffset + runtimeOffset;
 		expect(convertToLocalTime(timeUTC, eventOffset).getTime()).toBe(expectedTime);
 	});
-	it('should return expected date value based on time is provided with no offset', () => {
+	it('should return expected date value based on time when convertToLocalTime is not passed an offset arg', () => {
 		const expectedTime =
 			timeUTC + new Date(timeUTC).getTimezoneOffset() * 60 * 1000;
 		expect(convertToLocalTime(timeUTC).getTime()).toBe(expectedTime);
