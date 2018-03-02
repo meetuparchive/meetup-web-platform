@@ -29,7 +29,7 @@ describe('padNumber', () => {
 describe('getFormattedTime', () => {
 	it('should return a local time string in the format: `HH:MM:SS`', () => {
 		// Regex for formatted string `HH:MM:SS`
-		const regExp = new RegExp(/\d{2}:\d{2}:\d{2}/);
+		const regExp = /^\d{2}:\d{2}:\d{2}$/;
 		const date = new Date();
 		expect(getFormattedTime(date)).toMatch(regExp);
 	});
