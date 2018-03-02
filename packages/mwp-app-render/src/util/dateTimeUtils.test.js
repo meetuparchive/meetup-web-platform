@@ -11,13 +11,17 @@ const runtimeOffset = runtimeDate.getTimezoneOffset() * 60 * 1000; // runtime-de
 
 describe('padNumber', () => {
 	it('should pad numbers less than 10', () => {
-		for (let i = 0; i < 10; i += 1) {
-			expect(padNumber(i)).toBe(`0${i}`);
-		}
+		expect(
+			(new Array(10))
+				.fill() // make an empty array
+				.map((x, i) => padNumber(i)) // map each index to padNumber
+				.every((x, i) => x === `0${i}`) // test that every element in the array has the expected format
+		).toBe(true)
 	});
 	it('should not pad numbers greater or equal to 10', () => {
-		for (let i = 10; i < 60; i += 1) {
-			expect(padNumber(i)).toBe(String(i));
+		for (let pow = 1; pow < 5; pow += 1) {
+			const test = Math.pow(10, pow);
+			expect(padNumber(test)).toBe(test.toString())
 		}
 	});
 });

@@ -11,11 +11,11 @@ export const padNumber = num => (num < 10 ? `0${num}` : `${num}`);
  * object passed in for usage with the `find/upcoming_events` endpoint.
  * The formatted date must follow the format: `HH:MM:SS`. Javascript's
  * `.toISOString` method returns the iso value while we need the local value.
- * @param {Object} timeObj  Datetime object
+ * @param {Date} date date object
  * @returns {String} Formatted local date string in format `HH:MM:SS`
  */
-export const getFormattedTime = timeObj =>
-        timeObj.toLocaleTimeString('UTC', { hour12: false });
+export const getFormattedTime = date =>
+        date.toLocaleTimeString('UTC', { hour12: false });
 
 /**
  * Returns a Date object that offsets the supplied UTC time, correcting for the runtime environment's current UTC offset.
