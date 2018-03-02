@@ -44,6 +44,7 @@ describe('generateEventLdJson', () => {
 		const event = {
 			...MOCK_EVENT,
 			time: 1501284510,
+			utc_offset: -18000000, // Eastern Time
 			MOCK_VENUE,
 			MOCK_FEE,
 		};

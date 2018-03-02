@@ -7,7 +7,7 @@ Object {
   "description": "The coolest event in the world during which we will run and dance and sing
 	<script>alert(\\"bad time\\")</script>, 😊, &lt;blink&gt;what what&lt;blink&gt; this is getting
 	longer than it needs to be why am I still typing omg",
-  "endDate": "1970-01-18T10:01+00:00",
+  "endDate": "1970-01-18T05:01-05:00",
   "location": Object {
     "@type": "Place",
     "address": Object {
@@ -31,7 +31,7 @@ Object {
     "price": 10,
     "priceCurrency": "USD",
   },
-  "startDate": "1970-01-18T09:01+00:00",
+  "startDate": "1970-01-18T04:01-05:00",
   "url": undefined,
 }
 `;
