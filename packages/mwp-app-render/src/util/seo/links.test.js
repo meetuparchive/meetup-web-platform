@@ -28,6 +28,6 @@ describe('generateCanonicalUrlLinkTags', () => {
 
 	it('should generate a x-default url that is baseUrl + route', () => {
 		const canonicalUrlMetaTags = generateCanonicalUrlLinkTags(MOCK_BASE_URL, MOCK_LOCALE_CODE, MOCK_ROUTE);
-		expect(canonicalUrlMetaTags.filter(el => el.props.hrefLang === 'x-default')).toMatchSnapshot();
+		expect(canonicalUrlMetaTags.filter(el => el.props.hreflang === 'x-default')).toMatchSnapshot();
 	});
 });
