@@ -3,6 +3,42 @@ const paths = require('../paths');
 const babelrc = require('../babel');
 
 module.exports = {
+	scssModule: {
+		test: /\.module\.scss$/,
+		include: [paths.srcPath],
+		use: [
+			'universal-style-loader',
+			{
+				loader: 'css-loader',
+				options: {
+					importLoaders: 2,
+					modules: true,
+					localIdentName: '_[name]_[local]__[hash:base64:5]',
+				},
+			},
+			{
+				loader: 'postcss-loader',
+				options: {
+					ident: 'postcss',
+					plugins: (loader) => [
+						require('postcss-cssnext')({
+							browsers: [
+								'last 2 versions',
+								'not ie <= 10'
+							],
+							features: {
+								customProperties: false
+							}
+						}),
+						require('postcss-css-variables')({
+							preserve: true
+						})
+					]
+				}
+			},
+			'sass-loader'
+		],
+	},
 	css: {
 		test: /\.css$/,
 		include: [path.resolve(paths.src.asset, 'css')],
