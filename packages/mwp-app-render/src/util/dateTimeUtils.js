@@ -16,15 +16,22 @@ export const getFormattedTime = (date: Date): string =>
 	date.toLocaleTimeString('UTC', { hour12: false });
 
 /**
- * Returns a Date object that offsets the supplied UTC time, correcting for the runtime environment's current UTC offset.
+ * Shifts a supplied time to match time of another timezone
+ *
+ * @example
+ * // time & offset usually provided by API for event objects
+ * time = (new Date('2018-01-01T12:00:00-10:00')).getTime() // timestamp for 12 noon in -10hr timezone
+ * offset = -10 * 60 * 60 * 1000 // ms offset for -10hr timezone
+ * converted = convertToLocalTime(time, offset)
+ * converted.toString(); // == '... Jan 01 2018 12:00:00 ...'
  */
 export const convertToLocalTime = (time: number, offset: number = 0): Date => {
         // Takes in desired date to convert and applies offset
-        const eventTime = new Date(time + offset);
+        const date = new Date(time + offset);
         // generates new date object taking the time in milliseconds and
         // adds the runtime environment's timezone offset
         const localDate = new Date(
-                eventTime.getTime() + eventTime.getTimezoneOffset() * 60000
+                date.getTime() + date.getTimezoneOffset() * 60000
         );
 
         return localDate;
