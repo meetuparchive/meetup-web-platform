@@ -5,3 +5,7 @@
 escape-html@1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/escape-html/-/escape-html-1.0.3.tgz#0258eae4d3d0c0974de1c169188ef0051d1d1988"
+
+swarm-constants@1.2.84-beta:
+  version "1.2.84-beta"
+  resolved "https://registry.yarnpkg.com/swarm-constants/-/swarm-constants-1.2.84-beta.tgz#19f5eab20545bfa6156e61695c67f4fbf9edc0a1"
