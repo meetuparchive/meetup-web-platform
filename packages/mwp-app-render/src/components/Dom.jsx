@@ -2,6 +2,15 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import escapeHtml from 'escape-html';
 
+// This import causes our `.module.scss` loaders to inject all
+// CSS custom property declarations into the document.
+//
+// The `postcss-css-variables` plugin uses the values of these
+// custom properties to set fallback declarations for any usage
+// of `var(--customProperty`.
+//
+import styles from 'swarm-constants/dist/scss/customProperties.module.scss'; // eslint-disable-line no-unused-vars
+
 function getInnerHTML(__html) {
 	return {
 		__html,

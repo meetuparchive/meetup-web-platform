@@ -30,7 +30,8 @@
     "redux": "^3.7.2"
   },
   "dependencies": {
-    "escape-html": "1.0.3"
+    "escape-html": "1.0.3",
+    "swarm-constants": "1.2.84-beta"
   },
   "devDependencies": {}
 }
