@@ -27,7 +27,8 @@ module.exports = {
 								'not ie <= 10'
 							],
 							features: {
-								customProperties: false
+								customProperties: false,
+								colorFunction: false,
 							}
 						}),
 						require('postcss-css-variables')({
