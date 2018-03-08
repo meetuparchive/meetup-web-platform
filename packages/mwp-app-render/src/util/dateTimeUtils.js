@@ -16,7 +16,7 @@ export const getFormattedTime = (date: Date): string =>
 	date.toLocaleTimeString('UTC', { hour12: false });
 
 /**
- * Shifts a supplied time to match time of another timezone
+ * Shifts a supplied time to match timezone indicated by offset
  *
  * @example
  * // time & offset usually provided by API for event objects
