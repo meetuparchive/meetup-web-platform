@@ -171,97 +171,97 @@ exports[`SEOHead imageUrl applies meet script logo to og:image, twitter:image an
   />
   <link
     href="https://baseUrl.com/mock/preview/route"
-    hrefLang="en"
+    hreflang="en"
     key="en-US"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/de-DE/mock/preview/route"
-    hrefLang="de-DE"
+    hreflang="de-DE"
     key="de-DE"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/en-AU/mock/preview/route"
-    hrefLang="en-AU"
+    hreflang="en-AU"
     key="en-AU"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/es/mock/preview/route"
-    hrefLang="es"
+    hreflang="es"
     key="es"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/es-ES/mock/preview/route"
-    hrefLang="es-ES"
+    hreflang="es-ES"
     key="es-ES"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/fr-FR/mock/preview/route"
-    hrefLang="fr-FR"
+    hreflang="fr-FR"
     key="fr-FR"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/it-IT/mock/preview/route"
-    hrefLang="it-IT"
+    hreflang="it-IT"
     key="it-IT"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/ja-JP/mock/preview/route"
-    hrefLang="ja-JP"
+    hreflang="ja-JP"
     key="ja-JP"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/ko-KR/mock/preview/route"
-    hrefLang="ko-KR"
+    hreflang="ko-KR"
     key="ko-KR"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/nl-NL/mock/preview/route"
-    hrefLang="nl-NL"
+    hreflang="nl-NL"
     key="nl-NL"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/pt-BR/mock/preview/route"
-    hrefLang="pt-BR"
+    hreflang="pt-BR"
     key="pt-BR"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/pl-PL/mock/preview/route"
-    hrefLang="pl-PL"
+    hreflang="pl-PL"
     key="pl-PL"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/ru-RU/mock/preview/route"
-    hrefLang="ru-RU"
+    hreflang="ru-RU"
     key="ru-RU"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/th-TH/mock/preview/route"
-    hrefLang="th-TH"
+    hreflang="th-TH"
     key="th-TH"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/tr-TR/mock/preview/route"
-    hrefLang="tr-TR"
+    hreflang="tr-TR"
     key="tr-TR"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/mock/preview/route"
-    hrefLang="x-default"
+    hreflang="x-default"
     key="default"
     rel="alternate"
   />
@@ -448,97 +448,97 @@ exports[`SEOHead renders component markup 1`] = `
   />
   <link
     href="https://baseUrl.com/mock/preview/route"
-    hrefLang="en"
+    hreflang="en"
     key="en-US"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/de-DE/mock/preview/route"
-    hrefLang="de-DE"
+    hreflang="de-DE"
     key="de-DE"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/en-AU/mock/preview/route"
-    hrefLang="en-AU"
+    hreflang="en-AU"
     key="en-AU"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/es/mock/preview/route"
-    hrefLang="es"
+    hreflang="es"
     key="es"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/es-ES/mock/preview/route"
-    hrefLang="es-ES"
+    hreflang="es-ES"
     key="es-ES"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/fr-FR/mock/preview/route"
-    hrefLang="fr-FR"
+    hreflang="fr-FR"
     key="fr-FR"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/it-IT/mock/preview/route"
-    hrefLang="it-IT"
+    hreflang="it-IT"
     key="it-IT"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/ja-JP/mock/preview/route"
-    hrefLang="ja-JP"
+    hreflang="ja-JP"
     key="ja-JP"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/ko-KR/mock/preview/route"
-    hrefLang="ko-KR"
+    hreflang="ko-KR"
     key="ko-KR"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/nl-NL/mock/preview/route"
-    hrefLang="nl-NL"
+    hreflang="nl-NL"
     key="nl-NL"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/pt-BR/mock/preview/route"
-    hrefLang="pt-BR"
+    hreflang="pt-BR"
     key="pt-BR"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/pl-PL/mock/preview/route"
-    hrefLang="pl-PL"
+    hreflang="pl-PL"
     key="pl-PL"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/ru-RU/mock/preview/route"
-    hrefLang="ru-RU"
+    hreflang="ru-RU"
     key="ru-RU"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/th-TH/mock/preview/route"
-    hrefLang="th-TH"
+    hreflang="th-TH"
     key="th-TH"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/tr-TR/mock/preview/route"
-    hrefLang="tr-TR"
+    hreflang="tr-TR"
     key="tr-TR"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/mock/preview/route"
-    hrefLang="x-default"
+    hreflang="x-default"
     key="default"
     rel="alternate"
   />
@@ -581,4 +581,275 @@ exports[`SEOHead robots turns robots "off" 1`] = `
   content="noindex, nofollow"
   name="robots"
 />
+`;
+
+exports[`SEOHead strips out undefined json values 1`] = `
+<HelmetWrapper
+  defaultTitle="Meetup"
+  defer={true}
+  encodeSpecialCharacters={true}
+  titleTemplate="%s | Meetup"
+>
+  <title>
+    mock-page-title
+  </title>
+  <link
+    href="https://www.mock-image-url.com/"
+    rel="image_src"
+  />
+  <meta
+    content="noindex, nofollow"
+    name="robots"
+  />
+  <meta
+    content="mock description"
+    key="meta-0"
+    name="description"
+  />
+  <meta
+    content="mock keywords"
+    key="meta-1"
+    name="keywords"
+  />
+  <meta
+    content="36212898404"
+    key="meta-2"
+    property="fb:app_id"
+  />
+  <meta
+    content="Meetup"
+    key="meta-3"
+    property="og:site_name"
+  />
+  <meta
+    content="article"
+    key="meta-4"
+    property="og:type"
+  />
+  <meta
+    content="mock-page-title"
+    key="meta-5"
+    property="og:title"
+  />
+  <meta
+    content="mock description"
+    key="meta-6"
+    property="og:description"
+  />
+  <meta
+    content="https://baseUrl.com/es-ES/mock/preview/route"
+    key="meta-7"
+    property="og:url"
+  />
+  <meta
+    content="https://www.mock-image-url.com/"
+    key="meta-8"
+    property="og:image"
+  />
+  <meta
+    content="Meetup"
+    key="meta-9"
+    property="al:android:app_name"
+  />
+  <meta
+    content="com.meetup"
+    key="meta-10"
+    property="al:android:package"
+  />
+  <meta
+    content="375990038"
+    key="meta-11"
+    property="al:ios:app_store_id"
+  />
+  <meta
+    content="Meetup"
+    key="meta-12"
+    property="al:ios:app_name"
+  />
+  <meta
+    content="true"
+    key="meta-13"
+    property="al:web:should_fallback"
+  />
+  <meta
+    content="meetup://mock/preview/route"
+    key="meta-14"
+    property="al:android:url"
+  />
+  <meta
+    content="meetup://mock/preview/route"
+    key="meta-15"
+    property="al:ios:url"
+  />
+  <meta
+    content="https://baseUrl.com/es-ES/mock/preview/route"
+    key="meta-16"
+    property="al:web:url"
+  />
+  <meta
+    content="summary_large_image"
+    key="meta-17"
+    property="twitter:card"
+  />
+  <meta
+    content="@meetup"
+    key="meta-18"
+    property="twitter:site"
+  />
+  <meta
+    content="https://www.mock-image-url.com/"
+    key="meta-19"
+    property="twitter:image"
+  />
+  <meta
+    content="mock description"
+    key="meta-20"
+    property="twitter:description"
+  />
+  <meta
+    content="375990038"
+    key="meta-21"
+    property="twitter:app:id:iphone"
+  />
+  <meta
+    content="Meetup"
+    key="meta-22"
+    property="twitter:app:name:iphone"
+  />
+  <meta
+    content="375990038"
+    key="meta-23"
+    property="twitter:app:id:ipad"
+  />
+  <meta
+    content="Meetup"
+    key="meta-24"
+    property="twitter:app:name:ipad"
+  />
+  <meta
+    content="com.meetup"
+    key="meta-25"
+    property="twitter:app:id:googleplay"
+  />
+  <meta
+    content="Meetup"
+    key="meta-26"
+    property="twitter:app:name:googleplay"
+  />
+  <meta
+    key="meta-27"
+    mock="meta"
+  />
+  <meta
+    key="meta-28"
+    more="mock"
+  />
+  <link
+    href="https://baseUrl.com/mock/preview/route"
+    hreflang="en"
+    key="en-US"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/de-DE/mock/preview/route"
+    hreflang="de-DE"
+    key="de-DE"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/en-AU/mock/preview/route"
+    hreflang="en-AU"
+    key="en-AU"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/es/mock/preview/route"
+    hreflang="es"
+    key="es"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/es-ES/mock/preview/route"
+    hreflang="es-ES"
+    key="es-ES"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/fr-FR/mock/preview/route"
+    hreflang="fr-FR"
+    key="fr-FR"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/it-IT/mock/preview/route"
+    hreflang="it-IT"
+    key="it-IT"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/ja-JP/mock/preview/route"
+    hreflang="ja-JP"
+    key="ja-JP"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/ko-KR/mock/preview/route"
+    hreflang="ko-KR"
+    key="ko-KR"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/nl-NL/mock/preview/route"
+    hreflang="nl-NL"
+    key="nl-NL"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/pt-BR/mock/preview/route"
+    hreflang="pt-BR"
+    key="pt-BR"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/pl-PL/mock/preview/route"
+    hreflang="pl-PL"
+    key="pl-PL"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/ru-RU/mock/preview/route"
+    hreflang="ru-RU"
+    key="ru-RU"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/th-TH/mock/preview/route"
+    hreflang="th-TH"
+    key="th-TH"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/tr-TR/mock/preview/route"
+    hreflang="tr-TR"
+    key="tr-TR"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/mock/preview/route"
+    hreflang="x-default"
+    key="default"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/es-ES/mock/preview/route"
+    key="canonical"
+    rel="canonical"
+  />
+  <script
+    key="ldjson-0"
+    type="application/ld+json"
+  >
+    {"foo":"bar"}
+  </script>
+</HelmetWrapper>
 `;

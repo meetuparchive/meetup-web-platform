@@ -21,6 +21,21 @@ describe('SEOHead', () => {
 	it('renders component markup', () => {
 		expect(renderComponent()).toMatchSnapshot();
 	});
+
+	it('strips out undefined json values', () => {
+		const props = {
+			...MOCK_PROPS,
+			ldJson: [
+				{
+					foo: 'bar',
+					endDate: undefined,
+					startDate: undefined,
+				},
+			],
+		};
+		expect(shallow(<SEOHeadComponent {...props} />)).toMatchSnapshot();
+	});
+
 	describe('robots', () => {
 		const robotsSelector = 'meta[name="robots"]';
 		it('defaults to robots "on"', () => {
