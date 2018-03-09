@@ -35,12 +35,21 @@ class PageWrap extends React.Component {
 
 	componentDidMount() {
 		// Browser has now rendered client-side application - fire the browser TTI trigger
-		window.newrelic &&
+		if (window.newrelic) {
+			const now = new Date().getTime();
+			// 1. Set a marker in the trace details
 			window.newrelic.addToTrace({
 				name: 'appInteractive',
-				start: new Date().getTime(),
+				start: now,
 				type: 'Browser app has rendered and is interactive',
 			});
+			// 2. Add a custom attribute to the PageView & BrowserInteraction events in Insights
+			window.performance &&
+				window.newrelic.setCustomAttribue(
+					'timeToAppInteractive',
+					now - window.performance.timing.navigationStart // this is the event that NR uses as 'start' of page load
+				);
+		}
 	}
 
 	/**
