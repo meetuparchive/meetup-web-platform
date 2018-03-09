@@ -35,11 +35,12 @@ class PageWrap extends React.Component {
 
 	componentDidMount() {
 		// Browser has now rendered client-side application - fire the browser TTI trigger
-		window.newrelic.addToTrace({
-			name: 'appInteractive',
-			start: new Date().getTime(),
-			type: 'Browser app has rendered and is interactive',
-		});
+		window.newrelic &&
+			window.newrelic.addToTrace({
+				name: 'appInteractive',
+				start: new Date().getTime(),
+				type: 'Browser app has rendered and is interactive',
+			});
 	}
 
 	/**
