@@ -45,7 +45,7 @@ class PageWrap extends React.Component {
 			});
 			// 2. Add a custom attribute to the PageView & BrowserInteraction events in Insights
 			window.performance &&
-				window.newrelic.setCustomAttribue(
+				window.newrelic.setCustomAttribute(
 					'timeToAppInteractive',
 					now - window.performance.timing.navigationStart // this is the event that NR uses as 'start' of page load
 				);
