@@ -3,6 +3,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+// Runtime flag
+export const GOOGLE_TAG_MANAGER_RTF = 'google_tag_manager';
+
+// Production and dev keys
 const GTM_KEYS = {
 	'prod': 'GTM-T2LNGD', 
 	'dev': 'GTM-W9W847',
