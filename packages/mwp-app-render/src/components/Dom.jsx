@@ -37,7 +37,6 @@ const DOM = props => {
 		initialState = {},
 		scripts,
 		cssLinks,
-		moduleStyles: ModuleStyles,
 	} = props;
 
 	const htmlLang = initialState.config.requestLanguage.split('-')[0];
@@ -53,6 +52,11 @@ const DOM = props => {
 	const initialStateJson = JSON.stringify(initialState);
 	// escape the string
 	const escapedState = escapeHtml(initialStateJson);
+
+	// universal-style-loader adds styles from modules to `global.universal`.
+	// reactStyles() returns a React Component that enables us to inject
+	// module styles on server render
+	const ModuleStyles = global.__universal__.reactStyles(React);
 
 	const APP_RUNTIME = {
 		basename,
@@ -76,7 +80,7 @@ const DOM = props => {
 							key={key}
 						/>
 					)}
-				{moduleStyles && <ModuleStyles />}
+				<ModuleStyles />
 			</head>
 			<body>
 				<div
@@ -108,7 +112,6 @@ DOM.propTypes = {
 	initialState: PropTypes.object.isRequired,
 	scripts: PropTypes.array.isRequired,
 	cssLinks: PropTypes.arrayOf(PropTypes.string),
-	moduleStyles: PropTypes.element,
 };
 
 export default DOM;

@@ -147,11 +147,6 @@ const getRouterRenderer = ({
 		return redirect;
 	}
 
-	// universal-style-loader adds styles from modules to `global.universal`.
-	// reactStyles() returns a React Component that enables us to inject
-	// module styles on server render
-	const ModuleStyles = global.__universal__.reactStyles(React);
-
 	// all the data for the full `<html>` element has been initialized by the app
 	// so go ahead and assemble the full response body
 	const result = getHtml(
@@ -163,7 +158,6 @@ const getRouterRenderer = ({
 			appMarkup={appMarkup}
 			scripts={scripts}
 			cssLinks={cssLinks}
-			moduleStyles={ModuleStyles}
 		/>
 	);
 
