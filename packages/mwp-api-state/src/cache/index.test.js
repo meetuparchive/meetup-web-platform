@@ -17,24 +17,34 @@ const MOCK_SUCCESS_ACTION = api.success({
 });
 const apiRequestAction = api.get(MOCK_QUERY);
 
+const fakeStore = {
+	getState() {
+		return { api: {} };
+	},
+	dispatch() {},
+	subscribe() {},
+};
+
 function makeCacheEpic() {
 	return Promise.resolve(getCacheEpic(makeCache()));
 }
 function populateCacheEpic(CacheEpic) {
 	// set the cache with API_SUCCESS
-	return CacheEpic(MOCK_SUCCESS_ACTION).then(() => CacheEpic);
+	return CacheEpic(MOCK_SUCCESS_ACTION, fakeStore).then(() => CacheEpic);
 }
 
 function clearCacheEpic(CacheEpic) {
 	// clear the cache with CACHE_CLEAR
-	return CacheEpic({ type: CACHE_CLEAR }).then(() => CacheEpic);
+	return CacheEpic({ type: CACHE_CLEAR }, fakeStore).then(() => CacheEpic);
 }
 
 const testForEmptyCache = (action = apiRequestAction) => CacheEpic =>
-	CacheEpic(action).then(actions => expect(actions).toHaveLength(0));
+	CacheEpic(action, fakeStore).then(actions =>
+		expect(actions).toHaveLength(0)
+	);
 
 const testForPopulatedCache = (action = apiRequestAction) => CacheEpic =>
-	CacheEpic(action).then(actions =>
+	CacheEpic(action, fakeStore).then(actions =>
 		expect(actions.map(({ type }) => type)).toContain(CACHE_SUCCESS)
 	);
 

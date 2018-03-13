@@ -40,14 +40,17 @@ export function makeCache(): Cache {
 	return require('idb-keyval');
 }
 
+const makeKey = (memberId: string, query: Query) =>
+	`${memberId}${JSON.stringify(query)}`;
+
 /**
  * Generates a function that can read queries and return hits in the supplied cache
  */
-export const cacheReader = (cache: Cache) => (
+export const cacheReader = (cache: Cache, memberId: string) => (
 	query: Query
 ): Promise<QueryState> =>
 	cache
-		.get(JSON.stringify(query))
+		.get(makeKey(memberId, query))
 		.then((response: QueryResponse) => ({ query, response }))
 		.catch(err => ({ query, response: null })); // errors don't matter - just return null
 
@@ -57,7 +60,7 @@ export const cacheReader = (cache: Cache) => (
  * It will ignore non-GET responses and any responses to queries that have
  * opted-out of caching with `query.meta.noCache`
  */
-export const cacheWriter = (cache: Cache) => (
+export const cacheWriter = (cache: Cache, memberId: string) => (
 	query: Query,
 	response: QueryResponse
 ): Promise<boolean> => {
@@ -66,5 +69,5 @@ export const cacheWriter = (cache: Cache) => (
 		// skip cache writing
 		return Promise.resolve(true);
 	}
-	return cache.set(JSON.stringify(query), response);
+	return cache.set(makeKey(memberId, query), response);
 };
