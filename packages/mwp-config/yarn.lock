@@ -4795,6 +4795,10 @@ sw-toolbox@^3.4.0:
     path-to-regexp "^1.0.1"
     serviceworker-cache-polyfill "^4.0.0"
 
+swarm-constants@1.2.93:
+  version "1.2.93"
+  resolved "https://registry.yarnpkg.com/swarm-constants/-/swarm-constants-1.2.93.tgz#ab03c45321f6847f33b696544b91c258bfa1bcd6"
+
 tapable@^0.2.7, tapable@~0.2.5:
   version "0.2.8"
   resolved "https://registry.yarnpkg.com/tapable/-/tapable-0.2.8.tgz#99372a5c999bf2df160afc0d74bed4f47948cd22"
