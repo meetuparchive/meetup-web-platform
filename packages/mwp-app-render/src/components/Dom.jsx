@@ -37,6 +37,7 @@ const DOM = props => {
 		initialState = {},
 		scripts,
 		cssLinks,
+		moduleStyles: ModuleStyles,
 	} = props;
 
 	const htmlLang = initialState.config.requestLanguage.split('-')[0];
@@ -75,6 +76,7 @@ const DOM = props => {
 							key={key}
 						/>
 					)}
+				{moduleStyles && <ModuleStyles />}
 			</head>
 			<body>
 				<div
@@ -106,6 +108,7 @@ DOM.propTypes = {
 	initialState: PropTypes.object.isRequired,
 	scripts: PropTypes.array.isRequired,
 	cssLinks: PropTypes.arrayOf(PropTypes.string),
+	ModuleStyles: PropTypes.element,
 };
 
 export default DOM;
