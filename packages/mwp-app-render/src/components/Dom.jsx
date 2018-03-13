@@ -56,7 +56,9 @@ const DOM = props => {
 	// universal-style-loader adds styles from modules to `global.universal`.
 	// reactStyles() returns a React Component that enables us to inject
 	// module styles on server render
-	const ModuleStyles = global.__universal__.reactStyles(React);
+	if ( global.__universal__ ) {
+		const ModuleStyles = global.__universal__.reactStyles(React);
+	}
 
 	const APP_RUNTIME = {
 		basename,
@@ -80,7 +82,7 @@ const DOM = props => {
 							key={key}
 						/>
 					)}
-				<ModuleStyles />
+				{ModuleStyles && <ModuleStyles />}
 			</head>
 			<body>
 				<div
