@@ -108,7 +108,7 @@ DOM.propTypes = {
 	initialState: PropTypes.object.isRequired,
 	scripts: PropTypes.array.isRequired,
 	cssLinks: PropTypes.arrayOf(PropTypes.string),
-	ModuleStyles: PropTypes.element,
+	moduleStyles: PropTypes.element,
 };
 
 export default DOM;
