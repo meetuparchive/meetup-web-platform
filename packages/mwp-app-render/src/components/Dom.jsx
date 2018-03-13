@@ -53,6 +53,13 @@ const DOM = props => {
 	// escape the string
 	const escapedState = escapeHtml(initialStateJson);
 
+	// universal-style-loader adds styles from modules to `global.universal`.
+	// reactStyles() returns a React Component that enables us to inject
+	// module styles on server render
+	if ( global.__universal__ ) {
+		const ModuleStyles = global.__universal__.reactStyles(React);
+	}
+
 	const APP_RUNTIME = {
 		basename,
 		assetPublicPath,
@@ -75,6 +82,7 @@ const DOM = props => {
 							key={key}
 						/>
 					)}
+				{ModuleStyles && <ModuleStyles />}
 			</head>
 			<body>
 				<div
