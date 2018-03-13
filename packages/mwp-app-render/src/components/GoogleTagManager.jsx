@@ -17,8 +17,15 @@ const GTM_KEYS = {
  * @see {@link https://developers.google.com/tag-manager/quickstart}
 */
 const getScript = (key: string) => {
-	const script = `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${key}');` 
-	return <script>{script}</script>
+	const script = `
+		(function(w,d,s,l,i){
+			w[l]=w[l]||[];
+			w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+			var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
+			j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+			f.parentNode.insertBefore(j,f);
+		})(window,document,'script','dataLayer','${key}');`
+	return <script dangerouslySetInnerHtml={{ __html: script }} />
 };
 
 /*
@@ -26,8 +33,12 @@ const getScript = (key: string) => {
  * @see {@link https://developers.google.com/tag-manager/quickstart}
 */
 const getNoscript = (key: string) => { 
-	const src = `https://www.googletagmanager.com/ns.html?id=${key}`;
-	return <noscript><iframe src={src} height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+	const iframe = `
+		<iframe
+			src="https://www.googletagmanager.com/ns.html?id=${key}"
+			height="0" width="0" style="display:none;visibility:hidden">
+		</iframe>`;
+	return <noscript dangerouslySetInnerHtml={{ __html: iframe }}></noscript>
 };
 
 /*
@@ -70,7 +81,7 @@ const GoogleTagManager = ({tag, rtf = false, isProd = false}) => {
 GoogleTagManager.propTypes = {
 	rtf: PropTypes.bool,
 	isProd: PropTypes.bool,
-	tag: PropTypes.string.isRequired, 
+	tag: PropTypes.oneOf(['script','noscript']),
 };
 
 export default GoogleTagManager;
