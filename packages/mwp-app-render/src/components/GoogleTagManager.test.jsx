@@ -1,10 +1,10 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import { GoogleTagManagerScript, GoogleTagManagerNoscript } from './GoogleTagManager';
+import { getGoogleTagManagerSnippet, GoogleTagManagerNoscript } from './GoogleTagManager';
 
-describe('<GoogleTagManagerScript />', () => {
+describe('getGoogleTagManagerSnippet()', () => {
 	it('matches snap', () => {
-		expect(shallow(<GoogleTagManagerScript />)).toMatchSnapshot();
+		expect(getGoogleTagManagerSnippet()).toMatchSnapshot();
 	});
 });
 
