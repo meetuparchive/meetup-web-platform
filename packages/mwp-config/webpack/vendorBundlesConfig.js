@@ -1,4 +1,5 @@
 const ManifestPlugin = require('webpack-manifest-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const webpack = require('webpack');
 const path = require('path');
 
@@ -59,6 +60,7 @@ const config = {
 			name: dllName,
 		}),
 		new ManifestPlugin(),
+		new ExtractTextPlugin('bundle.css'),
 	],
 };
 

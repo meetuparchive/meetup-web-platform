@@ -1,5 +1,4 @@
 const webpack = require('webpack');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 module.exports = [
 	// Tells loaders to optimize what they can since in minimize mode
@@ -18,6 +17,4 @@ module.exports = [
 		},
 		sourceMap: true,
 	}),
-
-	new ExtractTextPlugin('bundle.css'),
 ];
