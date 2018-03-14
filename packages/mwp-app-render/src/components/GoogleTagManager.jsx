@@ -19,7 +19,7 @@ export const GoogleTagManagerScript = (key : string = GTM_KEY) => {
 			j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
 			f.parentNode.insertBefore(j,f);
 		})(window,document,'script','dataLayer','${GTM_KEY}');`
-	return <script dangerouslySetInnerHtml={{ __html: script }}></script>
+	return <script dangerouslySetInnerHTML={{ __html: script }}></script>
 };
 
 /*
@@ -32,5 +32,5 @@ export const GoogleTagManagerNoscript = (key : string  = GTM_KEY) => {
 			src="https://www.googletagmanager.com/ns.html?id=${GTM_KEY}"
 			height="0" width="0" style="display:none;visibility:hidden">
 		</iframe>`;
-	return <noscript dangerouslySetInnerHtml={{ __html: iframe }}></noscript>
+	return <noscript dangerouslySetInnerHTML={{ __html: iframe }}></noscript>
 };
