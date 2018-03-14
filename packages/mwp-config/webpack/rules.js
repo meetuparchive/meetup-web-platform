@@ -7,7 +7,7 @@ module.exports = {
 	scssModule: {
 		test: /\.module\.scss$/,
 		include: [paths.srcPath],
-		use: [
+		use: ExtractTextPlugin.extract([
 			'universal-style-loader',
 			{
 				loader: 'css-loader',
@@ -40,7 +40,7 @@ module.exports = {
 				}
 			},
 			'sass-loader'
-		],
+		]),
 	},
 	css: {
 		test: /\.css$/,
