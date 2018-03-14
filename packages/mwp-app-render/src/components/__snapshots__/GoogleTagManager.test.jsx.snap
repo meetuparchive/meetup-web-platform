@@ -2,7 +2,7 @@
 
 exports[`<GoogleTagManagerNoscript /> matches snap 1`] = `
 <noscript
-  dangerouslySetInnerHtml={
+  dangerouslySetInnerHTML={
     Object {
       "__html": "
     		<iframe
@@ -16,7 +16,7 @@ exports[`<GoogleTagManagerNoscript /> matches snap 1`] = `
 
 exports[`<GoogleTagManagerScript /> matches snap 1`] = `
 <script
-  dangerouslySetInnerHtml={
+  dangerouslySetInnerHTML={
     Object {
       "__html": "
     		(function(w,d,s,l,i){
