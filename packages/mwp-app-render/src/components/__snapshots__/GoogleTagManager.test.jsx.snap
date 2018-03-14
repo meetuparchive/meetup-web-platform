@@ -1,0 +1,32 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<GoogleTagManagerNoscript /> matches snap 1`] = `
+<noscript
+  dangerouslySetInnerHtml={
+    Object {
+      "__html": "
+    		<iframe
+    			src=\\"https://www.googletagmanager.com/ns.html?id=GTM-W9W847\\"
+    			height=\\"0\\" width=\\"0\\" style=\\"display:none;visibility:hidden\\">
+    		</iframe>",
+    }
+  }
+/>
+`;
+
+exports[`<GoogleTagManagerScript /> matches snap 1`] = `
+<script
+  dangerouslySetInnerHtml={
+    Object {
+      "__html": "
+    		(function(w,d,s,l,i){
+    			w[l]=w[l]||[];
+    			w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
+    			var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
+    			j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+    			f.parentNode.insertBefore(j,f);
+    		})(window,document,'script','dataLayer','GTM-W9W847');",
+    }
+  }
+/>
+`;
