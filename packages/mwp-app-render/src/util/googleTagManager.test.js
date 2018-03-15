@@ -1,5 +1,5 @@
 import React from 'react';
-import { getGoogleTagManagerSnippet } from './GoogleTagManager';
+import { getGoogleTagManagerSnippet } from './googleTagManager';
 
 describe('getGoogleTagManagerSnippet()', () => {
 	it('matches snap', () => {
