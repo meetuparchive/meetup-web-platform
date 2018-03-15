@@ -1,6 +1,14 @@
+## [13.0]
+
+- **BREAKING CHANGE** `publicPath` now set as a config var that is shared by server
+  and browser build config - `APP_RUNTIME.assetPublicPath` is no longer populated
+  by server, and consumer apps no longer need to set a 'dynamic' `__webpack_public_path__`
+  value in either the server or browser entry point script
+
 ## [12.3]
 
-- **New feature** `SEOHead` a component for rendering SEO content in the document head. Also adds related utils under `src/util/seo`. [WP-532](https://meetup.atlassian.net/browse/WP-532)
+- **New feature** `SEOHead` a component for rendering SEO content in the document
+  head. Also adds related utils under `src/util/seo`. [WP-532](https://meetup.atlassian.net/browse/WP-532)
 
 ## [12.2]
 
