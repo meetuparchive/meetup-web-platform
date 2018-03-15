@@ -1,7 +1,5 @@
 // @flow
 
-import React from 'react';
-
 // Production and dev keys
 const GTM_KEY = process.env.NODE_ENV === 'production' ? 'GTM-T2LNGD' : 'GTM-W9W847';
 
@@ -18,12 +16,3 @@ export const getGoogleTagManagerSnippet = (): string => (
 		f.parentNode.insertBefore(j,f);
 	})(window,document,'script','dataLayer','${GTM_KEY}');`
 );
-
-/*
- * @description Gets google tag manager noscript tag
- * @see {@link https://developers.google.com/tag-manager/quickstart}
-*/
-export const GoogleTagManagerNoscript = () => {
-	const src = `https://www.googletagmanager.com/ns.html?id=${GTM_KEY}`;
-	return <noscript><iframe src={src} height="0" width="0" style={{display:'none',visibility:'hidden'}}></iframe></noscript>;
-};
