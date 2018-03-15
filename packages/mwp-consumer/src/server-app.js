@@ -12,7 +12,6 @@ const renderRequest = makeServerRenderer$({
 	reducer: makeRootReducer(),
 	scripts: ['/app.js'], // don't care about serving scripts to browser, but have to specify something
 	baseUrl: '',
-	assetPublicPath: '', // don't care
 	enableServiceWorker: false, // don't care
 	cssLinks: [], // don't care
 });

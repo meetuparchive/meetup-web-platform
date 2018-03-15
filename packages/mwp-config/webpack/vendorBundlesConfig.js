@@ -58,7 +58,7 @@ const config = {
 			// output.library option above
 			name: dllName,
 		}),
-		new ManifestPlugin(),
+		new ManifestPlugin({ publicPath: env.publicPathBase }),
 	],
 };
 

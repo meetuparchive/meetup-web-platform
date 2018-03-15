@@ -4,7 +4,6 @@ import makeRootReducer from 'mwp-store/lib/reducer';
 import { Forbidden, NotFound, Redirect } from 'mwp-router';
 
 export const clientFilename = 'client.whatever.js';
-export const assetPublicPath = '//whatever';
 export const reducer = makeRootReducer();
 
 export const ROOT_INDEX_CONTENT = 'this is the life';
@@ -66,7 +65,8 @@ export const routes = [
 						params: {},
 					}),
 				},
-				getNestedRoutes: () => import('./mockAsyncRoute').then(r => r.default),
+				getNestedRoutes: () =>
+					import('./mockAsyncRoute').then(r => r.default),
 			},
 			{
 				path: '/badImplementation',

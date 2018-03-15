@@ -97,7 +97,7 @@ function getConfig(localeCode) {
 					'vendor-dll-manifest.json'
 				)),
 			}),
-			new ManifestPlugin({ writeToFileEmit: true }), // emit manifest from dev-server build
+			new ManifestPlugin({ publicPath, writeToFileEmit: true }), // emit manifest from dev-server build
 			new StatsPlugin({ fields: null }), // null means 'all fields in stats file'
 		],
 	};

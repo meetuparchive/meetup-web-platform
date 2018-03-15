@@ -4,6 +4,7 @@
   and browser build config - `APP_RUNTIME.assetPublicPath` is no longer populated
   by server, and consumer apps no longer need to set a 'dynamic' `__webpack_public_path__`
   value in either the server or browser entry point script
+- `asssetPublicPath` no longer needs to be passed to `server-render/makeRenderer`
 
 # [12.4]
 

@@ -6,7 +6,6 @@ const MOCK_BASENAME = '/fo-BA';
 
 const MOCK_PROPS = {
 	appMarkup: '<div>mock app markup</div>',
-	assetPublicPath: '/mock/asset/public/path',
 	basename: MOCK_BASENAME,
 	head: {
 		title: { toComponent: () => null },

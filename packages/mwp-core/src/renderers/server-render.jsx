@@ -107,7 +107,6 @@ const getRouterRenderer = ({
 	store,
 	location,
 	basename,
-	assetPublicPath,
 	scripts,
 	cssLinks,
 }): RenderResult => {
@@ -152,7 +151,6 @@ const getRouterRenderer = ({
 	const result = getHtml(
 		<Dom
 			basename={basename}
-			assetPublicPath={assetPublicPath}
 			head={sideEffects.head}
 			initialState={initialState}
 			appMarkup={appMarkup}
@@ -173,7 +171,6 @@ const getRouterRenderer = ({
 const makeRenderer$ = (renderConfig: {
 	routes: Array<Object>,
 	reducer: Reducer<MWPState, FluxStandardAction>,
-	assetPublicPath: string,
 	middleware: Array<Function>,
 	scripts: Array<string>,
 	enableServiceWorker: boolean,
@@ -182,8 +179,6 @@ const makeRenderer$ = (renderConfig: {
 	makeRenderer(
 		renderConfig.routes,
 		renderConfig.reducer,
-		null,
-		renderConfig.assetPublicPath,
 		renderConfig.middleware,
 		renderConfig.scripts,
 		renderConfig.enableServiceWorker,
@@ -200,21 +195,12 @@ const makeRenderer$ = (renderConfig: {
 const makeRenderer = (
 	routes: Array<Object>,
 	reducer: Reducer<MWPState, FluxStandardAction>,
-	clientFilename: ?string,
-	assetPublicPath: string,
 	middleware: Array<Function> = [],
 	scripts: Array<string> = [],
 	enableServiceWorker: boolean,
 	cssLinks: ?Array<string>
 ) => (request: HapiRequest, reply: HapiReply): Promise<RenderResult> => {
 	middleware = middleware || [];
-
-	if (clientFilename) {
-		console.warn(
-			'`clientFilename` deprecated in favor of `scripts` array in makeRenderer'
-		);
-		scripts.push(`${assetPublicPath}${clientFilename}`);
-	}
 
 	if (!scripts.length) {
 		throw new Error('No client script assets specified');
@@ -272,7 +258,6 @@ const makeRenderer = (
 			result: getHtml(
 				<Dom
 					basename={basename}
-					assetPublicPath={assetPublicPath}
 					head={Helmet.rewind()}
 					initialState={store.getState()}
 					scripts={scripts}
@@ -309,7 +294,6 @@ const makeRenderer = (
 			store: initializedStore,
 			location: url,
 			basename,
-			assetPublicPath,
 			scripts,
 			cssLinks,
 		})

@@ -92,7 +92,6 @@ const DOM = props => {
 
 DOM.propTypes = {
 	appMarkup: PropTypes.string,
-	assetPublicPath: PropTypes.string.isRequired,
 	basename: PropTypes.string,
 	head: PropTypes.shape({
 		// this is expected to come from Helmet.rewind()
