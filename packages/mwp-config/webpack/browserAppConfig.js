@@ -69,12 +69,6 @@ function getConfig(localeCode) {
 
 		module: { rules: [rules.file, rules.css, rules.js.browser, rules.raw] },
 
-		resolveLoader: {
-			alias: {
-				'require-loader': path.resolve(__dirname, 'require-loader.js'),
-			},
-		},
-
 		resolve: {
 			alias: {
 				src: paths.src.browser.app,

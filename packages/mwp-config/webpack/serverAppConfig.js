@@ -83,12 +83,6 @@ function getConfig(localeCode) {
 			/.*?build\//,
 		],
 
-		resolveLoader: {
-			alias: {
-				'require-loader': path.resolve(__dirname, 'require-loader.js'),
-			},
-		},
-
 		resolve: {
 			alias: {
 				src: paths.src.server.app,
