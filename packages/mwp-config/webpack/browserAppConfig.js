@@ -38,7 +38,7 @@ function injectHotReloadConfig(config) {
  * to determine the output path
  */
 function getConfig(localeCode) {
-	const publicPath = `${env.publicPathBase}${localeCode}/`;
+	const publicPath = `${env.properties.publicPathBase}${localeCode}/`;
 
 	const baseWebfontDir = path.resolve(
 		paths.src.server.app,
