@@ -34,8 +34,8 @@ describe('cache utils', () => {
 		const cache = makeCache();
 		const query = { foo: 'baz' };
 		const response = 'bar';
-		return cacheWriter(cache)(query, response)
-			.then(() => cache.get(JSON.stringify(query)))
+		return cacheWriter(cache, 'memberId')(query, response)
+			.then(() => cache.get(`memberId${JSON.stringify(query)}`))
 			.then(cachedResponse => expect(cachedResponse).toEqual(response));
 	});
 
