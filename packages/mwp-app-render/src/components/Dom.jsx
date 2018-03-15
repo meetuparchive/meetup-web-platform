@@ -59,6 +59,19 @@ const DOM = props => {
 		escapedState,
 	};
 
+	let moduleStyleTag;
+	if ( global.__styles__ ) {
+		moduleStyleTag = global.__styles__
+			.map(style =>
+				<style
+					type="text/css"
+					key={style.id}
+				>
+					{style.parts.map(part => part.css)}
+				</style>
+			)
+	}
+
 	return (
 		<html lang={htmlLang}>
 			<head>
@@ -75,6 +88,7 @@ const DOM = props => {
 							key={key}
 						/>
 					)}
+				{moduleStyleTag}
 			</head>
 			<body>
 				<div
