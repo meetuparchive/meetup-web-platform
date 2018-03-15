@@ -5,6 +5,13 @@
   by server, and consumer apps no longer need to set a 'dynamic' `__webpack_public_path__`
   value in either the server or browser entry point script
 
+# [12.4]
+
+* **Bugfix** the Redux cache middleware will now key the cache with the logged-in
+  member's ID in order to avoid incorrectly returning cached results corresponding
+  to other members or logged-out responses.
+
+
 ## [12.3]
 
 - **New feature** `SEOHead` a component for rendering SEO content in the document
