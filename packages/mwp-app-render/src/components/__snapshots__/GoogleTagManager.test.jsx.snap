@@ -1,21 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`<GoogleTagManagerNoscript /> matches snap 1`] = `
-<noscript>
-  <iframe
-    height="0"
-    src="https://www.googletagmanager.com/ns.html?id=GTM-W9W847"
-    style={
-      Object {
-        "display": "none",
-        "visibility": "hidden",
-      }
-    }
-    width="0"
-  />
-</noscript>
-`;
-
 exports[`getGoogleTagManagerSnippet() matches snap 1`] = `
 "(function(w,d,s,l,i){
 		w[l]=w[l]||[];
