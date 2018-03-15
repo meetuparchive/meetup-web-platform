@@ -78,6 +78,7 @@ const schema = {
 	},
 	publicPathBase: {
 		format: String,
+		default: '',
 	},
 };
 const config = convict(schema);
