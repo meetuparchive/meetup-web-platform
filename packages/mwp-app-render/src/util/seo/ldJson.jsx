@@ -1,5 +1,10 @@
 import { generateCanonicalUrl } from './links';
 import { getSocialLinks } from '../../util/socialHelper';
+import {
+	padNumber,
+	getFormattedTime,
+	convertToLocalTime,
+} from '../dateTimeUtils';
 
 export const DEFAULT_TITLE = 'Meetup';
 export const SCHEMA_ORG = 'http://schema.org';
@@ -88,11 +93,15 @@ export const generateFeeLdJson = fee =>
  * @return {Object} accumulated json object
  */
 export const generateEventLdJson = eventInfo => {
-	const eventDate = eventInfo.time && new Date(eventInfo.time);
-	// strip second/millisecond/timezone info, replace with explicit zero-offset
-	// this will create a startDate in this format 2018-02-23T18:00+00:00
-	const startDate = eventDate && eventDate.toISOString().replace(/:[^:]+$/, '+00:00');
-
+	const startDate =
+		eventInfo.time && generateEventDateForSeo(eventInfo.time, eventInfo.utc_offset);
+	const endDate =
+		eventInfo.time &&
+		eventInfo.duration &&
+		generateEventDateForSeo(
+			eventInfo.time + eventInfo.duration,
+			eventInfo.utc_offset
+		);
 	const offers = eventInfo.fee ? generateFeeLdJson(eventInfo.fee) : {};
 	const location = eventInfo.venue ? generateLocationLdJson(eventInfo.venue) : {};
 
@@ -110,7 +119,25 @@ export const generateEventLdJson = eventInfo => {
 		url: eventInfo.link,
 		description,
 		startDate,
+		endDate,
 		...location,
 		...offers,
 	};
+};
+
+export const generateEventDateForSeo = (time, offset = 0) => {
+	const localDate = convertToLocalTime(time, offset);
+	const localYear = localDate.getFullYear();
+	const localMonth = padNumber(localDate.getMonth() + 1);
+	const localDay = padNumber(localDate.getDate());
+	const localTime = getFormattedTime(localDate).replace(/:[^:]+$/, ''); // strip the last `:` and everything after
+
+	const offsetHoursMins = offset / (60 * 1000);
+	const offsetHours = padNumber(parseInt(Math.abs(offsetHoursMins / 60)));
+	const offsetMins = padNumber(Math.abs(offsetHoursMins % 60));
+	const operator = offset < 0 ? '-' : '+';
+	const formattedOffset = `${operator}${offsetHours}:${offsetMins}`;
+
+	// this will create a startDate in this format 2018-02-23T18:00+04:00
+	return `${localYear}-${localMonth}-${localDay}T${localTime}${formattedOffset}`;
 };
