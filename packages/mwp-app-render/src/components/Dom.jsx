@@ -59,6 +59,11 @@ const DOM = props => {
 		escapedState,
 	};
 
+	// simple-universal-style-loader accumulates CSS Module style rules
+	// in node's `global` object under the `__styles__` key.
+	//
+	// If this key is populated, we render a single style tag with all
+	// module styles needed for the request.
 	let moduleStyleTag;
 	if ( global.__styles__ ) {
 		moduleStyleTag = global.__styles__
