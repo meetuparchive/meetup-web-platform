@@ -1,8 +1,48 @@
 const path = require('path');
 const paths = require('../paths');
 const babelrc = require('../babel');
+const customProperties = require('swarm-constants/dist/js/customProperties.js').customProperties;
 
 module.exports = {
+	scssModule: {
+		test: /\.module\.scss$/,
+		include: [paths.srcPath],
+		use: [
+			'simple-universal-style-loader',
+			{
+				loader: 'css-loader',
+				options: {
+					importLoaders: 2,
+					modules: true,
+					localIdentName: '_[name]_[local]__[hash:base64:5]',
+					minimize: true
+				},
+			},
+			{
+				loader: 'postcss-loader',
+				options: {
+					ident: 'postcss',
+					plugins: (loader) => [
+						require('postcss-cssnext')({
+							browsers: [
+								'last 2 versions',
+								'not ie <= 10'
+							],
+							features: {
+								customProperties: false,
+								colorFunction: false,
+							}
+						}),
+						require('postcss-css-variables')({
+							preserve: true,
+							variables: customProperties,
+						})
+					]
+				}
+			},
+			'sass-loader'
+		],
+	},
 	css: {
 		test: /\.css$/,
 		include: [path.resolve(paths.src.asset, 'css')],
