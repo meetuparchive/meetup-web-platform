@@ -5,12 +5,7 @@ import config from 'mwp-config';
 import makeRenderer from 'mwp-core/lib/server-render';
 const appConfig = config.getServer().properties;
 
-import {
-	assetPublicPath,
-	clientFilename,
-	routes,
-	reducer,
-} from 'mwp-test-utils/lib/mockApp';
+import { clientFilename, routes, reducer } from 'mwp-test-utils/lib/mockApp';
 
 export const getMockFetch = (
 	mockResponseValue = { responses: [{}] },
@@ -42,15 +37,9 @@ export function getCsrfHeaders() {
 export const getMockRenderRequestMap = () => {
 	const basename = '';
 
-	const renderRequest$ = makeRenderer(
-		routes,
-		reducer,
-		undefined,
-		assetPublicPath,
-		[],
-		basename,
-		[`${assetPublicPath}${clientFilename}`]
-	);
+	const renderRequest$ = makeRenderer(routes, reducer, [], basename, [
+		clientFilename,
+	]);
 
 	return {
 		'en-US': renderRequest$,

@@ -41,12 +41,20 @@ const schema = {
 		},
 		key_file: {
 			format: String,
-			default: path.resolve(os.homedir(), '.certs', 'star.dev.meetup.com.key'),
+			default: path.resolve(
+				os.homedir(),
+				'.certs',
+				'star.dev.meetup.com.key'
+			),
 			env: 'ASSET_KEY_FILE',
 		},
 		crt_file: {
 			format: String,
-			default: path.resolve(os.homedir(), '.certs', 'star.dev.meetup.com.crt'),
+			default: path.resolve(
+				os.homedir(),
+				'.certs',
+				'star.dev.meetup.com.crt'
+			),
 			env: 'ASSET_CRT_FILE',
 		},
 	},
@@ -68,6 +76,10 @@ const schema = {
 		format: Boolean,
 		default: false,
 	},
+	publicPathBase: {
+		format: String,
+		default: '',
+	},
 };
 const config = convict(schema);
 
@@ -83,9 +95,20 @@ config.set('isDev', config.get('env') === 'development');
 
 const assetConf = config.get('asset_server');
 
+// static assets served from app domain/port in prod, custom domain/port in dev
+const devAssetRoot = `//${assetConf.host}:${assetConf.port}`;
+const assetPath = `${assetConf.path}/`;
+config.set(
+	'publicPathBase',
+	config.get('isProd')
+		? assetPath // domain-relative public path
+		: `${devAssetRoot}${assetPath}`
+); // protocol-relative public path
+
 if (
 	assetConf.protocol === 'https' &&
-	(!fs.existsSync(assetConf.key_file) || !fs.existsSync(assetConf.crt_file)) &&
+	(!fs.existsSync(assetConf.key_file) ||
+		!fs.existsSync(assetConf.crt_file)) &&
 	config.isProd
 ) {
 	throw new Error('Missing HTTPS cert or key for asset server!');

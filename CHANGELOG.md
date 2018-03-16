@@ -1,6 +1,22 @@
+## [13.0]
+
+- **BREAKING CHANGE** `publicPath` now set as a config var that is shared by server
+  and browser build config - `APP_RUNTIME.assetPublicPath` is no longer populated
+  by server, and consumer apps no longer need to set a 'dynamic' `__webpack_public_path__`
+  value in either the server or browser entry point script
+- `asssetPublicPath` no longer needs to be passed to `server-render/makeRenderer`
+
+# [12.4]
+
+* **Bugfix** the Redux cache middleware will now key the cache with the logged-in
+  member's ID in order to avoid incorrectly returning cached results corresponding
+  to other members or logged-out responses.
+
+
 ## [12.3]
 
-- **New feature** `SEOHead` a component for rendering SEO content in the document head. Also adds related utils under `src/util/seo`. [WP-532](https://meetup.atlassian.net/browse/WP-532)
+- **New feature** `SEOHead` a component for rendering SEO content in the document
+  head. Also adds related utils under `src/util/seo`. [WP-532](https://meetup.atlassian.net/browse/WP-532)
 
 ## [12.2]
 

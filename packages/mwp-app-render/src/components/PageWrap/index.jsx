@@ -33,6 +33,25 @@ class PageWrap extends React.Component {
 		);
 	}
 
+	componentDidMount() {
+		// Browser has now rendered client-side application - fire the browser TTI trigger
+		if (window.newrelic) {
+			const now = new Date().getTime();
+			// 1. Set a marker in the trace details
+			window.newrelic.addToTrace({
+				name: 'appInteractive',
+				start: now,
+				type: 'Browser app has rendered and is interactive',
+			});
+			// 2. Add a custom attribute to the PageView & BrowserInteraction events in Insights
+			window.performance &&
+				window.newrelic.setCustomAttribute(
+					'timeToAppInteractive',
+					now - window.performance.timing.navigationStart // this is the event that NR uses as 'start' of page load
+				);
+		}
+	}
+
 	/**
 	 * @return {React.element} the page wrapping component
 	 */
@@ -53,15 +72,24 @@ class PageWrap extends React.Component {
 				{head}
 
 				<Helmet defaultTitle="Meetup" titleTemplate="%s - Meetup">
-					<meta name="viewport" content="width=device-width, initial-scale=1" />
-					<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+					<meta
+						name="viewport"
+						content="width=device-width, initial-scale=1"
+					/>
+					<meta
+						http-equiv="Content-Type"
+						content="text/html; charset=UTF-8"
+					/>
 					<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 					<meta name="robots" content="index,follow" />
 					<meta
 						name="verify-v1"
 						content="h5EhuAEkLFlZmMxwpH5wnRaoDEmqYCCEUE+FLcrRNvE="
 					/>
-					<script type="text/javascript" src={polyfillServiceUrl(localeCode)} />
+					<script
+						type="text/javascript"
+						src={polyfillServiceUrl(localeCode)}
+					/>
 					<script type="text/javascript">
 						{newrelicBrowserJS}
 					</script>

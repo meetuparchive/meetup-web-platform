@@ -31,7 +31,6 @@ function getInnerHTML(__html) {
 const DOM = props => {
 	const {
 		appMarkup = '',
-		assetPublicPath,
 		basename,
 		head,
 		initialState = {},
@@ -55,7 +54,6 @@ const DOM = props => {
 
 	const APP_RUNTIME = {
 		basename,
-		assetPublicPath,
 		escapedState,
 	};
 
@@ -113,7 +111,6 @@ const DOM = props => {
 
 DOM.propTypes = {
 	appMarkup: PropTypes.string,
-	assetPublicPath: PropTypes.string.isRequired,
 	basename: PropTypes.string,
 	head: PropTypes.shape({
 		// this is expected to come from Helmet.rewind()

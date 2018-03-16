@@ -12,15 +12,15 @@ const rules = require('./rules');
 
 /*
  * Webpack config object determined by passed-in localeCode. The language is
- * used to resolve the translated message module paths in applications that
- * support translations (currently not supported by starter kit), but also
- * to determine the output path, and to inject a WEBPACK_BASE_URL constant
- * referenced in built files
+ * used to resolve the translated message module paths and determine the output
+ * path
  *
  * The server app is a module that exports a rendering function that can be
  * imported by the server and used to render requests to the app route.
  */
 function getConfig(localeCode) {
+	const publicPath = `${env.properties.publicPathBase}${localeCode}/`;
+
 	const baseWebfontDir = path.resolve(
 		paths.src.server.app,
 		'assets',
@@ -30,7 +30,6 @@ function getConfig(localeCode) {
 		localeCode === 'ru-RU'
 			? path.resolve(baseWebfontDir, localeCode)
 			: baseWebfontDir;
-	const publicPath = `/${localeCode}/`;
 	const config = {
 		entry: {
 			'server-app': [paths.src.server.entry],
@@ -55,7 +54,6 @@ function getConfig(localeCode) {
 			new webpack.DefinePlugin({
 				// server bundles must reference _browser_ bundle public path
 				// - inject it as a 'global variable' here
-				WEBPACK_ASSET_PUBLIC_PATH: JSON.stringify(publicPath),
 				VENDOR_MANIFEST_PATH: JSON.stringify(
 					path.resolve(paths.output.browser, 'manifest.json')
 				),
@@ -84,12 +82,6 @@ function getConfig(localeCode) {
 			}),
 			/.*?build\//,
 		],
-
-		resolveLoader: {
-			alias: {
-				'require-loader': path.resolve(__dirname, 'require-loader.js'),
-			},
-		},
 
 		resolve: {
 			alias: {

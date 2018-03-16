@@ -17,6 +17,7 @@ const PROPS = {
 
 describe('PageWrap', () => {
 	it('renders correct UI elements', () => {
+		global.window = { newrelic: { addToTrace: jest.fn() } };
 		expect(
 			shallow(
 				<PageWrap {...PROPS}>
@@ -24,5 +25,12 @@ describe('PageWrap', () => {
 				</PageWrap>
 			)
 		).toMatchSnapshot();
+		delete global.window;
+	});
+	it('Calls NR trace in componentDidMount', () => {
+		global.window = { newrelic: { addToTrace: jest.fn() } };
+		shallow(<PageWrap {...PROPS} />).instance().componentDidMount();
+		expect(global.window.newrelic.addToTrace).toHaveBeenCalled();
+		delete global.window;
 	});
 });

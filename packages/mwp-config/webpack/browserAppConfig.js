@@ -18,8 +18,8 @@ const rules = require('./rules');
 function injectHotReloadConfig(config) {
 	config.entry.app.unshift(
 		'react-hot-loader/patch', // logic for hot-reloading react components
-		`webpack-dev-server/client?http://${env.properties.asset_server.host}:${env
-			.properties.asset_server.port}/`, // connect to HMR websocket
+		`webpack-dev-server/client?http://${env.properties.asset_server
+			.host}:${env.properties.asset_server.port}/`, // connect to HMR websocket
 		'webpack/hot/dev-server' // run the dev server
 	);
 
@@ -38,7 +38,13 @@ function injectHotReloadConfig(config) {
  * to determine the output path
  */
 function getConfig(localeCode) {
-	const baseWebfontDir = path.resolve(paths.src.server.app, 'assets', 'fonts');
+	const publicPath = `${env.properties.publicPathBase}${localeCode}/`;
+
+	const baseWebfontDir = path.resolve(
+		paths.src.server.app,
+		'assets',
+		'fonts'
+	);
 	const webfontDir =
 		localeCode === 'ru-RU'
 			? path.resolve(baseWebfontDir, localeCode)
@@ -56,18 +62,12 @@ function getConfig(localeCode) {
 				: '[name].[chunkhash].js', // in prod, add hash to enable long-term caching
 			chunkFilename: '[name].[chunkhash].js',
 			hashDigestLength: 8,
-			publicPath: `/mu_static/${localeCode}/`,
+			publicPath,
 		},
 
 		devtool: 'cheap-module-source-map', // similar speed to 'eval', but with proper source maps
 
 		module: { rules: [rules.file, rules.scssModule, rules.css, rules.js.browser, rules.raw] },
-
-		resolveLoader: {
-			alias: {
-				'require-loader': path.resolve(__dirname, 'require-loader.js'),
-			},
-		},
 
 		resolve: {
 			alias: {
@@ -97,7 +97,7 @@ function getConfig(localeCode) {
 					'vendor-dll-manifest.json'
 				)),
 			}),
-			new ManifestPlugin({ writeToFileEmit: true }), // emit manifest from dev-server build
+			new ManifestPlugin({ publicPath, writeToFileEmit: true }), // emit manifest from dev-server build
 			new StatsPlugin({ fields: null }), // null means 'all fields in stats file'
 		],
 	};

@@ -30,6 +30,9 @@ export const cacheClearEpic = cache => action => {
 	return cache.clear().then(() => []);
 };
 
+const getMemberId = state =>
+	(((state.api.self || {}).value || {}).id || 0).toString();
+
 /**
  * Listen for any action that should set cached state with a
  * `{ queries, responses }` payload
@@ -40,12 +43,13 @@ export const cacheClearEpic = cache => action => {
  *
  * Not that this will set the cache without emitting an action
  */
-export const cacheSetEpic = cache => action => {
+export const cacheSetEpic = cache => (action, store) => {
 	if (![API_RESP_SUCCESS, CACHE_SET].some(type => action.type === type)) {
 		return Promise.resolve([]);
 	}
 	const { payload: { query, response } } = action;
-	return cacheWriter(cache)(query, response).then(() => []);
+	const writeCache = cacheWriter(cache, getMemberId(store.getState()));
+	return writeCache(query, response).then(() => []);
 };
 
 /**
@@ -56,12 +60,13 @@ export const cacheSetEpic = cache => action => {
  * the results are collated into a single response object containing the cache
  * hits.
  */
-export const cacheQueryEpic = cache => action => {
+export const cacheQueryEpic = cache => (action, store) => {
 	if (action.type !== API_REQ) {
 		return Promise.resolve([]);
 	}
 	const { payload: queries } = action;
-	return Promise.all(queries.map(cacheReader(cache))) // read cache for all queries
+	const readCache = cacheReader(cache, getMemberId(store.getState()));
+	return Promise.all(queries.map(readCache)) // read cache for all queries
 		.then(responses => responses.filter(({ query, response }) => response)) // filter out the misses
 		.then(hits => hits.map(cacheSuccess)); // map the hits onto cacheSuccess actions
 };
