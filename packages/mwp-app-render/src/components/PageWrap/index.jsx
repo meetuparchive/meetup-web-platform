@@ -2,8 +2,6 @@ import React from 'react';
 import Helmet from 'react-helmet';
 import PropTypes from 'prop-types';
 
-import { polyfillServiceUrl } from './browserPolyfill';
-
 /*
  * This just imports a blob of JS that New Relic give us so we can track usage/errors from real
  * users. We should only need to upgrade it in the event New Relic makes a major change, which
@@ -85,10 +83,6 @@ class PageWrap extends React.Component {
 					<meta
 						name="verify-v1"
 						content="h5EhuAEkLFlZmMxwpH5wnRaoDEmqYCCEUE+FLcrRNvE="
-					/>
-					<script
-						type="text/javascript"
-						src={polyfillServiceUrl(localeCode)}
 					/>
 					<script type="text/javascript">
 						{newrelicBrowserJS}
