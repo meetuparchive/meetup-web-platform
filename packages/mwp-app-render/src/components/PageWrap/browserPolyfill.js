@@ -6,9 +6,11 @@ export function polyfillServiceUrl(localeCode) {
 	const features = [
 		'default-3.6', // This includes a _lot_ of common polyfils - check https://polyfill.io/v2/docs/features/
 		'fetch', // IE, Safari
-		'Array.prototype.find', // IE 11
-		'Array.prototype.includes', // IE 11
-		'Object.values', // IE 11
+		'Intl',
+		`Intl.~locale.${localeCode}`,
+		'Array.prototype.find', // IE
+		'Array.prototype.includes', // IE
+		'Object.values', // IE, Safari
 	];
 	const flags = [
 		'gated', // use feature detection in addition to user agent test
