@@ -2,6 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import escapeHtml from 'escape-html';
 
+import { polyfillServiceUrl } from 'mwp-app-render/lib/components/PageWrap/browserPolyfill';
+
 function getInnerHTML(__html) {
 	return {
 		__html,
@@ -36,9 +38,17 @@ const DOM = props => {
 		initialState = {},
 		scripts,
 		cssLinks,
+		userAgent,
 	} = props;
 
-	const htmlLang = initialState.config.requestLanguage.split('-')[0];
+	const localeCode = initialState.config.requestLanguage;
+	console.log('Sadaf');
+	console.log(localeCode);
+	const htmlLang = localeCode.split('-')[0];
+
+	// Polyfill all browsers except Chrome and Firefox
+	const doPolyfill = userAgent && userAgent.indexOf("Chrome") === -1 && userAgent.indexOf("Firefox") === -1;
+	console.log(doPolyfill);
 
 	/**
 	 * `initialState` has untrusted user-generated content that needs to be
@@ -79,6 +89,12 @@ const DOM = props => {
 					id="outlet"
 					dangerouslySetInnerHTML={getInnerHTML(appMarkup)}
 				/>
+				{doPolyfill &&
+					<script
+						type="text/javascript"
+						src={polyfillServiceUrl(localeCode)}
+					/>
+				}
 				<script
 					dangerouslySetInnerHTML={getInnerHTML(
 						`window.APP_RUNTIME=${JSON.stringify(APP_RUNTIME)};`
@@ -103,6 +119,7 @@ DOM.propTypes = {
 	initialState: PropTypes.object.isRequired,
 	scripts: PropTypes.array.isRequired,
 	cssLinks: PropTypes.arrayOf(PropTypes.string),
+	userAgent: PropTypes.string,
 };
 
 export default DOM;

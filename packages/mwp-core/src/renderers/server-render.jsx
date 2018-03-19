@@ -109,6 +109,7 @@ const getRouterRenderer = ({
 	basename,
 	scripts,
 	cssLinks,
+	userAgent,
 }): RenderResult => {
 	// pre-render the app-specific markup, this is the string of markup that will
 	// be managed by React on the client.
@@ -156,6 +157,7 @@ const getRouterRenderer = ({
 			appMarkup={appMarkup}
 			scripts={scripts}
 			cssLinks={cssLinks}
+			userAgent={userAgent}
 		/>
 	);
 
@@ -296,6 +298,7 @@ const makeRenderer = (
 			basename,
 			scripts,
 			cssLinks,
+			userAgent,
 		})
 	);
 };
