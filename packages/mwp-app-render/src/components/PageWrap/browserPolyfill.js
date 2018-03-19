@@ -3,6 +3,10 @@
  * @return {String} the polyfill.io cdn string
  */
 export function polyfillServiceUrl(localeCode) {
+	/*
+	 * the majority of these polyfills are need for IE 11 and Safari 10
+	 * and whatever if required for partial support of slightly older browsers
+	 */
 	const features = [
 		'default-3.6', // This includes a _lot_ of common polyfils - check https://polyfill.io/v2/docs/features/
 		'fetch', // IE, Safari
