@@ -36,6 +36,7 @@ const DOM = props => {
 		initialState = {},
 		scripts,
 		cssLinks,
+		inlineStyleTags,
 	} = props;
 
 	const htmlLang = initialState.config.requestLanguage.split('-')[0];
@@ -57,24 +58,6 @@ const DOM = props => {
 		escapedState,
 	};
 
-	// simple-universal-style-loader accumulates CSS Module style rules
-	// in node's `global` object under the `__styles__` key.
-	//
-	// If this key is populated, we render a single style tag with all
-	// module styles needed for the request.
-	let moduleStyleTag;
-	if ( global.__styles__ ) {
-		moduleStyleTag = global.__styles__
-			.map(style =>
-				<style
-					type="text/css"
-					key={style.id}
-				>
-					{style.parts.map(part => part.css)}
-				</style>
-			)
-	}
-
 	return (
 		<html lang={htmlLang}>
 			<head>
@@ -91,7 +74,7 @@ const DOM = props => {
 							key={key}
 						/>
 					)}
-				{moduleStyleTag}
+				{inlineStyleTags}
 			</head>
 			<body>
 				<div
@@ -122,6 +105,7 @@ DOM.propTypes = {
 	initialState: PropTypes.object.isRequired,
 	scripts: PropTypes.array.isRequired,
 	cssLinks: PropTypes.arrayOf(PropTypes.string),
+	inlineStyleTags: PropTypes.arrayOf(PropTypes.element),
 };
 
 export default DOM;
