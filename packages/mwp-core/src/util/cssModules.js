@@ -8,7 +8,7 @@ import { getStyles } from 'simple-universal-style-loader';
  *
  * @returns {Array} - array of inline style tags
  */
-export default function getInlineStyleTags(): array {
+export function getInlineStyleTags(): array {
 	return getStyles() && getStyles()
 		.map(style =>
 			<style
