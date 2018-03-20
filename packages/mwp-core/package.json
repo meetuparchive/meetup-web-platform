@@ -39,6 +39,7 @@
     "mwp-store": ">=0.0.1",
     "node-fetch": "1.7.2",
     "pino": "4.7.1",
+    "simple-universal-style-loader": "0.14.4",
     "qs": "6.5.0"
   },
   "devDependencies": {}
