@@ -1,4 +1,5 @@
 // @flow
+import React from 'react';
 import { getStyles } from 'simple-universal-style-loader';
 
 /**
