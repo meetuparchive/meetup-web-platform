@@ -157,6 +157,7 @@ const getRouterRenderer = ({
 			appMarkup={appMarkup}
 			scripts={scripts}
 			cssLinks={cssLinks}
+			inlineStyleTags={getInlineStyleTags()}
 		/>
 	);
 
