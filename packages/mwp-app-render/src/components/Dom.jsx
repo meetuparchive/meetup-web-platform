@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import escapeHtml from 'escape-html';
 
-import { polyfillServiceUrl } from 'mwp-app-render/lib/components/PageWrap/browserPolyfill';
+import { getPolyfill } from 'mwp-app-render/lib/components/PageWrap/browserPolyfill';
 
 function getInnerHTML(__html) {
 	return {
@@ -44,9 +44,13 @@ const DOM = props => {
 	const localeCode = initialState.config.requestLanguage;
 	const htmlLang = localeCode.split('-')[0];
 
-	// Polyfill all browsers except Chrome and Firefox
-	// TODO: fine-tune this or leave is for now?
-	const doPolyfill = userAgent && userAgent.indexOf("Chrome") === -1 && userAgent.indexOf("Firefox") === -1;
+	/**
+	 * Add polyfill.io script if needed
+	 */
+	const polyfill = getPolyfill(userAgent, localeCode);
+	if(polyfill) {
+		scripts.push(polyfill);
+	}
 
 	/**
 	 * `initialState` has untrusted user-generated content that needs to be
@@ -92,12 +96,6 @@ const DOM = props => {
 						`window.APP_RUNTIME=${JSON.stringify(APP_RUNTIME)};`
 					)}
 				/>
-				{doPolyfill &&
-					<script
-						type="text/javascript"
-						src={polyfillServiceUrl(localeCode)}
-					/>
-				}
 				{scripts.map((url, key) => <script src={url} key={key} />)}
 			</body>
 		</html>
