@@ -48,8 +48,8 @@ const DOM = props => {
 	 * Add polyfill.io script if needed
 	 */
 	const polyfill = getPolyfill(userAgent, localeCode);
-	if(polyfill) {
-		scripts.push(polyfill);
+	if (polyfill) {
+		scripts.unshift(polyfill);
 	}
 
 	/**

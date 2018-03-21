@@ -30,11 +30,11 @@ exports[`Dom renders with mock props 1`] = `
     />
     <script
       key="0"
-      src="script.js"
+      src="https://cdn.polyfill.io/v2/polyfill.min.js?features=default-3.6,fetch,Intl,Intl.~locale.fr-FR,Array.prototype.find,Array.prototype.includes,Object.values&flags=gated"
     />
     <script
       key="1"
-      src="https://cdn.polyfill.io/v2/polyfill.min.js?features=default-3.6,fetch,Intl,Intl.~locale.fr-FR,Array.prototype.find,Array.prototype.includes,Object.values&flags=gated"
+      src="script.js"
     />
   </body>
 </html>
