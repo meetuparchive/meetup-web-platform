@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import escapeHtml from 'escape-html';
 
-import { getPolyfill } from 'mwp-app-render/lib/components/PageWrap/browserPolyfill';
+import { getPolyfill } from 'mwp-app-render/lib/util/browserPolyfill';
 
 function getInnerHTML(__html) {
 	return {
