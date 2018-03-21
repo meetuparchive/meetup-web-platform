@@ -2,6 +2,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import escapeHtml from 'escape-html';
 
+import { getPolyfill } from 'mwp-app-render/lib/util/browserPolyfill';
+
 function getInnerHTML(__html) {
 	return {
 		__html,
@@ -36,9 +38,19 @@ const DOM = props => {
 		initialState = {},
 		scripts,
 		cssLinks,
+		userAgent,
 	} = props;
 
-	const htmlLang = initialState.config.requestLanguage.split('-')[0];
+	const localeCode = initialState.config.requestLanguage;
+	const htmlLang = localeCode.split('-')[0];
+
+	/**
+	 * Add polyfill.io script if needed
+	 */
+	const polyfill = getPolyfill(userAgent, localeCode);
+	if(polyfill) {
+		scripts.push(polyfill);
+	}
 
 	/**
 	 * `initialState` has untrusted user-generated content that needs to be
@@ -103,6 +115,7 @@ DOM.propTypes = {
 	initialState: PropTypes.object.isRequired,
 	scripts: PropTypes.array.isRequired,
 	cssLinks: PropTypes.arrayOf(PropTypes.string),
+	userAgent: PropTypes.string,
 };
 
 export default DOM;
