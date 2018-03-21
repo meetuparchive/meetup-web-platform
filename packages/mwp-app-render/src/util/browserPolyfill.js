@@ -1,3 +1,5 @@
+// @flow
+
 /**
  * List of useragent sub-strings that don't require a polyfill
  */
@@ -7,7 +9,7 @@ export const userAgentPolyfillBlacklist = ['Chrome', 'Firefox'];
  * @param {String} localeCode the 'xx-XX' language code for the app
  * @return {String} the polyfill.io cdn string
  */
-export const polyfillServiceUrl = (localeCode) => {
+export const polyfillServiceUrl = (localeCode: string): string => {
 	const features = [
 		'default-3.6', // This includes a _lot_ of common polyfils - check https://polyfill.io/v2/docs/features/
 		'fetch', // IE, Safari
@@ -31,4 +33,4 @@ export const polyfillServiceUrl = (localeCode) => {
  * @param {String} localeCode xx-XX locale string for current request
  * @returns {Boolean|String} the polyfill service url or false
  */
-export const getPolyfill = (userAgent, localeCode) => !userAgentPolyfillBlacklist.some(ua => userAgent.includes(ua)) && polyfillServiceUrl(localeCode);
+export const getPolyfill = (userAgent: string, localeCode: string): boolean | string => !userAgentPolyfillBlacklist.some(ua => userAgent.includes(ua)) && polyfillServiceUrl(localeCode);
