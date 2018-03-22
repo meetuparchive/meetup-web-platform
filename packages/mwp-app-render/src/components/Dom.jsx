@@ -48,9 +48,7 @@ const DOM = props => {
 	 * Add polyfill.io script if needed
 	 */
 	const polyfill = getPolyfill(userAgent, localeCode);
-	if (polyfill) {
-		scripts.unshift(polyfill);
-	}
+	const js = polyfill ? [polyfill, ...scripts] : [...scripts];
 
 	/**
 	 * `initialState` has untrusted user-generated content that needs to be
@@ -96,7 +94,7 @@ const DOM = props => {
 						`window.APP_RUNTIME=${JSON.stringify(APP_RUNTIME)};`
 					)}
 				/>
-				{scripts.map((url, key) => <script src={url} key={key} />)}
+				{js.map((url, key) => <script src={url} key={key} />)}
 			</body>
 		</html>
 	);
