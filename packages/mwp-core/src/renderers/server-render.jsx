@@ -1,4 +1,5 @@
 // @flow
+import newrelic from 'newrelic';
 import type { Reducer } from 'redux';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
@@ -289,14 +290,19 @@ const makeRenderer = (
 	});
 
 	return initializeStore.then(initializedStore =>
-		getRouterRenderer({
-			routes,
-			store: initializedStore,
-			location: url,
-			basename,
-			scripts,
-			cssLinks,
-		})
+		// create tracer and immediately invoke the resulting function
+		// trace should start before rendering, finish after rendering
+		newrelic.createTracer(
+			'serverRender',
+			getRouterRenderer({
+				routes,
+				store: initializedStore,
+				location: url,
+				basename,
+				scripts,
+				cssLinks,
+			})
+		)()
 	);
 };
 

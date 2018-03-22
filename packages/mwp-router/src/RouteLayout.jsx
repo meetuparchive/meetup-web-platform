@@ -9,7 +9,7 @@ import AsyncRoute from './AsyncRoute';
  */
 class RouteLayout extends React.Component {
 	render() {
-		const { routes, matchedPath = '/' } = this.props;
+		const { routes, matchedPath = '/', childProps } = this.props;
 
 		return (
 			<Switch>
@@ -25,7 +25,12 @@ class RouteLayout extends React.Component {
 							path={path}
 							exact={route.exact || false}
 							strict={route.strict || false}
-							render={props => <AsyncRoute {...props} route={route} />}
+							render={props =>
+								<AsyncRoute
+									{...props}
+									{...childProps}
+									route={route}
+								/>}
 						/>
 					);
 				})}
@@ -36,6 +41,7 @@ class RouteLayout extends React.Component {
 
 RouteLayout.propTypes = {
 	routes: PropTypes.arrayOf(PropTypes.object).isRequired,
+	childProps: PropTypes.object,
 	matchedPath: PropTypes.string,
 };
 

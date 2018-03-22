@@ -1,4 +1,5 @@
 // @flow
+import newrelic from 'newrelic';
 // Implicit dependency: tracking plugin providing request.trackActivity method
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/zip';
@@ -40,6 +41,8 @@ export default (request: HapiRequest) => {
 		// This call uses `.first()` to guarantee a single response because WP-596
 		// indicated there were sporadic duplicate activity tracking logs, possibly
 		// related to request errors
-		return Observable.zip(...apiRequests$).first().do(request.trackActivity);
+		return Observable.zip(...apiRequests$)
+			.first()
+			.do(newrelic.createTracer('apiRequests', request.trackActivity));
 	};
 };
