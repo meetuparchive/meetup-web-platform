@@ -10,7 +10,7 @@ import { getStyles } from 'simple-universal-style-loader';
  *
  * @returns {Array} - array of style tags
  */
-export function getInlineStyleTags(): array {
+export function getInlineStyleTags(): Array<React$Element<'style'>> {
 	return getStyles() && getStyles()
 		.map(style =>
 			<style
