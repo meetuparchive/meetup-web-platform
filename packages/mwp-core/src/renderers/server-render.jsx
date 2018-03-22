@@ -58,20 +58,21 @@ const resolveSideEffects = () => ({
 /**
  * Get media from X-UA-Device header set by Fastly which parses the user agent string
  */
-const getMedia = (userAgentDevice: string) => {
+const getMedia = (userAgent: string, userAgentDevice: string) => {
 	const isAtSmallUp = true;
 	let isMobile = true;
 	let isTablet = false;
 
-	if (userAgentDevice instanceof MobileDetect) {
-		isMobile = Boolean(userAgentDevice.phone());
-		isTablet = Boolean(userAgentDevice.tablet());
-	} else {
+	if (userAgentDevice) {
 		isMobile =
 			userAgentDevice === 'smartphone' ||
 			userAgentDevice === 'mobilebot' ||
 			userAgentDevice === 'mobile';
 		isTablet = userAgentDevice === 'tablet';
+	} else {
+		const mobileDetect = new MobileDetect(userAgent);
+		isMobile = Boolean(mobileDetect.phone());
+		isTablet = Boolean(mobileDetect.tablet());
 	}
 
 	return {
@@ -228,10 +229,7 @@ const makeRenderer = (
 		headers['x-forwarded-host'] || headers['x-meetup-host'] || info.host;
 	const host = `${requestProtocol}://${domain}`;
 	const userAgent = headers['user-agent'];
-	const userAgentDevice =
-		headers['x-ua-device']
-			? headers['x-ua-device'] // set by fastly
-			: new MobileDetect(userAgent); // fallback to the real ua
+	const userAgentDevice = headers['x-ua-device']; // set by fastly
 
 	// create the store with populated `config`
 	const initialState = {
@@ -244,7 +242,7 @@ const makeRenderer = (
 			initialNow: new Date().getTime(),
 			variants: getVariants(state),
 			entryPath: url.pathname, // the path that the user entered the app on
-			media: getMedia(userAgentDevice),
+			media: getMedia(userAgent, userAgentDevice),
 		},
 	};
 
