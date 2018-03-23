@@ -231,7 +231,7 @@ const makeRenderer = (
 		headers['x-forwarded-host'] || headers['x-meetup-host'] || info.host;
 	const host = `${requestProtocol}://${domain}`;
 	const userAgent = headers['user-agent'];
-	const userAgentDevice = headers['x-ua-device']; // set by fastly
+	const userAgentDevice = headers['x-ua-device'] || ''; // set by fastly
 
 	// create the store with populated `config`
 	const initialState = {
