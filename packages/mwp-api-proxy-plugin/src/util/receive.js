@@ -1,4 +1,3 @@
-const newrelic = require('newrelic');
 import querystring from 'qs';
 import { logger } from 'mwp-logger-plugin';
 
@@ -259,7 +258,7 @@ export const makeReceive = request => {
 		const apiResponseToQueryResponse = makeApiResponseToQueryResponse(
 			query
 		);
-		return newrelic.createTracer('meetupApiRequest', response => {
+		return response => {
 			logResponse(response); // this will leak private API response data into production logs
 			injectResponseCookies(response);
 			try {
@@ -272,6 +271,6 @@ export const makeReceive = request => {
 					},
 				};
 			}
-		});
+		};
 	};
 };

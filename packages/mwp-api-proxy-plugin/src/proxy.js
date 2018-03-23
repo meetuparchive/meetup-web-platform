@@ -34,7 +34,9 @@ export default (request: HapiRequest) => {
 
 		// create an array of in-flight API request Observables
 		const apiRequests$ = queries.map(query =>
-			send$(query).map(receive(query)).map(setApiResponseDuotones)
+			send$(query)
+				.map(newrelic.createTracer('meetupApiRequest', receive(query)))
+				.map(setApiResponseDuotones)
 		);
 
 		// Zip them together to make requests in parallel and return responses in order.
