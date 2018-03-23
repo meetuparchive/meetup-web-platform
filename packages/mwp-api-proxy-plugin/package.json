@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "peerDependencies": {
+    "newrelic": "^3.2.0",
     "rxjs": "^5.4.3"
   },
   "dependencies": {
