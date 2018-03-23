@@ -255,7 +255,9 @@ export const makeReceive = request => {
 	const injectResponseCookies = makeInjectResponseCookies(request);
 	return query => {
 		const parseApiResponse = makeParseApiResponse(query);
-		const apiResponseToQueryResponse = makeApiResponseToQueryResponse(query);
+		const apiResponseToQueryResponse = makeApiResponseToQueryResponse(
+			query
+		);
 		return response => {
 			logResponse(response); // this will leak private API response data into production logs
 			injectResponseCookies(response);
