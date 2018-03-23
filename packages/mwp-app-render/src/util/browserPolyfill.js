@@ -33,4 +33,9 @@ export const polyfillServiceUrl = (localeCode: string): string => {
  * @param {String} localeCode xx-XX locale string for current request
  * @returns {Boolean|String} the polyfill service url or false
  */
-export const getPolyfill = (userAgent: string, localeCode: string): boolean | string => !userAgentPolyfillBlacklist.some(ua => userAgent.includes(ua)) && polyfillServiceUrl(localeCode);
+export const getPolyfill = (
+	userAgent: ?string,
+	localeCode: string
+): boolean | string =>
+	!userAgentPolyfillBlacklist.some(ua => (userAgent || '').includes(ua)) &&
+	polyfillServiceUrl(localeCode);
