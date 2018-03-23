@@ -1,4 +1,5 @@
 // @flow
+import newrelic from 'newrelic';
 // Implicit dependency: tracking plugin providing request.trackActivity method
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/zip';
@@ -33,13 +34,17 @@ export default (request: HapiRequest) => {
 
 		// create an array of in-flight API request Observables
 		const apiRequests$ = queries.map(query =>
-			send$(query).map(receive(query)).map(setApiResponseDuotones)
+			send$(query)
+				.map(newrelic.createTracer('meetupApiRequest', receive(query)))
+				.map(setApiResponseDuotones)
 		);
 
 		// Zip them together to make requests in parallel and return responses in order.
 		// This call uses `.first()` to guarantee a single response because WP-596
 		// indicated there were sporadic duplicate activity tracking logs, possibly
 		// related to request errors
-		return Observable.zip(...apiRequests$).first().do(request.trackActivity);
+		return Observable.zip(...apiRequests$)
+			.first()
+			.do(newrelic.createTracer('apiRequests', request.trackActivity));
 	};
 };
