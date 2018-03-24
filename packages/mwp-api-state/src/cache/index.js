@@ -12,8 +12,8 @@ import { makeCache, cacheReader, cacheWriter } from './util';
 
 export function checkEnable() {
 	if (typeof window !== 'undefined' && window.location) {
-		const currentUrl = new URL(window.location.href);
-		return !currentUrl.searchParams.has('__nocache');
+		const { searchParams } = new URL(window.location.href);
+		return !searchParams || !searchParams.has('__nocache');
 	}
 	return true;
 }
