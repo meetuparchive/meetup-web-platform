@@ -1,9 +1,10 @@
 // @flow
-
+// use mobile-detect to check browser agent name because we are using it in server-render as well
+import detect from 'browser-detect';
 /**
- * List of useragent sub-strings that don't require a polyfill
+ * List of useragent sub-strings that don't require a polyfill - lowercase
  */
-export const userAgentPolyfillBlacklist = ['Chrome', 'Firefox'];
+export const userAgentPolyfillBlacklist = ['chrome', 'firefox'];
 
 /**
  * @param {String} localeCode the 'xx-XX' language code for the app
@@ -37,5 +38,5 @@ export const getPolyfill = (
 	userAgent: ?string,
 	localeCode: string
 ): boolean | string =>
-	!userAgentPolyfillBlacklist.some(ua => (userAgent || '').includes(ua)) &&
+	!userAgentPolyfillBlacklist.includes(detect(userAgent).name) &&
 	polyfillServiceUrl(localeCode);
