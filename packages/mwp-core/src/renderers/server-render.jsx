@@ -295,20 +295,17 @@ const makeRenderer = (
 
 	return initializeStore.then(
 		initializedStore =>
-			// create tracer and immediately invoke the resulting function
+			// create tracer and immediately invoke the resulting function.
 			// trace should start before rendering, finish after rendering
-			newrelic.createTracer(
-				'serverRender',
-				getRouterRenderer({
-					routes,
-					store: initializedStore,
-					location: url,
-					basename,
-					scripts,
-					cssLinks,
-					userAgent,
-				})
-			)() // self-invoke
+			newrelic.createTracer('serverRender', getRouterRenderer)({
+				routes,
+				store: initializedStore,
+				location: url,
+				basename,
+				scripts,
+				cssLinks,
+				userAgent,
+			}) // immediately invoke callback
 	);
 };
 
