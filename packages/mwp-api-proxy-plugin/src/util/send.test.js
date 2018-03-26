@@ -322,7 +322,7 @@ describe('makeExternalApiRequest', () => {
 
 		return makeExternalApiRequest({
 			server: {
-				app: { logger: { error: () => { } } },
+				app: { logger: { error: () => {} } },
 				settings: { app: { api: { timeout: 100 } } },
 			},
 			raw: {},

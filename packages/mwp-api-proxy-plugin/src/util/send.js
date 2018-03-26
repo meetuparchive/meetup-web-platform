@@ -285,10 +285,10 @@ export const makeMockRequest = (
 	mockResponseContent,
 	responseMeta
 ) => requestOpts =>
-		Observable.of([
-			makeMockResponse(requestOpts, responseMeta),
-			JSON.stringify(mockResponseContent),
-		]);
+    Observable.of([
+	    makeMockResponse(requestOpts, responseMeta),
+	    JSON.stringify(mockResponseContent),
+    ]);
 
 const externalRequest$ = Observable.bindNodeCallback(externalRequest);
 /**

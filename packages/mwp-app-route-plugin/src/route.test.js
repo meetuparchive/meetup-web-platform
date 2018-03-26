@@ -9,7 +9,7 @@ describe('onPreResponse.method', () => {
 		const errorMessage = 'foobar';
 		const errorCode = 432;
 		const response = Boom.create(errorCode, errorMessage);
-		response.header = ((key, val) => val)
+		response.header = ((key,val) =>val);
 
 		const request = {
 			response,
@@ -17,7 +17,7 @@ describe('onPreResponse.method', () => {
 			server: getServer(),
 		};
 		const replyObj = {
-			code() { },
+			code() {},
 		};
 		const spyable = {
 			reply: () => replyObj,
