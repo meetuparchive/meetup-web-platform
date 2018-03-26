@@ -1,7 +1,7 @@
 import Boom from 'boom';
 import { MOCK_RENDER_RESULT } from 'meetup-web-mocks/lib/app';
 import { getServer } from 'mwp-test-utils';
-import getRoute, { onPreResponse } from './route';
+import getRoute, { onPreResponse, EXTERNAL_TRACK_HEADER, EXTERNAL_TRACK_URL_HEADER } from './route';
 
 describe('onPreResponse.method', () => {
 	it('returns html containing error message', () => {
@@ -38,11 +38,12 @@ describe('onPreResponse.method', () => {
 				'en-US': () => Promise.resolve({ statusCode: 200, result }),
 			})
 		);
+		const mockXtd = 'helloIAmAJunkParam';
 		return server
-			.inject({ url: '/?_xtd=helloIAmAJunkParam' })
+			.inject({ url: `/?junk=junkyjunk&_xtd=${mockXtd}` })
 			.then(response => {
-				expect(response.headers['X-Meetup-External-Track']).toBe('helloIAmAJunkParam');
-				expect(response.headers['X-Meetup-External-Track-Url']).toBe(request.route);
+				expect(response.headers[EXTERNAL_TRACK_HEADER]).toBe(mockXtd);
+				expect(response.headers[EXTERNAL_TRACK_URL_HEADER]).toBe(response.request.url.href);
 			});
 	});
 	it('serves the homepage route', () => {
