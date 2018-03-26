@@ -3,6 +3,9 @@ import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import getHandler from './handler';
 
+export const EXTERNAL_TRACK_HEADER = 'x-meetup-external-track';
+export const EXTERNAL_TRACK_URL_HEADER = 'x-meetup-external-track-url';
+
 export const onPreResponse = {
 	/*
 	 * This function processes the route response before it is sent to the client.
@@ -12,7 +15,13 @@ export const onPreResponse = {
 	 */
 	method: (request: HapiRequest, reply: HapiReply) => {
 		const response = request.response;
-
+		if (request.query) {
+			const trackingParam = request.query['_xtd']
+			if (trackingParam) {
+				response.header(EXTERNAL_TRACK_HEADER, trackingParam);
+				response.header(EXTERNAL_TRACK_URL_HEADER, request.url.href);
+			}
+		}
 		if (!response.isBoom || process.env.NODE_ENV === 'production') {
 			return reply.continue();
 		}

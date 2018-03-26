@@ -1,7 +1,7 @@
 import Boom from 'boom';
 import { MOCK_RENDER_RESULT } from 'meetup-web-mocks/lib/app';
 import { getServer } from 'mwp-test-utils';
-import getRoute, { onPreResponse } from './route';
+import getRoute, { onPreResponse, EXTERNAL_TRACK_HEADER, EXTERNAL_TRACK_URL_HEADER } from './route';
 
 describe('onPreResponse.method', () => {
 	it('returns html containing error message', () => {
@@ -9,7 +9,7 @@ describe('onPreResponse.method', () => {
 		const errorMessage = 'foobar';
 		const errorCode = 432;
 		const response = Boom.create(errorCode, errorMessage);
-		response.header = ((key,val) =>val)
+		response.header = ((key, val) => val)
 
 		const request = {
 			response,
@@ -17,7 +17,7 @@ describe('onPreResponse.method', () => {
 			server: getServer(),
 		};
 		const replyObj = {
-			code() {},
+			code() { },
 		};
 		const spyable = {
 			reply: () => replyObj,
@@ -29,6 +29,22 @@ describe('onPreResponse.method', () => {
 		const errorMarkup = spyable.reply.calls.mostRecent().args[0];
 		expect(errorMarkup).toContain(errorMessage);
 		expect(replyObj.code).toHaveBeenCalledWith(errorCode);
+	});
+	it('returns X-Meetup-External-Track and X-Meetup-External-Track-Url headers if _xtd query param exists', () => {
+		const server = getServer();
+		const result = 'ok';
+		server.route(
+			getRoute({
+				'en-US': () => Promise.resolve({ statusCode: 200, result }),
+			})
+		);
+		const mockXtd = 'helloIAmAJunkParam';
+		return server
+			.inject({ url: `/?junk=junkyjunk&_xtd=${mockXtd}` })
+			.then(response => {
+				expect(response.headers[EXTERNAL_TRACK_HEADER]).toBe(mockXtd);
+				expect(response.headers[EXTERNAL_TRACK_URL_HEADER]).toBe(response.request.url.href);
+			});
 	});
 	it('serves the homepage route', () => {
 		const server = getServer();
