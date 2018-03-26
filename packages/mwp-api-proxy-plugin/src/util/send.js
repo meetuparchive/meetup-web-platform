@@ -195,6 +195,19 @@ export function getClientIpHeader(request) {
 	if (clientIP) {
 		return { 'X-Meetup-Client-Ip': clientIP };
 	}
+	return {};
+}
+
+export function getTrackingHeaders(request) {
+	// email tracking with _xtd query param: https://meetup.atlassian.net/wiki/spaces/DAT/pages/27754630/Email+Tracking
+	const trackingParam = request.query._xtd;
+	if (trackingParam) {
+		return {
+			'X-Meetup-External-Track': trackingParam,
+			'X-Meetup-External-Track-Url': request.url.href,
+		};
+	}
+	return {};
 }
 
 export function parseRequestHeaders(request) {
@@ -202,6 +215,7 @@ export function parseRequestHeaders(request) {
 		...request.headers,
 		...getAuthHeaders(request),
 		...getClientIpHeader(request),
+		...getTrackingHeaders(request),
 		'accept-language': getLanguageHeader(request),
 		'x-meetup-agent': config.package.agent,
 		'x-meetup-parent-request-id': request.id,
