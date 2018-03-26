@@ -197,11 +197,23 @@ export function getClientIpHeader(request) {
 	}
 }
 
+export function getTrackingHeaders(request) {
+	// email tracking with _xtd query param: https://meetup.atlassian.net/wiki/spaces/DAT/pages/27754630/Email+Tracking
+	var trackingParam = request.query._xtd;
+	if (trackingParam) {
+		return {
+			"X-Meetup-External-Track": trackingParam,
+			"X-Meetup-External-Track-Url": request.url.href,
+		};
+	}
+}
+
 export function parseRequestHeaders(request) {
 	const externalRequestHeaders = {
 		...request.headers,
 		...getAuthHeaders(request),
 		...getClientIpHeader(request),
+		...getTrackingHeaders(request),
 		'accept-language': getLanguageHeader(request),
 		'x-meetup-agent': config.package.agent,
 		'x-meetup-parent-request-id': request.id,
@@ -218,7 +230,7 @@ export function parseRequestHeaders(request) {
 /*
  * In multipart form requests, the parsed payload includes string key-value
  * pairs for regular inputs, and raw Buffer objects for file uploads
- * 
+ *
  * This function passes through regular input values unchanged, but formats the
  * file buffers into a { value, options } object that can be used in request
  * formData
@@ -241,7 +253,7 @@ export const parseMultipart = payload =>
  * request properties. The resulting value will be used as the _base_ set of
  * options for _every_ parallel REST API request made by the platform
  * corresponding to single incoming request.
- * 
+ *
  * @return {Object} externalRequestOpts
  */
 export function getExternalRequestOpts(request) {
@@ -271,10 +283,10 @@ export const makeMockRequest = (
 	mockResponseContent,
 	responseMeta
 ) => requestOpts =>
-	Observable.of([
-		makeMockResponse(requestOpts, responseMeta),
-		JSON.stringify(mockResponseContent),
-	]);
+		Observable.of([
+			makeMockResponse(requestOpts, responseMeta),
+			JSON.stringify(mockResponseContent),
+		]);
 
 const externalRequest$ = Observable.bindNodeCallback(externalRequest);
 /**
