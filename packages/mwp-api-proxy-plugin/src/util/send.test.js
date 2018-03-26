@@ -104,7 +104,7 @@ describe('getClientIpHeader', () => {
 			headers: {},
 			query: {},
 		};
-		expect(getClientIpHeader(request)).toBeUndefined();
+		expect(getClientIpHeader(request)).toEqual({});
 	});
 });
 
@@ -127,7 +127,7 @@ describe('getTrackingHeaders', () => {
 		const request = {
 			query: {},
 		};
-		expect(getTrackingHeaders(request)).toBeUndefined();
+		expect(getTrackingHeaders(request)).toEqual({});
 	});
 });
 
