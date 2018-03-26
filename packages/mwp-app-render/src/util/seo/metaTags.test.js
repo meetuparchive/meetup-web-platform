@@ -1,4 +1,12 @@
-import { generateMetaData, generateMetaTags, generateGeoMetaData } from './metaTags';
+import React from 'react';
+import { shallow } from 'enzyme';
+
+import {
+	generateMetaData,
+	generateMetaTags,
+	generateGeoMetaData,
+	getGroupKeywords,
+} from './metaTags';
 
 const MOCK_META = {
 	appPath: '/mock/app/path',
@@ -67,5 +75,25 @@ describe('generateGeoMetaData', () => {
 		delete mockGeo.state;
 		const geoMetaData = generateGeoMetaData(mockGeo);
 		expect(geoMetaData).toMatchSnapshot();
+	});
+});
+
+describe('getGroupKeywords', () => {
+	const group = {
+		name: 'Test group',
+		city: 'Albuquerque',
+		state: 'NM',
+		country: 'us',
+	};
+	it('matches snap for group with topics', () => {
+		const keywords = getGroupKeywords({
+			...group,
+			topics: [{name: 'hiking'},{name: 'beagles'},{name: 'programming'}]
+		});
+		expect(keywords).toMatchSnapshot();
+	});
+	it('matches snap for group with no topics', () => {
+		const keywords = getGroupKeywords(group);
+		expect(keywords).toMatchSnapshot();
 	});
 });

@@ -341,3 +341,7 @@ Array [
 />,
 ]
 `;
+
+exports[`getGroupKeywords matches snap for group with no topics 1`] = `"Test group,Albuquerque,NM,us"`;
+
+exports[`getGroupKeywords matches snap for group with topics 1`] = `"hiking,beagles,programming,Test group,Albuquerque,NM,us"`;
