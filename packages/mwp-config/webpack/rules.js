@@ -1,7 +1,6 @@
 const path = require('path');
 const paths = require('../paths');
 const babelrc = require('../babel');
-const customProperties = require('swarm-constants/dist/js/customProperties.js').customProperties;
 
 module.exports = {
 	scssModule: {
@@ -35,7 +34,6 @@ module.exports = {
 						}),
 						require('postcss-css-variables')({
 							preserve: true,
-							variables: customProperties,
 						})
 					]
 				}
