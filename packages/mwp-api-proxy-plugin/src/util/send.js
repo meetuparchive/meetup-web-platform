@@ -232,7 +232,7 @@ export function parseRequestHeaders(request) {
 /*
  * In multipart form requests, the parsed payload includes string key-value
  * pairs for regular inputs, and raw Buffer objects for file uploads
- *
+ * 
  * This function passes through regular input values unchanged, but formats the
  * file buffers into a { value, options } object that can be used in request
  * formData
@@ -255,7 +255,7 @@ export const parseMultipart = payload =>
  * request properties. The resulting value will be used as the _base_ set of
  * options for _every_ parallel REST API request made by the platform
  * corresponding to single incoming request.
- *
+ * 
  * @return {Object} externalRequestOpts
  */
 export function getExternalRequestOpts(request) {
@@ -285,10 +285,10 @@ export const makeMockRequest = (
 	mockResponseContent,
 	responseMeta
 ) => requestOpts =>
-    Observable.of([
-	    makeMockResponse(requestOpts, responseMeta),
-	    JSON.stringify(mockResponseContent),
-    ]);
+   Observable.of([
+   	   makeMockResponse(requestOpts, responseMeta),
+   	   JSON.stringify(mockResponseContent),
+   	]);
 
 const externalRequest$ = Observable.bindNodeCallback(externalRequest);
 /**

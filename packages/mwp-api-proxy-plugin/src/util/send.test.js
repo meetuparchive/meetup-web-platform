@@ -153,7 +153,7 @@ describe('getLanguageHeader', () => {
 		const headerLang = 'foo';
 		const request = {
 			headers: { 'accept-language': headerLang },
-			getLanguage: () => { },
+			getLanguage: () => {},
 		};
 		expect(getLanguageHeader(request)).toEqual(headerLang);
 	});
