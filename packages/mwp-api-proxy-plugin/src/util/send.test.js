@@ -17,6 +17,7 @@ import {
 	getExternalRequestOpts,
 	getLanguageHeader,
 	getClientIpHeader,
+	getTrackingHeaders,
 	parseMultipart,
 	API_META_HEADER,
 } from './send';
@@ -103,7 +104,30 @@ describe('getClientIpHeader', () => {
 			headers: {},
 			query: {},
 		};
-		expect(getClientIpHeader(request)).toBeUndefined();
+		expect(getClientIpHeader(request)).toEqual({});
+	});
+});
+
+describe('getTrackingHeaders', () => {
+	it('returns a x-meetup-external-track and x-meetup-external-track-url header when the _xtd query param exists', () => {
+		const externalTrackHeaders = {
+			'X-Meetup-External-Track': 'helloIAmRandom',
+			'X-Meetup-External-Track-Url': 'https://www.meetup.com/cool-meetup/events/123',
+		};
+		const request = {
+			query: { '_xtd': 'helloIAmRandom' },
+			url: {
+				href: 'https://www.meetup.com/cool-meetup/events/123'
+			}
+		};
+		expect(getTrackingHeaders(request)).toEqual(externalTrackHeaders);
+	});
+
+	it('Does not set the header if query param is not set', () => {
+		const request = {
+			query: {},
+		};
+		expect(getTrackingHeaders(request)).toEqual({});
 	});
 });
 
@@ -129,7 +153,7 @@ describe('getLanguageHeader', () => {
 		const headerLang = 'foo';
 		const request = {
 			headers: { 'accept-language': headerLang },
-			getLanguage: () => {},
+			getLanguage: () => { },
 		};
 		expect(getLanguageHeader(request)).toEqual(headerLang);
 	});
@@ -298,7 +322,7 @@ describe('makeExternalApiRequest', () => {
 
 		return makeExternalApiRequest({
 			server: {
-				app: { logger: { error: () => {} } },
+				app: { logger: { error: () => { } } },
 				settings: { app: { api: { timeout: 100 } } },
 			},
 			raw: {},
