@@ -12,7 +12,11 @@ export const onPreResponse = {
 	 */
 	method: (request: HapiRequest, reply: HapiReply) => {
 		const response = request.response;
-
+		const trackingParam = request.query['_xtd'];
+		if (trackingParam) {
+			response.header('X-Meetup-External-Track', trackingParam);
+			response.header('X-Meetup-External-Track-Url', request.response.referer);
+		}
 		if (!response.isBoom || process.env.NODE_ENV === 'production') {
 			return reply.continue();
 		}

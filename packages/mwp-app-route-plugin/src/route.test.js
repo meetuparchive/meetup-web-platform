@@ -9,7 +9,7 @@ describe('onPreResponse.method', () => {
 		const errorMessage = 'foobar';
 		const errorCode = 432;
 		const response = Boom.create(errorCode, errorMessage);
-		response.header = ((key,val) =>val)
+		response.header = ((key, val) => val)
 
 		const request = {
 			response,
@@ -17,7 +17,7 @@ describe('onPreResponse.method', () => {
 			server: getServer(),
 		};
 		const replyObj = {
-			code() {},
+			code() { },
 		};
 		const spyable = {
 			reply: () => replyObj,
@@ -29,6 +29,21 @@ describe('onPreResponse.method', () => {
 		const errorMarkup = spyable.reply.calls.mostRecent().args[0];
 		expect(errorMarkup).toContain(errorMessage);
 		expect(replyObj.code).toHaveBeenCalledWith(errorCode);
+	});
+	it('returns X-Meetup-External-Track and X-Meetup-External-Track-Url headers if _xtd query param exists', () => {
+		const server = getServer();
+		const result = 'ok';
+		server.route(
+			getRoute({
+				'en-US': () => Promise.resolve({ statusCode: 200, result }),
+			})
+		);
+		return server
+			.inject({ url: '/?_xtd=helloIAmAJunkParam' })
+			.then(response => {
+				expect(response.headers['X-Meetup-External-Track']).toBe('helloIAmAJunkParam');
+				expect(response.headers['X-Meetup-External-Track-Url']).toBe(request.route);
+			});
 	});
 	it('serves the homepage route', () => {
 		const server = getServer();
