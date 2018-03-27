@@ -200,11 +200,19 @@ export function getClientIpHeader(request) {
 
 export function getTrackingHeaders(request) {
 	// email tracking with _xtd query param: https://meetup.atlassian.net/wiki/spaces/DAT/pages/27754630/Email+Tracking
+
+	// request protocol and host might be different from original request that hit proxy
+	// we want to use the proxy's protocol and host
+	const requestProtocol = request.headers['x-forwarded-proto'];
+	const domain =
+		request.headers['x-forwarded-host'] || request.headers['x-meetup-host'];
+	const host = `${requestProtocol}://${domain}`;
+
 	const trackingParam = request.query._xtd;
 	if (trackingParam) {
 		return {
 			'X-Meetup-External-Track': trackingParam,
-			'X-Meetup-External-Track-Url': request.url.href,
+			'X-Meetup-External-Track-Url': `${host}` + request.url.href,
 		};
 	}
 	return {};
@@ -232,7 +240,7 @@ export function parseRequestHeaders(request) {
 /*
  * In multipart form requests, the parsed payload includes string key-value
  * pairs for regular inputs, and raw Buffer objects for file uploads
- * 
+ *
  * This function passes through regular input values unchanged, but formats the
  * file buffers into a { value, options } object that can be used in request
  * formData
@@ -255,7 +263,7 @@ export const parseMultipart = payload =>
  * request properties. The resulting value will be used as the _base_ set of
  * options for _every_ parallel REST API request made by the platform
  * corresponding to single incoming request.
- * 
+ *
  * @return {Object} externalRequestOpts
  */
 export function getExternalRequestOpts(request) {
