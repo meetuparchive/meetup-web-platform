@@ -14,13 +14,7 @@ const altLang = 'fr-FR';
 const altLang2 = 'de-DE';
 const altLang3 = 'es-ES';
 const unsupportedLang = 'xx-XX';
-const supportedLangs = [
-	defaultLang,
-	similarToDefault,
-	altLang,
-	altLang2,
-	altLang3,
-];
+const supportedLangs = [defaultLang, similarToDefault, altLang, altLang2, altLang3];
 const MOCK_HAPI_REQUEST = {
 	log() {},
 	url: url.parse(rootUrl),

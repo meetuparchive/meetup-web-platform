@@ -83,9 +83,7 @@ export function api(
 		case API_RESP_ERROR:
 		case CACHE_SUCCESS: // fall through
 			if (!action.payload) {
-				throw new Error(
-					`${action.type} dispatched without required payload`
-				);
+				throw new Error(`${action.type} dispatched without required payload`);
 			}
 			// each of these actions provides an API response that should go into app
 			// state - error responses will contain error info

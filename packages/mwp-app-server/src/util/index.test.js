@@ -1,6 +1,6 @@
 import convict from 'convict';
 import https from 'https';
-import { MOCK_LOGGER, getServer } from 'mwp-test-utils';
+import { getServer } from 'mwp-test-utils';
 import * as serverUtils from './';
 
 describe('checkForDevUrl', () => {
@@ -18,9 +18,7 @@ describe('checkForDevUrl', () => {
 	});
 
 	it('returns true for nested dev URLs', () => {
-		expect(serverUtils.checkForDevUrl({ url: 'www.dev.meetup.com' })).toBe(
-			true
-		);
+		expect(serverUtils.checkForDevUrl({ url: 'www.dev.meetup.com' })).toBe(true);
 		expect(
 			serverUtils.checkForDevUrl({
 				url1: 'www.meetup.com',
@@ -36,8 +34,7 @@ describe('checkForDevUrl', () => {
 describe('configureEnv', function() {
 	beforeEach(() => {
 		// cache the 'default' setting for rejectUnauthorized
-		this.defaultRejectUnauthorized =
-			https.globalAgent.options.rejectUnauthorized;
+		this.defaultRejectUnauthorized = https.globalAgent.options.rejectUnauthorized;
 	});
 
 	afterEach(function() {

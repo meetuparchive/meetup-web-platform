@@ -1,11 +1,4 @@
-import React from 'react';
-import { shallow } from 'enzyme';
-
-import {
-	generateMetaData,
-	generateMetaTags,
-	generateGeoMetaData,
-} from './metaTags';
+import { generateMetaData, generateMetaTags, generateGeoMetaData } from './metaTags';
 
 const MOCK_META = {
 	appPath: '/mock/app/path',
@@ -24,7 +17,10 @@ describe('generateMetaData', () => {
 		expect(metaData).toMatchSnapshot();
 	});
 	it('should exlude meta entries with missing content', () => {
-		const emptyMetaData = generateMetaData([{property: 'mockProp2', content: undefined}, {property: 'mockProp2', content: ''}]);
+		const emptyMetaData = generateMetaData([
+			{ property: 'mockProp2', content: undefined },
+			{ property: 'mockProp2', content: '' },
+		]);
 		expect(emptyMetaData).toMatchSnapshot();
 	});
 });
@@ -55,7 +51,7 @@ describe('generateGeoMetaData', () => {
 		const geoMetaData = generateGeoMetaData(mockGeo);
 		expect(geoMetaData).not.toEqual(
 			expect.arrayContaining([
-				expect.objectContaining({property: 'geo.postion'})
+				expect.objectContaining({ property: 'geo.postion' }),
 			])
 		);
 	});

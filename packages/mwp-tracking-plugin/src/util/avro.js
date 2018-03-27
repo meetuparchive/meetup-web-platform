@@ -103,7 +103,9 @@ type Deserializer = string => Object;
 
 const avroSerializer: Object => Serializer = schema => {
 	const codec = avro.parse(schema);
-	const schemaPath = `gs://meetup-logs/avro_schemas/${schema.name}_${schema.doc}.avsc`;
+	const schemaPath = `gs://meetup-logs/avro_schemas/${schema.name}_${
+		schema.doc
+	}.avsc`;
 	return data => {
 		const record = codec.toBuffer(data);
 		// data.timestamp _must_ be ISOString if it exists

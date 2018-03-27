@@ -112,10 +112,7 @@ const config = convict(schema);
 config.load(envProperties);
 
 // Load environment dependent configuration
-const configPath = path.resolve(
-	process.cwd(),
-	`config.${config.get('env')}.json`
-);
+const configPath = path.resolve(process.cwd(), `config.${config.get('env')}.json`);
 
 const localConfig = fs.existsSync(configPath) ? require(configPath) : {};
 

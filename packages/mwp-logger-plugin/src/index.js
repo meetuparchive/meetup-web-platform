@@ -1,5 +1,4 @@
 import logger from './logger';
-import MetricLogging from './metric';
 
 export function logResponse(request) {
 	const { response, route, id, server: { app: { logger } } } = request;
@@ -25,10 +24,11 @@ export function logResponse(request) {
 		return;
 	}
 
-	const log = ((response.statusCode >= 500 && logger.error) ||
+	const log = (
+		(response.statusCode >= 500 && logger.error) ||
 		(response.statusCode >= 400 && logger.warn) ||
-		logger.info)
-		.bind(logger);
+		logger.info
+	).bind(logger);
 
 	log({ httpRequest: request, id, ...request.raw });
 

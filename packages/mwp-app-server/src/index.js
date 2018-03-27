@@ -27,10 +27,7 @@ import getRoutes from './routes';
  *   features in the additional routes
  * @return {Promise} the Promise returned by Hapi's `server.connection` method
  */
-export default function start(
-	languageRenderers,
-	{ routes = [], plugins = [] }
-) {
+export default function start(languageRenderers, { routes = [], plugins = [] }) {
 	// source maps make for better stack traces
 	// we might not want this in production if it makes anything slower
 	require('source-map-support').install();

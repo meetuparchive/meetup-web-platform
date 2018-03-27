@@ -8,10 +8,10 @@ const MOCK_GLOBAL_STYLES = [
 		parts: [
 			{
 				css: '.foo { overflow: inherit; }',
-				media: ''
-			}
-		]
-	}
+				media: '',
+			},
+		],
+	},
 ];
 
 describe('getInlineStyleTags', () => {

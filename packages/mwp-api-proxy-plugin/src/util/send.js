@@ -17,9 +17,7 @@ import config from 'mwp-config';
 
 export const API_META_HEADER = 'X-Meta-Request-Headers';
 const MEMBER_COOKIE_NAME =
-	process.env.NODE_ENV === 'production'
-		? 'MEETUP_MEMBER'
-		: 'MEETUP_MEMBER_DEV';
+	process.env.NODE_ENV === 'production' ? 'MEETUP_MEMBER' : 'MEETUP_MEMBER_DEV';
 const CSRF_COOKIE_NAME =
 	process.env.NODE_ENV === 'production' ? 'MEETUP_CSRF' : 'MEETUP_CSRF_DEV';
 
@@ -114,14 +112,15 @@ export const buildRequestArgs = externalRequestOpts => ({
 	}
 
 	if (meta.variants) {
-		headers['X-Meetup-Variants'] = Object.keys(
-			meta.variants
-		).reduce((header, experiment) => {
-			const context = meta.variants[experiment];
-			const contexts = context instanceof Array ? context : [context];
-			header += contexts.map(c => `${experiment}=${c}`).join(' ');
-			return header;
-		}, '');
+		headers['X-Meetup-Variants'] = Object.keys(meta.variants).reduce(
+			(header, experiment) => {
+				const context = meta.variants[experiment];
+				const contexts = context instanceof Array ? context : [context];
+				header += contexts.map(c => `${experiment}=${c}`).join(' ');
+				return header;
+			},
+			''
+		);
 	}
 
 	switch (externalRequestOpts.method) {
@@ -267,10 +266,7 @@ export function getExternalRequestOpts(request) {
 /**
  * Fake an API request and directly return the stringified mockResponse
  */
-export const makeMockRequest = (
-	mockResponseContent,
-	responseMeta
-) => requestOpts =>
+export const makeMockRequest = (mockResponseContent, responseMeta) => requestOpts =>
 	Observable.of([
 		makeMockResponse(requestOpts, responseMeta),
 		JSON.stringify(mockResponseContent),
@@ -292,13 +288,9 @@ export const makeExternalApiRequest = request => requestOpts => {
 
 			const errorObj = { errors: [err] };
 			if (err.code === 'ETIMEDOUT') {
-				return makeMockRequest(errorObj, API_TIMEOUT_RESPONSE)(
-					requestOpts
-				);
+				return makeMockRequest(errorObj, API_TIMEOUT_RESPONSE)(requestOpts);
 			}
-			return makeMockRequest(errorObj, makeAPIErrorResponse(err))(
-				requestOpts
-			);
+			return makeMockRequest(errorObj, makeAPIErrorResponse(err))(requestOpts);
 		})
 		.map(([response, body]) => [response, body, requestOpts.jar]);
 };

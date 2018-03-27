@@ -26,13 +26,11 @@ export const getFormattedTime = (date: Date): string =>
  * converted.toString(); // == '... Jan 01 2018 12:00:00 ...'
  */
 export const convertToLocalTime = (time: number, offset: number = 0): Date => {
-        // Takes in desired date to convert and applies offset
-        const date = new Date(time + offset);
-        // generates new date object taking the time in milliseconds and
-        // adds the runtime environment's timezone offset
-        const localDate = new Date(
-                date.getTime() + date.getTimezoneOffset() * 60000
-        );
+	// Takes in desired date to convert and applies offset
+	const date = new Date(time + offset);
+	// generates new date object taking the time in milliseconds and
+	// adds the runtime environment's timezone offset
+	const localDate = new Date(date.getTime() + date.getTimezoneOffset() * 60000);
 
-        return localDate;
+	return localDate;
 };

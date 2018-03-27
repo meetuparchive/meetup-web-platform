@@ -14,11 +14,7 @@ export const setPluginState = (request: HapiRequest, reply: HapiReply) => {
 	return reply.continue();
 };
 
-export default function register(
-	server: Object,
-	options: void,
-	next: () => void
-) {
+export default function register(server: Object, options: void, next: () => void) {
 	// supply duotone urls through `server.plugins['mwp-api-proxy-plugin'].duotoneUrls`
 	server.expose(
 		'duotoneUrls',

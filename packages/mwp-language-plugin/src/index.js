@@ -7,11 +7,7 @@ import { getLanguage, getLangPrefixPath } from './util';
  * - `getLangPrefixPath`: get the correct request path relative to the request's
  *   specified language
  */
-export default function register(
-	server: Object,
-	options: ?Object,
-	next: () => void
-) {
+export default function register(server: Object, options: ?Object, next: () => void) {
 	server.decorate('request', 'getLanguage', getLanguage, {
 		apply: true,
 	});

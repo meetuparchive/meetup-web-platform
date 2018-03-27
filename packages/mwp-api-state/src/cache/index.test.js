@@ -39,9 +39,7 @@ function clearCacheEpic(CacheEpic) {
 }
 
 const testForEmptyCache = (action = apiRequestAction) => CacheEpic =>
-	CacheEpic(action, fakeStore).then(actions =>
-		expect(actions).toHaveLength(0)
-	);
+	CacheEpic(action, fakeStore).then(actions => expect(actions).toHaveLength(0));
 
 const testForPopulatedCache = (action = apiRequestAction) => CacheEpic =>
 	CacheEpic(action, fakeStore).then(actions =>

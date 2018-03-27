@@ -1,7 +1,8 @@
 const path = require('path');
 const paths = require('../paths');
 const babelrc = require('../babel');
-const customProperties = require('swarm-constants/dist/js/customProperties.js').customProperties;
+const customProperties = require('swarm-constants/dist/js/customProperties.js')
+	.customProperties;
 
 module.exports = {
 	scssModule: {
@@ -15,32 +16,29 @@ module.exports = {
 					importLoaders: 2,
 					modules: true,
 					localIdentName: '_[name]_[local]__[hash:base64:5]',
-					minimize: true
+					minimize: true,
 				},
 			},
 			{
 				loader: 'postcss-loader',
 				options: {
 					ident: 'postcss',
-					plugins: (loader) => [
+					plugins: loader => [
 						require('postcss-cssnext')({
-							browsers: [
-								'last 2 versions',
-								'not ie <= 10'
-							],
+							browsers: ['last 2 versions', 'not ie <= 10'],
 							features: {
 								customProperties: false,
 								colorFunction: false,
-							}
+							},
 						}),
 						require('postcss-css-variables')({
 							preserve: true,
 							variables: customProperties,
-						})
-					]
-				}
+						}),
+					],
+				},
 			},
-			'sass-loader'
+			'sass-loader',
 		],
 	},
 	css: {

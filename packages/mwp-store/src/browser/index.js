@@ -28,9 +28,7 @@ export const clickTrackEnhancer = createStore => (
  * containing the HTML-escaped JSON string in `window.INITIAL_STATE.escapedState`.
  * unescape the text using native `textarea.textContent` unescaping
  */
-export const getInitialState = (APP_RUNTIME: {
-	escapedState: string,
-}): ?Object => {
+export const getInitialState = (APP_RUNTIME: { escapedState: string }): ?Object => {
 	if (!APP_RUNTIME) {
 		return;
 	}
