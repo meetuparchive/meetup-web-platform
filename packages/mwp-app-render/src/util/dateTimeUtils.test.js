@@ -1,8 +1,4 @@
-import {
-        padNumber,
-        getFormattedTime,
-        convertToLocalTime,
-} from './dateTimeUtils';
+import { padNumber, getFormattedTime, convertToLocalTime } from './dateTimeUtils';
 
 const timeUTC = 1234567890; // fixed millisecond value
 const eventOffset = -1234567; // fixed millisecond value
@@ -12,16 +8,16 @@ const runtimeOffset = runtimeDate.getTimezoneOffset() * 60 * 1000; // runtime-de
 describe('padNumber', () => {
 	it('should pad numbers less than 10', () => {
 		expect(
-			(new Array(10))
+			new Array(10)
 				.fill() // make an empty array
 				.map((x, i) => padNumber(i)) // map each index to padNumber
 				.every((x, i) => x === `0${i}`) // test that every element in the array has the expected format
-		).toBe(true)
+		).toBe(true);
 	});
 	it('should not pad numbers greater or equal to 10', () => {
 		for (let pow = 1; pow < 5; pow += 1) {
 			const test = Math.pow(10, pow);
-			expect(padNumber(test)).toBe(test.toString())
+			expect(padNumber(test)).toBe(test.toString());
 		}
 	});
 });

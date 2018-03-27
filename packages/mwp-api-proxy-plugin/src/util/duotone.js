@@ -50,7 +50,7 @@ export const duotones = [
  *
  * **Important** Do not import this module in client-side code
  *
-* - All duo-toning is done in the photo scaler (http://photos1.meetupstatic.com/photo_api/...)
+ * - All duo-toning is done in the photo scaler (http://photos1.meetupstatic.com/photo_api/...)
  *   the duotoned images aren't saved anywhere
  * - The photo scaler requires signed URLs in order to ensure that requests are
  *   coming from "authorized" clients that aren't going to DDoS it.
@@ -131,10 +131,7 @@ export const groupDuotoneSetter = duotoneUrls => group => {
 	const photo = group.key_photo || group.group_photo || {};
 	const duotoneKey =
 		group.photo_gradient &&
-		duotoneRef(
-			group.photo_gradient.light_color,
-			group.photo_gradient.dark_color
-		);
+		duotoneRef(group.photo_gradient.light_color, group.photo_gradient.dark_color);
 	const duotoneUrlRoot = duotoneKey && duotoneUrls[duotoneKey];
 	if (duotoneUrlRoot && photo.id) {
 		group.duotoneUrl = {
@@ -169,7 +166,9 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
 				groups.forEach(setGroupDuotone);
 				break;
 			case 'home':
-				(value.most_popular || []).forEach(event => event.group = setGroupDuotone(event.group || {}));
+				(value.most_popular || []).forEach(
+					event => (event.group = setGroupDuotone(event.group || {}))
+				);
 				break;
 		}
 		return queryResponse;

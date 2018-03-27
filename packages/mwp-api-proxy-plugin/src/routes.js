@@ -47,10 +47,7 @@ const getApiProxyRoutes = path => {
 		config: {
 			...routeBase.config,
 			payload: {
-				allow: [
-					'application/x-www-form-urlencoded',
-					'multipart/form-data',
-				],
+				allow: ['application/x-www-form-urlencoded', 'multipart/form-data'],
 				maxBytes: 1024 * 1024 * 10, // 10 MB max upload
 			},
 		},

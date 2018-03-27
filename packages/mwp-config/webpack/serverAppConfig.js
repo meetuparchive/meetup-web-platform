@@ -21,11 +21,7 @@ const rules = require('./rules');
 function getConfig(localeCode) {
 	const publicPath = `${env.properties.publicPathBase}${localeCode}/`;
 
-	const baseWebfontDir = path.resolve(
-		paths.src.server.app,
-		'assets',
-		'fonts'
-	);
+	const baseWebfontDir = path.resolve(paths.src.server.app, 'assets', 'fonts');
 	const webfontDir =
 		localeCode === 'ru-RU'
 			? path.resolve(baseWebfontDir, localeCode)
@@ -45,7 +41,15 @@ function getConfig(localeCode) {
 
 		devtool: 'eval',
 
-		module: { rules: [rules.file, rules.scssModule, rules.css, rules.js.server, rules.raw] },
+		module: {
+			rules: [
+				rules.file,
+				rules.scssModule,
+				rules.css,
+				rules.js.server,
+				rules.raw,
+			],
+		},
 
 		plugins: [
 			new webpack.EnvironmentPlugin({
@@ -58,11 +62,7 @@ function getConfig(localeCode) {
 					path.resolve(paths.output.browser, 'manifest.json')
 				),
 				BROWSER_MANIFEST_PATH: JSON.stringify(
-					path.resolve(
-						paths.output.browser,
-						localeCode,
-						'manifest.json'
-					)
+					path.resolve(paths.output.browser, localeCode, 'manifest.json')
 				),
 			}),
 			new StatsPlugin({ fields: null }), // null means 'all fields in stats file'
@@ -72,9 +72,7 @@ function getConfig(localeCode) {
 
 		externals: [
 			nodeExternals({
-				modulesDir: process.env.NODE_PATH
-					? process.env.NODE_PATH
-					: null,
+				modulesDir: process.env.NODE_PATH ? process.env.NODE_PATH : null,
 				whitelist: [
 					/^meetup-web-components/,
 					/^swarm-icons\/dist\/sprite\/sprite\.inc$/,

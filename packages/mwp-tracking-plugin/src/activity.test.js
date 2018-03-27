@@ -60,8 +60,6 @@ describe('updateId', () => {
 		const updatedTrackId = updateId(trackIdCookieName)(request, doRefresh);
 		expect(updatedTrackId).not.toBe(trackId); // no change
 		expect(request.plugins.tracking[trackIdCookieName]).not.toBeUndefined();
-		expect(request.plugins.tracking[trackIdCookieName]).toContain(
-			updatedTrackId
-		);
+		expect(request.plugins.tracking[trackIdCookieName]).toContain(updatedTrackId);
 	});
 });

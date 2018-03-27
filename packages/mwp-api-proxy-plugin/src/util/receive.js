@@ -105,14 +105,14 @@ const parseBody = body => {
 /**
  * The externalRequest callback provides a `response` object and a `body` string
  * that need to be parsed in order to determine the appropriate 'value'.
- * 
+ *
  * This function determines the { value, error } based on the status code and
  * body of the response - it will always set an 'error' value when a non-2xx
  * response is received, but it may provide additional error details that are
  * included in the 'body' of the response - body error details will usually
  * be JSON parsed into `value.errors`, but that is determined by the JSON
  * returned by the REST API.
- * 
+ *
  * @return {Object} { value, error? }
  */
 export const parseApiValue = ([response, body]) => {
@@ -169,11 +169,7 @@ export const makeParseApiResponse = query => ([response, body]) => {
  *
  * @param {Object} apiResponse JSON-parsed api response data
  */
-export const makeApiResponseToQueryResponse = query => ({
-	value,
-	error,
-	meta,
-}) => ({
+export const makeApiResponseToQueryResponse = query => ({ value, error, meta }) => ({
 	type: query.type,
 	ref: query.ref,
 	value,
@@ -182,10 +178,7 @@ export const makeApiResponseToQueryResponse = query => ({
 });
 
 export const makeLogResponse = request => ([response, body]) => {
-	const {
-		request: { headers, method, uri: { href: url } },
-		statusCode,
-	} = response;
+	const { request: { headers, method, uri: { href: url } }, statusCode } = response;
 	const logBase = {
 		...request.raw, // request to /mu_api
 		externalRequest: { headers, method, url }, // request to https://api.meetup.com/
@@ -195,9 +188,7 @@ export const makeLogResponse = request => ([response, body]) => {
 		statusCode >= 500 || // REST API had an internal error
 		(method.toLowerCase() === 'get' && statusCode >= 400) // something fishy with a GET
 	) {
-		const logError = (statusCode < 500 ? logger.warn : logger.error).bind(
-			logger
-		);
+		const logError = (statusCode < 500 ? logger.warn : logger.error).bind(logger);
 		let errorMessage;
 		try {
 			// well-behaved API errors return a JSON object with an `errors` array

@@ -1,15 +1,13 @@
 import Boom from 'boom';
-import { MOCK_RENDER_RESULT } from 'meetup-web-mocks/lib/app';
 import { getServer } from 'mwp-test-utils';
 import getRoute, { onPreResponse } from './route';
 
 describe('onPreResponse.method', () => {
 	it('returns html containing error message', () => {
-
 		const errorMessage = 'foobar';
 		const errorCode = 432;
 		const response = Boom.create(errorCode, errorMessage);
-		response.header = ((key,val) =>val)
+		response.header = (key, val) => val;
 
 		const request = {
 			response,

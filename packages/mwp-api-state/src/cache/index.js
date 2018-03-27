@@ -77,7 +77,7 @@ const getCacheEpic = (cache = makeCache()) =>
 				cacheClearEpic(cache),
 				cacheSetEpic(cache),
 				cacheQueryEpic(cache)
-			)
+		  )
 		: action => Promise.resolve([]);
 
 export default getCacheEpic;

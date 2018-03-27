@@ -56,7 +56,7 @@ export const cacheReader = (cache: Cache, memberId: string) => (
 
 /**
  * Generates a function that can write query-response values into cache
- * 
+ *
  * It will ignore non-GET responses and any responses to queries that have
  * opted-out of caching with `query.meta.noCache`
  */

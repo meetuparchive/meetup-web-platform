@@ -4,8 +4,7 @@ const getIsLoggedIn = (member: ?Object) => Boolean((member || {}).id);
 // on logged-in status
 export const getAuthedQueryFilter = (member: ?Object) => {
 	const isLoggedIn = getIsLoggedIn(member);
-	return (q: Query): boolean =>
-		isLoggedIn || !q.endpoint.includes('members/self');
+	return (q: Query): boolean => isLoggedIn || !q.endpoint.includes('members/self');
 };
 /**
  * A module for middleware that would like to make external calls through `fetch`

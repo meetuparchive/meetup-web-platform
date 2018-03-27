@@ -3,9 +3,7 @@ import config from 'mwp-config';
 import { logger } from 'mwp-logger-plugin';
 const appConfig = config.getServer().properties;
 
-export const MEMBER_COOKIE = appConfig.isProd
-	? 'MEETUP_MEMBER'
-	: 'MEETUP_MEMBER_DEV';
+export const MEMBER_COOKIE = appConfig.isProd ? 'MEETUP_MEMBER' : 'MEETUP_MEMBER_DEV';
 
 export const parseMemberCookie = state => {
 	if (!state[MEMBER_COOKIE]) {
