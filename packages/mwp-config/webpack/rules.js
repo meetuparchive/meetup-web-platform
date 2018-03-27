@@ -1,12 +1,11 @@
 const path = require('path');
 const paths = require('../paths');
 const babelrc = require('../babel');
-const customProperties = require('swarm-constants/dist/js/customProperties.js').customProperties;
 
 module.exports = {
 	scssModule: {
 		test: /\.module\.scss$/,
-		include: [paths.srcPath],
+		include: [paths.srcPath, paths.packages.swarmConstants.scss],
 		use: [
 			'simple-universal-style-loader',
 			{
@@ -35,7 +34,6 @@ module.exports = {
 						}),
 						require('postcss-css-variables')({
 							preserve: true,
-							variables: customProperties,
 						})
 					]
 				}
