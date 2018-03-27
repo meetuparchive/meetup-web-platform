@@ -112,13 +112,18 @@ describe('getTrackingHeaders', () => {
 	it('returns a x-meetup-external-track and x-meetup-external-track-url header when the _xtd query param exists', () => {
 		const externalTrackHeaders = {
 			'X-Meetup-External-Track': 'helloIAmRandom',
-			'X-Meetup-External-Track-Url': 'https://www.meetup.com/cool-meetup/events/123',
+			'X-Meetup-External-Track-Url':
+				'https://www.meetup.com/cool-meetup/events/123',
 		};
 		const request = {
-			query: { '_xtd': 'helloIAmRandom' },
+			query: { _xtd: 'helloIAmRandom' },
 			url: {
-				href: 'https://www.meetup.com/cool-meetup/events/123'
-			}
+				href: '/cool-meetup/events/123',
+			},
+			headers: {
+				'x-forwarded-proto': 'https',
+				'x-meetup-host': 'www.meetup.com',
+			},
 		};
 		expect(getTrackingHeaders(request)).toEqual(externalTrackHeaders);
 	});
@@ -126,6 +131,10 @@ describe('getTrackingHeaders', () => {
 	it('Does not set the header if query param is not set', () => {
 		const request = {
 			query: {},
+			headers: {
+				'x-forwarded-proto': 'https',
+				'x-meetup-host': 'www.meetup.com',
+			},
 		};
 		expect(getTrackingHeaders(request)).toEqual({});
 	});
