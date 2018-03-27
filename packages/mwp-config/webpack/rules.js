@@ -5,7 +5,7 @@ const babelrc = require('../babel');
 module.exports = {
 	scssModule: {
 		test: /\.module\.scss$/,
-		include: [paths.srcPath],
+		include: [paths.srcPath, paths.packages.swarmConstants.scss],
 		use: [
 			'simple-universal-style-loader',
 			{

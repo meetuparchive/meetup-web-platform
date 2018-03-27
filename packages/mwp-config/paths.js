@@ -25,6 +25,9 @@ const src = {
 };
 
 const packages = {
+	swarmConstants: {
+		scss: /node_modules\/swarm-constants\/dist\/scss/,
+	},
 	webComponents: {
 		src: /node_modules\/meetup-web-components\/src/,
 		icons: /node_modules\/meetup-web-components\/icons/,
