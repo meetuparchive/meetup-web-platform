@@ -1,8 +1,4 @@
-import {
-	getChildRoutes,
-	resolveChildRoutes,
-	getRouteResolver,
-} from './resolve';
+import { getChildRoutes, resolveChildRoutes, getRouteResolver } from './resolve';
 
 describe('getChildRoutes', () => {
 	it('returns [route.indexRoute] for exact match', () => {

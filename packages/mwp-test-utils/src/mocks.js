@@ -7,10 +7,7 @@ const appConfig = config.getServer().properties;
 
 import { clientFilename, routes, reducer } from 'mwp-test-utils/lib/mockApp';
 
-export const getMockFetch = (
-	mockResponseValue = { responses: [{}] },
-	headers = {}
-) =>
+export const getMockFetch = (mockResponseValue = { responses: [{}] }, headers = {}) =>
 	Promise.resolve({
 		text: () => Promise.resolve(JSON.stringify(mockResponseValue)),
 		json: () => Promise.resolve(mockResponseValue),

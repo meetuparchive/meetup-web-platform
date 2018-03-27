@@ -22,9 +22,7 @@ const _routeMatchOptions = (
  * Determine whether the indexRoute or nested route should be considered the
  * child route for a particular MatchedRoute
  */
-export const getChildRoutes = (
-	matchedRoute: MatchedRoute
-): Array<PlatformRoute> => {
+export const getChildRoutes = (matchedRoute: MatchedRoute): Array<PlatformRoute> => {
 	const { route, match } = matchedRoute;
 	if (match.isExact) {
 		return route.indexRoute ? [route.indexRoute] : [];
@@ -104,7 +102,7 @@ const _resolveRouteMatches = (
 						path,
 						currentMatchedRoutes,
 						currentMatchOptions.path
-					)
+				  )
 				: currentMatchedRoutes
 	);
 };
@@ -113,10 +111,9 @@ const _resolveRouteMatches = (
  * An curried interface into `_resolveRouteMatches`, using `basename`
  * + `location` instead of `path`
  */
-export const getRouteResolver = (
-	routes: Array<PlatformRoute>,
-	basename: string
-) => (location: URL): Promise<Array<MatchedRoute>> => {
+export const getRouteResolver = (routes: Array<PlatformRoute>, basename: string) => (
+	location: URL
+): Promise<Array<MatchedRoute>> => {
 	const path = location.pathname.replace(basename, '');
 	return _resolveRouteMatches(routes, path);
 };

@@ -91,7 +91,7 @@
     "tough-cookie": "2.3.2"
   },
   "lint-staged": {
-    "{src,tests,__mocks__}/**/*.{js,jsx}": [
+    "{tests,__mocks__,packages}/**/*.{js,jsx}": [
       "prettier --write --single-quote --use-tabs --trailing-comma es5",
       "eslint",
       "git add"

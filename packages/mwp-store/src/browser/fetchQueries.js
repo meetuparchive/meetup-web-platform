@@ -67,10 +67,7 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 	const isDelete = method === 'DELETE';
 
 	const searchParams = new URLSearchParams();
-	searchParams.append(
-		'queries',
-		rison.encode_array(makeSerializable(queries))
-	);
+	searchParams.append('queries', rison.encode_array(makeSerializable(queries)));
 
 	if (meta) {
 		const {
@@ -145,7 +142,7 @@ const _fetchQueryResponse = (apiUrl, queries, meta) => {
 /**
  * Wrapper around `fetch` to send an array of queries to the server and organize
  * the responses.
-*
+ *
  * **IMPORTANT**: This function should _only_ be called from the browser. The
  * server should never need to call itself over HTTP
  *
@@ -166,11 +163,7 @@ const fetchQueries = (apiUrl, member) => (queries, meta) => {
 
 	const authedQueries = getAuthedQueryFilter(member);
 	const validQueries = queries.filter(authedQueries);
-	return _fetchQueryResponse(
-		apiUrl,
-		validQueries,
-		meta
-	).then(queryResponse => ({
+	return _fetchQueryResponse(apiUrl, validQueries, meta).then(queryResponse => ({
 		...parseQueryResponse(validQueries)(queryResponse),
 	}));
 };

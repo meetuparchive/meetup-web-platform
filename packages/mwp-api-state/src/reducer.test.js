@@ -104,9 +104,7 @@ describe('api reducer', () => {
 			response: { ref: 'bing', value: 'baz' },
 		};
 		const API_RESP_SUCCESS = apiActions.success(resp);
-		expect(
-			api({ ...DEFAULT_API_STATE, foo: 'bar' }, API_RESP_SUCCESS)
-		).toEqual({
+		expect(api({ ...DEFAULT_API_STATE, foo: 'bar' }, API_RESP_SUCCESS)).toEqual({
 			foo: 'bar',
 			bing: { ref: 'bing', value: 'baz', query: resp.query },
 			inFlight: [],

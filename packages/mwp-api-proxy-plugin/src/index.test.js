@@ -28,10 +28,7 @@ describe('api proxy plugin', () => {
 		const endpoint = 'foo';
 		const validQuery = { type: 'a', ref: 'b', params: {}, endpoint };
 		const expectedResponse = { foo: 'bar' };
-		require('request').__setMockResponse(
-			null,
-			JSON.stringify(expectedResponse)
-		);
+		require('request').__setMockResponse(null, JSON.stringify(expectedResponse));
 		const queriesRison = rison.encode_array([validQuery]);
 
 		// little helper function to test various matchable proxy URLs

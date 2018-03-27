@@ -81,30 +81,29 @@ export const getNavEpic = resolveRoutes => (action, store) => {
 		getMatchedQueries(location)
 	);
 
-	return Promise.all([
-		resolveNewQueries,
-		resolvePrevQueries,
-	]).then(([newQueries, previousQueries]) => {
-		if (newQueries.filter(q => q).length === 0) {
-			// no valid queries - jump straight to 'complete'
-			return [api.complete([])];
+	return Promise.all([resolveNewQueries, resolvePrevQueries]).then(
+		([newQueries, previousQueries]) => {
+			if (newQueries.filter(q => q).length === 0) {
+				// no valid queries - jump straight to 'complete'
+				return [api.complete([])];
+			}
+			// perform a fast comparison of previous route's serialized queries
+			// with the new route's serialized queries. All state refs for
+			// _shared_ queries should be retained
+			const serializedNew = newQueries.map(JSON.stringify);
+			const serializedPrev = previousQueries.map(JSON.stringify);
+			const sharedRefs = serializedPrev
+				.filter(qJSON => serializedNew.includes(qJSON))
+				.map(JSON.parse)
+				.map(q => q.ref);
+			requestMetadata.retainRefs = sharedRefs;
+			return [
+				cacheAction,
+				api.get(newQueries, requestMetadata),
+				clickActions.clear(),
+			].filter(a => a);
 		}
-		// perform a fast comparison of previous route's serialized queries
-		// with the new route's serialized queries. All state refs for
-		// _shared_ queries should be retained
-		const serializedNew = newQueries.map(JSON.stringify);
-		const serializedPrev = previousQueries.map(JSON.stringify);
-		const sharedRefs = serializedPrev
-			.filter(qJSON => serializedNew.includes(qJSON))
-			.map(JSON.parse)
-			.map(q => q.ref);
-		requestMetadata.retainRefs = sharedRefs;
-		return [
-			cacheAction,
-			api.get(newQueries, requestMetadata),
-			clickActions.clear(),
-		].filter(a => a);
-	});
+	);
 };
 
 /**
@@ -113,9 +112,7 @@ export const getNavEpic = resolveRoutes => (action, store) => {
  */
 export const apiRequestToApiReq = action =>
 	Promise.resolve(
-		action.type === 'API_REQUEST'
-			? [api.get(action.payload, action.meta)]
-			: []
+		action.type === 'API_REQUEST' ? [api.get(action.payload, action.meta)] : []
 	);
 
 /**
@@ -154,11 +151,7 @@ export const getFetchQueriesEpic = (resolveRoutes, fetchQueriesFn) => {
 		}
 		const { payload: queries, meta } = action;
 		// set up the fetch call to the app server
-		const {
-			config,
-			api: { self },
-			routing: { location },
-		} = store.getState();
+		const { config, api: { self }, routing: { location } } = store.getState();
 
 		// first get the current route 'match' data
 		return resolveRoutes(location)
@@ -169,10 +162,7 @@ export const getFetchQueriesEpic = (resolveRoutes, fetchQueriesFn) => {
 			.then(apiPath => {
 				// construct the fetch call using match.path
 				const fetchUrl = `${config.apiUrl}${apiPath}`;
-				const fetchQueries = fetchQueriesFn(
-					fetchUrl,
-					(self || {}).value
-				);
+				const fetchQueries = fetchQueriesFn(fetchUrl, (self || {}).value);
 				return fetchQueries(queries, meta); // call fetch
 			})
 			.then(({ successes = [], errors = [] }) => {
@@ -182,13 +172,9 @@ export const getFetchQueriesEpic = (resolveRoutes, fetchQueriesFn) => {
 					successes,
 					errors
 				);
-				const deprecatedActions = [
-					apiSuccess(deprecatedSuccessPayload),
-				];
+				const deprecatedActions = [apiSuccess(deprecatedSuccessPayload)];
 				if (meta && meta.onSuccess) {
-					deprecatedActions.push(
-						meta.onSuccess(deprecatedSuccessPayload)
-					);
+					deprecatedActions.push(meta.onSuccess(deprecatedSuccessPayload));
 				}
 				return [
 					...successes.map(api.success), // send the successes to success

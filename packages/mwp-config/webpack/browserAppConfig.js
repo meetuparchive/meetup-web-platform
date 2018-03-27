@@ -18,8 +18,9 @@ const rules = require('./rules');
 function injectHotReloadConfig(config) {
 	config.entry.app.unshift(
 		'react-hot-loader/patch', // logic for hot-reloading react components
-		`webpack-dev-server/client?http://${env.properties.asset_server
-			.host}:${env.properties.asset_server.port}/`, // connect to HMR websocket
+		`webpack-dev-server/client?http://${env.properties.asset_server.host}:${
+			env.properties.asset_server.port
+		}/`, // connect to HMR websocket
 		'webpack/hot/dev-server' // run the dev server
 	);
 
@@ -40,11 +41,7 @@ function injectHotReloadConfig(config) {
 function getConfig(localeCode) {
 	const publicPath = `${env.properties.publicPathBase}${localeCode}/`;
 
-	const baseWebfontDir = path.resolve(
-		paths.src.server.app,
-		'assets',
-		'fonts'
-	);
+	const baseWebfontDir = path.resolve(paths.src.server.app, 'assets', 'fonts');
 	const webfontDir =
 		localeCode === 'ru-RU'
 			? path.resolve(baseWebfontDir, localeCode)
@@ -67,7 +64,15 @@ function getConfig(localeCode) {
 
 		devtool: 'cheap-module-source-map', // similar speed to 'eval', but with proper source maps
 
-		module: { rules: [rules.file, rules.scssModule, rules.css, rules.js.browser, rules.raw] },
+		module: {
+			rules: [
+				rules.file,
+				rules.scssModule,
+				rules.css,
+				rules.js.browser,
+				rules.raw,
+			],
+		},
 
 		resolve: {
 			alias: {
