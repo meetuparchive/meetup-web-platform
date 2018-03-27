@@ -212,7 +212,7 @@ export function getTrackingHeaders(request) {
 	if (trackingParam) {
 		return {
 			'X-Meetup-External-Track': trackingParam,
-			'X-Meetup-External-Track-Url': `${host}` + request.url.href,
+			'X-Meetup-External-Track-Url': `${host}${request.url.href}`,
 		};
 	}
 	return {};
