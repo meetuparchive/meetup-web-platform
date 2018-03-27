@@ -1,4 +1,3 @@
-import React from 'react';
 import { getGoogleTagManagerSnippet } from './googleTagManager';
 
 describe('getGoogleTagManagerSnippet()', () => {
