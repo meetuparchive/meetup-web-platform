@@ -1,17 +1,11 @@
 import React from 'react';
 import Helmet from 'react-helmet';
 import PropTypes from 'prop-types';
-
-/*
- * This just imports a blob of JS that New Relic give us so we can track usage/errors from real
- * users. We should only need to upgrade it in the event New Relic makes a major change, which
- * they'll let us know about.
- */
-import { newrelicBrowserJS } from './newrelicBrowser';
+import newrelic from 'newrelic';
 
 /**
  * This component wraps all pages on the website, and through [Helmet](https://github.com/nfl/react-helmet/)
- * sets up base CSS, favicons, javascript, and our New Relic RUM/error reporting (see `newrelicBrowserJS` above).
+ * sets up base CSS, favicons, & javascript
  *
  * @module PageWrap
  */
@@ -70,23 +64,15 @@ class PageWrap extends React.Component {
 				{head}
 
 				<Helmet defaultTitle="Meetup" titleTemplate="%s - Meetup">
-					<meta
-						name="viewport"
-						content="width=device-width, initial-scale=1"
-					/>
-					<meta
-						http-equiv="Content-Type"
-						content="text/html; charset=UTF-8"
-					/>
+					<meta name="viewport" content="width=device-width, initial-scale=1" />
+					<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 					<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 					<meta name="robots" content="index,follow" />
 					<meta
 						name="verify-v1"
 						content="h5EhuAEkLFlZmMxwpH5wnRaoDEmqYCCEUE+FLcrRNvE="
 					/>
-					<script type="text/javascript">
-						{newrelicBrowserJS}
-					</script>
+					{newrelic.getBrowserTimingHeader()}
 				</Helmet>
 
 				{iconSprite &&
