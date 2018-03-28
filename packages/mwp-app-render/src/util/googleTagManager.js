@@ -5,14 +5,15 @@ const GTM_KEY = process.env.NODE_ENV === 'production' ? 'GTM-T2LNGD' : 'GTM-W9W8
 
 /**
  * @description Method for passing additional variables to GTM
- * @param variablesList - object which contains custom variables. example: { variableAccessibleInGTM: "foo" }
- * window.dataLayer - global reserved GTM array
+ * @see {@link https://developers.google.com/tag-manager/devguide}
  */
-export const gtmPush = (variablesList) => {
-	window.dataLayer.push(variablesList);
+export const gtmPush = (data: { [string]: string }) => {
+	if (typeof window !== 'undefined' && window.dataLayer) {
+		window.dataLayer.push(data);
+	}
 };
 
-/*
+/**
  * @description Gets google tag manager JS snippet
  * @see {@link https://developers.google.com/tag-manager/quickstart}
 */
