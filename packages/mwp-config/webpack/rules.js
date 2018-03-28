@@ -8,7 +8,7 @@ module.exports = {
 		test: /\.module\.scss$/,
 		include: [paths.srcPath],
 		use: [
-			'simple-universal-style-loader',
+			'isomorphic-style-loader',
 			{
 				loader: 'css-loader',
 				options: {
