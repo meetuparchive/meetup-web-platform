@@ -12,7 +12,7 @@ import LoggingBunyan from '@google-cloud/logging-bunyan';
  */
 const formatDuration = ms => {
 	const seconds = Math.floor(ms / 1000); // whole seconds
-	const nanos = ms % 1000 * 1000 * 1000; // remainder milliseconds in nanoseconds (= ms * 1,000,000)
+	const nanos = (ms % 1000) * 1000 * 1000; // remainder milliseconds in nanoseconds (= ms * 1,000,000)
 	return {
 		seconds,
 		nanos,
@@ -80,7 +80,8 @@ const errorContextSerializers = {
 				referrer: request.headers['referer'],
 				responseStatusCode: (request.response || {}).statusCode || 500,
 				remoteIp:
-					request.headers['x_forwarded_for'] || request.headers['remote_addr'],
+					request.headers['x_forwarded_for'] ||
+					request.headers['remote_addr'],
 			},
 		};
 		const memberId = request.headers['x-member'];

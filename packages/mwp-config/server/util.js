@@ -52,9 +52,7 @@ const validateServerHost = host => {
 	}
 	const isDev = process.env.NODE_ENV === 'development' || !process.env.NODE_ENV;
 	if (process.env.NODE_ENV === 'production' && host.includes(DEV_SUBSTRING)) {
-		throw new Error(
-			`Server host ${host} must not include '.dev.' in production`
-		);
+		throw new Error(`Server host ${host} must not include '.dev.' in production`);
 	}
 	if (isDev && !host.includes(DEV_SUBSTRING)) {
 		throw new Error(`Server host ${host} must include '.dev.' in development`);

@@ -33,8 +33,7 @@ const _matchedRouteQueriesReducer = (location: URL) => (
 	if (!route.query) {
 		return queries;
 	}
-	const routeQueryFns =
-		route.query instanceof Array ? route.query : [route.query];
+	const routeQueryFns = route.query instanceof Array ? route.query : [route.query];
 
 	// call the query functions with non-url-encoded params
 	const params = decodeParams(match.params);
@@ -51,16 +50,12 @@ const _matchedRouteQueriesReducer = (location: URL) => (
  */
 export const getMatchedQueries = (location: URL) => (
 	matchedRoutes: Array<MatchedRoute>
-): Array<Query> =>
-	matchedRoutes.reduce(_matchedRouteQueriesReducer(location), []);
+): Array<Query> => matchedRoutes.reduce(_matchedRouteQueriesReducer(location), []);
 
 /*
  * A curried interface into `_resolveRouteMatches` + `getMatchedQueries`
  */
-export const activeRouteQueries = (
-	routes: Array<PlatformRoute>,
-	baseUrl: string
-) => {
+export const activeRouteQueries = (routes: Array<PlatformRoute>, baseUrl: string) => {
 	const resolveRoutes = getRouteResolver(routes, baseUrl);
 	return (location: URL) =>
 		resolveRoutes(location).then(getMatchedQueries(location));

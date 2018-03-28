@@ -59,9 +59,7 @@ describe('makeInjectResponseCookies', () => {
 		mockJar.setCookie(`${key}=${value}`, responseObj.request.uri.href);
 
 		makeInjectResponseCookies(request)([response, null, mockJar]);
-		expect(
-			request.plugins[API_PROXY_PLUGIN_NAME].setState
-		).toHaveBeenCalledWith(
+		expect(request.plugins[API_PROXY_PLUGIN_NAME].setState).toHaveBeenCalledWith(
 			key,
 			value,
 			jasmine.any(Object) // don't actually care about the cookie options

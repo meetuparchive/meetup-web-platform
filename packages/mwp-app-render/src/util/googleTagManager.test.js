@@ -1,6 +1,7 @@
 import React from 'react';
 import { getGoogleTagManagerSnippet, gtmPush } from './googleTagManager';
 
+
 describe('getGoogleTagManagerSnippet()', () => {
 	it('matches snap', () => {
 		expect(getGoogleTagManagerSnippet()).toMatchSnapshot();

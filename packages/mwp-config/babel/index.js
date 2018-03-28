@@ -15,7 +15,11 @@ module.exports = {
 				'env',
 				{
 					targets: {
-						browsers: ['last 2 versions', 'not ie < 11', 'android >= 4.2'],
+						browsers: [
+							'last 2 versions',
+							'not ie < 11',
+							'android >= 4.2',
+						],
 					},
 				},
 			],

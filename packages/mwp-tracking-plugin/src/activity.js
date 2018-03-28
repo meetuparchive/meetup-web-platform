@@ -44,9 +44,7 @@ export const fakeUTCinTimezone = (timezone: string) => {
  * - `trackActivity`
  */
 
-export const getLogger: string => (Object, Object) => mixed = (
-	agent: string
-) => {
+export const getLogger: string => (Object, Object) => mixed = (agent: string) => {
 	// activity record wants an ISO 8601 timestamp in the New York timezone,
 	// so we have to fake a UTC date object shifted into NYC's timezone before
 	// calling `toISOString()`
@@ -154,15 +152,11 @@ export default function register(
 ) {
 	const { agent, isProd } = options;
 
-	const trackIdCookieName: string = isProd
-		? 'MEETUP_TRACK'
-		: 'MEETUP_TRACK_DEV';
+	const trackIdCookieName: string = isProd ? 'MEETUP_TRACK' : 'MEETUP_TRACK_DEV';
 	const browserIdCookieName: string = isProd
 		? 'MEETUP_BROWSER_ID'
 		: 'MEETUP_BROWSER_ID_DEV';
-	const memberCookieName: string = isProd
-		? 'MEETUP_MEMBER'
-		: 'MEETUP_MEMBER_DEV';
+	const memberCookieName: string = isProd ? 'MEETUP_MEMBER' : 'MEETUP_MEMBER_DEV';
 
 	const trackers: { [string]: Tracker } = getTrackers({
 		agent,

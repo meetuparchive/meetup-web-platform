@@ -41,20 +41,12 @@ const schema = {
 		},
 		key_file: {
 			format: String,
-			default: path.resolve(
-				os.homedir(),
-				'.certs',
-				'star.dev.meetup.com.key'
-			),
+			default: path.resolve(os.homedir(), '.certs', 'star.dev.meetup.com.key'),
 			env: 'ASSET_KEY_FILE',
 		},
 		crt_file: {
 			format: String,
-			default: path.resolve(
-				os.homedir(),
-				'.certs',
-				'star.dev.meetup.com.crt'
-			),
+			default: path.resolve(os.homedir(), '.certs', 'star.dev.meetup.com.crt'),
 			env: 'ASSET_CRT_FILE',
 		},
 	},
@@ -107,8 +99,7 @@ config.set(
 
 if (
 	assetConf.protocol === 'https' &&
-	(!fs.existsSync(assetConf.key_file) ||
-		!fs.existsSync(assetConf.crt_file)) &&
+	(!fs.existsSync(assetConf.key_file) || !fs.existsSync(assetConf.crt_file)) &&
 	config.isProd
 ) {
 	throw new Error('Missing HTTPS cert or key for asset server!');

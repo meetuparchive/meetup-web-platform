@@ -1,4 +1,1 @@
-module.exports = [
-	'en-AU',
-	'es-ES',
-];
+module.exports = ['en-AU', 'es-ES'];

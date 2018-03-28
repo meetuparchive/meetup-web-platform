@@ -1,4 +1,3 @@
-import fs from 'fs';
 import { getServer } from 'mwp-test-utils';
 
 import 'rxjs/add/operator/toPromise';
@@ -58,15 +57,13 @@ describe('getAuthHeaders', () => {
 				},
 			},
 		});
-		const cookies = authHeaders.cookie
-			.split('; ')
-			.reduce((cookies, pair) => {
-				const [name, ...value] = pair.split('=');
-				return {
-					...cookies,
-					[name]: value.join('='),
-				};
-			}, {});
+		const cookies = authHeaders.cookie.split('; ').reduce((cookies, pair) => {
+			const [name, ...value] = pair.split('=');
+			return {
+				...cookies,
+				[name]: value.join('='),
+			};
+		}, {});
 
 		expect(cookies['MEETUP_CSRF_DEV']).not.toBeUndefined();
 		expect(authHeaders['csrf-token']).toEqual(cookies['MEETUP_CSRF_DEV']);
@@ -112,13 +109,18 @@ describe('getTrackingHeaders', () => {
 	it('returns a x-meetup-external-track and x-meetup-external-track-url header when the _xtd query param exists', () => {
 		const externalTrackHeaders = {
 			'X-Meetup-External-Track': 'helloIAmRandom',
-			'X-Meetup-External-Track-Url': 'https://www.meetup.com/cool-meetup/events/123',
+			'X-Meetup-External-Track-Url':
+				'https://www.meetup.com/cool-meetup/events/123',
 		};
 		const request = {
-			query: { '_xtd': 'helloIAmRandom' },
+			query: { _xtd: 'helloIAmRandom' },
 			url: {
-				href: 'https://www.meetup.com/cool-meetup/events/123'
-			}
+				href: '/cool-meetup/events/123',
+			},
+			headers: {
+				'x-forwarded-proto': 'https',
+				'x-meetup-host': 'www.meetup.com',
+			},
 		};
 		expect(getTrackingHeaders(request)).toEqual(externalTrackHeaders);
 	});
@@ -126,6 +128,10 @@ describe('getTrackingHeaders', () => {
 	it('Does not set the header if query param is not set', () => {
 		const request = {
 			query: {},
+			headers: {
+				'x-forwarded-proto': 'https',
+				'x-meetup-host': 'www.meetup.com',
+			},
 		};
 		expect(getTrackingHeaders(request)).toEqual({});
 	});
@@ -172,13 +178,9 @@ describe('buildRequestArgs', () => {
 
 	it('Converts an api config to arguments for a node-request call', () => {
 		let method = 'get';
-		const getArgs = buildRequestArgs({ ...options, method })(
-			testQueryResults
-		);
+		const getArgs = buildRequestArgs({ ...options, method })(testQueryResults);
 		method = 'post';
-		const postArgs = buildRequestArgs({ ...options, method })(
-			testQueryResults
-		);
+		const postArgs = buildRequestArgs({ ...options, method })(testQueryResults);
 		expect(getArgs).toEqual(jasmine.any(Object));
 		expect(getArgs.url).toMatch(/\?.+/); // get requests will add querystring
 		expect(getArgs.hasOwnProperty('body')).toBe(false); // get requests will not have a body
@@ -201,9 +203,7 @@ describe('buildRequestArgs', () => {
 		};
 		const getArgs = buildRequestArgs({ ...options, method: 'get' })(query);
 		expect(getArgs.headers['X-Meetup-Request-Flags']).not.toBeUndefined();
-		const postArgs = buildRequestArgs({ ...options, method: 'post' })(
-			query
-		);
+		const postArgs = buildRequestArgs({ ...options, method: 'post' })(query);
 		expect(postArgs.headers['X-Meetup-Request-Flags']).not.toBeUndefined();
 	});
 
@@ -226,9 +226,7 @@ describe('buildRequestArgs', () => {
 		expect(getArgs.headers['X-Meetup-Variants']).toEqual(
 			`${experiment}=${context}`
 		);
-		const postArgs = buildRequestArgs({ ...options, method: 'post' })(
-			query
-		);
+		const postArgs = buildRequestArgs({ ...options, method: 'post' })(query);
 		expect(postArgs.headers['X-Meetup-Variants']).toEqual(
 			`${experiment}=${context}`
 		);
@@ -240,16 +238,12 @@ describe('buildRequestArgs', () => {
 			type: 'bar',
 			meta: { metaRequestHeaders: ['foo', 'bar'] },
 		};
-		const requestArgs = buildRequestArgs({ ...options, method: 'get' })(
-			query
-		);
+		const requestArgs = buildRequestArgs({ ...options, method: 'get' })(query);
 		const requestHeaders = Object.keys(requestArgs.headers);
 		const expectedApiMetaHeader = 'foo,bar';
 
 		expect(requestHeaders).toContain(API_META_HEADER);
-		expect(requestArgs.headers[API_META_HEADER]).toBe(
-			expectedApiMetaHeader
-		);
+		expect(requestArgs.headers[API_META_HEADER]).toBe(expectedApiMetaHeader);
 	});
 
 	const testQueryResults_utf8 = mockQuery(MOCK_RENDERPROPS_UTF8);

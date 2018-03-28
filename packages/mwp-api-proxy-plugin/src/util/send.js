@@ -17,9 +17,7 @@ import config from 'mwp-config';
 
 export const API_META_HEADER = 'X-Meta-Request-Headers';
 const MEMBER_COOKIE_NAME =
-	process.env.NODE_ENV === 'production'
-		? 'MEETUP_MEMBER'
-		: 'MEETUP_MEMBER_DEV';
+	process.env.NODE_ENV === 'production' ? 'MEETUP_MEMBER' : 'MEETUP_MEMBER_DEV';
 const CSRF_COOKIE_NAME =
 	process.env.NODE_ENV === 'production' ? 'MEETUP_CSRF' : 'MEETUP_CSRF_DEV';
 
@@ -114,14 +112,15 @@ export const buildRequestArgs = externalRequestOpts => ({
 	}
 
 	if (meta.variants) {
-		headers['X-Meetup-Variants'] = Object.keys(
-			meta.variants
-		).reduce((header, experiment) => {
-			const context = meta.variants[experiment];
-			const contexts = context instanceof Array ? context : [context];
-			header += contexts.map(c => `${experiment}=${c}`).join(' ');
-			return header;
-		}, '');
+		headers['X-Meetup-Variants'] = Object.keys(meta.variants).reduce(
+			(header, experiment) => {
+				const context = meta.variants[experiment];
+				const contexts = context instanceof Array ? context : [context];
+				header += contexts.map(c => `${experiment}=${c}`).join(' ');
+				return header;
+			},
+			''
+		);
 	}
 
 	switch (externalRequestOpts.method) {
@@ -200,11 +199,19 @@ export function getClientIpHeader(request) {
 
 export function getTrackingHeaders(request) {
 	// email tracking with _xtd query param: https://meetup.atlassian.net/wiki/spaces/DAT/pages/27754630/Email+Tracking
+
+	// request protocol and host might be different from original request that hit proxy
+	// we want to use the proxy's protocol and host
+	const requestProtocol = request.headers['x-forwarded-proto'];
+	const domain =
+		request.headers['x-forwarded-host'] || request.headers['x-meetup-host'];
+	const host = `${requestProtocol}://${domain}`;
+
 	const trackingParam = request.query._xtd;
 	if (trackingParam) {
 		return {
 			'X-Meetup-External-Track': trackingParam,
-			'X-Meetup-External-Track-Url': request.url.href,
+			'X-Meetup-External-Track-Url': `${host}${request.url.href}`,
 		};
 	}
 	return {};
@@ -232,7 +239,7 @@ export function parseRequestHeaders(request) {
 /*
  * In multipart form requests, the parsed payload includes string key-value
  * pairs for regular inputs, and raw Buffer objects for file uploads
- * 
+ *
  * This function passes through regular input values unchanged, but formats the
  * file buffers into a { value, options } object that can be used in request
  * formData
@@ -255,7 +262,7 @@ export const parseMultipart = payload =>
  * request properties. The resulting value will be used as the _base_ set of
  * options for _every_ parallel REST API request made by the platform
  * corresponding to single incoming request.
- * 
+ *
  * @return {Object} externalRequestOpts
  */
 export function getExternalRequestOpts(request) {
@@ -281,10 +288,7 @@ export function getExternalRequestOpts(request) {
 /**
  * Fake an API request and directly return the stringified mockResponse
  */
-export const makeMockRequest = (
-	mockResponseContent,
-	responseMeta
-) => requestOpts =>
+export const makeMockRequest = (mockResponseContent, responseMeta) => requestOpts =>
 	Observable.of([
 		makeMockResponse(requestOpts, responseMeta),
 		JSON.stringify(mockResponseContent),
@@ -306,13 +310,9 @@ export const makeExternalApiRequest = request => requestOpts => {
 
 			const errorObj = { errors: [err] };
 			if (err.code === 'ETIMEDOUT') {
-				return makeMockRequest(errorObj, API_TIMEOUT_RESPONSE)(
-					requestOpts
-				);
+				return makeMockRequest(errorObj, API_TIMEOUT_RESPONSE)(requestOpts);
 			}
-			return makeMockRequest(errorObj, makeAPIErrorResponse(err))(
-				requestOpts
-			);
+			return makeMockRequest(errorObj, makeAPIErrorResponse(err))(requestOpts);
 		})
 		.map(([response, body]) => [response, body, requestOpts.jar]);
 };

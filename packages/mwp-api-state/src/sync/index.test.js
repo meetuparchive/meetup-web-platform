@@ -15,11 +15,7 @@ import {
 import { CACHE_CLEAR } from '../cache/cacheActionCreators';
 import * as api from './apiActionCreators';
 import * as syncActionCreators from './syncActionCreators';
-import getSyncEpic, {
-	getFetchQueriesEpic,
-	getNavEpic,
-	apiRequestToApiReq,
-} from './';
+import getSyncEpic, { getFetchQueriesEpic, getNavEpic, apiRequestToApiReq } from './';
 import { API_RESP_COMPLETE } from '../../lib/sync/apiActionCreators';
 
 MOCK_APP_STATE.config = {};
@@ -138,8 +134,7 @@ describe('Sync epic', () => {
 	});
 	describe('getFetchQueriesEpic', () => {
 		it('emits API_RESP_SUCCESS and API_RESP_COMPLETE on successful API_REQ', function() {
-			const mockFetchQueries = () => () =>
-				Promise.resolve({ successes: [{}] });
+			const mockFetchQueries = () => () => Promise.resolve({ successes: [{}] });
 
 			const queries = [mockQuery({})];
 			const apiRequest = api.get(queries);
@@ -220,10 +215,10 @@ describe('Sync epic', () => {
 			const apiRequest = api.get(queries);
 			apiRequest.meta.resolve = jest.fn();
 			const fakeStore = createFakeStore(MOCK_APP_STATE);
-			return getFetchQueriesEpic(
-				MAKE_MOCK_RESOLVE_ROUTES(),
-				mockFetchQueries
-			)(apiRequest, fakeStore).then(actions => {
+			return getFetchQueriesEpic(MAKE_MOCK_RESOLVE_ROUTES(), mockFetchQueries)(
+				apiRequest,
+				fakeStore
+			).then(actions => {
 				expect(apiRequest.meta.resolve).toHaveBeenCalledWith(
 					expectedSuccesses
 				);
@@ -237,10 +232,10 @@ describe('Sync epic', () => {
 			const queries = [mockQuery({})];
 			const apiRequest = api.get(queries);
 			const fakeStore = createFakeStore(MOCK_APP_STATE);
-			return getFetchQueriesEpic(
-				MAKE_MOCK_RESOLVE_ROUTES(),
-				mockFetchQueries
-			)(apiRequest, fakeStore).then(actions => {
+			return getFetchQueriesEpic(MAKE_MOCK_RESOLVE_ROUTES(), mockFetchQueries)(
+				apiRequest,
+				fakeStore
+			).then(actions => {
 				expect(actions.map(a => a.type)).toEqual([
 					api.API_RESP_FAIL,
 					'API_ERROR',
@@ -256,13 +251,11 @@ describe('Sync epic', () => {
 			const apiRequest = api.get(queries);
 			apiRequest.meta.reject = jest.fn();
 			const fakeStore = createFakeStore(MOCK_APP_STATE);
-			return getFetchQueriesEpic(
-				MAKE_MOCK_RESOLVE_ROUTES(),
-				mockFetchQueries
-			)(apiRequest, fakeStore).then(actions =>
-				expect(apiRequest.meta.reject).toHaveBeenCalledWith(
-					expectedError
-				)
+			return getFetchQueriesEpic(MAKE_MOCK_RESOLVE_ROUTES(), mockFetchQueries)(
+				apiRequest,
+				fakeStore
+			).then(actions =>
+				expect(apiRequest.meta.reject).toHaveBeenCalledWith(expectedError)
 			);
 		});
 	});

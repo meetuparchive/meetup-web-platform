@@ -5,9 +5,7 @@ import * as api from '../sync/apiActionCreators';
 
 describe('postEpic', () => {
 	it('does not pass through arbitrary actions', () =>
-		postEpic({ type: 'asdf' }).then(actions =>
-			expect(actions).toHaveLength(0)
-		));
+		postEpic({ type: 'asdf' }).then(actions => expect(actions).toHaveLength(0)));
 	it('returns an api.post(query) action', () => {
 		return postEpic(MOCK_POST_ACTION).then(([action]) => {
 			const { query, onSuccess, onError } = MOCK_POST_ACTION.payload;

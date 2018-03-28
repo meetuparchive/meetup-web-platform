@@ -8,13 +8,7 @@ const similarToDefault = 'en-AU';
 const altLang = 'fr-FR';
 const altLang2 = 'de-DE';
 const altLang3 = 'es-ES';
-const supportedLangs = [
-	defaultLang,
-	similarToDefault,
-	altLang,
-	altLang2,
-	altLang3,
-];
+const supportedLangs = [defaultLang, similarToDefault, altLang, altLang2, altLang3];
 
 const getMockRequest = override => {
 	const request = {};

@@ -15,9 +15,7 @@ describe('server', () => {
 		const fooPlugin = { register: 'foo' };
 		const routes = [fooRoute];
 		const plugins = [fooPlugin];
-		spyOn(serverUtils, 'server').and.returnValue(
-			Promise.resolve(expectedServer)
-		);
+		spyOn(serverUtils, 'server').and.returnValue(Promise.resolve(expectedServer));
 		return start({}, { routes, plugins }).then(returnedServer => {
 			const callArgs = serverUtils.server.calls.mostRecent().args;
 			expect(callArgs).toEqual([

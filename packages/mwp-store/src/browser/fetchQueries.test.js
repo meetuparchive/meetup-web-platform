@@ -28,9 +28,7 @@ describe('fetchQueries', () => {
 	const API_URL = new URL('http://api.example.com/');
 	const csrfJwt = `${CSRF_HEADER_COOKIE} value`;
 	const getQueries = [mockQuery({ params: {} })];
-	const POSTQueries = [
-		{ ...mockQuery({ params: {} }), meta: { method: 'POST' } },
-	];
+	const POSTQueries = [{ ...mockQuery({ params: {} }), meta: { method: 'POST' } }];
 	const meta = { foo: 'bar', clickTracking: { history: [] } };
 	const responses = [MOCK_GROUP];
 	const fakeSuccess = () =>
@@ -176,7 +174,10 @@ describe('fetchQueries', () => {
 			};
 			FormData.prototype.append = jest.fn();
 			const formQueries = [
-				{ ...mockQuery({ params: new FormData() }), meta: { method: 'POST' } },
+				{
+					...mockQuery({ params: new FormData() }),
+					meta: { method: 'POST' },
+				},
 			];
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
