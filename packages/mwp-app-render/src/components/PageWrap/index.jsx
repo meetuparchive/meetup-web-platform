@@ -1,6 +1,7 @@
 import React from 'react';
 import Helmet from 'react-helmet';
 import PropTypes from 'prop-types';
+import newrelic from 'newrelic';
 
 /**
  * This component wraps all pages on the website, and through [Helmet](https://github.com/nfl/react-helmet/)
@@ -71,6 +72,7 @@ class PageWrap extends React.Component {
 						name="verify-v1"
 						content="h5EhuAEkLFlZmMxwpH5wnRaoDEmqYCCEUE+FLcrRNvE="
 					/>
+					{newrelic.getBrowserTimingHeader()}
 				</Helmet>
 
 				{iconSprite &&
