@@ -17,7 +17,7 @@ export const gtmPush = (data: { [string]: string }) => {
  * @description Gets google tag manager JS snippet
  * @see {@link https://developers.google.com/tag-manager/quickstart}
 */
-export const getGoogleTagManagerSnippet = (): string => (
+export const getGoogleTagManagerSnippet = (): string =>
 	`dataLayer = [];
 	(function(w,d,s,l,i){
 		w[l]=w[l]||[];
