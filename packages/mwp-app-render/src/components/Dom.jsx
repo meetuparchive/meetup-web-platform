@@ -38,7 +38,6 @@ const DOM = props => {
 		initialState = {},
 		scripts,
 		cssLinks,
-		inlineStyleTags,
 		userAgent,
 	} = props;
 
@@ -84,7 +83,6 @@ const DOM = props => {
 							key={key}
 						/>
 					)}
-				{inlineStyleTags}
 			</head>
 			<body>
 				<div
@@ -115,7 +113,6 @@ DOM.propTypes = {
 	initialState: PropTypes.object.isRequired,
 	scripts: PropTypes.array.isRequired,
 	cssLinks: PropTypes.arrayOf(PropTypes.string),
-	inlineStyleTags: PropTypes.arrayOf(PropTypes.element),
 	userAgent: PropTypes.string,
 };
 
