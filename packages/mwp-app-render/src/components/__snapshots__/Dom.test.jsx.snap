@@ -1,46 +1,41 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Dom renders with mock props 1`] = `
-<StylesContextProvider
-  onInsertCss={[Function]}
+<html
+  lang="fr"
 >
-  <html
-    lang="fr"
-  >
-    <head>
-      <link
-        href="style.css"
-        key="0"
-        rel="stylesheet"
-        type="text/css"
-      />
-      0
-    </head>
-    <body>
-      <div
-        dangerouslySetInnerHTML={
-          Object {
-            "__html": "<div>mock app markup</div>",
-          }
+  <head>
+    <link
+      href="style.css"
+      key="0"
+      rel="stylesheet"
+      type="text/css"
+    />
+  </head>
+  <body>
+    <div
+      dangerouslySetInnerHTML={
+        Object {
+          "__html": "<div>mock app markup</div>",
         }
-        id="outlet"
-      />
-      <script
-        dangerouslySetInnerHTML={
-          Object {
-            "__html": "window.APP_RUNTIME={\\"basename\\":\\"/fo-BA\\",\\"escapedState\\":\\"{&quot;config&quot;:{&quot;requestLanguage&quot;:&quot;fr-FR&quot;}}\\"};",
-          }
+      }
+      id="outlet"
+    />
+    <script
+      dangerouslySetInnerHTML={
+        Object {
+          "__html": "window.APP_RUNTIME={\\"basename\\":\\"/fo-BA\\",\\"escapedState\\":\\"{&quot;config&quot;:{&quot;requestLanguage&quot;:&quot;fr-FR&quot;}}\\"};",
         }
-      />
-      <script
-        key="0"
-        src="https://cdn.polyfill.io/v2/polyfill.min.js?features=default-3.6,fetch,Intl,Intl.~locale.fr-FR,Array.prototype.find,Array.prototype.includes,Object.values&flags=gated"
-      />
-      <script
-        key="1"
-        src="script.js"
-      />
-    </body>
-  </html>
-</StylesContextProvider>
+      }
+    />
+    <script
+      key="0"
+      src="https://cdn.polyfill.io/v2/polyfill.min.js?features=default-3.6,fetch,Intl,Intl.~locale.fr-FR,Array.prototype.find,Array.prototype.includes,Object.values&flags=gated"
+    />
+    <script
+      key="1"
+      src="script.js"
+    />
+  </body>
+</html>
 `;
