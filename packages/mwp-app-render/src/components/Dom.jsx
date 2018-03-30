@@ -3,6 +3,7 @@ import React from 'react';
 import escapeHtml from 'escape-html';
 
 import { getPolyfill } from 'mwp-app-render/lib/util/browserPolyfill';
+import StylesContextProvider from '../util/StylesContextProvider';
 
 function getInnerHTML(__html) {
 	return {
@@ -67,36 +68,47 @@ const DOM = props => {
 		escapedState,
 	};
 
+	// TODO: move to util
+	const moduleCSS = new Set();
+	const onInsertCss = (...styles) => {
+		styles.forEach(s => {
+			moduleCSS.add(style._getCSS());
+		});
+	};
+
 	return (
-		<html lang={htmlLang}>
-			<head>
-				{head.title.toComponent()}
-				{head.meta.toComponent()}
-				{head.link.toComponent()}
-				{head.script.toComponent()}
-				{cssLinks &&
-					cssLinks.map((href, key) =>
-						<link
-							rel="stylesheet"
-							type="text/css"
-							href={href}
-							key={key}
-						/>
-					)}
-			</head>
-			<body>
-				<div
-					id="outlet"
-					dangerouslySetInnerHTML={getInnerHTML(appMarkup)}
-				/>
-				<script
-					dangerouslySetInnerHTML={getInnerHTML(
-						`window.APP_RUNTIME=${JSON.stringify(APP_RUNTIME)};`
-					)}
-				/>
-				{js.map((url, key) => <script src={url} key={key} />)}
-			</body>
-		</html>
+		<StylesContextProvider onInsertCss={onInsertCss}>
+			<html lang={htmlLang}>
+				<head>
+					{head.title.toComponent()}
+					{head.meta.toComponent()}
+					{head.link.toComponent()}
+					{head.script.toComponent()}
+					{cssLinks &&
+						cssLinks.map((href, key) =>
+							<link
+								rel="stylesheet"
+								type="text/css"
+								href={href}
+								key={key}
+							/>
+						)}
+					{moduleCSS.size && <style type="text/css">{[...moduleCSS].join('')}</style>}
+				</head>
+				<body>
+					<div
+						id="outlet"
+						dangerouslySetInnerHTML={getInnerHTML(appMarkup)}
+					/>
+					<script
+						dangerouslySetInnerHTML={getInnerHTML(
+							`window.APP_RUNTIME=${JSON.stringify(APP_RUNTIME)};`
+						)}
+					/>
+					{js.map((url, key) => <script src={url} key={key} />)}
+				</body>
+			</html>
+		</StylesContextProvider>
 	);
 };
 
