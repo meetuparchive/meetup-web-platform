@@ -1,14 +1,16 @@
 // @flow
 
 // Production and dev keys
-const GTM_KEY = process.env.NODE_ENV === 'production' ? 'GTM-T2LNGD' : 'GTM-W9W847';
+const GTM_KEY =
+	process.env.NODE_ENV === 'production' ? 'GTM-T2LNGD' : 'GTM-W9W847';
 
 /**
  * @description Method for passing additional variables to GTM
  * @see {@link https://developers.google.com/tag-manager/devguide}
  */
 export const gtmPush = (data: { [string]: string }) => {
-	if (typeof window !== 'undefined' && window.dataLayer) {
+	if (typeof window !== 'undefined') {
+		window.dataLayer = window.dataLayer || [];
 		window.dataLayer.push(data);
 	}
 };
@@ -18,8 +20,7 @@ export const gtmPush = (data: { [string]: string }) => {
  * @see {@link https://developers.google.com/tag-manager/quickstart}
 */
 export const getGoogleTagManagerSnippet = (): string =>
-	`dataLayer = [];
-	(function(w,d,s,l,i){
+	`(function(w,d,s,l,i){
 		w[l]=w[l]||[];
 		w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
 		var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
