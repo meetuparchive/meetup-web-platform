@@ -1,6 +1,8 @@
-import React from 'react';
-import { getGoogleTagManagerSnippet, gtmPush } from './googleTagManager';
-
+import {
+	getGoogleTagManagerSnippet,
+	getDataLayerInitSnippet,
+	gtmPush,
+} from './googleTagManager';
 
 describe('getGoogleTagManagerSnippet()', () => {
 	it('matches snap', () => {
@@ -8,8 +10,20 @@ describe('getGoogleTagManagerSnippet()', () => {
 	});
 });
 
+describe('getDataLayerInitSnippet()', () => {
+	const MOCK_INIT_DATA = { foo: 'bar' };
+
+	it('should match the snapshot without `data` passed', () => {
+		expect(getDataLayerInitSnippet()).toMatchSnapshot();
+	});
+
+	it('should match the snapshot with some `data`', () => {
+		expect(getDataLayerInitSnippet(MOCK_INIT_DATA)).toMatchSnapshot();
+	});
+});
+
 describe('gtmPush()', () => {
-	const MOCK_VARS = { 'foo': 'bar' };
+	const MOCK_VARS = { foo: 'bar' };
 
 	it('should push mocked variables to `dataLayer`', () => {
 		global.window = {};
