@@ -1,5 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`getDataLayerInitSnippet() should match the snapshot with some \`data\` 1`] = `"dataLayer=[{\\"foo\\":\\"bar\\"}]"`;
+
+exports[`getDataLayerInitSnippet() should match the snapshot without \`data\` passed 1`] = `"dataLayer=[]"`;
+
 exports[`getGoogleTagManagerSnippet() matches snap 1`] = `
 "(function(w,d,s,l,i){
 		w[l]=w[l]||[];

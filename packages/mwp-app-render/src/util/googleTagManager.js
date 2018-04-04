@@ -5,6 +5,14 @@ const GTM_KEY =
 	process.env.NODE_ENV === 'production' ? 'GTM-T2LNGD' : 'GTM-W9W847';
 
 /**
+ * @description Gets dataLayer initialization snippet with initial values provided
+ * It's important to use this snippet before getGoogleTagManagerSnippet()
+ * @see {@link https://developers.google.com/tag-manager/devguide#datalayer}
+ */
+export const getDataLayerInitSnippet = (data: { [string]: string }): string =>
+	`dataLayer=[${data ? JSON.stringify(data) : ''}]`;
+
+/**
  * @description Method for passing additional variables to GTM
  * @see {@link https://developers.google.com/tag-manager/devguide}
  */
