@@ -13,7 +13,7 @@ export default function register(
 	server: HapiServer,
 	options: {
 		languageRenderers: { [string]: LanguageRenderer },
-		ldkey: string,
+		ldkey?: string,
 	},
 	next: () => void
 ) {
@@ -21,9 +21,7 @@ export default function register(
 
 	const ldClient = LaunchDarkly.init(options.ldkey || LAUNCH_DARKLY_SDK_KEY);
 	server.expose('getFlags', ldClient.all_flags);
-	ldClient.once(`ready`, () => {
-		next();
-	});
+	ldClient.once(`ready`, () => next());
 }
 
 register.attributes = {
