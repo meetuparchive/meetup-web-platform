@@ -14,7 +14,6 @@ branches:
 env:
   global:
     - CI_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER
-    - secure: "UdU7dYh5Jef1yVYORQgpvRd3oVGi9UzPkoanUsAPF6Xmp/hpYN9bAG0nTnEE3OSFK4WehE2VdEQDtgvB/lgH6xgAmUcXv1ewNIZxRUvNQz7urYu6O+plbXlM+IUdDjOxGvj8P+ooWAiYuDYrChnfGOwcWydp1zOQc5RLmUSL9gi7E0hG119fCMPP+qJwaoDRpVQ2HdBQWLMCkcFqrRjYYEjf4ZYNhkNlL1jOx4+mgzbrezGL0jErnd9eX3ODt/NLH3NpX2XXt0WEYz9Q41HyMlV7eyUq/RHJRXWaksZYkEWHSitIJsjSOONFkBmEsLPD8VPS2fVYKfV1lXVoEVbERyy8HbbGDEbdm06DafOe3dB3+KSidSb95SyL8eUpdRetbySYyDSWsR4u8EF4Tr/SHUTl9ctOh6f0REvJzXjPRMM/uG+Pq5Fr+vGyA8YQj7n2LSvaw5zO2I07Nlf4MCFGY+CS0IE22AthnEptBKXbjFTFpLyTorkP5j8Tuvhru9BHZ3odJSOT2jFiZ5kxArbn5W+pg6Qiidm+JFmXZbtEVSsiS3HSJWXBxVJpBhWjMRpimKqdUMc272jyQ8KdEdpEVC0kEZtpE3Ul0ahdcIj492wnvhziGYHBR6s87fD4m9oPQ9r70iYQ3NcKbIo36uN7+Zd2w+C/jZr8XDIisg9NtI8="
 
 before_install:
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-api-proxy-plugin/.npmrc
