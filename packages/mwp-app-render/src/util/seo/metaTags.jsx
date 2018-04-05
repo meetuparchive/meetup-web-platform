@@ -47,7 +47,7 @@ export const getKeywordsByProperties = (item, keys) =>
  */
 export const getGroupKeywords = group => {
 	const topics = group.topics || [];
-	const topicKeywords = topics => topics.map(topic => topic.name);
+	const topicKeywords = topics.map(topic => topic.name);
 	const groupKeys = ['name', 'city', 'state', 'country'];
 	return [...topicKeywords, ...getKeywordsByProperties(group, groupKeys)].join(',');
 };

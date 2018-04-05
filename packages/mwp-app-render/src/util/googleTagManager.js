@@ -1,9 +1,29 @@
 // @flow
 
 // Production and dev keys
-const GTM_KEY = process.env.NODE_ENV === 'production' ? 'GTM-T2LNGD' : 'GTM-W9W847';
+const GTM_KEY =
+	process.env.NODE_ENV === 'production' ? 'GTM-T2LNGD' : 'GTM-W9W847';
 
-/*
+/**
+ * @description Gets dataLayer initialization snippet with initial values provided
+ * It's important to use this snippet before getGoogleTagManagerSnippet()
+ * @see {@link https://developers.google.com/tag-manager/devguide#datalayer}
+ */
+export const getDataLayerInitSnippet = (data: { [string]: string }): string =>
+	`dataLayer=[${data ? JSON.stringify(data) : ''}]`;
+
+/**
+ * @description Method for passing additional variables to GTM
+ * @see {@link https://developers.google.com/tag-manager/devguide}
+ */
+export const gtmPush = (data: { [string]: string }) => {
+	if (typeof window !== 'undefined') {
+		window.dataLayer = window.dataLayer || [];
+		window.dataLayer.push(data);
+	}
+};
+
+/**
  * @description Gets google tag manager JS snippet
  * @see {@link https://developers.google.com/tag-manager/quickstart}
 */
