@@ -38,7 +38,6 @@ const DOM = props => {
 		initialState = {},
 		scripts,
 		cssLinks,
-		inlineStyleTags,
 		userAgent,
 	} = props;
 
@@ -77,20 +76,11 @@ const DOM = props => {
 				{head.script.toComponent()}
 				{cssLinks &&
 					cssLinks.map((href, key) =>
-						<link
-							rel="stylesheet"
-							type="text/css"
-							href={href}
-							key={key}
-						/>
+						<link rel="stylesheet" type="text/css" href={href} key={key} />
 					)}
-				{inlineStyleTags}
 			</head>
 			<body>
-				<div
-					id="outlet"
-					dangerouslySetInnerHTML={getInnerHTML(appMarkup)}
-				/>
+				<div id="outlet" dangerouslySetInnerHTML={getInnerHTML(appMarkup)} />
 				<script
 					dangerouslySetInnerHTML={getInnerHTML(
 						`window.APP_RUNTIME=${JSON.stringify(APP_RUNTIME)};`
@@ -115,7 +105,6 @@ DOM.propTypes = {
 	initialState: PropTypes.object.isRequired,
 	scripts: PropTypes.array.isRequired,
 	cssLinks: PropTypes.arrayOf(PropTypes.string),
-	inlineStyleTags: PropTypes.arrayOf(PropTypes.element),
 	userAgent: PropTypes.string,
 };
 
