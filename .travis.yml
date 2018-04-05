@@ -62,7 +62,7 @@ after_script:
   - echo "GIT_TAG=$GIT_TAG"
   - echo "NPM_TAG=$NPM_TAG"
   - eval "$(ssh-agent)"
-  - echo "$GITHUB_DEPLOY_KEY" | base64 --decode > /tmp/github_deploy_key
+  - echo "$GITHUB_DEPLOY_KEY" > /tmp/github_deploy_key
   - chmod 600 /tmp/github_deploy_key
   - ssh-add /tmp/github_deploy_key
   - >
