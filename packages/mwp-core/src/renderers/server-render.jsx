@@ -263,8 +263,6 @@ const makeRenderer = (
 				return Promise.resolve(createStore(reducer, initialState));
 			});
 
-	// render skeleton if requested - the store is ready
-
 	// otherwise render using the API and React router
 	const checkReady = state =>
 		state.preRenderChecklist.every(isReady => isReady);
@@ -287,6 +285,7 @@ const makeRenderer = (
 
 	return initializeStore().then(store => {
 		if ('skeleton' in request.query) {
+			// render skeleton if requested - the store is ready
 			return {
 				result: getHtml(
 					<Dom
