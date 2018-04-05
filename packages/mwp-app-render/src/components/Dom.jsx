@@ -75,6 +75,7 @@ const DOM = props => {
 				{head.meta.toComponent()}
 				{head.link.toComponent()}
 				{head.script.toComponent()}
+				{head.style && head.style.toComponent()}
 				{cssLinks &&
 					cssLinks.map((href, key) =>
 						<link
@@ -111,6 +112,7 @@ DOM.propTypes = {
 		meta: PropTypes.shape({ toComponent: PropTypes.func }),
 		link: PropTypes.shape({ toComponent: PropTypes.func }),
 		script: PropTypes.shape({ toComponent: PropTypes.func }),
+		style: PropTypes.shape({ toComponent: PropTypes.func }),
 	}),
 	initialState: PropTypes.object.isRequired,
 	scripts: PropTypes.array.isRequired,
