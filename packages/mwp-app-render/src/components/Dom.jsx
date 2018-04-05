@@ -69,11 +69,12 @@ const DOM = props => {
 		escapedState,
 	};
 
+	// strip <script> html tags
+	// in order to dangerouslySetInnerHTML in JSX
 	const newrelicJS = newrelic
 		.getBrowserTimingHeader()
 		.replace(/<script[^>]+>/, '')
 		.replace(/<\/script>$/, '');
-	console.log(newrelicJS);
 
 	return (
 		<html lang={htmlLang}>
