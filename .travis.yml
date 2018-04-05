@@ -51,24 +51,25 @@ script:
 after_script:
   - git config --global user.email "builds@travis-ci.com"
   - git config --global user.name "Travis CI"
-  - >
-    [ "${TRAVIS_BRANCH}" = "master" ] && [ "${TRAVIS_PULL_REQUEST}" = "false" ] &&
-    export GIT_TAG=$(make version) ||
-    export GIT_TAG=$(make version)-beta
+  #- >
+  #  [ "${TRAVIS_BRANCH}" = "master" ] && [ "${TRAVIS_PULL_REQUEST}" = "false" ] &&
+  #  export GIT_TAG=$(make version) ||
+  #  export GIT_TAG=$(make version)-beta
   - >
     [ "${TRAVIS_BRANCH}" = "master" ] && [ "${TRAVIS_PULL_REQUEST}" = "false" ] &&
     export NPM_TAG=latest ||
     export NPM_TAG=beta
-  - echo "GIT_TAG=$GIT_TAG"
+  #- echo "GIT_TAG=$GIT_TAG"
   - echo "NPM_TAG=$NPM_TAG"
   - eval "$(ssh-agent)"
   - echo "$GITHUB_DEPLOY_KEY" > /tmp/github_deploy_key
   - chmod 600 /tmp/github_deploy_key
   - ssh-add /tmp/github_deploy_key
   - >
-    lerna publish --yes --force-publish --skip-git --npm-tag $NPM_TAG --repo-version $GIT_TAG &&
-    git tag -a $GIT_TAG -m "Version $GIT_TAG built by Travis CI - https://travis-ci.com/$TRAVIS_REPO_SLUG/builds/$TRAVIS_JOB_ID" &&
-    git push --tags git@github.com:$TRAVIS_REPO_SLUG.git
+    lerna publish --yes --force-publish --skip-git --npm-tag $NPM_TAG --repo-version $GIT_TAG
+  #  lerna publish --yes --force-publish --skip-git --npm-tag $NPM_TAG --repo-version $GIT_TAG &&
+  #  git tag -a $GIT_TAG -m "Version $GIT_TAG built by Travis CI - https://travis-ci.com/$TRAVIS_REPO_SLUG/builds/$TRAVIS_JOB_ID" &&
+  #  git push --tags git@github.com:$TRAVIS_REPO_SLUG.git
 
 after_success:
   - npm run coveralls
