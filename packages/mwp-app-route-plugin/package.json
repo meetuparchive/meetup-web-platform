@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "dependencies": {
+    "ldclient-node": "4.0.3",
     "redbox-react": "1.5.0"
   },
   "devDependencies": {

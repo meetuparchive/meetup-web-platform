@@ -9,6 +9,7 @@ declare type MatchMedia = {
 
 declare type MWPState = {
 	api: ApiState,
+	flags?: { [string]: boolean | string },
 	config: {
 		apiUrl: string,
 		baseUrl: string,
