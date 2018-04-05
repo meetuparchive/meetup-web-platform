@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import escapeHtml from 'escape-html';
-import newrelic from 'newrelic';
 
 import { getPolyfill } from 'mwp-app-render/lib/util/browserPolyfill';
 
@@ -76,7 +75,6 @@ const DOM = props => {
 				{head.meta.toComponent()}
 				{head.link.toComponent()}
 				{head.script.toComponent()}
-				{newrelic.getBrowserTimingHeader()}
 				{cssLinks &&
 					cssLinks.map((href, key) =>
 						<link rel="stylesheet" type="text/css" href={href} key={key} />
