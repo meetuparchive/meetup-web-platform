@@ -19,7 +19,18 @@ export default function register(
 	server.route(getRoute(options.languageRenderers));
 
 	const ldClient = LaunchDarkly.init(options.ldkey || LAUNCH_DARKLY_SDK_KEY);
-	server.expose('getFlags', ldClient.all_flags);
+	server.expose('getFlags', memberId =>
+		ldClient.all_flags(memberId).then(
+			flags => flags,
+			err => {
+				server.app.logger.error({
+					err,
+					memberId,
+				});
+				return {}; // return empty flags on error
+			}
+		)
+	);
 	// set up launchdarkly instance before continuing
 	ldClient.once(`ready`, () => next());
 }

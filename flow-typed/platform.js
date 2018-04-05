@@ -32,6 +32,7 @@ declare type HapiServer = {
 	app: {
 		logger: (...args: Array<any>) => void,
 	},
+	expose: (key: string, value: any) => void,
 	settings: {
 		app: { isProd: boolean, supportedLangs: Array<string>, [string]: any },
 	},
