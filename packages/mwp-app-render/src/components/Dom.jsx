@@ -39,7 +39,6 @@ const DOM = props => {
 		initialState = {},
 		scripts,
 		cssLinks,
-		inlineStyleTags,
 		userAgent,
 	} = props;
 
@@ -81,7 +80,6 @@ const DOM = props => {
 					cssLinks.map((href, key) =>
 						<link rel="stylesheet" type="text/css" href={href} key={key} />
 					)}
-				{inlineStyleTags}
 			</head>
 			<body>
 				<div id="outlet" dangerouslySetInnerHTML={getInnerHTML(appMarkup)} />
@@ -109,7 +107,6 @@ DOM.propTypes = {
 	initialState: PropTypes.object.isRequired,
 	scripts: PropTypes.array.isRequired,
 	cssLinks: PropTypes.arrayOf(PropTypes.string),
-	inlineStyleTags: PropTypes.arrayOf(PropTypes.element),
 	userAgent: PropTypes.string,
 };
 
