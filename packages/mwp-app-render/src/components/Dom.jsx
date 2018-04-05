@@ -69,6 +69,12 @@ const DOM = props => {
 		escapedState,
 	};
 
+	const newrelicJS = newrelic
+		.getBrowserTimingHeader()
+		.replace(/<script[^>]+>/, '')
+		.replace(/<\/script>$/, '');
+	console.log(newrelicJS);
+
 	return (
 		<html lang={htmlLang}>
 			<head>
@@ -76,7 +82,8 @@ const DOM = props => {
 				{head.meta.toComponent()}
 				{head.link.toComponent()}
 				{head.script.toComponent()}
-				{newrelic.getBrowserTimingHeader()}
+				{newrelicJS &&
+					<script dangerouslySetInnerHTML={getInnerHTML(newrelicJS)} />}
 				{cssLinks &&
 					cssLinks.map((href, key) =>
 						<link rel="stylesheet" type="text/css" href={href} key={key} />
