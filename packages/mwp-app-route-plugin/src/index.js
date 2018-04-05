@@ -2,7 +2,6 @@
 import LaunchDarkly from 'ldclient-node';
 import getRoute from './route';
 
-// set up launchdarkly instance before continuing
 const LAUNCH_DARKLY_SDK_KEY = 'sdk-86b4c7a9-a450-4527-a572-c80a603a200f';
 
 /*
@@ -21,6 +20,7 @@ export default function register(
 
 	const ldClient = LaunchDarkly.init(options.ldkey || LAUNCH_DARKLY_SDK_KEY);
 	server.expose('getFlags', ldClient.all_flags);
+	// set up launchdarkly instance before continuing
 	ldClient.once(`ready`, () => next());
 }
 
