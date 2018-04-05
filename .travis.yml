@@ -39,7 +39,7 @@ before_install:
   - yarn --version
 
 before_script:
-  - NPM_TOKEN=${NPM_TOKEN} lerna run build
+  - lerna run build
   - lerna bootstrap
   - git diff --exit-code
 
