@@ -1,5 +1,9 @@
 // @flow
+import LaunchDarkly from 'ldclient-node';
 import getRoute from './route';
+
+// set up launchdarkly instance before continuing
+const LAUNCH_DARKLY_SDK_KEY = 'sdk-86b4c7a9-a450-4527-a572-c80a603a200f';
 
 /*
  * The server app route plugin - this applies a wildcard catch-all route that
@@ -7,12 +11,17 @@ import getRoute from './route';
  */
 export default function register(
 	server: HapiServer,
-	options: { languageRenderers: { [string]: LanguageRenderer } },
+	options: {
+		languageRenderers: { [string]: LanguageRenderer },
+		ldkey?: string,
+	},
 	next: () => void
 ) {
 	server.route(getRoute(options.languageRenderers));
 
-	next();
+	const ldClient = LaunchDarkly.init(options.ldkey || LAUNCH_DARKLY_SDK_KEY);
+	server.expose('getFlags', ldClient.all_flags);
+	ldClient.once(`ready`, () => next());
 }
 
 register.attributes = {
