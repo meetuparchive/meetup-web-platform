@@ -237,31 +237,29 @@ const makeRenderer = (
 
 	// create the store with populated `config`
 	const initializeStore = () =>
-		request.server.plugins['mwp-app-route-plugin']
-			.getFlags(memberId)
-			.then(flags => {
-				const initialState = {
-					config: {
-						apiUrl: API_ROUTE_PATH,
-						baseUrl: host,
-						enableServiceWorker,
-						requestLanguage,
-						supportedLangs,
-						initialNow: new Date().getTime(),
-						variants: getVariants(state),
-						entryPath: url.pathname, // the path that the user entered the app on
-						media: getMedia(userAgent, userAgentDevice),
-					},
-					flags,
-				};
+		request.server.plugins['mwp-app-route'].getFlags(memberId).then(flags => {
+			const initialState = {
+				config: {
+					apiUrl: API_ROUTE_PATH,
+					baseUrl: host,
+					enableServiceWorker,
+					requestLanguage,
+					supportedLangs,
+					initialNow: new Date().getTime(),
+					variants: getVariants(state),
+					entryPath: url.pathname, // the path that the user entered the app on
+					media: getMedia(userAgent, userAgentDevice),
+				},
+				flags,
+			};
 
-				const createStore = getServerCreateStore(
-					getRouteResolver(routes, basename),
-					middleware,
-					request
-				);
-				return Promise.resolve(createStore(reducer, initialState));
-			});
+			const createStore = getServerCreateStore(
+				getRouteResolver(routes, basename),
+				middleware,
+				request
+			);
+			return Promise.resolve(createStore(reducer, initialState));
+		});
 
 	// otherwise render using the API and React router
 	const checkReady = state =>
