@@ -14,7 +14,7 @@ branches:
 env:
   global:
     - CI_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER
-    - NPM_TOKEN=$NPM_TOKEN
+    - NPM_TOKEN="$NPM_TOKEN"
 
 before_install:
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-api-proxy-plugin/.npmrc
