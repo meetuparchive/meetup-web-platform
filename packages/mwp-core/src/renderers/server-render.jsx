@@ -14,7 +14,7 @@ import Dom from 'mwp-app-render/lib/components/Dom';
 import ServerApp from 'mwp-app-render/lib/components/ServerApp';
 
 import { getInlineStyleTags } from '../util/inlineStyle';
-import { getVariants } from '../util/cookieUtils';
+import { getVariants, parseMemberCookie } from '../util/cookieUtils';
 
 const DOCTYPE = '<!DOCTYPE html>';
 
@@ -233,80 +233,88 @@ const makeRenderer = (
 	const host = `${requestProtocol}://${domain}`;
 	const userAgent = headers['user-agent'];
 	const userAgentDevice = headers['x-ua-device'] || ''; // set by fastly
+	const memberId = parseMemberCookie(state).id;
 
 	// create the store with populated `config`
-	const initialState = {
-		config: {
-			apiUrl: API_ROUTE_PATH,
-			baseUrl: host,
-			enableServiceWorker,
-			requestLanguage,
-			supportedLangs,
-			initialNow: new Date().getTime(),
-			variants: getVariants(state),
-			entryPath: url.pathname, // the path that the user entered the app on
-			media: getMedia(userAgent, userAgentDevice),
-		},
-	};
+	const initializeStore = () =>
+		request.server.plugins['mwp-app-route-plugin']
+			.getFlags(memberId)
+			.then(flags => {
+				const initialState = {
+					config: {
+						apiUrl: API_ROUTE_PATH,
+						baseUrl: host,
+						enableServiceWorker,
+						requestLanguage,
+						supportedLangs,
+						initialNow: new Date().getTime(),
+						variants: getVariants(state),
+						entryPath: url.pathname, // the path that the user entered the app on
+						media: getMedia(userAgent, userAgentDevice),
+					},
+					flags,
+				};
 
-	const createStore = getServerCreateStore(
-		getRouteResolver(routes, basename),
-		middleware,
-		request
-	);
-	const store = createStore(reducer, initialState);
-
-	// render skeleton if requested - the store is ready
-	if ('skeleton' in request.query) {
-		return Promise.resolve({
-			result: getHtml(
-				<Dom
-					basename={basename}
-					head={Helmet.rewind()}
-					initialState={store.getState()}
-					scripts={scripts}
-					cssLinks={cssLinks}
-					inlineStyleTags={getInlineStyleTags()}
-				/>
-			),
-			statusCode: 200,
-		});
-	}
+				const createStore = getServerCreateStore(
+					getRouteResolver(routes, basename),
+					middleware,
+					request
+				);
+				return Promise.resolve(createStore(reducer, initialState));
+			});
 
 	// otherwise render using the API and React router
 	const checkReady = state =>
 		state.preRenderChecklist.every(isReady => isReady);
+	const populateStore = store =>
+		new Promise((resolve, reject) => {
+			// dispatch SERVER_RENDER to kick off API middleware
+			store.dispatch({ type: SERVER_RENDER, payload: url });
 
-	const initializeStore = new Promise((resolve, reject) => {
-		// dispatch SERVER_RENDER to kick off API middleware
-		store.dispatch({ type: SERVER_RENDER, payload: url });
-
-		if (checkReady(store.getState())) {
-			resolve(store);
-			return;
-		}
-		const unsubscribe = store.subscribe(() => {
 			if (checkReady(store.getState())) {
 				resolve(store);
-				unsubscribe();
+				return;
 			}
+			const unsubscribe = store.subscribe(() => {
+				if (checkReady(store.getState())) {
+					resolve(store);
+					unsubscribe();
+				}
+			});
 		});
-	});
 
-	return initializeStore.then(
-		initializedStore =>
-			// create tracer and immediately invoke the resulting function.
-			// trace should start before rendering, finish after rendering
-			newrelic.createTracer('serverRender', getRouterRenderer)({
-				routes,
-				store: initializedStore,
-				location: url,
-				basename,
-				scripts,
-				cssLinks,
-				userAgent,
-			}) // immediately invoke callback
-	);
+	return initializeStore().then(store => {
+		if ('skeleton' in request.query) {
+			// render skeleton if requested - the store is ready
+			return {
+				result: getHtml(
+					<Dom
+						basename={basename}
+						head={Helmet.rewind()}
+						initialState={store.getState()}
+						scripts={scripts}
+						cssLinks={cssLinks}
+						inlineStyleTags={getInlineStyleTags()}
+					/>
+				),
+				statusCode: 200,
+			};
+		}
+		return populateStore(store).then(
+			store =>
+				// create tracer and immediately invoke the resulting function.
+				// trace should start before rendering, finish after rendering
+				newrelic.createTracer('serverRender', getRouterRenderer)({
+					routes,
+					store,
+					location: url,
+					basename,
+					scripts,
+					cssLinks,
+					userAgent,
+				}) // immediately invoke callback
+		);
+	});
 };
 
 export { makeRenderer$, makeRenderer };
