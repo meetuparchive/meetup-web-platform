@@ -73,7 +73,7 @@ const DOM = props => {
 	// in order to dangerouslySetInnerHTML in JSX
 	const newrelicJS = newrelic
 		.getBrowserTimingHeader()
-		.replace(/<script[^>]+>/, '')
+		.replace(/<script[^>]*>/, '')
 		.replace(/<\/script>$/, '');
 
 	return (
