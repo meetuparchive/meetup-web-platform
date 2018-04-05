@@ -12,7 +12,6 @@ const MOCK_PROPS = {
 		meta: { toComponent: () => null },
 		link: { toComponent: () => null },
 		script: { toComponent: () => null },
-		style: { toComponent: () => null },
 	},
 	initialState: {
 		config: {

@@ -38,7 +38,6 @@ const DOM = props => {
 		initialState = {},
 		scripts,
 		cssLinks,
-		inlineStyleTags,
 		userAgent,
 	} = props;
 
@@ -68,6 +67,10 @@ const DOM = props => {
 		escapedState,
 	};
 
+	console.info('\n---------------------------------------------');
+	console.dir(head.style);
+	console.info('\n---------------------------------------------');
+
 	return (
 		<html lang={htmlLang}>
 			<head>
@@ -75,7 +78,6 @@ const DOM = props => {
 				{head.meta.toComponent()}
 				{head.link.toComponent()}
 				{head.script.toComponent()}
-				{head.style && head.style.toComponent()}
 				{cssLinks &&
 					cssLinks.map((href, key) =>
 						<link
@@ -85,7 +87,6 @@ const DOM = props => {
 							key={key}
 						/>
 					)}
-				{inlineStyleTags}
 			</head>
 			<body>
 				<div
@@ -112,12 +113,10 @@ DOM.propTypes = {
 		meta: PropTypes.shape({ toComponent: PropTypes.func }),
 		link: PropTypes.shape({ toComponent: PropTypes.func }),
 		script: PropTypes.shape({ toComponent: PropTypes.func }),
-		style: PropTypes.shape({ toComponent: PropTypes.func }),
 	}),
 	initialState: PropTypes.object.isRequired,
 	scripts: PropTypes.array.isRequired,
 	cssLinks: PropTypes.arrayOf(PropTypes.string),
-	inlineStyleTags: PropTypes.arrayOf(PropTypes.element),
 	userAgent: PropTypes.string,
 };
 
