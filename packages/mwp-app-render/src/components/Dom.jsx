@@ -78,6 +78,7 @@ const DOM = props => {
 					cssLinks.map((href, key) =>
 						<link rel="stylesheet" type="text/css" href={href} key={key} />
 					)}
+				{head.style && head.style.toComponent()}
 			</head>
 			<body>
 				<div id="outlet" dangerouslySetInnerHTML={getInnerHTML(appMarkup)} />
@@ -101,6 +102,7 @@ DOM.propTypes = {
 		meta: PropTypes.shape({ toComponent: PropTypes.func }),
 		link: PropTypes.shape({ toComponent: PropTypes.func }),
 		script: PropTypes.shape({ toComponent: PropTypes.func }),
+		style: PropTypes.shape({ toComponent: PropTypes.func }),
 	}),
 	initialState: PropTypes.object.isRequired,
 	scripts: PropTypes.array.isRequired,
