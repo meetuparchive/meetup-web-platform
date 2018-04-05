@@ -13,7 +13,6 @@ import { getServerCreateStore } from 'mwp-store/lib/server';
 import Dom from 'mwp-app-render/lib/components/Dom';
 import ServerApp from 'mwp-app-render/lib/components/ServerApp';
 
-import { getInlineStyleTags } from '../util/inlineStyle';
 import { getVariants } from '../util/cookieUtils';
 
 const DOCTYPE = '<!DOCTYPE html>';
@@ -160,7 +159,6 @@ const getRouterRenderer = ({
 			appMarkup={appMarkup}
 			scripts={scripts}
 			cssLinks={cssLinks}
-			inlineStyleTags={getInlineStyleTags()}
 			userAgent={userAgent}
 		/>
 	);
@@ -266,7 +264,6 @@ const makeRenderer = (
 					initialState={store.getState()}
 					scripts={scripts}
 					cssLinks={cssLinks}
-					inlineStyleTags={getInlineStyleTags()}
 				/>
 			),
 			statusCode: 200,
