@@ -1,6 +1,7 @@
 import React from 'react';
 import Helmet from 'react-helmet';
 import PropTypes from 'prop-types';
+import newrelic from 'newrelic';
 
 /**
  * This component wraps all pages on the website, and through [Helmet](https://github.com/nfl/react-helmet/)
@@ -25,6 +26,15 @@ class PageWrap extends React.Component {
 	}
 
 	componentDidMount() {
+		if (typeof document !== 'undefined') {
+			const headEl = document.getElementsByTagName('head')[0];
+			if (headEl) {
+				headEl.appendChild(
+					document.createElement(newrelic.getBrowserTimingHeader())
+				);
+			}
+		}
+
 		// Browser has now rendered client-side application - fire the browser TTI trigger
 		if (window.newrelic) {
 			const now = new Date().getTime();

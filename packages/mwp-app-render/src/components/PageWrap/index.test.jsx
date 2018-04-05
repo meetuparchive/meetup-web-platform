@@ -1,4 +1,5 @@
 import React from 'react';
+import jsdom from 'jsdom';
 
 import { shallow } from 'enzyme';
 import { MOCK_MEMBER } from 'meetup-web-mocks/lib/api';
@@ -17,6 +18,10 @@ const PROPS = {
 
 describe('PageWrap', () => {
 	it('renders correct UI elements', () => {
+		const doc = jsdom.jsdom(
+			'<!doctype html><html><head></head><body></body></html>'
+		);
+		global.document = doc;
 		global.window = { newrelic: { addToTrace: jest.fn() } };
 		expect(
 			shallow(
@@ -28,6 +33,10 @@ describe('PageWrap', () => {
 		delete global.window;
 	});
 	it('Calls NR trace in componentDidMount', () => {
+		const doc = jsdom.jsdom(
+			'<!doctype html><html><head></head><body></body></html>'
+		);
+		global.document = doc;
 		global.window = { newrelic: { addToTrace: jest.fn() } };
 		shallow(<PageWrap {...PROPS} />).instance().componentDidMount();
 		expect(global.window.newrelic.addToTrace).toHaveBeenCalled();
