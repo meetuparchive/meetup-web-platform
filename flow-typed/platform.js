@@ -9,6 +9,7 @@ declare type MatchMedia = {
 
 declare type MWPState = {
 	api: ApiState,
+	flags?: { [string]: boolean | string },
 	config: {
 		apiUrl: string,
 		baseUrl: string,
@@ -31,6 +32,7 @@ declare type HapiServer = {
 	app: {
 		logger: (...args: Array<any>) => void,
 	},
+	expose: (key: string, value: any) => void,
 	settings: {
 		app: { isProd: boolean, supportedLangs: Array<string>, [string]: any },
 	},
