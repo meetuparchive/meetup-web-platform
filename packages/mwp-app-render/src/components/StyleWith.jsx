@@ -8,6 +8,7 @@ import Helmet from 'react-helmet';
  * Adds style module CSS to `head` for both
  * server and client render via `Helmet`.
  *
+ *
  * Usage:
  * ```
  * import StyleWith from 'mwp-app-render/lib/components/StyleWith';
@@ -15,7 +16,7 @@ import Helmet from 'react-helmet';
  *
  * const MyComponent = (props) => {
  *		return (
- *			<StyleWith styles={styles}>
+ *			<StyleWith styles={[styles]}>
 	 *			<p className={styles.someClass}>Hello world!</p>
  *			</StyleWith>
  *		);
