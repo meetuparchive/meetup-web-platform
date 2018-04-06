@@ -5,6 +5,13 @@ exports[`Dom renders with mock props 1`] = `
   lang="fr"
 >
   <head>
+    <script
+      dangerouslySetInnerHTML={
+        Object {
+          "__html": "<!-- NREUM: (1) -->",
+        }
+      }
+    />
     <link
       href="style.css"
       key="0"
