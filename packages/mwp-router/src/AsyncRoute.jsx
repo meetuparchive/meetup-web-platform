@@ -15,6 +15,23 @@ type State = {
 	_routesCache: { [string]: Array<PlatformRoute> },
 };
 
+const Empty = () => null;
+
+const getLogDeprecate = message => {
+	const calledForKeys = {};
+	return key => {
+		if (process.env.NODE === 'production' || calledForKeys[key]) {
+			return;
+		}
+		console.error('DEPRECATED:', key, message);
+		calledForKeys[key] = true;
+	};
+};
+
+const logAsyncChildDeprecate = getLogDeprecate(
+	'uses deprecated async routing function'
+);
+
 /**
  * Route rendering component that will render nested routes asynchronously
  * The nested routes are cached so that the async data is not re-requested
@@ -26,6 +43,7 @@ class AsyncRoute extends React.Component<Props, State> {
 		const { match, route } = props;
 		const childRoutes = getChildRoutes({ match, route });
 		this.state = {
+			component: route.component || Empty,
 			childRoutes,
 			_routesCache: {},
 		};
@@ -66,16 +84,19 @@ class AsyncRoute extends React.Component<Props, State> {
 			return;
 		}
 		const childRoutes = getChildRoutes({ match, route });
-		this.setState(state => ({ childRoutes }));
-		if (childRoutes.length) {
+		const component = route.component || Empty;
+		this.setState(state => ({ component, childRoutes }));
+		if (childRoutes.length && component !== Empty) {
 			return;
 		}
 		if (match.isExact && route.getIndexRoute) {
+			logAsyncChildDeprecate(route.path);
 			this.resolveAsyncChildRoutes(route.getIndexRoute);
 			return;
 		}
 
 		if (route.getNestedRoutes) {
+			logAsyncChildDeprecate(route.path);
 			this.resolveAsyncChildRoutes(route.getNestedRoutes);
 		}
 		return;
@@ -90,10 +111,7 @@ class AsyncRoute extends React.Component<Props, State> {
 		return (
 			<Component {...props} route={route} match={{ ...match, params }}>
 				{childRoutes.length > 0 &&
-					<RouteLayout
-						routes={childRoutes}
-						matchedPath={match.path}
-					/>}
+					<RouteLayout routes={childRoutes} matchedPath={match.path} />}
 			</Component>
 		);
 	}
