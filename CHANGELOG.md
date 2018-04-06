@@ -1,3 +1,7 @@
+## [13.1]
+
+- **New feature** `state.flags` containing all LaunchDarkly feature flags
+
 ## [13.0]
 
 - **BREAKING CHANGE** `publicPath` now set as a config var that is shared by server
