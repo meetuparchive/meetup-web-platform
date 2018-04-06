@@ -66,7 +66,6 @@ after_script:
   - chmod 600 /tmp/github_deploy_key
   - ssh-add /tmp/github_deploy_key
   - >
-  # lerna publish --yes --force-publish --skip-git --npm-tag $NPM_TAG --repo-version $GIT_TAG
    lerna publish --yes --force-publish --skip-git --npm-tag $NPM_TAG --repo-version $GIT_TAG &&
    git tag -a $GIT_TAG -m "Version $GIT_TAG built by Travis CI - https://travis-ci.com/$TRAVIS_REPO_SLUG/builds/$TRAVIS_JOB_ID" &&
    git push --tags git@github.com:$TRAVIS_REPO_SLUG.git
