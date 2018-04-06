@@ -3,42 +3,47 @@ import PropTypes from 'prop-types';
 import Helmet from 'react-helmet';
 
 /**
- * @module WriteStyles
+ * @module StyleWith
  *
  * Adds style module CSS to `head` for both
  * server and client render via `Helmet`.
  *
  * Usage:
  * ```
- * import WriteStyles from 'mwp-app-render/lib/components/WriteStyles';
+ * import StyleWith from 'mwp-app-render/lib/components/StyleWith';
  * import styles from './myComponent.module.scss';
  *
  * const MyComponent = (props) => {
  *		return (
  *			<div>
-	 *			<WriteStyles styles={styles} />
+	 *			<StyleWith styles={styles} />
 	 *			<p className={styles.someClass}>Hello world!</p>
  *			</div>
  *		);
  * };
  * ```
  */
-const WriteStyles = props => {
+const StyleWith = props => {
+	const { styles, children } = props;
+
 	const moduleCSS = new Set();
-	props.styles.forEach(style => {
+	styles.forEach(style => {
 		moduleCSS.add(style._getCss()); // eslint-disable-line no-underscore-dangle
 	});
 
 	return (
-		<Helmet defer={false}>
-			<style type="text/css">
-				{[...moduleCSS].join('')}
-			</style>
-		</Helmet>
+		<div>
+			<Helmet defer={false}>
+				<style type="text/css">
+					{[...moduleCSS].join('')}
+				</style>
+			</Helmet>
+			{children}
+		</div>
 	);
 };
-WriteStyles.propTypes = {
+StyleWith.propTypes = {
 	styles: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
-export default WriteStyles;
+export default StyleWith;
