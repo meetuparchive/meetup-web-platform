@@ -5,7 +5,6 @@ global.window = doc.defaultView;
 
 import React from 'react';
 import { shallow } from 'enzyme';
-import { Provider } from 'react-redux';
 import connectWithMatchMedia from './connectWithMatchMedia';
 
 export const createFakeStore = fakeData => ({
@@ -17,15 +16,7 @@ export const createFakeStore = fakeData => ({
 });
 
 const TestComponent = () => <div>Hello World</div>;
-const TestComponentConnectWithMatchMedia = connectWithMatchMedia(
-	TestComponent
-);
-
-const MATCH_MEDIA_FN_MOCK = mq => ({
-	matches: false,
-	addListener: jest.fn(),
-	removeListener: jest.fn(),
-});
+const TestComponentConnectWithMatchMedia = connectWithMatchMedia(TestComponent);
 
 describe('connectWithMatchMedia', () => {
 	const mockStore = createFakeStore({
@@ -33,7 +24,9 @@ describe('connectWithMatchMedia', () => {
 	});
 	const connectWithMatchMedia = shallow(
 		<TestComponentConnectWithMatchMedia />,
-		{ context: { store: mockStore } }
+		{
+			context: { store: mockStore },
+		}
 	);
 	it('exists', () => {
 		expect(connectWithMatchMedia).toMatchSnapshot();
