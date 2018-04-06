@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`StyleWith renders with mock props 1`] = `
+<div>
+  <HelmetWrapper
+    defer={false}
+    encodeSpecialCharacters={true}
+  >
+    <style
+      type="text/css"
+    >
+      .testClass1 {color: inherit;}.testClass2 {page-break-after: avoid;}
+    </style>
+  </HelmetWrapper>
+</div>
+`;
