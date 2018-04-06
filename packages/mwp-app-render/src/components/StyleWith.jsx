@@ -15,10 +15,9 @@ import Helmet from 'react-helmet';
  *
  * const MyComponent = (props) => {
  *		return (
- *			<div>
-	 *			<StyleWith styles={styles} />
+ *			<StyleWith styles={styles}>
 	 *			<p className={styles.someClass}>Hello world!</p>
- *			</div>
+ *			</StyleWith>
  *		);
  * };
  * ```
