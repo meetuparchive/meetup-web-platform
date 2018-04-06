@@ -16,6 +16,13 @@ export function config(state = {}, action) {
 	return state;
 }
 
+export function flags(state = {}, action) {
+	if (action.type === 'UPDATE_FLAGS') {
+		return { ...state, ...action.payload };
+	}
+	return state;
+}
+
 /**
  * This reducer manages a list of boolean flags that indicate the 'ready to
  * render' state of the application. It is used exclusively by the server,
@@ -33,6 +40,7 @@ export const platformReducers = {
 	app,
 	clickTracking,
 	config,
+	flags,
 	preRenderChecklist,
 	routing,
 };
