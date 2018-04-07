@@ -139,9 +139,7 @@ class AsyncRoute extends React.Component<Props, State> {
 			}
 			// DEPRECATED
 			if (route.getNestedRoutes) {
-				this.resolveAsyncChildRoutes(
-					route.getNestedRoutes || (() => Promise.resolve([]))
-				);
+				this.resolveAsyncChildRoutes(route.getNestedRoutes);
 			}
 			return;
 		}
