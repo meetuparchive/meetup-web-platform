@@ -10,18 +10,20 @@ type Props = {
 	location: URL,
 	history: RouterHistory,
 };
-type State = {
-	component: React.Component<*, *>,
-	_componentCache: { [string]: React.Component<*, *> },
+type ComponentState = {
+	component: React$ComponentType<*>,
+	_componentCache: { [string]: React$ComponentType<*> },
+};
+type State = ComponentState & {
 	childRoutes: Array<PlatformRoute>,
 	_routesCache: { [string]: Array<PlatformRoute> },
 };
 
-const Empty = () => null;
+const PassThrough = (children: React$Node) => React.Children.only(children);
 
-const getLogDeprecate = message => {
+const getLogDeprecate = (message: string) => {
 	const calledForKeys = {};
-	return key => {
+	return (key: string): void => {
 		if (process.env.NODE === 'production' || calledForKeys[key]) {
 			return;
 		}
@@ -35,8 +37,8 @@ const logAsyncChildDeprecate = getLogDeprecate(
 );
 
 const getComponentStateSetter = (key: string) => (
-	component: React.Component<*, *>
-) => (state: State) => ({
+	component: React$ComponentType<*>
+) => (state: State): ComponentState => ({
 	component,
 	_componentCache: { ...state._componentCache, [key]: component },
 });
@@ -49,10 +51,12 @@ const getComponentStateSetter = (key: string) => (
 class AsyncRoute extends React.Component<Props, State> {
 	constructor(props: Props) {
 		super(props);
-		const { match, route } = props;
+		const route: PlatformRoute = props.route;
+		const { match } = props;
 		const childRoutes = getChildRoutes({ match, route });
+
 		this.state = {
-			component: route.component || Empty,
+			component: route.component || PassThrough,
 			_componentCache: {},
 			childRoutes, // DEPRECATED
 			_routesCache: {}, // DEPRECATED
@@ -73,6 +77,7 @@ class AsyncRoute extends React.Component<Props, State> {
 		resolver: () => Promise<Array<PlatformRoute> | PlatformRoute>
 	) {
 		const key = resolver.toString();
+		logAsyncChildDeprecate(key);
 		// async route - check for cache keyed by stringified load function
 		const cached = this.state._routesCache[key];
 		if (cached) {
@@ -88,16 +93,18 @@ class AsyncRoute extends React.Component<Props, State> {
 
 	/*
 	 * Given a component-resolving function, update this.state.component with
-	 * the resolved value - use cached reference if available
+	 * the resolved value - set/get cached reference as necessary
 	 */
-	resolveComponent(resolver: () => Promise<React$Component>) {
+	resolveComponent(resolver: () => Promise<React$ComponentType<*>>) {
 		const key = resolver.toString();
 		const cached = this.state._componentCache[key];
 		if (cached) {
 			this.setState({ component: cached });
 			return;
 		}
-		resolver().then(getComponentStateSetter(key)).then(this.setState);
+		resolver()
+			.then(getComponentStateSetter(key))
+			.then(setter => this.setState(setter));
 	}
 
 	/*
@@ -114,37 +121,44 @@ class AsyncRoute extends React.Component<Props, State> {
 
 		// route change - get synchronously defined routes and component, if any
 		const childRoutes = getChildRoutes({ match, route });
-		const component = route.component || Empty;
-		this.setState(state => ({ component, childRoutes }));
+		if (route.component) {
+			this.setState(state => ({ component: route.component, childRoutes }));
 
-		// bail if static child routes and component were found - no need to resolve
-		// anything else
-		if (childRoutes.length && component !== Empty) {
+			// bail if static child routes found - no need to resolve
+			// anything else
+			// DEPRECATED - once async children are removed, we _always_ return here
+			if (childRoutes.length) {
+				return;
+			}
+
+			// if no static child routes found, need to resolve them from Promises, if any
+			// DEPRECATED
+			if (match.isExact && route.getIndexRoute) {
+				this.resolveAsyncChildRoutes(route.getIndexRoute);
+				return;
+			}
+			// DEPRECATED
+			if (route.getNestedRoutes) {
+				this.resolveAsyncChildRoutes(
+					route.getNestedRoutes || (() => Promise.resolve([]))
+				);
+			}
 			return;
 		}
 
+		// Component needs to be resolved - just render children for now
+		this.setState(state => ({ component: PassThrough, childRoutes }));
+
+		// resolve component async
 		if (route.getComponent) {
 			this.resolveComponent(route.getComponent);
 		}
-
-		// if no static child routes found, need to resolve them from Promises, if any
-		// DEPRECATED
-		if (match.isExact && route.getIndexRoute) {
-			logAsyncChildDeprecate(route.path);
-			this.resolveAsyncChildRoutes(route.getIndexRoute);
-			return;
-		}
-		// DEPRECATED
-		if (route.getNestedRoutes) {
-			logAsyncChildDeprecate(route.path);
-			this.resolveAsyncChildRoutes(route.getNestedRoutes);
-		}
-		return;
 	}
 
 	render() {
 		const { route, match, ...props } = this.props;
-		const { childRoutes, component: Component } = this.state;
+		const Component: React$ComponentType<*> = this.state.component;
+		const { childRoutes } = this.state;
 		// React Router encodes the URL params - send decoded values to component
 		const params = decodeParams(match.params);
 
