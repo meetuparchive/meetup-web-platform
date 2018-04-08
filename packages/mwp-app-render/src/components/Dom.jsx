@@ -5,11 +5,7 @@ import newrelic from 'newrelic';
 
 import { getPolyfill } from 'mwp-app-render/lib/util/browserPolyfill';
 
-function getInnerHTML(__html) {
-	return {
-		__html,
-	};
-}
+const getInnerHTML = __html => ({ __html });
 
 /**
  * Module that builds html, head, and body elements
