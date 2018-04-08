@@ -67,10 +67,11 @@ const DOM = props => {
 
 	// strip <script> html tags
 	// in order to dangerouslySetInnerHTML in JSX
-	const newrelicJS = newrelic
-		.getBrowserTimingHeader()
-		.replace(/<script[^>]*>/, '')
-		.replace(/<\/script>$/, '');
+	const scriptPattern = /^<script[^>]*>/;
+	const newrelicHTML = newrelic.getBrowserTimingHeader();
+	const newrelicJS = scriptPattern.test(newrelicHTML) // might just be HTML comment - skip it
+		? newrelicHTML.replace(scriptPattern, '').replace(/<\/script>$/, '')
+		: false;
 
 	return (
 		<html lang={htmlLang}>
