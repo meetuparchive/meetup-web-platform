@@ -28,7 +28,9 @@ const StyleWith = props => {
 
 	const moduleCSS = new Set();
 	styles.forEach(style => {
-		moduleCSS.add(style._getCss()); // eslint-disable-line no-underscore-dangle
+		if (typeof style._getCss === 'function') {
+			moduleCSS.add(style._getCss()); // eslint-disable-line no-underscore-dangle
+		}
 	});
 
 	return (
