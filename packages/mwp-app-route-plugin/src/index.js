@@ -34,6 +34,7 @@ export default function register(
 		)
 	);
 	// set up launchdarkly instance before continuing
+	server.on('stop', ldClient.close);
 	ldClient.once(`ready`, () => next());
 }
 
