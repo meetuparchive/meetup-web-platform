@@ -22,7 +22,9 @@ const _routeMatchOptions = (
  * Determine whether the indexRoute or nested route should be considered the
  * child route for a particular MatchedRoute
  */
-export const getChildRoutes = (matchedRoute: MatchedRoute): Array<PlatformRoute> => {
+export const getChildRoutes = (
+	matchedRoute: MatchedRoute
+): Array<PlatformRoute> => {
 	const { route, match } = matchedRoute;
 	if (match.isExact) {
 		return route.indexRoute ? [route.indexRoute] : [];
@@ -93,27 +95,46 @@ const _resolveRouteMatches = (
 	const matchedRoute = { route, match };
 	const currentMatchedRoutes = [...matchedRoutes, matchedRoute];
 
+	// resolve the `component` property - mutate the route in doing so
+	const resolveComponent = matchedRoute => {
+		if (matchedRoute.route.component) {
+			return Promise.resolve(matchedRoute);
+		}
+		const { getComponent, ...noComponentRoute } = matchedRoute.route;
+		// get the component and return a `matchedRoute` object containing a
+		// statically-defined `component` property
+		return getComponent().then(component => ({
+			match: matchedRoute.match,
+			route: {
+				component,
+				...noComponentRoute,
+			},
+		}));
+	};
 	// add any nested route matches
-	return resolveChildRoutes(matchedRoute).then(
-		childRoutes =>
-			childRoutes.length
-				? _resolveRouteMatches(
-						childRoutes,
-						path,
-						currentMatchedRoutes,
-						currentMatchOptions.path
-				  )
-				: currentMatchedRoutes
-	);
+	return resolveComponent(matchedRoute)
+		.then(resolveChildRoutes)
+		.then(
+			childRoutes =>
+				childRoutes.length
+					? _resolveRouteMatches(
+							childRoutes,
+							path,
+							currentMatchedRoutes,
+							currentMatchOptions.path
+						)
+					: currentMatchedRoutes
+		);
 };
 
 /*
  * An curried interface into `_resolveRouteMatches`, using `basename`
  * + `location` instead of `path`
  */
-export const getRouteResolver = (routes: Array<PlatformRoute>, basename: string) => (
-	location: URL
-): Promise<Array<MatchedRoute>> => {
+export const getRouteResolver = (
+	routes: Array<PlatformRoute>,
+	basename: string
+) => (location: URL): Promise<Array<MatchedRoute>> => {
 	const path = location.pathname.replace(basename, '');
 	return _resolveRouteMatches(routes, path);
 };
