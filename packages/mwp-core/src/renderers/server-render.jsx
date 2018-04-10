@@ -13,7 +13,7 @@ import { getServerCreateStore } from 'mwp-store/lib/server';
 import Dom from 'mwp-app-render/lib/components/Dom';
 import ServerApp from 'mwp-app-render/lib/components/ServerApp';
 
-import { getVariants, parseMemberCookie } from '../util/cookieUtils';
+import { getVariants } from '../util/cookieUtils';
 
 const DOCTYPE = '<!DOCTYPE html>';
 
@@ -231,35 +231,41 @@ const makeRenderer = (
 	const host = `${requestProtocol}://${domain}`;
 	const userAgent = headers['user-agent'];
 	const userAgentDevice = headers['x-ua-device'] || ''; // set by fastly
-	const memberId = parseMemberCookie(state).id;
 
 	// create the store with populated `config`
-	const initializeStore = () =>
-		request.server.plugins['mwp-app-route'].getFlags(memberId).then(flags => {
-			const initialState = {
-				config: {
-					apiUrl: API_ROUTE_PATH,
-					baseUrl: host,
-					enableServiceWorker,
-					requestLanguage,
-					supportedLangs,
-					initialNow: new Date().getTime(),
-					variants: getVariants(state),
-					entryPath: url.pathname, // the path that the user entered the app on
-					media: getMedia(userAgent, userAgentDevice),
-				},
-				flags,
-			};
+	const initializeStore = () => {
+		const initialState = {
+			config: {
+				apiUrl: API_ROUTE_PATH,
+				baseUrl: host,
+				enableServiceWorker,
+				requestLanguage,
+				supportedLangs,
+				initialNow: new Date().getTime(),
+				variants: getVariants(state),
+				entryPath: url.pathname, // the path that the user entered the app on
+				media: getMedia(userAgent, userAgentDevice),
+			},
+		};
 
-			const createStore = getServerCreateStore(
-				getRouteResolver(routes, basename),
-				middleware,
-				request
-			);
-			return Promise.resolve(createStore(reducer, initialState));
-		});
+		const createStore = getServerCreateStore(
+			getRouteResolver(routes, basename),
+			middleware,
+			request
+		);
+		return Promise.resolve(createStore(reducer, initialState));
+	};
 
 	// otherwise render using the API and React router
+	const addFlags = store => {
+		const memberObj = store.getState().api.self.value || {};
+		request.server.plugins['mwp-app-route'].getFlags(memberObj).then(flags =>
+			store.dispatch({
+				type: 'UPDATE_FLAGS',
+				payload: flags,
+			})
+		);
+	};
 	const checkReady = state =>
 		state.preRenderChecklist.every(isReady => isReady);
 	const populateStore = store =>
@@ -268,13 +274,17 @@ const makeRenderer = (
 			store.dispatch({ type: SERVER_RENDER, payload: url });
 
 			if (checkReady(store.getState())) {
-				resolve(store);
+				addFlags(store).then(() => {
+					resolve(store);
+				});
 				return;
 			}
 			const unsubscribe = store.subscribe(() => {
 				if (checkReady(store.getState())) {
-					resolve(store);
-					unsubscribe();
+					addFlags(store).then(() => {
+						resolve(store);
+						unsubscribe();
+					});
 				}
 			});
 		});
