@@ -19,9 +19,8 @@ const connectWithMatchMedia = <Props: {}>(
 	WrappedComponent: React.ComponentType<Props>
 ): ConnectedComponentClass<*, $Diff<{ initialMedia: MatchMedia }, Props>> => {
 	const MediaWrappedComponent = withMatchMedia(WrappedComponent);
-	const ConnectWithMatchMedia = (
-		props: $Diff<{ media: MatchMedia }, Props>
-	) => <MediaWrappedComponent {...props} initialMedia={props.media} />;
+	const ConnectWithMatchMedia = (props: $Diff<{ media: MatchMedia }, Props>) =>
+		<MediaWrappedComponent {...props} initialMedia={props.media} />;
 
 	const wrappedComponentName =
 		WrappedComponent.displayName || WrappedComponent.name || 'Component';
