@@ -21,18 +21,19 @@ export default function register(
 	const ldClient = LaunchDarkly.init(options.ldkey || LAUNCH_DARKLY_SDK_KEY, {
 		offline: process.env.NODE_ENV === 'test',
 	});
-	server.expose('getFlags', memberId =>
-		ldClient.all_flags({ key: memberId, anonymous: memberId === 0 }).then(
+	server.expose('getFlags', memberObj => {
+		const key = (memberObj && memberObj.id) || 0;
+		return ldClient.all_flags({ ...memberObj, key, anonymous: key === 0 }).then(
 			flags => flags,
 			err => {
 				server.app.logger.error({
 					err,
-					memberId,
+					member: memberObj,
 				});
 				return {}; // return empty flags on error
 			}
-		)
-	);
+		);
+	});
 	// set up launchdarkly instance before continuing
 	server.on('stop', ldClient.close);
 	ldClient.once(`ready`, () => next());
