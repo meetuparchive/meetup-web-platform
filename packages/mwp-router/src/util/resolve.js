@@ -97,7 +97,7 @@ const _resolveRouteMatches = (
 
 	// resolve the `component` property - mutate the route in doing so
 	const resolveComponent = matchedRoute => {
-		if (matchedRoute.route.component) {
+		if (matchedRoute.route.component || !matchedRoute.route.getComponent) {
 			return Promise.resolve(matchedRoute);
 		}
 		const { getComponent, ...noComponentRoute } = matchedRoute.route;
