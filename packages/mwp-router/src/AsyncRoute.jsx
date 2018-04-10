@@ -10,17 +10,22 @@ type Props = {
 	location: URL,
 	history: RouterHistory,
 };
+// DEPRECATED
+type RouteState = {
+	childRoutes: Array<PlatformRoute>,
+	_routesCache: { [string]: Array<PlatformRoute> },
+};
 type ComponentState = {
 	component: React$ComponentType<*>,
 	_componentCache: { [string]: React$ComponentType<*> },
 };
-type State = ComponentState & {
-	childRoutes: Array<PlatformRoute>,
-	_routesCache: { [string]: Array<PlatformRoute> },
-};
+type State = RouteState & ComponentState;
 
+// simple pass through component to use while real component is loading
 const PassThrough = (children: React$Node) => React.Children.only(children);
 
+// deprecation log function creator that handles the 'emit log message once' behavior
+// WILL NOT LOG IN PROD
 const getLogDeprecate = (message: string) => {
 	const calledForKeys = {};
 	return (key: string): void => {
@@ -32,10 +37,9 @@ const getLogDeprecate = (message: string) => {
 	};
 };
 
-const logAsyncChildDeprecate = getLogDeprecate(
-	'uses deprecated async routing function'
-);
+const logAsyncChildDeprecate = getLogDeprecate('uses async route getter');
 
+// Helper to set rendering component once resolved, as well as update cache
 const getComponentStateSetter = (key: string) => (
 	component: React$ComponentType<*>
 ) => (state: State): ComponentState => ({
@@ -44,15 +48,18 @@ const getComponentStateSetter = (key: string) => (
 });
 
 /**
- * Route rendering component that will render nested routes asynchronously
- * The nested routes are cached so that the async data is not re-requested
- * each time a route is re-rendered.
+ * Route rendering component that uses internal state to keep a reference to the
+ * wrapping component and (deprecated) child routes. If the `route` prop has
+ * statically defined `component`/`childRoutes`, those will be used on first render,
+ * otherwise they will be resolved using their 'getters' and the the results will
+ * be loaded (and cached) when available.
  */
 class AsyncRoute extends React.Component<Props, State> {
 	constructor(props: Props) {
 		super(props);
 		const route: PlatformRoute = props.route;
 		const { match } = props;
+		// DEPRECATED - make this call in `render()` when async children no longer supported
 		const childRoutes = getChildRoutes({ match, route });
 
 		this.state = {
@@ -155,7 +162,7 @@ class AsyncRoute extends React.Component<Props, State> {
 
 	render() {
 		const { route, match, ...props } = this.props;
-		const Component: React$ComponentType<*> = this.state.component;
+		const Component = this.state.component;
 		const { childRoutes } = this.state;
 		// React Router encodes the URL params - send decoded values to component
 		const params = decodeParams(match.params);
