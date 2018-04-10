@@ -258,13 +258,15 @@ const makeRenderer = (
 
 	// otherwise render using the API and React router
 	const addFlags = store => {
-		const memberObj = store.getState().api.self.value || {};
-		request.server.plugins['mwp-app-route'].getFlags(memberObj).then(flags =>
-			store.dispatch({
-				type: 'UPDATE_FLAGS',
-				payload: flags,
-			})
-		);
+		const memberObj = (store.getState().api.self || {}).value || {};
+		return request.server.plugins['mwp-app-route']
+			.getFlags(memberObj)
+			.then(flags =>
+				store.dispatch({
+					type: 'UPDATE_FLAGS',
+					payload: flags,
+				})
+			);
 	};
 	const checkReady = state =>
 		state.preRenderChecklist.every(isReady => isReady);
