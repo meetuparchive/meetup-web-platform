@@ -74,7 +74,7 @@ const _resolveIndexRoute: Resolver<MatchedRoute> = matchedRoute =>
 
 // resolve the `component` property - mutate the route in doing so
 const resolveComponent = (route: PlatformRoute): StaticPlatformRoute => {
-	if (route.component) {
+	if (route.component || !route.getComponent) {
 		return Promise.resolve(route);
 	}
 	const { getComponent, ...noComponentRoute } = route;
