@@ -51,14 +51,19 @@ export const resolveChildRoutes = (
 	return _resolveNestedRoutes(matchedRoute).then(m => m.route.routes || []);
 };
 
-const _resolveNestedRoutes: Resolver<MatchedRoute> = matchedRoute =>
-	matchedRoute.route.getNestedRoutes
-		? matchedRoute.route
-				.getNestedRoutes()
-				.then(routes => (matchedRoute.route.routes = routes))
-				.then(() => matchedRoute)
+const _resolveNestedRoutes: Resolver<MatchedRoute> = matchedRoute => {
+	const {
+		match,
+		route: { getNestedRoutes, ...noGetNestedRoutes },
+	} = matchedRoute;
+	return getNestedRoutes
+		? getNestedRoutes()
+				.then(routes => ({ ...noGetNestedRoutes, routes }))
+				.then(route => {
+					match, route;
+				})
 		: Promise.resolve(matchedRoute);
-
+};
 const _resolveIndexRoute: Resolver<MatchedRoute> = matchedRoute =>
 	matchedRoute.route.getIndexRoute
 		? matchedRoute.route
@@ -66,6 +71,20 @@ const _resolveIndexRoute: Resolver<MatchedRoute> = matchedRoute =>
 				.then(indexRoute => (matchedRoute.route.indexRoute = indexRoute))
 				.then(() => matchedRoute)
 		: Promise.resolve(matchedRoute);
+
+// resolve the `component` property - mutate the route in doing so
+const resolveComponent = (route: PlatformRoute): StaticPlatformRoute => {
+	if (route.component) {
+		return Promise.resolve(route);
+	}
+	const { getComponent, ...noComponentRoute } = route;
+	// get the component and return a `matchedRoute` object containing a
+	// statically-defined `component` property
+	return getComponent().then(component => ({
+		component,
+		...noComponentRoute,
+	}));
+};
 
 /*
  * Find all routes in the routes array that match the provided URL, including
@@ -95,24 +114,12 @@ const _resolveRouteMatches = (
 	const matchedRoute = { route, match };
 	const currentMatchedRoutes = [...matchedRoutes, matchedRoute];
 
-	// resolve the `component` property - mutate the route in doing so
-	const resolveComponent = matchedRoute => {
-		if (matchedRoute.route.component) {
-			return Promise.resolve(matchedRoute);
-		}
-		const { getComponent, ...noComponentRoute } = matchedRoute.route;
-		// get the component and return a `matchedRoute` object containing a
-		// statically-defined `component` property
-		return getComponent().then(component => ({
-			match: matchedRoute.match,
-			route: {
-				component,
-				...noComponentRoute,
-			},
-		}));
-	};
 	// add any nested route matches
-	return resolveComponent(matchedRoute)
+	return resolveComponent(route)
+		.then(route => ({
+			match,
+			route,
+		}))
 		.then(resolveChildRoutes)
 		.then(
 			childRoutes =>
@@ -137,4 +144,14 @@ export const getRouteResolver = (
 ) => (location: URL): Promise<Array<MatchedRoute>> => {
 	const path = location.pathname.replace(basename, '');
 	return _resolveRouteMatches(routes, path);
+};
+
+export const resolveRoute = (
+	route: PlatformRoute
+): Promise<StaticPlatformRoute> => {};
+
+export const resolveAllRoutes = (
+	routes: Array<PlatformRoute>
+): Promise<Array<StaticPlatformRoute>> => {
+	return Promise.all(routes.map(resolveRoute));
 };
