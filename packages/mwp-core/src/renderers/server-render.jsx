@@ -204,6 +204,9 @@ const makeRenderer = (
 	enableServiceWorker: boolean,
 	cssLinks: ?Array<string>
 ) => {
+	// set up a Promise that emits the resolved routes - this single Promise will
+	// be reused for all subsequent requests, so we're not resolving the routes repeatedly
+	// hooray performance
 	const routesPromise = resolveAllRoutes(routes);
 	return (request: HapiRequest, reply: HapiReply): Promise<RenderResult> => {
 		middleware = middleware || [];
