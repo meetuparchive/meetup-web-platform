@@ -5,11 +5,7 @@ import newrelic from 'newrelic';
 
 import { getPolyfill } from 'mwp-app-render/lib/util/browserPolyfill';
 
-function getInnerHTML(__html) {
-	return {
-		__html,
-	};
-}
+const getInnerHTML = __html => ({ __html });
 
 /**
  * Module that builds html, head, and body elements
@@ -39,7 +35,6 @@ const DOM = props => {
 		initialState = {},
 		scripts,
 		cssLinks,
-		inlineStyleTags,
 		userAgent,
 	} = props;
 
@@ -71,10 +66,11 @@ const DOM = props => {
 
 	// strip <script> html tags
 	// in order to dangerouslySetInnerHTML in JSX
-	const newrelicJS = newrelic
-		.getBrowserTimingHeader()
-		.replace(/<script[^>]*>/, '')
-		.replace(/<\/script>$/, '');
+	const scriptPattern = /^<script[^>]*>/;
+	const newrelicHTML = newrelic.getBrowserTimingHeader();
+	const newrelicJS = scriptPattern.test(newrelicHTML) // might just be HTML comment - skip it
+		? newrelicHTML.replace(scriptPattern, '').replace(/<\/script>$/, '')
+		: false;
 
 	return (
 		<html lang={htmlLang}>
@@ -89,7 +85,7 @@ const DOM = props => {
 					cssLinks.map((href, key) =>
 						<link rel="stylesheet" type="text/css" href={href} key={key} />
 					)}
-				{inlineStyleTags}
+				{head.style && head.style.toComponent()}
 			</head>
 			<body>
 				<div id="outlet" dangerouslySetInnerHTML={getInnerHTML(appMarkup)} />
@@ -113,11 +109,11 @@ DOM.propTypes = {
 		meta: PropTypes.shape({ toComponent: PropTypes.func }),
 		link: PropTypes.shape({ toComponent: PropTypes.func }),
 		script: PropTypes.shape({ toComponent: PropTypes.func }),
+		style: PropTypes.shape({ toComponent: PropTypes.func }),
 	}),
 	initialState: PropTypes.object.isRequired,
 	scripts: PropTypes.array.isRequired,
 	cssLinks: PropTypes.arrayOf(PropTypes.string),
-	inlineStyleTags: PropTypes.arrayOf(PropTypes.element),
 	userAgent: PropTypes.string,
 };
 
