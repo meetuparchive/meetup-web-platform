@@ -97,13 +97,19 @@ const _resolveRouteMatches = (
 
 	// resolve the `component` property - mutate the route in doing so
 	const resolveComponent = matchedRoute => {
-		if (matchedRoute.route.component) {
+		if (matchedRoute.route.component || !matchedRoute.route.getComponent) {
 			return Promise.resolve(matchedRoute);
 		}
-		return matchedRoute.getComponent().then(component => {
-			matchedRoute.route.component = component;
-			return matchedRoute;
-		});
+		const { getComponent, ...noComponentRoute } = matchedRoute.route;
+		// get the component and return a `matchedRoute` object containing a
+		// statically-defined `component` property
+		return getComponent().then(component => ({
+			match: matchedRoute.match,
+			route: {
+				component,
+				...noComponentRoute,
+			},
+		}));
 	};
 	// add any nested route matches
 	return resolveComponent(matchedRoute)
