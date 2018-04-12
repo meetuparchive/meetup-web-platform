@@ -116,12 +116,14 @@ declare type QueryResponse = {
 	flags?: Array<string>,
 	meta?: Object,
 	query?: Query,
+	error?: string,
 };
 
 declare type QueryFunction = (location: { [string]: mixed }) => Query;
 
-declare type PlatformRoute = {
-	component: React$ComponentType<*>,
+declare type PlatformRoute = {|
+	component?: React$ComponentType<*>,
+	getComponent?: () => Promise<React$ComponentType<*>>,
 	getNestedRoutes?: () => Promise<Array<PlatformRoute>>,
 	getIndexRoute?: () => Promise<PlatformRoute>,
 	path?: string,
@@ -130,7 +132,7 @@ declare type PlatformRoute = {
 	query?: QueryFunction | Array<QueryFunction>,
 	indexRoute?: PlatformRoute,
 	routes?: Array<PlatformRoute>,
-};
+|};
 
 declare type CookieOpts = {
 	path?: string,

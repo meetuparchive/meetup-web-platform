@@ -22,7 +22,9 @@ const _routeMatchOptions = (
  * Determine whether the indexRoute or nested route should be considered the
  * child route for a particular MatchedRoute
  */
-export const getChildRoutes = (matchedRoute: MatchedRoute): Array<PlatformRoute> => {
+export const getChildRoutes = (
+	matchedRoute: MatchedRoute
+): Array<PlatformRoute> => {
 	const { route, match } = matchedRoute;
 	if (match.isExact) {
 		return route.indexRoute ? [route.indexRoute] : [];
@@ -40,30 +42,39 @@ export const getChildRoutes = (matchedRoute: MatchedRoute): Array<PlatformRoute>
 export const resolveChildRoutes = (
 	matchedRoute: MatchedRoute
 ): Promise<Array<PlatformRoute>> => {
-	const { match } = matchedRoute;
+	const { match, route } = matchedRoute;
 	if (match.isExact) {
-		return _resolveIndexRoute(matchedRoute).then(
-			m => (m.route.indexRoute ? [m.route.indexRoute] : [])
+		return _resolveIndexRoute(route).then(
+			r => (r.indexRoute ? [r.indexRoute] : [])
 		);
 	}
-	return _resolveNestedRoutes(matchedRoute).then(m => m.route.routes || []);
+	return _resolveNestedRoutes(route).then(r => r.routes || []);
 };
 
-const _resolveNestedRoutes: Resolver<MatchedRoute> = matchedRoute =>
-	matchedRoute.route.getNestedRoutes
-		? matchedRoute.route
-				.getNestedRoutes()
-				.then(routes => (matchedRoute.route.routes = routes))
-				.then(() => matchedRoute)
-		: Promise.resolve(matchedRoute);
+const _resolveNestedRoutes: Resolver<PlatformRoute> = ({
+	getNestedRoutes,
+	...noGetNestedRoutes
+}) =>
+	getNestedRoutes
+		? getNestedRoutes().then(routes => ({ ...noGetNestedRoutes, routes }))
+		: Promise.resolve(noGetNestedRoutes);
 
-const _resolveIndexRoute: Resolver<MatchedRoute> = matchedRoute =>
-	matchedRoute.route.getIndexRoute
-		? matchedRoute.route
-				.getIndexRoute()
-				.then(indexRoute => (matchedRoute.route.indexRoute = indexRoute))
-				.then(() => matchedRoute)
-		: Promise.resolve(matchedRoute);
+const _resolveIndexRoute: Resolver<PlatformRoute> = ({
+	getIndexRoute,
+	...noGetIndexRoute
+}) =>
+	getIndexRoute
+		? getIndexRoute().then(indexRoute => ({ ...noGetIndexRoute, indexRoute }))
+		: Promise.resolve(noGetIndexRoute);
+
+// resolve the `component` property
+const resolveComponent = ({
+	getComponent,
+	...noGetCompRoute
+}: PlatformRoute): Promise<PlatformRoute> =>
+	getComponent
+		? getComponent().then(component => ({ ...noGetCompRoute, component }))
+		: Promise.resolve(noGetCompRoute);
 
 /*
  * Find all routes in the routes array that match the provided URL, including
@@ -94,26 +105,53 @@ const _resolveRouteMatches = (
 	const currentMatchedRoutes = [...matchedRoutes, matchedRoute];
 
 	// add any nested route matches
-	return resolveChildRoutes(matchedRoute).then(
-		childRoutes =>
-			childRoutes.length
-				? _resolveRouteMatches(
-						childRoutes,
-						path,
-						currentMatchedRoutes,
-						currentMatchOptions.path
-				  )
-				: currentMatchedRoutes
-	);
+	return resolveComponent(route)
+		.then(route => ({
+			match,
+			route,
+		}))
+		.then(resolveChildRoutes)
+		.then(
+			childRoutes =>
+				childRoutes.length
+					? _resolveRouteMatches(
+							childRoutes,
+							path,
+							currentMatchedRoutes,
+							currentMatchOptions.path
+						)
+					: currentMatchedRoutes
+		);
 };
 
 /*
  * An curried interface into `_resolveRouteMatches`, using `basename`
  * + `location` instead of `path`
  */
-export const getRouteResolver = (routes: Array<PlatformRoute>, basename: string) => (
-	location: URL
-): Promise<Array<MatchedRoute>> => {
+export const getRouteResolver = (
+	routes: Array<PlatformRoute>,
+	basename: string
+) => (location: URL): Promise<Array<MatchedRoute>> => {
 	const path = location.pathname.replace(basename, '');
 	return _resolveRouteMatches(routes, path);
+};
+
+export const resolveRoute = (route: PlatformRoute): Promise<PlatformRoute> => {
+	return _resolveIndexRoute(route)
+		.then(_resolveNestedRoutes)
+		.then(resolveComponent)
+		.then(({ routes, getComponent, ...noRoutesRoute }: PlatformRoute) =>
+			resolveAllRoutes(routes || []).then((routes: Array<PlatformRoute>) =>
+				Object.freeze({
+					...noRoutesRoute,
+					routes,
+				})
+			)
+		);
+};
+
+export const resolveAllRoutes = (
+	routes: Array<PlatformRoute>
+): Promise<Array<PlatformRoute>> => {
+	return Promise.all(routes.map(resolveRoute));
 };
