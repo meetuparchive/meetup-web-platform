@@ -40,6 +40,7 @@ declare type HapiServer = {
 		[string]: any,
 	},
 	route: (routes: HapiRoute | Array<HapiRoute>) => Promise<HapiServer>,
+	on: (eventName: string, () => void) => void,
 };
 declare type HapiRequest = {
 	getLanguage: () => string,
@@ -121,11 +122,7 @@ declare type QueryResponse = {
 
 declare type QueryFunction = (location: { [string]: mixed }) => Query;
 
-declare type PlatformRoute = {|
-	component?: React$ComponentType<*>,
-	getComponent?: () => Promise<React$ComponentType<*>>,
-	getNestedRoutes?: () => Promise<Array<PlatformRoute>>,
-	getIndexRoute?: () => Promise<PlatformRoute>,
+type BasePlatformRoute = {|
 	path?: string,
 	exact?: boolean,
 	strict?: boolean,
@@ -133,6 +130,18 @@ declare type PlatformRoute = {|
 	indexRoute?: PlatformRoute,
 	routes?: Array<PlatformRoute>,
 |};
+
+type AsyncPlatformRoute = {|
+	...BasePlatformRoute,
+	getComponent: () => Promise<React$ComponentType<*>>,
+|};
+
+type StaticPlatformRoute = {|
+	...BasePlatformRoute,
+	component: React$ComponentType<*>,
+|};
+
+declare type PlatformRoute = AsyncPlatformRoute | StaticPlatformRoute;
 
 declare type CookieOpts = {
 	path?: string,
