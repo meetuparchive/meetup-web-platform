@@ -1,12 +1,12 @@
-import { getChildRoutes, resolveChildRoutes, getRouteResolver } from './resolve';
+import { getMatchedChildRoutes, getRouteResolver } from './resolve';
 
-describe('getChildRoutes', () => {
+describe('getMatchedChildRoutes', () => {
 	it('returns [route.indexRoute] for exact match', () => {
 		const matchedRoute = {
 			route: { indexRoute: 'foo' },
 			match: { isExact: true },
 		};
-		const childRoutes = getChildRoutes(matchedRoute);
+		const childRoutes = getMatchedChildRoutes(matchedRoute);
 		expect(childRoutes).toEqual([matchedRoute.route.indexRoute]);
 	});
 	it('returns route.routes for not-exact match', () => {
@@ -14,7 +14,7 @@ describe('getChildRoutes', () => {
 			route: { indexRoute: 'foo', routes: ['bar', 'baz'] },
 			match: { isExact: false },
 		};
-		const childRoutes = getChildRoutes(matchedRoute);
+		const childRoutes = getMatchedChildRoutes(matchedRoute);
 		expect(childRoutes).toEqual(matchedRoute.route.routes);
 	});
 	it('returns empty array for exact match without index route', () => {
@@ -22,7 +22,7 @@ describe('getChildRoutes', () => {
 			route: { routes: ['bar', 'baz'] },
 			match: { isExact: true },
 		};
-		const childRoutes = getChildRoutes(matchedRoute);
+		const childRoutes = getMatchedChildRoutes(matchedRoute);
 		expect(childRoutes).toEqual([]);
 	});
 	it('returns empty array for not-exact match without route.routes', () => {
@@ -30,47 +30,8 @@ describe('getChildRoutes', () => {
 			route: { indexRoute: 'foo' },
 			match: { isExact: false },
 		};
-		const childRoutes = getChildRoutes(matchedRoute);
+		const childRoutes = getMatchedChildRoutes(matchedRoute);
 		expect(childRoutes).toEqual([]);
-	});
-});
-
-describe('resolveChildRoutes', () => {
-	it('returns [route.indexRoute] for exact match', () => {
-		const matchedRoute = {
-			route: { indexRoute: 'foo' },
-			match: { isExact: true },
-		};
-		return resolveChildRoutes(matchedRoute).then(childRoutes => {
-			expect(childRoutes).toEqual([matchedRoute.route.indexRoute]);
-		});
-	});
-	it('returns route.routes for not-exact match', () => {
-		const matchedRoute = {
-			route: { indexRoute: 'foo', routes: ['bar', 'baz'] },
-			match: { isExact: false },
-		};
-		return resolveChildRoutes(matchedRoute).then(childRoutes => {
-			expect(childRoutes).toEqual(matchedRoute.route.routes);
-		});
-	});
-	it('returns empty array for exact match without index route', () => {
-		const matchedRoute = {
-			route: { routes: ['bar', 'baz'] },
-			match: { isExact: true },
-		};
-		return resolveChildRoutes(matchedRoute).then(childRoutes => {
-			expect(childRoutes).toEqual([]);
-		});
-	});
-	it('returns empty array for not-exact match without route.routes', () => {
-		const matchedRoute = {
-			route: { indexRoute: 'foo' },
-			match: { isExact: false },
-		};
-		return resolveChildRoutes(matchedRoute).then(childRoutes => {
-			expect(childRoutes).toEqual([]);
-		});
 	});
 });
 

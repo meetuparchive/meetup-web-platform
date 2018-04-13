@@ -5,9 +5,40 @@
  */
 import matchPath from 'react-router-dom/matchPath';
 
-// A type for functions that mutate an object asynchronously
-type Resolver<T> = (input: T) => Promise<T>;
+// resolve the `component` property
+const resolveComponent = (
+	route: PlatformRoute
+): Promise<React$ComponentType<*>> => {
+	if (route.component) {
+		return Promise.resolve(route.component);
+	}
+	return route.getComponent();
+};
 
+export const resolveRoute = (
+	route: PlatformRoute
+): Promise<StaticPlatformRoute> =>
+	Promise.all([
+		resolveComponent(route),
+		resolveAllRoutes(route.routes || []),
+	]).then(
+		(
+			[component: React$ComponentType<*>, routes: Array<StaticPlatformRoute>]
+		): StaticPlatformRoute =>
+			Object.freeze({
+				// $FlowFixMe - Flow believes that `routes` might contain an AsyncPlatformRoute
+				routes,
+				...addComponentToRoute(route)(component),
+			})
+	);
+
+export const resolveAllRoutes = (
+	routes: Array<PlatformRoute>
+): Promise<Array<StaticPlatformRoute>> => {
+	return Promise.all(routes.map(resolveRoute));
+};
+
+/* FUNCTIONS THAT USE LOCATION/MATCH LOGIC */
 // munge a route's 'relative' `path` with the full matchedPath
 const _routeMatchOptions = (
 	route: PlatformRoute,
@@ -22,7 +53,9 @@ const _routeMatchOptions = (
  * Determine whether the indexRoute or nested route should be considered the
  * child route for a particular MatchedRoute
  */
-export const getChildRoutes = (matchedRoute: MatchedRoute): Array<PlatformRoute> => {
+export const getMatchedChildRoutes = (
+	matchedRoute: MatchedRoute
+): Array<PlatformRoute> => {
 	const { route, match } = matchedRoute;
 	if (match.isExact) {
 		return route.indexRoute ? [route.indexRoute] : [];
@@ -30,44 +63,20 @@ export const getChildRoutes = (matchedRoute: MatchedRoute): Array<PlatformRoute>
 	return route.routes || [];
 };
 
-/*
- * Given a matched route, return the expected child route(s). This function
- * encapsulates the logic for selecting between the `indexRoute` and the
- * child `routes` array
- *
- * This is essentially an async `getChildRoutes`
- */
-export const resolveChildRoutes = (
-	matchedRoute: MatchedRoute
-): Promise<Array<PlatformRoute>> => {
-	const { match } = matchedRoute;
-	if (match.isExact) {
-		return _resolveIndexRoute(matchedRoute).then(
-			m => (m.route.indexRoute ? [m.route.indexRoute] : [])
-		);
+const addComponentToRoute = (route: PlatformRoute) => (
+	component: React$ComponentType<*>
+): StaticPlatformRoute => {
+	if (!route.getComponent) {
+		return Object.freeze({ component, ...route });
 	}
-	return _resolveNestedRoutes(matchedRoute).then(m => m.route.routes || []);
+	// eslint-disable-next-line no-unused-vars
+	const { getComponent, ...noGetCompRoute } = route;
+	return Object.freeze({ component, ...noGetCompRoute });
 };
-
-const _resolveNestedRoutes: Resolver<MatchedRoute> = matchedRoute =>
-	matchedRoute.route.getNestedRoutes
-		? matchedRoute.route
-				.getNestedRoutes()
-				.then(routes => (matchedRoute.route.routes = routes))
-				.then(() => matchedRoute)
-		: Promise.resolve(matchedRoute);
-
-const _resolveIndexRoute: Resolver<MatchedRoute> = matchedRoute =>
-	matchedRoute.route.getIndexRoute
-		? matchedRoute.route
-				.getIndexRoute()
-				.then(indexRoute => (matchedRoute.route.indexRoute = indexRoute))
-				.then(() => matchedRoute)
-		: Promise.resolve(matchedRoute);
 
 /*
  * Find all routes in the routes array that match the provided URL, including
- * nested routes that may be async
+ * nested routes that may have async components
  */
 const _resolveRouteMatches = (
 	routes: Array<PlatformRoute> = [],
@@ -94,26 +103,31 @@ const _resolveRouteMatches = (
 	const currentMatchedRoutes = [...matchedRoutes, matchedRoute];
 
 	// add any nested route matches
-	return resolveChildRoutes(matchedRoute).then(
-		childRoutes =>
-			childRoutes.length
-				? _resolveRouteMatches(
-						childRoutes,
-						path,
-						currentMatchedRoutes,
-						currentMatchOptions.path
-				  )
-				: currentMatchedRoutes
-	);
+	return resolveComponent(route)
+		.then(addComponentToRoute(route))
+		.then((route: StaticPlatformRoute): MatchedRoute => ({ match, route }))
+		.then(getMatchedChildRoutes)
+		.then(
+			childRoutes =>
+				childRoutes.length
+					? _resolveRouteMatches(
+							childRoutes,
+							path,
+							currentMatchedRoutes,
+							currentMatchOptions.path
+						)
+					: currentMatchedRoutes
+		);
 };
 
 /*
- * An curried interface into `_resolveRouteMatches`, using `basename`
+ * A curried interface into `_resolveRouteMatches`, using `basename`
  * + `location` instead of `path`
  */
-export const getRouteResolver = (routes: Array<PlatformRoute>, basename: string) => (
-	location: URL
-): Promise<Array<MatchedRoute>> => {
+export const getRouteResolver = (
+	routes: Array<PlatformRoute>,
+	basename: string
+) => (location: URL): Promise<Array<MatchedRoute>> => {
 	const path = location.pathname.replace(basename, '');
 	return _resolveRouteMatches(routes, path);
 };

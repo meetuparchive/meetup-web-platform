@@ -1,3 +1,9 @@
+## [14.0]
+
+- **BREAKING CHANGE** routing definitions no longer support `getIndexRoute` and
+  `getNestedRoutes`. Instead, async loading should happen at the component level
+  - use `getComponent` instead of `component`.
+
 ## [13.1]
 
 - **New feature** `state.flags` containing all LaunchDarkly feature flags
