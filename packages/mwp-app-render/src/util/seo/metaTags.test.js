@@ -1,6 +1,3 @@
-import React from 'react';
-import { shallow } from 'enzyme';
-
 import {
 	generateMetaData,
 	generateMetaTags,
@@ -88,7 +85,11 @@ describe('getGroupKeywords', () => {
 	it('matches snap for group with topics', () => {
 		const keywords = getGroupKeywords({
 			...group,
-			topics: [{name: 'hiking'},{name: 'beagles'},{name: 'programming'}]
+			topics: [
+				{ name: 'hiking' },
+				{ name: 'beagles' },
+				{ name: 'programming' },
+			],
 		});
 		expect(keywords).toMatchSnapshot();
 	});
