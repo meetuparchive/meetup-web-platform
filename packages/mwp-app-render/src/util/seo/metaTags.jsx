@@ -1,9 +1,8 @@
 import React from 'react';
-import { getSocialLinks } from '../../util/socialHelper';
 import { generateCanonicalUrl } from './links';
 
 export const FB_APP_ID =
-        process.env.NODE_ENV === 'production' ? '2403839689' : '36212898404';
+	process.env.NODE_ENV === 'production' ? '2403839689' : '36212898404';
 
 export const YANDEX_META = {
 	name: 'yandex-verification',
@@ -17,7 +16,7 @@ export const BING_META = {
 export const TWITTER_APP_ID = '375990038';
 
 export const DEFAULT_IMAGE_URL =
-        'https://secure.meetupstatic.com/s/img/286374644891845767035/logo/meetup-logo-script-1200x630.png';
+	'https://secure.meetupstatic.com/s/img/286374644891845767035/logo/meetup-logo-script-1200x630.png';
 
 /**
  * Strips new lines and tabs from string + truncates provided
@@ -49,7 +48,9 @@ export const getGroupKeywords = group => {
 	const topics = group.topics || [];
 	const topicKeywords = topics.map(topic => topic.name);
 	const groupKeys = ['name', 'city', 'state', 'country'];
-	return [...topicKeywords, ...getKeywordsByProperties(group, groupKeys)].join(',');
+	return [...topicKeywords, ...getKeywordsByProperties(group, groupKeys)].join(
+		','
+	);
 };
 
 export const generateMetaTags = tags =>
@@ -105,10 +106,10 @@ export const generateMetaData = ({
 		appPath && { property: 'al:android:url', content: appPath },
 		appPath && { property: 'al:ios:url', content: appPath },
 		baseUrl &&
-			route && {
-				property: 'al:web:url',
-				content: generateCanonicalUrl(baseUrl, localeCode, route),
-			},
+		route && {
+			property: 'al:web:url',
+			content: generateCanonicalUrl(baseUrl, localeCode, route),
+		},
 		{ property: 'twitter:card', content: 'summary_large_image' },
 		{ property: 'twitter:site', content: '@meetup' },
 		{ property: 'twitter:image', content: imageUrl },
