@@ -5,4 +5,4 @@
  */
 const StyleWith = props => props.children;
 
-export default StyleWith;
+module.exports = StyleWith;
