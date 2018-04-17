@@ -1,3 +1,10 @@
+## [14.0]
+
+- **BREAKING CHANGE** dropping support for React 15. Peer dependencies
+  will require React 16.3 or higher.
+- Upgrade meetup-web-component dependencies to latest (4.8.2111), and
+  require meetup-web-component@^4.8.0 for peer dependencies.
+
 ## [13.1]
 
 - **New feature** `state.flags` containing all LaunchDarkly feature flags
