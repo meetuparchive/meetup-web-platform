@@ -3,7 +3,6 @@ import React from 'react';
 import type { ComponentType } from 'react';
 import { IntlProvider, injectIntl } from 'react-intl';
 import { connect } from 'react-redux';
-import type { MapStateToProps } from 'react-redux';
 
 const DEFAULT_LOCALE = 'en-US';
 type TRNSource = { [string]: string };
@@ -11,7 +10,7 @@ type TRNSource = { [string]: string };
 type Messages = { 'en-US': TRNSource, [string]: TRNSource };
 type Props = { requestLanguage: string, __locale?: string, [string]: any };
 
-const mapStateToProps: MapStateToProps<*, *, *> = (state: MWPState) => ({
+const mapStateToProps = (state: MWPState) => ({
 	requestLanguage: state.config.requestLanguage,
 });
 
