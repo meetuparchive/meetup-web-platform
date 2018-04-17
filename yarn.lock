@@ -31,10 +31,10 @@
     nan "^2.8.0"
 
 "@storybook/addon-actions@^3.2.10":
-  version "3.4.2"
-  resolved "https://registry.yarnpkg.com/@storybook/addon-actions/-/addon-actions-3.4.2.tgz#ab45c37f57027257530577a9c1af6896ffb40156"
+  version "3.4.1"
+  resolved "https://registry.yarnpkg.com/@storybook/addon-actions/-/addon-actions-3.4.1.tgz#6ec5dc337e4af301d2f0f8fbc0ad2dee812cfa29"
   dependencies:
-    "@storybook/components" "3.4.2"
+    "@storybook/components" "3.4.1"
     babel-runtime "^6.26.0"
     deep-equal "^1.0.1"
     glamor "^2.20.40"
@@ -45,9 +45,9 @@
     react-inspector "^2.2.2"
     uuid "^3.2.1"
 
-"@storybook/components@3.4.2":
-  version "3.4.2"
-  resolved "https://registry.yarnpkg.com/@storybook/components/-/components-3.4.2.tgz#1124cf22a54e36aa07c291608c652746919cf375"
+"@storybook/components@3.4.1":
+  version "3.4.1"
+  resolved "https://registry.yarnpkg.com/@storybook/components/-/components-3.4.1.tgz#74e3bcf9590cb314a4845d2f3264aada79856c1f"
   dependencies:
     glamor "^2.20.40"
     glamorous "^4.12.1"
