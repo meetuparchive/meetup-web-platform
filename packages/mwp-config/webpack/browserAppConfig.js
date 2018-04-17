@@ -18,9 +18,8 @@ const rules = require('./rules');
 function injectHotReloadConfig(config) {
 	config.entry.app.unshift(
 		'react-hot-loader/patch', // logic for hot-reloading react components
-		`webpack-dev-server/client?http://${env.properties.asset_server.host}:${
-			env.properties.asset_server.port
-		}/`, // connect to HMR websocket
+		`webpack-dev-server/client?http://${env.properties.asset_server.host}:${env
+			.properties.asset_server.port}/`, // connect to HMR websocket
 		'webpack/hot/dev-server' // run the dev server
 	);
 
@@ -122,6 +121,9 @@ function getConfig(localeCode) {
 					// don't cache these files
 					/\.map$/, // source-maps
 					/.json$/, // manifest files
+					/.jpg$/,
+					/.png$/,
+					/.mp4$/,
 				],
 			})
 		);
