@@ -6357,6 +6357,10 @@ svg-tag-names@^1.1.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/svg-tag-names/-/svg-tag-names-1.1.1.tgz#9641b29ef71025ee094c7043f7cdde7d99fbd50a"
 
+swarm-constants@1.2.99:
+  version "1.2.99"
+  resolved "https://registry.yarnpkg.com/swarm-constants/-/swarm-constants-1.2.99.tgz#0f1e4c9839b22aa87f2d665ad045fa304b0d82eb"
+
 swarm-icons@1.3.259:
   version "1.3.259"
   resolved "https://registry.yarnpkg.com/swarm-icons/-/swarm-icons-1.3.259.tgz#55abeb077e22e5d4b669c1e6767ec7cabaa29a45"
