@@ -25,7 +25,7 @@
 	"homepage": "https://github.com/meetup/meetup-web-platform#readme",
 	"dependencies": {
 		"classnames": "2.2.5",
-		"meetup-web-components": "3.3.1673",
+		"meetup-web-components": "4.8.2111",
 		"mwp-api-state": ">=0.0.1",
 		"mwp-app-server": ">=0.0.1",
 		"mwp-core": ">=0.0.1",
