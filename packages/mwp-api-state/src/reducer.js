@@ -25,12 +25,30 @@ export const filterKeys: ObjectFilter = (
 		return newObj;
 	}, {});
 
-export const responseToState = (resp: {
-	response: QueryResponse,
-	query: Query,
-}): { [string]: QueryResponse } => ({
-	[resp.response.ref]: { ...resp.response, query: resp.query },
-});
+export const responseToState = (
+	resp: {
+		response: QueryResponse,
+		query: Query,
+	},
+	state: ApiState
+): { [string]: QueryResponse } => {
+	const { response, query } = resp;
+	const newState = {
+		[response.ref]: { ...response, query },
+	};
+	if (query.list) {
+		// this query should be treated as a list-building query
+		// clean up and merge response
+		const { dynamicRef, dupeTest, sort } = query.list;
+		const newList = response.value instanceof Array ? response.value : [];
+		// remove anything in old list that is part of new list
+		const oldList = (state[dynamicRef] || [])
+			.filter(valOld => !newList.find(valNew => dupeTest(valOld, valNew)));
+		// combine the new list and the old list and sort the results
+		newState[dynamicRef] = [...oldList, ...newList].sort(sort);
+	}
+	return newState;
+};
 
 /*
  * The primary reducer for data provided by the API

@@ -100,12 +100,22 @@ declare type FluxStandardAction = {
 declare type Query = {
 	ref: string,
 	endpoint: string,
+	list?: {
+		dynamicRef: string, // dynamic ref that will be kept forever
+		dupeTest: (Object, Object) => boolean, // test for identical
+		sort: (Object, Object) => number, // test for order
+	},
 	params?: Params,
 	type?: string,
+	mockResponse?: () => any,
 	meta?: {
 		flags?: Array<string>,
-		method?: string,
+		method?: 'get' | 'post' | 'delete' | 'patch',
 		noCache?: boolean,
+		metaRequestHeaders?: Array<string>,
+		variants?: {
+			[string]: string | Array<string>,
+		},
 	},
 };
 
