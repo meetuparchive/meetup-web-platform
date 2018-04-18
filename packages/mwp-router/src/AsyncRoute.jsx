@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 import type { RouterHistory } from 'react-router-dom';
-import { decodeParams, getChildRoutes } from './util';
+import { decodeParams, getMatchedChildRoutes } from './util';
 import RouteLayout from './RouteLayout';
 
 type Props = {
@@ -10,90 +10,86 @@ type Props = {
 	location: URL,
 	history: RouterHistory,
 };
-type State = {
-	childRoutes: Array<PlatformRoute>,
-	_routesCache: { [string]: Array<PlatformRoute> },
+type ComponentState = {
+	component: React$ComponentType<*>,
+	_componentCache: { [string]: React$ComponentType<*> },
 };
+type State = ComponentState;
+
+// simple pass through component to use while real component is loading
+const PassThrough = (children: React$Node) => React.Children.only(children);
+
+// Helper to set rendering component once resolved, as well as update cache
+const getComponentStateSetter = (key: string) => (
+	component: React$ComponentType<*>
+) => (state: State): ComponentState => ({
+	component,
+	_componentCache: { ...state._componentCache, [key]: component },
+});
 
 /**
- * Route rendering component that will render nested routes asynchronously
- * The nested routes are cached so that the async data is not re-requested
- * each time a route is re-rendered.
+ * Route rendering component that uses internal state to keep a reference to the
+ * wrapping component. If the `route` prop has a statically defined `component`,
+ * it will be used on first render, otherwise it will be resolved using the
+ * component 'getter' and the the result will be rendered (and cached).
  */
 class AsyncRoute extends React.Component<Props, State> {
 	constructor(props: Props) {
 		super(props);
-		const { match, route } = props;
-		const childRoutes = getChildRoutes({ match, route });
+		const route = props.route;
+
 		this.state = {
-			childRoutes,
-			_routesCache: {},
+			component: route.component || PassThrough,
+			_componentCache: {},
 		};
 	}
-	updateChildRoutes(childRoutes: Array<PlatformRoute>, key: string) {
-		this.setState(state => ({
-			childRoutes,
-			_routesCache: {
-				...state._routesCache,
-				[key]: childRoutes,
-			},
-		}));
-	}
-	resolveAsyncChildRoutes(
-		resolver: () => Promise<Array<PlatformRoute> | PlatformRoute>
-	) {
+	/*
+	 * Given a component-resolving function, update this.state.component with
+	 * the resolved value - set/get cached reference as necessary
+	 */
+	resolveComponent(resolver: () => Promise<React$ComponentType<*>>) {
+		this.setState(state => ({ component: PassThrough }));
 		const key = resolver.toString();
-		// async route - check for cache keyed by stringified load function
-		const cached = this.state._routesCache[key];
+		const cached = this.state._componentCache[key];
 		if (cached) {
-			this.updateChildRoutes(cached, key);
+			this.setState({ component: cached });
 			return;
 		}
-		resolver().then(routes => {
-			routes = routes instanceof Array ? routes : [routes];
-			this.updateChildRoutes(routes, key);
-		});
-		return;
+		resolver()
+			.then(getComponentStateSetter(key))
+			.then(setter => this.setState(setter));
 	}
+
 	/*
-	 * New props may correspond to a route change. If so, this function populates
-	 * this.state.childRoutes to correspond to the indexRoute or nested routes
-	 * defined by the new route
+	 * New props may correspond to a route change. If so, this function sets the
+	 * component to render
 	 */
 	componentWillReceiveProps(nextProps: Props) {
 		const { match, route } = nextProps;
 		if (route === this.props.route && match === this.props.match) {
-			return;
+			return; // no new route, just re-render normally
 		}
-		const childRoutes = getChildRoutes({ match, route });
-		this.setState(state => ({ childRoutes }));
-		if (childRoutes.length) {
-			return;
-		}
-		if (match.isExact && route.getIndexRoute) {
-			this.resolveAsyncChildRoutes(route.getIndexRoute);
+
+		if (route.component) {
+			this.setState(state => ({ component: route.component }));
 			return;
 		}
 
-		if (route.getNestedRoutes) {
-			this.resolveAsyncChildRoutes(route.getNestedRoutes);
-		}
-		return;
+		// Component needs to be resolved - just render children for now
+		this.resolveComponent(route.getComponent);
 	}
+
 	render() {
-		const { route, match, ...props } = this.props;
-		const { childRoutes } = this.state;
-		// React Router encodes the URL params - send decoded values to component
-		const params = decodeParams(match.params);
-		const Component = route.component;
+		const { match, route, ...props } = this.props;
+
+		const Component = this.state.component;
+		const childRoutes = getMatchedChildRoutes({ match, route });
+		const params = decodeParams(match.params); // React Router encodes the URL params - send decoded values to component
 
 		return (
 			<Component {...props} route={route} match={{ ...match, params }}>
 				{childRoutes.length > 0 &&
-					<RouteLayout
-						routes={childRoutes}
-						matchedPath={match.path}
-					/>}
+					<RouteLayout routes={childRoutes} matchedPath={match.path} />}
 			</Component>
 		);
 	}
