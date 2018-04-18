@@ -40,7 +40,7 @@ declare type HapiServer = {
 		[string]: any,
 	},
 	route: (routes: HapiRoute | Array<HapiRoute>) => Promise<HapiServer>,
-	on: (eventName: string, () => void) => void,
+	on: (eventName: string, cb: () => void) => void,
 };
 declare type HapiRequest = {
 	getLanguage: () => string,

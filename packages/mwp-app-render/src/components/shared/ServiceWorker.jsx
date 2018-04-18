@@ -1,9 +1,8 @@
 // @flow
 import React from 'react';
 import { connect } from 'react-redux';
-import type { MapStateToProps } from 'react-redux';
 
-const mapStateToProps: MapStateToProps<*, *, *> = (state: MWPState) => ({
+const mapStateToProps = (state: MWPState) => ({
 	requestLanguage: state.config.requestLanguage,
 	enableServiceWorker: state.config.enableServiceWorker,
 });

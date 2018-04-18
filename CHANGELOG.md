@@ -1,8 +1,14 @@
-## [14.0]
-
+## [15.0]
 - **BREAKING CHANGE** routing definitions no longer support `getIndexRoute` and
   `getNestedRoutes`. Instead, async loading should happen at the component level
   - use `getComponent` instead of `component`.
+
+## [14.0]
+
+- **BREAKING CHANGE** dropping support for React 15. Peer dependencies
+  will require React 16.3 or higher.
+- Upgrade meetup-web-component dependencies to latest (4.8.2111), and
+  require meetup-web-component@^4.8.0 for peer dependencies.
 
 ## [13.1]
 
