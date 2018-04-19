@@ -25,29 +25,47 @@ export const filterKeys: ObjectFilter = (
 		return newObj;
 	}, {});
 
-export const responseToState = (
+type ResponseStateSetter = (
+	state: ApiState,
 	resp: {
 		response: QueryResponse,
 		query: Query,
-	},
-	state: ApiState
-): { [string]: QueryResponse } => {
+	}
+) => { [string]: QueryResponse };
+
+export const getListState: ResponseStateSetter = (state, resp) => {
+	const { response, query } = resp;
+	if (!query.list) {
+		// no list no problem
+		return {};
+	}
+	const { dynamicRef, merge } = query.list;
+	// this query should be treated as a list-building query
+	const newList = response.value instanceof Array ? response.value : [];
+	if (!merge) {
+		// no merge rules, so just make a new list
+		return { [dynamicRef]: { value: newList, query } };
+	}
+
+	// do some smart merging
+	const { idTest, sort } = merge;
+	// remove anything in old list that is part of new list
+	const oldList = (state[dynamicRef] || {}).value
+		.filter(valOld => !newList.find(valNew => idTest(valOld, valNew)));
+
+	// combine the new list and the old list and sort the results
+	return { [dynamicRef]: [...oldList, ...newList].sort(sort) };
+};
+
+export const responseToState: ResponseStateSetter = (state, resp) => {
 	const { response, query } = resp;
 	const newState = {
 		[response.ref]: { ...response, query },
 	};
-	if (query.list) {
-		// this query should be treated as a list-building query
-		// clean up and merge response
-		const { dynamicRef, dupeTest, sort } = query.list;
-		const newList = response.value instanceof Array ? response.value : [];
-		// remove anything in old list that is part of new list
-		const oldList = (state[dynamicRef] || [])
-			.filter(valOld => !newList.find(valNew => dupeTest(valOld, valNew)));
-		// combine the new list and the old list and sort the results
-		newState[dynamicRef] = [...oldList, ...newList].sort(sort);
-	}
-	return newState;
+	return {
+		...newState,
+		...getListState(state, resp),
+	};
 };
 
 /*
@@ -108,7 +126,7 @@ export function api(
 			delete state.fail; // if there are any values, the API is not failing
 			return {
 				...state,
-				...responseToState(action.payload),
+				...responseToState(state, action.payload),
 			};
 		case API_RESP_FAIL:
 			return { ...state, fail: action.payload };

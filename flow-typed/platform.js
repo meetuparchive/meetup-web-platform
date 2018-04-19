@@ -97,15 +97,18 @@ declare type FluxStandardAction = {
 	error?: boolean,
 };
 
+declare type QueryListParam = {|
+	dynamicRef: string, // dynamic ref that will be kept forever
+	merge?: {
+		idTest: (Object, Object) => boolean, // test for identical
+		sort: (Object, Object) => number, // test for order
+	},
+|};
 // API query structure
 declare type Query = {
 	ref: string,
 	endpoint: string,
-	list?: {
-		dynamicRef: string, // dynamic ref that will be kept forever
-		dupeTest: (Object, Object) => boolean, // test for identical
-		sort: (Object, Object) => number, // test for order
-	},
+	list?: QueryListParam,
 	params?: Params,
 	type?: string,
 	mockResponse?: () => any,

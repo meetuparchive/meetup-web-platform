@@ -104,7 +104,9 @@ describe('api reducer', () => {
 			response: { ref: 'bing', value: 'baz' },
 		};
 		const API_RESP_SUCCESS = apiActions.success(resp);
-		expect(api({ ...DEFAULT_API_STATE, foo: 'bar' }, API_RESP_SUCCESS)).toEqual({
+		expect(
+			api({ ...DEFAULT_API_STATE, foo: 'bar' }, API_RESP_SUCCESS)
+		).toEqual({
 			foo: 'bar',
 			bing: { ref: 'bing', value: 'baz', query: resp.query },
 			inFlight: [],
@@ -113,10 +115,11 @@ describe('api reducer', () => {
 	it('adds error response to state tree', () => {
 		const API_RESP_ERROR = apiActions.error({
 			response: { ref: 'bing', error: 'baz' },
+			query: {},
 		});
 		expect(api({ ...DEFAULT_API_STATE, foo: 'bar' }, API_RESP_ERROR)).toEqual({
 			foo: 'bar',
-			bing: { ref: 'bing', error: 'baz' },
+			bing: { ref: 'bing', error: 'baz', query: {} },
 			inFlight: [],
 		});
 	});
