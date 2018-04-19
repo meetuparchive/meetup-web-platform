@@ -27,15 +27,19 @@ export const filterKeys: ObjectFilter = (
 
 type ResponseStateSetter = (
 	state: ApiState,
-	resp: {
-		response: QueryResponse,
-		query: Query,
-	}
+	resp: QueryState
 ) => { [string]: QueryResponse };
 
-export const getListState: ResponseStateSetter = (state, resp) => {
-	const { response, query } = resp;
-	if (!query.list) {
+/*
+ * Queries can specify 'list' response handling - response values will be
+ * stored in a `dyanmicRef` in state. If a `list.merge` param is specified,
+ * the response will be merged with the existing list state stored in `dynamicRef`
+ */
+export const getListState: ResponseStateSetter = (
+	state,
+	{ response, query }
+) => {
+	if (!response || !query.list) {
 		// no list no problem
 		return {};
 	}
@@ -57,16 +61,13 @@ export const getListState: ResponseStateSetter = (state, resp) => {
 	return { [dynamicRef]: [...oldList, ...newList].sort(sort) };
 };
 
-export const responseToState: ResponseStateSetter = (state, resp) => {
-	const { response, query } = resp;
-	const newState = {
-		[response.ref]: { ...response, query },
-	};
-	return {
-		...newState,
-		...getListState(state, resp),
-	};
-};
+export const responseToState: ResponseStateSetter = (
+	state,
+	{ response, query }
+) => ({
+	[query.ref]: { ...response, query },
+	...getListState(state, { response, query }),
+});
 
 /*
  * The primary reducer for data provided by the API
