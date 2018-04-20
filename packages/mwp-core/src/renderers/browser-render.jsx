@@ -29,6 +29,10 @@ export function resolveAppProps(
 	const findMatches = getFindMatches(routes, basename);
 	const createStore = getBrowserCreateStore(findMatches, middleware);
 	const store = createStore(reducer, getInitialState(window.APP_RUNTIME));
+
+	// find the currently-matched routes that have components that need to
+	// be resolved, then resolve them - this doesn't actually change the route
+	// object, but loads the app chunks into memory
 	const matchedAsyncComponentGetters = findMatches(window.location)
 		.map(({ getComponent }) => getComponent)
 		.filter(x => x);
