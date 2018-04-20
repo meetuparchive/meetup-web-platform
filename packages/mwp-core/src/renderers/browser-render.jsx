@@ -3,7 +3,7 @@ import type { Reducer } from 'redux';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { getInitialState, getBrowserCreateStore } from 'mwp-store/lib/browser';
-import { getRouteResolver } from 'mwp-router/lib/util';
+import { getFindMatches } from 'mwp-router/lib/util';
 import BrowserApp from 'mwp-app-render/lib/components/BrowserApp';
 
 /**
@@ -16,9 +16,9 @@ type AppProps = {
 	basename: string,
 };
 
-/**
- * Async resolver of the props needed for `BrowserApp`:
- * { routes, store, basename }
+/*
+ * Ensures that all async parts of the app that are needed for initial render
+ * are downloaded before returning
  */
 export function resolveAppProps(
 	routes: Array<PlatformRoute>,
@@ -26,10 +26,14 @@ export function resolveAppProps(
 	middleware: Array<Object> = []
 ): Promise<AppProps> {
 	const basename = window.APP_RUNTIME.basename || '';
-	const resolveRoutes = getRouteResolver(routes, basename);
-	const createStore = getBrowserCreateStore(resolveRoutes, middleware);
+	const findMatches = getFindMatches(routes, basename);
+	const createStore = getBrowserCreateStore(findMatches, middleware);
 	const store = createStore(reducer, getInitialState(window.APP_RUNTIME));
-	return resolveRoutes(window.location).then(() => ({
+	const matchedAsyncComponentGetters = findMatches(window.location)
+		.map(({ getComponent }) => getComponent)
+		.filter(x => x);
+
+	return Promise.all(matchedAsyncComponentGetters).then(() => ({
 		routes,
 		store,
 		basename,
