@@ -8,7 +8,7 @@ import MobileDetect from 'mobile-detect';
 
 import { API_ROUTE_PATH } from 'mwp-api-proxy-plugin';
 import { Forbidden, NotFound, Redirect, SERVER_RENDER } from 'mwp-router';
-import { getRouteResolver, resolveAllRoutes } from 'mwp-router/lib/util';
+import { getFindMatches, resolveAllRoutes } from 'mwp-router/lib/util';
 import { getServerCreateStore } from 'mwp-store/lib/server';
 import Dom from 'mwp-app-render/lib/components/Dom';
 import ServerApp from 'mwp-app-render/lib/components/ServerApp';
@@ -254,7 +254,7 @@ const makeRenderer = (
 			};
 
 			const createStore = getServerCreateStore(
-				getRouteResolver(resolvedRoutes, basename),
+				getFindMatches(resolvedRoutes, basename),
 				middleware,
 				request
 			);
