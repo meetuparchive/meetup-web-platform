@@ -28,7 +28,9 @@ export const clickTrackEnhancer = createStore => (
  * containing the HTML-escaped JSON string in `window.INITIAL_STATE.escapedState`.
  * unescape the text using native `textarea.textContent` unescaping
  */
-export const getInitialState = (APP_RUNTIME: { escapedState: string }): ?Object => {
+export const getInitialState = (APP_RUNTIME: {
+	escapedState: string,
+}): ?Object => {
 	if (!APP_RUNTIME) {
 		return;
 	}
@@ -38,10 +40,10 @@ export const getInitialState = (APP_RUNTIME: { escapedState: string }): ?Object 
 	return JSON.parse(unescapedStateJSON);
 };
 
-export function getBrowserCreateStore(resolveRoutes, middleware = []) {
+export function getBrowserCreateStore(findMatches, middleware = []) {
 	const middlewareToApply = [
 		catchMiddleware(console.error),
-		getApiMiddleware(resolveRoutes, fetchQueries),
+		getApiMiddleware(findMatches, fetchQueries),
 		...middleware,
 		window.mupDevTools ? window.mupDevTools() : noopMiddleware, // must be last middleware
 	];
