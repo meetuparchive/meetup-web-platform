@@ -1,3 +1,8 @@
+## [15.0]
+- **BREAKING CHANGE** routing definitions no longer support `getIndexRoute` and
+  `getNestedRoutes`. Instead, async loading should happen at the component level
+  - use `getComponent` instead of `component`.
+
 ## [14.0]
 
 - **BREAKING CHANGE** dropping support for React 15. Peer dependencies
