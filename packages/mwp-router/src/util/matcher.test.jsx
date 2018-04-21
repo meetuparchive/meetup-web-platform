@@ -1,4 +1,5 @@
-import { getMatchedChildRoutes, getRouteResolver } from './resolve';
+import React from 'react';
+import { getMatchedChildRoutes, getFindMatches } from './matcher';
 
 describe('getMatchedChildRoutes', () => {
 	it('returns [route.indexRoute] for exact match', () => {
@@ -35,36 +36,46 @@ describe('getMatchedChildRoutes', () => {
 	});
 });
 
-describe('getRouteResolver', () => {
+describe('getFindMatches', () => {
+	const Component = () => <div />;
 	const bar = {
 		path: '/bar',
+		getComponent: () => Promise.resolve(Component),
 	};
 	const foo = {
 		path: '/foo',
+		getComponent: () => Promise.resolve(Component),
 		routes: [bar],
 	};
 	const qux = {
 		path: '/qux',
+		getComponent: () => Promise.resolve(Component),
 	};
 	const baz = {
 		path: '/baz',
-		getNestedRoutes: () => Promise.resolve([qux]),
+		component: Component,
+		routes: [qux],
 	};
 	const root = {
 		path: '/',
+		getComponent: () => Promise.resolve(Component),
 		routes: [foo, baz],
 	};
-	const resolveRoutes = getRouteResolver([root]);
+	const findMatches = getFindMatches([root]);
 	it('returns all matched synchronous routes', () => {
 		const location = new URL('http://example.com/foo/bar');
-		return resolveRoutes(location).then(matchedRoutes => {
-			expect(matchedRoutes.map(({ route }) => route)).toEqual([root, foo, bar]);
-		});
+		expect(findMatches(location).map(({ route }) => route)).toEqual([
+			root,
+			foo,
+			bar,
+		]);
 	});
 	it('returns all matched asynchronous routes', () => {
 		const location = new URL('http://example.com/baz/qux');
-		return resolveRoutes(location).then(matchedRoutes => {
-			expect(matchedRoutes.map(({ route }) => route)).toEqual([root, baz, qux]);
-		});
+		expect(findMatches(location).map(({ route }) => route)).toEqual([
+			root,
+			baz,
+			qux,
+		]);
 	});
 });

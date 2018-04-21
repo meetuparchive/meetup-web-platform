@@ -5,7 +5,7 @@
  * @module routeUtils
  */
 
-const addComponentToRoute = (route: PlatformRoute) => (
+export const addComponentToRoute = (route: PlatformRoute) => (
 	component: React$ComponentType<*>
 ): StaticPlatformRoute => {
 	if (!route.getComponent) {
@@ -37,20 +37,18 @@ export const resolveRoute = (
 ): Promise<StaticPlatformRoute> =>
 	Promise.all([
 		resolveComponent(route),
+		// $FlowFixMe - Flow doesn't realize the returned promise will be unwrapped
 		resolveAllRoutes(route.routes || []),
 	]).then(
 		(
 			[component: React$ComponentType<*>, routes: Array<StaticPlatformRoute>]
 		): StaticPlatformRoute =>
 			Object.freeze({
-				// $FlowFixMe - Flow believes that `routes` might contain an AsyncPlatformRoute
-				routes,
 				...addComponentToRoute(route)(component),
+				routes,
 			})
 	);
 
 export const resolveAllRoutes = (
 	routes: Array<PlatformRoute>
-): Promise<Array<StaticPlatformRoute>> => {
-	return Promise.all(routes.map(resolveRoute));
-};
+): Promise<Array<StaticPlatformRoute>> => Promise.all(routes.map(resolveRoute));
