@@ -25,11 +25,48 @@ export const filterKeys: ObjectFilter = (
 		return newObj;
 	}, {});
 
-export const responseToState = (resp: {
-	response: QueryResponse,
-	query: Query,
-}): { [string]: QueryResponse } => ({
-	[resp.response.ref]: { ...resp.response, query: resp.query },
+type ResponseStateSetter = (
+	state: ApiState,
+	resp: QueryState
+) => { [string]: QueryResponse };
+
+/*
+ * Queries can specify 'list' response handling - response values will be
+ * stored in a `dyanmicRef` in state. If a `list.merge` param is specified,
+ * the response will be merged with the existing list state stored in `dynamicRef`
+ */
+export const getListState: ResponseStateSetter = (
+	state,
+	{ response, query }
+) => {
+	if (!response || !query.list) {
+		// no list no problem
+		return {};
+	}
+	const { dynamicRef, merge } = query.list;
+	// this query should be treated as a list-building query
+	const newList = response.value instanceof Array ? response.value : [];
+	if (!merge) {
+		// no merge rules, so just make a new list
+		return { [dynamicRef]: { value: newList, query } };
+	}
+
+	// do some smart merging
+	const { idTest, sort } = merge;
+	// remove anything in old list that is part of new list
+	const oldList = ((state[dynamicRef] || {}).value || [])
+		.filter(valOld => !newList.find(valNew => idTest(valOld, valNew)));
+
+	// combine the new list and the old list and sort the results
+	return { [dynamicRef]: { value: [...oldList, ...newList].sort(sort) } };
+};
+
+export const responseToState: ResponseStateSetter = (
+	state,
+	{ response, query }
+) => ({
+	[query.ref]: { ...response, query },
+	...getListState(state, { response, query }),
 });
 
 /*
@@ -90,7 +127,7 @@ export function api(
 			delete state.fail; // if there are any values, the API is not failing
 			return {
 				...state,
-				...responseToState(action.payload),
+				...responseToState(state, action.payload),
 			};
 		case API_RESP_FAIL:
 			return { ...state, fail: action.payload };
