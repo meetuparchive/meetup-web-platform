@@ -4,10 +4,69 @@ import {
 	DEFAULT_APP_STATE, // DEPRECATED
 	api,
 	filterKeys,
+	getListState,
 	app, // DEPRECATED
 } from './reducer';
 import { apiRequest } from './sync/syncActionCreators';
 import * as apiActions from './sync/apiActionCreators';
+
+describe('getListState', () => {
+	const state = {};
+	const resp = {
+		response: { value: ['foo'] },
+		query: {
+			ref: 'bar',
+			list: {
+				dynamicRef: 'baz',
+				merge: {
+					idTest: () => false,
+					sort: (a, b) => {
+						if (a > b) {
+							return 1;
+						}
+						if (a < b) {
+							return -1;
+						}
+						return 0;
+					},
+				},
+			},
+		},
+	};
+	it('ignores no-response responses', () => {
+		expect(
+			getListState(state, {
+				response: null,
+				query: resp.query,
+			})
+		).toEqual({});
+	});
+	it('ignores no-list queries', () => {
+		expect(
+			getListState(state, {
+				response: resp.response,
+				query: { ref: 'bar' },
+			})
+		).toEqual({});
+	});
+	it('returns a new object with dynamicRef', () => {
+		expect(getListState(state, resp)).toEqual({
+			[resp.query.list.dynamicRef]: resp.response,
+		});
+	});
+	it('merges new response with existing dynamicRef, sorted', () => {
+		const value = ['qux'];
+		expect(
+			getListState({ [resp.query.list.dynamicRef]: { value } }, resp)
+		).toEqual({
+			[resp.query.list.dynamicRef]: {
+				value: [...value, ...resp.response.value].sort(
+					resp.query.list.merge.sort
+				),
+			},
+		});
+	});
+});
 
 describe('app reducer', () => {
 	beforeEach(function() {
