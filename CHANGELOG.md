@@ -3,6 +3,11 @@
   `getNestedRoutes`. Instead, async loading should happen at the component level
   - use `getComponent` instead of `component`.
 
+## [14.1]
+
+- **NEW FEATURE** support for `query.list` param to aggregate list endpoint
+  responses
+
 ## [14.0]
 
 - **BREAKING CHANGE** dropping support for React 15. Peer dependencies
