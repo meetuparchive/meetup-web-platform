@@ -234,111 +234,111 @@ Array [
   <meta
     content="mock description"
     name="description"
-/>,
+  />,
   <meta
     content="mock,keywords,comma,separated"
     name="keywords"
-/>,
+  />,
   <meta
     content="36212898404"
     property="fb:app_id"
-/>,
+  />,
   <meta
     content="Meetup"
     property="og:site_name"
-/>,
+  />,
   <meta
     content="article"
     property="og:type"
-/>,
+  />,
   <meta
     content="mock title"
     property="og:title"
-/>,
+  />,
   <meta
     content="mock description"
     property="og:description"
-/>,
+  />,
   <meta
     content="https://mock-base-url.com/fr-FR/mock/preview/path"
     property="og:url"
-/>,
+  />,
   <meta
     content="https://www.meetup.com/mock-default-image.jpg"
     property="og:image"
-/>,
+  />,
   <meta
     content="Meetup"
     property="al:android:app_name"
-/>,
+  />,
   <meta
     content="com.meetup"
     property="al:android:package"
-/>,
+  />,
   <meta
     content="375990038"
     property="al:ios:app_store_id"
-/>,
+  />,
   <meta
     content="Meetup"
     property="al:ios:app_name"
-/>,
+  />,
   <meta
     content="true"
     property="al:web:should_fallback"
-/>,
+  />,
   <meta
     content="/mock/app/path"
     property="al:android:url"
-/>,
+  />,
   <meta
     content="/mock/app/path"
     property="al:ios:url"
-/>,
+  />,
   <meta
     content="https://mock-base-url.com/fr-FR/mock/preview/path"
     property="al:web:url"
-/>,
+  />,
   <meta
     content="summary_large_image"
     property="twitter:card"
-/>,
+  />,
   <meta
     content="@meetup"
     property="twitter:site"
-/>,
+  />,
   <meta
     content="https://www.meetup.com/mock-default-image.jpg"
     property="twitter:image"
-/>,
+  />,
   <meta
     content="mock description"
     property="twitter:description"
-/>,
+  />,
   <meta
     content="375990038"
     property="twitter:app:id:iphone"
-/>,
+  />,
   <meta
     content="Meetup"
     property="twitter:app:name:iphone"
-/>,
+  />,
   <meta
     content="375990038"
     property="twitter:app:id:ipad"
-/>,
+  />,
   <meta
     content="Meetup"
     property="twitter:app:name:ipad"
-/>,
+  />,
   <meta
     content="com.meetup"
     property="twitter:app:id:googleplay"
-/>,
+  />,
   <meta
     content="Meetup"
     property="twitter:app:name:googleplay"
-/>,
+  />,
 ]
 `;
 
