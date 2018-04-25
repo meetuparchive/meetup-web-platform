@@ -1,5 +1,6 @@
 // @flow
 export * from './resolve';
+export * from './matcher';
 export { decodeParams, getMatchedQueries } from './query';
 
 export const testForExternal = (to: RouterTo): boolean => {
