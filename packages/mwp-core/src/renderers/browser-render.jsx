@@ -34,7 +34,7 @@ export function resolveAppProps(
 	// be resolved, then resolve them - this doesn't actually change the route
 	// object, but loads the app chunks into memory
 	const matchedAsyncComponentGetters = findMatches(window.location)
-		.map(({ getComponent }) => getComponent)
+		.map(({ route: { getComponent } }) => getComponent)
 		.filter(x => x);
 
 	return Promise.all(matchedAsyncComponentGetters).then(() => ({

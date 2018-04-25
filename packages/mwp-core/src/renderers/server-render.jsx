@@ -296,7 +296,7 @@ const makeRenderer = (
 				});
 			});
 
-		return routesPromise.then(resolvedRoutes => {
+		return routesPromise.then(resolvedRoutes =>
 			initializeStore(resolvedRoutes).then(store => {
 				if ('skeleton' in request.query) {
 					// render skeleton if requested - the store is ready
@@ -327,8 +327,8 @@ const makeRenderer = (
 							userAgent,
 						}) // immediately invoke callback
 				);
-			});
-		});
+			})
+		);
 	};
 };
 

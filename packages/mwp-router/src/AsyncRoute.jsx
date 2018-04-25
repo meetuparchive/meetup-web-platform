@@ -17,7 +17,7 @@ type ComponentState = {
 type State = ComponentState;
 
 // simple pass through component to use while real component is loading
-const PassThrough = (children: React$Node) => React.Children.only(children);
+const PassThrough = (children: React$Node) => <div />;
 
 // Helper to set rendering component once resolved, as well as update cache
 const getComponentStateSetter = (key: string) => (
@@ -42,13 +42,15 @@ class AsyncRoute extends React.Component<Props, State> {
 			component: route.component || PassThrough,
 			_componentCache: {},
 		};
+		if (route.getComponent) {
+			this.resolveComponent(route.getComponent);
+		}
 	}
 	/*
 	 * Given a component-resolving function, update this.state.component with
 	 * the resolved value - set/get cached reference as necessary
 	 */
 	resolveComponent(resolver: () => Promise<React$ComponentType<*>>) {
-		this.setState(state => ({ component: PassThrough }));
 		const key = resolver.toString();
 		const cached = this.state._componentCache[key];
 		if (cached) {
@@ -75,6 +77,7 @@ class AsyncRoute extends React.Component<Props, State> {
 			return;
 		}
 
+		this.setState(state => ({ component: PassThrough }));
 		// Component needs to be resolved - just render children for now
 		this.resolveComponent(route.getComponent);
 	}
