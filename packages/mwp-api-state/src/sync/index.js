@@ -58,7 +58,7 @@ export function getDeprecatedSuccessPayload(successes, errors) {
  * @param {Object} routes The application's React Router routes
  * @returns {Function} an Epic function that emits an API_REQUEST action
  */
-export const getNavEpic = findMatches => (action, store) => {
+export const getNavEpic = resolveRoutes => (action, store) => {
 	if (![LOCATION_CHANGE, SERVER_RENDER].some(type => type === action.type)) {
 		return Promise.resolve([]);
 	}
@@ -74,31 +74,35 @@ export const getNavEpic = findMatches => (action, store) => {
 	};
 	const cacheAction = requestMetadata.logout && { type: 'CACHE_CLEAR' };
 
-	const previousQueries = referrer.pathname
-		? getMatchedQueries(referrer)(findMatches(referrer))
-		: [];
-	const newQueries = getMatchedQueries(location)(findMatches(location));
-	if (newQueries.filter(q => q).length === 0) {
-		// no valid queries - jump straight to 'complete'
-		return [api.complete([])];
-	}
-	// perform a fast comparison of previous route's serialized queries
-	// with the new route's serialized queries. All state refs for
-	// _shared_ queries should be retained
-	const serializedNew = newQueries.map(JSON.stringify);
-	const serializedPrev = previousQueries.map(JSON.stringify);
-	const sharedRefs = serializedPrev
-		.filter(qJSON => serializedNew.includes(qJSON))
-		.map(JSON.parse)
-		.map(q => q.ref);
-	requestMetadata.retainRefs = sharedRefs;
+	const resolvePrevQueries = referrer.pathname
+		? resolveRoutes(referrer).then(getMatchedQueries(referrer))
+		: Promise.resolve([]);
+	const resolveNewQueries = resolveRoutes(location).then(
+		getMatchedQueries(location)
+	);
 
-	return Promise.resolve(
-		[
-			cacheAction,
-			api.get(newQueries, requestMetadata),
-			clickActions.clear(),
-		].filter(a => a)
+	return Promise.all([resolveNewQueries, resolvePrevQueries]).then(
+		([newQueries, previousQueries]) => {
+			if (newQueries.filter(q => q).length === 0) {
+				// no valid queries - jump straight to 'complete'
+				return [api.complete([])];
+			}
+			// perform a fast comparison of previous route's serialized queries
+			// with the new route's serialized queries. All state refs for
+			// _shared_ queries should be retained
+			const serializedNew = newQueries.map(JSON.stringify);
+			const serializedPrev = previousQueries.map(JSON.stringify);
+			const sharedRefs = serializedPrev
+				.filter(qJSON => serializedNew.includes(qJSON))
+				.map(JSON.parse)
+				.map(q => q.ref);
+			requestMetadata.retainRefs = sharedRefs;
+			return [
+				cacheAction,
+				api.get(newQueries, requestMetadata),
+				clickActions.clear(),
+			].filter(a => a);
+		}
 	);
 };
 
@@ -126,7 +130,7 @@ export const apiRequestToApiReq = action =>
  * - API_ERROR  // deprecated
  * - API_COMPLETE
  */
-export const getFetchQueriesEpic = (findMatches, fetchQueriesFn) => {
+export const getFetchQueriesEpic = (resolveRoutes, fetchQueriesFn) => {
 	// keep track of location changes - will first be set by SERVER_RENDER
 	let locationIndex = 0;
 
@@ -150,13 +154,17 @@ export const getFetchQueriesEpic = (findMatches, fetchQueriesFn) => {
 		const { config, api: { self }, routing: { location } } = store.getState();
 
 		// first get the current route 'match' data
-		const matched = findMatches(location);
-		// clean up path for use as endpoint URL
-		const apiPath = matched.pop().match.path.replace(/[^a-z0-9/]/gi, '');
-		// construct the fetch call using match.path
-		const fetchUrl = `${config.apiUrl}${apiPath}`;
-		const fetchQueries = fetchQueriesFn(fetchUrl, (self || {}).value);
-		return fetchQueries(queries, meta)
+		return resolveRoutes(location)
+			.then(matched =>
+				// clean up path for use as endpoint URL
+				matched.pop().match.path.replace(/[^a-z0-9/]/gi, '')
+			)
+			.then(apiPath => {
+				// construct the fetch call using match.path
+				const fetchUrl = `${config.apiUrl}${apiPath}`;
+				const fetchQueries = fetchQueriesFn(fetchUrl, (self || {}).value);
+				return fetchQueries(queries, meta); // call fetch
+			})
 			.then(({ successes = [], errors = [] }) => {
 				// meta contains a Promise that must be resolved
 				meta.resolve([...successes, ...errors]);
@@ -187,10 +195,9 @@ export const getFetchQueriesEpic = (findMatches, fetchQueriesFn) => {
 			.then(actions => [...actions, api.complete(queries)]);
 	};
 };
-
-export default (findMatches, fetchQueriesFn) =>
+export default (resolveRoutes, fetchQueriesFn) =>
 	combineEpics(
-		getNavEpic(findMatches),
-		getFetchQueriesEpic(findMatches, fetchQueriesFn),
+		getNavEpic(resolveRoutes),
+		getFetchQueriesEpic(resolveRoutes, fetchQueriesFn),
 		apiRequestToApiReq
 	);
