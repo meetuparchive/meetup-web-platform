@@ -12,10 +12,15 @@ export const querySchema = Joi.object({
 	mockResponse: [Joi.object(), Joi.array()],
 	params: Joi.object(), // can be FormData
 	type: Joi.string(),
+	list: Joi.object({
+		dynamicRef: Joi.string(),
+		merge: Joi.object({
+			sort: Joi.func(),
+			idTest: Joi.func(),
+		}),
+	}),
 	meta: Joi.object({
-		method: Joi.string()
-			.valid('get', 'post', 'delete', 'patch')
-			.insensitive(),
+		method: Joi.string().valid('get', 'post', 'delete', 'patch').insensitive(),
 		noCache: Joi.bool(),
 		flags: Joi.array(),
 		variants: Joi.object().pattern(/\w+/, stringOrArray),
