@@ -24,13 +24,12 @@ component tree, using `route` definitions that conform to the [type defined in
 
 ```js
 type PlatformRoute = {
-  component: React$Element<any>,
+  component?: React$Element<*>,
+  getComponent?: () => Promise<React$Element<*>>,
   path?: string,
   indexRoute?: PlatformRoute,
-  getIndexRoute?: () => Promise<PlatformRoute>,
-  routes?: () => Promise<Array<PlatformRoute>>,
-  getNestedRoutes:
-  query?: QueryFunction? | Array<QueryFunction?>,
+  routes?: Array<PlatformRoute>,
+  query?: QueryFunction | Array<QueryFunction>,
   exact?: boolean,
 };
 ```
@@ -42,9 +41,25 @@ v4 API](https://reacttraining.com/react-router/api). However, be aware that any
 navigation-based data fetching must be defined in this top-level `routes`
 configuration object passed to the app renderers.
 
-### `component`
+### `component` (synchronous)
 
 The React component that will be rendered when the route matches.
+
+### `getComponent` (asynchronous)
+
+A function that, when called, will return a Promise that resolves with a React
+Component that will be used as the rendering component.
+
+**Note**
+
+This is the _preferred method of defining the component_ for anything but the
+most trivial routes (e.g. a Error404 or Redirect). Use it.
+
+If the components for child routes have already been resolved (or are defined
+synchronously), they will render before the parent warpper component is resolved.
+This might create some unexpected UI flashes/reflows, but hopefully it's minimal.
+Let the web platform team know if you would prefer to suppress the rendering of
+child routes until parent components are resolved.
 
 ### `path`
 
@@ -67,45 +82,17 @@ This is a function or array of functions that yield(s) a
 when the route matches, and all resulting non-null queries will be included in
 the resulting API request.
 
-### `indexRoute` (synchronous)
+### `indexRoute`
 
 The `indexRoute` parameter is a pared-down `PlatformRoute` definition that
 contains just the `component` that should be rendered when the location/url
 matches the root `path` _exactly_.
 
-### `routes` (synchronous)
+### `routes`
 
 An array of 'child routes' that will be rendered as children of any parent
 routes. Child routes' `path` property will be concatenated with the parent
 `route`.
-
-### `getIndexRoute` (asynchronous)
-
-A function that, when invoked, will return a Promise that resolves with a
-`Route` object. This can be used for code splitting by using `import()` to
-dynamically import a route to be used as the `exact` index root.
-
-### `getNestedRoutes` (asynchronous)
-
-A function that, when invoked, will return a Promise that resolves with a
-`routes` array. This can be used for code splitting by using `import()` to
-dynamically import a route subtree.
-
-```js
-{
-  path: '/',
-  component: RootContainer,
-  getNestedRoutes: () => import('./childRoutes').then(r => r.default),
-}
-```
-
-Be cautious with using async routes - they are very useful for splitting your
-app bundle into smaller chunks, but they also force the application to make two
-HTTP roundtrips when loading a new async chunk - one to get the route subtree,
-and another to fetch the API data defined in that subtree. In general, it's a
-good idea to use async routes near the root of your app so that it can be
-broken into large chunks but define the branches with synchronous routes that
-will be immediately parseable as the user navigates deeper into the application.
 
 ### 404 Not Found route
 

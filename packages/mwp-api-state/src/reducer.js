@@ -155,6 +155,7 @@ export function app(
 		type: string,
 		payload: { responses: Array<Object> },
 		error?: Error,
+		meta?: any,
 	}
 ) {
 	let newState;
