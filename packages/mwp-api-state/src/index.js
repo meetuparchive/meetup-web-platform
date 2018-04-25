@@ -27,11 +27,11 @@ export { api, app, DEFAULT_API_STATE } from './reducer';
  * order to render the application. We may want to write a server-specific
  * middleware that doesn't include the other epics if performance is an issue
  */
-export const getApiMiddleware = (findMatches, fetchQueriesFn) =>
+export const getApiMiddleware = (resolveRoutes, fetchQueriesFn) =>
 	createEpicMiddleware(
 		combineEpics(
 			getCacheEpic(),
-			getSyncEpic(findMatches, fetchQueriesFn),
+			getSyncEpic(resolveRoutes, fetchQueriesFn),
 			postEpic, // DEPRECATED
 			deleteEpic // DEPRECATED
 		)

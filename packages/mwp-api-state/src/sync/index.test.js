@@ -15,21 +15,18 @@ import {
 import { CACHE_CLEAR } from '../cache/cacheActionCreators';
 import * as api from './apiActionCreators';
 import * as syncActionCreators from './syncActionCreators';
-import getSyncEpic, {
-	getFetchQueriesEpic,
-	getNavEpic,
-	apiRequestToApiReq,
-} from './';
+import getSyncEpic, { getFetchQueriesEpic, getNavEpic, apiRequestToApiReq } from './';
 import { API_RESP_COMPLETE } from '../../lib/sync/apiActionCreators';
 
 MOCK_APP_STATE.config = {};
 MOCK_APP_STATE.routing = {};
-const MAKE_MOCK_FIND_MATCHES = (queryFn = () => ({ params: {} })) => () => [
-	{
-		route: { path: '/', query: queryFn },
-		match: { path: '/', params: {} },
-	},
-];
+const MAKE_MOCK_RESOLVE_ROUTES = (queryFn = () => ({ params: {} })) => () =>
+	Promise.resolve([
+		{
+			route: { path: '/', query: queryFn },
+			match: { path: '/', params: {} },
+		},
+	]);
 
 /**
  * @module SyncEpicTest
@@ -51,7 +48,7 @@ describe('Sync epic', () => {
 			};
 
 			const fakeStore = createFakeStore(MOCK_APP_STATE);
-			const navEpic = getNavEpic(MAKE_MOCK_FIND_MATCHES());
+			const navEpic = getNavEpic(MAKE_MOCK_RESOLVE_ROUTES());
 			return Promise.all([
 				navEpic(locationChange, fakeStore),
 				navEpic(serverRender, fakeStore),
@@ -74,7 +71,7 @@ describe('Sync epic', () => {
 			};
 
 			const fakeStore = createFakeStore(MOCK_APP_STATE);
-			return getNavEpic(MAKE_MOCK_FIND_MATCHES())(
+			return getNavEpic(MAKE_MOCK_RESOLVE_ROUTES())(
 				locationChange,
 				fakeStore
 			).then(actions => {
@@ -97,13 +94,15 @@ describe('Sync epic', () => {
 			};
 
 			const fakeStore = createFakeStore(MOCK_APP_STATE);
-			const navEpic = getNavEpic(MAKE_MOCK_FIND_MATCHES(null));
+			const navEpic = getNavEpic(MAKE_MOCK_RESOLVE_ROUTES(null));
 			return Promise.all([
 				navEpic(locationChange, fakeStore),
 				navEpic(serverRender, fakeStore),
 			]).then(actionArrays => {
 				actionArrays.forEach(actions => {
-					expect(actions.map(({ type }) => type)).toEqual([API_RESP_COMPLETE]);
+					expect(actions.map(({ type }) => type)).toEqual([
+						API_RESP_COMPLETE,
+					]);
 				});
 			});
 		});
@@ -120,13 +119,15 @@ describe('Sync epic', () => {
 			};
 
 			const fakeStore = createFakeStore(MOCK_APP_STATE);
-			const navEpic = getNavEpic(MAKE_MOCK_FIND_MATCHES(() => null));
+			const navEpic = getNavEpic(MAKE_MOCK_RESOLVE_ROUTES(() => null));
 			return Promise.all([
 				navEpic(locationChange, fakeStore),
 				navEpic(serverRender, fakeStore),
 			]).then(actionArrays => {
 				actionArrays.forEach(actions => {
-					expect(actions.map(({ type }) => type)).toEqual([API_RESP_COMPLETE]);
+					expect(actions.map(({ type }) => type)).toEqual([
+						API_RESP_COMPLETE,
+					]);
 				});
 			});
 		});
@@ -139,7 +140,7 @@ describe('Sync epic', () => {
 			const apiRequest = api.get(queries);
 			const fakeStore = createFakeStore(MOCK_APP_STATE);
 			const fqEpic = getFetchQueriesEpic(
-				MAKE_MOCK_FIND_MATCHES(),
+				MAKE_MOCK_RESOLVE_ROUTES(),
 				mockFetchQueries
 			);
 			// kick off the fetch
@@ -163,7 +164,7 @@ describe('Sync epic', () => {
 			const apiRequest = api.get(queries);
 			const fakeStore = createFakeStore(MOCK_APP_STATE);
 			const fqEpic = getFetchQueriesEpic(
-				MAKE_MOCK_FIND_MATCHES(),
+				MAKE_MOCK_RESOLVE_ROUTES(),
 				mockFetchQueries
 			);
 
@@ -189,7 +190,7 @@ describe('Sync epic', () => {
 			const apiRequest = api.get(queries);
 			const fakeStore = createFakeStore(MOCK_APP_STATE);
 			const fqEpic = getFetchQueriesEpic(
-				MAKE_MOCK_FIND_MATCHES(),
+				MAKE_MOCK_RESOLVE_ROUTES(),
 				mockFetchQueries
 			);
 
@@ -214,11 +215,13 @@ describe('Sync epic', () => {
 			const apiRequest = api.get(queries);
 			apiRequest.meta.resolve = jest.fn();
 			const fakeStore = createFakeStore(MOCK_APP_STATE);
-			return getFetchQueriesEpic(MAKE_MOCK_FIND_MATCHES(), mockFetchQueries)(
+			return getFetchQueriesEpic(MAKE_MOCK_RESOLVE_ROUTES(), mockFetchQueries)(
 				apiRequest,
 				fakeStore
 			).then(actions => {
-				expect(apiRequest.meta.resolve).toHaveBeenCalledWith(expectedSuccesses);
+				expect(apiRequest.meta.resolve).toHaveBeenCalledWith(
+					expectedSuccesses
+				);
 			});
 		});
 
@@ -229,7 +232,7 @@ describe('Sync epic', () => {
 			const queries = [mockQuery({})];
 			const apiRequest = api.get(queries);
 			const fakeStore = createFakeStore(MOCK_APP_STATE);
-			return getFetchQueriesEpic(MAKE_MOCK_FIND_MATCHES(), mockFetchQueries)(
+			return getFetchQueriesEpic(MAKE_MOCK_RESOLVE_ROUTES(), mockFetchQueries)(
 				apiRequest,
 				fakeStore
 			).then(actions => {
@@ -248,7 +251,7 @@ describe('Sync epic', () => {
 			const apiRequest = api.get(queries);
 			apiRequest.meta.reject = jest.fn();
 			const fakeStore = createFakeStore(MOCK_APP_STATE);
-			return getFetchQueriesEpic(MAKE_MOCK_FIND_MATCHES(), mockFetchQueries)(
+			return getFetchQueriesEpic(MAKE_MOCK_RESOLVE_ROUTES(), mockFetchQueries)(
 				apiRequest,
 				fakeStore
 			).then(actions =>

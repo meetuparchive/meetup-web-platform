@@ -20,15 +20,8 @@ A Query is just a plain object with the following shape:
 {
   ref: string,
   endpoint: string,
-  list?: {
-    dynamicRef: string,
-    merge?: {
-      sort: (Object, Object) => number,
-      idTest: (Object, Object) => boolean,
-    }
-  },
   params?: object,
-  type?: string, // DEPRECATED
+  type?: string,
   meta?: {
     flags?: string[],
     method?: string
