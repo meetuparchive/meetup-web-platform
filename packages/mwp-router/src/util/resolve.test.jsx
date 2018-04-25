@@ -44,11 +44,13 @@ const bazResolved = {
 const root = {
 	path: '/',
 	getComponent: () => Promise.resolve(Component),
+	indexRoute: qux,
 	routes: [foo, baz],
 };
 const rootResolved = {
 	path: '/',
 	component: Component,
+	indexRoute: quxResolved,
 	routes: [fooResolved, bazResolved],
 };
 describe('addComponentToRoute', () => {

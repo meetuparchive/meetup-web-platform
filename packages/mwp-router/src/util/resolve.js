@@ -39,14 +39,27 @@ export const resolveRoute = (
 		resolveComponent(route),
 		// $FlowFixMe - Flow doesn't realize the returned promise will be unwrapped
 		resolveAllRoutes(route.routes || []),
+		route.indexRoute ? resolveRoute(route.indexRoute) : Promise.resolve(null),
 	]).then(
 		(
-			[component: React$ComponentType<*>, routes: Array<StaticPlatformRoute>]
-		): StaticPlatformRoute =>
-			Object.freeze({
+			[
+				component: React$ComponentType<*>,
+				routes: Array<StaticPlatformRoute>,
+				indexRoute: ?StaticPlatformRoute,
+			]
+		): StaticPlatformRoute => {
+			if (indexRoute) {
+				return Object.freeze({
+					...addComponentToRoute(route)(component),
+					indexRoute,
+					routes,
+				});
+			}
+			return Object.freeze({
 				...addComponentToRoute(route)(component),
 				routes,
-			})
+			});
+		}
 	);
 
 export const resolveAllRoutes = (
