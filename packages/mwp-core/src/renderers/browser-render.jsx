@@ -30,14 +30,29 @@ export function resolveAppProps(
 	const createStore = getBrowserCreateStore(findMatches, middleware);
 	const store = createStore(reducer, getInitialState(window.APP_RUNTIME));
 
-	// find the currently-matched routes that have components that need to
-	// be resolved, then resolve them - this doesn't actually change the route
-	// object, but loads the app chunks into memory
-	const matchedAsyncComponentGetters = findMatches(window.location)
-		.map(({ route: { getComponent } }) => getComponent)
-		.filter(x => x);
+	// find the matched routes, and then resolve their components - mutate
+	// the route object so that the overall `routes` object contains
+	// resolved `component` properties for the current location
+	const resolveComponents = (): Promise<void> => {
+		// get an array of matched routes
+		const matchedRoutes = findMatches(window.location);
+		// resolve components in parallel (AJAX chunk requests)
+		return Promise.all(
+			matchedRoutes.map(matchedRoute => {
+				if (matchedRoute.route.getComponent) {
+					return matchedRoute.route.getComponent();
+				}
+				return Promise.resolve(matchedRoute.route.component);
+			})
+		).then(components => {
+			// mutate route objects in place
+			matchedRoutes.forEach((matchedRoute, i) => {
+				matchedRoute.route.component = components[i];
+			});
+		});
+	};
 
-	return Promise.all(matchedAsyncComponentGetters).then(() => ({
+	return resolveComponents().then(() => ({
 		routes,
 		store,
 		basename,
