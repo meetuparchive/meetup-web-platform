@@ -43,8 +43,6 @@ export default (request: HapiRequest) => {
 		// This call uses `.first()` to guarantee a single response because WP-596
 		// indicated there were sporadic duplicate activity tracking logs, possibly
 		// related to request errors
-		return Observable.zip(...apiRequests$)
-			.first()
-			.do(newrelic.createTracer('apiRequests', request.trackActivity));
+		return Observable.zip(...apiRequests$).first().do(request.trackActivity);
 	};
 };
