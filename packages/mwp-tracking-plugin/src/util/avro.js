@@ -57,12 +57,12 @@ const click = {
 };
 
 // currently the schema is manually copied from
-// https://github.com/meetup/meetup/blob/master/modules/base/src/main/versioned_avro/Activity_v6.avsc
+// https://github.com/meetup/meetup/blob/master/modules/base/src/main/versioned_avro/Activity_v8.avsc
 const activity = {
 	namespace: 'com.meetup.base.avro',
 	type: 'record',
 	name: 'Activity',
-	doc: 'v6',
+	doc: 'v8',
 	fields: [
 		{ name: 'requestId', type: 'string' },
 		{ name: 'timestamp', type: 'string' },
@@ -95,6 +95,11 @@ const activity = {
 		},
 		{ name: 'isUserActivity', type: 'boolean', default: true },
 		{ name: 'browserId', type: 'string', default: '' },
+		{ name: 'parentRequestId', type: ['null', 'string'], default: null },
+		{ name: 'oauthConsumerId', type: ['null', 'int'], default: null },
+		{ name: 'apiVersion', type: ['null', 'string'], default: null },
+		{ name: 'viewName', type: ['null', 'string'], default: null },
+		{ name: 'subViewName', type: ['null', 'string'], default: null },
 	],
 };
 
@@ -103,9 +108,7 @@ type Deserializer = string => Object;
 
 const avroSerializer: Object => Serializer = schema => {
 	const codec = avro.parse(schema);
-	const schemaPath = `gs://meetup-logs/avro_schemas/${schema.name}_${
-		schema.doc
-	}.avsc`;
+	const schemaPath = `gs://meetup-logs/avro_schemas/${schema.name}_${schema.doc}.avsc`;
 	return data => {
 		const record = codec.toBuffer(data);
 		// data.timestamp _must_ be ISOString if it exists

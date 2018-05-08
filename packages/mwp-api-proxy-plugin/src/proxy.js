@@ -30,7 +30,7 @@ export default (request: HapiRequest) => {
 		// special case handling of tracking call
 		if (queries.length === 1 && query.endpoint === 'track') {
 			return Observable.of([]).do(responses =>
-				request.trackActivity(responses, query.ref)
+				request.trackActivity(query.params)
 			);
 		}
 
@@ -51,6 +51,8 @@ export default (request: HapiRequest) => {
 		// This call uses `.first()` to guarantee a single response because WP-596
 		// indicated there were sporadic duplicate activity tracking logs, possibly
 		// related to request errors
-		return Observable.zip(...apiRequests$).first().do(request.trackActivity);
+		return Observable.zip(...apiRequests$)
+			.first()
+			.do(() => request.trackActivity());
 	};
 };

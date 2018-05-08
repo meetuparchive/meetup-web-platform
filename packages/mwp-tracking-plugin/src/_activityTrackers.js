@@ -11,29 +11,26 @@ const parseUrl = url.parse;
  * tracking record.
  */
 
-export const getTrackApiResponses: TrackGetter = trackOpts => request => (opts: {
-	queryResponses: Array<Object>,
+type ActivityFields = {
 	url?: string,
 	referrer?: string,
-	label?: string,
-}) => {
-	const { queryResponses, url, referrer, label } = opts;
-	const apiRequests: Array<{
-		requestId: string,
-		endpoint: string,
-	}> = queryResponses.map(({ meta }: { meta: { [string]: string } }) => ({
-		requestId: meta.requestId,
-		endpoint: meta.endpoint,
-	}));
+	viewName?: string,
+	subViewName?: string,
+};
+
+export const getTrackApiResponses: TrackGetter = trackOpts => request => (
+	fields: ActivityFields
+) => {
+	const { url = '', referrer = '', viewName, subViewName } = fields;
 	return trackOpts.log(request, {
 		description: 'nav',
 		memberId: parseIdCookie(request.state[trackOpts.memberCookieName], true), // read memberId
 		browserId: updateId(trackOpts.browserIdCookieName)(request), // read/add browserId
 		trackId: updateId(trackOpts.trackIdCookieName)(request), // read/add trackId
-		url: url || '',
-		referer: referrer || '',
-		apiRequests,
-		label,
+		referer: referrer,
+		url,
+		viewName,
+		subViewName,
 	});
 };
 
@@ -42,8 +39,7 @@ export const getTrackApiResponses: TrackGetter = trackOpts => request => (opts: 
  * REST API call(s)
  */
 export const getTrackActivity: TrackGetter = trackOpts => request => (
-	queryResponses: Array<Object>,
-	label: ?string
+	fields: ActivityFields
 ) => {
 	const { method, payload, query, info: { referrer } } = request;
 	const requestReferrer = parseUrl(referrer).pathname || '';
@@ -56,13 +52,12 @@ export const getTrackActivity: TrackGetter = trackOpts => request => (
 		const metadataRison = reqData.metadata || rison.encode_object({});
 		const { referrer } = rison.decode_object(metadataRison);
 		const url = parseUrl(requestReferrer).pathname;
-		return request.trackApiResponses({ queryResponses, label, url, referrer });
+		return request.trackApiResponses({ url, referrer, ...fields });
 	}
 
 	return request.trackApiResponses({
-		queryResponses,
-		label,
 		url: request.url.pathname, // requested url
 		referrer: requestReferrer, // referer
+		...fields,
 	});
 };

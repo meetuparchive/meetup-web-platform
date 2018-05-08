@@ -1,3 +1,8 @@
+## [15.1]
+- **NEW FEATURE** `api.track` action creator for async activity tracking requests
+  from consumer apps. Pass along `viewName` and (optionally) `subViewName` in
+  `query.params` in order to tag the record with those fields.
+
 ## [15.0]
 - **BREAKING CHANGE** routing definitions no longer support `getIndexRoute` and
   `getNestedRoutes`. Instead, async loading should happen at the component level

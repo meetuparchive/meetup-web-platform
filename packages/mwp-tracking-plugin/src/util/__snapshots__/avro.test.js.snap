@@ -1,0 +1,26 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Activity tracking encodes standard output from getLogger 1`] = `
+Activity {
+  "agent": "",
+  "aggregratedUrl": "",
+  "apiVersion": null,
+  "browserId": "",
+  "ip": "",
+  "isUserActivity": true,
+  "memberId": 1234,
+  "mobileWeb": false,
+  "oauthConsumerId": null,
+  "parentRequestId": null,
+  "platform": "WEB",
+  "platformAgent": "WEB",
+  "referer": "",
+  "requestId": "foo",
+  "subViewName": null,
+  "timestamp": "2018-05-08T19:50:00.000Z",
+  "trackId": "foo",
+  "trax": Object {},
+  "url": "asdf",
+  "viewName": null,
+}
+`;
