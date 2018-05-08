@@ -11,11 +11,13 @@ const parseUrl = url.parse;
  * tracking record.
  */
 
-export const getTrackApiResponses: TrackGetter = trackOpts => request => (
+export const getTrackApiResponses: TrackGetter = trackOpts => request => (opts: {
 	queryResponses: Array<Object>,
-	url: ?string,
-	referrer: ?string
-) => {
+	url?: string,
+	referrer?: string,
+	label?: string,
+}) => {
+	const { queryResponses, url, referrer, label } = opts;
 	const apiRequests: Array<{
 		requestId: string,
 		endpoint: string,
@@ -31,6 +33,7 @@ export const getTrackApiResponses: TrackGetter = trackOpts => request => (
 		url: url || '',
 		referer: referrer || '',
 		apiRequests,
+		label,
 	});
 };
 
@@ -39,7 +42,8 @@ export const getTrackApiResponses: TrackGetter = trackOpts => request => (
  * REST API call(s)
  */
 export const getTrackActivity: TrackGetter = trackOpts => request => (
-	queryResponses: Array<Object>
+	queryResponses: Array<Object>,
+	label: ?string
 ) => {
 	const { method, payload, query, info: { referrer } } = request;
 	const requestReferrer = parseUrl(referrer).pathname || '';
@@ -52,12 +56,13 @@ export const getTrackActivity: TrackGetter = trackOpts => request => (
 		const metadataRison = reqData.metadata || rison.encode_object({});
 		const { referrer } = rison.decode_object(metadataRison);
 		const url = parseUrl(requestReferrer).pathname;
-		return request.trackApiResponses(queryResponses, url, referrer);
+		return request.trackApiResponses({ queryResponses, label, url, referrer });
 	}
 
-	return request.trackApiResponses(
+	return request.trackApiResponses({
 		queryResponses,
-		request.url.pathname, // requested url
-		requestReferrer // referer
-	);
+		label,
+		url: request.url.pathname, // requested url
+		referrer: requestReferrer, // referer
+	});
 };
