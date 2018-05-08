@@ -82,6 +82,10 @@ export const get = _applyMethod('get');
 export const post = _applyMethod('post');
 export const patch = _applyMethod('patch');
 export const del = _applyMethod('delete');
+export const track = (query: Query, meta: ?Object) => {
+	query.endpoint = 'track';
+	return post(query, meta);
+};
 
 type ResponseAction = {
 	query: Query,

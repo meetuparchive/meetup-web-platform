@@ -26,6 +26,14 @@ export default (request: HapiRequest) => {
 		request.server.plugins[API_PROXY_PLUGIN_NAME].duotoneUrls
 	);
 	return (queries: Array<Query>): Observable<Array<QueryResponse>> => {
+		const [query] = queries;
+		// special case handling of tracking call
+		if (queries.length === 1 && query.endpoint === 'track') {
+			return Observable.of([]).do(responses =>
+				request.trackActivity(responses, query.ref)
+			);
+		}
+
 		// send$ and receive must be assigned here rather than when the `request`
 		// is first passed in because the `request.state` isn't guaranteed to be
 		// available until after the `queries` have been parsed
