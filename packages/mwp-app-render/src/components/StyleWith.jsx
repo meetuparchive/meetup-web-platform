@@ -26,16 +26,16 @@ import Helmet from 'react-helmet';
 const StyleWith = props => {
 	const { styles, children } = props;
 
-	const moduleCSS = new Set();
+	const moduleCSS = [];
 	styles.forEach(style => {
-		moduleCSS.add(style._getCss()); // eslint-disable-line no-underscore-dangle
+		moduleCSS.push(style._getCss()); // eslint-disable-line no-underscore-dangle
 	});
 
 	return (
 		<div>
 			<Helmet defer={false}>
 				<style type="text/css">
-					{[...moduleCSS].join('')}
+					{moduleCSS.join('')}
 				</style>
 			</Helmet>
 			{children}
