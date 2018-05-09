@@ -35,13 +35,12 @@ before_install:
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-test-utils/.npmrc
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-toaster/.npmrc
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-tracking-plugin/.npmrc
-  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.3.2
+  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.6.0
   - export PATH=$HOME/.yarn/bin:$PATH
   - yarn --version
 
 before_script:
   - lerna run build
-  - lerna bootstrap
   - git diff --exit-code
 
 script:
