@@ -88,6 +88,7 @@ describe('Activity tracking', () => {
 		const recordedInfo = avsc
 			.parse(avro.schemas.activity)
 			.fromBuffer(avroBuffer);
+		delete recordedInfo.timestamp;
 		expect(recordedInfo).toMatchSnapshot();
 	});
 });
