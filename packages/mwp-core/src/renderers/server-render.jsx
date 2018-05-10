@@ -237,17 +237,13 @@ const makeRenderer = (
 		const userAgent = headers['user-agent'];
 		const userAgentDevice = headers['x-ua-device'] || ''; // set by fastly
 
-		// service worker can be disabled per-request with __disable_sw querystring param
-		const enableServiceWorkerReq =
-			!('__disable_sw' in request.query) && enableServiceWorker;
-
 		// create the store with populated `config`
 		const initializeStore = resolvedRoutes => {
 			const initialState = {
 				config: {
 					apiUrl: API_ROUTE_PATH,
 					baseUrl: host,
-					enableServiceWorker: enableServiceWorkerReq,
+					enableServiceWorker,
 					requestLanguage,
 					supportedLangs,
 					initialNow: new Date().getTime(),

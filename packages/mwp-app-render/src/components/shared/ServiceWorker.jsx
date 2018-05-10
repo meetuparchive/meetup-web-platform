@@ -21,6 +21,7 @@ class ServiceWorker extends React.Component<*> {
 		if (
 			this.props.enableServiceWorker &&
 			navigator.serviceWorker &&
+			!window.location.search.includes('__disable_sw') && // opt-in disable SW
 			process.env.NODE_ENV === 'production' // sw caching creates confusion in dev
 		) {
 			navigator.serviceWorker.register(
