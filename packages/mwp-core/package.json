@@ -30,7 +30,7 @@
     "react-intl": "^2.4.0"
   },
   "dependencies": {
-    "@google-cloud/pubsub": "0.15.0",
+    "@google-cloud/pubsub": "0.18.0",
     "joi": "10.6.0",
     "mobile-detect": "1.4.1",
     "mwp-api-proxy-plugin": ">=0.0.1",
