@@ -15,6 +15,7 @@ export {
 	post,
 	patch,
 	del,
+	track,
 } from './sync/apiActionCreators';
 export { api, app, DEFAULT_API_STATE } from './reducer';
 
