@@ -12,6 +12,7 @@ import { getFindMatches, resolveAllRoutes } from 'mwp-router/lib/util';
 import { getServerCreateStore } from 'mwp-store/lib/server';
 import Dom from 'mwp-app-render/lib/components/Dom';
 import ServerApp from 'mwp-app-render/lib/components/ServerApp';
+import { parseMemberCookie } from 'mwp-core/lib/util/cookieUtils';
 
 import { getVariants } from '../util/cookieUtils';
 
@@ -247,6 +248,7 @@ const makeRenderer = (
 					requestLanguage,
 					supportedLangs,
 					initialNow: new Date().getTime(),
+					isQLd: parseMemberCookie(state)['ql'] === 'true',
 					variants: getVariants(state),
 					entryPath: url.pathname, // the path that the user entered the app on
 					media: getMedia(userAgent, userAgentDevice),
