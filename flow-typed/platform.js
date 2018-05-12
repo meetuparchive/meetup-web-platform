@@ -17,6 +17,7 @@ declare type MWPState = {
 		requestLanguage: string,
 		supportedLangs: Array<string>,
 		initialNow: number,
+		isQLd: boolean,
 		variants: mixed,
 		entryPath: string,
 		media: MatchMedia,
