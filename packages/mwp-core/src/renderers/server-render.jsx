@@ -248,7 +248,7 @@ const makeRenderer = (
 					requestLanguage,
 					supportedLangs,
 					initialNow: new Date().getTime(),
-					isQLd: parseMemberCookie(state)['ql'] === 'true',
+					isQL: parseMemberCookie(state).ql === 'true',
 					variants: getVariants(state),
 					entryPath: url.pathname, // the path that the user entered the app on
 					media: getMedia(userAgent, userAgentDevice),
