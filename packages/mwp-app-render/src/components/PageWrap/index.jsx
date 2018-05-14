@@ -25,7 +25,9 @@ class PageWrap extends React.Component {
 	}
 
 	componentDidMount() {
-		// Browser has now rendered client-side application - fire the browser TTI trigger
+		// Browser has now rendered client-side application - fire the browser TTI triggers
+
+		// Fire TTI trigger to be sent to NewRelic
 		if (window.newrelic) {
 			const now = new Date().getTime();
 			// 1. Set a marker in the trace details
@@ -40,6 +42,21 @@ class PageWrap extends React.Component {
 					'timeToAppInteractive',
 					now - window.performance.timing.navigationStart // this is the event that NR uses as 'start' of page load
 				);
+		}
+
+		// Add W3C UserTiming mark for TTI and measure (from navigationStart to newly created mark)
+		if (
+			window.performance &&
+			window.performance.mark &&
+			window.performance.measure
+		) {
+			window.performance.mark('meetup-tti');
+			window.performance.measure('navigationStart', 'meetup-tti');
+		}
+
+		// Specially for Developer Tools in the browsers (Chrome & Firefox), create entry for the event so it shows up on Performance timeline
+		if (console && console.timeStamp) {
+			console.timeStamp('meetup-tti');
 		}
 	}
 
