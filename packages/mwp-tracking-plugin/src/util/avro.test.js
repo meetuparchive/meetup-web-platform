@@ -75,6 +75,8 @@ describe('Activity tracking', () => {
 		trackId: 'foo',
 		sessionId: 'bar', // not part of v3 spec
 		url: 'asdf',
+		viewName: 'foo view',
+		subViewName: 'foo subview',
 	});
 
 	it('encodes standard output from getLogger', () => {

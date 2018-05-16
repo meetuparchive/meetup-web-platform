@@ -27,9 +27,10 @@ export default (request: HapiRequest) => {
 	);
 	return (queries: Array<Query>): Observable<Array<QueryResponse>> => {
 		const [query] = queries;
-		// special case handling of tracking call
+		// special case handling of tracking call - must supply a response, but
+		// empty object is fine
 		if (queries.length === 1 && query.endpoint === 'track') {
-			return Observable.of([]).do(responses =>
+			return Observable.of([{}]).do(responses =>
 				request.trackActivity(query.params)
 			);
 		}

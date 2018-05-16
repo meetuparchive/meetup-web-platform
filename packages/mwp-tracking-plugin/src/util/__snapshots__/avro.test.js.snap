@@ -16,10 +16,10 @@ Activity {
   "platformAgent": "WEB",
   "referer": "",
   "requestId": "foo",
-  "subViewName": null,
+  "subViewName": "foo subview",
   "trackId": "foo",
   "trax": Object {},
   "url": "asdf",
-  "viewName": null,
+  "viewName": "foo view",
 }
 `;
