@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import Helmet from 'react-helmet';
 
@@ -32,14 +32,14 @@ const StyleWith = props => {
 	});
 
 	return (
-		<div>
+		<Fragment>
 			<Helmet defer={false}>
 				<style type="text/css">
 					{moduleCSS.join('')}
 				</style>
 			</Helmet>
 			{children}
-		</div>
+		</Fragment>
 	);
 };
 StyleWith.propTypes = {
