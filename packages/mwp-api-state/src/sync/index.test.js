@@ -19,6 +19,7 @@ import getSyncEpic, {
 	getFetchQueriesEpic,
 	getNavEpic,
 	apiRequestToApiReq,
+	clickEpic,
 } from './';
 import { API_RESP_COMPLETE } from '../../lib/sync/apiActionCreators';
 
@@ -40,7 +41,7 @@ describe('Sync epic', () => {
 			expect(actions).toHaveLength(0)
 		));
 	describe('getNavEpic', () => {
-		it('emits API_REQ and CLICK_TRACK_CLEAR for nav-related actions with matched query', function() {
+		it('emits API_REQ for nav-related actions with matched query', function() {
 			const locationChange = {
 				type: LOCATION_CHANGE,
 				payload: MOCK_RENDERPROPS.location,
@@ -59,11 +60,10 @@ describe('Sync epic', () => {
 				actionArrays.forEach(actions => {
 					const types = actions.map(a => a.type);
 					expect(types).toContain(api.API_REQ);
-					expect(types.includes(CLICK_TRACK_CLEAR_ACTION)).toBe(true);
 				});
 			});
 		});
-		it('emits API_REQ, CACHE_CLEAR, and CLICK_TRACK_CLEAR for nav-related actions with logout request', function() {
+		it('emits API_REQ, CACHE_CLEAR for nav-related actions with logout request', function() {
 			const logoutLocation = {
 				...MOCK_RENDERPROPS.location,
 				pathname: '/logout',
@@ -81,7 +81,6 @@ describe('Sync epic', () => {
 				const types = actions.map(a => a.type);
 				expect(types).toContain(api.API_REQ);
 				expect(types.includes(CACHE_CLEAR)).toBe(true);
-				expect(types.includes(CLICK_TRACK_CLEAR_ACTION)).toBe(true);
 			});
 		});
 		it('emits API_COMPLETE for nav-related actions without matched query', () => {
@@ -254,6 +253,23 @@ describe('Sync epic', () => {
 			).then(actions =>
 				expect(apiRequest.meta.reject).toHaveBeenCalledWith(expectedError)
 			);
+		});
+	});
+	describe('clickEpic', () => {
+		it('emits CLICK_CLEAR for API_REQ with meta.clickAction', function() {
+			const reqClicks = {
+				type: api.API_REQ,
+				payload: {},
+				meta: {
+					clickTracking: true,
+				},
+			};
+
+			const fakeStore = createFakeStore(MOCK_APP_STATE);
+			return clickEpic(reqClicks, fakeStore).then(actions => {
+				expect(actions).toHaveLength(1);
+				expect(actions[0].type).toBe(CLICK_TRACK_CLEAR_ACTION);
+			});
 		});
 	});
 });
