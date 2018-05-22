@@ -1,3 +1,8 @@
+## [16.0]
+- **BREAKING CHANGE** webpack build configurations have been moved to
+   mwp-cli and are no longer a part of `mwp-config`. Make sure to upgrade
+   to mwp-cli >= 7.1.429.
+
 ## [15.1]
 - **NEW FEATURE** `api.track` action creator for async activity tracking requests
   from consumer apps. Pass along `viewName` and (optionally) `subViewName` in

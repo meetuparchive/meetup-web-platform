@@ -1,5 +1,5 @@
 CI_BUILD_NUMBER ?= $(USER)-snapshot
-VERSION ?= 15.1.$(CI_BUILD_NUMBER)
+VERSION ?= 16.0.$(CI_BUILD_NUMBER)
 
 version:
 	@echo $(VERSION)
