@@ -10,8 +10,8 @@ By consolidating all of this configuration into a single module/package, all
 downstream dependencies can explicitly opt-in to reading configuration values
 that determine the behavior of the system.
 
-**Important**: browser-run scripts should never directly import configuration 
-values. Instead, config should be read from the application state provided to 
+**Important**: browser-run scripts should never directly import configuration
+values. Instead, config should be read from the application state provided to
 the client on initial render.
 
 ## General config
@@ -21,15 +21,9 @@ is used by many different packages. For the most part, they describe the
 application environment, e.g. standard file `paths`, `env` values, and `package`
 config values.
 
-## Build config
-
-Build-time config is primarily used by Webpack and its dependencies to define
-build behavior, including paths to the source files and build targets.
+## Babel config
 
 All **Babel** plugins and presets are defined in the `/babel` module.
-
-All **Webpack** configuration rules and helpers are defined in the `/webpack`
-module.
 
 ## Server config
 
