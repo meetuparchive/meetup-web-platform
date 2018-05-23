@@ -51,13 +51,19 @@ module.exports = {
 			'/^animation/': ['ms'],
 			'/^transition/': ['ms'],
 		},
-		'declaration-property-value-blacklist': {
-			outline: ['outline'],
-			// no font-size values under 12px or .75rem
-			'font-size': [
-				'/^(((0?[.](7[5-9]|[8-9][0-9])|[1-9].?([0-9]?[0-9]?[0-9])*)rem)|(?:(?:1[2-9]|[2-9][0-9]|[1-9][0-9][0-9])px))$/',
-			],
-		},
+		'declaration-property-value-blacklist': [
+			{
+				outline: ['none'],
+				// no font-size values under 12px or .75rem
+				'font-size': [
+					'/^(((0?[.](7[5-9]|[8-9][0-9])|[1-9].?([0-9]?[0-9]?[0-9])*)rem)|(?:(?:1[2-9]|[2-9][0-9]|[1-9][0-9][0-9])px))$/',
+				],
+			},
+			{
+				message:
+					"Either this font-size is too small, or you're overriding the focus outline. Please make sure this interfaces uses other techniques to maintain usability for all users.",
+			},
+		],
 		'font-family-name-quotes': 'always-where-recommended',
 		'font-family-no-duplicate-names': true,
 		'font-family-no-missing-generic-family-keyword': true,
