@@ -3048,6 +3048,10 @@ double-ended-queue@^2.1.0-0:
   version "2.1.0-0"
   resolved "https://registry.yarnpkg.com/double-ended-queue/-/double-ended-queue-2.1.0-0.tgz#103d3527fd31528f40188130c841efdd78264e5c"
 
+downshift@1.31.12:
+  version "1.31.12"
+  resolved "https://registry.yarnpkg.com/downshift/-/downshift-1.31.12.tgz#78be425583234f18774fc37643eba17a776a91db"
+
 downshift@1.31.2:
   version "1.31.2"
   resolved "https://registry.yarnpkg.com/downshift/-/downshift-1.31.2.tgz#6f638e9720d7540d9dffa0b4c4587cf10811cf8c"
@@ -3768,6 +3772,13 @@ file-entry-cache@^2.0.0:
   dependencies:
     flat-cache "^1.2.1"
     object-assign "^4.0.1"
+
+file-loader@1.1.11:
+  version "1.1.11"
+  resolved "https://registry.yarnpkg.com/file-loader/-/file-loader-1.1.11.tgz#6fe886449b0f2a936e43cabaac0cdbfb369506f8"
+  dependencies:
+    loader-utils "^1.0.2"
+    schema-utils "^0.4.5"
 
 file-loader@1.1.5:
   version "1.1.5"
@@ -6262,6 +6273,21 @@ meetup-web-components@4.8.2111:
     react-portal "4.1.2"
     recompose "0.26.0"
     storybook-router "0.3.2"
+
+meetup-web-components@5.0.2241:
+  version "5.0.2241"
+  resolved "https://registry.yarnpkg.com/meetup-web-components/-/meetup-web-components-5.0.2241.tgz#823676cb543ac3cca51f9bd4621c4be1578aab3c"
+  dependencies:
+    autosize "3.0.21"
+    downshift "1.31.12"
+    file-loader "1.1.11"
+    focus-trap-react "3.1.2"
+    lint-staged "7.0.0"
+    raf-schd "2.1.0"
+    react-flatpickr "3.6.4"
+    react-portal "4.1.2"
+    recompose "0.26.0"
+    storybook-react-router "1.0.1"
 
 meetup-web-mocks@1.0.217:
   version "1.0.217"
@@ -9407,6 +9433,12 @@ statuses@~1.4.0:
 stealthy-require@^1.1.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/stealthy-require/-/stealthy-require-1.1.1.tgz#35b09875b4ff49f26a777e509b3090a3226bf24b"
+
+storybook-react-router@1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/storybook-react-router/-/storybook-react-router-1.0.1.tgz#a33af1cb0c16f0e755f420296352c8f8709cb674"
+  dependencies:
+    prop-types "^15.6.1"
 
 storybook-router@0.3.2:
   version "0.3.2"
