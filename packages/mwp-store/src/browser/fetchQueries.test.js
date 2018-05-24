@@ -10,6 +10,7 @@ clickState.setClickCookie = jest.fn();
 
 global.FormData = function() {};
 global.URLSearchParams = URLSearchParams;
+global.window = { location: { search: '' } };
 
 jest.mock('js-cookie', () => {
 	const get = jest.fn(name => `${name} value`);
@@ -28,7 +29,9 @@ describe('fetchQueries', () => {
 	const API_URL = new URL('http://api.example.com/');
 	const csrfJwt = `${CSRF_HEADER_COOKIE} value`;
 	const getQueries = [mockQuery({ params: {} })];
-	const POSTQueries = [{ ...mockQuery({ params: {} }), meta: { method: 'POST' } }];
+	const POSTQueries = [
+		{ ...mockQuery({ params: {} }), meta: { method: 'POST' } },
+	];
 	const meta = { foo: 'bar', clickTracking: { history: [] } };
 	const responses = [MOCK_GROUP];
 	const fakeSuccess = () =>
@@ -100,6 +103,21 @@ describe('fetchQueries', () => {
 				expect(url.searchParams.has('queries')).toBe(true);
 				expect(url.searchParams.has('metadata')).toBe(true);
 				expect(calledWith[1].method).toEqual('GET');
+			});
+		});
+
+		it('passes along __set_geoip querystring param', () => {
+			spyOn(global, 'fetch').and.callFake(fakeSuccess);
+			const _window = global.window;
+			global.window = { location: { search: '?__set_geoip=1234' } };
+
+			return fetchQueries(API_URL.toString())(getQueries, {
+				...meta,
+			}).then(() => {
+				const calledWith = global.fetch.calls.mostRecent().args;
+				const url = new URL(calledWith[0]);
+				expect(url.searchParams.has('__set_geoip')).toBe(true);
+				global.window = _window;
 			});
 		});
 

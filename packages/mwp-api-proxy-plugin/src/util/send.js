@@ -112,15 +112,14 @@ export const buildRequestArgs = externalRequestOpts => ({
 	}
 
 	if (meta.variants) {
-		headers['X-Meetup-Variants'] = Object.keys(meta.variants).reduce(
-			(header, experiment) => {
-				const context = meta.variants[experiment];
-				const contexts = context instanceof Array ? context : [context];
-				header += contexts.map(c => `${experiment}=${c}`).join(' ');
-				return header;
-			},
-			''
-		);
+		headers['X-Meetup-Variants'] = Object.keys(
+			meta.variants
+		).reduce((header, experiment) => {
+			const context = meta.variants[experiment];
+			const contexts = context instanceof Array ? context : [context];
+			header += contexts.map(c => `${experiment}=${c}`).join(' ');
+			return header;
+		}, '');
 	}
 
 	switch (externalRequestOpts.method) {
@@ -190,7 +189,7 @@ export function getLanguageHeader(request) {
 
 export function getClientIpHeader(request) {
 	const clientIP =
-		request.query['_set_geoip'] || request.headers['fastly-client-ip'];
+		request.query._set_geoip || request.headers['fastly-client-ip'];
 	if (clientIP) {
 		return { 'X-Meetup-Client-Ip': clientIP };
 	}
@@ -288,7 +287,10 @@ export function getExternalRequestOpts(request) {
 /**
  * Fake an API request and directly return the stringified mockResponse
  */
-export const makeMockRequest = (mockResponseContent, responseMeta) => requestOpts =>
+export const makeMockRequest = (
+	mockResponseContent,
+	responseMeta
+) => requestOpts =>
 	Observable.of([
 		makeMockResponse(requestOpts, responseMeta),
 		JSON.stringify(mockResponseContent),
