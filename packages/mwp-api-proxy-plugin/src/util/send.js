@@ -189,7 +189,7 @@ export function getLanguageHeader(request) {
 
 export function getClientIpHeader(request) {
 	const clientIP =
-		request.query._set_geoip || request.headers['fastly-client-ip'];
+		request.query.__set_geoip || request.headers['fastly-client-ip'];
 	if (clientIP) {
 		return { 'X-Meetup-Client-Ip': clientIP };
 	}

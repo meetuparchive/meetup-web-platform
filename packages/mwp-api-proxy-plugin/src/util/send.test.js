@@ -83,13 +83,13 @@ describe('getClientIpHeader', () => {
 		};
 		expect(getClientIpHeader(request)).toEqual(clientIpHeader);
 	});
-	it('returns a x-meetup-client-ip header when _set_geoip header is set', () => {
+	it('returns a x-meetup-client-ip header when __set_geoip header is set', () => {
 		const clientIpHeader = {
 			'X-Meetup-Client-Ip': '127.0.0.2',
 		};
 		const request = {
 			query: {
-				_set_geoip: '127.0.0.2',
+				__set_geoip: '127.0.0.2',
 			},
 			headers: {},
 		};
