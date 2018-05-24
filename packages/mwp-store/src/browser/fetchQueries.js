@@ -66,8 +66,12 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 	const isFormData = queries[0].params instanceof FormData;
 	const isDelete = method === 'DELETE';
 
+	const pageSearchParams = new URLSearchParams(window.location.search);
 	const searchParams = new URLSearchParams();
 	searchParams.append('queries', rison.encode_array(makeSerializable(queries)));
+	if (pageSearchParams.has('__set_geoip')) {
+		searchParams.append('__set_geoip', pageSearchParams.get('__set_geoip'));
+	}
 
 	if (meta) {
 		const {
@@ -163,7 +167,11 @@ const fetchQueries = (apiUrl, member) => (queries, meta) => {
 
 	const authedQueries = getAuthedQueryFilter(member);
 	const validQueries = queries.filter(authedQueries);
-	return _fetchQueryResponse(apiUrl, validQueries, meta).then(queryResponse => ({
+	return _fetchQueryResponse(
+		apiUrl,
+		validQueries,
+		meta
+	).then(queryResponse => ({
 		...parseQueryResponse(validQueries)(queryResponse),
 	}));
 };
