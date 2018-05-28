@@ -10,6 +10,7 @@ import {
 	apiError, // DEPRECATED
 } from './syncActionCreators';
 
+const IGNORE_ACTION = Promise.resolve([]);
 /**
  * @deprecated
  */
@@ -59,8 +60,8 @@ export function getDeprecatedSuccessPayload(successes, errors) {
  * @returns {Function} an Epic function that emits an API_REQUEST action
  */
 export const getNavEpic = findMatches => (action, store) => {
-	if (![LOCATION_CHANGE, SERVER_RENDER].some(type => type === action.type)) {
-		return Promise.resolve([]);
+	if (![LOCATION_CHANGE, SERVER_RENDER].includes(action.type)) {
+		return IGNORE_ACTION;
 	}
 	const { payload: location } = action;
 	const state = store.getState();
@@ -69,7 +70,7 @@ export const getNavEpic = findMatches => (action, store) => {
 	const requestMetadata = {
 		referrer: referrer.pathname || state.config.entryPath || '',
 		logout: location.pathname.endsWith('logout'), // assume logout route ends with logout - not currently implemented in any app
-		clickTracking: state.clickTracking,
+		clickTracking: true, // clicks should be tracked with this request
 		retainRefs: [],
 	};
 	const cacheAction = requestMetadata.logout && { type: 'CACHE_CLEAR' };
@@ -94,22 +95,28 @@ export const getNavEpic = findMatches => (action, store) => {
 	requestMetadata.retainRefs = sharedRefs;
 
 	return Promise.resolve(
-		[
-			cacheAction,
-			api.get(newQueries, requestMetadata),
-			clickActions.clear(),
-		].filter(a => a)
+		[cacheAction, api.get(newQueries, requestMetadata)].filter(a => a)
 	);
 };
+
+/*
+ * Any API_REQ action that contains `meta.clickTracking` needs to trigger
+ * an action that clears the click data from state - the data will be consumed
+ * by the fethQueriesEpic
+ */
+export const clickEpic = action =>
+	action.type === api.API_REQ && action.meta && action.meta.clickTracking
+		? Promise.resolve([clickActions.clear()])
+		: IGNORE_ACTION;
 
 /**
  * Old apiRequest maps directly onto new api.get
  * @deprecated
  */
 export const apiRequestToApiReq = action =>
-	Promise.resolve(
-		action.type === 'API_REQUEST' ? [api.get(action.payload, action.meta)] : []
-	);
+	action.type === 'API_REQUEST'
+		? Promise.resolve([api.get(action.payload, action.meta)])
+		: IGNORE_ACTION;
 
 /**
  * Listen for API_REQ and generate response actions from fetch results
@@ -143,11 +150,21 @@ export const getFetchQueriesEpic = (findMatches, fetchQueriesFn) => {
 			locationIndex = locationIndex + 1;
 		}
 		if (action.type !== api.API_REQ) {
-			return Promise.resolve([]);
+			return IGNORE_ACTION;
 		}
 		const { payload: queries, meta } = action;
 		// set up the fetch call to the app server
-		const { config, api: { self }, routing: { location } } = store.getState();
+		const {
+			clickTracking,
+			config,
+			api: { self },
+			routing: { location },
+		} = store.getState();
+
+		// if API_REQ action says it should carry click tracking data, inject it here
+		if (meta.clickTracking) {
+			meta.clickTracking = clickTracking;
+		}
 
 		// first get the current route 'match' data
 		const matched = findMatches(location);
@@ -192,5 +209,6 @@ export default (findMatches, fetchQueriesFn) =>
 	combineEpics(
 		getNavEpic(findMatches),
 		getFetchQueriesEpic(findMatches, fetchQueriesFn),
-		apiRequestToApiReq
+		apiRequestToApiReq,
+		clickEpic
 	);

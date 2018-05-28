@@ -83,7 +83,9 @@ export const post = _applyMethod('post');
 export const patch = _applyMethod('patch');
 export const del = _applyMethod('delete');
 export const track = (query: Query, meta: ?Object) => {
+	meta = meta || {};
 	query.endpoint = 'track';
+	meta.clickTracking = true;
 	return post(query, meta);
 };
 
