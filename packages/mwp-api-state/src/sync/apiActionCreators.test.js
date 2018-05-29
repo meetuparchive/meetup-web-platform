@@ -20,4 +20,17 @@ describe('method-specific creators', () => {
 			expect(requestAction.meta.reject).toEqual(expect.any(Function));
 		});
 	});
+	it('track sets endpoint, meta.method, adds requestMeta.clickTracking.true', () => {
+		const query = {};
+		const trackAction = api.track(query);
+		expect(trackAction.type).toBe('API_REQ');
+		expect(trackAction.payload).toHaveLength(1);
+		expect(trackAction.payload[0]).toMatchObject({
+			endpoint: 'track',
+			meta: {
+				method: 'post',
+			},
+		});
+		expect(trackAction.meta.clickTracking).toBe(true);
+	});
 });

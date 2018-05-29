@@ -30,7 +30,7 @@ export default (request: HapiRequest) => {
 		// special case handling of tracking call - must supply a response, but
 		// empty object is fine
 		if (queries.length === 1 && query.endpoint === 'track') {
-			return Observable.of([{}]).do(responses =>
+			return Observable.of([{ ref: query.ref, value: {} }]).do(responses =>
 				request.trackActivity(query.params)
 			);
 		}

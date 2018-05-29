@@ -24,13 +24,15 @@ export const setClickCookie = clickTracking => {
 
 export const CLICK_TRACK_ACTION = 'CLICK_TRACK';
 export const CLICK_TRACK_CLEAR_ACTION = 'CLICK_TRACK_CLEAR';
+// constant 'clear' action object
+const _CLICK_TRACK_CLEAR = { type: CLICK_TRACK_CLEAR_ACTION };
 
 export const actions = {
 	click: clickData => ({
 		type: CLICK_TRACK_ACTION,
 		payload: clickData,
 	}),
-	clear: () => ({ type: CLICK_TRACK_CLEAR_ACTION }),
+	clear: () => _CLICK_TRACK_CLEAR,
 };
 
 export const DEFAULT_CLICK_TRACK = { history: [] };
