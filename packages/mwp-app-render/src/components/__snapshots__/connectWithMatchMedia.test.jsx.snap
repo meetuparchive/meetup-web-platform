@@ -2,7 +2,6 @@
 
 exports[`connectWithMatchMedia exists 1`] = `
 <ConnectWithMatchMedia(TestComponent)
-  dispatch={[Function]}
   media={
     Object {
       "isAtSmallUp": true,
