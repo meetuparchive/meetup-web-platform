@@ -26,7 +26,7 @@ const connectWithMatchMedia = <Props: {}>(
 
 	ConnectWithMatchMedia.displayName = `ConnectWithMatchMedia(${wrappedComponentName})`;
 
-	return connect(mapStateToProps)(ConnectWithMatchMedia);
+	return connect(mapStateToProps, () => ({}))(ConnectWithMatchMedia);
 };
 
 export default connectWithMatchMedia;
