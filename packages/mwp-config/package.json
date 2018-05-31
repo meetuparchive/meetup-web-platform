@@ -25,6 +25,7 @@
         "babel-preset-stage-2": "6.24.1",
         "convict": "4.0.1",
         "stylelint": "9.2.1",
+        "stylelint-order": "0.8.1",
         "stylelint-scss": "3.1.0"
     },
     "devDependencies": {}
