@@ -1,5 +1,5 @@
 module.exports = {
-	extends: './stylelint-config-scss',
+	extends: ['./stylelint-config-scss', './stylelint-config-order'],
 	rules: {
 		'at-rule-empty-line-before': 'always',
 		'at-rule-name-case': 'lower',
