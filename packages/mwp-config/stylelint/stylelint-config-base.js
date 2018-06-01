@@ -1,14 +1,24 @@
 module.exports = {
 	extends: ['./stylelint-config-scss', './stylelint-config-order'],
 	rules: {
-		'at-rule-empty-line-before': 'always',
+		'at-rule-empty-line-before': [
+			'always',
+			{
+				except: ['first-nested'],
+				ignore: ['after-comment', 'inside-block'],
+				ignoreAtRules: ['if', 'else', 'import'],
+			},
+		],
 		'at-rule-name-case': 'lower',
 		'at-rule-name-space-after': 'always',
 		'at-rule-no-vendor-prefix': true,
 		'at-rule-semicolon-newline-after': 'always',
 		'at-rule-semicolon-space-before': 'never',
 		'block-closing-brace-empty-line-before': 'never',
-		'block-closing-brace-newline-after': 'always',
+		'block-closing-brace-newline-after': [
+			'always',
+			{ ignoreAtRules: ['if', 'else'] },
+		],
 		'block-closing-brace-newline-before': 'always-multi-line',
 		'block-no-empty': true,
 		'block-opening-brace-newline-after': 'always-multi-line',
@@ -39,7 +49,7 @@ module.exports = {
 		'declaration-block-no-shorthand-property-overrides': true,
 		'declaration-block-semicolon-newline-after': 'always',
 		'declaration-block-semicolon-newline-before': 'never-multi-line',
-		'declaration-block-semicolon-space-after': 'never',
+		'declaration-block-semicolon-space-after': 'never-single-line',
 		'declaration-block-semicolon-space-before': 'never',
 		'declaration-block-single-line-max-declarations': 1,
 		'declaration-block-trailing-semicolon': 'always',
@@ -56,7 +66,7 @@ module.exports = {
 				outline: ['none'],
 				// no font-size values under 12px or .75rem
 				'font-size': [
-					'/^(((0?[.](7[5-9]|[8-9][0-9])|[1-9].?([0-9]?[0-9]?[0-9])*)rem)|(?:(?:1[2-9]|[2-9][0-9]|[1-9][0-9][0-9])px))$/',
+					'^(((0?[.](7[5-9]|[8-9][0-9])|[1-9].?([0-9]?[0-9]?[0-9])*)rem)|(?:(?:1[2-9]|[2-9][0-9]|[1-9][0-9][0-9])px))$',
 				],
 			},
 			{
@@ -105,8 +115,25 @@ module.exports = {
 		'property-blacklist': 'text-rendering',
 		'property-case': 'lower',
 		'property-no-unknown': true,
-		'property-no-vendor-prefix': true,
-		'rule-empty-line-before': 'always',
+		'property-no-vendor-prefix': [
+			true,
+			{
+				ignoreProperties: [
+					'appearance',
+					'touch-action',
+					'user-select',
+					'sticky',
+					'hyphens',
+					'font-feature-settings',
+					'text-size-adjust',
+					'interpolation-mode',
+				],
+			},
+		],
+		'rule-empty-line-before': [
+			'always',
+			{ except: ['first-nested', 'after-single-line-comment'] },
+		],
 		'selector-attribute-brackets-space-inside': 'never',
 		'selector-attribute-operator-blacklist': '|=',
 		'selector-attribute-operator-space-after': 'never',
@@ -117,15 +144,15 @@ module.exports = {
 		'selector-descendant-combinator-no-non-space': true,
 		'selector-list-comma-newline-after': 'always',
 		'selector-list-comma-newline-before': 'never-multi-line',
-		'selector-list-comma-space-after': 'never',
+		'selector-list-comma-space-after': 'never-single-line',
 		'selector-list-comma-space-before': 'never',
 		'selector-max-attribute': 1,
-		'selector-max-class': 1,
+		'selector-max-class': 2,
 		'selector-max-combinators': 1,
 		'selector-max-compound-selectors': 2,
 		'selector-max-empty-lines': 0,
 		'selector-max-id': 0,
-		'selector-max-specificity': '0,2,1',
+		'selector-max-specificity': '0,3,1',
 		'selector-max-universal': 0,
 		'selector-no-qualifying-type': true,
 		'selector-no-vendor-prefix': true,
@@ -145,7 +172,12 @@ module.exports = {
 		'unit-no-unknown': true,
 		'value-keyword-case': 'lower',
 		'value-list-max-empty-lines': 0,
-		'value-no-vendor-prefix': true,
+		'value-no-vendor-prefix': [
+			true,
+			{
+				ignoreValues: ['sticky'],
+			},
+		],
 
 		// the following rules are intentionally disabled
 		'at-rule-blacklist': null,
