@@ -14,6 +14,7 @@ describe('serverFetchQueries', () => {
 			}),
 			trackActivity: jest.fn(),
 			state: {},
+			server: { settings: { app: { api: {} } } },
 		};
 		const queries = [];
 		const expectedParsedResponse = 'foo';

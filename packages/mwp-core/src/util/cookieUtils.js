@@ -3,7 +3,9 @@ import config from 'mwp-config';
 import { logger } from 'mwp-logger-plugin';
 const appConfig = config.getServer().properties;
 
-export const MEMBER_COOKIE = appConfig.isProd ? 'MEETUP_MEMBER' : 'MEETUP_MEMBER_DEV';
+export const MEMBER_COOKIE = appConfig.api.isProd
+	? 'MEETUP_MEMBER'
+	: 'MEETUP_MEMBER_DEV';
 
 export const parseMemberCookie = state => {
 	if (!state[MEMBER_COOKIE]) {
@@ -22,7 +24,7 @@ export const parseMemberCookie = state => {
  */
 export const getVariants = state =>
 	Object.keys(state).reduce((variants, cookieName) => {
-		const isEnvCookie = !(appConfig.isProd ^ !cookieName.endsWith('_DEV')); // XNOR - both conditions or neither condition
+		const isEnvCookie = !(appConfig.api.isProd ^ !cookieName.endsWith('_DEV')); // XNOR - both conditions or neither condition
 		if (cookieName.startsWith('MEETUP_VARIANT_') && isEnvCookie) {
 			variants[cookieName.replace(/^MEETUP_VARIANT_|_DEV$/g, '')] =
 				state[cookieName];

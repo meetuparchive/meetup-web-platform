@@ -8,7 +8,6 @@ import { COOKIE_NAME } from './clickState';
  */
 
 const isProd = process.env.NODE_ENV === 'production';
-const memberCookieName = isProd ? 'MEETUP_MEMBER' : 'MEETUP_MEMBER_DEV';
 export const clickCookieOptions = {
 	isSecure: isProd,
 	isHttpOnly: false,
@@ -16,6 +15,9 @@ export const clickCookieOptions = {
 };
 
 export const clickToClickRecord = request => click => {
+	const memberCookieName = request.server.settings.app.api.isProd
+		? 'MEETUP_MEMBER'
+		: 'MEETUP_MEMBER_DEV';
 	return {
 		timestamp: click.timestamp || new Date().toISOString(),
 		requestId: request.id,

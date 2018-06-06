@@ -97,12 +97,12 @@ export function getLogger(
 	};
 }
 
-export function getActivityTrackingPlugin({ agent, isProd }) {
+export function getActivityTrackingPlugin({ agent, isProdApi }) {
 	return {
 		register: activityPlugin,
 		options: {
 			agent,
-			isProd,
+			isProdApi,
 		},
 	};
 }
@@ -132,7 +132,7 @@ function getLanguagePlugin() {
 }
 
 export default function getPlugins({ languageRenderers }) {
-	const { package: { agent }, env: { properties: { isProd } } } = config;
+	const { package: { agent }, getServer } = config;
 	return [
 		getAppRoutePlugin({ languageRenderers }),
 		getApiProxyPlugin(),
@@ -140,7 +140,10 @@ export default function getPlugins({ languageRenderers }) {
 		getLogger(),
 		getCsrfPlugin(),
 		getRequestAuthPlugin(),
-		getActivityTrackingPlugin({ agent, isProd }),
+		getActivityTrackingPlugin({
+			agent,
+			isProdApi: getServer().properties.api.isProd,
+		}),
 		getClickTrackingPlugin(),
 		getServiceWorkerPlugin(),
 		Inert,

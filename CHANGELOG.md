@@ -1,3 +1,11 @@
+## [16.1]
+
+- **NEW FEATURE** the prod REST API can now be used directly in the dev environment.
+  To enable, simply add `{ "api": { "host": "api.meetup.com" } }` to a
+  `config.development.json` file in the root of your application. _Note_: there
+  is no visible difference between using the prod REST API and the dev REST API.
+  Try not to chnage any data that doesn't belong to you.
+
 ## [16.0]
 - **BREAKING CHANGE** webpack build configurations have been moved to
    mwp-cli and are no longer a part of `mwp-config`. Make sure to upgrade

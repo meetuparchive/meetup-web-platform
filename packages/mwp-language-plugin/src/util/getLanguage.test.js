@@ -14,7 +14,13 @@ const altLang = 'fr-FR';
 const altLang2 = 'de-DE';
 const altLang3 = 'es-ES';
 const unsupportedLang = 'xx-XX';
-const supportedLangs = [defaultLang, similarToDefault, altLang, altLang2, altLang3];
+const supportedLangs = [
+	defaultLang,
+	similarToDefault,
+	altLang,
+	altLang2,
+	altLang3,
+];
 const MOCK_HAPI_REQUEST = {
 	log() {},
 	url: url.parse(rootUrl),
@@ -22,7 +28,7 @@ const MOCK_HAPI_REQUEST = {
 		'accept-language': unsupportedLang, // must test unsupported lang by default
 	},
 	state: {},
-	server: { settings: { app: { supportedLangs } } },
+	server: { settings: { app: { supportedLangs, api: {} } } },
 };
 describe('getCookieLang', () => {
 	it('returns undefined when no cookie in state', () => {
