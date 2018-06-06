@@ -13,7 +13,6 @@ const {
 	validateCsrfSecret,
 	validatePhotoScalerSalt,
 	validateProtocol,
-	validateServerHost,
 } = require('./util');
 
 /**
@@ -73,7 +72,7 @@ const schema = Object.assign({}, envSchema, {
 			env: 'API_PROTOCOL',
 		},
 		host: {
-			format: validateServerHost,
+			format: String,
 			default: 'api.dev.meetup.com',
 			env: 'API_HOST',
 		},
