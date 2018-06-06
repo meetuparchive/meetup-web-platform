@@ -1,10 +1,5 @@
 import uuid from 'uuid';
 
-const MEMBER_COOKIE_NAME =
-	process.env.NODE_ENV === 'production' ? 'MEETUP_MEMBER' : 'MEETUP_MEMBER_DEV';
-const CSRF_COOKIE_NAME =
-	process.env.NODE_ENV === 'production' ? 'MEETUP_CSRF' : 'MEETUP_CSRF_DEV';
-
 // hardcoded logged-out cookies with valid signatures that can be used for any logged-out API request
 const mockCookies = {
 	MEETUP_MEMBER:
@@ -24,6 +19,13 @@ const mockCookies = {
  *   auth stategy instance
  */
 export const mwpScheme = server => {
+	const MEMBER_COOKIE_NAME = server.settings.app.api.isProd
+		? 'MEETUP_MEMBER'
+		: 'MEETUP_MEMBER_DEV';
+	const CSRF_COOKIE_NAME = server.settings.app.api.isProd
+		? 'MEETUP_CSRF'
+		: 'MEETUP_CSRF_DEV';
+
 	// authenticate function takes (request, reply) and eventually calls
 	// `reply.continue({ credentials })`, where credentials === { memberCookie, csrfToken }
 	// 1. check for meetup_member(_dev) cookie

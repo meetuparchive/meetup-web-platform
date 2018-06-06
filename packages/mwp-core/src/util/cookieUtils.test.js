@@ -46,10 +46,6 @@ describe('getVariants', () => {
 			expect.any(Object)
 		);
 	});
-	it('extracts prefix-free key from MEETUP_VARIANT_XXX', () => {
-		const val = 'bar';
-		expect(getVariants({ MEETUP_VARIANT_FOO_DEV: val }).FOO).toEqual(val);
-	});
 	it('extracts suffix-free key from MEETUP_VARIANT_XXX_DEV', () => {
 		const val = 'bar';
 		expect(getVariants({ MEETUP_VARIANT_FOO_DEV: val }).FOO).toEqual(val);
