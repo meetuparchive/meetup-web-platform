@@ -69,6 +69,7 @@ describe('Activity tracking', () => {
 		id: 'foo',
 		headers: {},
 		log() {},
+		server: { settings: { app: { api: {} } } },
 	};
 	const trackInfo = getLogger('WEB')(request, {
 		memberId: 1234,
@@ -99,6 +100,7 @@ describe('Click tracking', () => {
 	const request = {
 		id: 'foo',
 		state: {},
+		server: { settings: { app: { api: {} } } },
 	};
 	const click = {
 		timestamp: new Date(0).toISOString(),

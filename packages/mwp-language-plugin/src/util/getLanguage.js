@@ -11,7 +11,7 @@ const getServerSettings = (request: HapiRequest) => request.server.settings.app;
  * Get cookie-specified language using MEETUP_LANGUAGE cookie value
  */
 export const getCookieLang: ParseRequestLang = (request: HapiRequest) => {
-	const { isProd, supportedLangs } = getServerSettings(request);
+	const { api: { isProd }, supportedLangs } = getServerSettings(request);
 	const LANGUAGE_COOKIE = isProd ? 'MEETUP_LANGUAGE' : 'MEETUP_LANGUAGE_DEV';
 
 	const cookie = request.state[LANGUAGE_COOKIE];

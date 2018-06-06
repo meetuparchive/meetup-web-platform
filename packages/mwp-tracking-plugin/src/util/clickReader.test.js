@@ -14,6 +14,7 @@ describe('processClickTracking', () => {
 		},
 		log: jest.fn(),
 		id: '1234',
+		server: { settings: { app: { api: {} } } },
 	};
 	const reply = {
 		unstate: jest.fn(),
@@ -23,7 +24,9 @@ describe('processClickTracking', () => {
 	it('calls process.stdout.write for each click record', () => {
 		process.stdout.write.mockClear();
 		processClickTracking(request, reply);
-		expect(process.stdout.write).toHaveBeenCalledTimes(clickData.history.length);
+		expect(process.stdout.write).toHaveBeenCalledTimes(
+			clickData.history.length
+		);
 	});
 	it('calls reply.unstate for click-track cookie', () => {
 		reply.unstate.mockClear();
