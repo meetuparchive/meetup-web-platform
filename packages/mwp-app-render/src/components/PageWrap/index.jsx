@@ -51,7 +51,7 @@ class PageWrap extends React.Component {
 			window.performance.measure
 		) {
 			window.performance.mark('meetup-tti');
-			window.performance.measure('navigationStart', 'meetup-tti');
+			window.performance.measure('meetup-tti', 'navigationStart', 'meetup-tti');
 		}
 
 		// Specially for Developer Tools in the browsers (Chrome & Firefox), create entry for the event so it shows up on Performance timeline
