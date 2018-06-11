@@ -44,7 +44,9 @@ export const fakeUTCinTimezone = (timezone: string) => {
  * - `trackActivity`
  */
 
-export const getLogger: string => (Object, Object) => mixed = (agent: string) => {
+export const getLogger: string => (Object, Object) => mixed = (
+	agent: string
+) => {
 	// activity record wants an ISO 8601 timestamp in the New York timezone,
 	// so we have to fake a UTC date object shifted into NYC's timezone before
 	// calling `toISOString()`
@@ -121,8 +123,8 @@ const onRequest = (request, reply) => {
 const getOnPreResponse = cookieConfig => (request, reply) => {
 	const { browserIdCookieName, trackIdCookieName } = cookieConfig;
 	const pluginData = request.plugins[ACTIVITY_PLUGIN_NAME];
-	const browserId = pluginData.browserIdCookieName;
-	const trackId = pluginData.trackIdCookieName;
+	const browserId = pluginData[browserIdCookieName];
+	const trackId = pluginData[trackIdCookieName];
 
 	const FOREVER: CookieOpts = {
 		encoding: 'none',
@@ -152,11 +154,15 @@ export default function register(
 ) {
 	const { agent, isProd } = options;
 
-	const trackIdCookieName: string = isProd ? 'MEETUP_TRACK' : 'MEETUP_TRACK_DEV';
+	const trackIdCookieName: string = isProd
+		? 'MEETUP_TRACK'
+		: 'MEETUP_TRACK_DEV';
 	const browserIdCookieName: string = isProd
 		? 'MEETUP_BROWSER_ID'
 		: 'MEETUP_BROWSER_ID_DEV';
-	const memberCookieName: string = isProd ? 'MEETUP_MEMBER' : 'MEETUP_MEMBER_DEV';
+	const memberCookieName: string = isProd
+		? 'MEETUP_MEMBER'
+		: 'MEETUP_MEMBER_DEV';
 
 	const trackers: { [string]: Tracker } = getTrackers({
 		agent,
