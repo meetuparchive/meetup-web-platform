@@ -132,6 +132,7 @@ const getOnPreResponse = cookieConfig => (request, reply) => {
 		path: '/',
 		isHttpOnly: true,
 		ttl: YEAR_IN_MS * 20,
+		strictHeader: false, // skip strict cookie format validation (no quotes)
 	};
 
 	if (browserId) {
