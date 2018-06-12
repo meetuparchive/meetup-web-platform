@@ -121,12 +121,13 @@ const onRequest = (request, reply) => {
  * tracking cookies that need to be set using request.response.state.
  */
 const getOnPreResponse = cookieConfig => (request, reply) => {
-	const { browserIdCookieName, trackIdCookieName } = cookieConfig;
+	const { browserIdCookieName, trackIdCookieName, domain } = cookieConfig;
 	const pluginData = request.plugins[ACTIVITY_PLUGIN_NAME];
 	const browserId = pluginData[browserIdCookieName];
 	const trackId = pluginData[trackIdCookieName];
 
 	const FOREVER: CookieOpts = {
+		domain,
 		encoding: 'none',
 		path: '/',
 		isHttpOnly: true,
@@ -184,6 +185,7 @@ export default function register(
 			browserIdCookieName,
 			memberCookieName,
 			trackIdCookieName,
+			domain: isProd ? '.meetup.com' : '.dev.meetup.com',
 		})
 	);
 
