@@ -25,7 +25,7 @@ export const getTrackApiResponses: TrackGetter = trackOpts => request => (
 	return trackOpts.log(request, {
 		description: 'nav',
 		memberId: parseIdCookie(
-			request.state[trackOpts.memberCookieName] || '',
+			request.state[trackOpts.memberCookieName].toString() || '',
 			true
 		), // read memberId
 		browserId: updateId(trackOpts.browserIdCookieName)(request), // read/add browserId

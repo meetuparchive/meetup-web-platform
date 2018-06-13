@@ -19,7 +19,10 @@ export const clickToClickRecord = request => click => {
 	return {
 		timestamp: click.timestamp || new Date().toISOString(),
 		requestId: request.id,
-		memberId: parseIdCookie(request.state[memberCookieName] || '', true), // force integer
+		memberId: parseIdCookie(
+			request.state[memberCookieName].toString() || '',
+			true
+		), // force integer
 		lineage: click.lineage,
 		linkText: click.linkText || '',
 		coordX: click.coords[0] || 0,
