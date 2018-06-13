@@ -24,7 +24,10 @@ export const getTrackApiResponses: TrackGetter = trackOpts => request => (
 	const { url = '', referrer = '', viewName, subViewName } = fields;
 	return trackOpts.log(request, {
 		description: 'nav',
-		memberId: parseIdCookie(request.state[trackOpts.memberCookieName], true), // read memberId
+		memberId: parseIdCookie(
+			request.state[trackOpts.memberCookieName] || '',
+			true
+		), // read memberId
 		browserId: updateId(trackOpts.browserIdCookieName)(request), // read/add browserId
 		trackId: updateId(trackOpts.trackIdCookieName)(request), // read/add trackId
 		referer: referrer,

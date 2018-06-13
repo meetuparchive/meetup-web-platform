@@ -20,7 +20,7 @@ export const updateId: UpdateId = cookieName => (
 		// set in the plugin's onResponse handler
 		return newId(cookieName)(request);
 	}
-	return parseIdCookie(cookieVal).toString(); // toString used to satisfy Flow
+	return parseIdCookie(cookieVal || '').toString(); // toString used to satisfy Flow
 };
 
 /*
