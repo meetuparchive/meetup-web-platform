@@ -4,11 +4,12 @@ import fs from 'fs';
 import Http2 from 'spdy'; // eventually this will be a native node module
 
 import config from 'mwp-config';
-const appConfig = config.getServer().properties;
 
+import getRoutes from './routes';
 import getPlugins from './util/getPlugins';
 import { configureEnv, server } from './util';
-import getRoutes from './routes';
+
+const appConfig = config.getServer().properties;
 
 /**
  * @module server
@@ -27,7 +28,10 @@ import getRoutes from './routes';
  *   features in the additional routes
  * @return {Promise} the Promise returned by Hapi's `server.connection` method
  */
-export default function start(languageRenderers, { routes = [], plugins = [] }) {
+export default function start(
+	languageRenderers,
+	{ routes = [], plugins = [] }
+) {
 	// source maps make for better stack traces
 	// we might not want this in production if it makes anything slower
 	require('source-map-support').install();
@@ -37,9 +41,15 @@ export default function start(languageRenderers, { routes = [], plugins = [] }) 
 	const baseRoutes = getRoutes();
 	const finalRoutes = [...routes, ...baseRoutes];
 
-	const connection = {
+	const serverConfig = {
 		host: '0.0.0.0',
 		port: appConfig.app_server.port,
+		app: appConfig,
+	};
+
+	/*
+	* TODO: figure out what these are for
+	const serverRoutes = {
 		routes: {
 			plugins: {
 				'electrode-csrf-jwt': {
@@ -51,11 +61,12 @@ export default function start(languageRenderers, { routes = [], plugins = [] }) 
 			},
 		},
 	};
+	*/
 
 	if (appConfig.app_server.protocol === 'https') {
 		// enable HTTP/2
-		connection.tls = true;
-		connection.listener = Http2.createServer({
+		serverConfig.tls = true;
+		serverConfig.listener = Http2.createServer({
 			key: fs.readFileSync(appConfig.app_server.key_file),
 			cert: fs.readFileSync(appConfig.app_server.crt_file),
 		});
@@ -64,5 +75,5 @@ export default function start(languageRenderers, { routes = [], plugins = [] }) 
 	const finalPlugins = [...plugins, ...getPlugins({ languageRenderers })];
 
 	appConfig.supportedLangs = Object.keys(languageRenderers);
-	return server(finalRoutes, connection, finalPlugins, appConfig);
+	return server(serverConfig, finalRoutes, finalPlugins, appConfig);
 }
