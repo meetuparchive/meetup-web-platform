@@ -28,8 +28,8 @@
   "dependencies": {
     "convict": "4.0.1",
     "electrode-csrf-jwt": "1.2.1",
-    "hapi": "16.5.2",
-    "inert": "4.2.1",
+    "hapi": "17.4.0",
+    "inert": "5.1.0",
     "mwp-api-proxy-plugin": ">=0.0.1",
     "mwp-app-route-plugin": ">=0.0.1",
     "mwp-auth-plugin": ">=0.0.1",
