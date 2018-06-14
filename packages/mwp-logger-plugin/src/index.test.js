@@ -2,8 +2,10 @@ import Hapi from 'hapi';
 import LoggerPlugin from './';
 
 const testServer = test => {
-	const server = new Hapi.Server();
-	server.connection({ port: 0 });
+	const server = new Hapi.Server({
+		port: 0,
+	});
+
 	return server
 		.register(LoggerPlugin)
 		.then(() =>
