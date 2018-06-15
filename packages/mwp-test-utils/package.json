@@ -29,7 +29,7 @@
     "mwp-router": ">=0.0.1"
   },
   "dependencies": {
-    "electrode-csrf-jwt": "1.2.1",
+    "electrode-csrf-jwt": "1.4.0",
     "hapi": "17.4.0",
     "inert": "5.1.0",
     "meetup-web-mocks": "1.0.217",
