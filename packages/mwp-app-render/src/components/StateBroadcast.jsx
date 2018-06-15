@@ -7,7 +7,7 @@ type Props = {
 };
 const mapStateToProps = state => ({ state });
 
-class StateBroadCastComponent extends React.PureComponent<Props> {
+export class StateBroadcastComponent extends React.PureComponent<Props> {
 	componentDidMount() {
 		window.getAppState = () => this.props.state;
 	}
@@ -17,4 +17,4 @@ class StateBroadCastComponent extends React.PureComponent<Props> {
 	}
 }
 
-export default connect(mapStateToProps, () => ({}))(StateBroadCastComponent);
+export default connect(mapStateToProps, () => ({}))(StateBroadcastComponent);
