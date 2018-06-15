@@ -50,6 +50,7 @@ const MOCK_HAPI_REQUEST = {
 describe('getAuthHeaders', () => {
 	it('sets MEETUP_CSRF', () => {
 		const authHeaders = getAuthHeaders({
+			server: { settings: { app: { api: {} } } },
 			auth: {
 				credentials: {
 					memberCookie: 'foo member',

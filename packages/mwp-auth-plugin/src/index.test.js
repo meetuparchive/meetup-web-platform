@@ -17,6 +17,7 @@ const MOCK_SERVER = {
 	plugins: {
 		requestAuth: {},
 	},
+	settings: { app: { api: {} } },
 };
 
 const MOCK_REQUEST = {
@@ -32,11 +33,13 @@ const MOCK_REQUEST = {
 
 describe('mwpScheme', () => {
 	test('returns an object with an "authenticate" function', () => {
-		expect(mwpScheme()).toMatchObject({ authenticate: expect.any(Function) });
+		expect(mwpScheme(MOCK_SERVER)).toMatchObject({
+			authenticate: expect.any(Function),
+		});
 	});
 	test('authenticate function calls reply.continue with an object with a "credentials" value', () => {
 		MOCK_REPLY_FN.continue.mockClear();
-		mwpScheme().authenticate(MOCK_REQUEST, MOCK_REPLY_FN);
+		mwpScheme(MOCK_SERVER).authenticate(MOCK_REQUEST, MOCK_REPLY_FN);
 		expect(MOCK_REPLY_FN.continue).toHaveBeenCalledWith({
 			credentials: {
 				memberCookie: expect.any(String),
@@ -56,7 +59,7 @@ describe('mwpScheme', () => {
 				[CSRF_TOKEN_COOKIE]: csrfToken,
 			},
 		};
-		mwpScheme().authenticate(MOCK_REQUEST_AUTH, MOCK_REPLY_FN);
+		mwpScheme(MOCK_SERVER).authenticate(MOCK_REQUEST_AUTH, MOCK_REPLY_FN);
 		expect(MOCK_REPLY_FN.continue).toHaveBeenCalledWith({
 			credentials: {
 				memberCookie,

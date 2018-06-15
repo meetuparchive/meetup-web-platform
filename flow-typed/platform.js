@@ -36,6 +36,7 @@ declare type HapiServer = {
 	expose: (key: string, value: any) => void,
 	settings: {
 		app: { isProd: boolean, supportedLangs: Array<string>, [string]: any },
+		api: { host: string, isProd: boolean },
 	},
 	plugins: {
 		[string]: any,
