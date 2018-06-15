@@ -61,20 +61,22 @@ export function configureEnv(config) {
 /**
  * server-starting function
  */
-export function server(routes, connection, plugins, config) {
-	const server = new Hapi.Server();
+export async function server(serverConfig, routes, plugins) {
+	const server = Hapi.server(serverConfig);
 
-	// store runtime state - must modify existing server.settings.app in order to keep
-	// previously-defined properties
-	// https://hapijs.com/api#serverapp
-	server.settings.app = Object.assign(server.settings.app || {}, config);
+	// register plugins
+	// server.register() accepts an array of plugins
+	await server.register(plugins);
 
-	const appConnection = server.connection(connection);
-	return appConnection
-		.register(plugins)
-		.then(() => registerExtensionEvents(server))
-		.then(() => server.auth.strategy('default', 'mwp', true))
-		.then(() => appConnection.route(routes))
-		.then(() => server.start())
-		.then(() => server);
+	await registerExtensionEvents(server);
+
+	await server.auth.strategy('default', 'mwp', true);
+
+	// register routes
+	// server.route() accepts an array of routes
+	await server.route(routes);
+
+	await server.start();
+
+	return server;
 }
