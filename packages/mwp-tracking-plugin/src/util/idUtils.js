@@ -20,7 +20,7 @@ export const updateId: UpdateId = cookieName => (
 		// set in the plugin's onResponse handler
 		return newId(cookieName)(request);
 	}
-	return parseIdCookie(cookieVal).toString(); // toString used to satisfy Flow
+	return parseIdCookie(cookieVal.toString() || '').toString(); // toString used to satisfy Flow
 };
 
 /*
@@ -34,9 +34,18 @@ export const newId = (cookieName: string) => (request: HapiRequest): string => {
 	return id;
 };
 
-export const makeIdCookie = (id: string) => `id=${id}`;
-export const parseIdCookie = (cookieVal: string, doParseInt?: boolean) => {
-	const parsed: { id: string } = querystring.parse(cookieVal) || { id: '' };
+// chapstick cookies generally wrap cookie values with quotes, which is broken
+// and wrong, but when in Rome...
+export const makeIdCookie = (id: string) => `"id=${id}"`;
+export const parseIdCookie = (
+	cookieVal: ?string | ?Array<string>,
+	doParseInt?: boolean
+) => {
+	const cleanCookie =
+		cookieVal && cookieVal instanceof Array ? cookieVal[0] : cookieVal;
+	const parsed: { id: string } = querystring.parse(
+		(cleanCookie || '').toString().replace(/^"|"$/g, '') // strip nasty leading/ending quotes
+	) || { id: '' };
 	parsed.id = parsed.id || '';
 	if (doParseInt) {
 		return parseInt(parsed.id, 10) || 0;
