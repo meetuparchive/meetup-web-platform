@@ -42,7 +42,7 @@ export const parseCookieHeader = cookieHeader => {
 export const getServer = () => {
 	const config = { ...serverConfig, supportedLangs: ['en-US'] };
 
-	const server = new Hapi.Server({
+	const server = Hapi.server({
 		port: 0,
 		app: config,
 	});

@@ -44,28 +44,26 @@ export default function start(
 	const serverConfig = {
 		host: '0.0.0.0',
 		port: appConfig.app_server.port,
-		app: appConfig,
-	};
 
-	/*
-	* TODO: figure out what these are for
-	const serverRoutes = {
-		routes: {
-			plugins: {
-				'electrode-csrf-jwt': {
-					enabled: false,
-				},
-				'mwp-logger-plugin': {
-					enabled: true,
-				},
+		// accessed via server.settings.app
+		app: appConfig,
+
+		// accessed via erver.settings.plugins
+		plugins: {
+			'electrode-csrf-jwt': {
+				enabled: false,
+			},
+			'mwp-logger-plugin': {
+				enabled: true,
 			},
 		},
 	};
-	*/
 
 	if (appConfig.app_server.protocol === 'https') {
-		// enable HTTP/2
+		// enable https
 		serverConfig.tls = true;
+
+		// enable HTTP/2
 		serverConfig.listener = Http2.createServer({
 			key: fs.readFileSync(appConfig.app_server.key_file),
 			cert: fs.readFileSync(appConfig.app_server.crt_file),

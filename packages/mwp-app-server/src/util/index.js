@@ -62,7 +62,7 @@ export function configureEnv(config) {
  * server-starting function
  */
 export async function server(serverConfig, routes, plugins) {
-	const server = new Hapi.Server(serverConfig);
+	const server = Hapi.server(serverConfig);
 
 	// register plugins
 	// server.register() accepts an array of plugins

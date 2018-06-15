@@ -2,7 +2,7 @@ import Hapi from 'hapi';
 import LoggerPlugin from './';
 
 const testServer = test => {
-	const server = new Hapi.Server({
+	const server = Hapi.server({
 		port: 0,
 	});
 
