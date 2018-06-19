@@ -41,9 +41,12 @@ export function setCsrfCookies(request, reply) {
  */
 export function getCsrfPlugin() {
 	const register = (server, options, next) => {
+		const { isProd } = server.settings.app;
 		const cookieOptions = {
 			path: '/',
-			isSecure: server.settings.app.isProd,
+			isSecure: isProd, // No need to worry about https in dev
+			isSameSite: false, // Firefox will not read SameSite cookies set on redirect (e.g. from email link), so we disable that setting
+			domain: isProd ? '.meetup.com' : '.dev.meetup.com', // target the current app server domain
 		};
 
 		options.secret = server.settings.app.csrf_secret;
@@ -133,6 +136,7 @@ function getLanguagePlugin() {
 
 export default function getPlugins({ languageRenderers }) {
 	const { package: { agent }, getServer } = config;
+	const isProdApi = getServer().properties.api.isProd;
 	return [
 		getAppRoutePlugin({ languageRenderers }),
 		getApiProxyPlugin(),
@@ -140,10 +144,7 @@ export default function getPlugins({ languageRenderers }) {
 		getLogger(),
 		getCsrfPlugin(),
 		getRequestAuthPlugin(),
-		getActivityTrackingPlugin({
-			agent,
-			isProdApi: getServer().properties.api.isProd,
-		}),
+		getActivityTrackingPlugin({ agent, isProdApi }),
 		getClickTrackingPlugin(),
 		getServiceWorkerPlugin(),
 		Inert,
