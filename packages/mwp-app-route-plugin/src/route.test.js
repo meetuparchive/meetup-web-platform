@@ -6,7 +6,10 @@ describe('onPreResponse.method', () => {
 	it('returns html containing error message', () => {
 		const errorMessage = 'foobar';
 		const errorCode = 432;
-		const response = Boom.create(errorCode, errorMessage);
+		// const response = Boom.create(errorCode, errorMessage);
+		const response = new Boom(errorMessage, {
+			statusCode: errorCode,
+		});
 		response.header = (key, val) => val;
 
 		const request = {
@@ -14,19 +17,20 @@ describe('onPreResponse.method', () => {
 			route: {},
 			server: getServer(),
 		};
-		const replyObj = {
+		const responseObj = {
 			code() {},
+			response() {},
 		};
 		const spyable = {
-			reply: () => replyObj,
+			response: () => responseObj,
 		};
-		spyOn(replyObj, 'code');
-		spyOn(spyable, 'reply').and.callThrough();
-		const errorResponse = onPreResponse.method(request, spyable.reply);
-		expect(errorResponse).toBe(replyObj);
-		const errorMarkup = spyable.reply.calls.mostRecent().args[0];
+		spyOn(responseObj, 'code');
+		spyOn(spyable, 'response').and.callThrough();
+		const errorResponse = onPreResponse.method(request, spyable.response);
+		expect(errorResponse).toBe(responseObj);
+		const errorMarkup = spyable.response.calls.mostRecent().args[0];
 		expect(errorMarkup).toContain(errorMessage);
-		expect(replyObj.code).toHaveBeenCalledWith(errorCode);
+		expect(responseObj.code).toHaveBeenCalledWith(errorCode);
 	});
 	it('serves the homepage route', () => {
 		const server = getServer();
