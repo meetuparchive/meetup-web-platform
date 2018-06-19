@@ -149,10 +149,9 @@ const getOnPreResponse = cookieConfig => (request, reply) => {
  * all tracking functions returned from `getTrackers`, as well as assign request
  * lifecycle event handlers that can affect the response, e.g. by setting cookies
  */
-export default function register(
+export function register(
 	server: Object,
-	options: { agent: string, isProdApi: boolean },
-	next: () => void
+	options: { agent: string, isProdApi: boolean }
 ) {
 	const { agent, isProdApi } = options;
 
@@ -189,11 +188,10 @@ export default function register(
 			domain: isProdApi ? '.meetup.com' : '.dev.meetup.com',
 		})
 	);
-
-	next();
 }
 
-register.attributes = {
+exports.plugin = {
+	register,
 	name: ACTIVITY_PLUGIN_NAME,
 	version: '1.0.0',
 };

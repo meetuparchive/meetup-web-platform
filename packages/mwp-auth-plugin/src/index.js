@@ -48,13 +48,13 @@ export const mwpScheme = server => {
 	};
 };
 
-export default function register(server, options, next) {
+export function register(server, options) {
 	// register the plugin's auth scheme
 	server.auth.scheme('mwp', mwpScheme);
-	next();
 }
 
-register.attributes = {
+exports.plugin = {
+	register,
 	name: 'mwp-auth',
 	version: '1.0.0',
 };

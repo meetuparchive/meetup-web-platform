@@ -184,7 +184,9 @@ describe('API proxy POST endpoint integration tests', () => {
 			JSON.stringify(POST_BODY)
 		);
 		const expectedPayload = JSON.stringify(
-			Boom.create(400, 'INVALID_JWT').output.payload
+			new Boom('INVALID_JWT', {
+				statusCode: 400,
+			}).output.payload
 		);
 		const test = response => expect(response.payload).toEqual(expectedPayload);
 		const csrfHeaders = () =>

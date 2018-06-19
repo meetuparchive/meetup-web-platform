@@ -41,12 +41,16 @@ export const parseCookieHeader = cookieHeader => {
 
 export const getServer = () => {
 	const config = { ...serverConfig, supportedLangs: ['en-US'] };
-	const server = new Hapi.Server();
-	server.connection({ port: 0 });
+
+	const server = Hapi.server({
+		port: 0,
+		app: config,
+	});
+
 	server.app = {
 		logger: MOCK_LOGGER,
 	};
-	server.settings.app = config;
+
 	server.plugins = {
 		'mwp-api-proxy-plugin': {
 			duotoneUrls: [],
@@ -56,11 +60,14 @@ export const getServer = () => {
 	server.decorate('request', 'trackActivity', () => ({}));
 	server.decorate('request', 'getLangPrefixPath', () => '/');
 	server.decorate('request', 'getLanguage', () => 'en-US');
+
 	server.logger = () => MOCK_LOGGER;
+
 	server.ext('onPreHandler', (request, reply) => {
 		request.plugins.tracking = {};
 		reply.continue();
 	});
+
 	return server;
 };
 

@@ -14,7 +14,7 @@ export const setPluginState = (request: HapiRequest, reply: HapiReply) => {
 	return reply.continue();
 };
 
-export default function register(server: Object, options: void, next: () => void) {
+export function register(server: Object, options: void) {
 	// supply duotone urls through `server.plugins['mwp-api-proxy-plugin'].duotoneUrls`
 	server.expose(
 		'duotoneUrls',
@@ -29,11 +29,10 @@ export default function register(server: Object, options: void, next: () => void
 	// add a route that will receive query requests as querystring params
 	const routes = getApiProxyRoutes(`${API_ROUTE_PATH}/{page*}`);
 	server.route(routes);
-
-	next();
 }
 
-register.attributes = {
+exports.plugin = {
+	register,
 	name: API_PROXY_PLUGIN_NAME,
 	version: '1.0.0',
 	dependencies: [
