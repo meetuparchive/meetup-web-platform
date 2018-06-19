@@ -16,10 +16,30 @@ import 'rxjs/add/operator/timeout';
 import config from 'mwp-config';
 
 export const API_META_HEADER = 'X-Meta-Request-Headers';
-const MEMBER_COOKIE_NAME =
-	process.env.NODE_ENV === 'production' ? 'MEETUP_MEMBER' : 'MEETUP_MEMBER_DEV';
-const CSRF_COOKIE_NAME =
-	process.env.NODE_ENV === 'production' ? 'MEETUP_CSRF' : 'MEETUP_CSRF_DEV';
+
+const _makeGetCookieNames = () => {
+	// memoize the cookie names - they don't change
+	let memberCookieName;
+	let csrfCookieName;
+	return request => {
+		if (!memberCookieName) {
+			memberCookieName = request.server.settings.app.api.isProd
+				? 'MEETUP_MEMBER'
+				: 'MEETUP_MEMBER_DEV';
+		}
+		if (!csrfCookieName) {
+			csrfCookieName = request.server.settings.app.api.isProd
+				? 'MEETUP_CSRF'
+				: 'MEETUP_CSRF_DEV';
+		}
+
+		return {
+			memberCookieName,
+			csrfCookieName,
+		};
+	};
+};
+const getCookieNames = _makeGetCookieNames();
 
 const MOCK_RESPONSE_OK = {
 	// minimal representation of http.IncomingMessage
@@ -161,10 +181,11 @@ export function getAuthHeaders(request) {
 	// Cookie + CSRF auth: need have matching UUID in MEETUP_CSRF cookie and 'csrf-token' header
 	// Valid cookie and CSRF are supplied by mwp-auth-plugin in request.auth.credentials
 	const cookies = { ...request.state };
+	const { memberCookieName, csrfCookieName } = getCookieNames(request);
 	const { memberCookie, csrfToken } = request.auth.credentials; // set by mwp-auth plugin
 
-	cookies[CSRF_COOKIE_NAME] = csrfToken;
-	cookies[MEMBER_COOKIE_NAME] = memberCookie;
+	cookies[memberCookieName] = memberCookie;
+	cookies[csrfCookieName] = csrfToken;
 
 	// rebuild a cookie header string from the parsed `cookies` object
 	const cookie = Object.keys(cookies)

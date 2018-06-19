@@ -151,18 +151,18 @@ const getOnPreResponse = cookieConfig => (request, reply) => {
  */
 export default function register(
 	server: Object,
-	options: { agent: string, isProd: boolean },
+	options: { agent: string, isProdApi: boolean },
 	next: () => void
 ) {
-	const { agent, isProd } = options;
+	const { agent, isProdApi } = options;
 
-	const trackIdCookieName: string = isProd
+	const trackIdCookieName: string = isProdApi
 		? 'MEETUP_TRACK'
 		: 'MEETUP_TRACK_DEV';
-	const browserIdCookieName: string = isProd
+	const browserIdCookieName: string = isProdApi
 		? 'MEETUP_BROWSER_ID'
 		: 'MEETUP_BROWSER_ID_DEV';
-	const memberCookieName: string = isProd
+	const memberCookieName: string = isProdApi
 		? 'MEETUP_MEMBER'
 		: 'MEETUP_MEMBER_DEV';
 
@@ -186,7 +186,7 @@ export default function register(
 			browserIdCookieName,
 			memberCookieName,
 			trackIdCookieName,
-			domain: isProd ? '.meetup.com' : '.dev.meetup.com',
+			domain: isProdApi ? '.meetup.com' : '.dev.meetup.com',
 		})
 	);
 
