@@ -1,3 +1,9 @@
+## [16.2]
+
+- **NEW FEATURE** `mwp-app-render/lib/components/StateBroadcast` component that
+  can be inserted anywhere in an application in order to enable a `window.getAppState()`
+  function that returns the current Redux state tree as a single object.
+
 ## [16.1]
 
 - **NEW FEATURE** the prod REST API can now be used directly in the dev environment.
