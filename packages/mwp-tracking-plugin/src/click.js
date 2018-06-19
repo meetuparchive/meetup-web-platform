@@ -21,13 +21,14 @@ export function onPreHandlerExtension(request: HapiRequest, reply: HapiReply) {
  * all tracking functions returned from `getTrackers`, as well as assign request
  * lifecycle event handlers that can affect the response, e.g. by setting cookies
  */
-export default function register(server: Object, options: void, next: () => void) {
+export function register(server: Object, options: void) {
 	server.ext('onPreHandler', onPreHandlerExtension);
-
-	next();
 }
 
-register.attributes = {
+register.attributes = {};
+
+exports.plugin = {
+	register,
 	name: CLICK_PLUGIN_NAME,
 	version: '1.0.0',
 	dependencies: [
