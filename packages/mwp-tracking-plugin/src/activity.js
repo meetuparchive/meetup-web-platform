@@ -111,16 +111,16 @@ export function getTrackers(options: {
 /*
  * Run request-initialization routines, e.g. creating plugin data store
  */
-const onRequest = (request, reply) => {
+const onRequest = (request, h) => {
 	// initialize request.plugins[ACTIVITY_PLUGIN_NAME] to store cookie vals
 	request.plugins[ACTIVITY_PLUGIN_NAME] = {};
-	reply.continue();
+	h.continue();
 };
 /*
  * Read from request data to prepare/modify response. Mainly looking for new
  * tracking cookies that need to be set using request.response.state.
  */
-const getOnPreResponse = cookieConfig => (request, reply) => {
+const getOnPreResponse = cookieConfig => (request, h) => {
 	const { browserIdCookieName, trackIdCookieName, domain } = cookieConfig;
 	const pluginData = request.plugins[ACTIVITY_PLUGIN_NAME];
 	const browserId = pluginData[browserIdCookieName];
@@ -141,7 +141,7 @@ const getOnPreResponse = cookieConfig => (request, reply) => {
 	if (trackId) {
 		request.response.state(trackIdCookieName, trackId, FOREVER);
 	}
-	reply.continue();
+	h.continue();
 };
 
 /*

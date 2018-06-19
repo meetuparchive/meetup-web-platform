@@ -6,12 +6,12 @@ import proxyApi$ from './proxy';
 import { API_ROUTE_PATH, API_PROXY_PLUGIN_NAME } from './config';
 export { API_ROUTE_PATH } from './config';
 
-export const setPluginState = (request: HapiRequest, reply: HapiReply) => {
+export const setPluginState = (request: HapiRequest, h: HapiRequestToolkit) => {
 	request.plugins[API_PROXY_PLUGIN_NAME] = {
-		setState: reply.state, // allow plugin to proxy cookies from API
+		setState: h.state, // allow plugin to proxy cookies from API
 	};
 
-	return reply.continue();
+	return h.continue();
 };
 
 export function register(server: Object, options: void) {

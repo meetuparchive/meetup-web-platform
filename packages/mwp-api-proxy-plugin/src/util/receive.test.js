@@ -49,7 +49,7 @@ describe('makeInjectResponseCookies', () => {
 		makeInjectResponseCookies(request)([response, null, null]);
 		expect(response.toJSON).not.toHaveBeenCalled();
 	});
-	it('sets the provided cookies on the reply state', () => {
+	it('sets the provided cookies on the response state', () => {
 		const mockJar = externalRequest.jar();
 		spyOn(request.plugins[API_PROXY_PLUGIN_NAME], 'setState');
 
@@ -59,7 +59,9 @@ describe('makeInjectResponseCookies', () => {
 		mockJar.setCookie(`${key}=${value}`, responseObj.request.uri.href);
 
 		makeInjectResponseCookies(request)([response, null, mockJar]);
-		expect(request.plugins[API_PROXY_PLUGIN_NAME].setState).toHaveBeenCalledWith(
+		expect(
+			request.plugins[API_PROXY_PLUGIN_NAME].setState
+		).toHaveBeenCalledWith(
 			key,
 			value,
 			jasmine.any(Object) // don't actually care about the cookie options

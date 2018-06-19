@@ -22,9 +22,9 @@ export function checkForDevUrl(value) {
 	return false;
 }
 
-export function onRequestExtension(request, reply) {
+export function onRequestExtension(request, h) {
 	request.id = uuid.v4(); // provide uuid for request instead of default Hapi id
-	return reply.continue();
+	return h.continue();
 }
 
 /**

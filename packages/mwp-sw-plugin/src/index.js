@@ -20,14 +20,14 @@ export function register(server: Object, options: ?Object) {
 		config: {
 			auth: false,
 		},
-		handler: (request, reply) => {
+		handler: (request, h) => {
 			const { localeCode } = request.params;
 			const swPath = path.resolve(
 				buildPaths.output.browser,
 				localeCode,
 				'asset-service-worker.js'
 			);
-			reply.file(swPath).type('application/javascript');
+			h.file(swPath).type('application/javascript');
 		},
 	});
 }
@@ -36,5 +36,5 @@ exports.plugin = {
 	register,
 	name: 'mwp-service-worker',
 	version: '1.0.0',
-	dependencies: 'inert', // decorates `reply.file`
+	dependencies: 'inert', // decorates `h.file`
 };

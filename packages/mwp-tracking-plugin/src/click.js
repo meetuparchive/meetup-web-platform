@@ -3,9 +3,12 @@ import clickReader from './util/clickReader';
 
 export const CLICK_PLUGIN_NAME = 'mwp-click-tracking';
 
-export function onPreHandlerExtension(request: HapiRequest, reply: HapiReply) {
+export function onPreHandlerExtension(
+	request: HapiRequest,
+	h: HapiResponseToolkit
+) {
 	try {
-		clickReader(request, reply);
+		clickReader(request, h);
 	} catch (err) {
 		request.server.app.logger.error({
 			err,
@@ -13,7 +16,7 @@ export function onPreHandlerExtension(request: HapiRequest, reply: HapiReply) {
 			...request.raw,
 		});
 	}
-	return reply.continue();
+	return h.continue();
 }
 
 /*

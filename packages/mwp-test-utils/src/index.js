@@ -63,9 +63,9 @@ export const getServer = () => {
 
 	server.logger = () => MOCK_LOGGER;
 
-	server.ext('onPreHandler', (request, reply) => {
+	server.ext('onPreHandler', (request, h) => {
 		request.plugins.tracking = {};
-		reply.continue();
+		h.continue();
 	});
 
 	return server;

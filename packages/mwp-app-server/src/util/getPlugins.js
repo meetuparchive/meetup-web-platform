@@ -17,12 +17,12 @@ import apiProxyPlugin from 'mwp-api-proxy-plugin';
  * @module ServerPlugins
  */
 
-export function setCsrfCookies(request, reply) {
+export function setCsrfCookies(request, h) {
 	const csrfHeader = (request.response.headers || {})['x-csrf-jwt'];
 	if (csrfHeader) {
-		reply.state('x-csrf-jwt-header', csrfHeader);
+		h.state('x-csrf-jwt-header', csrfHeader);
 	}
-	return reply.continue();
+	return h.continue();
 }
 
 /**

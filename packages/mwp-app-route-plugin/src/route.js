@@ -10,18 +10,18 @@ export const onPreResponse = {
 	 * - In dev, it transforms the generic 500 error response JSON into a full dev-
 	 *   friendly rendering of the stack trace.
 	 */
-	method: (request: HapiRequest, reply: HapiReply) => {
+	method: (request: HapiRequest, h: HapiResponseToolkit) => {
 		const response = request.response;
 
 		if (!response.isBoom || process.env.NODE_ENV === 'production') {
-			return reply.continue();
+			return h.continue();
 		}
 		const error = response;
 		const { RedBoxError } = require('redbox-react');
 		const errorMarkup = ReactDOMServer.renderToString(
 			React.createElement(RedBoxError, { error })
 		);
-		const errorResponse = reply(
+		const errorResponse = h.response(
 			`<!DOCTYPE html><html><body>${errorMarkup}</body></html>`
 		);
 		errorResponse.code(error.output.statusCode);

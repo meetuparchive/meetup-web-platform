@@ -43,13 +43,13 @@ const onRequestError = (request, err) => {
 	});
 };
 
-const onRequestExtension = (request, reply) => {
+const onRequestExtension = (request, h) => {
 	// log at debug level to make it easy to filter out
 	logger.debug({
 		httpRequest: request,
 		...request.raw,
 	});
-	return reply.continue();
+	return h.continue();
 };
 
 export function register(server, options) {
