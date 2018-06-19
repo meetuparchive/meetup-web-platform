@@ -34,12 +34,11 @@ export function onRequestExtension(request, reply) {
  * @return {Object} Hapi server
  */
 export function registerExtensionEvents(server) {
-	server.ext([
-		{
-			type: 'onRequest',
-			method: onRequestExtension,
-		},
-	]);
+	server.ext({
+		type: 'onRequest',
+		method: onRequestExtension,
+	});
+
 	return server;
 }
 
