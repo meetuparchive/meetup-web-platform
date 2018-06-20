@@ -6,7 +6,6 @@ describe('onPreResponse.method', () => {
 	it('returns html containing error message', () => {
 		const errorMessage = 'foobar';
 		const errorCode = 432;
-		// const response = Boom.create(errorCode, errorMessage);
 		const response = new Boom(errorMessage, {
 			statusCode: errorCode,
 		});

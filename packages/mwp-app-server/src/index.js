@@ -48,7 +48,7 @@ export default function start(
 		// accessed via server.settings.app
 		app: appConfig,
 
-		// accessed via erver.settings.plugins
+		// accessed via server.settings.plugins
 		plugins: {
 			'electrode-csrf-jwt': {
 				enabled: false,
