@@ -24,11 +24,10 @@ export function logResponse(request) {
 		return;
 	}
 
-	const log = (
-		(response.statusCode >= 500 && logger.error) ||
+	const log = ((response.statusCode >= 500 && logger.error) ||
 		(response.statusCode >= 400 && logger.warn) ||
-		logger.info
-	).bind(logger);
+		logger.info)
+		.bind(logger);
 
 	log({ httpRequest: request, id, ...request.raw });
 
@@ -44,16 +43,16 @@ const onRequestError = (request, err) => {
 	});
 };
 
-const onRequestExtension = (request, reply) => {
+const onRequestExtension = (request, h) => {
 	// log at debug level to make it easy to filter out
 	logger.debug({
 		httpRequest: request,
 		...request.raw,
 	});
-	return reply.continue();
+	return h.continue;
 };
 
-export default function register(server, options, next) {
+export function register(server, options) {
 	// might also want to add default logging for 'onPostStart', 'onPostStop'
 	server.ext([
 		{
@@ -64,11 +63,10 @@ export default function register(server, options, next) {
 	server.on('request-error', onRequestError);
 	server.on('response', logResponse);
 	server.app.logger = logger;
-
-	next();
 }
 
-register.attributes = {
+exports.plugin = {
+	register,
 	name: 'mwp-logger-plugin',
 	version: '1.0.0',
 };
