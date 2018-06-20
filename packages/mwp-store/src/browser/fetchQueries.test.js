@@ -3,7 +3,7 @@ import { mockQuery } from 'meetup-web-mocks/lib/app';
 import { MOCK_GROUP } from 'meetup-web-mocks/lib/api';
 import * as clickState from 'mwp-tracking-plugin/lib/util/clickState';
 
-import fetchQueries, { CSRF_HEADER_COOKIE } from './fetchQueries';
+import fetchQueries from './fetchQueries';
 
 const { URLSearchParams } = url;
 clickState.setClickCookie = jest.fn();
@@ -27,7 +27,7 @@ jest.mock('js-cookie', () => {
 
 describe('fetchQueries', () => {
 	const API_URL = new URL('http://api.example.com/');
-	const csrfJwt = `${CSRF_HEADER_COOKIE} value`;
+	const csrfJwt = 'x-mwp-csrf value';
 	const getQueries = [mockQuery({ params: {} })];
 	const POSTQueries = [
 		{ ...mockQuery({ params: {} }), meta: { method: 'POST' } },
@@ -40,7 +40,7 @@ describe('fetchQueries', () => {
 			headers: {
 				get: key =>
 					({
-						'x-csrf-jwt': csrfJwt,
+						'x-mwp-csrf': csrfJwt,
 					}[key]),
 			},
 		});
@@ -51,7 +51,7 @@ describe('fetchQueries', () => {
 			headers: {
 				get: key =>
 					({
-						'x-csrf-jwt': csrfJwt,
+						'x-mwp-csrf': csrfJwt,
 					}[key]),
 			},
 		});
@@ -163,7 +163,7 @@ describe('fetchQueries', () => {
 				const dummyUrl = new URL(`http://example.com?${options.body}`);
 				expect(dummyUrl.searchParams.has('queries')).toBe(true);
 				expect(dummyUrl.searchParams.has('metadata')).toBe(true);
-				expect(options.headers['x-csrf-jwt']).toEqual(csrfJwt);
+				expect(options.headers['x-mwp-csrf']).toEqual(csrfJwt);
 			});
 		});
 		it('POST without meta calls fetch without metadata body params', () => {
@@ -178,7 +178,7 @@ describe('fetchQueries', () => {
 				const dummyUrl = new URL(`http://example.com?${options.body}`);
 				expect(dummyUrl.searchParams.has('queries')).toBe(true);
 				expect(dummyUrl.searchParams.has('metadata')).toBe(false);
-				expect(options.headers['x-csrf-jwt']).toEqual(csrfJwt);
+				expect(options.headers['x-mwp-csrf']).toEqual(csrfJwt);
 			});
 		});
 	});
@@ -206,7 +206,7 @@ describe('fetchQueries', () => {
 				expect(options.method).toEqual('POST');
 				expect(url.searchParams.has('queries')).toBe(true);
 				expect(url.searchParams.has('metadata')).toBe(false);
-				expect(options.headers['x-csrf-jwt']).toEqual(csrfJwt);
+				expect(options.headers['x-mwp-csrf']).toEqual(csrfJwt);
 			});
 		});
 	});

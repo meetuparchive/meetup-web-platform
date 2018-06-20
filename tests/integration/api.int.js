@@ -121,9 +121,9 @@ const runMutationTest = ({ csrfHeaders, method, test, queries }) => server => {
 	return csrfHeaders()
 		.then(([headerToken, cookieToken]) => {
 			const headers = {
-				'x-csrf-jwt': headerToken,
+				'x-mwp-csrf': headerToken,
 				'content-type': 'application/x-www-form-urlencoded',
-				cookie: `x-csrf-jwt=${cookieToken}`,
+				cookie: `x-mwp-csrf=${cookieToken}`,
 			};
 			const request = {
 				method,
