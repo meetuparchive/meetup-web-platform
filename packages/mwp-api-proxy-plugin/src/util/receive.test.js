@@ -22,14 +22,15 @@ jest.mock('mwp-logger-plugin', () => {
 	};
 });
 
-describe('makeInjectResponseCookies', () => {
+describe('makeInjectResponseCookies', async () => {
+	const server = await getServer();
 	const request = {
 		plugins: {
 			[API_PROXY_PLUGIN_NAME]: {
 				setState() {},
 			},
 		},
-		server: getServer(),
+		server,
 	};
 	const responseObj = {
 		request: {
@@ -252,8 +253,9 @@ describe('makeApiResponseToQueryResponse', () => {
 	});
 });
 
-describe('makeLogResponse', () => {
-	const request = { server: getServer() };
+describe('makeLogResponse', async () => {
+	const server = await getServer();
+	const request = { server };
 	const MOCK_INCOMINGMESSAGE_GET = {
 		elapsedTime: 1234,
 		request: {

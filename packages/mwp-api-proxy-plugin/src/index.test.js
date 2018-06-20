@@ -11,7 +11,9 @@ jest.mock('mwp-config', () => {
 	return config;
 });
 
-async function getResponse(injectRequest, server = getServer()) {
+async function getResponse(injectRequest) {
+	const server = await getServer();
+
 	// returns the server instance after it has been configured with the routes being tested
 	await server.register([
 		{

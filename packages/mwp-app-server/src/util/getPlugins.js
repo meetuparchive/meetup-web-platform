@@ -134,9 +134,10 @@ function getLanguagePlugin() {
 	};
 }
 
-export default function getPlugins({ languageRenderers }) {
+export default async function getPlugins({ languageRenderers }) {
 	const { package: { agent }, getServer } = config;
-	const isProdApi = getServer().properties.api.isProd;
+	const server = await getServer();
+	const isProdApi = server.properties.api.isProd;
 	return [
 		getAppRoutePlugin({ languageRenderers }),
 		getApiProxyPlugin(),

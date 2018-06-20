@@ -64,7 +64,8 @@ describe('configureEnv', function() {
 	});
 });
 
-describe('onRequestExtension', () => {
+describe('onRequestExtension', async () => {
+	const server = await getServer();
 	const request = {
 		headers: 'foo',
 		id: 'bar',
@@ -72,7 +73,7 @@ describe('onRequestExtension', () => {
 		info: {},
 		url: { href: 'http://example.com' },
 		state: {},
-		server: getServer(),
+		server,
 	};
 
 	it('returns h.continue', () => {

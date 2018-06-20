@@ -25,7 +25,7 @@ const MOCK_HAPI_REQUEST = {
 	state: {
 		oauth_token: 'foo',
 	},
-	server: getServer(),
+	server: (async () => await getServer())(),
 	log: () => {},
 	trackActivity: () => {},
 	getLanguage: () => 'en-US',
