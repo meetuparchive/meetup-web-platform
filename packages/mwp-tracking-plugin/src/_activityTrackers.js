@@ -1,9 +1,6 @@
 // @flow
-import url from 'url';
 import rison from 'rison';
 import { parseIdCookie, updateId } from './util/idUtils';
-
-const parseUrl = url.parse;
 
 /*
  * This module exports specific tracking functions that consume the `request`
@@ -42,7 +39,7 @@ export const getTrackActivity: TrackGetter = trackOpts => request => (
 	fields: ActivityFields
 ) => {
 	const { method, payload, query, info: { referrer } } = request;
-	const requestReferrer = parseUrl(referrer).pathname || '';
+	const requestReferrer = referrer || '';
 
 	const reqData = method === 'post' ? payload : query;
 
@@ -51,12 +48,12 @@ export const getTrackActivity: TrackGetter = trackOpts => request => (
 		// the reqData. The 'url' is the 'requestReferrer'
 		const metadataRison = reqData.metadata || rison.encode_object({});
 		const { referrer } = rison.decode_object(metadataRison);
-		const url = parseUrl(requestReferrer).pathname;
+		const url = requestReferrer;
 		return request.trackApiResponses({ url, referrer, ...fields });
 	}
 
 	return request.trackApiResponses({
-		url: request.url.pathname, // requested url
+		url: request.url.path, // requested url
 		referrer: requestReferrer, // referer
 		...fields,
 	});
