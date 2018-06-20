@@ -26,7 +26,11 @@ async function getResponse(injectRequest, server = getServer()) {
 		},
 	]);
 
-	await server.auth.strategy('default', 'mwp', true);
+	await server.auth.strategy('default', 'mwp');
+	await server.auth.default({
+		mode: true,
+		strategy: 'default',
+	});
 
 	await server.inject(injectRequest);
 

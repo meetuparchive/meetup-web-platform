@@ -64,15 +64,18 @@ export async function server(serverConfig, routes, plugins) {
 	const server = Hapi.server(serverConfig);
 
 	// register plugins
-	// server.register() accepts an array of plugins
 	await server.register(plugins);
 
 	await registerExtensionEvents(server);
 
-	await server.auth.strategy('default', 'mwp', true);
+	// in hapi v17, mode can only be set through `server.auth.default()`
+	await server.auth.strategy('default', 'mwp');
+	await server.auth.default({
+		mode: true, // true === (mode: 'required')
+		strategy: 'default',
+	});
 
 	// register routes
-	// server.route() accepts an array of routes
 	await server.route(routes);
 
 	try {
