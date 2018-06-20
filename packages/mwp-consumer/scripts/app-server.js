@@ -17,7 +17,7 @@ const routes = [
 	{
 		method: 'GET',
 		path: `/app.js`,
-		config: {
+		options: {
 			auth: false,
 			cache: {
 				expiresIn: 1000 * 60 * 60 * 24 * 365, // one year
