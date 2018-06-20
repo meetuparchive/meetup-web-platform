@@ -22,9 +22,9 @@ export function checkForDevUrl(value) {
 	return false;
 }
 
-export function onRequestExtension(request, reply) {
+export function onRequestExtension(request, h) {
 	request.id = uuid.v4(); // provide uuid for request instead of default Hapi id
-	return reply.continue();
+	return h.continue();
 }
 
 /**
@@ -34,12 +34,11 @@ export function onRequestExtension(request, reply) {
  * @return {Object} Hapi server
  */
 export function registerExtensionEvents(server) {
-	server.ext([
-		{
-			type: 'onRequest',
-			method: onRequestExtension,
-		},
-	]);
+	server.ext({
+		type: 'onRequest',
+		method: onRequestExtension,
+	});
+
 	return server;
 }
 
@@ -61,20 +60,30 @@ export function configureEnv(config) {
 /**
  * server-starting function
  */
-export function server(routes, connection, plugins, config) {
-	const server = new Hapi.Server();
+export async function server(serverConfig, routes, plugins) {
+	const server = Hapi.server(serverConfig);
 
-	// store runtime state - must modify existing server.settings.app in order to keep
-	// previously-defined properties
-	// https://hapijs.com/api#serverapp
-	server.settings.app = Object.assign(server.settings.app || {}, config);
+	// register plugins
+	await server.register(plugins);
 
-	const appConnection = server.connection(connection);
-	return appConnection
-		.register(plugins)
-		.then(() => registerExtensionEvents(server))
-		.then(() => server.auth.strategy('default', 'mwp', true))
-		.then(() => appConnection.route(routes))
-		.then(() => server.start())
-		.then(() => server);
+	await registerExtensionEvents(server);
+
+	// in hapi v17, mode can only be set through `server.auth.default()`
+	await server.auth.strategy('default', 'mwp');
+	await server.auth.default({
+		mode: true, // true === (mode: 'required')
+		strategy: 'default',
+	});
+
+	// register routes
+	await server.route(routes);
+
+	try {
+		await server.start();
+	} catch (err) {
+		// TODO: add logging
+		console.log(err);
+	}
+
+	return server;
 }

@@ -2,15 +2,17 @@ import Hapi from 'hapi';
 import LoggerPlugin from './';
 
 const testServer = test => {
-	const server = new Hapi.Server();
-	server.connection({ port: 0 });
+	const server = Hapi.server({
+		port: 0,
+	});
+
 	return server
 		.register(LoggerPlugin)
 		.then(() =>
 			server.route({
 				method: 'GET',
 				path: '/{wild*}',
-				handler: (request, reply) => reply('okay'),
+				handler: (request, h) => h.response('okay'),
 			})
 		)
 		.then(() => server.inject({ url: '/ping' }))

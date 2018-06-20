@@ -15,16 +15,18 @@ describe('server', () => {
 		const fooPlugin = { register: 'foo' };
 		const routes = [fooRoute];
 		const plugins = [fooPlugin];
-		spyOn(serverUtils, 'server').and.returnValue(Promise.resolve(expectedServer));
+		spyOn(serverUtils, 'server').and.returnValue(
+			Promise.resolve(expectedServer)
+		);
 		return start({}, { routes, plugins }).then(returnedServer => {
 			const callArgs = serverUtils.server.calls.mostRecent().args;
 			expect(callArgs).toEqual([
+				jasmine.any(Object), // serverConfig
 				jasmine.any(Array), // routes
-				jasmine.any(Object), // connection
 				jasmine.any(Array), // plugins
-				jasmine.any(Object), // config
+				jasmine.any(Object), // appConfig
 			]);
-			expect(callArgs[0].indexOf(fooRoute)).toBeGreaterThan(-1);
+			expect(callArgs[1].indexOf(fooRoute)).toBeGreaterThan(-1);
 			expect(callArgs[2].indexOf(fooPlugin)).toBeGreaterThan(-1);
 			expect(returnedServer).toBe(expectedServer);
 		});
