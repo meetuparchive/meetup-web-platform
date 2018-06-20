@@ -17,10 +17,13 @@ import apiProxyPlugin from 'mwp-api-proxy-plugin';
  * @module ServerPlugins
  */
 
+const CSRF_COOKIE_NAME = 'x-mwp-csrf';
+const CSRF_HEADER_COOKIE_NAME = `${CSRF_COOKIE_NAME}-header`;
+const CSRF_HEADER_NAME = CSRF_COOKIE_NAME;
 export function setCsrfCookies(request, reply) {
-	const csrfHeader = (request.response.headers || {})['x-csrf-jwt'];
+	const csrfHeader = (request.response.headers || {})[CSRF_COOKIE_NAME];
 	if (csrfHeader) {
-		reply.state('x-csrf-jwt-header', csrfHeader);
+		reply.state(CSRF_HEADER_COOKIE_NAME, csrfHeader);
 	}
 	return reply.continue();
 }
@@ -28,9 +31,9 @@ export function setCsrfCookies(request, reply) {
 /**
  * The CSRF plugin we use - 'electrode-csrf-jwt' compares a cookie token to a
  * header token in non-GET requests. By default, it will set the cookie token
- * itself ('x-csrf-jwt'), and supply the corresponding header token in a custom
- * header (also 'x-csrf-jwt'). However, we update this flow to also supply the
- * header token as a cookie ('x-csrf-jwt-header') so that it syncs across
+ * itself (CSRF_COOKIE_NAME), and supply the corresponding header token in a custom
+ * header (also CSRF_COOKIE_NAME). However, we update this flow to also supply the
+ * header token as a cookie (CSRF_COOKIE_NAME-header) so that it syncs across
  * browser tabs.
  *
  * In order to ensure that both cookie values have parallel settings, this
@@ -39,7 +42,7 @@ export function setCsrfCookies(request, reply) {
  *
  * @return {Object} the { register } object for a `server.register` call.
  */
-export function getCsrfPlugin() {
+export function getCsrfPlugin(electrodeOptions) {
 	const register = (server, options, next) => {
 		const { isProd } = server.settings.app;
 		const cookieOptions = {
@@ -49,15 +52,19 @@ export function getCsrfPlugin() {
 			domain: isProd ? '.meetup.com' : '.dev.meetup.com', // target the current app server domain
 		};
 
-		options.secret = server.settings.app.csrf_secret;
+		Object.assign(
+			options,
+			{ secret: server.settings.app.csrf_secret },
+			electrodeOptions
+		);
 
 		server.state(
-			'x-csrf-jwt', // set by plugin
+			CSRF_COOKIE_NAME, // set by plugin
 			{ ...cookieOptions, isHttpOnly: true } // no client-side interaction needed
 		);
 
 		server.state(
-			'x-csrf-jwt-header', // set by onPreResponse
+			CSRF_HEADER_COOKIE_NAME, // set by onPreResponse
 			{ ...cookieOptions, isHttpOnly: false } // the client must read this cookie and return as a custom header
 		);
 
@@ -142,7 +149,10 @@ export default function getPlugins({ languageRenderers }) {
 		getApiProxyPlugin(),
 		getLanguagePlugin(),
 		getLogger(),
-		getCsrfPlugin(),
+		getCsrfPlugin({
+			headerName: CSRF_HEADER_NAME,
+			cookieName: CSRF_COOKIE_NAME,
+		}),
 		getRequestAuthPlugin(),
 		getActivityTrackingPlugin({ agent, isProdApi }),
 		getClickTrackingPlugin(),
