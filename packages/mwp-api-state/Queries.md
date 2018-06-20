@@ -91,11 +91,11 @@ array or a singleton.
 
 **Type examples**
 
-- `group`
-- `member`
-- `event`
-- `comment`
-- feature-specific objects like `home`, `conversations`
+-   `group`
+-   `member`
+-   `event`
+-   `comment`
+-   feature-specific objects like `home`, `conversations`
 
 #### `meta`
 
@@ -107,9 +107,8 @@ alongside the main request.
 #### `metaRequestHeaders`
 
 The `metaRequestHeaders` property is in reference to `X-Meta-Request-Headers` in the
-[meetup api](https://www.meetup.com/meetup_api/#meta-headers).  The response for each
+[meetup api](https://www.meetup.com/meetup_api/#meta-headers). The response for each
 header passed in will be in `REF.meta`, converted from `snake-case` to `camelCase`.
-
 
 ##### `method`
 
@@ -173,8 +172,8 @@ as its first argument, and an optional `meta` argument
 import * as api from 'meetup-web-platform/lib/actions/apiActionCreators';
 
 const getQuery = {
-  endpoint: 'ny-tech/members',
-  ref: 'newMember',
+	endpoint: 'ny-tech/members',
+	ref: 'newMember',
 };
 const getAction = api.get(getQuery);
 ```
@@ -185,9 +184,9 @@ const getAction = api.get(getQuery);
 import * as api from 'meetup-web-platform/lib/actions/apiActionCreators';
 
 const postQuery = {
-  endpoint: 'ny-tech/members',
-  ref: 'newMember',
-  params: { name, bio },
+	endpoint: 'ny-tech/members',
+	ref: 'newMember',
+	params: { name, bio },
 };
 const postAction = api.post(postQuery);
 const patchAction = api.patch(postQuery);
@@ -199,11 +198,11 @@ const patchAction = api.patch(postQuery);
 import * as api from 'meetup-web-platform/lib/actions/apiActionCreators';
 
 const deleteQuery = {
-  endpoint: 'ny-tech/members/123456',
-  ref: 'deletedMember',
-  params: { id },
+	endpoint: 'ny-tech/members/123456',
+	ref: 'deletedMember',
+	params: { id },
 };
-const deleteAction = api.del(deleteQuery);  // note `api.del` not `api.delete` because `delete` is a keywork
+const deleteAction = api.del(deleteQuery); // note `api.del` not `api.delete` because `delete` is a keywork
 ```
 
 ### Query dispatch
@@ -361,7 +360,7 @@ the failed call.
 
 ```js
 // see description for docs about object argument
-({ params, isExact, url, path, location }) => Query
+({ params, isExact, url, path, location }, state) => Query;
 ```
 
 One of the primary uses for queries is to load route-specific data from the
@@ -371,15 +370,15 @@ producing a fully-qualified 'query' object from the routing state input.
 
 Route query creator functions have two requirements:
 
-1. They are assigned as _props_ of React Router `route`s .The `query` prop can
-be either a single query creator function or an array of functions
-2. They are pure functions that take a single object argument constructed from the
-[`match` object from React Router](https://reacttraining.com/react-router/web/api/match),
-which includes `params` extracted from the URL) with an additional `location`
-property corresponding to the current
-[React Router `location`](https://reacttraining.com/react-router/web/api/location).
+1.  They are assigned as _props_ of React Router `route`s .The `query` prop can
+    be either a single query creator function or an array of functions
+2.  They are pure functions that take two arguments:
+    -   object constructed from the [`match` object from React Router](https://reacttraining.com/react-router/web/api/match),
+        which includes `params` extracted from the URL) with an additional `location`
+        property corresponding to the current [React Router `location`](https://reacttraining.com/react-router/web/api/location).
+    -   current Redux `state`, _including feature flag values_
 
-More info in the [Routing docs](./Routing.md).
+More info in the [mwp-router docs](../mwp-router/README.md).
 
 #### Example query function
 
@@ -393,7 +392,7 @@ function groupQuery({ params, location }) {
 		type: 'group',
 		endpoint: `/${urlname}`,
 		params: {
-			fields: ['event_sample']
+			fields: ['event_sample'],
 		},
 	};
 }
@@ -422,18 +421,18 @@ to make another GET request, you can manually dispatch an API request using the
 import * as api from 'meetup-web-platform/lib/actions/apiActionCreators';
 
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({ get: api.get }, dispatch);
+	return bindActionCreators({ get: api.get }, dispatch);
 }
 
 class Example extends React.Component {
-  componentDidMount() {
-    const lazyQuery = {
-      endpoint: `${this.props.match.params.urlname}/more/stuff`,
-      ref: 'moreStuff',
-      params: { foo: 'bar' },
-    };
-    this.props.get(lazyQuery);
-  }
+	componentDidMount() {
+		const lazyQuery = {
+			endpoint: `${this.props.match.params.urlname}/more/stuff`,
+			ref: 'moreStuff',
+			params: { foo: 'bar' },
+		};
+		this.props.get(lazyQuery);
+	}
 }
 ```
 
@@ -446,40 +445,36 @@ import * as api from 'meetup-web-platform/lib/actions/apiActionCreators';
 const NEW_STUFF_REF = 'newStuff';
 
 function mapStateToProps(state) {
-  // when the POST returns, the response will be accessible in Redux state,
-  // populated by an `API_RESP_SUCCESS` or `API_RESP_ERROR` action
-  return {
-    NEW_STUFF_REF: state.api[NEW_STUFF_REF],  
-  };
+	// when the POST returns, the response will be accessible in Redux state,
+	// populated by an `API_RESP_SUCCESS` or `API_RESP_ERROR` action
+	return {
+		NEW_STUFF_REF: state.api[NEW_STUFF_REF],
+	};
 }
 
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({ post: api.post }, dispatch);
+	return bindActionCreators({ post: api.post }, dispatch);
 }
 
 class Example extends React.Component {
-  componentWillReceiveProps(nextProps) {
-    if (nextProps[NEW_STUFF_REF]) {
-      // the POST returned _something_ - maybe an error
-      // you probably want to call `this.setState` or something here
-    }
-  }
-  onSubmit(e) {
-    e.preventDefault();  // prevent full-page submit
-    const postQuery = {
-      endpoint: `${this.props.match.params.urlname}/new/stuff`,
-      ref: NEW_STUFF_REF,
-      params: this.state.formValues,  // this would be set by controlled inputs in the form
-    };
-    this.props.post(postQuery);
-  }
-  render() {
-    return (
-      <form onSubmit={this.onSubmit}>
-        ...
-      </form>
-    );
-  }
+	componentWillReceiveProps(nextProps) {
+		if (nextProps[NEW_STUFF_REF]) {
+			// the POST returned _something_ - maybe an error
+			// you probably want to call `this.setState` or something here
+		}
+	}
+	onSubmit(e) {
+		e.preventDefault(); // prevent full-page submit
+		const postQuery = {
+			endpoint: `${this.props.match.params.urlname}/new/stuff`,
+			ref: NEW_STUFF_REF,
+			params: this.state.formValues, // this would be set by controlled inputs in the form
+		};
+		this.props.post(postQuery);
+	}
+	render() {
+		return <form onSubmit={this.onSubmit}>...</form>;
+	}
 }
 ```
 
@@ -505,43 +500,40 @@ import * as api from 'meetup-web-platform/lib/actions/apiActionCreators';
 const NEW_FILE_STUFF = 'newFileStuff';
 
 function mapStateToProps(state) {
-  // when the POST returns, the response will be accessible in Redux state,
-  // populated by an `API_RESP_SUCCESS` or `API_RESP_ERROR` action
-  return {
-    NEW_FILE_STUFF: state.api[NEW_FILE_STUFF],  
-  };
+	// when the POST returns, the response will be accessible in Redux state,
+	// populated by an `API_RESP_SUCCESS` or `API_RESP_ERROR` action
+	return {
+		NEW_FILE_STUFF: state.api[NEW_FILE_STUFF],
+	};
 }
 
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({ post: api.post }, dispatch);
+	return bindActionCreators({ post: api.post }, dispatch);
 }
 
 class Example extends React.Component {
-  componentWillReceiveProps(nextProps) {
-    if (nextProps[NEW_FILE_STUFF]) {
-      // the POST returned _something_ - maybe an error
-      // you probably want to call `this.setState` or something here
-    }
-  }
-  onSubmit(e) {
-    e.preventDefault();  // prevent full-page submit
-    const postQuery = {
-      endpoint: `${this.props.match.params.urlname}/new/stuff`,
-      ref: NEW_FILE_STUFF,
-      params: new FormData(this.form),  // one stop form encoding - forces 'multipart/form-data' content type
-    };
-    this.props.post(postQuery);
-  }
-  render() {
-    return (
-      <form
-        onSubmit={this.onSubmit}
-        ref={el => this.form = el}
-      >
-        ...
-      </form>
-    );
-  }
+	componentWillReceiveProps(nextProps) {
+		if (nextProps[NEW_FILE_STUFF]) {
+			// the POST returned _something_ - maybe an error
+			// you probably want to call `this.setState` or something here
+		}
+	}
+	onSubmit(e) {
+		e.preventDefault(); // prevent full-page submit
+		const postQuery = {
+			endpoint: `${this.props.match.params.urlname}/new/stuff`,
+			ref: NEW_FILE_STUFF,
+			params: new FormData(this.form), // one stop form encoding - forces 'multipart/form-data' content type
+		};
+		this.props.post(postQuery);
+	}
+	render() {
+		return (
+			<form onSubmit={this.onSubmit} ref={el => (this.form = el)}>
+				...
+			</form>
+		);
+	}
 }
 ```
 
