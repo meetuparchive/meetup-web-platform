@@ -17,7 +17,7 @@ export function register(server: Object, options: ?Object) {
 	server.route({
 		method: 'GET',
 		path: '/asset-service-worker.{localeCode}.js',
-		config: {
+		options: {
 			auth: false,
 		},
 		handler: (request, h) => {

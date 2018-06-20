@@ -33,7 +33,7 @@ export const onPreResponse = {
  * Wildcard route for all application GET requests - see the 'handler' module
  * for rendering details
  *
- * Route config:
+ * Route options:
  *
  * - `onPreResponse`: process the response before it is sent to client
  * - `state`: skip cookie validation because cookies can be set by other services
@@ -43,7 +43,7 @@ export const onPreResponse = {
 export default (languageRenderers: { [string]: LanguageRenderer }) => ({
 	method: 'GET',
 	path: '/{wild*}',
-	config: {
+	options: {
 		ext: {
 			onPreResponse,
 		},

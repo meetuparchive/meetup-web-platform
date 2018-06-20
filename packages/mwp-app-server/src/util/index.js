@@ -75,7 +75,12 @@ export async function server(serverConfig, routes, plugins) {
 	// server.route() accepts an array of routes
 	await server.route(routes);
 
-	await server.start();
+	try {
+		await server.start();
+	} catch (err) {
+		// TODO: add logging
+		console.log(err);
+	}
 
 	return server;
 }

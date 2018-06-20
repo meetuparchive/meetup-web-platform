@@ -22,7 +22,7 @@ describe('General server startup tests', () => {
 		const fooRoute = {
 			method: 'get',
 			path: '/foo',
-			config: {
+			options: {
 				auth: false,
 			},
 			handler: (request, h) => h.response(expectedResponse),

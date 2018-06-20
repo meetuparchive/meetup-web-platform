@@ -3,7 +3,7 @@ export default function getRoutes() {
 		path: '/ping',
 		method: 'GET',
 		handler: (request, h) => h.response('pong!'),
-		config: {
+		options: {
 			auth: false,
 			plugins: {
 				'mwp-logger-plugin': {
@@ -18,7 +18,7 @@ export default function getRoutes() {
 	const appEngineLifecycleRoutes = {
 		method: 'GET',
 		path: '/_ah/{param*}',
-		config: {
+		options: {
 			auth: false,
 			plugins: {
 				'mwp-logger-plugin': {
