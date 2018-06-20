@@ -16,7 +16,7 @@ export function onPreHandlerExtension(
 			...request.raw,
 		});
 	}
-	return h.continue();
+	return h.continue;
 }
 
 /*

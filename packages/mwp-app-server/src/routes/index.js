@@ -2,7 +2,7 @@ export default function getRoutes() {
 	const pingRoute = {
 		path: '/ping',
 		method: 'GET',
-		handler: (request, h) => h.response('pong!'),
+		handler: (request, h) => 'pong!',
 		options: {
 			auth: false,
 			plugins: {
@@ -30,7 +30,7 @@ export default function getRoutes() {
 			if (request.params.param === 'error') {
 				throw new Error('Simulated error via url');
 			}
-			h.response('OK');
+			return 'OK';
 		},
 	};
 

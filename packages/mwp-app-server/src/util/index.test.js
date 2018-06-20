@@ -75,12 +75,11 @@ describe('onRequestExtension', () => {
 		server: getServer(),
 	};
 
-	it('calls h.continue', () => {
+	it('returns h.continue', () => {
 		const h = {
-			continue: () => {},
+			continue: {},
 		};
-		spyOn(h, 'continue');
-		serverUtils.onRequestExtension(request, h);
-		expect(h.continue).toHaveBeenCalled();
+		const response = serverUtils.onRequestExtension(request, h);
+		expect(response).toEqual(h.continue);
 	});
 });

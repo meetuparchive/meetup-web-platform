@@ -114,7 +114,7 @@ export function getTrackers(options: {
 const onRequest = (request, h) => {
 	// initialize request.plugins[ACTIVITY_PLUGIN_NAME] to store cookie vals
 	request.plugins[ACTIVITY_PLUGIN_NAME] = {};
-	h.continue();
+	return h.continue;
 };
 /*
  * Read from request data to prepare/modify response. Mainly looking for new
@@ -141,7 +141,7 @@ const getOnPreResponse = cookieConfig => (request, h) => {
 	if (trackId) {
 		request.response.state(trackIdCookieName, trackId, FOREVER);
 	}
-	h.continue();
+	return h.continue;
 };
 
 /*

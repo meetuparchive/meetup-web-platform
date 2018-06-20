@@ -39,7 +39,7 @@ export const parseCookieHeader = cookieHeader => {
 	);
 };
 
-export const getServer = () => {
+export async function getServer() {
 	const config = { ...serverConfig, supportedLangs: ['en-US'] };
 
 	const server = Hapi.server({
@@ -57,19 +57,19 @@ export const getServer = () => {
 		},
 	};
 
-	server.decorate('request', 'trackActivity', () => ({}));
-	server.decorate('request', 'getLangPrefixPath', () => '/');
-	server.decorate('request', 'getLanguage', () => 'en-US');
+	await server.decorate('request', 'trackActivity', () => ({}));
+	await server.decorate('request', 'getLangPrefixPath', () => '/');
+	await server.decorate('request', 'getLanguage', () => 'en-US');
 
 	server.logger = () => MOCK_LOGGER;
 
-	server.ext('onPreHandler', (request, h) => {
+	await server.ext('onPreHandler', (request, h) => {
 		request.plugins.tracking = {};
-		h.continue();
+		return h.continue;
 	});
 
 	return server;
-};
+}
 
 const IDENTITY_REDUCER = state => state;
 export function testCreateStore(createStoreFn) {

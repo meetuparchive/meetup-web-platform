@@ -24,7 +24,7 @@ export function checkForDevUrl(value) {
 
 export function onRequestExtension(request, h) {
 	request.id = uuid.v4(); // provide uuid for request instead of default Hapi id
-	return h.continue();
+	return h.continue;
 }
 
 /**

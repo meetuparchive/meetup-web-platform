@@ -49,7 +49,7 @@ const onRequestExtension = (request, h) => {
 		httpRequest: request,
 		...request.raw,
 	});
-	return h.continue();
+	return h.continue;
 };
 
 export function register(server, options) {

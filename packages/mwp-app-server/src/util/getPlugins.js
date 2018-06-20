@@ -22,7 +22,7 @@ export function setCsrfCookies(request, h) {
 	if (csrfHeader) {
 		h.state('x-csrf-jwt-header', csrfHeader);
 	}
-	return h.continue();
+	return h.continue;
 }
 
 /**

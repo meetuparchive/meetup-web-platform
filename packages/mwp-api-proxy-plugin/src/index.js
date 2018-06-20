@@ -11,7 +11,7 @@ export const setPluginState = (request: HapiRequest, h: HapiRequestToolkit) => {
 		setState: h.state, // allow plugin to proxy cookies from API
 	};
 
-	return h.continue();
+	return h.continue;
 };
 
 export function register(server: Object, options: void) {

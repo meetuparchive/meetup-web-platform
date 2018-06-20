@@ -14,7 +14,7 @@ export const onPreResponse = {
 		const response = request.response;
 
 		if (!response.isBoom || process.env.NODE_ENV === 'production') {
-			return h.continue();
+			return h.continue;
 		}
 		const error = response;
 		const { RedBoxError } = require('redbox-react');

@@ -27,7 +27,7 @@ export const mwpScheme = server => {
 		: 'MEETUP_CSRF_DEV';
 
 	// authenticate function takes (request, h) and eventually calls
-	// `h.continue({ credentials })`, where credentials === { memberCookie, csrfToken }
+	// `h.authenticated({ credentials })`, where credentials === { memberCookie, csrfToken }
 	// 1. check for meetup_member(_dev) cookie
 	// 2. if none, credentials are provided by mock logged out cookie
 	// 3. check for csrf cookie
@@ -43,7 +43,10 @@ export const mwpScheme = server => {
 				memberCookie,
 				csrfToken,
 			};
-			h.continue({ credentials });
+			h.authenticated({
+				credentials,
+			});
+			return h.continue;
 		},
 	};
 };
