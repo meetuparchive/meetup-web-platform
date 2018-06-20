@@ -10,18 +10,18 @@ export const onPreResponse = {
 	 * - In dev, it transforms the generic 500 error response JSON into a full dev-
 	 *   friendly rendering of the stack trace.
 	 */
-	method: (request: HapiRequest, reply: HapiReply) => {
+	method: (request: HapiRequest, h: HapiResponseToolkit) => {
 		const response = request.response;
 
 		if (!response.isBoom || process.env.NODE_ENV === 'production') {
-			return reply.continue();
+			return h.continue();
 		}
 		const error = response;
 		const { RedBoxError } = require('redbox-react');
 		const errorMarkup = ReactDOMServer.renderToString(
 			React.createElement(RedBoxError, { error })
 		);
-		const errorResponse = reply(
+		const errorResponse = h.response(
 			`<!DOCTYPE html><html><body>${errorMarkup}</body></html>`
 		);
 		errorResponse.code(error.output.statusCode);
@@ -33,7 +33,7 @@ export const onPreResponse = {
  * Wildcard route for all application GET requests - see the 'handler' module
  * for rendering details
  *
- * Route config:
+ * Route options:
  *
  * - `onPreResponse`: process the response before it is sent to client
  * - `state`: skip cookie validation because cookies can be set by other services
@@ -43,7 +43,7 @@ export const onPreResponse = {
 export default (languageRenderers: { [string]: LanguageRenderer }) => ({
 	method: 'GET',
 	path: '/{wild*}',
-	config: {
+	options: {
 		ext: {
 			onPreResponse,
 		},
