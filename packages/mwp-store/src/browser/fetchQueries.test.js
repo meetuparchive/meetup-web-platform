@@ -27,7 +27,7 @@ jest.mock('js-cookie', () => {
 
 describe('fetchQueries', () => {
 	const API_URL = new URL('http://api.example.com/');
-	const csrfJwt = 'x-mwp-csrf value';
+	const csrfJwt = 'x-mwp-csrf-header value';
 	const getQueries = [mockQuery({ params: {} })];
 	const POSTQueries = [
 		{ ...mockQuery({ params: {} }), meta: { method: 'POST' } },
