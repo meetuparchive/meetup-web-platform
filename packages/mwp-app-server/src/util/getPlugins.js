@@ -42,7 +42,7 @@ export function setCsrfCookies(request, reply) {
  *
  * @return {Object} the { register } object for a `server.register` call.
  */
-export function getCsrfPlugin() {
+export function getCsrfPlugin(electrodeOptions) {
 	const register = (server, options, next) => {
 		const { isProd } = server.settings.app;
 		const cookieOptions = {
@@ -52,7 +52,11 @@ export function getCsrfPlugin() {
 			domain: isProd ? '.meetup.com' : '.dev.meetup.com', // target the current app server domain
 		};
 
-		options.secret = server.settings.app.csrf_secret;
+		Object.assign(
+			options,
+			{ secret: server.settings.app.csrf_secret },
+			electrodeOptions
+		);
 
 		server.state(
 			CSRF_COOKIE_NAME, // set by plugin
