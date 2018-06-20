@@ -63,6 +63,8 @@ declare type HapiRequest = {
 	},
 	[string]: any,
 };
+
+/*
 const HapiReplyFn = (reply: string | Object) => HapiReplyFn;
 HapiReplyFn.continue = () => {};
 HapiReplyFn.code = (code: number) => HapiReplyFn;
@@ -74,6 +76,7 @@ HapiReplyFn.state = (key: string, value: string, opts: ?{ [string]: any }) =>
 HapiReplyFn.header = (key: string, value: string) => HapiReplyFn;
 
 declare type HapiReply = typeof HapiReplyFn;
+*/
 
 type RedirectResult = {|
 	redirect: {
