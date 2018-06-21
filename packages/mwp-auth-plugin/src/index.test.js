@@ -37,7 +37,7 @@ describe('mwpScheme', () => {
 			authenticate: expect.any(Function),
 		});
 	});
-	test('authenticate function calls reply.continue with an object with a "credentials" value', () => {
+	test('authenticate function calls h.continue with an object with a "credentials" value', () => {
 		MOCK_REPLY_FN.continue.mockClear();
 		mwpScheme(MOCK_SERVER).authenticate(MOCK_REQUEST, MOCK_REPLY_FN);
 		expect(MOCK_REPLY_FN.continue).toHaveBeenCalledWith({
