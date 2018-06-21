@@ -56,9 +56,7 @@ describe('API proxy GET endpoint integration tests', () => {
 			GET_RESPONSE,
 			JSON.stringify(GET_BODY)
 		);
-		spyOn(apiProxyHandler, 'default').and.callFake((request, h) => {
-			h.response('okay');
-		});
+		spyOn(apiProxyHandler, 'default').and.callFake((request, h) => 'okay');
 		return start({}, {}).then(server => {
 			const request = {
 				method: 'get',
@@ -148,9 +146,7 @@ describe('API proxy POST endpoint integration tests', () => {
 			POST_RESPONSE,
 			JSON.stringify(POST_BODY)
 		);
-		spyOn(apiProxyHandler, 'default').and.callFake((request, h) => {
-			h.response('okay');
-		});
+		spyOn(apiProxyHandler, 'default').and.callFake((request, h) => 'okay');
 		const test = response => expect(apiProxyHandler.default).toHaveBeenCalled();
 
 		return start({}, {}).then(runMutationTest({ method: 'post', test }));
@@ -207,9 +203,7 @@ describe('API proxy PATCH endpoint integration tests', () => {
 			PATCH_RESPONSE,
 			JSON.stringify(PATCH_BODY)
 		);
-		spyOn(apiProxyHandler, 'default').and.callFake((request, h) => {
-			h.response('okay');
-		});
+		spyOn(apiProxyHandler, 'default').and.callFake((request, h) => 'okay');
 		const test = response => expect(apiProxyHandler.default).toHaveBeenCalled();
 
 		return start({}, {}).then(runMutationTest({ method: 'patch', test }));
@@ -225,9 +219,7 @@ describe('API proxy DELETE endpoint integration tests', () => {
 			DELETE_RESPONSE,
 			JSON.stringify(DELETE_BODY)
 		);
-		spyOn(apiProxyHandler, 'default').and.callFake((request, h) => {
-			h.response('okay');
-		});
+		spyOn(apiProxyHandler, 'default').and.callFake((request, h) => 'okay');
 		const test = response => expect(apiProxyHandler.default).toHaveBeenCalled();
 
 		return start({}, {}).then(

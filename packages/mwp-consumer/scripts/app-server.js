@@ -23,7 +23,7 @@ const routes = [
 				expiresIn: 1000 * 60 * 60 * 24 * 365, // one year
 			},
 		},
-		handler: (request, h) => h.response(''),
+		handler: (request, h) => '',
 	},
 ];
 /**

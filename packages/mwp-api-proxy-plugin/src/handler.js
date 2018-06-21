@@ -31,6 +31,6 @@ export default (request, h) => {
 	request.proxyApi$(parseRequestQueries(request)).subscribe(
 		responses =>
 			h.response(JSON.stringify({ responses })).type('application/json'),
-		err => h.response(err) // 500 error - will only be thrown on bad implementation
+		err => err // 500 error - will only be thrown on bad implementation
 	);
 };

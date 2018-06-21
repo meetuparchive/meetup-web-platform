@@ -38,6 +38,6 @@ export default (languageRenderers: { [string]: LanguageRenderer }) => (
 				.code(renderResult.statusCode)
 				.header('vary', 'X-UA-Device'); // set by fastly
 		},
-		err => h.response(err) // 500 error - will only be thrown on bad implementation
+		err => err // 500 error - will only be thrown on bad implementation
 	);
 };

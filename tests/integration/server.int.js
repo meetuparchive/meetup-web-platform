@@ -9,7 +9,7 @@ describe('General server startup tests', () => {
 		const fooRoute = {
 			method: 'get',
 			path: '/foo',
-			handler: (request, h) => h.response('okay'),
+			handler: (request, h) => 'okay',
 		};
 		const routes = [fooRoute];
 		// spyOn(config, 'default').and.returnValue(Promise.resolve({}));
@@ -25,7 +25,7 @@ describe('General server startup tests', () => {
 			options: {
 				auth: false,
 			},
-			handler: (request, h) => h.response(expectedResponse),
+			handler: (request, h) => expectedResponse,
 		};
 		const routes = [fooRoute];
 		// spyOn(config, 'default').and.returnValue(Promise.resolve({}));
@@ -49,7 +49,7 @@ describe('General server startup tests', () => {
 		const fooRoute = {
 			method: 'get',
 			path: '/foo',
-			handler: (request, h) => h.response(expectedResponse),
+			handler: (request, h) => expectedResponse,
 		};
 		const routes = [fooRoute];
 		// spyOn(config, 'default').and.returnValue(Promise.resolve({}));
@@ -71,7 +71,7 @@ describe('General server startup tests', () => {
 	});
 	it('calls the handler for /{*wild}', () => {
 		const spyable = {
-			handler: (request, h) => h.response('okay'),
+			handler: (request, h) => 'okay',
 		};
 		spyOn(spyable, 'handler').and.callThrough();
 		spyOn(appRouteHandler, 'default').and.callFake(() => spyable.handler);
@@ -109,7 +109,7 @@ describe('Cookie setting', () => {
 		const fooRoute = {
 			method: 'get',
 			path: '/ny-tech',
-			handler: (request, h) => h.response('okay'),
+			handler: (request, h) => 'okay',
 		};
 		const routes = [fooRoute];
 		// spyOn(config, 'default').and.returnValue(Promise.resolve({}));

@@ -12,7 +12,7 @@ const testServer = test => {
 			server.route({
 				method: 'GET',
 				path: '/{wild*}',
-				handler: (request, h) => h.response('okay'),
+				handler: (request, h) => 'okay',
 			})
 		)
 		.then(() => server.inject({ url: '/ping' }))
