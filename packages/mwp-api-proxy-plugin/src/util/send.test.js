@@ -34,7 +34,6 @@ const MOCK_HAPI_REQUEST = {
 		credentials: { memberCookie: 'foo member', csrfToken: 'bar token' },
 	},
 	id: 'mock-uuid-1234',
-	server: (async () => await getServer())(),
 	method: 'get',
 	headers: {},
 	query: {},
@@ -269,10 +268,16 @@ describe('buildRequestArgs', () => {
 });
 
 describe('getExternalRequestOpts', () => {
-	it('returns the expected object from a vanilla request', () => {
+	it('returns the expected object from a vanilla request', async () => {
+		const server = await getServer();
+		MOCK_HAPI_REQUEST.server = server;
+
 		expect(getExternalRequestOpts(MOCK_HAPI_REQUEST)).toMatchSnapshot();
 	});
-	it('returns the expected object from a multipart request', () => {
+	it('returns the expected object from a multipart request', async () => {
+		const server = await getServer();
+		MOCK_HAPI_REQUEST.server = server;
+
 		// most important difference is that multipart has a 'formData' key
 		expect(
 			getExternalRequestOpts({
@@ -296,7 +301,10 @@ describe('createCookieJar', () => {
 });
 
 describe('makeExternalApiRequest', () => {
-	it('calls externalRequest with requestOpts', () => {
+	it('calls externalRequest with requestOpts', async () => {
+		const server = await getServer();
+		MOCK_HAPI_REQUEST.server = server;
+
 		const requestOpts = {
 			foo: 'bar',
 			url: 'http://example.com',
@@ -327,7 +335,9 @@ describe('makeExternalApiRequest', () => {
 				expect(JSON.parse(body).errors[0].code).toBe('ETIMEDOUT')
 			);
 	});
-	it('returns the requestOpts jar at array index 2', () => {
+	it('returns the requestOpts jar at array index 2', async () => {
+		const server = await getServer();
+		MOCK_HAPI_REQUEST.server = server;
 		const requestOpts = {
 			foo: 'bar',
 			url: 'http://example.com',
