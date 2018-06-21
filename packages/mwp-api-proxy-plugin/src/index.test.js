@@ -1,9 +1,9 @@
 import rison from 'rison';
-import requestAuthPlugin from 'mwp-auth-plugin';
+import { plugin as requestAuthPlugin } from 'mwp-auth-plugin';
 import CsrfPlugin from 'electrode-csrf-jwt';
 
 import { getServer } from 'mwp-test-utils';
-import apiProxyPlugin from './';
+import { plugin as apiProxyPlugin } from './';
 
 jest.mock('mwp-config', () => {
 	const config = require.requireActual('mwp-config');
@@ -16,21 +16,19 @@ async function getResponse(injectRequest) {
 
 	// returns the server instance after it has been configured with the routes being tested
 	await server.register([
+		requestAuthPlugin,
 		{
-			register: requestAuthPlugin,
-		},
-		{
-			register: CsrfPlugin,
+			register: CsrfPlugin.register,
+			name: 'electrode-csrf-jwt-plugin',
+			version: '1.0.0',
 			options: { secret: 'asfd' },
 		},
-		{
-			register: apiProxyPlugin,
-		},
+		apiProxyPlugin,
 	]);
 
 	await server.auth.strategy('default', 'mwp');
 	await server.auth.default({
-		mode: true,
+		mode: 'required',
 		strategy: 'default',
 	});
 

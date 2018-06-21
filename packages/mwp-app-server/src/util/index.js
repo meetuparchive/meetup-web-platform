@@ -71,7 +71,7 @@ export async function server(serverConfig, routes, plugins) {
 	// in hapi v17, mode can only be set through `server.auth.default()`
 	await server.auth.strategy('default', 'mwp');
 	await server.auth.default({
-		mode: true, // true === (mode: 'required')
+		mode: 'required', // true === (mode: 'required')
 		strategy: 'default',
 	});
 

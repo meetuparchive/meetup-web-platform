@@ -65,14 +65,14 @@ export function register(server, options) {
 	server.app.logger = logger;
 }
 
-exports.plugin = {
-	register,
-	name: 'mwp-logger-plugin',
-	version: '1.0.0',
-};
-
 export {
 	default as logger,
 	httpRequestSerializers as serializers,
 	MetricLogging,
 } from './logger'; // named export for easy import
+
+exports.plugin = {
+	register,
+	name: 'mwp-logger-plugin',
+	version: '1.0.0',
+};

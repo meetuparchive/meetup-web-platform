@@ -2,14 +2,14 @@ import Inert from 'inert';
 import CsrfPlugin from 'electrode-csrf-jwt';
 
 import config from 'mwp-config';
-import loggerPlugin from 'mwp-logger-plugin';
-import appRoutePlugin from 'mwp-app-route-plugin';
-import requestAuthPlugin from 'mwp-auth-plugin';
-import activityPlugin from 'mwp-tracking-plugin/lib/activity';
-import clickPlugin from 'mwp-tracking-plugin/lib/click';
-import languagePlugin from 'mwp-language-plugin';
-import serviceWorkerPlugin from 'mwp-sw-plugin';
-import apiProxyPlugin from 'mwp-api-proxy-plugin';
+import { plugin as loggerPlugin } from 'mwp-logger-plugin';
+import { plugin as appRoutePlugin } from 'mwp-app-route-plugin';
+import { plugin as activityPlugin } from 'mwp-tracking-plugin/lib/activity';
+import { plugin as clickPlugin } from 'mwp-tracking-plugin/lib/click';
+import { plugin as languagePlugin } from 'mwp-language-plugin';
+import { plugin as serviceWorkerPlugin } from 'mwp-sw-plugin';
+import { plugin as apiProxyPlugin } from 'mwp-api-proxy-plugin';
+import { plugin as requestAuthPlugin } from 'mwp-auth-plugin';
 
 /**
  * Hapi plugins for the dev server
