@@ -111,16 +111,16 @@ export function getTrackers(options: {
 /*
  * Run request-initialization routines, e.g. creating plugin data store
  */
-const onRequest = (request, reply) => {
+const onRequest = (request, h) => {
 	// initialize request.plugins[ACTIVITY_PLUGIN_NAME] to store cookie vals
 	request.plugins[ACTIVITY_PLUGIN_NAME] = {};
-	reply.continue();
+	return h.continue;
 };
 /*
  * Read from request data to prepare/modify response. Mainly looking for new
  * tracking cookies that need to be set using request.response.state.
  */
-const getOnPreResponse = cookieConfig => (request, reply) => {
+const getOnPreResponse = cookieConfig => (request, h) => {
 	const { browserIdCookieName, trackIdCookieName, domain } = cookieConfig;
 	const pluginData = request.plugins[ACTIVITY_PLUGIN_NAME];
 	const browserId = pluginData[browserIdCookieName];
@@ -141,7 +141,7 @@ const getOnPreResponse = cookieConfig => (request, reply) => {
 	if (trackId) {
 		request.response.state(trackIdCookieName, trackId, FOREVER);
 	}
-	reply.continue();
+	return h.continue;
 };
 
 /*
@@ -149,10 +149,9 @@ const getOnPreResponse = cookieConfig => (request, reply) => {
  * all tracking functions returned from `getTrackers`, as well as assign request
  * lifecycle event handlers that can affect the response, e.g. by setting cookies
  */
-export default function register(
+export function register(
 	server: Object,
-	options: { agent: string, isProdApi: boolean },
-	next: () => void
+	options: { agent: string, isProdApi: boolean }
 ) {
 	const { agent, isProdApi } = options;
 
@@ -189,11 +188,10 @@ export default function register(
 			domain: isProdApi ? '.meetup.com' : '.dev.meetup.com',
 		})
 	);
-
-	next();
 }
 
-register.attributes = {
+exports.plugin = {
+	register,
 	name: ACTIVITY_PLUGIN_NAME,
 	version: '1.0.0',
 };

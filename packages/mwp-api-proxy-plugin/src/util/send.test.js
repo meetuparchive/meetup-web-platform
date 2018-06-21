@@ -34,7 +34,7 @@ const MOCK_HAPI_REQUEST = {
 		credentials: { memberCookie: 'foo member', csrfToken: 'bar token' },
 	},
 	id: 'mock-uuid-1234',
-	server: getServer(),
+	server: (async () => await getServer())(),
 	method: 'get',
 	headers: {},
 	query: {},
