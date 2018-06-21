@@ -20,12 +20,12 @@ import apiProxyPlugin from 'mwp-api-proxy-plugin';
 const CSRF_COOKIE_NAME = 'x-mwp-csrf';
 const CSRF_HEADER_COOKIE_NAME = `${CSRF_COOKIE_NAME}-header`;
 const CSRF_HEADER_NAME = CSRF_COOKIE_NAME;
-export function setCsrfCookies(request, reply) {
+export function setCsrfCookies(request, h) {
 	const csrfHeader = (request.response.headers || {})[CSRF_COOKIE_NAME];
 	if (csrfHeader) {
-		reply.state(CSRF_HEADER_COOKIE_NAME, csrfHeader);
+		h.state(CSRF_HEADER_COOKIE_NAME, csrfHeader);
 	}
-	return reply.continue();
+	return h.continue;
 }
 
 /**
@@ -141,9 +141,10 @@ function getLanguagePlugin() {
 	};
 }
 
-export default function getPlugins({ languageRenderers }) {
+export default async function getPlugins({ languageRenderers }) {
 	const { package: { agent }, getServer } = config;
-	const isProdApi = getServer().properties.api.isProd;
+	const server = await getServer();
+	const isProdApi = server.properties.api.isProd;
 	return [
 		getAppRoutePlugin({ languageRenderers }),
 		getApiProxyPlugin(),
