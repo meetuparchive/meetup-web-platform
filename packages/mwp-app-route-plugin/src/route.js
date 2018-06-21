@@ -21,11 +21,10 @@ export const onPreResponse = {
 		const errorMarkup = ReactDOMServer.renderToString(
 			React.createElement(RedBoxError, { error })
 		);
-		const errorResponse = h.response(
-			`<!DOCTYPE html><html><body>${errorMarkup}</body></html>`
-		);
-		errorResponse.code(error.output.statusCode);
-		return errorResponse;
+
+		return h
+			.response(`<!DOCTYPE html><html><body>${errorMarkup}</body></html>`)
+			.code(error.output.statusCode);
 	},
 };
 
