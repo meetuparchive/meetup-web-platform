@@ -76,9 +76,9 @@ export const getNavEpic = findMatches => (action, store) => {
 	const cacheAction = requestMetadata.logout && { type: 'CACHE_CLEAR' };
 
 	const previousQueries = referrer.pathname
-		? getMatchedQueries(referrer)(findMatches(referrer))
+		? getMatchedQueries(referrer, state)(findMatches(referrer))
 		: [];
-	const newQueries = getMatchedQueries(location)(findMatches(location));
+	const newQueries = getMatchedQueries(location, state)(findMatches(location));
 	if (newQueries.filter(q => q).length === 0) {
 		// no valid queries - jump straight to 'complete'
 		return [api.complete([])];

@@ -24,7 +24,7 @@ export const decodeParams = (params: { [string]: string }): Params =>
  * The function returned from calling `_matchedRouteQueriesReducer` with a
  * `location` should be used as the callback to an `array.reduce` call.
  */
-const _matchedRouteQueriesReducer = (location: URL) => (
+const _matchedRouteQueriesReducer = (location: URL, state: MWPState) => (
 	queries: Array<Query>,
 	{ route, match }: MatchedRoute
 ): Array<Query> => {
@@ -37,7 +37,7 @@ const _matchedRouteQueriesReducer = (location: URL) => (
 	// call the query functions with non-url-encoded params
 	const params = decodeParams(match.params);
 	const routeQueries = routeQueryFns
-		.map(queryFn => queryFn({ ...match, location, params }))
+		.map(queryFn => queryFn({ ...match, location, params }, state))
 		.filter(query => query);
 
 	return [...queries, ...routeQueries];
@@ -47,7 +47,7 @@ const _matchedRouteQueriesReducer = (location: URL) => (
  * A synchronous, curried interface to derive the query values returned by the
  * query functions of a provided set of routes given a particular location
  */
-export const getMatchedQueries = (location: URL) => (
+export const getMatchedQueries = (location: URL, state: MWPState) => (
 	matchedRoutes: Array<MatchedRoute>
 ): Array<Query> =>
-	matchedRoutes.reduce(_matchedRouteQueriesReducer(location), []);
+	matchedRoutes.reduce(_matchedRouteQueriesReducer(location, state), []);
