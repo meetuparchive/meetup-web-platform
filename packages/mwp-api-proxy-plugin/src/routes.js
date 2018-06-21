@@ -21,7 +21,7 @@ const getApiProxyRoutes = path => {
 	const routeBase = {
 		path,
 		handler,
-		config: {
+		options: {
 			plugins: {
 				'electrode-csrf-jwt': {
 					enabled: true,
@@ -35,8 +35,8 @@ const getApiProxyRoutes = path => {
 	const apiGetRoute = {
 		...routeBase,
 		method: ['GET', 'DELETE'],
-		config: {
-			...routeBase.config,
+		options: {
+			...routeBase.options,
 			validate: {
 				query: validApiPayloadSchema,
 			},
@@ -45,8 +45,8 @@ const getApiProxyRoutes = path => {
 	const apiPostRoute = {
 		...routeBase,
 		method: ['POST', 'PATCH'],
-		config: {
-			...routeBase.config,
+		options: {
+			...routeBase.options,
 			payload: {
 				allow: ['application/x-www-form-urlencoded', 'multipart/form-data'],
 				maxBytes: 1024 * 1024 * 10, // 10 MB max upload
