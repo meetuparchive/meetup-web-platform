@@ -44,7 +44,7 @@ points for testing how the server behaves when each function returns early, i.e.
 checking the performance impact of skipping some rendering steps.
 
 - For the most part, every part of the server startup routine is required.
-- The route handler just needs to call `reply('<SOME RESPONSE STRING>')` - adding
+- The route handler just needs to `return '<SOME RESPONSE STRING>'` - adding
   that and a `return` before the renderer is called will show the the theoretical
   performance of a fully-configured server that executes _no_ rendering logic
 - The main rendering function in `server-render.jsx` is `makeRenderer`, which
