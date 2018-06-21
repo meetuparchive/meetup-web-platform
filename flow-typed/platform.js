@@ -64,19 +64,54 @@ declare type HapiRequest = {
 	[string]: any,
 };
 
-/*
-const HapiReplyFn = (reply: string | Object) => HapiReplyFn;
-HapiReplyFn.continue = () => {};
-HapiReplyFn.code = (code: number) => HapiReplyFn;
-HapiReplyFn.redirect = (url: string) => ({
-	permanent: (isPermanent: ?boolean) => HapiReplyFn,
-});
-HapiReplyFn.state = (key: string, value: string, opts: ?{ [string]: any }) =>
-	HapiReplyFn;
-HapiReplyFn.header = (key: string, value: string) => HapiReplyFn;
+declare type HapiResponseObject = {
+	app: any,
+	events: any,
+	headers: any,
+	plugins: any,
+	settings: any,
+	source: any,
+	statusCode: any,
+	variety: any,
+	bytes: any,
+	charset: any,
+	code: any,
+	message: any,
+	created: any,
+	encoding: any,
+	etag: any,
+	header: any,
+	location: any,
+	redirect: any,
+	replacer: any,
+	spaces: any,
+	state: any,
+	suffix: any,
+	ttl: any,
+	type: any,
+	unstate: any,
+	vary: any,
+	takeover: any,
+	temporary: any,
+	permanent: any,
+	rewritable: any,
+};
 
-declare type HapiReply = typeof HapiReplyFn;
-*/
+declare type HapiResponseToolkit = {
+	abandon: any,
+	close: any,
+	context: any,
+	continue: any,
+	realm: any,
+	request: any,
+	authenticated: any,
+	entity: any,
+	redirect: any,
+	response: (value: string) => HapiResponseObject,
+	state: (key: string, value: string | Object, options: ?{ [string]: any }) => HapiResponseObject,
+	unauthenticated: any,
+	unstate: (key: string, options: ?{ [string]: any }) => HapiResponseObject,
+};
 
 type RedirectResult = {|
 	redirect: {
@@ -92,7 +127,7 @@ declare type RenderResult = RedirectResult | HTMLResult;
 
 declare type LanguageRenderer = (
 	request: HapiRequest,
-	reply: ?HapiReply
+	h: ?HapiResponseToolkit
 ) => Promise<RenderResult>;
 
 declare type FluxStandardAction = {
