@@ -28,9 +28,7 @@ export function register(server: Object, options: void) {
 	server.ext('onPreHandler', onPreHandlerExtension);
 }
 
-register.attributes = {};
-
-exports.plugin = {
+export const plugin = {
 	register,
 	name: CLICK_PLUGIN_NAME,
 	version: '1.0.0',

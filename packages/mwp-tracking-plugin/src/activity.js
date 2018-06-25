@@ -190,7 +190,7 @@ export function register(
 	);
 }
 
-exports.plugin = {
+export const plugin = {
 	register,
 	name: ACTIVITY_PLUGIN_NAME,
 	version: '1.0.0',

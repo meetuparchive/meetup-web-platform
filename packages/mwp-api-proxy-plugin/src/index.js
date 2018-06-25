@@ -34,7 +34,7 @@ export function register(server: Object, options: void) {
 	server.route(routes);
 }
 
-exports.plugin = {
+export const plugin = {
 	register,
 	name: API_PROXY_PLUGIN_NAME,
 	version: '1.0.0',

@@ -19,15 +19,17 @@ describe('onPreResponse.method', () => {
 			server,
 		};
 		const h = {
-			code: jest.fn(),
-			response: jest.fn(),
+			code: jest.fn(() => h),
+			response: jest.fn(() => h),
 		};
 
-		const errorResponse = onPreResponse.method(request, h);
-		expect(errorResponse).toBe(response);
-		// expect(responseObj.response).toHaveLastReturnedWith(expect.stringContaining(errorMessage));
-		// expect(responseObj.code).toHaveBeenCalledWith(errorCode);
+		onPreResponse.method(request, h);
+		expect(h.response).toHaveBeenCalledWith(
+			expect.stringContaining(errorMessage)
+		);
+		expect(h.code).toHaveBeenCalledWith(errorCode);
 	});
+
 	it('serves the homepage route', async () => {
 		const result = 'ok';
 		const server = await getServer();

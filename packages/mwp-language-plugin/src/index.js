@@ -16,7 +16,7 @@ export function register(server: Object, options: ?Object) {
 	});
 }
 
-exports.plugin = {
+export const plugin = {
 	register,
 	name: 'mwp-language-plugin',
 	version: '1.0.0',

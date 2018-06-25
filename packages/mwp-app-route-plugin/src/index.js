@@ -37,7 +37,7 @@ export function register(
 	server.on('stop', ldClient.close);
 }
 
-exports.plugin = {
+export const plugin = {
 	register,
 	name: 'mwp-app-route',
 	version: '1.0.0',
