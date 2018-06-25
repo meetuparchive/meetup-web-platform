@@ -17,26 +17,27 @@ import url from 'url';
  */
 export default (languageRenderers: { [string]: LanguageRenderer }) => (
 	request: HapiRequest,
-	reply: HapiReply
+	h: HapiResponseToolkit // todo : create in /flow-typed
 ) => {
 	const pathname = request.getLangPrefixPath();
 	if (pathname !== request.url.pathname) {
-		return reply.redirect(url.format({ ...request.url, pathname }));
+		return h.redirect(url.format({ ...request.url, pathname }));
 	}
 	const requestLanguage = request.getLanguage();
 	const renderRequest = languageRenderers[requestLanguage];
 
-	renderRequest(request).then(
+	return renderRequest(request).then(
 		(renderResult: RenderResult) => {
 			if (renderResult.redirect) {
-				return reply
+				return h
 					.redirect(renderResult.redirect.url)
 					.permanent(Boolean(renderResult.redirect.permanent));
 			}
-			return reply(renderResult.result)
+			return h
+				.response(renderResult.result)
 				.code(renderResult.statusCode)
 				.header('vary', 'X-UA-Device'); // set by fastly
 		},
-		err => reply(err) // 500 error - will only be thrown on bad implementation
+		err => err // 500 error - will only be thrown on bad implementation
 	);
 };

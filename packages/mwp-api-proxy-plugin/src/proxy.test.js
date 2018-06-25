@@ -25,7 +25,6 @@ const MOCK_HAPI_REQUEST = {
 	state: {
 		oauth_token: 'foo',
 	},
-	server: getServer(),
 	log: () => {},
 	trackActivity: () => {},
 	getLanguage: () => 'en-US',
@@ -33,7 +32,9 @@ const MOCK_HAPI_REQUEST = {
 
 describe('apiProxy$', () => {
 	const queries = [mockQuery(MOCK_RENDERPROPS), mockQuery(MOCK_RENDERPROPS)];
-	it('returns an observable that emits an array of results', () => {
+	it('returns an observable that emits an array of results', async () => {
+		const server = await getServer();
+		MOCK_HAPI_REQUEST.server = server;
 		const requestResult = {
 			type: 'fake',
 			value: { foo: 'bar' },
@@ -50,21 +51,27 @@ describe('apiProxy$', () => {
 	});
 
 	const endpoint = 'foo';
-	it('makes a GET request', () => {
+	it('makes a GET request', async () => {
+		const server = await getServer();
+		MOCK_HAPI_REQUEST.server = server;
 		const query = { ...mockQuery(MOCK_RENDERPROPS) };
 		return apiProxy$({ ...MOCK_HAPI_REQUEST, method: 'get' })([query])
 			.toPromise()
 			.then(() => require('request').mock.calls.pop()[0])
 			.then(arg => expect(arg.method).toBe('get'));
 	});
-	it('makes a POST request', () => {
+	it('makes a POST request', async () => {
+		const server = await getServer();
+		MOCK_HAPI_REQUEST.server = server;
 		const query = { ...mockQuery(MOCK_RENDERPROPS), meta: { method: 'post' } };
 		return apiProxy$({ ...MOCK_HAPI_REQUEST, method: 'post' })([query])
 			.toPromise()
 			.then(() => require('request').mock.calls.pop()[0])
 			.then(arg => expect(arg.method).toBe('post'));
 	});
-	it('responds with query.mockResponse when set', () => {
+	it('responds with query.mockResponse when set', async () => {
+		const server = await getServer();
+		MOCK_HAPI_REQUEST.server = server;
 		const mockResponse = { foo: 'bar' };
 		const query = { ...mockQuery(MOCK_RENDERPROPS), mockResponse };
 		const expectedResponses = [
