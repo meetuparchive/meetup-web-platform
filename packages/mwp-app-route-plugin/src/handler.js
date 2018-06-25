@@ -15,10 +15,10 @@ import url from 'url';
  *    the Vary header to 'User-Agent', in order for the google bots
  *    to crawl mobile and desktop versions of the site
  */
-export default (languageRenderers: { [string]: LanguageRenderer }) => (
+export default (languageRenderers: { [string]: LanguageRenderer }): any => (
 	request: HapiRequest,
-	h: HapiResponseToolkit // todo : create in /flow-typed
-) => {
+	h: HapiResponseToolkit
+): any => {
 	const pathname = request.getLangPrefixPath();
 	if (pathname !== request.url.pathname) {
 		return h.redirect(url.format({ ...request.url, pathname }));
@@ -27,7 +27,7 @@ export default (languageRenderers: { [string]: LanguageRenderer }) => (
 	const renderRequest = languageRenderers[requestLanguage];
 
 	return renderRequest(request).then(
-		(renderResult: RenderResult) => {
+		(renderResult: RenderResult): any => {
 			if (renderResult.redirect) {
 				return h
 					.redirect(renderResult.redirect.url)
