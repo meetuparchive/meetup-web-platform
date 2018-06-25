@@ -1,13 +1,32 @@
 // @flow
 
-declare type SealOptionsSub = any; // todo: import { SealOptions, SealOptionsSub } from "iron";
+/**
+ * @see Typescript HapiJS v17 https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/hapi/index.d.ts
+
+ */
+
+// todo: import { SealOptions, SealOptionsSub } from "iron";
+declare type SealOptionsSub = any;
 declare type SealOptions = any;
+
+// todo: update to actual values
+declare type HapiApplicationState = any;
+declare type HapiResponseEvents = any;
+declare type HapiPluginsStates = any;
+declare type HapiResponseSettings = any;
 
 declare type HapiRequestUrl = URL & {
 	path: string,
 };
 
 declare type HapiRoute = Object;
+
+declare type HapiResponseObjectHeaderOptions = {
+    append?: boolean,
+    separator?: string,
+    override?: boolean,
+    duplicate?: boolean,
+};
 
 declare type HapiServerStateCookieOptions = {
     /** time-to-live in milliseconds. Defaults to null (session time-life - cookies are deleted when the browser is closed). */
@@ -124,36 +143,36 @@ declare type HapiRequest = {
 declare type HapiResponseValue = string | Object;
 
 declare type HapiResponseObject = {
-	app: any,
-	events: any,
+	app: HapiApplicationState,
+	events: HapiResponseEvents,
 	headers: any,
-	plugins: any,
-	settings: any,
+	plugins: HapiPluginsStates,
+	settings: HapiResponseSettings,
 	source: any,
-	statusCode: any,
-	variety: any,
-	bytes: any,
-	charset: any,
-	code: any,
-	message: any,
-	created: any,
-	encoding: any,
-	etag: any,
-	header: any,
-	location: any,
-	redirect: any,
+	statusCode: number,
+	variety: 'plain' | 'buffer' | 'stream',
+	bytes: (length: number) => HapiResponseObject,
+	charset: (charset: string) => HapiResponseObject,
+	code: (statusCode: number) => HapiResponseObject,
+	message: (httpMessage: string) => HapiResponseObject,
+	created: (uri: string) => HapiResponseObject,
+	encoding: (encoding: 'ascii' | 'utf8' | 'utf16le' | 'ucs2' | 'base64' | 'latin1' | 'binary' | 'hex') => HapiResponseObject,
+	etag: (tag: string, options?: {weak: boolean, vary: boolean}) => HapiResponseObject,
+	header: (name: string, value: string, options?: HapiResponseObjectHeaderOptions) => HapiResponseObject,
+	location: (uri: string) => HapiResponseObject,
+	redirect: (uri: string) => HapiResponseObject,
 	replacer: any,
-	spaces: any,
-	state: any,
-	suffix: any,
-	ttl: any,
-	type: any,
-	unstate: any,
-	vary: any,
-	takeover: any,
-	temporary: any,
-	permanent: any,
-	rewritable: any,
+	spaces: (count: number) => HapiResponseObject,
+	state: (name: string, value: Object | string, options?: HapiServerStateCookieOptions) => HapiResponseObject,
+	suffix: (suffix: string) => HapiResponseObject,
+	ttl: (msec: number) => HapiResponseObject,
+	type: (mimeType: string) => HapiResponseObject,
+	unstate: (name: string, options?: HapiServerStateCookieOptions) => HapiResponseObject,
+	vary: (header: string) => HapiResponseObject,
+	takeover: () => HapiResponseObject,
+	temporary: (isTemporary: boolean) => HapiResponseObject,
+	permanent: (isPermanent: boolean) => HapiResponseObject,
+	rewritable: (isRewritable: boolean) => HapiResponseObject,
 };
 
 declare type HapiResponseToolkit = {
