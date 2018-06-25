@@ -25,55 +25,6 @@ declare type MWPState = {
 };
 
 declare type Params = { [string]: string };
-declare type HapiRequestUrl = URL & {
-	path: string,
-};
-declare type HapiRoute = Object;
-declare type HapiServer = {
-	app: {
-		logger: (...args: Array<any>) => void,
-	},
-	expose: (key: string, value: any) => void,
-	settings: {
-		app: { isProd: boolean, supportedLangs: Array<string>, [string]: any },
-		api: { host: string, isProd: boolean },
-	},
-	plugins: {
-		[string]: any,
-	},
-	route: (routes: HapiRoute | Array<HapiRoute>) => Promise<HapiServer>,
-	on: (eventName: string, cb: () => void) => void,
-};
-declare type HapiRequest = {
-	getLanguage: () => string,
-	getLangPrefixPath: () => string,
-	log: (Array<string>, string) => void,
-	url: HapiRequestUrl,
-	server: HapiServer,
-	state: {
-		[string]: string,
-	},
-	info: {
-		referrer: string,
-		host: string,
-		[string]: mixed,
-	},
-	headers: {
-		[string]: string,
-	},
-	[string]: any,
-};
-const HapiReplyFn = (reply: string | Object) => HapiReplyFn;
-HapiReplyFn.continue = () => {};
-HapiReplyFn.code = (code: number) => HapiReplyFn;
-HapiReplyFn.redirect = (url: string) => ({
-	permanent: (isPermanent: ?boolean) => HapiReplyFn,
-});
-HapiReplyFn.state = (key: string, value: string, opts: ?{ [string]: any }) =>
-	HapiReplyFn;
-HapiReplyFn.header = (key: string, value: string) => HapiReplyFn;
-
-declare type HapiReply = typeof HapiReplyFn;
 
 type RedirectResult = {|
 	redirect: {
@@ -89,7 +40,7 @@ declare type RenderResult = RedirectResult | HTMLResult;
 
 declare type LanguageRenderer = (
 	request: HapiRequest,
-	reply: ?HapiReply
+	h: ?HapiResponseToolkit
 ) => Promise<RenderResult>;
 
 declare type FluxStandardAction = {
@@ -135,7 +86,7 @@ declare type QueryResponse = {
 	error?: string,
 };
 
-declare type QueryFunction = (location: { [string]: mixed }) => Query;
+declare type QueryFunction = (location: { [string]: mixed }, state: any) => Query;
 
 type BasePlatformRoute = {|
 	path?: string,
