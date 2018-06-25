@@ -26,8 +26,8 @@ export const mwpScheme = server => {
 		? 'MEETUP_CSRF'
 		: 'MEETUP_CSRF_DEV';
 
-	// authenticate function takes (request, reply) and eventually calls
-	// `reply.continue({ credentials })`, where credentials === { memberCookie, csrfToken }
+	// authenticate function takes (request, h) and eventually calls
+	// `h.authenticated({ credentials })`, where credentials === { memberCookie, csrfToken }
 	// 1. check for meetup_member(_dev) cookie
 	// 2. if none, credentials are provided by mock logged out cookie
 	// 3. check for csrf cookie
@@ -35,7 +35,7 @@ export const mwpScheme = server => {
 	// 5. return { memberCookie, csrfToken }
 
 	return {
-		authenticate: (request, reply) => {
+		authenticate: (request, h) => {
 			const csrfToken = request.state[CSRF_COOKIE_NAME] || uuid.v4();
 			const memberCookie =
 				request.state[MEMBER_COOKIE_NAME] || mockCookies[MEMBER_COOKIE_NAME];
@@ -43,18 +43,21 @@ export const mwpScheme = server => {
 				memberCookie,
 				csrfToken,
 			};
-			reply.continue({ credentials });
+			h.authenticated({
+				credentials,
+			});
+			return h.continue;
 		},
 	};
 };
 
-export default function register(server, options, next) {
+export function register(server, options) {
 	// register the plugin's auth scheme
 	server.auth.scheme('mwp', mwpScheme);
-	next();
 }
 
-register.attributes = {
+exports.plugin = {
+	register,
 	name: 'mwp-auth',
 	version: '1.0.0',
 };
