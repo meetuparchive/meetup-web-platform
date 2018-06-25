@@ -2,14 +2,14 @@ import Inert from 'inert';
 import CsrfPlugin from 'electrode-csrf-jwt';
 
 import config from 'mwp-config';
-import loggerPlugin from 'mwp-logger-plugin';
-import appRoutePlugin from 'mwp-app-route-plugin';
-import requestAuthPlugin from 'mwp-auth-plugin';
-import activityPlugin from 'mwp-tracking-plugin/lib/activity';
-import clickPlugin from 'mwp-tracking-plugin/lib/click';
-import languagePlugin from 'mwp-language-plugin';
-import serviceWorkerPlugin from 'mwp-sw-plugin';
-import apiProxyPlugin from 'mwp-api-proxy-plugin';
+import { plugin as loggerPlugin } from 'mwp-logger-plugin';
+import { plugin as appRoutePlugin } from 'mwp-app-route-plugin';
+import { plugin as activityPlugin } from 'mwp-tracking-plugin/lib/activity';
+import { plugin as clickPlugin } from 'mwp-tracking-plugin/lib/click';
+import { plugin as languagePlugin } from 'mwp-language-plugin';
+import { plugin as serviceWorkerPlugin } from 'mwp-sw-plugin';
+import { plugin as apiProxyPlugin } from 'mwp-api-proxy-plugin';
+import { plugin as requestAuthPlugin } from 'mwp-auth-plugin';
 
 /**
  * Hapi plugins for the dev server
@@ -20,12 +20,12 @@ import apiProxyPlugin from 'mwp-api-proxy-plugin';
 const CSRF_COOKIE_NAME = 'x-mwp-csrf';
 const CSRF_HEADER_COOKIE_NAME = `${CSRF_COOKIE_NAME}-header`;
 const CSRF_HEADER_NAME = CSRF_COOKIE_NAME;
-export function setCsrfCookies(request, reply) {
+export function setCsrfCookies(request, h) {
 	const csrfHeader = (request.response.headers || {})[CSRF_COOKIE_NAME];
 	if (csrfHeader) {
-		reply.state(CSRF_HEADER_COOKIE_NAME, csrfHeader);
+		h.state(CSRF_HEADER_COOKIE_NAME, csrfHeader);
 	}
-	return reply.continue();
+	return h.continue;
 }
 
 /**
@@ -141,9 +141,10 @@ function getLanguagePlugin() {
 	};
 }
 
-export default function getPlugins({ languageRenderers }) {
+export default async function getPlugins({ languageRenderers }) {
 	const { package: { agent }, getServer } = config;
-	const isProdApi = getServer().properties.api.isProd;
+	const server = await getServer();
+	const isProdApi = server.properties.api.isProd;
 	return [
 		getAppRoutePlugin({ languageRenderers }),
 		getApiProxyPlugin(),
