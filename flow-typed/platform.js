@@ -86,7 +86,7 @@ declare type QueryResponse = {
 	error?: string,
 };
 
-declare type QueryFunction = (location: { [string]: mixed }, state: any) => Query;
+declare type QueryFunction = (location: { [string]: mixed }, state: MWPState) => Query;
 
 type BasePlatformRoute = {|
 	path?: string,
