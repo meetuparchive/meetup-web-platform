@@ -1,9 +1,9 @@
 import rison from 'rison';
-import requestAuthPlugin from 'mwp-auth-plugin';
 import CsrfPlugin from 'electrode-csrf-jwt';
 
+import { plugin as requestAuthPlugin } from 'mwp-auth-plugin';
 import { getServer } from 'mwp-test-utils';
-import apiProxyPlugin from './';
+import { plugin as apiProxyPlugin } from './';
 
 jest.mock('mwp-config', () => {
 	const config = require.requireActual('mwp-config');
@@ -11,24 +11,41 @@ jest.mock('mwp-config', () => {
 	return config;
 });
 
-function getResponse(injectRequest, server = getServer()) {
-	// a Promise that returns the server instance after it has been
-	// configured with the routes being tested
-	return server
-		.register([
-			requestAuthPlugin,
-			{ register: CsrfPlugin, options: { secret: 'asfd' } },
-			apiProxyPlugin,
-		])
-		.then(() => server.auth.strategy('default', 'mwp', true))
-		.then(() => server.inject(injectRequest));
+async function getResponse(injectRequest) {
+	const server = await getServer();
+
+	// returns the server instance after it has been configured with the routes being tested
+	await server.register([
+		requestAuthPlugin,
+		{
+			register: CsrfPlugin.register,
+			name: 'electrode-csrf-jwt-plugin',
+			version: '1.0.0',
+			options: { secret: 'asfd' },
+		},
+		apiProxyPlugin,
+	]);
+
+	await server.auth.strategy('default', 'mwp');
+	await server.auth.default({
+		mode: 'required',
+		strategy: 'default',
+	});
+
+	const response = await server.inject(injectRequest);
+
+	return response;
 }
+
 describe('api proxy plugin', () => {
 	it('serves api responses from the configured route path', () => {
 		const endpoint = 'foo';
 		const validQuery = { type: 'a', ref: 'b', params: {}, endpoint };
 		const expectedResponse = { foo: 'bar' };
-		require('request').__setMockResponse(null, JSON.stringify(expectedResponse));
+		require('request').__setMockResponse(
+			null,
+			JSON.stringify(expectedResponse)
+		);
 		const queriesRison = rison.encode_array([validQuery]);
 
 		// little helper function to test various matchable proxy URLs
