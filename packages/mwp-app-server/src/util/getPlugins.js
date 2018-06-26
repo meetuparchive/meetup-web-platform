@@ -20,6 +20,7 @@ import { plugin as requestAuthPlugin } from 'mwp-auth-plugin';
 const CSRF_COOKIE_NAME = 'x-mwp-csrf';
 const CSRF_HEADER_COOKIE_NAME = `${CSRF_COOKIE_NAME}-header`;
 const CSRF_HEADER_NAME = CSRF_COOKIE_NAME;
+
 export function setCsrfCookies(request, h) {
 	const csrfHeader = (request.response.headers || {})[CSRF_COOKIE_NAME];
 	if (csrfHeader) {
@@ -43,7 +44,7 @@ export function setCsrfCookies(request, h) {
  * @return {Object} the { register } object for a `server.register` call.
  */
 export function getCsrfPlugin(electrodeOptions) {
-	const register = (server, options, next) => {
+	const register = (server, options) => {
 		const { isProd } = server.settings.app;
 		const cookieOptions = {
 			path: '/',
@@ -68,7 +69,7 @@ export function getCsrfPlugin(electrodeOptions) {
 			{ ...cookieOptions, isHttpOnly: false } // the client must read this cookie and return as a custom header
 		);
 
-		const registration = CsrfPlugin.register(server, options, next);
+		const registration = CsrfPlugin.register(server, options);
 		server.ext('onPreResponse', setCsrfCookies); // this extension must be registered _after_ plugin is registered
 
 		return registration;
@@ -83,33 +84,23 @@ export function getCsrfPlugin(electrodeOptions) {
 
 export function getAppRoutePlugin(options) {
 	return {
-		register: appRoutePlugin,
+		...appRoutePlugin,
 		options,
 	};
 }
-/**
- * configure and return the plugin that
- * allows requests to get anonymous oauth tokens
- * to communicate with the API
- */
-export function getRequestAuthPlugin() {
-	return {
-		register: requestAuthPlugin,
-	};
-}
 
-export function getLogger(
+export function getLoggerPlugin(
 	options = { logEvents: ['onPostStart', 'onPostStop', 'response'] }
 ) {
 	return {
-		register: loggerPlugin,
+		...loggerPlugin,
 		options,
 	};
 }
 
 export function getActivityTrackingPlugin({ agent, isProdApi }) {
 	return {
-		register: activityPlugin,
+		...activityPlugin,
 		options: {
 			agent,
 			isProdApi,
@@ -117,48 +108,24 @@ export function getActivityTrackingPlugin({ agent, isProdApi }) {
 	};
 }
 
-export function getClickTrackingPlugin() {
-	return {
-		register: clickPlugin,
-	};
-}
-
-function getServiceWorkerPlugin() {
-	return {
-		register: serviceWorkerPlugin,
-	};
-}
-
-export function getApiProxyPlugin() {
-	return {
-		register: apiProxyPlugin,
-	};
-}
-
-function getLanguagePlugin() {
-	return {
-		register: languagePlugin,
-	};
-}
-
 export default async function getPlugins({ languageRenderers }) {
 	const { package: { agent }, getServer } = config;
 	const server = await getServer();
 	const isProdApi = server.properties.api.isProd;
-	console.log(requestAuthPlugin);
+
 	return [
 		getAppRoutePlugin({ languageRenderers }),
-		getApiProxyPlugin(),
-		getLanguagePlugin(),
-		getLogger(),
+		apiProxyPlugin,
+		languagePlugin,
+		getLoggerPlugin(),
 		getCsrfPlugin({
 			headerName: CSRF_HEADER_NAME,
 			cookieName: CSRF_COOKIE_NAME,
 		}),
-		getRequestAuthPlugin(),
+		requestAuthPlugin,
 		getActivityTrackingPlugin({ agent, isProdApi }),
-		getClickTrackingPlugin(),
-		getServiceWorkerPlugin(),
+		clickPlugin,
+		serviceWorkerPlugin,
 		Inert,
 	];
 }
