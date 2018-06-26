@@ -145,6 +145,7 @@ export default async function getPlugins({ languageRenderers }) {
 	const { package: { agent }, getServer } = config;
 	const server = await getServer();
 	const isProdApi = server.properties.api.isProd;
+	console.log(requestAuthPlugin);
 	return [
 		getAppRoutePlugin({ languageRenderers }),
 		getApiProxyPlugin(),

@@ -1,7 +1,7 @@
 import rison from 'rison';
-import { plugin as requestAuthPlugin } from 'mwp-auth-plugin';
 import CsrfPlugin from 'electrode-csrf-jwt';
 
+import { plugin as requestAuthPlugin } from 'mwp-auth-plugin';
 import { getServer } from 'mwp-test-utils';
 import { plugin as apiProxyPlugin } from './';
 
@@ -32,9 +32,9 @@ async function getResponse(injectRequest) {
 		strategy: 'default',
 	});
 
-	await server.inject(injectRequest);
+	const response = await server.inject(injectRequest);
 
-	return server;
+	return response;
 }
 
 describe('api proxy plugin', () => {
