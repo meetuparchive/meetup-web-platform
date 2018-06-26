@@ -19,6 +19,9 @@ declare type HapiRequestUrl = URL & {
 	path: string,
 };
 
+declare type HapiHandlerReturnValue = HapiResponseObject | Error | string | { [string]: any };
+declare type HapiHandler = (HapiRequest, HapiResponseToolkit) => HapiHandlerReturnValue | Promise<HapiHandlerReturnValue>;
+
 declare type HapiRoute = Object;
 
 declare type HapiResponseObjectHeaderOptions = {
