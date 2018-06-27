@@ -276,14 +276,7 @@ ajv-keywords@^3.0.0, ajv-keywords@^3.1.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/ajv-keywords/-/ajv-keywords-3.2.0.tgz#e86b819c602cf8821ad637413698f1dec021847a"
 
-ajv@^4.9.1:
-  version "4.11.8"
-  resolved "https://registry.yarnpkg.com/ajv/-/ajv-4.11.8.tgz#82ffb02b29e662ae53bdc20af15947706739c536"
-  dependencies:
-    co "^4.6.0"
-    json-stable-stringify "^1.0.1"
-
-ajv@^5.1.0, ajv@^5.2.0:
+ajv@5.5.2, ajv@^5.1.0, ajv@^5.2.0:
   version "5.5.2"
   resolved "https://registry.yarnpkg.com/ajv/-/ajv-5.5.2.tgz#73b5eeca3fab653e3d3f9422b341ad42205dc965"
   dependencies:
@@ -291,6 +284,13 @@ ajv@^5.1.0, ajv@^5.2.0:
     fast-deep-equal "^1.0.0"
     fast-json-stable-stringify "^2.0.0"
     json-schema-traverse "^0.3.0"
+
+ajv@^4.9.1:
+  version "4.11.8"
+  resolved "https://registry.yarnpkg.com/ajv/-/ajv-4.11.8.tgz#82ffb02b29e662ae53bdc20af15947706739c536"
+  dependencies:
+    co "^4.6.0"
+    json-stable-stringify "^1.0.1"
 
 ajv@^6.0.1, ajv@^6.1.0:
   version "6.5.0"
@@ -5701,9 +5701,9 @@ negotiator@0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/negotiator/-/negotiator-0.6.1.tgz#2b327184e8992101177b28563fb5e7102acd0ca9"
 
-newrelic@3.2.0:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/newrelic/-/newrelic-3.2.0.tgz#78c4a616b2cf4584fdbfb33b807fab6dd2c0b0c0"
+newrelic@3.3.1:
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/newrelic/-/newrelic-3.3.1.tgz#52fddd74d10af7dbfe4bb4a750a72306602e55ce"
   dependencies:
     "@newrelic/koa" "^1.0.0"
     async "^2.1.4"
@@ -6357,6 +6357,10 @@ postcss-sorting@^3.1.0:
   dependencies:
     lodash "^4.17.4"
     postcss "^6.0.13"
+
+postcss-syntax@0.10.0:
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/postcss-syntax/-/postcss-syntax-0.10.0.tgz#62662d75479e1e75024b582c5f604613707d8f92"
 
 postcss-syntax@^0.9.0:
   version "0.9.1"

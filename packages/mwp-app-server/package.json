@@ -40,6 +40,7 @@
     "mwp-sw-plugin": ">=0.0.1",
     "mwp-tracking-plugin": ">=0.0.1",
     "pino": "4.7.1",
+    "postcss-syntax": "0.10.0",
     "spdy": "3.4.7",
     "uuid": "3.1.0"
   },

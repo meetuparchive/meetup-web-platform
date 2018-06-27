@@ -26,10 +26,11 @@
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "peerDependencies": {
-    "newrelic": "^3.2.0",
+    "newrelic": "^3.3.1",
     "rxjs": "^5.4.3"
   },
   "dependencies": {
+    "ajv": "5.5.2",
     "joi": "13.4.0",
     "mwp-auth-plugin": ">=0.0.1",
     "mwp-logger-plugin": ">=0.0.1",
