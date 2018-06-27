@@ -46,7 +46,6 @@ describe('api proxy plugin', () => {
 		// little helper function to test various matchable proxy URLs
 		const testUrl = url =>
 			getResponse({ url }).then(response => {
-				console.log(response.payload);
 				expect(response.statusCode).toBe(200);
 				expect(JSON.parse(response.payload)).toMatchObject({
 					responses: [
