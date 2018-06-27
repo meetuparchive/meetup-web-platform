@@ -45,6 +45,9 @@ export async function getServer() {
 	const server = Hapi.server({
 		port: 0,
 		app: config,
+		debug: {
+			request: ['error'],
+		},
 	});
 
 	server.app = {

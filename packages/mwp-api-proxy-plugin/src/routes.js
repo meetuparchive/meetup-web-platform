@@ -22,6 +22,9 @@ const getApiProxyRoutes = path => {
 		path,
 		handler,
 		options: {
+			ext: {
+				onPreResponse,
+			},
 			plugins: {
 				'electrode-csrf-jwt': {
 					enabled: true,

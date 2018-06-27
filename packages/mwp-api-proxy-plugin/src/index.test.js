@@ -1,5 +1,5 @@
 import rison from 'rison';
-import CsrfPlugin from 'electrode-csrf-jwt';
+import CsrfPlugin from 'electrode-csrf-jwt/lib/csrf-hapi17';
 
 import { plugin as requestAuthPlugin } from 'mwp-auth-plugin';
 import { getServer } from 'mwp-test-utils';
@@ -14,23 +14,18 @@ jest.mock('mwp-config', () => {
 async function getResponse(injectRequest) {
 	const server = await getServer();
 
-	// returns the server instance after it has been configured with the routes being tested
 	await server.register([
-		requestAuthPlugin,
+		apiProxyPlugin,
 		{
 			register: CsrfPlugin.register,
-			name: 'electrode-csrf-jwt-plugin',
-			version: '1.0.0',
+			pkg: CsrfPlugin.pkg,
 			options: { secret: 'asfd' },
 		},
-		apiProxyPlugin,
+		requestAuthPlugin,
 	]);
 
 	await server.auth.strategy('default', 'mwp');
-	await server.auth.default({
-		mode: 'required',
-		strategy: 'default',
-	});
+	await server.auth.default('default');
 
 	const response = await server.inject(injectRequest);
 
@@ -51,6 +46,7 @@ describe('api proxy plugin', () => {
 		// little helper function to test various matchable proxy URLs
 		const testUrl = url =>
 			getResponse({ url }).then(response => {
+				console.log(response.payload);
 				expect(response.statusCode).toBe(200);
 				expect(JSON.parse(response.payload)).toMatchObject({
 					responses: [

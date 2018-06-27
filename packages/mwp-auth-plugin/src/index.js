@@ -18,7 +18,7 @@ const mockCookies = {
  * @param {Object} options the options passed to `server.auth.strategy`for the
  *   auth stategy instance
  */
-export const mwpScheme = server => {
+export const mwpScheme = (server, options) => {
 	const MEMBER_COOKIE_NAME = server.settings.app.api.isProd
 		? 'MEETUP_MEMBER'
 		: 'MEETUP_MEMBER_DEV';
@@ -39,14 +39,12 @@ export const mwpScheme = server => {
 			const csrfToken = request.state[CSRF_COOKIE_NAME] || uuid.v4();
 			const memberCookie =
 				request.state[MEMBER_COOKIE_NAME] || mockCookies[MEMBER_COOKIE_NAME];
-			const credentials = {
-				memberCookie,
-				csrfToken,
-			};
-			h.authenticated({
-				credentials,
+			return h.authenticated({
+				credentials: {
+					memberCookie,
+					csrfToken,
+				},
 			});
-			return h.continue;
 		},
 	};
 };

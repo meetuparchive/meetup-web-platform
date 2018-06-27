@@ -1,5 +1,5 @@
 import Inert from 'inert';
-import CsrfPlugin from 'electrode-csrf-jwt';
+import CsrfPlugin from 'electrode-csrf-jwt/lib/csrf-hapi17';
 
 import config from 'mwp-config';
 import { plugin as loggerPlugin } from 'mwp-logger-plugin';
@@ -75,10 +75,9 @@ export function getCsrfPlugin(electrodeOptions) {
 		return registration;
 	};
 
-	register.attributes = CsrfPlugin.register.attributes;
-
 	return {
 		register,
+		pkg: CsrfPlugin.pkg,
 	};
 }
 
@@ -108,9 +107,9 @@ export function getActivityTrackingPlugin({ agent, isProdApi }) {
 	};
 }
 
-export default async function getPlugins({ languageRenderers }) {
+export default function getPlugins({ languageRenderers }) {
 	const { package: { agent }, getServer } = config;
-	const server = await getServer();
+	const server = getServer();
 	const isProdApi = server.properties.api.isProd;
 
 	return [

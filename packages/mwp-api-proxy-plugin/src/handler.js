@@ -28,9 +28,22 @@ export function parseRequestQueries(request) {
  * and serializes the API responses
  */
 export default (request, h) => {
-	request.proxyApi$(parseRequestQueries(request)).subscribe(
-		responses =>
-			h.response(JSON.stringify({ responses })).type('application/json'),
+	console.log('!!!!!!');
+	let parsedRequestQueries;
+	try {
+		parsedRequestQueries = parseRequestQueries(request);
+	} catch (err) {
+		console.log('xxx');
+		console.log(err);
+	}
+
+	const handleResponses = responses => {
+		console.log('wwwwww');
+		h.response(JSON.stringify({ responses })).type('application/json');
+	};
+
+	return request.proxyApi$(parsedRequestQueries).subscribe(
+		responses => handleResponses,
 		err => err // 500 error - will only be thrown on bad implementation
 	);
 };
