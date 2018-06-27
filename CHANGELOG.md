@@ -1,3 +1,9 @@
+## [16.4]
+
+-   **NEW FEATURE** A selector for pulling Feature Flags from redux state
+-   `mwp-store/lib/selectors` `getFeatureFlags`
+-   This selector will pull all feature flags from `state->flags`
+
 ## [16.3]
 
 -   **NEW FEATURE** query functions attached to routes will now get called with a
