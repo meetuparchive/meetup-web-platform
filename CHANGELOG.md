@@ -1,3 +1,9 @@
+## [17.0]
+
+-  **BREAKING CHANGE** Upgrade to hapi v17, which requires updating of
+   much of the platform code. Consumer apps that leverage the hapi server
+   will need to be updated as well.
+
 ## [16.3]
 
 -   **NEW FEATURE** query functions attached to routes will now get called with a
