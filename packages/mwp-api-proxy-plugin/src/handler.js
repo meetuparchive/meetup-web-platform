@@ -28,9 +28,8 @@ export function parseRequestQueries(request) {
  * and serializes the API responses
  */
 export default (request, h) => {
-	const handleResponses = responses => {
+	const handleResponses = responses =>
 		h.response(JSON.stringify({ responses })).type('application/json');
-	};
 
 	return request.proxyApi$(parseRequestQueries(request)).subscribe(
 		responses => handleResponses,
