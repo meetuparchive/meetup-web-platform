@@ -270,22 +270,24 @@ describe('buildRequestArgs', () => {
 describe('getExternalRequestOpts', () => {
 	it('returns the expected object from a vanilla request', async () => {
 		const server = await getServer();
-		MOCK_HAPI_REQUEST.server = server;
-
-		expect(getExternalRequestOpts(MOCK_HAPI_REQUEST)).toMatchSnapshot();
+		const mockRequest = {
+			...MOCK_HAPI_REQUEST,
+			server,
+		};
+		expect(getExternalRequestOpts(mockRequest)).toMatchSnapshot();
 	});
 	it('returns the expected object from a multipart request', async () => {
 		const server = await getServer();
-		MOCK_HAPI_REQUEST.server = server;
 
 		// most important difference is that multipart has a 'formData' key
-		expect(
-			getExternalRequestOpts({
-				...MOCK_HAPI_REQUEST,
-				mime: 'multipart/form-data',
-				payload: { foo: 'bar' },
-			})
-		).toMatchSnapshot();
+		const mockRequest = {
+			...MOCK_HAPI_REQUEST,
+			server,
+			mime: 'multipart/form-data',
+			payload: { foo: 'bar' },
+		};
+
+		expect(getExternalRequestOpts(mockRequest)).toMatchSnapshot();
 	});
 });
 
@@ -303,13 +305,17 @@ describe('createCookieJar', () => {
 describe('makeExternalApiRequest', () => {
 	it('calls externalRequest with requestOpts', async () => {
 		const server = await getServer();
-		MOCK_HAPI_REQUEST.server = server;
+		const mockRequest = {
+			...MOCK_HAPI_REQUEST,
+			server,
+		};
 
 		const requestOpts = {
 			foo: 'bar',
 			url: 'http://example.com',
 		};
-		return makeExternalApiRequest(MOCK_HAPI_REQUEST)(requestOpts)
+
+		return makeExternalApiRequest(mockRequest)(requestOpts)
 			.toPromise()
 			.then(() => require('request').mock.calls.pop()[0])
 			.then(arg => expect(arg).toBe(requestOpts));
@@ -337,13 +343,18 @@ describe('makeExternalApiRequest', () => {
 	});
 	it('returns the requestOpts jar at array index 2', async () => {
 		const server = await getServer();
-		MOCK_HAPI_REQUEST.server = server;
+
+		const mockRequest = {
+			...MOCK_HAPI_REQUEST,
+			server,
+		};
+
 		const requestOpts = {
 			foo: 'bar',
 			url: 'http://example.com',
 			jar: 'fooJar',
 		};
-		return makeExternalApiRequest(MOCK_HAPI_REQUEST)(requestOpts)
+		return makeExternalApiRequest(mockRequest)(requestOpts)
 			.toPromise()
 			.then(([response, body, jar]) => expect(jar).toBe(requestOpts.jar));
 	});
