@@ -29,10 +29,10 @@ export function parseRequestQueries(request) {
  */
 export default (request, h) => {
 	const handleResponses = responses =>
-		h.response(JSON.stringify({ responses })).type('application/json');
+		h.response({ responses }).type('application/json');
 
-	return request.proxyApi$(parseRequestQueries(request)).subscribe(
-		responses => handleResponses,
+	return request.proxyApi$(parseRequestQueries(request)).toPromise().then(
+		handleResponses,
 		err => err // 500 error - will only be thrown on bad implementation
 	);
 };

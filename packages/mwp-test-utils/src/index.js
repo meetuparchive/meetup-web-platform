@@ -4,10 +4,10 @@ import Cookie from 'tough-cookie';
 import { properties as serverConfig } from 'mwp-config/server';
 
 export const MOCK_LOGGER = {
-	debug: jest.fn(),
-	info: jest.fn(),
-	warn: jest.fn(),
-	error: jest.fn(),
+	debug: jest.fn(console.log),
+	info: jest.fn(console.log),
+	warn: jest.fn(console.log),
+	error: jest.fn(console.log),
 };
 
 export const createFakeStore = fakeData => ({
