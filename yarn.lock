@@ -2503,7 +2503,7 @@ ecdsa-sig-formatter@1.0.10:
   dependencies:
     safe-buffer "^5.0.1"
 
-electrode-csrf-jwt@1.4.0, "electrode-csrf-jwt@git+https://github.com/sadafie/electrode-csrf-jwt.git":
+"electrode-csrf-jwt@git+https://github.com/sadafie/electrode-csrf-jwt.git":
   version "1.4.0"
   resolved "git+https://github.com/sadafie/electrode-csrf-jwt.git#62142e498fe755560625ea0c3c6510ee6d5c2369"
   dependencies:
