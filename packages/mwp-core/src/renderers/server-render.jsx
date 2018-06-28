@@ -279,15 +279,18 @@ const makeRenderer = (
 			state.preRenderChecklist.every(isReady => isReady);
 		const populateStore = store =>
 			new Promise((resolve, reject) => {
-				// dispatch SERVER_RENDER to kick off API middleware
-				store.dispatch({ type: SERVER_RENDER, payload: url });
-
+				// keep this above the SERVER_RENDER so
+				// state.flags is available to query calls
 				if (checkReady(store.getState())) {
 					addFlags(store).then(() => {
 						resolve(store);
 					});
 					return;
 				}
+
+				// dispatch SERVER_RENDER to kick off API middleware
+				store.dispatch({ type: SERVER_RENDER, payload: url });
+
 				const unsubscribe = store.subscribe(() => {
 					if (checkReady(store.getState())) {
 						addFlags(store).then(() => {
