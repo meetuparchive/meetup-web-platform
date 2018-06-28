@@ -277,26 +277,30 @@ const makeRenderer = (
 		};
 		const checkReady = state =>
 			state.preRenderChecklist.every(isReady => isReady);
-		const populateStore = store =>
-			new Promise((resolve, reject) => {
+		const populateStore = store => {
+			return addFlags(store).then(() => {
 				// dispatch SERVER_RENDER to kick off API middleware
 				store.dispatch({ type: SERVER_RENDER, payload: url });
 
-				if (checkReady(store.getState())) {
-					addFlags(store).then(() => {
-						resolve(store);
-					});
-					return;
-				}
-				const unsubscribe = store.subscribe(() => {
+				return new Promise((resolve, reject) => {
+					// check whether store is already ready
+					// and resolve immediately if so
 					if (checkReady(store.getState())) {
-						addFlags(store).then(() => {
-							resolve(store);
-							unsubscribe();
-						});
+						resolve(store);
 					}
+					// otherwise, subscribe and add flags
+					// when store is ready
+					const unsubscribe = store.subscribe(() => {
+						if (checkReady(store.getState())) {
+							addFlags(store).then(() => {
+								resolve(store);
+								unsubscribe();
+							});
+						}
+					});
 				});
 			});
+		};
 
 		return routesPromise.then(resolvedRoutes =>
 			initializeStore(resolvedRoutes).then(store => {
