@@ -264,12 +264,15 @@ const makeRenderer = (
 		};
 
 		// otherwise render using the API and React router
-		const addFlags = store => {
-			const memberObj = (store.getState().api.self || {}).value || {};
+		// addFlags _must_ be called after the store is 'ready' to ensure that
+		// there is a full member object available in state - feature flags can
+		// be selected based on member id, email, and other properties
+		const addFlags = populatedStore => {
+			const memberObj = (populatedStore.getState().api.self || {}).value || {};
 			return request.server.plugins['mwp-app-route']
 				.getFlags(memberObj)
 				.then(flags =>
-					store.dispatch({
+					populatedStore.dispatch({
 						type: 'UPDATE_FLAGS',
 						payload: flags,
 					})
