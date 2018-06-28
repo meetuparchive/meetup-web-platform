@@ -283,16 +283,16 @@ const makeRenderer = (
 				store.dispatch({ type: SERVER_RENDER, payload: url });
 
 				return new Promise((resolve, reject) => {
-					// dispatch SERVER_RENDER to kick off API middleware
-					store.dispatch({ type: SERVER_RENDER, payload: url });
-					const unsubscribe = store.subscribe(() => {
-						if (checkReady(store.getState())) {
-							addFlags(store).then(() => {
-								resolve(store);
-								unsubscribe();
-							});
-						}
-					});
+					if (!checkReady(store.getState())) {
+						const unsubscribe = store.subscribe(() => {
+							if (checkReady(store.getState())) {
+								addFlags(store).then(() => {
+									resolve(store);
+									unsubscribe();
+								});
+							}
+						});
+					}
 				});
 			});
 		};
