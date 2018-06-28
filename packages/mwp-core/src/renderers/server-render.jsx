@@ -283,18 +283,17 @@ const makeRenderer = (
 				// state.flags is available to query calls
 				if (checkReady(store.getState())) {
 					addFlags(store).then(() => {
-						// dispatch SERVER_RENDER to kick off API middleware
-						store.dispatch({ type: SERVER_RENDER, payload: url });
 						resolve(store);
 					});
 					return;
 				}
 
+				// dispatch SERVER_RENDER to kick off API middleware
+				store.dispatch({ type: SERVER_RENDER, payload: url });
+
 				const unsubscribe = store.subscribe(() => {
 					if (checkReady(store.getState())) {
 						addFlags(store).then(() => {
-							// dispatch SERVER_RENDER to kick off API middleware
-							store.dispatch({ type: SERVER_RENDER, payload: url });
 							resolve(store);
 							unsubscribe();
 						});
