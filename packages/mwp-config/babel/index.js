@@ -1,6 +1,18 @@
 const core = {
 	compact: true,
-	presets: ['flow', 'react', 'stage-2'],
+	presets: [
+		'flow',
+		'react',
+		'stage-2',
+		[
+			'env',
+			{
+				targets: {
+					node: 'current',
+				},
+			},
+		],
+	],
 	plugins: [
 		'transform-class-properties',
 		['react-intl', { extractSourceLocation: true }],
@@ -15,11 +27,7 @@ module.exports = {
 				'env',
 				{
 					targets: {
-						browsers: [
-							'last 2 versions',
-							'not ie < 11',
-							'android >= 4.2',
-						],
+						browsers: ['last 2 versions', 'not ie < 11', 'android >= 4.2'],
 					},
 				},
 			],
