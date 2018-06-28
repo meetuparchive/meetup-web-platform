@@ -283,16 +283,21 @@ const makeRenderer = (
 				store.dispatch({ type: SERVER_RENDER, payload: url });
 
 				return new Promise((resolve, reject) => {
-					if (!checkReady(store.getState())) {
-						const unsubscribe = store.subscribe(() => {
-							if (checkReady(store.getState())) {
-								addFlags(store).then(() => {
-									resolve(store);
-									unsubscribe();
-								});
-							}
-						});
+					// check whether store is already ready
+					// and resolve immediately if so
+					if (checkReady(store.getState())) {
+						resolve(store);
 					}
+					// otherwise, subscribe and add flags
+					// when store is ready
+					const unsubscribe = store.subscribe(() => {
+						if (checkReady(store.getState())) {
+							addFlags(store).then(() => {
+								resolve(store);
+								unsubscribe();
+							});
+						}
+					});
 				});
 			});
 		};
