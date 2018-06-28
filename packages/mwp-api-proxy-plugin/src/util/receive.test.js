@@ -22,14 +22,15 @@ jest.mock('mwp-logger-plugin', () => {
 	};
 });
 
-describe('makeInjectResponseCookies', () => {
+describe('makeInjectResponseCookies', async () => {
+	const server = await getServer();
 	const request = {
 		plugins: {
 			[API_PROXY_PLUGIN_NAME]: {
 				setState() {},
 			},
 		},
-		server: getServer(),
+		server,
 	};
 	const responseObj = {
 		request: {
@@ -49,7 +50,7 @@ describe('makeInjectResponseCookies', () => {
 		makeInjectResponseCookies(request)([response, null, null]);
 		expect(response.toJSON).not.toHaveBeenCalled();
 	});
-	it('sets the provided cookies on the reply state', () => {
+	it('sets the provided cookies on the response state', () => {
 		const mockJar = externalRequest.jar();
 		spyOn(request.plugins[API_PROXY_PLUGIN_NAME], 'setState');
 
@@ -59,7 +60,9 @@ describe('makeInjectResponseCookies', () => {
 		mockJar.setCookie(`${key}=${value}`, responseObj.request.uri.href);
 
 		makeInjectResponseCookies(request)([response, null, mockJar]);
-		expect(request.plugins[API_PROXY_PLUGIN_NAME].setState).toHaveBeenCalledWith(
+		expect(
+			request.plugins[API_PROXY_PLUGIN_NAME].setState
+		).toHaveBeenCalledWith(
 			key,
 			value,
 			jasmine.any(Object) // don't actually care about the cookie options
@@ -250,8 +253,9 @@ describe('makeApiResponseToQueryResponse', () => {
 	});
 });
 
-describe('makeLogResponse', () => {
-	const request = { server: getServer() };
+describe('makeLogResponse', async () => {
+	const server = await getServer();
+	const request = { server };
 	const MOCK_INCOMINGMESSAGE_GET = {
 		elapsedTime: 1234,
 		request: {
