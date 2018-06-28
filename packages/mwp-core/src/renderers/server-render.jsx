@@ -265,7 +265,14 @@ const makeRenderer = (
 
 		// otherwise render using the API and React router
 		const addFlags = store => {
-			const memberObj = (store.getState().api.self || {}).value || {};
+			// use the api self object first if it exists,
+			// else, use the member id on the member cookie,
+			// else, this person's a guest and they'll get a
+			// default id of 0
+			const memberObj = (store.getState().api.self || {}).value || {
+				id: parseMemberCookie(request.state).id,
+			};
+
 			return request.server.plugins['mwp-app-route']
 				.getFlags(memberObj)
 				.then(flags =>
