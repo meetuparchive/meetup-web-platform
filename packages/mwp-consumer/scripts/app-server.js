@@ -2,7 +2,9 @@ const memwatch = require('memwatch-next');
 memwatch.on('leak', info => {
 	console.error('GC HAPPENED Memory leak detected:\n', info);
 });
-memwatch.on('stats', stats => console.log('GC HAPPENED', JSON.stringify(stats)));
+memwatch.on('stats', stats =>
+	console.log('GC HAPPENED', JSON.stringify(stats))
+);
 // run directly by node, no babel
 const startServer = require('mwp-app-server').default;
 
@@ -10,18 +12,18 @@ const routes = [
 	{
 		method: 'GET',
 		path: `/favicon.ico`,
-		handler: (request, reply) => reply(''),
+		handler: (request, h) => h.reponse(''),
 	},
 	{
 		method: 'GET',
 		path: `/app.js`,
-		config: {
+		options: {
 			auth: false,
 			cache: {
 				expiresIn: 1000 * 60 * 60 * 24 * 365, // one year
 			},
 		},
-		handler: (request, reply) => reply(''),
+		handler: (request, h) => '',
 	},
 ];
 /**
