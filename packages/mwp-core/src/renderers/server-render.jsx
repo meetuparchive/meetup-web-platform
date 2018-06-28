@@ -277,8 +277,8 @@ const makeRenderer = (
 		};
 		const checkReady = state =>
 			state.preRenderChecklist.every(isReady => isReady);
-		const populateStore = store =>
-			addFlags(store).then(() => {
+		const populateStore = store => {
+			return addFlags(store).then(() => {
 				// dispatch SERVER_RENDER to kick off API middleware
 				store.dispatch({ type: SERVER_RENDER, payload: url });
 
@@ -300,6 +300,7 @@ const makeRenderer = (
 					});
 				});
 			});
+		};
 
 		return routesPromise.then(resolvedRoutes =>
 			initializeStore(resolvedRoutes).then(store => {
