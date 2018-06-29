@@ -268,6 +268,8 @@ const makeRenderer = (
 		// there is a full member object available in state - feature flags can
 		// be selected based on member id, email, and other properties
 		const addFlags = populatedStore => {
+			// getFlags needs as much member info as possible, but particularly id and email
+			// in order to match on common targeting rules
 			const memberObj = (populatedStore.getState().api.self || {}).value || {};
 			return request.server.plugins['mwp-app-route']
 				.getFlags(memberObj)
