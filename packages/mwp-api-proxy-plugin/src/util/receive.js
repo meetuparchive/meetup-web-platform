@@ -216,11 +216,13 @@ export const makeLogResponse = request => ([response, body]) => {
 		});
 		return;
 	}
-	// not an error response
-	logger.info({
-		...logBase,
-		httpRequest: response,
-	});
+	// not an error response - log in dev, not prod
+	if (process.env.NODE_ENV !== 'production') {
+		logger.info({
+			...logBase,
+			httpRequest: response,
+		});
+	}
 };
 
 /**
