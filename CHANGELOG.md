@@ -1,3 +1,9 @@
+## [16.5]
+
+- **New feature** the API proxy path prefix can now be specified using an app's
+  `package.json` file by specifying `config.apiProxyPath` with a leading slash,
+  e.g. `/mu_api`, or by an env variable `API_PROXY_PATH`.
+
 ## [16.4]
 
 -   **NEW FEATURE** A selector for pulling Feature Flags from redux state
