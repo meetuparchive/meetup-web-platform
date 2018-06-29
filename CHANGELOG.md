@@ -1,8 +1,13 @@
+## [16.6]
+
+-   Logging change - no more stdout debug logging for tracking calls, no logging
+    of successful api.meetup.com calls in prod.
+
 ## [16.5]
 
-- **New feature** the API proxy path prefix can now be specified using an app's
-  `package.json` file by specifying `config.apiProxyPath` with a leading slash,
-  e.g. `/mu_api`, or by an env variable `API_PROXY_PATH`.
+-   **New feature** the API proxy path prefix can now be specified using an app's
+    `package.json` file by specifying `config.apiProxyPath` with a leading slash,
+    e.g. `/mu_api`, or by an env variable `API_PROXY_PATH`.
 
 ## [16.4]
 
