@@ -5,6 +5,8 @@ const path = require('path');
 const chalk = require('chalk');
 const convict = require('convict');
 
+const packageConfig = require('../package');
+
 const { schema: envSchema, properties: envProperties } = require('../env');
 
 const {
@@ -53,6 +55,11 @@ const schema = Object.assign({}, envSchema, {
 			default: 8000,
 			arg: 'app-port',
 			env: process.env.NODE_ENV !== 'test' && 'DEV_SERVER_PORT', // don't read env in tests
+		},
+		api_proxy_path: {
+			format: String,
+			default: packageConfig.apiProxyPath || '/mu_api',
+			env: 'API_PROXY_PATH',
 		},
 		key_file: {
 			format: String,
