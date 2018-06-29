@@ -1,8 +1,3 @@
-const memwatch = require('memwatch-next');
-memwatch.on('leak', info => {
-	console.error('GC HAPPENED Memory leak detected:\n', info);
-});
-memwatch.on('stats', stats => console.log('GC HAPPENED', JSON.stringify(stats)));
 // run directly by node, no babel
 const startServer = require('mwp-app-server').default;
 
