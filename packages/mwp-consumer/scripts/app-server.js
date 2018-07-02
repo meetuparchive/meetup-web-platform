@@ -13,7 +13,7 @@ const routes = [
 	{
 		method: 'GET',
 		path: `/favicon.ico`,
-		handler: (request, h) => h.reponse(''),
+		handler: (request, h) => '',
 	},
 	{
 		method: 'GET',

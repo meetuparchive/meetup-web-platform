@@ -27,7 +27,7 @@ export function register(server: Object, options: ?Object) {
 				localeCode,
 				'asset-service-worker.js'
 			);
-			h.file(swPath).type('application/javascript');
+			return h.file(swPath).type('application/javascript');
 		},
 	});
 }
