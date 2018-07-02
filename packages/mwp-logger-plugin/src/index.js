@@ -35,9 +35,16 @@ export function logResponse(request) {
 }
 
 // this might be redundant with the `logResponse` behavior
-const onRequestError = (request, err) => {
+const onRequestError = (request, event, tags) => {
+	if (!tags.error) {
+		return;
+	}
+
+	const err =
+		event.error && event.error.message ? event.error.message : 'unknown error';
+
 	logger.error({
-		err,
+		err: `Request ${event.request} failed: ${err}`,
 		context: request,
 		...request.raw,
 	});
@@ -60,7 +67,7 @@ export function register(server, options) {
 			method: onRequestExtension,
 		},
 	]);
-	server.events.on('request-error', onRequestError);
+	server.events.on({ name: 'request', channels: 'error' }, onRequestError);
 	server.events.on('response', logResponse);
 	server.app.logger = logger;
 }
