@@ -34,6 +34,7 @@
     "joi": "13.4.0",
     "mwp-auth-plugin": ">=0.0.1",
     "mwp-logger-plugin": ">=0.0.1",
+    "mwp-config": ">=0.0.1",
     "qs": "6.5.0",
     "request": "2.81.0",
     "rison": "0.1.1"

@@ -9,7 +9,7 @@ declare type MatchMedia = {
 
 declare type MWPState = {
 	api: ApiState,
-	flags?: { [string]: boolean | string },
+	flags?: FeatureFlags,
 	config: {
 		apiUrl: string,
 		baseUrl: string,
@@ -23,6 +23,8 @@ declare type MWPState = {
 		media: MatchMedia,
 	},
 };
+
+declare type FeatureFlags = { [string]: boolean | string };
 
 declare type Params = { [string]: string };
 

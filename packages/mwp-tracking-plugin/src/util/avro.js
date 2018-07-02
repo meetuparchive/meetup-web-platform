@@ -137,7 +137,9 @@ const logger = (serializer: Serializer, deserializer: Deserializer) => (
 	const serializedRecord = serializer(record);
 	const deserializedRecord = deserializer(serializedRecord);
 	analyticsLog(serializedRecord);
-	debugLog(deserializedRecord);
+	if (process.argv.includes('--debug')) {
+		debugLog(deserializedRecord);
+	}
 };
 
 const schemas = {

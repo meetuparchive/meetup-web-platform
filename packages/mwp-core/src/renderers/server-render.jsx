@@ -266,12 +266,17 @@ const makeRenderer = (
 		};
 
 		// otherwise render using the API and React router
-		const addFlags = store => {
-			const memberObj = (store.getState().api.self || {}).value || {};
+		// addFlags _must_ be called after the store is 'ready' to ensure that
+		// there is a full member object available in state - feature flags can
+		// be selected based on member id, email, and other properties
+		const addFlags = populatedStore => {
+			// getFlags needs as much member info as possible, but particularly id and email
+			// in order to match on common targeting rules
+			const memberObj = (populatedStore.getState().api.self || {}).value || {};
 			return request.server.plugins['mwp-app-route']
 				.getFlags(memberObj)
 				.then(flags =>
-					store.dispatch({
+					populatedStore.dispatch({
 						type: 'UPDATE_FLAGS',
 						payload: flags,
 					})
@@ -280,26 +285,23 @@ const makeRenderer = (
 		const checkReady = state =>
 			state.preRenderChecklist.every(isReady => isReady);
 		const populateStore = store =>
-			addFlags(store).then(() => {
+			new Promise((resolve, reject) => {
 				// dispatch SERVER_RENDER to kick off API middleware
 				store.dispatch({ type: SERVER_RENDER, payload: url });
 
-				return new Promise((resolve, reject) => {
-					// check whether store is already ready
-					// and resolve immediately if so
-					if (checkReady(store.getState())) {
+				if (checkReady(store.getState())) {
+					addFlags(store).then(() => {
 						resolve(store);
-					}
-					// otherwise, subscribe and add flags
-					// when store is ready
-					const unsubscribe = store.subscribe(() => {
-						if (checkReady(store.getState())) {
-							addFlags(store).then(() => {
-								resolve(store);
-								unsubscribe();
-							});
-						}
 					});
+					return;
+				}
+				const unsubscribe = store.subscribe(() => {
+					if (checkReady(store.getState())) {
+						addFlags(store).then(() => {
+							resolve(store);
+							unsubscribe();
+						});
+					}
 				});
 			});
 

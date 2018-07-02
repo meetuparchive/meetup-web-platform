@@ -150,7 +150,7 @@ serializers.httpRequest = request => {
 	return {};
 };
 
-const streams = []; // stdout by default
+const streams = [];
 const {
 	NODE_ENV,
 	GAE_INSTANCE,

@@ -2,7 +2,23 @@
 
 -  **BREAKING CHANGE** Upgrade to hapi v17, which requires updating of
    much of the platform code. Consumer apps that leverage the hapi server
-   will need to be updated as well.
+
+## [16.6]
+
+-   Logging change - no more stdout debug logging for tracking calls, no logging
+    of successful api.meetup.com calls in prod.
+
+## [16.5]
+
+-   **New feature** the API proxy path prefix can now be specified using an app's
+    `package.json` file by specifying `config.apiProxyPath` with a leading slash,
+    e.g. `/mu_api`, or by an env variable `API_PROXY_PATH`.
+
+## [16.4]
+
+-   **NEW FEATURE** A selector for pulling Feature Flags from redux state
+-   `mwp-store/lib/selectors` `getFeatureFlags`
+-   This selector will pull all feature flags from `state->flags`
 
 ## [16.3]
 

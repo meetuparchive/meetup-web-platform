@@ -169,7 +169,11 @@ export const makeParseApiResponse = query => ([response, body]) => {
  *
  * @param {Object} apiResponse JSON-parsed api response data
  */
-export const makeApiResponseToQueryResponse = query => ({ value, error, meta }) => ({
+export const makeApiResponseToQueryResponse = query => ({
+	value,
+	error,
+	meta,
+}) => ({
 	type: query.type,
 	ref: query.ref,
 	value,
@@ -178,9 +182,12 @@ export const makeApiResponseToQueryResponse = query => ({ value, error, meta }) 
 });
 
 export const makeLogResponse = request => ([response, body]) => {
-	const { request: { headers, method, uri: { href: url } }, statusCode } = response;
+	const {
+		request: { headers, method, uri: { href: url } },
+		statusCode,
+	} = response;
 	const logBase = {
-		...request.raw, // request to /mu_api
+		...request.raw, // request to API_ROUTE_PATH
 		externalRequest: { headers, method, url }, // request to https://api.meetup.com/
 	};
 
@@ -188,7 +195,9 @@ export const makeLogResponse = request => ([response, body]) => {
 		statusCode >= 500 || // REST API had an internal error
 		(method.toLowerCase() === 'get' && statusCode >= 400) // something fishy with a GET
 	) {
-		const logError = (statusCode < 500 ? logger.warn : logger.error).bind(logger);
+		const logError = (statusCode < 500 ? logger.warn : logger.error).bind(
+			logger
+		);
 		let errorMessage;
 		try {
 			// well-behaved API errors return a JSON object with an `errors` array
@@ -207,11 +216,13 @@ export const makeLogResponse = request => ([response, body]) => {
 		});
 		return;
 	}
-	// not an error response
-	logger.info({
-		...logBase,
-		httpRequest: response,
-	});
+	// not an error response - log in dev, not prod
+	if (process.env.NODE_ENV !== 'production') {
+		logger.info({
+			...logBase,
+			httpRequest: response,
+		});
+	}
 };
 
 /**
