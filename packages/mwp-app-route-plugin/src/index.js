@@ -34,7 +34,7 @@ export function register(
 		);
 	});
 	// set up launchdarkly instance before continuing
-	server.on('stop', ldClient.close);
+	server.events.on('stop', ldClient.close);
 }
 
 export const plugin = {

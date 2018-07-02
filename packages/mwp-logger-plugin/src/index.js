@@ -60,8 +60,8 @@ export function register(server, options) {
 			method: onRequestExtension,
 		},
 	]);
-	server.on('request-error', onRequestError);
-	server.on('response', logResponse);
+	server.events.on('request-error', onRequestError);
+	server.events.on('response', logResponse);
 	server.app.logger = logger;
 }
 
