@@ -120,7 +120,9 @@ declare type HapiServer = {
 		[string]: any,
 	},
 	route: (routes: HapiRoute | Array<HapiRoute>) => Promise<HapiServer>,
-	on: (eventName: string, cb: () => void) => void,
+	events: {
+		on: (eventName: string, cb: () => void) => void,
+	}
 };
 
 declare type HapiRequest = {
