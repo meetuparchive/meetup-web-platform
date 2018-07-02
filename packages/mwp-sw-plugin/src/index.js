@@ -8,7 +8,7 @@ const path = require('path');
  *
  * Disk location of the script file is determined by builder CLI config import.
  */
-export default function register(server: Object, options: ?Object, next: () => void) {
+export function register(server: Object, options: ?Object) {
 	/*
 	 * Route for service worker script at top-level path. Depends on `Inert`
 	 * `path` must match client `serviceWorker.register` call - MWP provides this
@@ -17,25 +17,24 @@ export default function register(server: Object, options: ?Object, next: () => v
 	server.route({
 		method: 'GET',
 		path: '/asset-service-worker.{localeCode}.js',
-		config: {
+		options: {
 			auth: false,
 		},
-		handler: (request, reply) => {
+		handler: (request, h) => {
 			const { localeCode } = request.params;
 			const swPath = path.resolve(
 				buildPaths.output.browser,
 				localeCode,
 				'asset-service-worker.js'
 			);
-			reply.file(swPath).type('application/javascript');
+			return h.file(swPath).type('application/javascript');
 		},
 	});
-
-	next();
 }
 
-register.attributes = {
+export const plugin = {
+	register,
 	name: 'mwp-service-worker',
 	version: '1.0.0',
-	dependencies: 'inert', // decorates `reply.file`
+	dependencies: 'inert', // decorates `h.file`
 };
