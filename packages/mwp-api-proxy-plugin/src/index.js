@@ -6,15 +6,18 @@ import proxyApi$ from './proxy';
 import { API_ROUTE_PATH, API_PROXY_PLUGIN_NAME } from './config';
 export { API_ROUTE_PATH } from './config';
 
-export const setPluginState = (request: HapiRequest, reply: HapiReply) => {
+export const setPluginState = (
+	request: HapiRequest,
+	h: HapiResponseToolkit
+) => {
 	request.plugins[API_PROXY_PLUGIN_NAME] = {
-		setState: reply.state, // allow plugin to proxy cookies from API
+		setState: h.state, // allow plugin to proxy cookies from API
 	};
 
-	return reply.continue();
+	return h.continue;
 };
 
-export default function register(server: Object, options: void, next: () => void) {
+export function register(server: Object, options: void) {
 	// supply duotone urls through `server.plugins['mwp-api-proxy-plugin'].duotoneUrls`
 	server.expose(
 		'duotoneUrls',
@@ -29,11 +32,10 @@ export default function register(server: Object, options: void, next: () => void
 	// add a route that will receive query requests as querystring params
 	const routes = getApiProxyRoutes(`${API_ROUTE_PATH}/{page*}`);
 	server.route(routes);
-
-	next();
 }
 
-register.attributes = {
+export const plugin = {
+	register,
 	name: API_PROXY_PLUGIN_NAME,
 	version: '1.0.0',
 	dependencies: [
