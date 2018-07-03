@@ -34,7 +34,6 @@ const MOCK_HAPI_REQUEST = {
 		credentials: { memberCookie: 'foo member', csrfToken: 'bar token' },
 	},
 	id: 'mock-uuid-1234',
-	server: getServer(),
 	method: 'get',
 	headers: {},
 	query: {},
@@ -269,18 +268,26 @@ describe('buildRequestArgs', () => {
 });
 
 describe('getExternalRequestOpts', () => {
-	it('returns the expected object from a vanilla request', () => {
-		expect(getExternalRequestOpts(MOCK_HAPI_REQUEST)).toMatchSnapshot();
+	it('returns the expected object from a vanilla request', async () => {
+		const server = await getServer();
+		const mockRequest = {
+			...MOCK_HAPI_REQUEST,
+			server,
+		};
+		expect(getExternalRequestOpts(mockRequest)).toMatchSnapshot();
 	});
-	it('returns the expected object from a multipart request', () => {
+	it('returns the expected object from a multipart request', async () => {
+		const server = await getServer();
+
 		// most important difference is that multipart has a 'formData' key
-		expect(
-			getExternalRequestOpts({
-				...MOCK_HAPI_REQUEST,
-				mime: 'multipart/form-data',
-				payload: { foo: 'bar' },
-			})
-		).toMatchSnapshot();
+		const mockRequest = {
+			...MOCK_HAPI_REQUEST,
+			server,
+			mime: 'multipart/form-data',
+			payload: { foo: 'bar' },
+		};
+
+		expect(getExternalRequestOpts(mockRequest)).toMatchSnapshot();
 	});
 });
 
@@ -296,12 +303,19 @@ describe('createCookieJar', () => {
 });
 
 describe('makeExternalApiRequest', () => {
-	it('calls externalRequest with requestOpts', () => {
+	it('calls externalRequest with requestOpts', async () => {
+		const server = await getServer();
+		const mockRequest = {
+			...MOCK_HAPI_REQUEST,
+			server,
+		};
+
 		const requestOpts = {
 			foo: 'bar',
 			url: 'http://example.com',
 		};
-		return makeExternalApiRequest(MOCK_HAPI_REQUEST)(requestOpts)
+
+		return makeExternalApiRequest(mockRequest)(requestOpts)
 			.toPromise()
 			.then(() => require('request').mock.calls.pop()[0])
 			.then(arg => expect(arg).toBe(requestOpts));
@@ -327,13 +341,20 @@ describe('makeExternalApiRequest', () => {
 				expect(JSON.parse(body).errors[0].code).toBe('ETIMEDOUT')
 			);
 	});
-	it('returns the requestOpts jar at array index 2', () => {
+	it('returns the requestOpts jar at array index 2', async () => {
+		const server = await getServer();
+
+		const mockRequest = {
+			...MOCK_HAPI_REQUEST,
+			server,
+		};
+
 		const requestOpts = {
 			foo: 'bar',
 			url: 'http://example.com',
 			jar: 'fooJar',
 		};
-		return makeExternalApiRequest(MOCK_HAPI_REQUEST)(requestOpts)
+		return makeExternalApiRequest(mockRequest)(requestOpts)
 			.toPromise()
 			.then(([response, body, jar]) => expect(jar).toBe(requestOpts.jar));
 	});
