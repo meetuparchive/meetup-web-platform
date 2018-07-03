@@ -98,8 +98,7 @@ const getMedia = (userAgent: string, userAgentDevice: string) => {
  *
  * @param {Object} renderProps
  * @param {ReduxStore} store the store containing the initial state of the app
- * @return {Object} the statusCode and result used by Hapi's `reply` API
- *   {@link http://hapijs.com/api#replyerr-result}
+ * @return {Object} the statusCode and result used by Hapi's response API
  */
 type RenderResult =
 	| { result: string, statusCode: number }
@@ -209,7 +208,10 @@ const makeRenderer = (
 	// be reused for all subsequent requests, so we're not resolving the routes repeatedly
 	// hooray performance
 	const routesPromise = resolveAllRoutes(routes);
-	return (request: HapiRequest, reply: HapiReply): Promise<RenderResult> => {
+	return (
+		request: HapiRequest,
+		h: HapiResponseToolkit
+	): Promise<RenderResult> => {
 		middleware = middleware || [];
 
 		if (!scripts.length) {

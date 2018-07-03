@@ -2,8 +2,8 @@ export default function getRoutes() {
 	const pingRoute = {
 		path: '/ping',
 		method: 'GET',
-		handler: (request, reply) => reply('pong!'),
-		config: {
+		handler: (request, h) => 'pong!',
+		options: {
 			auth: false,
 			plugins: {
 				'mwp-logger-plugin': {
@@ -18,7 +18,7 @@ export default function getRoutes() {
 	const appEngineLifecycleRoutes = {
 		method: 'GET',
 		path: '/_ah/{param*}',
-		config: {
+		options: {
 			auth: false,
 			plugins: {
 				'mwp-logger-plugin': {
@@ -26,11 +26,11 @@ export default function getRoutes() {
 				},
 			},
 		},
-		handler: (request, reply) => {
+		handler: (request, h) => {
 			if (request.params.param === 'error') {
 				throw new Error('Simulated error via url');
 			}
-			reply('OK');
+			return 'OK';
 		},
 	};
 

@@ -25,7 +25,6 @@ const MOCK_HAPI_REQUEST = {
 	state: {
 		oauth_token: 'foo',
 	},
-	server: getServer(),
 	log: () => {},
 	trackActivity: () => {},
 	getLanguage: () => 'en-US',
@@ -33,7 +32,12 @@ const MOCK_HAPI_REQUEST = {
 
 describe('apiProxy$', () => {
 	const queries = [mockQuery(MOCK_RENDERPROPS), mockQuery(MOCK_RENDERPROPS)];
-	it('returns an observable that emits an array of results', () => {
+	it('returns an observable that emits an array of results', async () => {
+		const server = await getServer();
+		const mockRequest = {
+			...MOCK_HAPI_REQUEST,
+			server,
+		};
 		const requestResult = {
 			type: 'fake',
 			value: { foo: 'bar' },
@@ -44,27 +48,45 @@ describe('apiProxy$', () => {
 			requestResult
 		);
 		const expectedResults = [requestResult, requestResult];
-		return apiProxy$(MOCK_HAPI_REQUEST)(queries)
+		return apiProxy$(mockRequest)(queries)
 			.toPromise()
 			.then(results => expect(results).toEqual(expectedResults));
 	});
 
 	const endpoint = 'foo';
-	it('makes a GET request', () => {
+	it('makes a GET request', async () => {
+		const server = await getServer();
+		const mockRequest = {
+			...MOCK_HAPI_REQUEST,
+			server,
+			method: 'get',
+		};
 		const query = { ...mockQuery(MOCK_RENDERPROPS) };
-		return apiProxy$({ ...MOCK_HAPI_REQUEST, method: 'get' })([query])
+		return apiProxy$(mockRequest)([query])
 			.toPromise()
 			.then(() => require('request').mock.calls.pop()[0])
 			.then(arg => expect(arg.method).toBe('get'));
 	});
-	it('makes a POST request', () => {
+	it('makes a POST request', async () => {
+		const server = await getServer();
+		const mockRequest = {
+			...MOCK_HAPI_REQUEST,
+			server,
+			method: 'post',
+		};
 		const query = { ...mockQuery(MOCK_RENDERPROPS), meta: { method: 'post' } };
-		return apiProxy$({ ...MOCK_HAPI_REQUEST, method: 'post' })([query])
+		return apiProxy$(mockRequest)([query])
 			.toPromise()
 			.then(() => require('request').mock.calls.pop()[0])
 			.then(arg => expect(arg.method).toBe('post'));
 	});
-	it('responds with query.mockResponse when set', () => {
+	it('responds with query.mockResponse when set', async () => {
+		const server = await getServer();
+		const mockRequest = {
+			...MOCK_HAPI_REQUEST,
+			server,
+			method: 'get',
+		};
 		const mockResponse = { foo: 'bar' };
 		const query = { ...mockQuery(MOCK_RENDERPROPS), mockResponse };
 		const expectedResponses = [
@@ -80,7 +102,7 @@ describe('apiProxy$', () => {
 				error: undefined,
 			},
 		];
-		return apiProxy$({ ...MOCK_HAPI_REQUEST, method: 'get' })([query])
+		return apiProxy$(mockRequest)([query])
 			.toPromise()
 			.then(responses => expect(responses).toEqual(expectedResponses));
 	});
