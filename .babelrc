@@ -6,6 +6,10 @@
   ],
   "plugins": [
     "transform-flow-strip-types",
-    "babel-plugin-dynamic-import-node"
+    "babel-plugin-dynamic-import-node",
+    ["transform-runtime", {
+      "polyfill": false,
+      "regenerator": true
+    }]
   ]
 }
