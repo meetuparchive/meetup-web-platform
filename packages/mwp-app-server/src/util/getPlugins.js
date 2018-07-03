@@ -76,14 +76,16 @@ export function getCsrfPlugin(electrodeOptions) {
 	};
 
 	return {
-		register,
-		pkg: CsrfPlugin.pkg,
+		plugin: {
+			register,
+			pkg: CsrfPlugin.pkg,
+		},
 	};
 }
 
 export function getAppRoutePlugin(options) {
 	return {
-		...appRoutePlugin,
+		plugin: appRoutePlugin,
 		options,
 	};
 }
@@ -92,14 +94,14 @@ export function getLoggerPlugin(
 	options = { logEvents: ['onPostStart', 'onPostStop', 'response'] }
 ) {
 	return {
-		...loggerPlugin,
+		plugin: loggerPlugin,
 		options,
 	};
 }
 
 export function getActivityTrackingPlugin({ agent, isProdApi }) {
 	return {
-		...activityPlugin,
+		plugin: activityPlugin,
 		options: {
 			agent,
 			isProdApi,
