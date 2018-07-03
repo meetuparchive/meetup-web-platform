@@ -1,4 +1,3 @@
-// @flow
 import { duotones, getDuotoneUrls } from './util/duotone';
 import getApiProxyRoutes from './routes';
 import proxyApi$ from './proxy';
@@ -6,18 +5,15 @@ import proxyApi$ from './proxy';
 import { API_ROUTE_PATH, API_PROXY_PLUGIN_NAME } from './config';
 export { API_ROUTE_PATH } from './config';
 
-export const setPluginState = (
-	request: HapiRequest,
-	h: HapiResponseToolkit
-) => {
+export function setPluginState(request, h) {
 	request.plugins[API_PROXY_PLUGIN_NAME] = {
 		setState: h.state, // allow plugin to proxy cookies from API
 	};
 
 	return h.continue;
-};
+}
 
-export function register(server: Object, options: void) {
+export function register(server, options) {
 	// supply duotone urls through `server.plugins['mwp-api-proxy-plugin'].duotoneUrls`
 	server.expose(
 		'duotoneUrls',
