@@ -9,6 +9,25 @@ const validApiPayloadSchema = Joi.object({
 	__set_geoip: Joi.string().ip(),
 });
 
+export const onPreResponse = {
+	/*
+	 * This function processes the route response before it is sent to the client.
+	 *
+	 * - In dev, it transforms the generic 500 error response JSON into a full dev-
+	 *   friendly rendering of the stack trace.
+	 */
+	method: (request, h) => {
+		const response = request.response;
+
+		if (!response.isBoom || process.env.NODE_ENV === 'production') {
+			return h.continue;
+		}
+
+		// return response which contains error
+		return h.response(response).code(response.statusCode);
+	},
+};
+
 const getApiProxyRoutes = path => {
 	/**
 	 * This handler converts the application-supplied queries into external API
@@ -21,7 +40,10 @@ const getApiProxyRoutes = path => {
 	const routeBase = {
 		path,
 		handler,
-		config: {
+		options: {
+			ext: {
+				onPreResponse,
+			},
 			plugins: {
 				'electrode-csrf-jwt': {
 					enabled: true,
@@ -35,8 +57,8 @@ const getApiProxyRoutes = path => {
 	const apiGetRoute = {
 		...routeBase,
 		method: ['GET', 'DELETE'],
-		config: {
-			...routeBase.config,
+		options: {
+			...routeBase.options,
 			validate: {
 				query: validApiPayloadSchema,
 			},
@@ -45,8 +67,8 @@ const getApiProxyRoutes = path => {
 	const apiPostRoute = {
 		...routeBase,
 		method: ['POST', 'PATCH'],
-		config: {
-			...routeBase.config,
+		options: {
+			...routeBase.options,
 			payload: {
 				allow: ['application/x-www-form-urlencoded', 'multipart/form-data'],
 				maxBytes: 1024 * 1024 * 10, // 10 MB max upload
