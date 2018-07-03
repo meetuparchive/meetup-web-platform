@@ -44,5 +44,5 @@ export default function processClickTracking(request, h) {
 	history.map(clickToClickRecord(request)).forEach(avro.loggers.click);
 
 	h.unstate(COOKIE_NAME, clickCookieOptions);
-	return;
+	return h.continue;
 }
