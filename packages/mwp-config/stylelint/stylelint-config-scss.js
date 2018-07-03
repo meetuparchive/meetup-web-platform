@@ -16,6 +16,7 @@ module.exports = {
 		'scss/declaration-nested-properties': 'never',
 		'scss/selector-no-redundant-nesting-selector': true,
 		'scss/no-duplicate-dollar-variables': true,
+		'scss/operator-no-unspaced': true,
 
 		// the following rules are intentionally disabled
 		'scss/at-else-closing-brace-space-after': null,
@@ -37,9 +38,8 @@ module.exports = {
 		'scss/double-slash-comment-whitespace-inside': null,
 		'scss/declaration-nested-properties-no-divided-groups': null,
 		'scss/media-feature-value-dollar-variable': null,
-		'scss/operator-no-newline-after': true,
-		'scss/operator-no-newline-before': true,
-		'scss/operator-no-unspaced': true,
+		'scss/operator-no-newline-after': null,
+		'scss/operator-no-newline-before': null,
 		'scss/partial-no-import': null,
 	},
 };
