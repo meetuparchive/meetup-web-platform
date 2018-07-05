@@ -1,3 +1,8 @@
+## [17.0]
+
+-  **BREAKING CHANGE** Upgrade to hapi v17, which requires updating of
+   much of the platform code. Consumer apps that leverage the hapi server
+
 ## [16.6]
 
 -   Logging change - no more stdout debug logging for tracking calls, no logging
