@@ -26,7 +26,7 @@ const appConfig = config.getServer().properties;
  *   wildcard route
  * @param {Array} plugins additional plugins for the server, usually to support
  *   features in the additional routes
- * @return {Promise} the Promise returned by Hapi's `server.connection` method
+ * @return {Promise} the Promise returned by Hapi server
  */
 export default function start(
 	languageRenderers,

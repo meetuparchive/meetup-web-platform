@@ -218,14 +218,7 @@ const makeRenderer = (
 			throw new Error('No client script assets specified');
 		}
 
-		const {
-			connection,
-			headers,
-			info,
-			url,
-			server: { settings: { app: { supportedLangs } } },
-			state,
-		} = request;
+		const { headers, info, url, server, state } = request;
 		const requestLanguage = request.getLanguage();
 		// basename is the 'base path' for the application - usually a localeCode
 		const basename = requestLanguage === 'en-US' ? '' : `/${requestLanguage}`;
@@ -233,7 +226,7 @@ const makeRenderer = (
 		// request protocol and host might be different from original request that hit proxy
 		// we want to use the proxy's protocol and host
 		const requestProtocol =
-			headers['x-forwarded-proto'] || connection.info.protocol;
+			headers['x-forwarded-proto'] || server.info.protocol;
 		const domain: string =
 			headers['x-forwarded-host'] || headers['x-meetup-host'] || info.host;
 		const host = `${requestProtocol}://${domain}`;
@@ -248,7 +241,7 @@ const makeRenderer = (
 					baseUrl: host,
 					enableServiceWorker,
 					requestLanguage,
-					supportedLangs,
+					supportedLangs: server.settings.app.supportedLangs,
 					initialNow: new Date().getTime(),
 					isQL: parseMemberCookie(state).ql === 'true',
 					variants: getVariants(state),
