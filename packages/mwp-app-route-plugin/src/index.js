@@ -8,14 +8,13 @@ const LAUNCH_DARKLY_SDK_KEY = 'sdk-86b4c7a9-a450-4527-a572-c80a603a200f';
  * The server app route plugin - this applies a wildcard catch-all route that
  * will call the server app rendering function for the correct request language.
  */
-export default function register(
+export function register(
 	server: HapiServer,
 	options: {
 		languageRenderers: { [string]: LanguageRenderer },
 		ldkey?: string,
-	},
-	next: () => void
-) {
+	}
+): Promise<any> {
 	server.route(getRoute(options.languageRenderers));
 
 	const ldClient = LaunchDarkly.init(options.ldkey || LAUNCH_DARKLY_SDK_KEY, {
@@ -35,11 +34,17 @@ export default function register(
 		);
 	});
 	// set up launchdarkly instance before continuing
-	server.on('stop', ldClient.close);
-	ldClient.once(`ready`, () => next());
+	server.events.on('stop', ldClient.close);
+
+	return new Promise(function(resolve, reject) {
+		ldClient.once('ready', function() {
+			resolve();
+		});
+	});
 }
 
-register.attributes = {
+export const plugin = {
+	register,
 	name: 'mwp-app-route',
 	version: '1.0.0',
 	dependencies: [
