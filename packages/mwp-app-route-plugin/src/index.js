@@ -14,7 +14,7 @@ export function register(
 		languageRenderers: { [string]: LanguageRenderer },
 		ldkey?: string,
 	}
-) {
+): Promise<any> {
 	server.route(getRoute(options.languageRenderers));
 
 	const ldClient = LaunchDarkly.init(options.ldkey || LAUNCH_DARKLY_SDK_KEY, {
@@ -35,6 +35,12 @@ export function register(
 	});
 	// set up launchdarkly instance before continuing
 	server.events.on('stop', ldClient.close);
+
+	return new Promise(function(resolve, reject) {
+		ldClient.once('ready', function() {
+			resolve();
+		});
+	});
 }
 
 export const plugin = {
