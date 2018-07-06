@@ -18,7 +18,9 @@ describe('checkForDevUrl', () => {
 	});
 
 	it('returns true for nested dev URLs', () => {
-		expect(serverUtils.checkForDevUrl({ url: 'www.dev.meetup.com' })).toBe(true);
+		expect(serverUtils.checkForDevUrl({ url: 'www.dev.meetup.com' })).toBe(
+			true
+		);
 		expect(
 			serverUtils.checkForDevUrl({
 				url1: 'www.meetup.com',
@@ -34,7 +36,8 @@ describe('checkForDevUrl', () => {
 describe('configureEnv', function() {
 	beforeEach(() => {
 		// cache the 'default' setting for rejectUnauthorized
-		this.defaultRejectUnauthorized = https.globalAgent.options.rejectUnauthorized;
+		this.defaultRejectUnauthorized =
+			https.globalAgent.options.rejectUnauthorized;
 	});
 
 	afterEach(function() {
@@ -61,7 +64,8 @@ describe('configureEnv', function() {
 	});
 });
 
-describe('onRequestExtension', () => {
+describe('onRequestExtension', async () => {
+	const server = await getServer();
 	const request = {
 		headers: 'foo',
 		id: 'bar',
@@ -69,15 +73,14 @@ describe('onRequestExtension', () => {
 		info: {},
 		url: { href: 'http://example.com' },
 		state: {},
-		server: getServer(),
+		server,
 	};
 
-	it('calls reply.continue', () => {
-		const reply = {
-			continue: () => {},
+	it('returns h.continue', () => {
+		const h = {
+			continue: {},
 		};
-		spyOn(reply, 'continue');
-		serverUtils.onRequestExtension(request, reply);
-		expect(reply.continue).toHaveBeenCalled();
+		const response = serverUtils.onRequestExtension(request, h);
+		expect(response).toEqual(h.continue);
 	});
 });

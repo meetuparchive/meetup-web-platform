@@ -16,22 +16,22 @@ describe('processClickTracking', () => {
 		id: '1234',
 		server: { settings: { app: { api: {} } } },
 	};
-	const reply = {
+	const h = {
 		unstate: jest.fn(),
 	};
 	process.stdout.write = jest.fn(process.stdout.write);
 
 	it('calls process.stdout.write for each click record', () => {
 		process.stdout.write.mockClear();
-		processClickTracking(request, reply);
+		processClickTracking(request, h);
 		expect(process.stdout.write).toHaveBeenCalledTimes(
 			clickData.history.length
 		);
 	});
-	it('calls reply.unstate for click-track cookie', () => {
-		reply.unstate.mockClear();
-		processClickTracking(request, reply);
-		expect(reply.unstate).toHaveBeenCalledWith(COOKIE_NAME, clickCookieOptions);
+	it('calls h.unstate for click-track cookie', () => {
+		h.unstate.mockClear();
+		processClickTracking(request, h);
+		expect(h.unstate).toHaveBeenCalledWith(COOKIE_NAME, clickCookieOptions);
 	});
 	it('does nothing with no click data', () => {
 		request.log.mockClear();
@@ -39,7 +39,7 @@ describe('processClickTracking', () => {
 			...request,
 			state: {},
 		};
-		processClickTracking(emptyRequest, reply);
+		processClickTracking(emptyRequest, h);
 		expect(request.log).not.toHaveBeenCalled();
 	});
 });
