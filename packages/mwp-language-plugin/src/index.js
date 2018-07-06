@@ -7,7 +7,7 @@ import { getLanguage, getLangPrefixPath } from './util';
  * - `getLangPrefixPath`: get the correct request path relative to the request's
  *   specified language
  */
-export function register(server: Object, options: ?Object) {
+export function register(server: HapiServer, options: ?Object) {
 	server.decorate('request', 'getLanguage', getLanguage, {
 		apply: true,
 	});
