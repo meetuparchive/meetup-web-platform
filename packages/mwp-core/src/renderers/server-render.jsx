@@ -98,8 +98,7 @@ const getMedia = (userAgent: string, userAgentDevice: string) => {
  *
  * @param {Object} renderProps
  * @param {ReduxStore} store the store containing the initial state of the app
- * @return {Object} the statusCode and result used by Hapi's `reply` API
- *   {@link http://hapijs.com/api#replyerr-result}
+ * @return {Object} the statusCode and result used by Hapi's response API
  */
 type RenderResult =
 	| { result: string, statusCode: number }
@@ -209,21 +208,17 @@ const makeRenderer = (
 	// be reused for all subsequent requests, so we're not resolving the routes repeatedly
 	// hooray performance
 	const routesPromise = resolveAllRoutes(routes);
-	return (request: HapiRequest, reply: HapiReply): Promise<RenderResult> => {
+	return (
+		request: HapiRequest,
+		h: HapiResponseToolkit
+	): Promise<RenderResult> => {
 		middleware = middleware || [];
 
 		if (!scripts.length) {
 			throw new Error('No client script assets specified');
 		}
 
-		const {
-			connection,
-			headers,
-			info,
-			url,
-			server: { settings: { app: { supportedLangs } } },
-			state,
-		} = request;
+		const { headers, info, url, server, state } = request;
 		const requestLanguage = request.getLanguage();
 		// basename is the 'base path' for the application - usually a localeCode
 		const basename = requestLanguage === 'en-US' ? '' : `/${requestLanguage}`;
@@ -231,7 +226,7 @@ const makeRenderer = (
 		// request protocol and host might be different from original request that hit proxy
 		// we want to use the proxy's protocol and host
 		const requestProtocol =
-			headers['x-forwarded-proto'] || connection.info.protocol;
+			headers['x-forwarded-proto'] || server.info.protocol;
 		const domain: string =
 			headers['x-forwarded-host'] || headers['x-meetup-host'] || info.host;
 		const host = `${requestProtocol}://${domain}`;
@@ -246,7 +241,7 @@ const makeRenderer = (
 					baseUrl: host,
 					enableServiceWorker,
 					requestLanguage,
-					supportedLangs,
+					supportedLangs: server.settings.app.supportedLangs,
 					initialNow: new Date().getTime(),
 					isQL: parseMemberCookie(state).ql === 'true',
 					variants: getVariants(state),

@@ -29,9 +29,9 @@
     "mwp-router": ">=0.0.1"
   },
   "dependencies": {
-    "electrode-csrf-jwt": "1.2.1",
-    "hapi": "16.5.2",
-    "inert": "4.2.1",
+    "electrode-csrf-jwt": "git+https://github.com/sadafie/electrode-csrf-jwt.git",
+    "hapi": "17.4.0",
+    "inert": "5.1.0",
     "meetup-web-mocks": "1.0.217",
     "mwp-core": ">=0.0.1",
     "mwp-logger-plugin": ">=0.0.1",
