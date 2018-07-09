@@ -219,9 +219,8 @@ const makeRenderer = (
 		}
 
 		const { headers, info, url, server, state } = request;
-		const apiHost = server.settings;
-		console.log('API HOST', server.settings);
-		debugger;
+		const isProdApi = server.settings.api.isProd;
+		console.log('IS_PROD_API', isProdApi);
 		const requestLanguage = request.getLanguage();
 		// basename is the 'base path' for the application - usually a localeCode
 		const basename = requestLanguage === 'en-US' ? '' : `/${requestLanguage}`;
@@ -240,7 +239,7 @@ const makeRenderer = (
 		const initializeStore = resolvedRoutes => {
 			const initialState = {
 				config: {
-					apiHost,
+					isProdApi,
 					apiUrl: API_ROUTE_PATH,
 					baseUrl: host,
 					enableServiceWorker,
