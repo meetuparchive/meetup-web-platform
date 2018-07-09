@@ -237,6 +237,7 @@ const makeRenderer = (
 		const initializeStore = resolvedRoutes => {
 			const initialState = {
 				config: {
+					isProdApi: server.settings.app.api.isProd,
 					apiUrl: API_ROUTE_PATH,
 					baseUrl: host,
 					enableServiceWorker,
