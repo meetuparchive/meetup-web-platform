@@ -239,7 +239,7 @@ const makeRenderer = (
 		const initializeStore = resolvedRoutes => {
 			const initialState = {
 				config: {
-					apiHost:,
+					apiHost,
 					apiUrl: API_ROUTE_PATH,
 					baseUrl: host,
 					enableServiceWorker,
