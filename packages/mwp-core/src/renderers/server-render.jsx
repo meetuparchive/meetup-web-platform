@@ -219,8 +219,8 @@ const makeRenderer = (
 		}
 
 		const { headers, info, url, server, state } = request;
-		const isProdApi = server.settings.api.isProd;
-		console.log('IS_PROD_API', isProdApi);
+		const isProdApi = server.settings;
+		console.log('SETTINGS.API >>>>>>>>', server.settings.api);
 		const requestLanguage = request.getLanguage();
 		// basename is the 'base path' for the application - usually a localeCode
 		const basename = requestLanguage === 'en-US' ? '' : `/${requestLanguage}`;
