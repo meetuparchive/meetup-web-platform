@@ -219,6 +219,9 @@ const makeRenderer = (
 		}
 
 		const { headers, info, url, server, state } = request;
+		const apiHost = server.settings;
+		console.log('API HOST', server.settings);
+		debugger;
 		const requestLanguage = request.getLanguage();
 		// basename is the 'base path' for the application - usually a localeCode
 		const basename = requestLanguage === 'en-US' ? '' : `/${requestLanguage}`;
@@ -237,6 +240,7 @@ const makeRenderer = (
 		const initializeStore = resolvedRoutes => {
 			const initialState = {
 				config: {
+					apiHost,
 					apiUrl: API_ROUTE_PATH,
 					baseUrl: host,
 					enableServiceWorker,
