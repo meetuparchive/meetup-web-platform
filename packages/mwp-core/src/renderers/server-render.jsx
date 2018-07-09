@@ -219,7 +219,7 @@ const makeRenderer = (
 		}
 
 		const { headers, info, url, server, state } = request;
-		const apiHost = server.settings.api.host;
+		const apiHost = server.settings;
 		console.log(server);
 		const requestLanguage = request.getLanguage();
 		// basename is the 'base path' for the application - usually a localeCode
