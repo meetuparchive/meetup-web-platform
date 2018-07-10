@@ -243,6 +243,7 @@ const makeRenderer = (
 					requestLanguage,
 					supportedLangs: server.settings.app.supportedLangs,
 					initialNow: new Date().getTime(),
+					isProdApi: server.settings.app.api.isProd,
 					isQL: parseMemberCookie(state).ql === 'true',
 					variants: getVariants(state),
 					entryPath: url.pathname, // the path that the user entered the app on
