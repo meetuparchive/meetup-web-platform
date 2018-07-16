@@ -31,6 +31,6 @@
     "react-router-dom": "^4.2.2",
     "react-transition-group": "^2.2.1",
     "reselect": "^3.0.1",
-    "swarm-constants": "1.2.99"
+    "swarm-constants": "^1.2.99"
   }
 }
