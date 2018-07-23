@@ -65,7 +65,7 @@
     "jest": "23.1.0",
     "joi": "13.4.0",
     "lint-staged": "4.0.1",
-    "meetup-web-components": "5.0.2241",
+    "meetup-web-components": "5.2.2434",
     "meetup-web-mocks": "1.0.217",
     "mwp-router": "11.1.2034",
     "newrelic": "3.3.1",
@@ -86,7 +86,7 @@
     "reselect": "3.0.1",
     "rison": "0.1.1",
     "rxjs": "5.5.1",
-    "swarm-constants": "1.2.99",
+    "swarm-constants": "2.2.122",
     "swarm-icons": "2.3.301",
     "tough-cookie": "2.3.2"
   },
