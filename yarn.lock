@@ -7973,13 +7973,7 @@ topo@3.x.x:
   dependencies:
     hoek "5.x.x"
 
-tough-cookie@2.3.2:
-  version "2.3.2"
-  resolved "https://registry.yarnpkg.com/tough-cookie/-/tough-cookie-2.3.2.tgz#f081f76e4c85720e6c37a5faced737150d84072a"
-  dependencies:
-    punycode "^1.4.1"
-
-tough-cookie@>=2.3.3, tough-cookie@^2.3.3:
+tough-cookie@2.4.3, tough-cookie@>=2.3.3, tough-cookie@^2.3.3:
   version "2.4.3"
   resolved "https://registry.yarnpkg.com/tough-cookie/-/tough-cookie-2.4.3.tgz#53f36da3f47783b0925afa06ff9f3b165280f781"
   dependencies:
