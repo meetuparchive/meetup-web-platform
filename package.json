@@ -88,7 +88,7 @@
     "rxjs": "5.5.1",
     "swarm-constants": "2.2.122",
     "swarm-icons": "2.3.301",
-    "tough-cookie": "2.4.3"
+    "tough-cookie": "2.3.3"
   },
   "lint-staged": {
     "{tests,__mocks__,packages}/**/*.{js,jsx}": [
