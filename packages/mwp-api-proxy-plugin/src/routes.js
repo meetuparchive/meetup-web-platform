@@ -9,25 +9,6 @@ const validApiPayloadSchema = Joi.object({
 	__set_geoip: Joi.string().ip(),
 });
 
-export const onPreResponse = {
-	/*
-	 * This function processes the route response before it is sent to the client.
-	 *
-	 * - In dev, it transforms the generic 500 error response JSON into a full dev-
-	 *   friendly rendering of the stack trace.
-	 */
-	method: (request, h) => {
-		const response = request.response;
-
-		if (!response.isBoom || process.env.NODE_ENV === 'production') {
-			return h.continue;
-		}
-
-		// return response which contains error
-		return h.response(response).code(response.statusCode);
-	},
-};
-
 const getApiProxyRoutes = path => {
 	/**
 	 * This handler converts the application-supplied queries into external API
@@ -41,9 +22,6 @@ const getApiProxyRoutes = path => {
 		path,
 		handler,
 		options: {
-			ext: {
-				onPreResponse,
-			},
 			plugins: {
 				'electrode-csrf-jwt': {
 					enabled: true,
