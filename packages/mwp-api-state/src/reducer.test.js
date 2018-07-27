@@ -66,6 +66,23 @@ describe('getListState', () => {
 			},
 		});
 	});
+	it('merges new response with existing dynamicRef, sorted in case list is not top level value (is under `value` filed)', () => {
+		const list = ['qux'];
+		const value = { value: list };
+		const response = {
+			response: { value: { value: ['foo'] } },
+			query: resp.query,
+		};
+		expect(
+			getListState({ [resp.query.list.dynamicRef]: { value: list } }, response)
+		).toEqual({
+			[resp.query.list.dynamicRef]: {
+				value: [...value.value, ...response.response.value.value].sort(
+					resp.query.list.merge.sort
+				),
+			},
+		});
+	});
 });
 
 describe('app reducer', () => {
