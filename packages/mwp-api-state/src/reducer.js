@@ -45,7 +45,13 @@ export const getListState: ResponseStateSetter = (
 	}
 	const { dynamicRef, merge } = query.list;
 	// this query should be treated as a list-building query
-	const newList = response.value instanceof Array ? response.value : [];
+	// list can be either a root query result (response.value) or be under `value` field of the result (response.value.value)
+	let newList = [];
+	if (response.value instanceof Array) {
+		newList = response.value;
+	} else if (response.value && response.value.value instanceof Array) {
+		newList = response.value.value;
+	}
 	if (!merge) {
 		// no merge rules, so just make a new list
 		return { [dynamicRef]: { value: newList, query } };
