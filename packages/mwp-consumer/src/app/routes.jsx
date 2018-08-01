@@ -2,10 +2,10 @@ import React from 'react';
 
 const Div = ({ location, children }) =>
 	<div>
+		<h1>MWP-Consumer</h1>
 		<pre>
-			{JSON.stringify(location, null, 2)}
+			{JSON.stringify(location.path, null, 2)}
 		</pre>
-		{children}
 	</div>;
 
 const routes = [
