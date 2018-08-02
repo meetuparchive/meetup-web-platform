@@ -1,19 +1,19 @@
-const memwatch = require('memwatch-next');
-memwatch.on('leak', info => {
-	console.error('GC HAPPENED Memory leak detected:\n', info);
-});
-memwatch.on('stats', stats =>
-	console.log('GC HAPPENED', JSON.stringify(stats))
-);
-
 // run directly by node, no babel
 const startServer = require('mwp-app-server').default;
+
+/**
+ * special route for root request for favicon
+ * @return {Object} the route for the favicon
+ */
 
 const routes = [
 	{
 		method: 'GET',
-		path: `/favicon.ico`,
-		handler: (request, h) => '',
+		path: '/favicon.ico',
+		options: {
+			auth: false,
+		},
+		handler: (request, h) => 'favicon',
 	},
 	{
 		method: 'GET',
@@ -41,9 +41,10 @@ module.exports = function main(appMap) {
 	if (!appMap) {
 		throw new Error('No map of localeCode to renderer provided');
 	}
+
 	const plugins = []; // for serving the favicon
 
-	return startServer(appMap, { plugins, routes }).catch(err => {
+	return startServer(appMap, { routes, plugins }).catch(err => {
 		// catch because otherwise Node swallows errors in Promises
 		throw err;
 	});
