@@ -37,9 +37,17 @@ export function register(
 	server.events.on('stop', ldClient.close);
 
 	return new Promise(function(resolve, reject) {
-		ldClient.once('ready', function() {
-			resolve();
-		});
+		// https://github.com/launchdarkly/node-client/issues/96
+		// use waitForInitialization to catch launch darkly failures
+		ldClient
+			.waitForInitialization()
+			.then(() => {
+				resolve();
+			})
+			.catch(error => {
+				console.error(error);
+				process.exit(1);
+			});
 	});
 }
 
