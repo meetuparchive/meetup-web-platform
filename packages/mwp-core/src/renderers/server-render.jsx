@@ -245,6 +245,7 @@ const makeRenderer = (
 					initialNow: new Date().getTime(),
 					isProdApi: server.settings.app.api.isProd,
 					isQL: parseMemberCookie(state).ql === 'true',
+					memberId: parseMemberCookie(state).id,
 					variants: getVariants(state),
 					entryPath: url.pathname, // the path that the user entered the app on
 					media: getMedia(userAgent, userAgentDevice),
@@ -262,13 +263,13 @@ const makeRenderer = (
 		// otherwise render using the API and React router
 		// addFlags _must_ be called after the store is 'ready' to ensure that
 		// there is a full member object available in state - feature flags can
-		// be selected based on member id, email, and other properties
-		const addFlags = populatedStore => {
+		// be selected based on member id, email, and other properties.
+		// in the case where we need member split tests on server render, we can call addFlags before our store is ready.
+		const addFlags = (populatedStore, member) => {
 			// getFlags needs as much member info as possible, but particularly id and email
 			// in order to match on common targeting rules
-			const memberObj = (populatedStore.getState().api.self || {}).value || {};
 			return request.server.plugins['mwp-app-route']
-				.getFlags(memberObj)
+				.getFlags(member)
 				.then(flags =>
 					populatedStore.dispatch({
 						type: 'UPDATE_FLAGS',
@@ -284,14 +285,16 @@ const makeRenderer = (
 				store.dispatch({ type: SERVER_RENDER, payload: url });
 
 				if (checkReady(store.getState())) {
-					addFlags(store).then(() => {
+					const memberObj = (store.getState().api.self || {}).value || {};
+					addFlags(store, memberObj).then(() => {
 						resolve(store);
 					});
 					return;
 				}
 				const unsubscribe = store.subscribe(() => {
 					if (checkReady(store.getState())) {
-						addFlags(store).then(() => {
+						const memberObj = (store.getState().api.self || {}).value || {};
+						addFlags(store, memberObj).then(() => {
 							resolve(store);
 							unsubscribe();
 						});
@@ -316,20 +319,23 @@ const makeRenderer = (
 						statusCode: 200,
 					};
 				}
-				return populateStore(store).then(
-					store =>
-						// create tracer and immediately invoke the resulting function.
-						// trace should start before rendering, finish after rendering
-						newrelic.createTracer('serverRender', getRouterRenderer)({
-							routes: resolvedRoutes,
-							store,
-							location: url,
-							basename,
-							scripts,
-							cssLinks,
-							userAgent,
-						}) // immediately invoke callback
-				);
+				// use the bare member id to get all member id related split tests before the store is fully populated
+				return addFlags(store, { id: parseMemberCookie(state).id })
+					.then(() => populateStore(store))
+					.then(
+						store =>
+							// create tracer and immediately invoke the resulting function.
+							// trace should start before rendering, finish after rendering
+							newrelic.createTracer('serverRender', getRouterRenderer)({
+								routes: resolvedRoutes,
+								store,
+								location: url,
+								basename,
+								scripts,
+								cssLinks,
+								userAgent,
+							}) // immediately invoke callback
+					);
 			})
 		);
 	};

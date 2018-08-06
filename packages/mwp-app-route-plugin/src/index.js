@@ -22,7 +22,7 @@ export function register(
 	});
 	server.expose('getFlags', memberObj => {
 		const key = (memberObj && memberObj.id) || 0;
-		return ldClient.all_flags({ ...memberObj, key, anonymous: key === 0 }).then(
+		return ldClient.allFlags({ ...memberObj, key, anonymous: key === 0 }).then(
 			flags => flags,
 			err => {
 				server.app.logger.error({
@@ -37,9 +37,16 @@ export function register(
 	server.events.on('stop', ldClient.close);
 
 	return new Promise(function(resolve, reject) {
-		ldClient.once('ready', function() {
-			resolve();
-		});
+		// https://github.com/launchdarkly/node-client/issues/96
+		// use waitForInitialization to catch launch darkly failures
+		ldClient
+			.waitForInitialization()
+			.then(() => {
+				resolve();
+			})
+			.catch(error => {
+				console.error(error);
+			});
 	});
 }
 
