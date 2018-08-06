@@ -263,25 +263,13 @@ const makeRenderer = (
 		// otherwise render using the API and React router
 		// addFlags _must_ be called after the store is 'ready' to ensure that
 		// there is a full member object available in state - feature flags can
-		// be selected based on member id, email, and other properties
-		const addFlags = (populatedStore, member?: { id: number }) => {
-			// check to see if member object was passed in so
-			// we have all member related splits on a route query
-			if (member) {
-				return request.server.plugins['mwp-app-route']
-					.getFlags(member)
-					.then(flags =>
-						populatedStore.dispatch({
-							type: 'UPDATE_FLAGS',
-							payload: flags,
-						})
-					);
-			}
+		// be selected based on member id, email, and other properties.
+		// in the case where we need member split tests on server render, we can call addFlags before our store is ready.
+		const addFlags = (populatedStore, member) => {
 			// getFlags needs as much member info as possible, but particularly id and email
 			// in order to match on common targeting rules
-			const memberObj = (populatedStore.getState().api.self || {}).value || {};
 			return request.server.plugins['mwp-app-route']
-				.getFlags(memberObj)
+				.getFlags(member)
 				.then(flags =>
 					populatedStore.dispatch({
 						type: 'UPDATE_FLAGS',
@@ -297,14 +285,16 @@ const makeRenderer = (
 				store.dispatch({ type: SERVER_RENDER, payload: url });
 
 				if (checkReady(store.getState())) {
-					addFlags(store).then(() => {
+					const memberObj = (store.getState().api.self || {}).value || {};
+					addFlags(store, memberObj).then(() => {
 						resolve(store);
 					});
 					return;
 				}
 				const unsubscribe = store.subscribe(() => {
 					if (checkReady(store.getState())) {
-						addFlags(store).then(() => {
+						const memberObj = (store.getState().api.self || {}).value || {};
+						addFlags(store, memberObj).then(() => {
 							resolve(store);
 							unsubscribe();
 						});
