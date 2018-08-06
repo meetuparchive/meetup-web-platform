@@ -323,17 +323,18 @@ const makeRenderer = (
 				return addFlags(store, { id: parseMemberCookie(state).id })
 					.then(() => populateStore(store))
 					.then(
-						// create tracer and immediately invoke the resulting function.
-						// trace should start before rendering, finish after rendering
-						newrelic.createTracer('serverRender', getRouterRenderer)({
-							routes: resolvedRoutes,
-							store,
-							location: url,
-							basename,
-							scripts,
-							cssLinks,
-							userAgent,
-						}) // immediately invoke callback
+						store =>
+							// create tracer and immediately invoke the resulting function.
+							// trace should start before rendering, finish after rendering
+							newrelic.createTracer('serverRender', getRouterRenderer)({
+								routes: resolvedRoutes,
+								store,
+								location: url,
+								basename,
+								scripts,
+								cssLinks,
+								userAgent,
+							}) // immediately invoke callback
 					);
 			})
 		);
