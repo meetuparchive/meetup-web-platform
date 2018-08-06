@@ -245,7 +245,6 @@ const makeRenderer = (
 					initialNow: new Date().getTime(),
 					isProdApi: server.settings.app.api.isProd,
 					isQL: parseMemberCookie(state).ql === 'true',
-					memberId: parseMemberCookie(state).id,
 					variants: getVariants(state),
 					entryPath: url.pathname, // the path that the user entered the app on
 					media: getMedia(userAgent, userAgentDevice),
@@ -261,22 +260,21 @@ const makeRenderer = (
 		};
 
 		// otherwise render using the API and React router
-		// addFlags _must_ be called after the store is 'ready' to ensure that
-		// there is a full member object available in state - feature flags can
-		// be selected based on member id, email, and other properties.
-		// in the case where we need member split tests on server render, we can call addFlags before our store is ready.
-		const addFlags = (populatedStore, member) => {
+		// addFlags is called twice in order to ensure that
+		// there is a full member object available in state
+		// feature flags can be selected based on member id,
+		// email, and other properties.
+		// feature flags based on member id are available before the store is populated.
+		const addFlags = (populatedStore, member) =>
 			// getFlags needs as much member info as possible, but particularly id and email
 			// in order to match on common targeting rules
-			return request.server.plugins['mwp-app-route']
-				.getFlags(member)
-				.then(flags =>
-					populatedStore.dispatch({
-						type: 'UPDATE_FLAGS',
-						payload: flags,
-					})
-				);
-		};
+			request.server.plugins['mwp-app-route'].getFlags(member).then(flags =>
+				populatedStore.dispatch({
+					type: 'UPDATE_FLAGS',
+					payload: flags,
+				})
+			);
+
 		const checkReady = state =>
 			state.preRenderChecklist.every(isReady => isReady);
 		const populateStore = store =>
@@ -285,6 +283,8 @@ const makeRenderer = (
 				store.dispatch({ type: SERVER_RENDER, payload: url });
 
 				if (checkReady(store.getState())) {
+					// we need to use the _latest_ version of the member object
+					// which is why memberObj is defined after the checkReady call.
 					const memberObj = (store.getState().api.self || {}).value || {};
 					addFlags(store, memberObj).then(() => {
 						resolve(store);
@@ -293,6 +293,8 @@ const makeRenderer = (
 				}
 				const unsubscribe = store.subscribe(() => {
 					if (checkReady(store.getState())) {
+						// we need to use the _latest_ version of the member object
+						// which is why memberObj is defined after the checkReady call.
 						const memberObj = (store.getState().api.self || {}).value || {};
 						addFlags(store, memberObj).then(() => {
 							resolve(store);
@@ -319,7 +321,7 @@ const makeRenderer = (
 						statusCode: 200,
 					};
 				}
-				// use the bare member id to get all member id related split tests before the store is fully populated
+				// the initial addFlags call will only be key'd by member ID
 				return addFlags(store, { id: parseMemberCookie(state).id })
 					.then(() => populateStore(store))
 					.then(
