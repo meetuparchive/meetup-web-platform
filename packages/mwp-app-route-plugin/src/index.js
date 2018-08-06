@@ -22,7 +22,7 @@ export function register(
 	});
 	server.expose('getFlags', memberObj => {
 		const key = (memberObj && memberObj.id) || 0;
-		return ldClient.all_flags({ ...memberObj, key, anonymous: key === 0 }).then(
+		return ldClient.allFlags({ ...memberObj, key, anonymous: key === 0 }).then(
 			flags => flags,
 			err => {
 				server.app.logger.error({
