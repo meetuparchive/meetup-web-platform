@@ -6,7 +6,9 @@ import { parseQueryResponse, getAuthedQueryFilter } from '../util/fetchUtils';
 
 export const CSRF_COOKIE_NAME = 'x-mwp-csrf';
 export const CSRF_HEADER_COOKIE_NAME = `${CSRF_COOKIE_NAME}-header`;
-
+// dev cookie names
+export const DEV_CSRF_COOKIE_NAME = `${CSRF_COOKIE_NAME}-dev`;
+export const DEV_CSRF_HEADER_COOKIE_NAME = `${DEV_CSRF_COOKIE_NAME}-header`;
 /*
  * rison serialization fails for unserializable data, including params with
  * `undefined` values. This if/else will log an error in the browser in dev
@@ -103,7 +105,11 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 	}
 
 	if (hasBody || isDelete) {
-		headers[CSRF_COOKIE_NAME] = JSCookie.get(CSRF_HEADER_COOKIE_NAME);
+		process.env.NODE_ENV === 'production'
+			? (headers[CSRF_COOKIE_NAME] = JSCookie.get(CSRF_HEADER_COOKIE_NAME))
+			: (headers[DEV_CSRF_COOKIE_NAME] = JSCookie.get(
+					DEV_CSRF_HEADER_COOKIE_NAME
+				));
 	}
 
 	const config = {

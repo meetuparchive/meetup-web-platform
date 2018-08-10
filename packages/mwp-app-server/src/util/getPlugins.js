@@ -20,23 +20,41 @@ import { plugin as requestAuthPlugin } from 'mwp-auth-plugin';
 const CSRF_COOKIE_NAME = 'x-mwp-csrf';
 const CSRF_HEADER_COOKIE_NAME = `${CSRF_COOKIE_NAME}-header`;
 const CSRF_HEADER_NAME = CSRF_COOKIE_NAME;
+// dev cookie names
+const DEV_CSRF_COOKIE_NAME = `${CSRF_COOKIE_NAME}-dev`;
+const DEV_CSRF_HEADER_COOKIE_NAME = `${DEV_CSRF_COOKIE_NAME}-header`;
+const DEV_CSRF_HEADER_NAME = DEV_CSRF_COOKIE_NAME;
 
+// Sets the csrf header token from plugin into a cookie
 export function setCsrfCookies(request, h) {
-	const csrfHeader = (request.response.headers || {})[CSRF_COOKIE_NAME];
+	const { headers = {} } = request.response;
+	const csrfHeader = headers[CSRF_COOKIE_NAME];
+	const csrfDevHeader = headers[DEV_CSRF_COOKIE_NAME];
 	if (csrfHeader) {
 		h.state(CSRF_HEADER_COOKIE_NAME, csrfHeader);
+	}
+	if (csrfDevHeader) {
+		h.state(DEV_CSRF_HEADER_COOKIE_NAME, csrfDevHeader);
 	}
 	return h.continue;
 }
 
 /**
- * The CSRF plugin we use - 'electrode-csrf-jwt' compares a cookie token to a
- * header token in non-GET requests. By default, it will set the cookie token
- * itself (CSRF_COOKIE_NAME), and supply the corresponding header token in a custom
- * header (also CSRF_COOKIE_NAME). However, we update this flow to also supply the
- * header token as a cookie (CSRF_COOKIE_NAME-header) so that it syncs across
- * browser tabs.
+ * The CSRF plugin we use, 'electrode-csrf-jwt', generates a token for each request 
+ * that we make and sets the token in an HTTP-only cookie (CSRF_COOKIE_NAME) and in
+ * the HTTP response header (also CSRF_COOKIE_NAME). In non-GET requests we must supply
+ * the latest generated token from the response header as an HTTP request header - the
+ * plugin will compare the cookie token and the request header token and return a
+ * BAD_TOKEN error if they do not match.
+ * 
+ * We updated this flow to set the token from the response header as a cookie 
+ * (CSRF_COOKIE_NAME-header) and use the cookie value to set the request header
+ * so that it syncs across browser tabs.
  *
+ * We set similar but different cookie names for dev and prod environments so the prod
+ * cookies are not read in the dev environment, which was causing BAD_TOKEN errors
+ * because we were comparing dev and prod tokens which would never match.
+ * 
  * In order to ensure that both cookie values have parallel settings, this
  * function calls `server.state` for both cookie names before registering the
  * plugin.
@@ -46,6 +64,7 @@ export function setCsrfCookies(request, h) {
 export function getCsrfPlugin(electrodeOptions) {
 	const register = (server, options) => {
 		const { isProd } = server.settings.app;
+
 		const cookieOptions = {
 			path: '/',
 			isSecure: isProd, // No need to worry about https in dev
@@ -58,14 +77,17 @@ export function getCsrfPlugin(electrodeOptions) {
 			{ secret: server.settings.app.csrf_secret },
 			electrodeOptions
 		);
-
+		const cookie_name = isProd ? CSRF_COOKIE_NAME : DEV_CSRF_COOKIE_NAME;
 		server.state(
-			CSRF_COOKIE_NAME, // set by plugin
+			cookie_name, // set by plugin
 			{ ...cookieOptions, isHttpOnly: true } // no client-side interaction needed
 		);
 
+		const header_cookie_name = isProd
+			? CSRF_HEADER_COOKIE_NAME
+			: DEV_CSRF_HEADER_COOKIE_NAME;
 		server.state(
-			CSRF_HEADER_COOKIE_NAME, // set by onPreResponse
+			header_cookie_name, // set by onPreResponse
 			{ ...cookieOptions, isHttpOnly: false } // the client must read this cookie and return as a custom header
 		);
 
@@ -120,8 +142,8 @@ export default function getPlugins({ languageRenderers }) {
 		languagePlugin,
 		getLoggerPlugin(),
 		getCsrfPlugin({
-			headerName: CSRF_HEADER_NAME,
-			cookieName: CSRF_COOKIE_NAME,
+			headerName: isProdApi ? CSRF_HEADER_NAME : DEV_CSRF_HEADER_NAME,
+			cookieName: isProdApi ? CSRF_COOKIE_NAME : DEV_CSRF_COOKIE_NAME,
 		}),
 		requestAuthPlugin,
 		getActivityTrackingPlugin({ agent, isProdApi }),
