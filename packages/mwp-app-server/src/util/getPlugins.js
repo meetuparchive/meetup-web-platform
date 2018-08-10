@@ -135,6 +135,7 @@ export default function getPlugins({ languageRenderers }) {
 	const { package: { agent }, getServer } = config;
 	const server = getServer();
 	const isProdApi = server.properties.api.isProd;
+	const isProdEnv = server.properties.isProd;
 
 	return [
 		getAppRoutePlugin({ languageRenderers }),
@@ -142,8 +143,10 @@ export default function getPlugins({ languageRenderers }) {
 		languagePlugin,
 		getLoggerPlugin(),
 		getCsrfPlugin({
-			headerName: isProdApi ? CSRF_HEADER_NAME : DEV_CSRF_HEADER_NAME,
-			cookieName: isProdApi ? CSRF_COOKIE_NAME : DEV_CSRF_COOKIE_NAME,
+			// Use prod cookies in production environment and dev cookies in
+			// dev environment regardless of whether you're using the prod api
+			headerName: isProdEnv ? CSRF_HEADER_NAME : DEV_CSRF_HEADER_NAME,
+			cookieName: isProdEnv ? CSRF_COOKIE_NAME : DEV_CSRF_COOKIE_NAME,
 		}),
 		requestAuthPlugin,
 		getActivityTrackingPlugin({ agent, isProdApi }),
