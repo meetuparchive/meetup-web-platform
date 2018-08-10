@@ -56,7 +56,7 @@ declare type QueryListParam = {|
 	dynamicRef: string, // dynamic ref that will be kept forever
 	merge?: {
 		idTest: (Object, Object) => boolean, // test for same object identity
-		sort: (Object, Object) => number, // test for order
+		sort?: (Object, Object) => number, // test for order
 	},
 |};
 // API query structure

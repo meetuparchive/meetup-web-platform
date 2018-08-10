@@ -63,12 +63,12 @@ export const getListState: ResponseStateSetter = (
 	const oldList = ((state[dynamicRef] || {}).value || [])
 		.filter(valOld => !newList.find(valNew => idTest(valOld, valNew)));
 
+	// combine the new list and the old list
 	const mergedList = [...oldList, ...newList];
-	// we can omit sort callback e.g. in members search default sort is `closest_match` which we decided not to implement on FE side
+	// sort is optional
 	if (sort) {
 		mergedList.sort(sort);
 	}
-	// combine the new list and the old list and sort the results
 	return { [dynamicRef]: { value: mergedList } };
 };
 
