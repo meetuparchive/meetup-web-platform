@@ -27,7 +27,7 @@ jest.mock('js-cookie', () => {
 
 describe('fetchQueries', () => {
 	const API_URL = new URL('http://api.example.com/');
-	const csrfJwt = 'x-mwp-csrf-header value';
+	const csrfJwt = 'x-mwp-csrf_dev-header value';
 	const getQueries = [mockQuery({ params: {} })];
 	const POSTQueries = [
 		{ ...mockQuery({ params: {} }), meta: { method: 'POST' } },
@@ -40,7 +40,7 @@ describe('fetchQueries', () => {
 			headers: {
 				get: key =>
 					({
-						'x-mwp-csrf': csrfJwt,
+						'x-mwp-csrf_dev-header': csrfJwt,
 					}[key]),
 			},
 		});
@@ -51,7 +51,7 @@ describe('fetchQueries', () => {
 			headers: {
 				get: key =>
 					({
-						'x-mwp-csrf': csrfJwt,
+						'x-mwp-csrf_dev-': csrfJwt,
 					}[key]),
 			},
 		});
@@ -163,7 +163,7 @@ describe('fetchQueries', () => {
 				const dummyUrl = new URL(`http://example.com?${options.body}`);
 				expect(dummyUrl.searchParams.has('queries')).toBe(true);
 				expect(dummyUrl.searchParams.has('metadata')).toBe(true);
-				expect(options.headers['x-mwp-csrf']).toEqual(csrfJwt);
+				expect(options.headers['x-mwp-csrf_dev']).toEqual(csrfJwt);
 			});
 		});
 		it('POST without meta calls fetch without metadata body params', () => {
@@ -178,7 +178,7 @@ describe('fetchQueries', () => {
 				const dummyUrl = new URL(`http://example.com?${options.body}`);
 				expect(dummyUrl.searchParams.has('queries')).toBe(true);
 				expect(dummyUrl.searchParams.has('metadata')).toBe(false);
-				expect(options.headers['x-mwp-csrf']).toEqual(csrfJwt);
+				expect(options.headers['x-mwp-csrf_dev']).toEqual(csrfJwt);
 			});
 		});
 	});
@@ -206,7 +206,7 @@ describe('fetchQueries', () => {
 				expect(options.method).toEqual('POST');
 				expect(url.searchParams.has('queries')).toBe(true);
 				expect(url.searchParams.has('metadata')).toBe(false);
-				expect(options.headers['x-mwp-csrf']).toEqual(csrfJwt);
+				expect(options.headers['x-mwp-csrf_dev']).toEqual(csrfJwt);
 			});
 		});
 	});

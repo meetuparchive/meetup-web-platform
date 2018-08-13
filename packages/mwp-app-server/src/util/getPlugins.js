@@ -16,11 +16,12 @@ import { plugin as requestAuthPlugin } from 'mwp-auth-plugin';
  *
  * @module ServerPlugins
  */
-
-const CSRF_COOKIE_NAME = 'x-mwp-csrf';
+const CSRF_COOKIE_NAME =
+	process.env.NODE_ENV === 'production' ? 'x-mwp-csrf' : 'x-mwp-csrf_dev';
 const CSRF_HEADER_COOKIE_NAME = `${CSRF_COOKIE_NAME}-header`;
 const CSRF_HEADER_NAME = CSRF_COOKIE_NAME;
 
+// Sets the csrf header token from plugin into a cookie
 export function setCsrfCookies(request, h) {
 	const csrfHeader = (request.response.headers || {})[CSRF_COOKIE_NAME];
 	if (csrfHeader) {
@@ -30,13 +31,20 @@ export function setCsrfCookies(request, h) {
 }
 
 /**
- * The CSRF plugin we use - 'electrode-csrf-jwt' compares a cookie token to a
- * header token in non-GET requests. By default, it will set the cookie token
- * itself (CSRF_COOKIE_NAME), and supply the corresponding header token in a custom
- * header (also CSRF_COOKIE_NAME). However, we update this flow to also supply the
- * header token as a cookie (CSRF_COOKIE_NAME-header) so that it syncs across
- * browser tabs.
+ * The CSRF plugin we use, 'electrode-csrf-jwt', generates a token for each request 
+ * that we make and sets the token in an HTTP-only cookie (CSRF_COOKIE_NAME) and in
+ * the HTTP response header (also CSRF_COOKIE_NAME). In non-GET requests we must supply
+ * the latest generated token from the response header as an HTTP request header - the
+ * plugin will compare the cookie token and the request header token and return a
+ * BAD_TOKEN error if they do not match.
+ * 
+ * We updated this flow to set the token from the response header as a cookie 
+ * (CSRF_COOKIE_NAME-header) and use the cookie value to set the request header
+ * so that it syncs across browser tabs.
  *
+ * We set similar but different cookie names for dev and prod environments so the prod
+ * cookies are not read in the dev environment.
+ * 
  * In order to ensure that both cookie values have parallel settings, this
  * function calls `server.state` for both cookie names before registering the
  * plugin.
@@ -46,6 +54,7 @@ export function setCsrfCookies(request, h) {
 export function getCsrfPlugin(electrodeOptions) {
 	const register = (server, options) => {
 		const { isProd } = server.settings.app;
+
 		const cookieOptions = {
 			path: '/',
 			isSecure: isProd, // No need to worry about https in dev
