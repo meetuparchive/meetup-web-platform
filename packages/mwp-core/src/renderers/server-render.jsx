@@ -245,6 +245,7 @@ const makeRenderer = (
 					initialNow: new Date().getTime(),
 					isProdApi: server.settings.app.api.isProd,
 					isQL: parseMemberCookie(state).ql === 'true',
+					memberId: parseMemberCookie(state).id,
 					variants: getVariants(state),
 					entryPath: url.pathname, // the path that the user entered the app on
 					media: getMedia(userAgent, userAgentDevice),
@@ -260,22 +261,21 @@ const makeRenderer = (
 		};
 
 		// otherwise render using the API and React router
-		// addFlags _must_ be called after the store is 'ready' to ensure that
-		// there is a full member object available in state - feature flags can
-		// be selected based on member id, email, and other properties
-		const addFlags = populatedStore => {
+		// addFlags is called twice in order to ensure that
+		// there is a full member object available in state
+		// feature flags can be selected based on member id,
+		// email, and other properties.
+		// feature flags based on member id are available before the store is populated.
+		const addFlags = (populatedStore, member) =>
 			// getFlags needs as much member info as possible, but particularly id and email
 			// in order to match on common targeting rules
-			const memberObj = (populatedStore.getState().api.self || {}).value || {};
-			return request.server.plugins['mwp-app-route']
-				.getFlags(memberObj)
-				.then(flags =>
-					populatedStore.dispatch({
-						type: 'UPDATE_FLAGS',
-						payload: flags,
-					})
-				);
-		};
+			request.server.plugins['mwp-app-route'].getFlags(member).then(flags =>
+				populatedStore.dispatch({
+					type: 'UPDATE_FLAGS',
+					payload: flags,
+				})
+			);
+
 		const checkReady = state =>
 			state.preRenderChecklist.every(isReady => isReady);
 		const populateStore = store =>
@@ -284,14 +284,20 @@ const makeRenderer = (
 				store.dispatch({ type: SERVER_RENDER, payload: url });
 
 				if (checkReady(store.getState())) {
-					addFlags(store).then(() => {
+					// we need to use the _latest_ version of the member object
+					// which is why memberObj is defined after the checkReady call.
+					const memberObj = (store.getState().api.self || {}).value || {};
+					addFlags(store, memberObj).then(() => {
 						resolve(store);
 					});
 					return;
 				}
 				const unsubscribe = store.subscribe(() => {
 					if (checkReady(store.getState())) {
-						addFlags(store).then(() => {
+						// we need to use the _latest_ version of the member object
+						// which is why memberObj is defined after the checkReady call.
+						const memberObj = (store.getState().api.self || {}).value || {};
+						addFlags(store, memberObj).then(() => {
 							resolve(store);
 							unsubscribe();
 						});
@@ -316,20 +322,23 @@ const makeRenderer = (
 						statusCode: 200,
 					};
 				}
-				return populateStore(store).then(
-					store =>
-						// create tracer and immediately invoke the resulting function.
-						// trace should start before rendering, finish after rendering
-						newrelic.createTracer('serverRender', getRouterRenderer)({
-							routes: resolvedRoutes,
-							store,
-							location: url,
-							basename,
-							scripts,
-							cssLinks,
-							userAgent,
-						}) // immediately invoke callback
-				);
+				// the initial addFlags call will only be key'd by member ID
+				return addFlags(store, { id: parseMemberCookie(state).id })
+					.then(() => populateStore(store))
+					.then(
+						store =>
+							// create tracer and immediately invoke the resulting function.
+							// trace should start before rendering, finish after rendering
+							newrelic.createTracer('serverRender', getRouterRenderer)({
+								routes: resolvedRoutes,
+								store,
+								location: url,
+								basename,
+								scripts,
+								cssLinks,
+								userAgent,
+							}) // immediately invoke callback
+					);
 			})
 		);
 	};
