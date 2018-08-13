@@ -16,25 +16,16 @@ import { plugin as requestAuthPlugin } from 'mwp-auth-plugin';
  *
  * @module ServerPlugins
  */
-
-const CSRF_COOKIE_NAME = 'x-mwp-csrf';
+const CSRF_COOKIE_NAME =
+	process.env.NODE_ENV === 'production' ? 'x-mwp-csrf' : 'x-mwp-csrf_dev';
 const CSRF_HEADER_COOKIE_NAME = `${CSRF_COOKIE_NAME}-header`;
 const CSRF_HEADER_NAME = CSRF_COOKIE_NAME;
-// dev cookie names
-const DEV_CSRF_COOKIE_NAME = `${CSRF_COOKIE_NAME}-dev`;
-const DEV_CSRF_HEADER_COOKIE_NAME = `${DEV_CSRF_COOKIE_NAME}-header`;
-const DEV_CSRF_HEADER_NAME = DEV_CSRF_COOKIE_NAME;
 
 // Sets the csrf header token from plugin into a cookie
 export function setCsrfCookies(request, h) {
-	const { headers = {} } = request.response;
-	const csrfHeader = headers[CSRF_COOKIE_NAME];
-	const csrfDevHeader = headers[DEV_CSRF_COOKIE_NAME];
+	const csrfHeader = (request.response.headers || {})[CSRF_COOKIE_NAME];
 	if (csrfHeader) {
 		h.state(CSRF_HEADER_COOKIE_NAME, csrfHeader);
-	}
-	if (csrfDevHeader) {
-		h.state(DEV_CSRF_HEADER_COOKIE_NAME, csrfDevHeader);
 	}
 	return h.continue;
 }
@@ -52,8 +43,7 @@ export function setCsrfCookies(request, h) {
  * so that it syncs across browser tabs.
  *
  * We set similar but different cookie names for dev and prod environments so the prod
- * cookies are not read in the dev environment, which was causing BAD_TOKEN errors
- * because we were comparing dev and prod tokens which would never match.
+ * cookies are not read in the dev environment.
  * 
  * In order to ensure that both cookie values have parallel settings, this
  * function calls `server.state` for both cookie names before registering the
@@ -77,17 +67,14 @@ export function getCsrfPlugin(electrodeOptions) {
 			{ secret: server.settings.app.csrf_secret },
 			electrodeOptions
 		);
-		const cookie_name = isProd ? CSRF_COOKIE_NAME : DEV_CSRF_COOKIE_NAME;
+
 		server.state(
-			cookie_name, // set by plugin
+			CSRF_COOKIE_NAME, // set by plugin
 			{ ...cookieOptions, isHttpOnly: true } // no client-side interaction needed
 		);
 
-		const header_cookie_name = isProd
-			? CSRF_HEADER_COOKIE_NAME
-			: DEV_CSRF_HEADER_COOKIE_NAME;
 		server.state(
-			header_cookie_name, // set by onPreResponse
+			CSRF_HEADER_COOKIE_NAME, // set by onPreResponse
 			{ ...cookieOptions, isHttpOnly: false } // the client must read this cookie and return as a custom header
 		);
 
@@ -135,7 +122,6 @@ export default function getPlugins({ languageRenderers }) {
 	const { package: { agent }, getServer } = config;
 	const server = getServer();
 	const isProdApi = server.properties.api.isProd;
-	const isProdEnv = server.properties.isProd;
 
 	return [
 		getAppRoutePlugin({ languageRenderers }),
@@ -145,8 +131,8 @@ export default function getPlugins({ languageRenderers }) {
 		getCsrfPlugin({
 			// Use prod cookies in production environment and dev cookies in
 			// dev environment regardless of whether you're using the prod api
-			headerName: isProdEnv ? CSRF_HEADER_NAME : DEV_CSRF_HEADER_NAME,
-			cookieName: isProdEnv ? CSRF_COOKIE_NAME : DEV_CSRF_COOKIE_NAME,
+			headerName: CSRF_HEADER_NAME,
+			cookieName: CSRF_COOKIE_NAME,
 		}),
 		requestAuthPlugin,
 		getActivityTrackingPlugin({ agent, isProdApi }),
