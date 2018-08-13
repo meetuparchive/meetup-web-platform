@@ -4,7 +4,8 @@ import { setClickCookie } from 'mwp-tracking-plugin/lib/util/clickState';
 
 import { parseQueryResponse, getAuthedQueryFilter } from '../util/fetchUtils';
 
-export const CSRF_COOKIE_NAME = 'x-mwp-csrf';
+export const CSRF_COOKIE_NAME =
+	process.env.NODE_ENV === 'production' ? 'x-mwp-csrf' : 'x-mwp-csrf_dev';
 export const CSRF_HEADER_COOKIE_NAME = `${CSRF_COOKIE_NAME}-header`;
 
 /*
