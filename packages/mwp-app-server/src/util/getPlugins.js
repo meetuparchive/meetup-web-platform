@@ -129,8 +129,6 @@ export default function getPlugins({ languageRenderers }) {
 		languagePlugin,
 		getLoggerPlugin(),
 		getCsrfPlugin({
-			// Use prod cookies in production environment and dev cookies in
-			// dev environment regardless of whether you're using the prod api
 			headerName: CSRF_HEADER_NAME,
 			cookieName: CSRF_COOKIE_NAME,
 		}),
