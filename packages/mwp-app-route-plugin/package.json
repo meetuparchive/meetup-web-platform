@@ -33,7 +33,7 @@
     "mwp-test-utils": ">=0.0.1"
   },
   "peerDependencies": {
-    "electrode-csrf-jwt": "git+https://github.com/meetup/electrode-csrf-jwt.git#ce08f887bbe4a113e3ac92f5ce2f2740d1a667e5",
+    "electrode-csrf-jwt": "git+https://github.com/meetup/electrode-csrf-jwt.git#793431729d8fb4ee315f28709f323f198b25d460",
     "mwp-core": ">=0.0.1",
     "mwp-language-plugin": ">=0.0.1",
     "react": "^16.3.1",
