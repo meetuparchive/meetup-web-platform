@@ -35,6 +35,7 @@
     "meetup-web-mocks": "1.0.217",
     "mwp-core": ">=0.0.1",
     "mwp-logger-plugin": ">=0.0.1",
+    "mwp-router": ">=0.0.1",
     "mwp-store": ">=0.0.1",
     "react-helmet": "5.2.0",
     "redux": "3.7.2",
