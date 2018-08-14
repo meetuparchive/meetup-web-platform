@@ -34,7 +34,7 @@
 		"mwp-toaster": "17.0.2552",
 		"prop-types": "15.6.0",
 		"react": "16.3.1",
-		"react-dom": "16.4.1",
+		"react-dom": "16.4.2",
 		"react-helmet": "5.2.0",
 		"react-intl": "2.4.0",
 		"react-redux": "5.0.7",
