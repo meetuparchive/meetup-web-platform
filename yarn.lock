@@ -2510,16 +2510,6 @@ ecdsa-sig-formatter@1.0.10:
     on-headers "^1.0.1"
     uuid "^3.2.1"
 
-"electrode-csrf-jwt@git+https://github.com/meetup/electrode-csrf-jwt.git#ce08f887bbe4a113e3ac92f5ce2f2740d1a667e5":
-  version "1.4.0"
-  resolved "git+https://github.com/meetup/electrode-csrf-jwt.git#ce08f887bbe4a113e3ac92f5ce2f2740d1a667e5"
-  dependencies:
-    boom "^7.2.0"
-    jsonwebtoken "^8.0.0"
-    ms "^2.1.1"
-    on-headers "^1.0.1"
-    uuid "^3.2.1"
-
 electron-to-chromium@^1.3.30, electron-to-chromium@^1.3.57:
   version "1.3.58"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.58.tgz#8267a4000014e93986d9d18c65a8b4022ca75188"
@@ -5435,7 +5425,7 @@ mv@~2:
     ncp "~2.0.0"
     rimraf "~2.4.0"
 
-mwp-api-proxy-plugin@^17.0.2552, mwp-api-proxy-plugin@^17.0.2575:
+mwp-api-proxy-plugin@^17.0.2575:
   version "17.0.2575"
   resolved "https://registry.yarnpkg.com/mwp-api-proxy-plugin/-/mwp-api-proxy-plugin-17.0.2575.tgz#ea685aa66889043c46f31d5aff2720642d8b1158"
   dependencies:
@@ -5448,69 +5438,56 @@ mwp-api-proxy-plugin@^17.0.2552, mwp-api-proxy-plugin@^17.0.2575:
     request "2.81.0"
     rison "0.1.1"
 
-mwp-api-state@17.0.2552:
-  version "17.0.2552"
-  resolved "https://registry.yarnpkg.com/mwp-api-state/-/mwp-api-state-17.0.2552.tgz#cd462abf296b7240a8794f0e6efe95a29bf44985"
-  dependencies:
-    idb-keyval "2.3.0"
-    mwp-tracking-plugin "^17.0.2552"
-
-mwp-api-state@^17.0.2552, mwp-api-state@^17.0.2575:
+mwp-api-state@>=17.0.0, mwp-api-state@^17.0.2575:
   version "17.0.2575"
   resolved "https://registry.yarnpkg.com/mwp-api-state/-/mwp-api-state-17.0.2575.tgz#498316ed8cf2b96bee80234a484cc7ac6a4da7c5"
   dependencies:
     idb-keyval "2.3.0"
     mwp-tracking-plugin "^17.0.2575"
 
-mwp-app-render@^17.0.2552, mwp-app-render@^17.0.2575:
+mwp-app-render@^17.0.2575:
   version "17.0.2575"
   resolved "https://registry.yarnpkg.com/mwp-app-render/-/mwp-app-render-17.0.2575.tgz#c1cd8dec7928b6069959b3ca904d2228530a05ad"
   dependencies:
     browser-detect "0.2.22"
     escape-html "1.0.3"
 
-mwp-app-route-plugin@^17.0.2552:
+mwp-app-route-plugin@^17.0.2575:
   version "17.0.2575"
   resolved "https://registry.yarnpkg.com/mwp-app-route-plugin/-/mwp-app-route-plugin-17.0.2575.tgz#a9529f8ee7a2c0a5103a54117e0e8623ecb8fa2f"
   dependencies:
     ldclient-node "5.2.0"
     redbox-react "1.5.0"
 
-mwp-app-server@17.0.2552:
-  version "17.0.2552"
-  resolved "https://registry.yarnpkg.com/mwp-app-server/-/mwp-app-server-17.0.2552.tgz#207a59e95e44e33cedab0a3f580a4654da7ced8d"
+mwp-app-server@>=17.0.0:
+  version "17.0.2575"
+  resolved "https://registry.yarnpkg.com/mwp-app-server/-/mwp-app-server-17.0.2575.tgz#26a13eed5619f5b11e15f2d3a0ae94b27bca797a"
   dependencies:
     convict "4.0.1"
-    electrode-csrf-jwt "git+https://github.com/meetup/electrode-csrf-jwt.git#ce08f887bbe4a113e3ac92f5ce2f2740d1a667e5"
+    electrode-csrf-jwt "git+https://github.com/meetup/electrode-csrf-jwt.git#793431729d8fb4ee315f28709f323f198b25d460"
     hapi "17.4.0"
     inert "5.1.0"
-    mwp-api-proxy-plugin "^17.0.2552"
-    mwp-app-route-plugin "^17.0.2552"
-    mwp-auth-plugin "^17.0.2552"
-    mwp-config "^17.0.2552"
-    mwp-core "^17.0.2552"
-    mwp-language-plugin "^17.0.2552"
-    mwp-logger-plugin "^17.0.2552"
-    mwp-sw-plugin "^17.0.2552"
-    mwp-tracking-plugin "^17.0.2552"
+    mwp-api-proxy-plugin "^17.0.2575"
+    mwp-app-route-plugin "^17.0.2575"
+    mwp-auth-plugin "^17.0.2575"
+    mwp-config "^17.0.2575"
+    mwp-core "^17.0.2575"
+    mwp-language-plugin "^17.0.2575"
+    mwp-logger-plugin "^17.0.2575"
+    mwp-sw-plugin "^17.0.2575"
+    mwp-tracking-plugin "^17.0.2575"
     pino "4.7.1"
     postcss-syntax "0.10.0"
     spdy "3.4.7"
     uuid "3.1.0"
 
-mwp-auth-plugin@^11.1.2034:
-  version "11.1.2062"
-  resolved "https://registry.yarnpkg.com/mwp-auth-plugin/-/mwp-auth-plugin-11.1.2062.tgz#2aa1e1bf977057f7993996795d1a8b8cd256a33f"
-  dependencies:
-    uuid "3.1.0"
-
-mwp-auth-plugin@^17.0.2552, mwp-auth-plugin@^17.0.2575:
+mwp-auth-plugin@^17.0.2575:
   version "17.0.2575"
   resolved "https://registry.yarnpkg.com/mwp-auth-plugin/-/mwp-auth-plugin-17.0.2575.tgz#c4a4a7f094bffb301e45560eb5f485bec6108595"
   dependencies:
     uuid "3.1.0"
 
-mwp-config@^17.0.2552, mwp-config@^17.0.2575:
+mwp-config@^17.0.2575:
   version "17.0.2575"
   resolved "https://registry.yarnpkg.com/mwp-config/-/mwp-config-17.0.2575.tgz#bc443e83ef8addbc65129fb486edeafe300d4068"
   dependencies:
@@ -5528,23 +5505,7 @@ mwp-config@^17.0.2552, mwp-config@^17.0.2575:
     stylelint-order "1.0.0"
     stylelint-scss "3.3.0"
 
-mwp-core@17.0.2552:
-  version "17.0.2552"
-  resolved "https://registry.yarnpkg.com/mwp-core/-/mwp-core-17.0.2552.tgz#32a4f246ad8b65df48f1c1080fc51ac224b782bd"
-  dependencies:
-    "@google-cloud/pubsub" "0.18.0"
-    joi "13.4.0"
-    mobile-detect "1.4.1"
-    mwp-api-proxy-plugin "^17.0.2552"
-    mwp-app-render "^17.0.2552"
-    mwp-logger-plugin "^17.0.2552"
-    mwp-router "^17.0.2552"
-    mwp-store "^17.0.2552"
-    node-fetch "1.7.2"
-    pino "4.7.1"
-    qs "6.5.0"
-
-mwp-core@^17.0.2552:
+mwp-core@>=17.0.0, mwp-core@^17.0.2575:
   version "17.0.2575"
   resolved "https://registry.yarnpkg.com/mwp-core/-/mwp-core-17.0.2575.tgz#8e1ed420c6fd5b3198be1c5f3c75adbccf7b125c"
   dependencies:
@@ -5560,14 +5521,14 @@ mwp-core@^17.0.2552:
     pino "4.7.1"
     qs "6.5.0"
 
-mwp-language-plugin@^17.0.2552:
+mwp-language-plugin@^17.0.2575:
   version "17.0.2575"
   resolved "https://registry.yarnpkg.com/mwp-language-plugin/-/mwp-language-plugin-17.0.2575.tgz#8a0da2cd1e188ac4a1ce216191d624bfd90923f0"
   dependencies:
     accepts "1.3.4"
     qs "6.5.0"
 
-mwp-logger-plugin@^17.0.2552, mwp-logger-plugin@^17.0.2575:
+mwp-logger-plugin@^17.0.2575:
   version "17.0.2575"
   resolved "https://registry.yarnpkg.com/mwp-logger-plugin/-/mwp-logger-plugin-17.0.2575.tgz#e16b1ca1c0571dd79adc98ae2aa39d5ed110cd97"
   dependencies:
@@ -5575,37 +5536,14 @@ mwp-logger-plugin@^17.0.2552, mwp-logger-plugin@^17.0.2575:
     bunyan "1.8.12"
     bunyan-debug-stream "1.0.8"
 
-mwp-router@11.1.2034:
-  version "11.1.2034"
-  resolved "https://registry.yarnpkg.com/mwp-router/-/mwp-router-11.1.2034.tgz#e6594a77597022d4cb11a5b39730360ec4f08a00"
-  dependencies:
-    mwp-auth-plugin "^11.1.2034"
-    react-side-effect "1.1.3"
-
-mwp-router@17.0.2552:
-  version "17.0.2552"
-  resolved "https://registry.yarnpkg.com/mwp-router/-/mwp-router-17.0.2552.tgz#e57491989b5759bf844b513fff44bef0e709c348"
-  dependencies:
-    mwp-auth-plugin "^17.0.2552"
-    react-side-effect "1.1.3"
-
-mwp-router@^17.0.2552, mwp-router@^17.0.2575:
+mwp-router@>=17.0.0, mwp-router@^17.0.2575:
   version "17.0.2575"
   resolved "https://registry.yarnpkg.com/mwp-router/-/mwp-router-17.0.2575.tgz#a40973fa0cb55ed94b378c7f2d860a2e7e0e3dc1"
   dependencies:
     mwp-auth-plugin "^17.0.2575"
     react-side-effect "1.1.3"
 
-mwp-store@17.0.2552:
-  version "17.0.2552"
-  resolved "https://registry.yarnpkg.com/mwp-store/-/mwp-store-17.0.2552.tgz#a875be1e8962e80b1c36245f6f8b70586f42f3fe"
-  dependencies:
-    js-cookie "2.1.4"
-    mwp-api-state "^17.0.2552"
-    mwp-tracking-plugin "^17.0.2552"
-    rison "0.1.1"
-
-mwp-store@^17.0.2552, mwp-store@^17.0.2575:
+mwp-store@>=17.0.0, mwp-store@^17.0.2575:
   version "17.0.2575"
   resolved "https://registry.yarnpkg.com/mwp-store/-/mwp-store-17.0.2575.tgz#264c0c0974fe569945386995c3c55c3b5fb013bb"
   dependencies:
@@ -5614,17 +5552,17 @@ mwp-store@^17.0.2552, mwp-store@^17.0.2575:
     mwp-tracking-plugin "^17.0.2575"
     rison "0.1.1"
 
-mwp-sw-plugin@^17.0.2552:
+mwp-sw-plugin@^17.0.2575:
   version "17.0.2575"
   resolved "https://registry.yarnpkg.com/mwp-sw-plugin/-/mwp-sw-plugin-17.0.2575.tgz#7cf733280cc43d549968f272bfa4bf8f0b5bea7d"
   dependencies:
     mwp-config "^17.0.2575"
 
-mwp-toaster@17.0.2552:
-  version "17.0.2552"
-  resolved "https://registry.yarnpkg.com/mwp-toaster/-/mwp-toaster-17.0.2552.tgz#391eaf993c9941a07fdaa4ead464c63d803a09cb"
+mwp-toaster@>=17.0.0:
+  version "17.0.2575"
+  resolved "https://registry.yarnpkg.com/mwp-toaster/-/mwp-toaster-17.0.2575.tgz#307f77f20854370efc8103d85014761e197035bc"
 
-mwp-tracking-plugin@^17.0.2552, mwp-tracking-plugin@^17.0.2575:
+mwp-tracking-plugin@^17.0.2575:
   version "17.0.2575"
   resolved "https://registry.yarnpkg.com/mwp-tracking-plugin/-/mwp-tracking-plugin-17.0.2575.tgz#bde2f58b94e382cbde312b7a80c06d713a637a54"
   dependencies:
