@@ -92,7 +92,8 @@
     "swarm-constants": "2.2.122",
     "swarm-icons": "^3.8.349",
     "swarm-sasstools": "^5.0.417",
-    "tough-cookie": "2.3.3"
+    "tough-cookie": "2.3.3",
+    "uuid": "3.3.2"
   },
   "lint-staged": {
     "{tests,__mocks__,packages}/**/*.{js,jsx}": [
