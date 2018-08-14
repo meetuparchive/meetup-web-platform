@@ -24,14 +24,12 @@
     "mwp-auth-plugin": ">=0.0.1",
     "react-side-effect": "1.1.3"
   },
-  "devDependencies": {
-    "mwp-test-utils": ">=0.0.1"
-  },
   "peerDependencies": {
     "prop-types": "^15.5.10",
     "react": "^16.3.1",
-    "react-dom": "^16.3.1",
+    "react-dom": "^16.4.2",
     "react-router-dom": "^4.2.2",
     "redux": "^3.7.2 || ^4"
-  }
+  },
+  "devDependencies": {}
 }
