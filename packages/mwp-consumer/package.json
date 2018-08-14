@@ -23,6 +23,9 @@
 		"url": "https://github.com/meetup/meetup-web-platform/issues"
 	},
 	"homepage": "https://github.com/meetup/meetup-web-platform#readme",
+	"peerDependencies": {
+		"mwp-router": ">=0.0.1"
+	},
 	"dependencies": {
 		"classnames": "2.2.5",
 		"js-joda": "^1.8.0",
@@ -30,7 +33,7 @@
 		"mwp-api-state": ">=17.0.0",
 		"mwp-app-server": ">=17.0.0",
 		"mwp-core": ">=17.0.0",
-		"mwp-router": ">=17.0.0",
+		"mwp-router": ">=0.0.1",
 		"mwp-store": ">=17.0.0",
 		"mwp-toaster": ">=17.0.0",
 		"prop-types": "15.6.0",
