@@ -63,8 +63,13 @@ export const getListState: ResponseStateSetter = (
 	const oldList = ((state[dynamicRef] || {}).value || [])
 		.filter(valOld => !newList.find(valNew => idTest(valOld, valNew)));
 
-	// combine the new list and the old list and sort the results
-	return { [dynamicRef]: { value: [...oldList, ...newList].sort(sort) } };
+	// combine the new list and the old list
+	const mergedList = [...oldList, ...newList];
+	// sort is optional
+	if (sort) {
+		mergedList.sort(sort);
+	}
+	return { [dynamicRef]: { value: mergedList } };
 };
 
 export const responseToState: ResponseStateSetter = (

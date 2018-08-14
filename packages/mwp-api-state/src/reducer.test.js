@@ -33,6 +33,18 @@ describe('getListState', () => {
 			},
 		},
 	};
+	const respWithoutSort = {
+		response: { value: ['foo'] },
+		query: {
+			ref: 'bar',
+			list: {
+				dynamicRef: 'baz',
+				merge: {
+					idTest: () => false,
+				},
+			},
+		},
+	};
 	it('ignores no-response responses', () => {
 		expect(
 			getListState(state, {
@@ -63,6 +75,16 @@ describe('getListState', () => {
 				value: [...value, ...resp.response.value].sort(
 					resp.query.list.merge.sort
 				),
+			},
+		});
+	});
+	it('merges new response with existing dynamicRef, not sorted if sort callback undefined', () => {
+		const value = ['qux'];
+		expect(
+			getListState({ [resp.query.list.dynamicRef]: { value } }, respWithoutSort)
+		).toEqual({
+			[resp.query.list.dynamicRef]: {
+				value: [...value, ...resp.response.value],
 			},
 		});
 	});
