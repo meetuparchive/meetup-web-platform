@@ -1772,7 +1772,7 @@ classnames@2.2.5:
   version "2.2.5"
   resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.2.5.tgz#fb3801d453467649ef3603c7d61a02bd129bde6d"
 
-classnames@^2.2.5:
+classnames@^2.2.5, classnames@^2.2.6:
   version "2.2.6"
   resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.2.6.tgz#43935bffdd291f326dad0a205309b38d00f650ce"
 
@@ -4632,6 +4632,10 @@ js-cookie@2.1.4:
   version "2.1.4"
   resolved "https://registry.yarnpkg.com/js-cookie/-/js-cookie-2.1.4.tgz#da4ec503866f149d164cf25f579ef31015025d8d"
 
+js-joda@^1.8.0:
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/js-joda/-/js-joda-1.8.2.tgz#4a7f3aa0cd1e386c35d7628a741184d761cb1401"
+
 js-tokens@^3.0.0, js-tokens@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-3.0.2.tgz#9866df395102130e38f7f996bceb65443209c25b"
@@ -5456,10 +5460,6 @@ ms@2.0.0:
 ms@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.1.tgz#30a5864eb3ebb0a66f2ebe6d727af06a09d86e0a"
-
-mustache@^2.3.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/mustache/-/mustache-2.3.0.tgz#4028f7778b17708a489930a6e52ac3bca0da41d0"
 
 mute-stream@0.0.7:
   version "0.0.7"
@@ -7446,7 +7446,7 @@ sass-rem@^1.2.4:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/sass-rem/-/sass-rem-1.2.4.tgz#59194e82a58c6d62e551a774f9bf4367ae6b2370"
 
-sax@>=0.6.0, sax@^1.2.4:
+sax@^1.2.4:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
 
@@ -8068,7 +8068,7 @@ svg-tags@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/svg-tags/-/svg-tags-1.0.0.tgz#58f71cee3bd519b59d4b2a843b6c7de64ac04764"
 
-swarm-animation@0.0.95:
+swarm-animation@0.0.95, swarm-animation@^0.0.95:
   version "0.0.95"
   resolved "https://registry.yarnpkg.com/swarm-animation/-/swarm-animation-0.0.95.tgz#262df7a9360ceaf101bec27520d63b6e18b4f7ed"
   dependencies:
@@ -8080,20 +8080,23 @@ swarm-constants@2.2.122:
   version "2.2.122"
   resolved "https://registry.yarnpkg.com/swarm-constants/-/swarm-constants-2.2.122.tgz#bdc7573e1f2691b8dfd3a730cdf01e5b91d8e6fc"
 
-swarm-icons@2.3.301:
-  version "2.3.301"
-  resolved "https://registry.yarnpkg.com/swarm-icons/-/swarm-icons-2.3.301.tgz#3e4d7a3ddd790853a4209c8935c8784d529ab77f"
-  dependencies:
-    mustache "^2.3.0"
-    xml2js "^0.4.17"
-
 swarm-icons@3.5.336:
   version "3.5.336"
   resolved "https://registry.yarnpkg.com/swarm-icons/-/swarm-icons-3.5.336.tgz#a6d551421d1b3994b153770ed1161ffd82d232d2"
 
+swarm-icons@^3.8.349:
+  version "3.8.349"
+  resolved "https://registry.yarnpkg.com/swarm-icons/-/swarm-icons-3.8.349.tgz#af520f40843d3186b7eac66b174b6df2fcc21594"
+
 swarm-sasstools@5.0.415:
   version "5.0.415"
   resolved "https://registry.yarnpkg.com/swarm-sasstools/-/swarm-sasstools-5.0.415.tgz#4e2e12ffba32846836bab55dd596530093e5181f"
+  dependencies:
+    sass-rem "^1.2.4"
+
+swarm-sasstools@^5.0.417:
+  version "5.0.417"
+  resolved "https://registry.yarnpkg.com/swarm-sasstools/-/swarm-sasstools-5.0.417.tgz#f13aec5678df480473e058256901ebf5f921a4b6"
   dependencies:
     sass-rem "^1.2.4"
 
@@ -8764,17 +8767,6 @@ x-is-string@^0.1.0:
 xml-name-validator@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/xml-name-validator/-/xml-name-validator-3.0.0.tgz#6ae73e06de4d8c6e47f9fb181f78d648ad457c6a"
-
-xml2js@^0.4.17:
-  version "0.4.19"
-  resolved "https://registry.yarnpkg.com/xml2js/-/xml2js-0.4.19.tgz#686c20f213209e94abf0d1bcf1efaa291c7827a7"
-  dependencies:
-    sax ">=0.6.0"
-    xmlbuilder "~9.0.1"
-
-xmlbuilder@~9.0.1:
-  version "9.0.7"
-  resolved "https://registry.yarnpkg.com/xmlbuilder/-/xmlbuilder-9.0.7.tgz#132ee63d2ec5565c557e20f4c22df9aca686b10d"
 
 xtend@^4.0.0, xtend@^4.0.1, xtend@~4.0.1:
   version "4.0.1"

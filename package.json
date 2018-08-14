@@ -47,6 +47,7 @@
     "babel-preset-react": "6.24.1",
     "babel-preset-stage-2": "6.24.1",
     "boom": "7.2.0",
+    "classnames": "^2.2.6",
     "electrode-csrf-jwt": "git+https://github.com/meetup/electrode-csrf-jwt.git#793431729d8fb4ee315f28709f323f198b25d460",
     "enzyme": "3.4.1",
     "enzyme-adapter-react-16": "1.2.0",
@@ -64,6 +65,7 @@
     "iron": "4.0.5",
     "jest": "23.1.0",
     "joi": "13.4.0",
+    "js-joda": "^1.8.0",
     "lint-staged": "4.0.1",
     "meetup-web-components": "5.2.2434",
     "meetup-web-mocks": "1.0.217",
@@ -86,8 +88,10 @@
     "reselect": "3.0.1",
     "rison": "0.1.1",
     "rxjs": "5.5.1",
+    "swarm-animation": "^0.0.95",
     "swarm-constants": "2.2.122",
-    "swarm-icons": "2.3.301",
+    "swarm-icons": "^3.8.349",
+    "swarm-sasstools": "^5.0.417",
     "tough-cookie": "2.3.3"
   },
   "lint-staged": {
