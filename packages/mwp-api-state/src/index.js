@@ -1,7 +1,7 @@
-import { createEpicMiddleware, combineEpics } from './redux-promise-epic';
+import { createMiddleware } from './redux-promise-epic';
 
-import getSyncEpic from './sync';
-import getCacheEpic from './cache';
+import getSyncEpics from './sync';
+import getCacheEpics from './cache';
 import { postEpic, deleteEpic } from './mutate'; // DEPRECATED
 
 // export specific values of internal modules
@@ -29,11 +29,9 @@ export { api, app, DEFAULT_API_STATE } from './reducer';
  * middleware that doesn't include the other epics if performance is an issue
  */
 export const getApiMiddleware = (findMatches, fetchQueriesFn) =>
-	createEpicMiddleware(
-		combineEpics(
-			getCacheEpic(),
-			getSyncEpic(findMatches, fetchQueriesFn),
-			postEpic, // DEPRECATED
-			deleteEpic // DEPRECATED
-		)
+	createMiddleware(
+		...getCacheEpics(),
+		...getSyncEpics(findMatches, fetchQueriesFn),
+		postEpic, // DEPRECATED
+		deleteEpic // DEPRECATED
 	);
