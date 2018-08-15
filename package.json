@@ -69,6 +69,7 @@
     "lint-staged": "4.0.1",
     "meetup-web-components": "5.2.2434",
     "meetup-web-mocks": "1.0.217",
+    "mwp-router": ">=0.0.1",
     "mwp-test-utils": ">=0.0.1",
     "newrelic": "3.3.1",
     "node-fetch": "1.7.2",
