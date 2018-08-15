@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`makeCallEpics every epic calls store.dipatch 1`] = `
+Array [
+  Array [
+    "action1",
+  ],
+  Array [
+    "action2",
+  ],
+  Array [
+    "action3",
+  ],
+]
+`;
