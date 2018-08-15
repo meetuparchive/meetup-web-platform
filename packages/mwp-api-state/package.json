@@ -33,7 +33,5 @@
     "mwp-router": ">=0.0.1",
     "mwp-tracking-plugin": ">=0.0.1"
   },
-  "devDependencies": {
-    "mwp-test-utils": ">=0.0.1"
-  }
+  "devDependencies": {}
 }

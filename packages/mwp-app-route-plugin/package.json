@@ -30,9 +30,7 @@
     "redbox-react": "1.5.0",
     "electrode-csrf-jwt": "git+https://github.com/meetup/electrode-csrf-jwt.git#793431729d8fb4ee315f28709f323f198b25d460"
   },
-  "devDependencies": {
-    "mwp-test-utils": ">=0.0.1"
-  },
+  "devDependencies": {},
   "peerDependencies": {
     "electrode-csrf-jwt": "git+https://github.com/meetup/electrode-csrf-jwt.git#793431729d8fb4ee315f28709f323f198b25d460",
     "mwp-core": ">=0.0.1",
