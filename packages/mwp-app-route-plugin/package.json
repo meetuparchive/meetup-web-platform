@@ -37,6 +37,7 @@
     "electrode-csrf-jwt": "git+https://github.com/meetup/electrode-csrf-jwt.git#793431729d8fb4ee315f28709f323f198b25d460",
     "mwp-core": ">=0.0.1",
     "mwp-language-plugin": ">=0.0.1",
+    "mwp-router": ">=0.0.1",
     "react": "^16.3.1",
     "react-dom": "^16.4.2"
   }
