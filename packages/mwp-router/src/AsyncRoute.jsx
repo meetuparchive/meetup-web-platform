@@ -21,11 +21,12 @@ const _componentCache = {};
 // simple pass through component to use while real component is loading
 const Placeholder = (children: React$Node) => <div />;
 
-const componentFromRoute = route =>
+const keyFromRoute = (route: PlatformRoute): string =>
+	(route.getComponent || '').toString();
+const componentFromRoute = (route: PlatformRoute): React$Node =>
 	route.component || // statically defined component
-	(route.getComponent && // cached getComponent
-		_componentCache[route.getComponent.toString()]) ||
-	Placeholder;
+	_componentCache[keyFromRoute(route)] || // cached getComponent
+	Placeholder; // fallback placeholder while getComponent is resolved
 
 /**
  * Route rendering component that uses internal state to keep a reference to the
@@ -35,7 +36,7 @@ const componentFromRoute = route =>
  */
 class AsyncRoute extends React.Component<Props, State> {
 	state = {
-		component: componentFromRoute(this.props.route), // fallback placeholder while getComponent is resolved
+		component: componentFromRoute(this.props.route),
 	};
 	static getDerivedStateFromProps(props, state) {
 		const component = componentFromRoute(props.route);
@@ -50,15 +51,17 @@ class AsyncRoute extends React.Component<Props, State> {
 	componentDidUpdate() {
 		this.resolveComponent();
 	}
+	componentWillUnmount() {
+		this.stopLoading = true;
+	}
 
 	resolveComponent() {
 		const { route } = this.props;
 		if (this.state.component !== Placeholder || !route.getComponent) {
-			// nothing to resolve
+			// already resolved
 			return;
 		}
-		// currently showing placeholder AND there's a getComponent defined
-		const key = route.getComponent.toString();
+		const key = keyFromRoute(route);
 		const cached = _componentCache[key];
 		if (cached) {
 			this.setState({ component: cached });
@@ -68,7 +71,10 @@ class AsyncRoute extends React.Component<Props, State> {
 		route.getComponent().then(component => {
 			// now cache it
 			_componentCache[key] = component;
-			// and set it to render
+			if (this.stopLoading) {
+				return;
+			}
+			// and set it to render if this route is still mounted
 			this.setState({ component });
 		});
 	}

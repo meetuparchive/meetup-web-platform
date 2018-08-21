@@ -7,7 +7,7 @@ import AsyncRoute from './AsyncRoute';
 /**
  * @class RouteLayout
  */
-class RouteLayout extends React.Component {
+class RouteLayout extends React.PureComponent {
 	render() {
 		const { routes, matchedPath = '/' } = this.props;
 
