@@ -23,7 +23,7 @@ const Placeholder = (children: React$Node) => <div />;
 
 const keyFromRoute = (route: PlatformRoute): string =>
 	(route.getComponent || '').toString();
-const componentFromRoute = (route: PlatformRoute): React$Node =>
+const componentFromRoute = (route: PlatformRoute): React$ComponentType<*> =>
 	route.component || // statically defined component
 	_componentCache[keyFromRoute(route)] || // cached getComponent
 	Placeholder; // fallback placeholder while getComponent is resolved
@@ -35,10 +35,11 @@ const componentFromRoute = (route: PlatformRoute): React$Node =>
  * component 'getter' and the the result will be rendered (and cached).
  */
 class AsyncRoute extends React.Component<Props, State> {
+	stopLoading: boolean = false;
 	state = {
 		component: componentFromRoute(this.props.route),
 	};
-	static getDerivedStateFromProps(props, state) {
+	static getDerivedStateFromProps(props: Props, state: State) {
 		const component = componentFromRoute(props.route);
 		if (state.component === component) {
 			return null;
