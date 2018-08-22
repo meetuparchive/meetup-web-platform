@@ -7,13 +7,13 @@ import AsyncRoute from './AsyncRoute';
 /**
  * @class RouteLayout
  */
-class RouteLayout extends React.Component {
+class RouteLayout extends React.PureComponent {
 	render() {
 		const { routes, matchedPath = '/' } = this.props;
 
 		return (
 			<Switch>
-				{routes.map((route, i) => {
+				{routes.map(route => {
 					const path =
 						matchedPath === '/' // root path, no need to prepend
 							? route.path
@@ -21,7 +21,7 @@ class RouteLayout extends React.Component {
 
 					return (
 						<Route
-							key={i}
+							key={`${path}${route.exact}`}
 							path={path}
 							exact={route.exact || false}
 							strict={route.strict || false}

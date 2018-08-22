@@ -1,5 +1,3 @@
-import { combineEpics } from '../redux-promise-epic';
-
 import { LOCATION_CHANGE, SERVER_RENDER } from 'mwp-router';
 import { getMatchedQueries } from 'mwp-router/lib/util';
 import { actions as clickActions } from 'mwp-tracking-plugin/lib/util/clickState';
@@ -205,10 +203,9 @@ export const getFetchQueriesEpic = (findMatches, fetchQueriesFn) => {
 	};
 };
 
-export default (findMatches, fetchQueriesFn) =>
-	combineEpics(
-		getNavEpic(findMatches),
-		getFetchQueriesEpic(findMatches, fetchQueriesFn),
-		apiRequestToApiReq,
-		clickEpic
-	);
+export default (findMatches, fetchQueriesFn) => [
+	getNavEpic(findMatches),
+	getFetchQueriesEpic(findMatches, fetchQueriesFn),
+	apiRequestToApiReq,
+	clickEpic,
+];
