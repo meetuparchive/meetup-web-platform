@@ -1,5 +1,7 @@
 import Inert from 'inert';
 import CsrfPlugin from 'electrode-csrf-jwt/lib/csrf-hapi17';
+import CspPlugin from 'blankie';
+import ScooterPlugin from 'scooter'; // blankie dependency
 
 import config from 'mwp-config';
 import { plugin as loggerPlugin } from 'mwp-logger-plugin';
@@ -91,6 +93,20 @@ export function getCsrfPlugin(electrodeOptions) {
 		},
 	};
 }
+/**
+ * We are using Blankie as our Content Security Policy (CSP) plugin 
+ * Which uses Scooter to detect the user agent and apply the appropriate
+ * CSP header, usually Content-Security-Policy but some older browsers are
+ * slightly different. A CSP compatible browser will use the header to ignore
+ * scripts not whitelisted in our policy header.
+ * https://github.com/nlf/blankie 
+ */
+export function getCspPlugin(options) {
+	return {
+		plugin: CspPlugin,
+		options,
+	};
+}
 
 export function getAppRoutePlugin(options) {
 	return {
@@ -131,6 +147,16 @@ export default function getPlugins({ languageRenderers }) {
 		getCsrfPlugin({
 			headerName: CSRF_HEADER_NAME,
 			cookieName: CSRF_COOKIE_NAME,
+		}),
+		ScooterPlugin, // csp plugin (blankie) dependency
+		getCspPlugin({
+			defaultSrc: "'self' *.meetup.com beta2.dev.meetup.com:8001",
+			connectSrc: '*',
+			frameSrc: 'https://staticxx.facebook.com',
+			imgSrc: '*',
+			styleSrc: "* 'unsafe-inline'",
+			scriptSrc: "* 'unsafe-inline' 'unsafe-eval'",
+			generateNonces: 'false',
 		}),
 		requestAuthPlugin,
 		getActivityTrackingPlugin({ agent, isProdApi }),
