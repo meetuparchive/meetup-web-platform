@@ -30,7 +30,7 @@ class ServiceWorker extends React.Component<*> {
 		}
 	}
 	render() {
-		return this.props.children;
+		return null;
 	}
 }
 
