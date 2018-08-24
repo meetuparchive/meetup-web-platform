@@ -1,7 +1,13 @@
+## [17.1]
+
+-   **Refactor** `AsyncRoute` refactored to be React 17 compatible, with improved
+    component caching. `SyncContainer` and `ServiceWorker` are now non-rendering
+    components that purely provide side effects.
+
 ## [17.0]
 
--  **BREAKING CHANGE** Upgrade to hapi v17, which requires updating of
-   much of the platform code. Consumer apps that leverage the hapi server
+-   **BREAKING CHANGE** Upgrade to hapi v17, which requires updating of
+    much of the platform code. Consumer apps that leverage the hapi server
 
 ## [16.6]
 
