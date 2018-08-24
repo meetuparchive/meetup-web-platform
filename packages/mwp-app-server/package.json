@@ -26,7 +26,6 @@
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "dependencies": {
-    "blankie": "4.0.0",
     "convict": "4.0.1",
     "electrode-csrf-jwt": "git+https://github.com/meetup/electrode-csrf-jwt.git#793431729d8fb4ee315f28709f323f198b25d460",
     "hapi": "17.4.0",
@@ -42,7 +41,6 @@
     "mwp-sw-plugin": ">=0.0.1",
     "mwp-tracking-plugin": ">=0.0.1",
     "pino": "4.7.1",
-    "scooter": "5.0.0",
     "spdy": "3.4.7",
     "uuid": "3.1.0"
   },
