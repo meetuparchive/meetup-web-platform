@@ -26,6 +26,7 @@ before_install:
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-core/.npmrc
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-config/.npmrc
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-consumer/.npmrc
+  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-csp-plugin/.npmrc
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-i18n/.npmrc
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-language-plugin/.npmrc
   - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-logger-plugin/.npmrc
