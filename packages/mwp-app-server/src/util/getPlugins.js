@@ -1,7 +1,5 @@
 import Inert from 'inert';
 import CsrfPlugin from 'electrode-csrf-jwt/lib/csrf-hapi17';
-import CspPlugin from 'blankie';
-import ScooterPlugin from 'scooter'; // blankie dependency
 
 import config from 'mwp-config';
 import { plugin as loggerPlugin } from 'mwp-logger-plugin';
@@ -12,6 +10,7 @@ import { plugin as languagePlugin } from 'mwp-language-plugin';
 import { plugin as serviceWorkerPlugin } from 'mwp-sw-plugin';
 import { plugin as apiProxyPlugin } from 'mwp-api-proxy-plugin';
 import { plugin as requestAuthPlugin } from 'mwp-auth-plugin';
+import { plugin as cspPlugin } from 'mwp-csp-plugin';
 
 // single quotes are required around these keywords
 const CSP_KEYWORDS = {
@@ -100,17 +99,10 @@ export function getCsrfPlugin(electrodeOptions) {
 		},
 	};
 }
-/**
- * We are using Blankie as our Content Security Policy (CSP) plugin 
- * Which uses Scooter to detect the user agent and apply the appropriate
- * CSP header, usually Content-Security-Policy but some older browsers are
- * slightly different. A CSP compatible browser will use the header to ignore
- * scripts not whitelisted in our policy header.
- * https://github.com/nlf/blankie 
- */
+
 export function getCspPlugin(options) {
 	return {
-		plugin: CspPlugin,
+		plugin: cspPlugin,
 		options,
 	};
 }
@@ -159,7 +151,6 @@ export default function getPlugins({ languageRenderers }) {
 			headerName: CSRF_HEADER_NAME,
 			cookieName: CSRF_COOKIE_NAME,
 		}),
-		ScooterPlugin, // csp plugin (blankie) dependency
 		getCspPlugin({
 			defaultSrc: [
 				CSP_KEYWORDS.self,
