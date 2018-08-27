@@ -1,3 +1,6 @@
+## [17.1]
+- **NEW FEATURE** Create 'mwp-csp-plugin' which adds some useful security headers
+
 ## [17.0]
 
 -  **BREAKING CHANGE** Upgrade to hapi v17, which requires updating of
@@ -10,7 +13,7 @@
 
 ## [16.5]
 
--   **New feature** the API proxy path prefix can now be specified using an app's
+-   **NEW FEATURE** the API proxy path prefix can now be specified using an app's
     `package.json` file by specifying `config.apiProxyPath` with a leading slash,
     e.g. `/mu_api`, or by an env variable `API_PROXY_PATH`.
 

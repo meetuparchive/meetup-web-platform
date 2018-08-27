@@ -26,6 +26,7 @@ In general, application-specific code will live outside of this package.
   - ['Query': structuring data requests](packages/mwp-api-state/Queries.md) -
 	  GET/POST/PATCH/DELETE requests to REST API
 - [Redux store modules](packages/mwp-store/README.md) - browser and server
+- [Security Policy headers](packages/mwp-csp-plugin/README.md)
 
 # Releases
 
