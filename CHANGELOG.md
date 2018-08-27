@@ -1,3 +1,6 @@
+## [17.1]
+- **New feature** Create 'mwp-csp-plugin' which adds some useful security headers
+
 ## [17.0]
 
 -  **BREAKING CHANGE** Upgrade to hapi v17, which requires updating of
