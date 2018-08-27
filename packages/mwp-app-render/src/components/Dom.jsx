@@ -84,9 +84,7 @@ const DOM = props => {
 				{head.link.toComponent()}
 				{head.script.toComponent()}
 				{uxCaptureJS &&
-					<script type="text/javascript">
-						{uxCaptureJS}
-					</script>}
+					<script dangerouslySetInnerHTML={getInnerHTML(uxCaptureJS)} />}
 				{newrelicJS &&
 					<script dangerouslySetInnerHTML={getInnerHTML(newrelicJS)} />}
 				{cssLinks &&
