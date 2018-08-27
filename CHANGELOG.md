@@ -1,6 +1,5 @@
 ## [17.1]
-
-Create mwp-csp-plugin which adds some useful security headers
+- **New feature** Create 'mwp-csp-plugin' which adds some useful security headers
 
 ## [17.0]
 
