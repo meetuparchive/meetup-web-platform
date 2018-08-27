@@ -1,5 +1,5 @@
 ## [17.1]
-- **New feature** Create 'mwp-csp-plugin' which adds some useful security headers
+- **NEW FEATURE** Create 'mwp-csp-plugin' which adds some useful security headers
 
 ## [17.0]
 
@@ -13,7 +13,7 @@
 
 ## [16.5]
 
--   **New feature** the API proxy path prefix can now be specified using an app's
+-   **NEW FEATURE** the API proxy path prefix can now be specified using an app's
     `package.json` file by specifying `config.apiProxyPath` with a leading slash,
     e.g. `/mu_api`, or by an env variable `API_PROXY_PATH`.
 
