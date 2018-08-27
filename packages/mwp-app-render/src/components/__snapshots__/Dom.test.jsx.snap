@@ -5,6 +5,12 @@ exports[`Dom renders with mock props 1`] = `
   lang="fr"
 >
   <head>
+    <script
+      type="text/javascript"
+    >
+      "use strict";window.UX=function(){var expectedZones=[];var isUserTimingSupported=typeof performance!=="undefined"&&typeof performance.mark!=="undefined"&&typeof performance.measure!=="undefined";var isConsoleTimeStampSupported=typeof console!=="undefined"&&typeof console.timeStamp!=="undefined";var getMark=function getMark(markLabel){return expectedZones.reduce(function(expectedMark,expectedZone){return expectedMark?expectedMark:expectedZone.marks.find(function(expectedMark){return expectedMark.label===markLabel})},null)};return{expect:function expect(zones){expectedZones=zones.map(function(zone){if(zone.marks&&zone.marks.length&gt;0){zone.marks=zone.marks.map(function(label){return{label:label}});var promises=zone.marks.map(function(mark){return new Promise(function(resolve,reject){mark.record=function(){if(isUserTimingSupported){performance.mark(mark.label)}if(isConsoleTimeStampSupported){console.timeStamp(mark.label)}zone.lastMarkLabel=mark.label;resolve(mark.label)}})});Promise.all(promises).then(function(){if(isUserTimingSupported){performance.measure(zone.label,"navigationStart",zone.lastMarkLabel)}});return zone}})},mark:function mark(markLabel){var mark=getMark(markLabel);if(mark){mark.record()}}}}();
+
+    </script>
     <link
       href="style.css"
       key="0"
