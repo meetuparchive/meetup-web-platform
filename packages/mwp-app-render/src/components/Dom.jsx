@@ -74,7 +74,7 @@ const DOM = props => {
 		: false;
 
 	const uxCaptureFilename = require.resolve('ux-capture/js/ux-capture.min.js');
-	const uxCaptureJS = fs.readFileSync(uxCaptureFilename);
+	const uxCaptureJS = fs.readFileSync(uxCaptureFilename, 'utf-8');
 
 	return (
 		<html lang={htmlLang}>
