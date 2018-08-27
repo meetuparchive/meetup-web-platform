@@ -35,6 +35,7 @@
     "mwp-auth-plugin": ">=0.0.1",
     "mwp-config": ">=0.0.1",
     "mwp-core": ">=0.0.1",
+    "mwp-csp-plugin": ">=0.0.1",
     "mwp-language-plugin": ">=0.0.1",
     "mwp-logger-plugin": ">=0.0.1",
     "mwp-router": ">=0.0.1",
