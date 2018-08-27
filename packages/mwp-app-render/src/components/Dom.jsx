@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import escapeHtml from 'escape-html';
 import newrelic from 'newrelic';
+import fs from 'fs';
 
 import { getPolyfill } from 'mwp-app-render/lib/util/browserPolyfill';
 
@@ -72,6 +73,9 @@ const DOM = props => {
 		? newrelicHTML.replace(scriptPattern, '').replace(/<\/script>$/, '')
 		: false;
 
+	const uxCaptureFilename = require.resolve('ux-capture/js/ux-capture.min.js');
+	const uxCaptureJS = fs.readFileSync(uxCaptureFilename, 'utf-8');
+
 	return (
 		<html lang={htmlLang}>
 			<head>
@@ -79,6 +83,8 @@ const DOM = props => {
 				{head.meta.toComponent()}
 				{head.link.toComponent()}
 				{head.script.toComponent()}
+				{uxCaptureJS &&
+					<script dangerouslySetInnerHTML={getInnerHTML(uxCaptureJS)} />}
 				{newrelicJS &&
 					<script dangerouslySetInnerHTML={getInnerHTML(newrelicJS)} />}
 				{cssLinks &&
