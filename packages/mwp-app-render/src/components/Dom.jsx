@@ -72,6 +72,8 @@ const DOM = props => {
 		? newrelicHTML.replace(scriptPattern, '').replace(/<\/script>$/, '')
 		: false;
 
+	const uxCaptureJS = require('ux-capture/js/ux-capture.min.js');
+
 	return (
 		<html lang={htmlLang}>
 			<head>
@@ -79,6 +81,9 @@ const DOM = props => {
 				{head.meta.toComponent()}
 				{head.link.toComponent()}
 				{head.script.toComponent()}
+				<script type="text/javascript">
+					{uxCaptureJS}
+				</script>
 				{newrelicJS &&
 					<script dangerouslySetInnerHTML={getInnerHTML(newrelicJS)} />}
 				{cssLinks &&

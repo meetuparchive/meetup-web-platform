@@ -8062,6 +8062,10 @@ uuid@^2.0.1:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-2.0.3.tgz#67e2e863797215530dff318e5bf9dcebfd47b21a"
 
+ux-capture@1.0.7:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/ux-capture/-/ux-capture-1.0.7.tgz#b3595c9592a72575b2120d9a79bb18e4b1aa2dc5"
+
 v8flags@^2.0.10:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/v8flags/-/v8flags-2.1.1.tgz#aab1a1fa30d45f88dd321148875ac02c0b55e5b4"
