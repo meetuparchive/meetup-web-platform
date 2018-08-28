@@ -12,21 +12,20 @@ type Props = {
 };
 type ComponentState = {
 	component: React$ComponentType<*>,
+	_componentCache: { [string]: React$ComponentType<*> },
 };
 type State = ComponentState;
 
-// 'global' cache of resolved components to skip async fetching on repeat renders
-const _componentCache = {};
-
 // simple pass through component to use while real component is loading
-const Placeholder = (children: React$Node) => <div />;
+const PassThrough = (children: React$Node) => <div />;
 
-const keyFromRoute = (route: PlatformRoute): string =>
-	(route.getComponent || '').toString();
-const componentFromRoute = (route: PlatformRoute): React$ComponentType<*> =>
-	route.component || // statically defined component
-	_componentCache[keyFromRoute(route)] || // cached getComponent
-	Placeholder; // fallback placeholder while getComponent is resolved
+// Helper to set rendering component once resolved, as well as update cache
+const getComponentStateSetter = (key: string) => (
+	component: React$ComponentType<*>
+) => (state: State): ComponentState => ({
+	component,
+	_componentCache: { ...state._componentCache, [key]: component },
+});
 
 /**
  * Route rendering component that uses internal state to keep a reference to the
@@ -35,50 +34,54 @@ const componentFromRoute = (route: PlatformRoute): React$ComponentType<*> =>
  * component 'getter' and the the result will be rendered (and cached).
  */
 class AsyncRoute extends React.Component<Props, State> {
-	stopLoading: boolean = false;
-	state = {
-		component: componentFromRoute(this.props.route),
-	};
-	static getDerivedStateFromProps(props: Props, state: State) {
-		const component = componentFromRoute(props.route);
-		if (state.component === component) {
-			return null;
-		}
-		return { component };
-	}
-	componentDidMount() {
-		this.resolveComponent();
-	}
-	componentDidUpdate() {
-		this.resolveComponent();
-	}
-	componentWillUnmount() {
-		this.stopLoading = true;
-	}
+	constructor(props: Props) {
+		super(props);
+		const route = props.route;
 
-	resolveComponent() {
-		const { route } = this.props;
-		if (this.state.component !== Placeholder || !route.getComponent) {
-			// already resolved
-			return;
+		this.state = {
+			component: route.component || PassThrough,
+			_componentCache: {},
+		};
+		if (route.getComponent) {
+			this.resolveComponent(route.getComponent);
 		}
-		const key = keyFromRoute(route);
-		const cached = _componentCache[key];
+	}
+	/*
+	 * Given a component-resolving function, update this.state.component with
+	 * the resolved value - set/get cached reference as necessary
+	 */
+	resolveComponent(resolver: () => Promise<React$ComponentType<*>>) {
+		const key = resolver.toString();
+		const cached = this.state._componentCache[key];
 		if (cached) {
 			this.setState({ component: cached });
 			return;
 		}
-		// not cached yet - go get it
-		route.getComponent().then(component => {
-			// now cache it
-			_componentCache[key] = component;
-			if (this.stopLoading) {
-				return;
-			}
-			// and set it to render if this route is still mounted
-			this.setState({ component });
-		});
+		resolver()
+			.then(getComponentStateSetter(key))
+			.then(setter => this.setState(setter));
 	}
+
+	/*
+	 * New props may correspond to a route change. If so, this function sets the
+	 * component to render
+	 */
+	componentWillReceiveProps(nextProps: Props) {
+		const { match, route } = nextProps;
+		if (route === this.props.route && match === this.props.match) {
+			return; // no new route, just re-render normally
+		}
+
+		if (route.component) {
+			this.setState(state => ({ component: route.component }));
+			return;
+		}
+
+		this.setState(state => ({ component: PassThrough }));
+		// Component needs to be resolved - just render children for now
+		this.resolveComponent(route.getComponent);
+	}
+
 	render() {
 		const { match, route, ...props } = this.props;
 
