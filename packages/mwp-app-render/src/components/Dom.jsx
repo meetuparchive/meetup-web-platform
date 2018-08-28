@@ -74,7 +74,7 @@ const DOM = props => {
 		: false;
 
 	const uxCaptureFilename = require.resolve('ux-capture/js/ux-capture.min.js');
-	const uxCaptureJS = fs.readFileSync(uxCaptureFilename, 'utf-8');
+	const uxCaptureJS = fs.readFileSync(uxCaptureFilename, 'utf8');
 
 	return (
 		<html lang={htmlLang}>
@@ -83,8 +83,7 @@ const DOM = props => {
 				{head.meta.toComponent()}
 				{head.link.toComponent()}
 				{head.script.toComponent()}
-				{uxCaptureJS &&
-					<script dangerouslySetInnerHTML={getInnerHTML(uxCaptureJS)} />}
+				<script dangerouslySetInnerHTML={getInnerHTML(uxCaptureJS)} />
 				{newrelicJS &&
 					<script dangerouslySetInnerHTML={getInnerHTML(newrelicJS)} />}
 				{cssLinks &&
