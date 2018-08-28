@@ -4,6 +4,7 @@
  *
  * @module CacheMiddleware
  */
+import { combineEpics } from '../redux-promise-epic';
 import { API_REQ, API_RESP_SUCCESS } from '../sync/apiActionCreators';
 import { CACHE_CLEAR, CACHE_SET, cacheSuccess } from './cacheActionCreators';
 
@@ -69,7 +70,13 @@ export const cacheQueryEpic = cache => (action, store) => {
 		.then(hits => hits.map(cacheSuccess)); // map the hits onto cacheSuccess actions
 };
 
-export default (cache = makeCache()) =>
+const getCacheEpic = (cache = makeCache()) =>
 	checkEnable()
-		? [cacheClearEpic(cache), cacheSetEpic(cache), cacheQueryEpic(cache)]
-		: [action => Promise.resolve([])];
+		? combineEpics(
+				cacheClearEpic(cache),
+				cacheSetEpic(cache),
+				cacheQueryEpic(cache)
+			)
+		: action => Promise.resolve([]);
+
+export default getCacheEpic;
