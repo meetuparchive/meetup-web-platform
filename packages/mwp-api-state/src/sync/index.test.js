@@ -15,7 +15,7 @@ import {
 import { CACHE_CLEAR } from '../cache/cacheActionCreators';
 import * as api from './apiActionCreators';
 import * as syncActionCreators from './syncActionCreators';
-import getSyncEpic, {
+import getSyncEpics, {
 	getFetchQueriesEpic,
 	getNavEpic,
 	apiRequestToApiReq,
@@ -32,14 +32,15 @@ const MAKE_MOCK_FIND_MATCHES = (queryFn = () => ({ params: {} })) => () => [
 	},
 ];
 
+const flattenArray = arrays => [].concat.apply([], arrays);
 /**
  * @module SyncEpicTest
  */
 describe('Sync epic', () => {
 	it('does not emit actions for undefined action input', () =>
-		getSyncEpic(MOCK_ROUTES)({ type: 'asdf' }).then(actions =>
-			expect(actions).toHaveLength(0)
-		));
+		Promise.all(getSyncEpics(MOCK_ROUTES).map(e => e({ type: 'asdf' })))
+			.then(flattenArray)
+			.then(actions => expect(actions).toHaveLength(0)));
 	describe('getNavEpic', () => {
 		it('emits API_REQ for nav-related actions with matched query', function() {
 			const locationChange = {
@@ -227,6 +228,7 @@ describe('Sync epic', () => {
 
 			const queries = [mockQuery({})];
 			const apiRequest = api.get(queries);
+			apiRequest.meta.request.catch(() => {}); // ignore the rejected request
 			const fakeStore = createFakeStore(MOCK_APP_STATE);
 			return getFetchQueriesEpic(MAKE_MOCK_FIND_MATCHES(), mockFetchQueries)(
 				apiRequest,
