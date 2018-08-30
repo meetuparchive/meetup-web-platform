@@ -4,8 +4,7 @@
 	"description": "A minimal MWP consumer application that can be used for performance testing",
 	"engineStrict": true,
 	"engines": {
-		"node": "^8.11.4",
-		"yarn": "1.9.4"
+		"node": ">=8.9.0"
 	},
 	"config": {},
 	"main": "./lib/index.js",
