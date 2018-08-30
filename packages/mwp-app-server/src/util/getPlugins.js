@@ -159,7 +159,7 @@ export default function getPlugins({ languageRenderers }) {
 			].join(' '),
 			connectSrc: '*',
 			frameSrc: '*',
-			imgSrc: '*',
+			imgSrc: '* data:',
 			styleSrc: ['*', CSP_KEYWORDS.unsafeInline].join(' '),
 			scriptSrc: ['*', CSP_KEYWORDS.unsafeEval, CSP_KEYWORDS.unsafeInline].join(
 				' '
