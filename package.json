@@ -4,8 +4,7 @@
   "description": "A collection of Node web application utilities for the Meetup web platform",
   "engineStrict": true,
   "engines": {
-    "node": "^8.11.4",
-    "yarn": "1.9.4"
+    "node": ">=8.9.0"
   },
   "main": "./lib/index.js",
   "config": {
