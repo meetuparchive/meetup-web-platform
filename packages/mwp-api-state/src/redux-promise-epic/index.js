@@ -1,16 +1,17 @@
 // type Epic = (action: Action, store: ReduxStore) => Promise<Array<Action>>
-export const createMiddleware = (...epics) => {
-	const callEpics = makeCallEpics(...epics);
+export const createEpicMiddleware = epic => {
 	return store => next => action => {
-		// call all epics with action + store, dispatch immediately as actions get resolved
-		callEpics(action, store);
+		// need to execute epics in the next tick in order to ensure that that state
+		// has been updated by reducers
+		Promise.resolve().then(() =>
+			epic(action, store).then(actions => {
+				actions.forEach(a => store.dispatch(a));
+			})
+		);
 		return next(action);
 	};
 };
-export const makeCallEpics = (...epics) => (action, store) =>
-	// using .map here so that tests have access to the Promises that are created
-	epics.map(e =>
-		e(action, store).then(actions => {
-			actions.forEach(a => store.dispatch(a));
-		})
-	);
+
+const flattenArray = arrays => [].concat.apply([], arrays);
+export const combineEpics = (...epics) => (action, store) =>
+	Promise.all(epics.map(e => e(action, store))).then(flattenArray);

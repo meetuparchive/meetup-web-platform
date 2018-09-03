@@ -4,6 +4,7 @@
  *
  * @module CacheMiddleware
  */
+import { combineEpics } from '../redux-promise-epic';
 import { API_REQ, API_RESP_SUCCESS } from '../sync/apiActionCreators';
 import { CACHE_CLEAR, CACHE_SET, cacheSuccess } from './cacheActionCreators';
 
@@ -29,8 +30,7 @@ export const cacheClearEpic = cache => action => {
 	return cache.clear().then(() => []);
 };
 
-const getMemberId = state =>
-	(((state.api.self || {}).value || {}).id || 0).toString();
+const getMemberId = state => state.config.memberId.toString();
 
 /**
  * Listen for any action that should set cached state with a
@@ -70,7 +70,13 @@ export const cacheQueryEpic = cache => (action, store) => {
 		.then(hits => hits.map(cacheSuccess)); // map the hits onto cacheSuccess actions
 };
 
-export default (cache = makeCache()) =>
+const getCacheEpic = (cache = makeCache()) =>
 	checkEnable()
-		? [cacheClearEpic(cache), cacheSetEpic(cache), cacheQueryEpic(cache)]
-		: [action => Promise.resolve([])];
+		? combineEpics(
+				cacheClearEpic(cache),
+				cacheSetEpic(cache),
+				cacheQueryEpic(cache)
+			)
+		: action => Promise.resolve([]);
+
+export default getCacheEpic;

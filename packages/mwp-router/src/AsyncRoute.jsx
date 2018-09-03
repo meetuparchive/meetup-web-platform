@@ -65,17 +65,21 @@ class AsyncRoute extends React.Component<Props, State> {
 		const key = keyFromRoute(route);
 		const cached = _componentCache[key];
 		if (cached) {
-			this.setState({ component: cached });
+			// something has been cached for this - no need to fetch
+			if (this.state.component !== cached) {
+				this.setState({ component: cached });
+			}
 			return;
 		}
+		_componentCache[key] === Placeholder;
 		// not cached yet - go get it
 		route.getComponent().then(component => {
 			// now cache it
 			_componentCache[key] = component;
-			if (this.stopLoading) {
+			// and set it to render if this route is still mounted and not already in sync
+			if (this.stopLoading || this.state.component === component) {
 				return;
 			}
-			// and set it to render if this route is still mounted
 			this.setState({ component });
 		});
 	}

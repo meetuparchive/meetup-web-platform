@@ -1,7 +1,7 @@
 {
-  "name": "mwp-app-render",
-  "version": "0.0.1",
-  "description": "MWP application rendering tools",
+  "name": "mwp-csp-plugin",
+  "version": "1.0.0",
+  "description": "Sets content security policy headers",
   "engineStrict": true,
   "engines": {
     "node": ">=8.1.0"
@@ -20,19 +20,8 @@
     "url": "https://github.com/meetup/meetup-web-platform/issues"
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
-  "peerDependencies": {
-    "mwp-router": ">=0.0.1",
-    "prop-types": "^15.6.0",
-    "react": "^16.3.1",
-    "react-helmet": "^5.2.0",
-    "react-redux": "^5.0.6",
-    "react-router-dom": "^4.2.2",
-    "redux": "^3.7.2"
-  },
   "dependencies": {
-    "browser-detect": "0.2.22",
-    "escape-html": "1.0.3",
-    "ux-capture": "1.0.7"
-  },
-  "devDependencies": {}
+    "blankie": "4.0.0",
+    "scooter": "5.0.0"
+  }
 }

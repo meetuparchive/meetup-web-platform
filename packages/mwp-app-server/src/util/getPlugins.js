@@ -10,6 +10,14 @@ import { plugin as languagePlugin } from 'mwp-language-plugin';
 import { plugin as serviceWorkerPlugin } from 'mwp-sw-plugin';
 import { plugin as apiProxyPlugin } from 'mwp-api-proxy-plugin';
 import { plugin as requestAuthPlugin } from 'mwp-auth-plugin';
+import { plugin as cspPlugin } from 'mwp-csp-plugin';
+
+// single quotes are required around these keywords
+const CSP_KEYWORDS = {
+	self: "'self'",
+	unsafeInline: "'unsafe-inline'",
+	unsafeEval: "'unsafe-eval'",
+};
 
 /**
  * Hapi plugins for the dev server
@@ -92,6 +100,13 @@ export function getCsrfPlugin(electrodeOptions) {
 	};
 }
 
+export function getCspPlugin(options) {
+	return {
+		plugin: cspPlugin,
+		options,
+	};
+}
+
 export function getAppRoutePlugin(options) {
 	return {
 		plugin: appRoutePlugin,
@@ -119,7 +134,11 @@ export function getActivityTrackingPlugin({ agent, isProdApi }) {
 }
 
 export default function getPlugins({ languageRenderers }) {
-	const { package: { agent }, getServer } = config;
+	const {
+		package: { agent },
+		getServer,
+		env: { schema: { asset_server } },
+	} = config;
 	const server = getServer();
 	const isProdApi = server.properties.api.isProd;
 
@@ -131,6 +150,21 @@ export default function getPlugins({ languageRenderers }) {
 		getCsrfPlugin({
 			headerName: CSRF_HEADER_NAME,
 			cookieName: CSRF_COOKIE_NAME,
+		}),
+		getCspPlugin({
+			defaultSrc: [
+				CSP_KEYWORDS.self,
+				'*.meetup.com',
+				`*.dev.meetup.com:${asset_server.port.default}`,
+			].join(' '),
+			connectSrc: '*',
+			frameSrc: '*',
+			imgSrc: '* data:',
+			styleSrc: ['*', CSP_KEYWORDS.unsafeInline].join(' '),
+			scriptSrc: ['*', CSP_KEYWORDS.unsafeEval, CSP_KEYWORDS.unsafeInline].join(
+				' '
+			),
+			generateNonces: 'false',
 		}),
 		requestAuthPlugin,
 		getActivityTrackingPlugin({ agent, isProdApi }),

@@ -1,8 +1,6 @@
 ## [17.1]
 
--   **Refactor** `AsyncRoute` refactored to be React 17 compatible, with improved
-    component caching. `SyncContainer` and `ServiceWorker` are now non-rendering
-    components that purely provide side effects.
+-   **NEW FEATURE** Create 'mwp-csp-plugin' which adds some useful security headers
 
 ## [17.0]
 
@@ -16,7 +14,7 @@
 
 ## [16.5]
 
--   **New feature** the API proxy path prefix can now be specified using an app's
+-   **NEW FEATURE** the API proxy path prefix can now be specified using an app's
     `package.json` file by specifying `config.apiProxyPath` with a leading slash,
     e.g. `/mu_api`, or by an env variable `API_PROXY_PATH`.
 

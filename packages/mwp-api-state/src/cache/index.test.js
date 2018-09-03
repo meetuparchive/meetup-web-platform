@@ -8,7 +8,7 @@ import * as api from '../sync/apiActionCreators';
 
 import { makeCache } from './util';
 import { CACHE_CLEAR, CACHE_SUCCESS } from './cacheActionCreators';
-import getCacheEpics from './';
+import getCacheEpic from './';
 
 const MOCK_QUERY = mockQuery(MOCK_RENDERPROPS);
 const MOCK_SUCCESS_ACTION = api.success({
@@ -19,17 +19,14 @@ const apiRequestAction = api.get(MOCK_QUERY);
 
 const fakeStore = {
 	getState() {
-		return { api: {} };
+		return { api: {}, config: { memberId: 0 } };
 	},
 	dispatch() {},
 	subscribe() {},
 };
 
-const flattenArray = arrays => [].concat.apply([], arrays);
 function makeCacheEpic() {
-	const cacheEpics = getCacheEpics(makeCache());
-	return (action, store) =>
-		Promise.all(cacheEpics.map(e => e(action, store))).then(flattenArray);
+	return Promise.resolve(getCacheEpic(makeCache()));
 }
 function populateCacheEpic(CacheEpic) {
 	// set the cache with API_SUCCESS
@@ -49,19 +46,22 @@ const testForPopulatedCache = (action = apiRequestAction) => CacheEpic =>
 		expect(actions.map(({ type }) => type)).toContain(CACHE_SUCCESS)
 	);
 
-describe('getCacheEpics', () => {
+describe('getCacheEpic', () => {
 	it('does not pass through arbitrary actions', () =>
-		Promise.all(getCacheEpics().map(e => e({ type: 'asdf' })))
-			.then(flattenArray)
-			.then(actions => expect(actions).toHaveLength(0)));
+		getCacheEpic()({ type: 'asdf' }).then(actions =>
+			expect(actions).toHaveLength(0)
+		));
 	it('does not emit CACHE_SUCCESS when no cache hit from API_REQ', () =>
-		testForEmptyCache()(makeCacheEpic()));
+		makeCacheEpic().then(testForEmptyCache()));
 
 	it('emits CACHE_SUCCESS when there is a cache hit for API_REQ', () =>
-		populateCacheEpic(makeCacheEpic()).then(testForPopulatedCache()));
+		makeCacheEpic()
+			.then(populateCacheEpic) // also indirectly testing for successful cache set on API_SUCCESS
+			.then(testForPopulatedCache()));
 
 	it('does not emit CACHE_SUCCESS after CACHE_CLEAR is dispatched', () =>
-		populateCacheEpic(makeCacheEpic())
+		makeCacheEpic()
+			.then(populateCacheEpic)
 			.then(clearCacheEpic)
 			.then(testForEmptyCache()));
 });
