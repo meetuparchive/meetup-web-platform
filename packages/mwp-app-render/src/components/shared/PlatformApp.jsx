@@ -11,11 +11,11 @@ class PlatformApp extends React.Component {
 		const { store, routes } = this.props;
 		return (
 			<Provider store={store}>
-				<ServiceWorker>
-					<SyncContainer>
-						<RouteLayout routes={routes} />
-					</SyncContainer>
-				</ServiceWorker>
+				<React.Fragment>
+					<ServiceWorker />
+					<SyncContainer />
+					<RouteLayout routes={routes} />
+				</React.Fragment>
 			</Provider>
 		);
 	}
