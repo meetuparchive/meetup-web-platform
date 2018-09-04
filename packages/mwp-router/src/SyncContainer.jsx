@@ -34,7 +34,7 @@ export class SyncContainer extends React.Component<Props> {
 		}
 	}
 	render() {
-		return null;
+		return this.props.children;
 	}
 }
 
