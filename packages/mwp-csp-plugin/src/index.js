@@ -7,6 +7,10 @@ export function register(
 	options: ?{ [string]: string }
 ): Promise<any> {
 	server.ext('onPreResponse', (request, h) => {
+		if (request.response.isBoom) {
+			// don't set headers on error objects
+			return h.continue;
+		}
 		// Tells browser that it should only be accessed using HTTPS & how long to remember that
 		request.response.header('Strict-Transport-Security', 'max-age=7776000'); // 3 months
 
