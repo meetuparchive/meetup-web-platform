@@ -5,7 +5,7 @@ import { API_PROXY_PLUGIN_NAME } from '../config';
 import { coerceBool, toCamelCase } from './stringUtils';
 
 // match escpaed unicode characters that are treated as newline literals in JS
-const ESCAPED_UNICODE_NEWLINES = /\\u2028|\\u2029/g;
+const ESCAPED_UNICODE_NEWLINES = /\u2028|\u2029/g;
 
 /**
  * Convert the X-Meetup-Variants response header into a state-ready object

@@ -139,10 +139,10 @@ describe('parseApiValue', () => {
 		);
 	});
 	it('returns a value without any JS-literal unfriendly newline characters', () => {
-		const fragileValue = 'foo \\u2028 \\u2029';
+		const fragileValue = 'foo \u2028 \u2029';
 		const fragileJSON = JSON.stringify({ foo: fragileValue });
 		const parsed = parseApiValue([MOCK_RESPONSE, fragileJSON]).value.foo;
-		expect(parsed).toEqual('foo \\n \\n');
+		expect(parsed).toEqual('foo \n \n');
 	});
 });
 
