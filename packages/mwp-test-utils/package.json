@@ -4,7 +4,8 @@
   "description": "Helpers for running unit tests in MWP apps",
   "engineStrict": true,
   "engines": {
-    "node": ">=8.1.0"
+    "node": "^8.11.4",
+    "yarn": "1.9.4"
   },
   "main": "./lib/index.js",
   "scripts": {
