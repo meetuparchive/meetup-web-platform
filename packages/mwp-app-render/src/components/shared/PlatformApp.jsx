@@ -13,9 +13,8 @@ class PlatformApp extends React.Component {
 			<Provider store={store}>
 				<React.Fragment>
 					<ServiceWorker />
-					<SyncContainer>
-						<RouteLayout routes={routes} />
-					</SyncContainer>
+					<SyncContainer />
+					<RouteLayout routes={routes} />
 				</React.Fragment>
 			</Provider>
 		);
