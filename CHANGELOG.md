@@ -1,11 +1,10 @@
 ## [17.1]
-
--   **NEW FEATURE** Create 'mwp-csp-plugin' which adds some useful security headers
+- **NEW FEATURE** Create 'mwp-csp-plugin' which adds some useful security headers
 
 ## [17.0]
 
--   **BREAKING CHANGE** Upgrade to hapi v17, which requires updating of
-    much of the platform code. Consumer apps that leverage the hapi server
+-  **BREAKING CHANGE** Upgrade to hapi v17, which requires updating of
+   much of the platform code. Consumer apps that leverage the hapi server
 
 ## [16.6]
 
