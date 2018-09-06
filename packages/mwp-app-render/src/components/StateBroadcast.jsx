@@ -14,6 +14,7 @@ export class StateBroadcastComponent extends React.PureComponent<Props> {
 	render() {
 		// don't actually need to render - this.props.state will always contain
 		// latest Redux state
+		return null;
 	}
 }
 
