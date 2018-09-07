@@ -5,7 +5,8 @@ import { API_PROXY_PLUGIN_NAME } from '../config';
 import { coerceBool, toCamelCase } from './stringUtils';
 
 // match escpaed unicode characters that are treated as newline literals in JS
-const ESCAPED_UNICODE_NEWLINES = /\u2028|\u2029/g;
+const UNICODE_NEWLINES = /\u2028|\u2029/g;
+const ESCAPED_UNICODE_NEWLINES = /\\u2028|\\u2029/g;
 
 /**
  * Convert the X-Meetup-Variants response header into a state-ready object
@@ -98,7 +99,9 @@ const parseBody = body => {
 	// Some newline literals will not work in JS string literals - they must be
 	// converted to an escaped newline character that will work end to end ('\n')
 	// treat non-success HTTP code as an error
-	const safeBody = body.replace(ESCAPED_UNICODE_NEWLINES, '\\n');
+	const safeBody = body
+		.replace(UNICODE_NEWLINES, '\n')
+		.replace(ESCAPED_UNICODE_NEWLINES, '\\n');
 	return JSON.parse(safeBody);
 };
 
