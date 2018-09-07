@@ -100,7 +100,7 @@ const parseBody = body => {
 	// converted to an escaped newline character that will work end to end ('\n')
 	// treat non-success HTTP code as an error
 	const safeBody = body
-		.replace(UNICODE_NEWLINES, '\n')
+		.replace(UNICODE_NEWLINES, '\\n')
 		.replace(ESCAPED_UNICODE_NEWLINES, '\\n');
 	return JSON.parse(safeBody);
 };
