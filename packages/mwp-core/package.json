@@ -23,7 +23,7 @@
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "peerDependencies": {
     "mwp-router": ">=0.0.1",
-    "newrelic": "^3.3.1",
+    "newrelic": "^4.8.1",
     "react": "^16.3.1",
     "react-dom": "^16.4.2",
     "react-helmet": "^5.2.0",

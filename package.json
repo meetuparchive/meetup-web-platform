@@ -72,7 +72,7 @@
     "meetup-web-mocks": "1.0.217",
     "mwp-router": ">=0.0.1",
     "mwp-test-utils": ">=0.0.1",
-    "newrelic": "3.3.1",
+    "newrelic": "^4.8.1",
     "node-fetch": "1.7.2",
     "prettier": "1.5.2",
     "prop-types": "15.6.0",
