@@ -1,3 +1,7 @@
+## [17.2]
+- **NEW FEATURE** Add whole member cookie to initial redux configuration on server 
+	render. Deprecate memberId property in the config. 
+
 ## [17.1]
 - **NEW FEATURE** Create 'mwp-csp-plugin' which adds some useful security headers
 
