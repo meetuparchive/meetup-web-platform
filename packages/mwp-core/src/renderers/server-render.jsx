@@ -245,19 +245,9 @@ const makeRenderer = (
 					initialNow: new Date().getTime(),
 					isProdApi: server.settings.app.api.isProd,
 					isQL: parseMemberCookie(state).ql === 'true',
-					/**
-					 * Original tickets that caused need:
-					 * 
-					 * @see https://meetup.atlassian.net/browse/MG-2473
-					 * @see https://meetup.atlassian.net/browse/MG-2441
-					 * 
-					 * For segmentation and rollout purposes, it is extremely advantageous
-					 * to have the member object available pre query to do split tests
-					 * based off of things like the member's id or location.
-					 * 
-					 * If the member is not logged in, this will return an empty object
-					 * with a member id of 0.
-					 */
+					memberId: parseMemberCookie(state).id, // deprecated, use member.id
+					// the member cookie is not the same as the member object returned from /member/self
+					// be careful relying on it to have the same properties downstream
 					member: parseMemberCookie(state),
 					variants: getVariants(state),
 					entryPath: url.pathname, // the path that the user entered the app on

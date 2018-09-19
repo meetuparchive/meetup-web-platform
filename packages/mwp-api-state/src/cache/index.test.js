@@ -19,7 +19,7 @@ const apiRequestAction = api.get(MOCK_QUERY);
 
 const fakeStore = {
 	getState() {
-		return { api: {}, config: { memberId: 0 } };
+		return { api: {}, config: { member: { id: 0 } } };
 	},
 	dispatch() {},
 	subscribe() {},
