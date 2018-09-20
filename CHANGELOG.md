@@ -1,6 +1,8 @@
 ## [17.2]
-- **NEW FEATURE** Add whole member cookie to initial redux configuration on server 
-	render. Deprecate memberId property in the config. 
+- **NEW FEATURE** Add member data from the encdoed member cookie to initial redux configuration on server 
+	render.
+- **DEPRECATED** `state.config.memberId` should not be used. Reference `state.config.member.id`
+   instead, which is guaranteed to be populated.
 
 ## [17.1]
 - **NEW FEATURE** Create 'mwp-csp-plugin' which adds some useful security headers
