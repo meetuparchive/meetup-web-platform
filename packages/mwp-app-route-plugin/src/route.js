@@ -51,7 +51,7 @@ export default (languageRenderers: { [string]: LanguageRenderer }) => ({
 				enabled: true, // need to generate tokens on page request
 			},
 			'mwp-tracking-plugin': {
-				click: () => true, // always
+				click: () => true, // always track clicks on server render
 			},
 		},
 		state: {
