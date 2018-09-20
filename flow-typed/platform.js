@@ -34,6 +34,7 @@ declare type MWPState = {
 					scope?: string,
 					// whether the member selected remember me or not
 					rem?: number,
+					// whether the member is an organizer or not
 					org?: 1,
 				|}
 			| {| id: 0 |},
