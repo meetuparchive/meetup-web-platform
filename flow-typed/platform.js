@@ -16,6 +16,28 @@ declare type MWPState = {
 		enableServiceWorker: boolean,
 		requestLanguage: string,
 		supportedLangs: Array<string>,
+		member:
+			| {|
+					id: number,
+					status: number,
+					timestamp: number,
+					bs: number,
+					// time zone
+					tz: string,
+					zip: number,
+					country: string,
+					city: string,
+					state?: string,
+					lat: number,
+					lon: number,
+					ql: boolean,
+					scope?: string,
+					// whether the member selected remember me or not
+					rem?: number,
+					// whether the member is an organizer or not
+					org?: 1,
+				|}
+			| {| id: 0 |},
 		initialNow: number,
 		isQL: boolean,
 		variants: mixed,
@@ -88,7 +110,10 @@ declare type QueryResponse = {
 	error?: string,
 };
 
-declare type QueryFunction = (location: { [string]: mixed }, state: MWPState) => Query;
+declare type QueryFunction = (
+	location: { [string]: mixed },
+	state: MWPState
+) => Query;
 
 type BasePlatformRoute = {|
 	path?: string,
