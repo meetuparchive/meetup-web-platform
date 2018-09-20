@@ -21,6 +21,7 @@ declare type MWPState = {
 					id: number,
 					status: number,
 					timestamp: number,
+					// board status, related to permissions on message boards https://github.com/meetup/meetup/blob/master/modules/base/src/main/java/com/meetup/base/util/MeetupStatus.java#L743-L752
 					bs: number,
 					// time zone
 					tz: string,
