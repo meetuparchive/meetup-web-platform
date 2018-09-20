@@ -1,5 +1,6 @@
 // @flow
 import clickReader from './util/clickReader';
+export { default as clickMiddleware } from './util/clickMiddleware';
 
 export const CLICK_PLUGIN_NAME = 'mwp-click-tracking';
 
@@ -8,13 +9,16 @@ export function onPreHandlerExtension(
 	h: HapiResponseToolkit
 ) {
 	try {
-		clickReader(request, h);
+		const pluginSettings = request.route.settings.plugins[CLICK_PLUGIN_NAME];
+		if (
+			pluginSettings &&
+			pluginSettings.click &&
+			pluginSettings.click(request)
+		) {
+			return clickReader(request, h);
+		}
 	} catch (err) {
-		request.server.app.logger.error({
-			err,
-			context: request,
-			...request.raw,
-		});
+		request.server.app.logger.error({ err, context: request, ...request.raw });
 	}
 	return h.continue;
 }
