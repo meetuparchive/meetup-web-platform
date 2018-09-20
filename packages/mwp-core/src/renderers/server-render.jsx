@@ -246,7 +246,7 @@ const makeRenderer = (
 					isProdApi: server.settings.app.api.isProd,
 					isQL: parseMemberCookie(state).ql === 'true',
 					memberId: parseMemberCookie(state).id, // deprecated, use member.id
-					// the member cookie is not the same as the member object returned from /member/self
+					// the member cookie is not structured the same way as the member object returned from /member/self
 					// be careful relying on it to have the same properties downstream
 					member: parseMemberCookie(state),
 					variants: getVariants(state),
