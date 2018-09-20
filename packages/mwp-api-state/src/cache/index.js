@@ -30,7 +30,7 @@ export const cacheClearEpic = cache => action => {
 	return cache.clear().then(() => []);
 };
 
-const getMemberId = state => state.config.memberId.toString();
+const getMemberId = state => state.config.member.id.toString();
 
 /**
  * Listen for any action that should set cached state with a
