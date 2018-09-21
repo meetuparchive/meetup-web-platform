@@ -12,7 +12,7 @@ export function onPreHandlerExtension(
 		const pluginSettings =
 			request.route.settings.plugins[CLICK_PLUGIN_NAME] || {};
 		if (pluginSettings.click && pluginSettings.click(request)) {
-			return clickReader(request, h);
+			clickReader(request, h);
 		}
 	} catch (err) {
 		request.server.app.logger.error({ err, context: request, ...request.raw });

@@ -10,13 +10,12 @@ export const clickMiddleware = store => next => action => {
 	return next(action);
 };
 
-const parseClick = getClickParser();
-
 export const clickTrackEnhancer = createStore => (
 	reducer,
 	initialState,
 	enhancer
 ) => {
+	const parseClick = getClickParser();
 	const store = createStore(reducer, initialState, enhancer);
 	const clickTracker = e => {
 		setTimeout(() => store.dispatch(parseClick(e)), 0);

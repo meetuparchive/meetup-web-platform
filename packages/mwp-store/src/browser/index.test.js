@@ -4,7 +4,7 @@ import { getInitialState, getBrowserCreateStore } from './';
 
 const MOCK_ROUTES = {};
 
-// skipping these tests until we set up a jsdom-based test runner for browser modules
+// skipping these tests until we set up a jsdom-based test runner for browser s
 describe.skip('getBrowserCreateStore', () => {
 	global.window = {};
 	global.Event = function() {};
