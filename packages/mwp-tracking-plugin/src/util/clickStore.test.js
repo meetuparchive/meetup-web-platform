@@ -1,5 +1,11 @@
 import { createStore } from 'redux';
-import { clickTrackEnhancer } from './clickStore';
+import { clickTrackEnhancer, clickMiddleware } from './clickStore';
+const mockClickState = require('./clickState');
+
+jest.mock('./clickState', () => ({
+	CLICK_TRACK_ACTION: 'foo',
+	appendClick: jest.fn(),
+}));
 
 const IDENTITY_REDUCER = state => state;
 
@@ -22,5 +28,28 @@ describe.skip('clickTrackEnhancer', () => {
 
 		expect(eventNames).toEqual(['click', 'change']);
 		expect(handlers.every(h => h instanceof Function)).toBe(true);
+	});
+});
+
+describe('clickMiddleware', () => {
+	// export const clickMiddleware = store => next => action => {
+	// 	if (action.type === CLICK_TRACK_ACTION) {
+	// 		appendClick(action);
+	// 	}
+	// 	return next(action);
+	// };
+	test('calls appendClick with CLICK_TRACK_ACTIONs', () => {
+		const action = {
+			type: mockClickState.CLICK_TRACK_ACTION,
+		};
+		const [store, next] = [{}, () => {}];
+		clickMiddleware(store)(next)(action);
+		expect(mockClickState.appendClick).toHaveBeenCalledWith(action);
+	});
+	test('does not call appendClick with arbitrary action', () => {
+		const action = { type: 'ghost chips' };
+		const [store, next] = [{}, () => {}];
+		clickMiddleware(store)(next)(action);
+		expect(mockClickState.appendClick).not.toHaveBeenCalledWith(action);
 	});
 });
