@@ -29,9 +29,8 @@ const getApiProxyRoutes = path => {
 				},
 				'mwp-tracking-plugin': {
 					click: request => {
-						// only consume click data when the querystring indicates that it should be consumed
-						// this allows the client to avoid invoking click parsing for lazy-loaded API requests
-						if (request.query.metadata) {
+						// only consume click data when the querystring includes `?metadata={clickTracking:true}` (rison-encoded)
+						if (!request.query.metadata) {
 							return false;
 						}
 						return Boolean(

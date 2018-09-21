@@ -1,28 +1,15 @@
 // @flow weak
 import { applyMiddleware, createStore, compose } from 'redux';
-import getClickWriter from 'mwp-tracking-plugin/lib/util/clickWriter';
-import { clickMiddleware } from 'mwp-tracking-plugin/lib/click';
+import {
+	clickMiddleware,
+	clickTrackEnhancer,
+} from 'mwp-tracking-plugin/lib/click';
 import { getApiMiddleware } from 'mwp-api-state';
 
 import catchMiddleware from '../middleware/catch';
 import fetchQueries from './fetchQueries';
 
-declare var document: Object; // ignore 'potentially null' document.body
-
 const noopMiddleware = store => next => action => next(action);
-
-export const clickTrackEnhancer = createStore => (
-	reducer,
-	initialState,
-	enhancer
-) => {
-	const store = createStore(reducer, initialState, enhancer);
-	const clickTracker = getClickWriter(store);
-	document.body.addEventListener('click', clickTracker);
-	document.body.addEventListener('change', clickTracker);
-
-	return store;
-};
 
 /**
  * the initial state is delivered in the HTML from the server as a plain object
