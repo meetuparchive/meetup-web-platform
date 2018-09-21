@@ -1,12 +1,11 @@
-import { createStore } from 'redux';
 import { testCreateStore } from 'mwp-test-utils';
 
-import { clickTrackEnhancer, getInitialState, getBrowserCreateStore } from './';
+import { getInitialState, getBrowserCreateStore } from './';
 
 const MOCK_ROUTES = {};
-const IDENTITY_REDUCER = state => state;
 
-describe('clickTrackEnhancer', () => {
+// skipping these tests until we set up a jsdom-based test runner for browser modules
+describe.skip('getBrowserCreateStore', () => {
 	global.window = {};
 	global.Event = function() {};
 	global.document = {
@@ -14,24 +13,17 @@ describe('clickTrackEnhancer', () => {
 			addEventListener() {},
 		},
 	};
-	it('adds event listeners to document.body', () => {
-		spyOn(global.document.body, 'addEventListener');
-		const enhancedCreateStore = clickTrackEnhancer(createStore);
-		enhancedCreateStore(IDENTITY_REDUCER);
-		const args = global.document.body.addEventListener.calls.allArgs();
-		const eventNames = args.map(a => a[0]);
-		const handlers = args.map(a => a[1]);
-
-		expect(eventNames).toEqual(['click', 'change']);
-		expect(handlers.every(h => h instanceof Function)).toBe(true);
-	});
-});
-
-describe('getBrowserCreateStore', () => {
 	testCreateStore(getBrowserCreateStore(MOCK_ROUTES, []));
 });
 
 describe('getInitialState', () => {
+	global.window = {};
+	global.Event = function() {};
+	global.document = {
+		body: {
+			addEventListener() {},
+		},
+	};
 	const injectedState = { foo: 'bar' };
 	global.document.createElement = jest.fn(() => {
 		return {

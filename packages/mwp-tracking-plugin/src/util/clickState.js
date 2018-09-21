@@ -21,18 +21,18 @@ export const setClickCookie = clickTracking => {
 	const cookieVal = JSON.stringify(clickTracking);
 	BrowserCookies.set(COOKIE_NAME, cookieVal, { domain });
 };
+export const getClickCookie = () => BrowserCookies.get(COOKIE_NAME);
+
+export const appendClick = action =>
+	setClickCookie(reducer(getClickCookie(), action));
 
 export const CLICK_TRACK_ACTION = 'CLICK_TRACK';
-export const CLICK_TRACK_CLEAR_ACTION = 'CLICK_TRACK_CLEAR';
-// constant 'clear' action object
-const _CLICK_TRACK_CLEAR = { type: CLICK_TRACK_CLEAR_ACTION };
 
 export const actions = {
 	click: clickData => ({
 		type: CLICK_TRACK_ACTION,
 		payload: clickData,
 	}),
-	clear: () => _CLICK_TRACK_CLEAR,
 };
 
 export const DEFAULT_CLICK_TRACK = { history: [] };
@@ -50,9 +50,6 @@ export function reducer(state = DEFAULT_CLICK_TRACK, action) {
 			...state,
 			history,
 		};
-	}
-	if (action.type === CLICK_TRACK_CLEAR_ACTION) {
-		return DEFAULT_CLICK_TRACK;
 	}
 	return state;
 }
