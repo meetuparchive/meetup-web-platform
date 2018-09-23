@@ -8,15 +8,6 @@ jest.mock('./util/clickReader', () => jest.fn());
 const h = { continue: Symbol('continue') };
 
 describe('onPreHandlerExtension', () => {
-	// try {
-	// 	const pluginSettings =
-	// 		request.route.settings.plugins[CLICK_PLUGIN_NAME] || {};
-	// 	if (pluginSettings.click && pluginSettings.click(request)) {
-	// 		return clickReader(request, h);
-	// 	}
-	// } catch (err) {
-	// 	request.server.app.logger.error({ err, context: request, ...request.raw });
-	// }
 	test('calls click test for settings.plugins', () => {
 		mockClickReader.mockClear();
 		const click = jest.fn(() => true);
