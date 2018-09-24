@@ -121,21 +121,6 @@ describe('fetchQueries', () => {
 			});
 		});
 
-		it('GET calls clickState.setClickCookie', () => {
-			const clickTracking = {
-				history: [{ bar: 'foo' }],
-			};
-			spyOn(global, 'fetch').and.callFake(fakeSuccess);
-
-			return fetchQueries(API_URL.toString())(getQueries, {
-				...meta,
-				clickTracking,
-				logout: true,
-			}).then(() => {
-				expect(clickState.setClickCookie).toHaveBeenCalledWith(clickTracking);
-			});
-		});
-
 		it('GET without meta calls fetch without metadata querystring params', () => {
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
 
