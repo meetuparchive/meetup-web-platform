@@ -17,7 +17,7 @@ type Props = {
  *
  * @see example https://github.com/meetup/ux-capture#image-elements
  */
-export default ({ mark, children }: Props) => {
+const UXCaptureEventMark = ({ mark, children }: Props) => {
 	// if child has on onLoad prop
 	// don't do anything
 	if (children.props.onLoad) {
@@ -28,3 +28,5 @@ export default ({ mark, children }: Props) => {
 		onLoad: `if(window.UX) { UX.mark('${mark}'); }`,
 	});
 };
+
+export default UXCaptureEventMark;
