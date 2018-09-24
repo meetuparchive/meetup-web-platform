@@ -3,7 +3,7 @@ import { applyMiddleware, createStore, compose } from 'redux';
 import {
 	clickMiddleware,
 	clickTrackEnhancer,
-} from 'mwp-tracking-plugin/lib/click';
+} from 'mwp-tracking-plugin/lib/util/clickStore';
 import { getApiMiddleware } from 'mwp-api-state';
 
 import catchMiddleware from '../middleware/catch';
