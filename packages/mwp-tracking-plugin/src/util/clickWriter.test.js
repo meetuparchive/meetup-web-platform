@@ -1,4 +1,4 @@
-import * as clickParser from './clickParser';
+import * as clickWriter from './clickWriter';
 
 /*
  * This test suite is disabled n Travis because tests don't have
@@ -28,18 +28,18 @@ xdescribe('trackStopPropagation', () => {
 		global.document = document;
 	});
 	it('adds Event.prototype.stopPropAndTrack', () => {
-		clickParser.trackStopPropagation(() => {});
+		clickWriter.trackStopPropagation(() => {});
 		expect(Event.prototype.stopPropAndTrack).toBeDefined();
 	});
 	it('overrides Event.prototype.stopPropagation', () => {
-		clickParser.trackStopPropagation(() => {});
+		clickWriter.trackStopPropagation(() => {});
 	});
 	it('calls supplied event handler on stopPropagation', () => {
 		const spyable = {
 			dummyListener() {},
 		};
 		spyOn(spyable, 'dummyListener');
-		clickParser.trackStopPropagation(spyable.dummyListener);
+		clickWriter.trackStopPropagation(spyable.dummyListener);
 		const evt = document.createEvent('HTMLEvents');
 		evt.initEvent('click', false, true);
 		document.body.dispatchEvent(evt);
@@ -52,7 +52,7 @@ xdescribe('trackStopPropagation', () => {
 				dummyListener() {},
 			};
 			spyOn(spyable, 'dummyListener');
-			clickParser.trackStopPropagation(spyable.dummyListener);
+			clickWriter.trackStopPropagation(spyable.dummyListener);
 			const evt = document.createEvent('HTMLEvents');
 			evt.initEvent('click', false, true);
 			document.body.dispatchEvent(evt);

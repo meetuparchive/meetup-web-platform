@@ -1,5 +1,6 @@
 import JSCookie from 'js-cookie';
 import rison from 'rison';
+import { setClickCookie } from 'mwp-tracking-plugin/lib/util/clickState';
 
 import { parseQueryResponse, getAuthedQueryFilter } from '../util/fetchUtils';
 
@@ -75,12 +76,17 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 
 	if (meta) {
 		const {
+			clickTracking,
 			onSuccess, // eslint-disable-line no-unused-vars
 			onError, // eslint-disable-line no-unused-vars
 			promise, // eslint-disable-line no-unused-vars
 			request, // eslint-disable-line no-unused-vars
 			...metadata
 		} = meta;
+
+		if (clickTracking) {
+			setClickCookie(clickTracking);
+		}
 
 		// send other metadata in searchParams
 		const encodedMetadata = metadata && rison.encode_object(metadata);
