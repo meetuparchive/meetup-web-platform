@@ -33,7 +33,7 @@
   "dependencies": {
     "browser-detect": "0.2.22",
     "escape-html": "1.0.3",
-    "ux-capture": "1.0.7"
+    "ux-capture": "1.0.8"
   },
   "devDependencies": {}
 }
