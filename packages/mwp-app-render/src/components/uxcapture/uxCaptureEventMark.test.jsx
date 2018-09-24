@@ -3,19 +3,25 @@ import { shallow } from 'enzyme';
 import UXCaptureEventMark from './UXCaptureEventMark';
 
 const MOCK_PROPS = {
-	browserEvent: 'onLoad',
 	mark: 'ux-image-load-logo',
 };
 
-const renderComponent = (props = MOCK_PROPS) =>
+const MOCK_CHILD = <img src="/foo" />;
+
+const renderComponent = (props = MOCK_PROPS, children = MOCK_CHILD) =>
 	shallow(
 		<UXCaptureEventMark {...props}>
-			<img src="/foo" />
+			{children}
 		</UXCaptureEventMark>
 	);
 
 describe('UXCaptureEventMark', () => {
 	it('renders component markup', () => {
 		expect(renderComponent()).toMatchSnapshot();
+	});
+
+	it('returns the child element untouched if it has an onLoad prop', () => {
+		const onLoadChild = <img src="/foo" onLoad="alert('hi');" />;
+		expect(renderComponent(MOCK_PROPS, onLoadChild)).toMatchSnapshot();
 	});
 });

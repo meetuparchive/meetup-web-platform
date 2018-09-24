@@ -1,14 +1,15 @@
 // @flow
 import * as React from 'react';
 
-type Props = {
-	browserEvent: string,
-	mark: string,
-	children: React$Element<*>,
-};
+type onLoadHTMLElements =
+	| React.Element<'iframe'>
+	| React.Element<'img'>
+	| React.Element<'input'>;
 
-const generateUXCaptureJS = (mark: string) =>
-	`if(window.UX) { UX.mark('${mark}'); }`;
+type Props = {
+	mark: string,
+	children: onLoadHTMLElements,
+};
 
 /**
  * takes only a *single* child element
@@ -16,7 +17,14 @@ const generateUXCaptureJS = (mark: string) =>
  *
  * @see example https://github.com/meetup/ux-capture#image-elements
  */
-export default ({ browserEvent, mark, children }: Props) =>
-	React.cloneElement(children, {
-		[browserEvent]: generateUXCaptureJS(mark),
+export default ({ mark, children }: Props) => {
+	// if child has on onLoad prop
+	// don't do anything
+	if (children.props.onLoad) {
+		return children;
+	}
+
+	return React.cloneElement(children, {
+		onLoad: `if(window.UX) { UX.mark('${mark}'); }`,
 	});
+};
