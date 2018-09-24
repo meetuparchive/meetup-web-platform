@@ -2,6 +2,7 @@ import { combineEpics } from '../redux-promise-epic';
 
 import { LOCATION_CHANGE, SERVER_RENDER } from 'mwp-router';
 import { getMatchedQueries } from 'mwp-router/lib/util';
+import { actions as clickActions } from 'mwp-tracking-plugin/lib/util/clickState';
 
 import * as api from './apiActionCreators';
 import {
@@ -98,6 +99,16 @@ export const getNavEpic = findMatches => (action, store) => {
 	);
 };
 
+/*
+ * Any API_REQ action that contains `meta.clickTracking` needs to trigger
+ * an action that clears the click data from state - the data will be consumed
+ * by the fethQueriesEpic
+ */
+export const clickEpic = action =>
+	action.type === api.API_REQ && action.meta && action.meta.clickTracking
+		? Promise.resolve([clickActions.clear()])
+		: IGNORE_ACTION;
+
 /**
  * Old apiRequest maps directly onto new api.get
  * @deprecated
@@ -143,7 +154,17 @@ export const getFetchQueriesEpic = (findMatches, fetchQueriesFn) => {
 		}
 		const { payload: queries, meta } = action;
 		// set up the fetch call to the app server
-		const { config, api: { self }, routing: { location } } = store.getState();
+		const {
+			clickTracking,
+			config,
+			api: { self },
+			routing: { location },
+		} = store.getState();
+
+		// if API_REQ action says it should carry click tracking data, inject it here
+		if (meta.clickTracking) {
+			meta.clickTracking = clickTracking;
+		}
 
 		// first get the current route 'match' data
 		const matched = findMatches(location);
@@ -188,5 +209,6 @@ export default (findMatches, fetchQueriesFn) =>
 	combineEpics(
 		getNavEpic(findMatches),
 		getFetchQueriesEpic(findMatches, fetchQueriesFn),
-		apiRequestToApiReq
+		apiRequestToApiReq,
+		clickEpic
 	);

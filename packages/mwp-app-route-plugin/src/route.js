@@ -50,9 +50,6 @@ export default (languageRenderers: { [string]: LanguageRenderer }) => ({
 			'electrode-csrf-jwt': {
 				enabled: true, // need to generate tokens on page request
 			},
-			'mwp-tracking-plugin': {
-				click: () => true, // always track clicks on server render
-			},
 		},
 		state: {
 			failAction: 'ignore', // ignore cookie validation, just accept

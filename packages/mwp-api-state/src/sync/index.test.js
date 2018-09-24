@@ -1,3 +1,4 @@
+import { CLICK_TRACK_CLEAR_ACTION } from 'mwp-tracking-plugin/lib/util/clickState';
 import { LOCATION_CHANGE, SERVER_RENDER } from 'mwp-router';
 import { createFakeStore } from 'mwp-test-utils';
 
@@ -18,6 +19,7 @@ import getSyncEpic, {
 	getFetchQueriesEpic,
 	getNavEpic,
 	apiRequestToApiReq,
+	clickEpic,
 } from './';
 import { API_RESP_COMPLETE } from '../../lib/sync/apiActionCreators';
 
@@ -251,6 +253,23 @@ describe('Sync epic', () => {
 			).then(actions =>
 				expect(apiRequest.meta.reject).toHaveBeenCalledWith(expectedError)
 			);
+		});
+	});
+	describe('clickEpic', () => {
+		it('emits CLICK_CLEAR for API_REQ with meta.clickAction', function() {
+			const reqClicks = {
+				type: api.API_REQ,
+				payload: {},
+				meta: {
+					clickTracking: true,
+				},
+			};
+
+			const fakeStore = createFakeStore(MOCK_APP_STATE);
+			return clickEpic(reqClicks, fakeStore).then(actions => {
+				expect(actions).toHaveLength(1);
+				expect(actions[0].type).toBe(CLICK_TRACK_CLEAR_ACTION);
+			});
 		});
 	});
 });
