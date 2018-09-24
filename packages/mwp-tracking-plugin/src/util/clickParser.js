@@ -68,7 +68,7 @@ function _getData(e) {
 	}
 }
 
-function getTrackClick(store) {
+function getTrackClick() {
 	/**
 	 * Event handler that emits data about each in-page click
 	 *
@@ -109,21 +109,16 @@ function getTrackClick(store) {
 
 		// 2. Create click action with metadata
 		const now = new Date();
-		const clickTrackAction = actions.click({
+		return actions.click({
 			timestamp: now.toISOString(),
 			lineage: clickLineage.join('<'),
 			linkText: linkText,
 			coords: [x, y],
 			data: data,
 		});
-
-		// 3. dispatch the action - must be deferred until after click event has
-		//    been processed by all other listeners
-		setTimeout(() => store.dispatch(clickTrackAction), 0);
-
-		return clickTrackAction;
 	}
 
+	// modify window.Event prototype
 	trackStopPropagation(trackClick);
 
 	return trackClick;
