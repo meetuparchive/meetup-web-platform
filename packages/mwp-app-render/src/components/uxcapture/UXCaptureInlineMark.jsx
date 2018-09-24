@@ -15,5 +15,7 @@ const generateUXCaptureJS = (mark: string) => `
 
 // inject inline UX.mark() call into rendered markup
 // @see https://github.com/meetup/ux-capture#text-without-custom-font
-export default ({ mark }: Props) =>
+const UXCaptureInlineMark = ({ mark }: Props) =>
 	<div dangerouslySetInnerHTML={{ __html: generateUXCaptureJS(mark) }} />; // eslint-disable-line react/no-danger
+
+export default UXCaptureInlineMark;
