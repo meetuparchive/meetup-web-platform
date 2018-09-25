@@ -55,11 +55,9 @@ responsibilities:
 
 Click tracking consists of 4 related modules:
 
-1. `clickWriter` for writing the click `Event` data to a Redux action.
-2. `clickState` for defining Redux click actions and reducing those actions into
-   a click history object, and writing click tracking data into a cookie.
-3. `clickMiddleware` for listening for click actions and updating the click cookie
-4. `clickReader` for reading the click tracking data cookie on the server.
+1. `clickParser` for converting a DOM click or change event into a click record
+2. `clickState` for connecting click records to a cookie 'history'.
+3. `clickReader` for reading the click tracking data cookie on the server.
 
 Ultimately, the only 'fixed' requirements are that the click tracking data must
 be passed to the server in a cookie, and the serialization of that data must be
@@ -68,14 +66,12 @@ with parallel behavior implemented in Meetup Classic.
 
 ### Behavior
 
-The platform currently adds `click` _and_ `change` listeners when creating the
-Redux store for the browser - this is done on application start and is
-guaranteed not to run on the server. Each `click` and `change` event is sent
-to `clickWriter`, which dispatches a Redux `CLICK_TRACK` action.
-
-The click action is _not_ reduced into Redux state, but is picked up by middleware
-in order to accumulate the data in a cookie that will collect data from multiple
-tabs and persist when navigating away from the web app.
+`browserInit` can be called by a client application whenever it is ready to start
+listening for clicks (usually in `componentDidMount` in the application wrapper
+component). The platform does the rest. The init code attaches `click` _and_
+`change` listeners to the `<body>`. Each `click` and `change` event is converted
+to a click record and stored in a cookie that will be sent to the server on the
+next HTTP request.
 
 Server routes must opt-in to consuming the click cookie using `route.options.plugins['mwp-tracking-plugin']`,
 which should define an object with a `click` property defining a function that

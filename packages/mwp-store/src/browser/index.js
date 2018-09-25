@@ -1,9 +1,5 @@
 // @flow weak
 import { applyMiddleware, createStore, compose } from 'redux';
-import {
-	clickMiddleware,
-	clickTrackEnhancer,
-} from 'mwp-tracking-plugin/lib/util/clickStore';
 import { getApiMiddleware } from 'mwp-api-state';
 
 import catchMiddleware from '../middleware/catch';
@@ -32,7 +28,6 @@ export function getBrowserCreateStore(findMatches, middleware = []) {
 	const middlewareToApply = [
 		catchMiddleware(console.error),
 		getApiMiddleware(findMatches, fetchQueries),
-		clickMiddleware,
 		...middleware,
 		window.mupDevTools ? window.mupDevTools() : noopMiddleware, // must be last middleware
 	];
@@ -40,7 +35,6 @@ export function getBrowserCreateStore(findMatches, middleware = []) {
 
 	const enhancer = compose(
 		middlewareEnhancer,
-		clickTrackEnhancer,
 		window.devToolsExtension ? window.devToolsExtension() : fn => fn // this must be last enhancer
 	);
 	return enhancer(createStore);

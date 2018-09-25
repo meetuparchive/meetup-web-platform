@@ -1,8 +1,6 @@
 ## [17.2]
-- **NEW FEATURE** Add member data from the encdoed member cookie to initial redux configuration on server 
-	render.
-- **DEPRECATED** `state.config.memberId` should not be used. Reference `state.config.member.id`
-   instead, which is guaranteed to be populated.
+- **Refactor** click tracking provided by `mwp-tracking-plugin` now keeps click
+  state in a cookie rather than Redux state.
 
 ## [17.1]
 - **NEW FEATURE** Create 'mwp-csp-plugin' which adds some useful security headers
