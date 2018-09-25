@@ -44,6 +44,11 @@ const generateUXCaptureExpectJS = (
 		});
 	}
 
+	// Don't add UX.expect() to page is no zones specified
+	if (!zones.length) {
+		return;
+	}
+
 	return `
 		<script>
 			if(window.UX) {
