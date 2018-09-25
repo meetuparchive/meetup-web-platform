@@ -48,7 +48,7 @@ script:
   - yarn flow
   - yarn test
 
-after_script:
+after_success:
   - git config --global user.email "builds@travis-ci.com"
   - git config --global user.name "Travis CI"
   - >
@@ -69,6 +69,4 @@ after_script:
    lerna publish --yes --force-publish --skip-git --npm-tag $NPM_TAG --repo-version $GIT_TAG &&
    git tag -a $GIT_TAG -m "Version $GIT_TAG built by Travis CI - https://travis-ci.com/$TRAVIS_REPO_SLUG/builds/$TRAVIS_JOB_ID" &&
    git push --tags git@github.com:$TRAVIS_REPO_SLUG.git
-
-after_success:
   - npm run coveralls
