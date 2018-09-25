@@ -1,6 +1,5 @@
 // @flow
 import clickReader from './util/clickReader';
-export { clickMiddleware, clickTrackEnhancer } from './util/clickStore';
 
 export const CLICK_PLUGIN_NAME = 'mwp-click-tracking';
 

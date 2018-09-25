@@ -1,8 +1,7 @@
 import JSCookie from 'js-cookie';
 
 /*
- * This module provides utilities for managing click tracking data in Redux
- * state an saving that data to a browser cookie
+ * This module provides utilities for managing click tracking data in a cookie
  */
 
 export const COOKIE_NAME = 'click-track'; // must remain in sync with Meetup Classic implementation
@@ -23,33 +22,19 @@ export const setClickCookie = clickTracking => {
 };
 export const getClickCookie = () => BrowserCookies.get(COOKIE_NAME);
 
-export const appendClick = action =>
-	setClickCookie(reducer(getClickCookie(), action));
-
-export const CLICK_TRACK_ACTION = 'CLICK_TRACK';
-
-export const actions = {
-	click: clickData => ({
-		type: CLICK_TRACK_ACTION,
-		payload: clickData,
-	}),
-};
+export const appendClick = clickData =>
+	setClickCookie(reducer(getClickCookie(), clickData));
 
 export const DEFAULT_CLICK_TRACK = { history: [] };
+
 /**
  * @param {Object} data extensible object to store click data {
  *   history: array
  * }
  * @param {Object} action the dispatched action
- * @return {Object} new state
+ * @return {Object} new clickState
  */
-export function reducer(state = DEFAULT_CLICK_TRACK, action) {
-	if (action.type === CLICK_TRACK_ACTION) {
-		const history = [...state.history, action.payload];
-		return {
-			...state,
-			history,
-		};
-	}
-	return state;
-}
+export const reducer = (clickState = DEFAULT_CLICK_TRACK, clickData) => ({
+	...clickState,
+	history: [...clickState.history, clickData],
+});
