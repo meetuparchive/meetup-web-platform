@@ -17,11 +17,15 @@ const renderComponent = (props = MOCK_PROPS, children = MOCK_CHILD) =>
 
 describe('UXCaptureEventMark', () => {
 	it('renders component markup', () => {
+		global.window = { UX: { mark: jest.fn() } };
 		expect(renderComponent()).toMatchSnapshot();
+		delete global.window;
 	});
 
 	it('returns the child element untouched if it has an onLoad prop', () => {
+		global.window = { UX: { mark: jest.fn() } };
 		const onLoadChild = <img src="/foo" onLoad="alert('hi');" />;
 		expect(renderComponent(MOCK_PROPS, onLoadChild)).toMatchSnapshot();
+		delete global.window;
 	});
 });
