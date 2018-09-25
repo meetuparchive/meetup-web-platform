@@ -1,4 +1,3 @@
-import { actions } from './clickState';
 const DATA_ATTR = 'clicktrack';
 
 /*
@@ -109,13 +108,13 @@ function getTrackClick() {
 
 		// 2. Create click action with metadata
 		const now = new Date();
-		return actions.click({
+		return {
 			timestamp: now.toISOString(),
 			lineage: clickLineage.join('<'),
 			linkText: linkText,
 			coords: [x, y],
 			data: data,
-		});
+		};
 	}
 
 	// modify window.Event prototype
