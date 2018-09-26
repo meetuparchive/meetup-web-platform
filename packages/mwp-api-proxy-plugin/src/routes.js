@@ -1,5 +1,6 @@
 import Joi from 'joi';
 import rison from 'rison';
+import { CLICK_PLUGIN_NAME } from 'mwp-tracking-plugin/lib/click';
 
 import handler from './handler'; // import allows easier mocking in integration tests
 
@@ -27,7 +28,7 @@ const getApiProxyRoutes = path => {
 				'electrode-csrf-jwt': {
 					enabled: true,
 				},
-				'mwp-tracking-plugin': {
+				[CLICK_PLUGIN_NAME]: {
 					click: request => {
 						// only consume click data when the querystring includes `?metadata={clickTracking:true}` (rison-encoded)
 						if (!request.query.metadata) {
