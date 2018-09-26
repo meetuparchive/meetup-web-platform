@@ -12,6 +12,7 @@ export const clickCookieOptions = {
 	isSecure: isProd,
 	isHttpOnly: false,
 	domain: `${isProd ? '' : '.dev'}.meetup.com`,
+	path: '/',
 };
 
 export const clickToClickRecord = request => click => {

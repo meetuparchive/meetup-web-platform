@@ -2,6 +2,7 @@
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import getHandler from './handler';
+import { CLICK_PLUGIN_NAME } from 'mwp-tracking-plugin/lib/click';
 
 export const onPreResponse = {
 	/*
@@ -50,7 +51,7 @@ export default (languageRenderers: { [string]: LanguageRenderer }) => ({
 			'electrode-csrf-jwt': {
 				enabled: true, // need to generate tokens on page request
 			},
-			'mwp-tracking-plugin': {
+			[CLICK_PLUGIN_NAME]: {
 				click: () => true, // always track clicks on server render
 			},
 		},
