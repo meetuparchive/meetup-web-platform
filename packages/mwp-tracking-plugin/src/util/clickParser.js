@@ -83,8 +83,9 @@ function getTrackClick() {
 	 */
 	function trackClick(e) {
 		const el = e.target;
-		if (e.type === 'change' && !e.target.dataset[DATA_ATTR]) {
-			// ignore change events on elements without data-clicktrack
+		const tagName = e.tagName.toLowerCase();
+		if (tagName !== 'a' && tagName !== 'button' && !el.dataset[DATA_ATTR]) {
+			// ignore all events on non-anchor/button elements that do not have data-clicktrack
 			return;
 		}
 

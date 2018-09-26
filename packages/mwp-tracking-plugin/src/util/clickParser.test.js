@@ -14,7 +14,8 @@ import * as clickParser from './clickParser';
  * that seems to me like a heavy refactor that is specifically for unit testing
  * - mikem Feb 2017
  */
-xdescribe('trackStopPropagation', () => {
+// skpping until we can run this in jsdom
+describe.skip('trackStopPropagation', () => {
 	let document;
 	beforeEach(() => {
 		document = global.document;
