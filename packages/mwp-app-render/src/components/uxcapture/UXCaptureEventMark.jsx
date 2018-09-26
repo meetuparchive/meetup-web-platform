@@ -25,8 +25,14 @@ const UXCaptureEventMark = ({ mark, children }: Props) => {
 		return children;
 	}
 
+	const uxCaptureOnLoadMark = () => {
+		if (window.UX) {
+			window.UX.mark(mark);
+		}
+	};
+
 	return React.cloneElement(children, {
-		onLoad: `if(window.UX) { UX.mark('${mark}'); }`,
+		onLoad: uxCaptureOnLoadMark,
 	});
 };
 
