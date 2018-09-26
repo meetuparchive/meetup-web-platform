@@ -21,6 +21,10 @@ describe('UXCaptureExpect', () => {
 		expect(renderComponent()).toMatchSnapshot();
 	});
 
+	it('does not render markup when no zones are defined', () => {
+		expect(renderComponent({})).toMatchSnapshot();
+	});
+
 	describe('secondaryContentDisplay', () => {
 		it('renders correct markup when `secondaryContentDisplayed` not supplied', () => {
 			const props = { ...MOCK_PROPS };
