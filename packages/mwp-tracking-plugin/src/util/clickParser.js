@@ -83,7 +83,7 @@ function getTrackClick() {
 	 */
 	function trackClick(e) {
 		const el = e.target;
-		const tagName = e.tagName.toLowerCase();
+		const tagName = el.tagName.toLowerCase();
 		if (tagName !== 'a' && tagName !== 'button' && !el.dataset[DATA_ATTR]) {
 			// ignore all events on non-anchor/button elements that do not have data-clicktrack
 			return;
