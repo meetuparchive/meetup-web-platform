@@ -82,40 +82,47 @@ function getTrackClick() {
 	 * @return {Object} a Redux action describing the click
 	 */
 	function trackClick(e) {
-		const el = e.target;
-		const tagName = el.tagName.toLowerCase();
-		if (tagName !== 'a' && tagName !== 'button' && !el.dataset[DATA_ATTR]) {
-			// ignore all events on non-anchor/button elements that do not have data-clicktrack
-			return;
+		try {
+			const el = e.target;
+			const tagName = el.tagName.toLowerCase();
+			if (tagName !== 'a' && tagName !== 'button' && !el.dataset[DATA_ATTR]) {
+				// ignore all events on non-anchor/button elements that do not have data-clicktrack
+				return;
+			}
+
+			const linkText = el.textContent
+				.trim()
+				.substring(0, 16) // truncate if text is long
+				.replace(/\s{2,}/g, ' ');
+			const clickLineage = [];
+			const targetPosition = el.getBoundingClientRect();
+			const docMidlineOffset = document.body.clientWidth / 2;
+			const x = Math.round(targetPosition.left - docMidlineOffset);
+			const y = Math.round(targetPosition.top);
+			const data = _getData(e);
+
+			// 1. Build array of DOM tag lineage
+			clickLineage.push(elementShorthand(el)); // full shorthand for clicked el
+			var currentEl = el;
+			while (
+				(currentEl = currentEl.parentNode) &&
+				currentEl !== document.body
+			) {
+				clickLineage.push(elementShorthand(currentEl, true)); // id/tag only for parents
+			}
+
+			// 2. Create click action with metadata
+			const now = new Date(); // TODO: make this a America/New_York timestamp
+			return {
+				timestamp: now.toISOString(),
+				lineage: clickLineage.join('<'),
+				linkText: linkText,
+				coords: [x, y],
+				data: data,
+			};
+		} catch (err) {
+			console.error(err);
 		}
-
-		const linkText = el.textContent
-			.trim()
-			.substring(0, 16) // truncate if text is long
-			.replace(/\s{2,}/g, ' ');
-		const clickLineage = [];
-		const targetPosition = el.getBoundingClientRect();
-		const docMidlineOffset = document.body.clientWidth / 2;
-		const x = Math.round(targetPosition.left - docMidlineOffset);
-		const y = Math.round(targetPosition.top);
-		const data = _getData(e);
-
-		// 1. Build array of DOM tag lineage
-		clickLineage.push(elementShorthand(el)); // full shorthand for clicked el
-		var currentEl = el;
-		while ((currentEl = currentEl.parentNode) && currentEl !== document.body) {
-			clickLineage.push(elementShorthand(currentEl, true)); // id/tag only for parents
-		}
-
-		// 2. Create click action with metadata
-		const now = new Date();
-		return {
-			timestamp: now.toISOString(),
-			lineage: clickLineage.join('<'),
-			linkText: linkText,
-			coords: [x, y],
-			data: data,
-		};
 	}
 
 	// modify window.Event prototype
