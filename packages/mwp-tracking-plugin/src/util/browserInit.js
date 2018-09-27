@@ -5,7 +5,11 @@ import getClickParser from './clickParser';
 export default () => {
 	const parseClick = getClickParser();
 	const handler = e => {
-		appendClick(parseClick(e));
+		const clickData = parseClick(e);
+		if (!clickData) {
+			return;
+		}
+		appendClick(clickData);
 	};
 	document.body.addEventListener('click', handler);
 	document.body.addEventListener('change', handler);
