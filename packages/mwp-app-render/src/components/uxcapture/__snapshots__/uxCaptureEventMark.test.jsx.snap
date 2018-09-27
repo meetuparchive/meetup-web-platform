@@ -2,7 +2,7 @@
 
 exports[`UXCaptureEventMark renders component markup 1`] = `
 <img
-  onLoad="if(window.UX) { UX.mark('ux-image-load-logo'); }"
+  onLoad={[Function]}
   src="/foo"
 />
 `;
