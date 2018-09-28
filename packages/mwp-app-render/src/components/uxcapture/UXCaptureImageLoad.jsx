@@ -1,10 +1,7 @@
 // @flow
 import * as React from 'react';
 
-type Props = {
-	mark: string,
-	src: string,
-};
+type Props = React$ElementConfig<HTMLImageElement> & { mark: string };
 
 /**
  * Creates an image tag with provide props
@@ -15,15 +12,18 @@ type Props = {
 const UXCaptureImageLoad = (props: Props) => {
 	const { mark, src, ...other } = props;
 
-	// TODO: handle merging of onLoad prop
+	const onLoad = (ev: SyntheticEvent<*>) => {
+		// trigger any existing onLoad prop
+		if (props.onLoad) {
+			props.onLoad(ev);
+		}
 
-	const onLoadCallback = () => {
 		if (window.UX) {
 			window.UX.mark(mark);
 		}
 	};
 
-	return <img src={src} {...other} onLoad={onLoadCallback} />;
+	return <img src={src} {...other} onLoad={onLoad} />;
 };
 
 export default UXCaptureImageLoad;
