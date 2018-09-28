@@ -14,6 +14,7 @@ export {
 	get,
 	post,
 	patch,
+	put,
 	del,
 	track,
 } from './sync/apiActionCreators';

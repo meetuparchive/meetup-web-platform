@@ -38,6 +38,14 @@ const PATCH_RESPONSE = {
 	},
 };
 const PATCH_BODY = { foo: 'patch' };
+const PUT_RESPONSE = {
+	...POST_RESPONSE,
+	request: {
+		...POST_RESPONSE.request,
+		method: 'put',
+	},
+};
+const PUT_BODY = { foo: 'put' };
 const DELETE_RESPONSE = {
 	...POST_RESPONSE,
 	request: {
@@ -207,6 +215,22 @@ describe('API proxy PATCH endpoint integration tests', () => {
 		const test = response => expect(apiProxyHandler.default).toHaveBeenCalled();
 
 		return start({}, {}).then(runMutationTest({ method: 'patch', test }));
+	});
+});
+
+/*
+ * BEGIN PUT TEST
+ */
+describe('API proxy PUT endpoint integration tests', () => {
+	it('calls the PUT handler for /mu_api', () => {
+		require('request').__setMockResponse(
+			PUT_RESPONSE,
+			JSON.stringify(PUT_BODY)
+		);
+		spyOn(apiProxyHandler, 'default').and.callFake((request, h) => 'okay');
+		const test = response => expect(apiProxyHandler.default).toHaveBeenCalled();
+
+		return start({}, {}).then(runMutationTest({ method: 'put', test }));
 	});
 });
 

@@ -53,6 +53,6 @@ from the API using [Queries](Queries.md).
 ## Action creators
 
 To send/receive data to/from the REST API, use `get`, `post`,
-`patch`, and `del` action creators from `api-state`.
+`patch`, `put` and `del` action creators from `api-state`.
 
 See the [Queries documentation](Queries.md) for more details on usage.
