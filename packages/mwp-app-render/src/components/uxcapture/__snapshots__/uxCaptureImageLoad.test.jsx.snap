@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`UXCaptureImageLoad renders component markup 1`] = `
+<div
+  dangerouslySetInnerHTML={
+    Object {
+      "__html": "
+					<img src=\\"/foo.png\\" onload=\\"console.log('ux-image-load-logo')\\" />
+				",
+    }
+  }
+/>
+`;
