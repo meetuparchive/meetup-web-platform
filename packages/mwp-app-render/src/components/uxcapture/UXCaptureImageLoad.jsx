@@ -17,7 +17,7 @@ export default class UXCaptureImageLoad extends React.Component<Props, State> {
 		loaded: false,
 	};
 
-	static getDerivedStateFromProps(nextProps, prevState) {
+	static getDerivedStateFromProps(nextProps: Props, prevState: State) {
 		if (window && window.UX && window.UX[`${nextProps.mark}-LOADED`]) {
 			console.log(`${nextProps.mark}-LOADED`);
 			return {
@@ -28,13 +28,7 @@ export default class UXCaptureImageLoad extends React.Component<Props, State> {
 		return null;
 	}
 
-	render() {
-		const { mark, src, ...other } = this.props;
-
-		if (this.state.loaded) {
-			return <img src={src} {...other} />;
-		}
-
+	getOnLoadHTMLString = mark => {
 		const onload = `
 			if (window.UX) {
 				window.UX.mark(${mark});
@@ -43,14 +37,30 @@ export default class UXCaptureImageLoad extends React.Component<Props, State> {
 			window.UX.${mark}-LOADED = true;
 		`;
 
-		const onloadSingleLine = onload.replace(/[\n\t]+/g, ' ');
+		// Replace newlines and tabs with space characters
+		return onload.replace(/[\n\t]+/g, ' ');
+	};
 
-		// TODO: add other props to img html tag
+	getPropsAsHTMLAttrString = props => {
+		// TODO: other props need to be mapped from camelCase / JSX syntax
+		return Object.keys(props).map(prop => `${prop}="${props[prop]}"`).join(' ');
+	};
+
+	render() {
+		const { mark, src, ...other } = this.props;
+
+		if (this.state.loaded) {
+			return <img src={src} {...other} />;
+		}
+
+		const onLoadHTML = this.getOnLoadHTMLString(mark);
+		const otherHTMLAttributes = this.getPropsAsHTMLAttrString(other);
+
 		return (
 			<div
 				dangerouslySetInnerHTML={{
 					__html: `
-					<img id="ux-capture-${mark}" src="${src}" onload="${onloadSingleLine}" />
+					<img id="ux-capture-${mark}" src="${src}" onload="${onLoadHTML}" ${otherHTMLAttributes} />
 				`,
 				}}
 			/>
