@@ -2,17 +2,6 @@
 import * as React from 'react';
 
 type Props = React$ElementConfig<HTMLImageElement> & { mark: string };
-type State = {
-	loaded: boolean,
-};
-
-/*
-window.UXCaptureImageOnLoad = (ev: SyntheticEvent<*>) => {
-	if (window.UX) {
-		window.UX.mark(mark);
-	}
-};
-*/
 
 /**
  * Creates an image tag with provide props
@@ -20,30 +9,21 @@ window.UXCaptureImageOnLoad = (ev: SyntheticEvent<*>) => {
  *
  * @see example https://github.com/meetup/ux-capture#image-elements
  */
-export default class UXCaptureImageLoad extends React.Component<Props, State> {
-	state = {
-		loaded: false,
-	};
+const UXCaptureImageLoad = (props: Props) => {
+	const { mark, src, ...other } = props;
 
-	componentDidMount() {
-		this.state.loaded = true;
-	}
-
-	render() {
-		const { mark, src, ...other } = this.props;
-
-		if (this.state.loaded) {
-			return <img src={src} {...other} />;
+	const onLoad = (ev: SyntheticEvent<*>) => {
+		// trigger any existing onLoad prop
+		if (props.onLoad) {
+			props.onLoad(ev);
 		}
 
-		return (
-			<div
-				dangerouslySetInnerHTML={{
-					__html: `
-					<img src="${src}" onload="console.log('${mark}')" />
-				`,
-				}}
-			/>
-		);
-	}
-}
+		if (window.UX) {
+			window.UX.mark(mark);
+		}
+	};
+
+	return <img src={src} {...other} onLoad={onLoad} />;
+};
+
+export default UXCaptureImageLoad;
