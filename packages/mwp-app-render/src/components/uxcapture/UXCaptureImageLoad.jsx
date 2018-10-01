@@ -17,13 +17,15 @@ export default class UXCaptureImageLoad extends React.Component<Props, State> {
 		loaded: false,
 	};
 
-	getDerivedStateFromProps(nextProps, prevState) {
+	static getDerivedStateFromProps(nextProps, prevState) {
 		if (window && window.UX && window.UX[`${nextProps.mark}-LOADED`]) {
 			console.log(`${nextProps.mark}-LOADED`);
 			return {
 				loaded: true,
 			};
 		}
+
+		return null;
 	}
 
 	render() {
