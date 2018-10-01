@@ -17,6 +17,7 @@ export default class UXCaptureImageLoad extends React.Component<Props, State> {
 		loaded: false,
 	};
 
+	/*
 	static getDerivedStateFromProps(nextProps: Props, prevState: State) {
 		if (window && window.UX && window.UX[`${nextProps.mark}-LOADED`]) {
 			console.log(`${nextProps.mark}-LOADED`);
@@ -27,14 +28,23 @@ export default class UXCaptureImageLoad extends React.Component<Props, State> {
 
 		return null;
 	}
+	*/
 
 	getOnLoadHTMLString = mark => {
+		/*
+		const onload = `
+			if (window.UX) {
+				window.UX.mark('${mark}');
+				console.log('MARKED: ${mark}');
+			}
+			window.UX.${mark}-LOADED = true;
+		`;
+		*/
 		const onload = `
 			if (window.UX) {
 				window.UX.mark(${mark});
 				console.log('MARKED: ${mark}');
 			}
-			window.UX.${mark}-LOADED = true;
 		`;
 
 		// Replace newlines and tabs with space characters
@@ -49,9 +59,11 @@ export default class UXCaptureImageLoad extends React.Component<Props, State> {
 	render() {
 		const { mark, src, ...other } = this.props;
 
+		/*
 		if (this.state.loaded) {
 			return <img src={src} {...other} />;
 		}
+		*/
 
 		const onLoadHTML = this.getOnLoadHTMLString(mark);
 		const otherHTMLAttributes = this.getPropsAsHTMLAttrString(other);
