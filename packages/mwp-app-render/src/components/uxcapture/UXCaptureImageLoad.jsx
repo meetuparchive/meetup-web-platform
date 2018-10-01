@@ -12,18 +12,30 @@ type Props = React$ElementConfig<HTMLImageElement> & { mark: string };
 const UXCaptureImageLoad = (props: Props) => {
 	const { mark, src, ...other } = props;
 
-	const onLoad = (ev: SyntheticEvent<*>) => {
-		// trigger any existing onLoad prop
-		if (props.onLoad) {
-			props.onLoad(ev);
-		}
+	if (window && window.UX && window.UX[`${mark}-LOADED`]) {
+		console.log(`${mark}-LOADED`);
+		return <img src={src} {...other} />;
+	}
 
+	const onload = `
 		if (window.UX) {
-			window.UX.mark(mark);
+			window.UX.mark(${mark});
+			console.log('MARKED: ${mark}');
 		}
-	};
+		window.UX.${mark}-LOADED = true;
+	`;
 
-	return <img src={src} {...other} onLoad={onLoad} />;
+	const onloadSingleLine = onload.replace(/[\n\t]+/g, ' ');
+
+	return (
+		<div
+			dangerouslySetInnerHTML={{
+				__html: `
+				<img id="ux-capture-${mark}" src="${src}" onload="${onloadSingleLine}" />
+			`,
+			}}
+		/>
+	);
 };
 
 export default UXCaptureImageLoad;

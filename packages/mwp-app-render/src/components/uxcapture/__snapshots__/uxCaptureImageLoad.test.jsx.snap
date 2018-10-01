@@ -1,11 +1,13 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`UXCaptureImageLoad renders component markup 1`] = `
-<img
-  alt="altText"
-  className="someClass"
-  height="50"
-  onLoad={[Function]}
-  src="/foo.png"
+<div
+  dangerouslySetInnerHTML={
+    Object {
+      "__html": "
+				<img id=\\"ux-capture-ux-image-load-logo\\" src=\\"/foo.png\\" onload=\\" if (window.UX) { window.UX.mark(ux-image-load-logo); console.log('MARKED: ux-image-load-logo'); } window.UX.ux-image-load-logo-LOADED = true; \\" />
+			",
+    }
+  }
 />
 `;
