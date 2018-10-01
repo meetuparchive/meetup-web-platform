@@ -25,15 +25,26 @@ const UXCaptureEventMark = ({ mark, children }: Props) => {
 		return children;
 	}
 
-	const uxCaptureOnLoadMark = () => {
+	const uxCaptureOnLoadMark = mark => {
 		if (window.UX) {
 			window.UX.mark(mark);
 		}
 	};
 
+	console.log(children);
+
+	return (
+		<children.type
+			{...children.props}
+			onLoad={() => uxCaptureOnLoadMark(mark)}
+		/>
+	);
+
+	/**
 	return React.cloneElement(children, {
 		onLoad: uxCaptureOnLoadMark,
 	});
+*/
 };
 
 export default UXCaptureEventMark;
