@@ -2,6 +2,9 @@
 import * as React from 'react';
 
 type Props = React$ElementConfig<HTMLImageElement> & { mark: string };
+type State = {
+	loaded: boolean,
+};
 
 /**
  * Creates an image tag with provide props
@@ -9,33 +12,46 @@ type Props = React$ElementConfig<HTMLImageElement> & { mark: string };
  *
  * @see example https://github.com/meetup/ux-capture#image-elements
  */
-const UXCaptureImageLoad = (props: Props) => {
-	const { mark, src, ...other } = props;
+export default class UXCaptureImageLoad extends React.Component<Props, State> {
+	state = {
+		loaded: false,
+	};
 
-	if (window && window.UX && window.UX[`${mark}-LOADED`]) {
-		console.log(`${mark}-LOADED`);
-		return <img src={src} {...other} />;
+	getDerivedStateFromProps(nextProps, prevState) {
+		if (window && window.UX && window.UX[`${nextProps.mark}-LOADED`]) {
+			console.log(`${nextProps.mark}-LOADED`);
+			return {
+				loaded: true,
+			};
+		}
 	}
 
-	const onload = `
-		if (window.UX) {
-			window.UX.mark(${mark});
-			console.log('MARKED: ${mark}');
+	render() {
+		const { mark, src, ...other } = this.props;
+
+		if (this.state.loaded) {
+			return <img src={src} {...other} />;
 		}
-		window.UX.${mark}-LOADED = true;
-	`;
 
-	const onloadSingleLine = onload.replace(/[\n\t]+/g, ' ');
+		const onload = `
+			if (window.UX) {
+				window.UX.mark(${mark});
+				console.log('MARKED: ${mark}');
+			}
+			window.UX.${mark}-LOADED = true;
+		`;
 
-	return (
-		<div
-			dangerouslySetInnerHTML={{
-				__html: `
-				<img id="ux-capture-${mark}" src="${src}" onload="${onloadSingleLine}" />
-			`,
-			}}
-		/>
-	);
-};
+		const onloadSingleLine = onload.replace(/[\n\t]+/g, ' ');
 
-export default UXCaptureImageLoad;
+		// TODO: add other props to img html tag
+		return (
+			<div
+				dangerouslySetInnerHTML={{
+					__html: `
+					<img id="ux-capture-${mark}" src="${src}" onload="${onloadSingleLine}" />
+				`,
+				}}
+			/>
+		);
+	}
+}
