@@ -31,19 +31,12 @@ export default class UXCaptureImageLoad extends React.Component<Props, State> {
 	*/
 
 	getOnLoadHTMLString = mark => {
-		/*
 		const onload = `
-			if (window.UX) {
+			if (window.UX && !window.UX[${mark}-LOADED]) {
 				window.UX.mark('${mark}');
 				console.log('MARKED: ${mark}');
-			}
-			window.UX.${mark}-LOADED = true;
-		`;
-		*/
-		const onload = `
-			if (window.UX) {
-				window.UX.mark(${mark});
-				console.log('MARKED: ${mark}');
+			} else {
+				window.UX[${mark}-LOADED] = true;
 			}
 		`;
 
