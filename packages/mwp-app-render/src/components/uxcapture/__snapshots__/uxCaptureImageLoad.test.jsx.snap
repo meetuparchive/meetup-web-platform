@@ -5,9 +5,13 @@ exports[`UXCaptureImageLoad renders component markup 1`] = `
   dangerouslySetInnerHTML={
     Object {
       "__html": "
-					<img id=\\"ux-capture-ux-image-load-logo\\" src=\\"/foo.png\\" onload=\\" if (window.UX && !window.UX[ux-image-load-logo-LOADED]) { window.UX.mark('ux-image-load-logo'); console.log('MARKED: ux-image-load-logo'); } else { window.UX[ux-image-load-logo-LOADED] = true; } \\" className=\\"someClass\\" alt=\\"altText\\" height=\\"50\\" />
-				",
+				<img id=\\"ux-capture-ux-image-load-logo\\" src=\\"/foo.png\\" onload=\\" if (window.UX && !window.UX['ux-image-load-logo-LOADED']) { window.UX.mark('ux-image-load-logo'); window.UX['ux-image-load-logo-LOADED'] = true; } \\" className=\\"someClass\\" alt=\\"altText\\" height=\\"50\\" />
+			",
     }
   }
 />
 `;
+
+exports[`getOnLoadJS renders the correct javascript as a string 1`] = `" if (window.UX && !window.UX['ux-image-load-logo-LOADED']) { window.UX.mark('ux-image-load-logo'); window.UX['ux-image-load-logo-LOADED'] = true; } "`;
+
+exports[`getPropsAsHTMLAttrs renders the correct javascript as a string 1`] = `"className=\\"someClass\\" alt=\\"altText\\" height=\\"50\\""`;

@@ -1,9 +1,25 @@
 // @flow
 import * as React from 'react';
 
-type Props = React$ElementConfig<HTMLImageElement> & { mark: string };
-type State = {
-	loaded: boolean,
+type Props = React$ElementConfig<typeof HTMLImageElement> & { mark: string };
+
+export const getOnLoadJS = (mark: string): string => {
+	const onload = `
+		if (window.UX && !window.UX['${mark}-LOADED']) {
+			window.UX.mark('${mark}');
+			window.UX['${mark}-LOADED'] = true;
+		}
+	`;
+
+	// Replace newlines and tabs with space characters
+	return onload.replace(/[\n\t]+/g, ' ');
+};
+
+export const getPropsAsHTMLAttrs = (
+	props: React$ElementConfig<typeof HTMLImageElement>
+): string => {
+	// TODO: other props need to be mapped from camelCase / JSX syntax
+	return Object.keys(props).map(prop => `${prop}="${props[prop]}"`).join(' ');
 };
 
 /**
@@ -12,63 +28,21 @@ type State = {
  *
  * @see example https://github.com/meetup/ux-capture#image-elements
  */
-export default class UXCaptureImageLoad extends React.Component<Props, State> {
-	state = {
-		loaded: false,
-	};
+const UXCaptureImageLoad = (props: Props) => {
+	const { mark, src, ...other } = props;
 
-	/*
-	static getDerivedStateFromProps(nextProps: Props, prevState: State) {
-		if (window && window.UX && window.UX[`${nextProps.mark}-LOADED`]) {
-			console.log(`${nextProps.mark}-LOADED`);
-			return {
-				loaded: true,
-			};
-		}
+	const onload = getOnLoadJS(mark);
+	const otherImgAttrs = getPropsAsHTMLAttrs(other);
 
-		return null;
-	}
-	*/
+	return (
+		<div
+			dangerouslySetInnerHTML={{
+				__html: `
+				<img id="ux-capture-${mark}" src="${src}" onload="${onload}" ${otherImgAttrs} />
+			`,
+			}}
+		/>
+	);
+};
 
-	getOnLoadHTMLString = mark => {
-		const onload = `
-			if (window.UX && !window.UX[${mark}-LOADED]) {
-				window.UX.mark('${mark}');
-				console.log('MARKED: ${mark}');
-			} else {
-				window.UX[${mark}-LOADED] = true;
-			}
-		`;
-
-		// Replace newlines and tabs with space characters
-		return onload.replace(/[\n\t]+/g, ' ');
-	};
-
-	getPropsAsHTMLAttrString = props => {
-		// TODO: other props need to be mapped from camelCase / JSX syntax
-		return Object.keys(props).map(prop => `${prop}="${props[prop]}"`).join(' ');
-	};
-
-	render() {
-		const { mark, src, ...other } = this.props;
-
-		/*
-		if (this.state.loaded) {
-			return <img src={src} {...other} />;
-		}
-		*/
-
-		const onLoadHTML = this.getOnLoadHTMLString(mark);
-		const otherHTMLAttributes = this.getPropsAsHTMLAttrString(other);
-
-		return (
-			<div
-				dangerouslySetInnerHTML={{
-					__html: `
-					<img id="ux-capture-${mark}" src="${src}" onload="${onLoadHTML}" ${otherHTMLAttributes} />
-				`,
-				}}
-			/>
-		);
-	}
-}
+export default UXCaptureImageLoad;
