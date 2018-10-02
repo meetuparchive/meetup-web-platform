@@ -18,8 +18,26 @@ export const getOnLoadJS = (mark: string): string => {
 export const getPropsAsHTMLAttrs = (
 	props: React$ElementConfig<typeof HTMLImageElement>
 ): string => {
-	// TODO: other props need to be mapped from camelCase / JSX syntax
-	return Object.keys(props).map(prop => `${prop}="${props[prop]}"`).join(' ');
+	return Object.keys(props)
+		.map(prop => {
+			let attribute = prop;
+
+			// convert JSX attribute names to HTML syntax
+			// Any other special props needed? Add here.
+			// @see: https://reactjs.org/docs/dom-elements.html
+			if (prop === 'className') {
+				attribute = 'class';
+			}
+			if (prop === 'htmlFor') {
+				attribute = 'for';
+			} else {
+				// handles camelCased attributes like `onLoad`
+				attribute = attribute.toLowerCase();
+			}
+
+			return `${attribute}="${props[prop]}"`;
+		})
+		.join(' ');
 };
 
 /**
