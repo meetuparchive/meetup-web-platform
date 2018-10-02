@@ -64,15 +64,7 @@ exports[`UXCaptureExpect destinationVerified renders correct markup when \`desti
 />
 `;
 
-exports[`UXCaptureExpect does not render markup when no zones are defined 1`] = `
-<div
-  dangerouslySetInnerHTML={
-    Object {
-      "__html": undefined,
-    }
-  }
-/>
-`;
+exports[`UXCaptureExpect does not render markup when no zones are defined 1`] = `""`;
 
 exports[`UXCaptureExpect primaryActionAvailable renders correct markup when \`primaryActionAvailable\` is an empty array 1`] = `
 <div
