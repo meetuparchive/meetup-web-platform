@@ -7,7 +7,7 @@ exports[`UXCaptureExpect destinationVerified renders correct markup when \`desti
       "__html": "
 		<script>
 			if(window.UX) {
-				UX.expect([{\\"label\\":\\"ux-primary-content-displayed\\",\\"marks\\":[\\"ux-primary-content-1\\",\\"ux-primary-content-2\\"]},{\\"label\\":\\"ux-primary-action-available\\",\\"marks\\":[\\"ux-primary-action-available\\"]},{\\"label\\":\\"ux-secondary-content-displayed\\",\\"marks\\":[\\"ux-secondary-content-1\\",\\"ux-secondary-content-2\\",\\"ux-secondary-content-3\\"]}]);
+				window.UX.expect([{\\"label\\":\\"ux-primary-content-displayed\\",\\"marks\\":[\\"ux-primary-content-1\\",\\"ux-primary-content-2\\"]},{\\"label\\":\\"ux-primary-action-available\\",\\"marks\\":[\\"ux-primary-action-available\\"]},{\\"label\\":\\"ux-secondary-content-displayed\\",\\"marks\\":[\\"ux-secondary-content-1\\",\\"ux-secondary-content-2\\",\\"ux-secondary-content-3\\"]}]);
 			}
 		</script>
 	",
@@ -23,7 +23,7 @@ exports[`UXCaptureExpect destinationVerified renders correct markup when \`desti
       "__html": "
 		<script>
 			if(window.UX) {
-				UX.expect([{\\"label\\":\\"ux-primary-content-displayed\\",\\"marks\\":[\\"ux-primary-content-1\\",\\"ux-primary-content-2\\"]},{\\"label\\":\\"ux-primary-action-available\\",\\"marks\\":[\\"ux-primary-action-available\\"]},{\\"label\\":\\"ux-secondary-content-displayed\\",\\"marks\\":[\\"ux-secondary-content-1\\",\\"ux-secondary-content-2\\",\\"ux-secondary-content-3\\"]}]);
+				window.UX.expect([{\\"label\\":\\"ux-primary-content-displayed\\",\\"marks\\":[\\"ux-primary-content-1\\",\\"ux-primary-content-2\\"]},{\\"label\\":\\"ux-primary-action-available\\",\\"marks\\":[\\"ux-primary-action-available\\"]},{\\"label\\":\\"ux-secondary-content-displayed\\",\\"marks\\":[\\"ux-secondary-content-1\\",\\"ux-secondary-content-2\\",\\"ux-secondary-content-3\\"]}]);
 			}
 		</script>
 	",
@@ -39,7 +39,7 @@ exports[`UXCaptureExpect destinationVerified renders correct markup when \`desti
       "__html": "
 		<script>
 			if(window.UX) {
-				UX.expect([{\\"label\\":\\"ux-primary-content-displayed\\",\\"marks\\":[\\"ux-primary-content-1\\",\\"ux-primary-content-2\\"]},{\\"label\\":\\"ux-primary-action-available\\",\\"marks\\":[\\"ux-primary-action-available\\"]},{\\"label\\":\\"ux-secondary-content-displayed\\",\\"marks\\":[\\"ux-secondary-content-1\\",\\"ux-secondary-content-2\\",\\"ux-secondary-content-3\\"]}]);
+				window.UX.expect([{\\"label\\":\\"ux-primary-content-displayed\\",\\"marks\\":[\\"ux-primary-content-1\\",\\"ux-primary-content-2\\"]},{\\"label\\":\\"ux-primary-action-available\\",\\"marks\\":[\\"ux-primary-action-available\\"]},{\\"label\\":\\"ux-secondary-content-displayed\\",\\"marks\\":[\\"ux-secondary-content-1\\",\\"ux-secondary-content-2\\",\\"ux-secondary-content-3\\"]}]);
 			}
 		</script>
 	",
@@ -55,7 +55,7 @@ exports[`UXCaptureExpect destinationVerified renders correct markup when \`desti
       "__html": "
 		<script>
 			if(window.UX) {
-				UX.expect([{\\"label\\":\\"ux-primary-content-displayed\\",\\"marks\\":[\\"ux-primary-content-1\\",\\"ux-primary-content-2\\"]},{\\"label\\":\\"ux-primary-action-available\\",\\"marks\\":[\\"ux-primary-action-available\\"]},{\\"label\\":\\"ux-secondary-content-displayed\\",\\"marks\\":[\\"ux-secondary-content-1\\",\\"ux-secondary-content-2\\",\\"ux-secondary-content-3\\"]}]);
+				window.UX.expect([{\\"label\\":\\"ux-primary-content-displayed\\",\\"marks\\":[\\"ux-primary-content-1\\",\\"ux-primary-content-2\\"]},{\\"label\\":\\"ux-primary-action-available\\",\\"marks\\":[\\"ux-primary-action-available\\"]},{\\"label\\":\\"ux-secondary-content-displayed\\",\\"marks\\":[\\"ux-secondary-content-1\\",\\"ux-secondary-content-2\\",\\"ux-secondary-content-3\\"]}]);
 			}
 		</script>
 	",
@@ -81,7 +81,7 @@ exports[`UXCaptureExpect primaryActionAvailable renders correct markup when \`pr
       "__html": "
 		<script>
 			if(window.UX) {
-				UX.expect([{\\"label\\":\\"ux-primary-content-displayed\\",\\"marks\\":[\\"ux-primary-content-1\\",\\"ux-primary-content-2\\"]},{\\"label\\":\\"ux-secondary-content-displayed\\",\\"marks\\":[\\"ux-secondary-content-1\\",\\"ux-secondary-content-2\\",\\"ux-secondary-content-3\\"]}]);
+				window.UX.expect([{\\"label\\":\\"ux-primary-content-displayed\\",\\"marks\\":[\\"ux-primary-content-1\\",\\"ux-primary-content-2\\"]},{\\"label\\":\\"ux-secondary-content-displayed\\",\\"marks\\":[\\"ux-secondary-content-1\\",\\"ux-secondary-content-2\\",\\"ux-secondary-content-3\\"]}]);
 			}
 		</script>
 	",
@@ -97,7 +97,7 @@ exports[`UXCaptureExpect primaryActionAvailable renders correct markup when \`pr
       "__html": "
 		<script>
 			if(window.UX) {
-				UX.expect([{\\"label\\":\\"ux-primary-content-displayed\\",\\"marks\\":[\\"ux-primary-content-1\\",\\"ux-primary-content-2\\"]},{\\"label\\":\\"ux-secondary-content-displayed\\",\\"marks\\":[\\"ux-secondary-content-1\\",\\"ux-secondary-content-2\\",\\"ux-secondary-content-3\\"]}]);
+				window.UX.expect([{\\"label\\":\\"ux-primary-content-displayed\\",\\"marks\\":[\\"ux-primary-content-1\\",\\"ux-primary-content-2\\"]},{\\"label\\":\\"ux-secondary-content-displayed\\",\\"marks\\":[\\"ux-secondary-content-1\\",\\"ux-secondary-content-2\\",\\"ux-secondary-content-3\\"]}]);
 			}
 		</script>
 	",
@@ -113,7 +113,7 @@ exports[`UXCaptureExpect primaryActionAvailable renders correct markup when \`pr
       "__html": "
 		<script>
 			if(window.UX) {
-				UX.expect([{\\"label\\":\\"ux-primary-content-displayed\\",\\"marks\\":[\\"ux-primary-content-1\\",\\"ux-primary-content-2\\"]},{\\"label\\":\\"ux-secondary-content-displayed\\",\\"marks\\":[\\"ux-secondary-content-1\\",\\"ux-secondary-content-2\\",\\"ux-secondary-content-3\\"]}]);
+				window.UX.expect([{\\"label\\":\\"ux-primary-content-displayed\\",\\"marks\\":[\\"ux-primary-content-1\\",\\"ux-primary-content-2\\"]},{\\"label\\":\\"ux-secondary-content-displayed\\",\\"marks\\":[\\"ux-secondary-content-1\\",\\"ux-secondary-content-2\\",\\"ux-secondary-content-3\\"]}]);
 			}
 		</script>
 	",
@@ -129,7 +129,7 @@ exports[`UXCaptureExpect primaryActionAvailable renders correct markup when \`pr
       "__html": "
 		<script>
 			if(window.UX) {
-				UX.expect([{\\"label\\":\\"ux-primary-content-displayed\\",\\"marks\\":[\\"ux-primary-content-1\\",\\"ux-primary-content-2\\"]},{\\"label\\":\\"ux-secondary-content-displayed\\",\\"marks\\":[\\"ux-secondary-content-1\\",\\"ux-secondary-content-2\\",\\"ux-secondary-content-3\\"]}]);
+				window.UX.expect([{\\"label\\":\\"ux-primary-content-displayed\\",\\"marks\\":[\\"ux-primary-content-1\\",\\"ux-primary-content-2\\"]},{\\"label\\":\\"ux-secondary-content-displayed\\",\\"marks\\":[\\"ux-secondary-content-1\\",\\"ux-secondary-content-2\\",\\"ux-secondary-content-3\\"]}]);
 			}
 		</script>
 	",
@@ -145,7 +145,7 @@ exports[`UXCaptureExpect primaryContentDisplayed renders correct markup when \`p
       "__html": "
 		<script>
 			if(window.UX) {
-				UX.expect([{\\"label\\":\\"ux-primary-action-available\\",\\"marks\\":[\\"ux-primary-action-available\\"]},{\\"label\\":\\"ux-secondary-content-displayed\\",\\"marks\\":[\\"ux-secondary-content-1\\",\\"ux-secondary-content-2\\",\\"ux-secondary-content-3\\"]}]);
+				window.UX.expect([{\\"label\\":\\"ux-primary-action-available\\",\\"marks\\":[\\"ux-primary-action-available\\"]},{\\"label\\":\\"ux-secondary-content-displayed\\",\\"marks\\":[\\"ux-secondary-content-1\\",\\"ux-secondary-content-2\\",\\"ux-secondary-content-3\\"]}]);
 			}
 		</script>
 	",
@@ -161,7 +161,7 @@ exports[`UXCaptureExpect primaryContentDisplayed renders correct markup when \`p
       "__html": "
 		<script>
 			if(window.UX) {
-				UX.expect([{\\"label\\":\\"ux-primary-action-available\\",\\"marks\\":[\\"ux-primary-action-available\\"]},{\\"label\\":\\"ux-secondary-content-displayed\\",\\"marks\\":[\\"ux-secondary-content-1\\",\\"ux-secondary-content-2\\",\\"ux-secondary-content-3\\"]}]);
+				window.UX.expect([{\\"label\\":\\"ux-primary-action-available\\",\\"marks\\":[\\"ux-primary-action-available\\"]},{\\"label\\":\\"ux-secondary-content-displayed\\",\\"marks\\":[\\"ux-secondary-content-1\\",\\"ux-secondary-content-2\\",\\"ux-secondary-content-3\\"]}]);
 			}
 		</script>
 	",
@@ -177,7 +177,7 @@ exports[`UXCaptureExpect primaryContentDisplayed renders correct markup when \`p
       "__html": "
 		<script>
 			if(window.UX) {
-				UX.expect([{\\"label\\":\\"ux-primary-action-available\\",\\"marks\\":[\\"ux-primary-action-available\\"]},{\\"label\\":\\"ux-secondary-content-displayed\\",\\"marks\\":[\\"ux-secondary-content-1\\",\\"ux-secondary-content-2\\",\\"ux-secondary-content-3\\"]}]);
+				window.UX.expect([{\\"label\\":\\"ux-primary-action-available\\",\\"marks\\":[\\"ux-primary-action-available\\"]},{\\"label\\":\\"ux-secondary-content-displayed\\",\\"marks\\":[\\"ux-secondary-content-1\\",\\"ux-secondary-content-2\\",\\"ux-secondary-content-3\\"]}]);
 			}
 		</script>
 	",
@@ -193,7 +193,7 @@ exports[`UXCaptureExpect primaryContentDisplayed renders correct markup when \`p
       "__html": "
 		<script>
 			if(window.UX) {
-				UX.expect([{\\"label\\":\\"ux-primary-action-available\\",\\"marks\\":[\\"ux-primary-action-available\\"]},{\\"label\\":\\"ux-secondary-content-displayed\\",\\"marks\\":[\\"ux-secondary-content-1\\",\\"ux-secondary-content-2\\",\\"ux-secondary-content-3\\"]}]);
+				window.UX.expect([{\\"label\\":\\"ux-primary-action-available\\",\\"marks\\":[\\"ux-primary-action-available\\"]},{\\"label\\":\\"ux-secondary-content-displayed\\",\\"marks\\":[\\"ux-secondary-content-1\\",\\"ux-secondary-content-2\\",\\"ux-secondary-content-3\\"]}]);
 			}
 		</script>
 	",
@@ -209,7 +209,7 @@ exports[`UXCaptureExpect renders correct markup when all props are defined 1`] =
       "__html": "
 		<script>
 			if(window.UX) {
-				UX.expect([{\\"label\\":\\"ux-primary-content-displayed\\",\\"marks\\":[\\"ux-primary-content-1\\",\\"ux-primary-content-2\\"]},{\\"label\\":\\"ux-primary-action-available\\",\\"marks\\":[\\"ux-primary-action-available\\"]},{\\"label\\":\\"ux-secondary-content-displayed\\",\\"marks\\":[\\"ux-secondary-content-1\\",\\"ux-secondary-content-2\\",\\"ux-secondary-content-3\\"]}]);
+				window.UX.expect([{\\"label\\":\\"ux-primary-content-displayed\\",\\"marks\\":[\\"ux-primary-content-1\\",\\"ux-primary-content-2\\"]},{\\"label\\":\\"ux-primary-action-available\\",\\"marks\\":[\\"ux-primary-action-available\\"]},{\\"label\\":\\"ux-secondary-content-displayed\\",\\"marks\\":[\\"ux-secondary-content-1\\",\\"ux-secondary-content-2\\",\\"ux-secondary-content-3\\"]}]);
 			}
 		</script>
 	",
@@ -225,7 +225,7 @@ exports[`UXCaptureExpect secondaryContentDisplay renders correct markup when \`s
       "__html": "
 		<script>
 			if(window.UX) {
-				UX.expect([{\\"label\\":\\"ux-primary-content-displayed\\",\\"marks\\":[\\"ux-primary-content-1\\",\\"ux-primary-content-2\\"]},{\\"label\\":\\"ux-primary-action-available\\",\\"marks\\":[\\"ux-primary-action-available\\"]}]);
+				window.UX.expect([{\\"label\\":\\"ux-primary-content-displayed\\",\\"marks\\":[\\"ux-primary-content-1\\",\\"ux-primary-content-2\\"]},{\\"label\\":\\"ux-primary-action-available\\",\\"marks\\":[\\"ux-primary-action-available\\"]}]);
 			}
 		</script>
 	",
@@ -241,7 +241,7 @@ exports[`UXCaptureExpect secondaryContentDisplay renders correct markup when \`s
       "__html": "
 		<script>
 			if(window.UX) {
-				UX.expect([{\\"label\\":\\"ux-primary-content-displayed\\",\\"marks\\":[\\"ux-primary-content-1\\",\\"ux-primary-content-2\\"]},{\\"label\\":\\"ux-primary-action-available\\",\\"marks\\":[\\"ux-primary-action-available\\"]}]);
+				window.UX.expect([{\\"label\\":\\"ux-primary-content-displayed\\",\\"marks\\":[\\"ux-primary-content-1\\",\\"ux-primary-content-2\\"]},{\\"label\\":\\"ux-primary-action-available\\",\\"marks\\":[\\"ux-primary-action-available\\"]}]);
 			}
 		</script>
 	",
@@ -257,7 +257,7 @@ exports[`UXCaptureExpect secondaryContentDisplay renders correct markup when \`s
       "__html": "
 		<script>
 			if(window.UX) {
-				UX.expect([{\\"label\\":\\"ux-primary-content-displayed\\",\\"marks\\":[\\"ux-primary-content-1\\",\\"ux-primary-content-2\\"]},{\\"label\\":\\"ux-primary-action-available\\",\\"marks\\":[\\"ux-primary-action-available\\"]}]);
+				window.UX.expect([{\\"label\\":\\"ux-primary-content-displayed\\",\\"marks\\":[\\"ux-primary-content-1\\",\\"ux-primary-content-2\\"]},{\\"label\\":\\"ux-primary-action-available\\",\\"marks\\":[\\"ux-primary-action-available\\"]}]);
 			}
 		</script>
 	",
@@ -273,7 +273,7 @@ exports[`UXCaptureExpect secondaryContentDisplay renders correct markup when \`s
       "__html": "
 		<script>
 			if(window.UX) {
-				UX.expect([{\\"label\\":\\"ux-primary-content-displayed\\",\\"marks\\":[\\"ux-primary-content-1\\",\\"ux-primary-content-2\\"]},{\\"label\\":\\"ux-primary-action-available\\",\\"marks\\":[\\"ux-primary-action-available\\"]}]);
+				window.UX.expect([{\\"label\\":\\"ux-primary-content-displayed\\",\\"marks\\":[\\"ux-primary-content-1\\",\\"ux-primary-content-2\\"]},{\\"label\\":\\"ux-primary-action-available\\",\\"marks\\":[\\"ux-primary-action-available\\"]}]);
 			}
 		</script>
 	",

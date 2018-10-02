@@ -52,7 +52,7 @@ const generateUXCaptureExpectJS = (
 	return `
 		<script>
 			if(window.UX) {
-				UX.expect(${JSON.stringify(zones)});
+				window.UX.expect(${JSON.stringify(zones)});
 			}
 		</script>
 	`;
