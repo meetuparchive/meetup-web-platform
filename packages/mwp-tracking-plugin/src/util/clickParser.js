@@ -67,6 +67,26 @@ function _getData(e) {
 	}
 }
 
+// recursive function to build an array of 'element shorthand' strings for the
+// passed-in `el` _starting with the first a/button/[DATA_ATTR] element_
+function getLineage(lineage, el) {
+	if (el === window.document.body || lineage.length > 20) {
+		// end of the line
+		return lineage;
+	}
+	const tagName = el.tagName.toLowerCase();
+	if (
+		lineage.length > 0 || // we have started
+		tagName === 'a' || // or found an anchor
+		tagName === 'button' || // or found a button
+		el.dataset[DATA_ATTR] // or found a manually-tagged element
+	) {
+		lineage.push(elementShorthand(el, true));
+	}
+	// tail recursion FTW
+	return getLineage(lineage, el.parentNode);
+}
+
 function getTrackClick() {
 	/**
 	 * Event handler that emits data about each in-page click
@@ -84,9 +104,8 @@ function getTrackClick() {
 	function trackClick(e) {
 		try {
 			const el = e.target;
-			const tagName = el.tagName.toLowerCase();
-			if (tagName !== 'a' && tagName !== 'button' && !el.dataset[DATA_ATTR]) {
-				// ignore all events on non-anchor/button elements that do not have data-clicktrack
+			const clickLineage = getLineage([], el);
+			if (clickLineage.length === 0) {
 				return;
 			}
 
@@ -94,22 +113,11 @@ function getTrackClick() {
 				.trim()
 				.substring(0, 16) // truncate if text is long
 				.replace(/\s{2,}/g, ' ');
-			const clickLineage = [];
 			const targetPosition = el.getBoundingClientRect();
 			const docMidlineOffset = document.body.clientWidth / 2;
 			const x = Math.round(targetPosition.left - docMidlineOffset);
 			const y = Math.round(targetPosition.top);
 			const data = _getData(e);
-
-			// 1. Build array of DOM tag lineage
-			clickLineage.push(elementShorthand(el)); // full shorthand for clicked el
-			var currentEl = el;
-			while (
-				(currentEl = currentEl.parentNode) &&
-				currentEl !== document.body
-			) {
-				clickLineage.push(elementShorthand(currentEl, true)); // id/tag only for parents
-			}
 
 			// 2. Create click action with metadata
 			const now = new Date(); // TODO: make this a America/New_York timestamp
