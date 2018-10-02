@@ -1,0 +1,67 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`UXCaptureConfig renders correct markup when all props are defined 1`] = `
+<div
+  dangerouslySetInnerHTML={
+    Object {
+      "__html": "
+		<script>
+			if(window.UX) {
+				window.UX.config({\\"onMark\\":\\"function onMark(foo) {\\\\n\\\\t\\\\tif (foo) {\\\\n\\\\t\\\\t\\\\treturn foo;\\\\n\\\\t\\\\t}\\\\n\\\\t}\\",\\"onMeasure\\":\\"function onMeasure(bar, noop) {\\\\n\\\\t\\\\tif (bar && noop) {\\\\n\\\\t\\\\t\\\\treturn bar;\\\\n\\\\t\\\\t}\\\\n\\\\t}\\"});
+			}
+		</script>
+	",
+    }
+  }
+/>
+`;
+
+exports[`UXCaptureConfig renders the correct markup when no props are provided 1`] = `""`;
+
+exports[`UXCaptureConfig renders the correct markup when only onMark is provided 1`] = `
+<div
+  dangerouslySetInnerHTML={
+    Object {
+      "__html": "
+		<script>
+			if(window.UX) {
+				window.UX.config({\\"onMark\\":\\"function onMark(foo) {\\\\n\\\\t\\\\tif (foo) {\\\\n\\\\t\\\\t\\\\treturn foo;\\\\n\\\\t\\\\t}\\\\n\\\\t}\\"});
+			}
+		</script>
+	",
+    }
+  }
+/>
+`;
+
+exports[`UXCaptureConfig renders the correct markup when only onMeasure is provided 1`] = `
+<div
+  dangerouslySetInnerHTML={
+    Object {
+      "__html": "
+		<script>
+			if(window.UX) {
+				window.UX.config({\\"onMeasure\\":\\"function onMeasure(bar, noop) {\\\\n\\\\t\\\\tif (bar && noop) {\\\\n\\\\t\\\\t\\\\treturn bar;\\\\n\\\\t\\\\t}\\\\n\\\\t}\\"});
+			}
+		</script>
+	",
+    }
+  }
+/>
+`;
+
+exports[`UXCaptureConfig renders the correct markup when unsupported props are provided 1`] = `
+<div
+  dangerouslySetInnerHTML={
+    Object {
+      "__html": "
+		<script>
+			if(window.UX) {
+				window.UX.config({\\"onMark\\":\\"function onMark(foo) {\\\\n\\\\t\\\\tif (foo) {\\\\n\\\\t\\\\t\\\\treturn foo;\\\\n\\\\t\\\\t}\\\\n\\\\t}\\",\\"onMeasure\\":\\"function onMeasure(bar, noop) {\\\\n\\\\t\\\\tif (bar && noop) {\\\\n\\\\t\\\\t\\\\treturn bar;\\\\n\\\\t\\\\t}\\\\n\\\\t}\\"});
+			}
+		</script>
+	",
+    }
+  }
+/>
+`;
