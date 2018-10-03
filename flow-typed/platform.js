@@ -92,7 +92,7 @@ declare type Query = {
 	mockResponse?: () => any,
 	meta?: {
 		flags?: Array<string>,
-		method?: 'get' | 'post' | 'delete' | 'patch',
+		method?: 'get' | 'post' | 'delete' | 'patch' | 'put',
 		noCache?: boolean,
 		metaRequestHeaders?: Array<string>,
 		variants?: {

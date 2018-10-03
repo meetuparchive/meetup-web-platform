@@ -57,7 +57,7 @@ const getApiProxyRoutes = path => {
 	};
 	const apiPostRoute = {
 		...routeBase,
-		method: ['POST', 'PATCH'],
+		method: ['POST', 'PATCH', 'PUT'],
 		options: {
 			...routeBase.options,
 			payload: {
