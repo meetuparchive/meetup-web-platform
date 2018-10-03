@@ -5,6 +5,7 @@ describe('method-specific creators', () => {
 		const methodMap = {
 			get: 'get',
 			patch: 'patch',
+			put: 'put',
 			post: 'post',
 			del: 'delete',
 		};

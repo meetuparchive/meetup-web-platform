@@ -1,3 +1,7 @@
+## [17.3]
+
+- **New feature** added support for `put` request
+
 ## [17.2]
 - **Refactor** click tracking provided by `mwp-tracking-plugin` now keeps click
   state in a cookie rather than Redux state.

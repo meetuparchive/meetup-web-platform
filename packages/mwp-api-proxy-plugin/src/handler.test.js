@@ -63,6 +63,23 @@ describe('parseRequestQueries', () => {
 			parseRequestQueries(patchRequest, 'http://dummy.api.meetup.com')
 		).toEqual(queries);
 	});
+	it('extracts the queries provided in PUT requests', async () => {
+		const data = { queries: rison.encode_array(queries) };
+		const server = await getServer();
+		const patchRequest = {
+			headers,
+			server,
+			method: 'put',
+			payload: data,
+			state: {
+				oauth_token: 'foo',
+			},
+			getLanguage: () => 'en-US',
+		};
+		expect(
+			parseRequestQueries(patchRequest, 'http://dummy.api.meetup.com')
+		).toEqual(queries);
+	});
 	it('throws an error for mal-formed queries', async () => {
 		const notAQuery = { foo: 'bar' };
 		const data = { queries: rison.encode_array([notAQuery]) };

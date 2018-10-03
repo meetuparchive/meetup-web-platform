@@ -62,7 +62,7 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 	const method = ((queries[0].meta || {}).method || 'GET') // fallback to 'get'
 		.toUpperCase(); // must be upper case - requests can fail silently otherwise
 
-	const hasBody = method === 'POST' || method === 'PATCH';
+	const hasBody = method === 'POST' || method === 'PATCH' || method === 'PUT';
 	const isFormData = queries[0].params instanceof FormData;
 	const isDelete = method === 'DELETE';
 

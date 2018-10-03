@@ -88,6 +88,7 @@ describe('fetchQueries', () => {
 		};
 		return methodTest('POST')()
 			.then(methodTest('PATCH'))
+			.then(methodTest('PUT'))
 			.then(methodTest('DELETE'));
 	});
 	describe('GET', () => {

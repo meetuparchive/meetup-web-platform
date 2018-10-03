@@ -5,7 +5,8 @@ import { querySchema } from './util/validation';
 export function parseRequestQueries(request) {
 	const { method, mime, payload, query } = request;
 	const queriesRison =
-		(method === 'post' || method === 'patch') && mime !== 'multipart/form-data'
+		(method === 'post' || method === 'patch' || method === 'put') &&
+		mime !== 'multipart/form-data'
 			? payload.queries
 			: query.queries;
 

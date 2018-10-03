@@ -144,6 +144,7 @@ export const buildRequestArgs = externalRequestOpts => ({
 
 	switch (externalRequestOpts.method) {
 		case 'patch':
+		case 'put':
 		case 'post':
 			if (externalRequestOpts.formData) {
 				break;

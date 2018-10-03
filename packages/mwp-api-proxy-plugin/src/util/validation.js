@@ -20,7 +20,9 @@ export const querySchema = Joi.object({
 		}),
 	}),
 	meta: Joi.object({
-		method: Joi.string().valid('get', 'post', 'delete', 'patch').insensitive(),
+		method: Joi.string()
+			.valid('get', 'post', 'delete', 'patch', 'put')
+			.insensitive(),
 		noCache: Joi.bool(),
 		flags: Joi.array(),
 		variants: Joi.object().pattern(/\w+/, stringOrArray),
