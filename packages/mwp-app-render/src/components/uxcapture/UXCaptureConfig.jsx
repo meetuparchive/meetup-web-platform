@@ -12,7 +12,7 @@ export default ({ onMark, onMeasure }: Props) => {
 
 	// No need to inject `UX.config()` script if no callbacks provided
 	if (!onMark && !onMeasure) {
-		return;
+		return null;
 	}
 
 	if (onMark) {

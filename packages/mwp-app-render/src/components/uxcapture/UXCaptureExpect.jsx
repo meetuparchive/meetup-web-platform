@@ -46,7 +46,7 @@ export default ({
 
 	// Don't add UX.expect() to page is no zones specified
 	if (!zones.length) {
-		return;
+		return null;
 	}
 
 	const uxCaptureJS = `
