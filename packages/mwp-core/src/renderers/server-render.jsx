@@ -30,13 +30,15 @@ function getHtml(el) {
 	return `${DOCTYPE}${htmlMarkup}`;
 }
 
-function getRedirect(context) {
+export function getRedirect(context) {
 	if (!context || !context.url) {
 		return;
 	}
+	// use `URL` to ensure valid character encoding (e.g. escaped emoji)
+	const url = new URL(context.url).toString();
 	return {
 		redirect: {
-			url: encodeURI(decodeURI(context.url)), // ensure that the url is encoded for the redirect header
+			url,
 			permanent: context.permanent,
 		},
 	};
