@@ -8,12 +8,12 @@ type Props = {|
 	secondaryContentDisplayed?: Array<string>,
 |};
 
-const generateUXCaptureExpectJS = (
-	destinationVerified: ?Array<string>,
-	primaryContentDisplayed: ?Array<string>,
-	primaryActionAvailable: ?Array<string>,
-	secondaryContentDisplayed: ?Array<string>
-) => {
+export default ({
+	destinationVerified,
+	primaryContentDisplayed,
+	primaryActionAvailable,
+	secondaryContentDisplayed,
+}: Props) => {
 	const zones = [];
 
 	if (destinationVerified && destinationVerified.length > 0) {
@@ -46,30 +46,16 @@ const generateUXCaptureExpectJS = (
 
 	// Don't add UX.expect() to page is no zones specified
 	if (!zones.length) {
-		return;
+		return null;
 	}
 
-	return `
+	const uxCaptureJS = `
 		<script>
 			if(window.UX) {
-				UX.expect(${JSON.stringify(zones)});
+				window.UX.expect(${JSON.stringify(zones)});
 			}
 		</script>
 	`;
-};
-
-export default ({
-	destinationVerified,
-	primaryContentDisplayed,
-	primaryActionAvailable,
-	secondaryContentDisplayed,
-}: Props) => {
-	const uxCaptureJS = generateUXCaptureExpectJS(
-		destinationVerified,
-		primaryContentDisplayed,
-		primaryActionAvailable,
-		secondaryContentDisplayed
-	);
 
 	return (
 		<div dangerouslySetInnerHTML={{ __html: uxCaptureJS }} /> // eslint-disable-line react/no-danger
