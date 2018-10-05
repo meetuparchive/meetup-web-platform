@@ -83,9 +83,9 @@ const DOM = props => {
 				{head.meta.toComponent()}
 				{head.link.toComponent()}
 				{head.script.toComponent()}
-				<script dangerouslySetInnerHTML={getInnerHTML(uxCaptureJS)} />
 				{newrelicJS &&
 					<script dangerouslySetInnerHTML={getInnerHTML(newrelicJS)} />}
+				<script dangerouslySetInnerHTML={getInnerHTML(uxCaptureJS)} />
 				{cssLinks &&
 					cssLinks.map((href, key) =>
 						<link rel="stylesheet" type="text/css" href={href} key={key} />
