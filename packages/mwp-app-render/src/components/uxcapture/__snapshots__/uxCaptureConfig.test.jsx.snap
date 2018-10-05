@@ -1,0 +1,103 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`UXCaptureConfig renders correct markup when all props are defined 1`] = `
+<div
+  dangerouslySetInnerHTML={
+    Object {
+      "__html": "
+		<script>
+			if(window.UX) {
+				window.UX.config({
+					\\"onMark\\": function onMark(foo) {
+		if (foo) {
+			return foo;
+		}
+	},
+					\\"onMeasure\\": function onMeasure(bar, noop) {
+		if (bar && noop) {
+			return bar;
+		}
+	},
+				});
+			}
+		</script>
+	",
+    }
+  }
+/>
+`;
+
+exports[`UXCaptureConfig renders the correct markup when no props are provided 1`] = `""`;
+
+exports[`UXCaptureConfig renders the correct markup when only onMark is provided 1`] = `
+<div
+  dangerouslySetInnerHTML={
+    Object {
+      "__html": "
+		<script>
+			if(window.UX) {
+				window.UX.config({
+					\\"onMark\\": function onMark(foo) {
+		if (foo) {
+			return foo;
+		}
+	},
+					
+				});
+			}
+		</script>
+	",
+    }
+  }
+/>
+`;
+
+exports[`UXCaptureConfig renders the correct markup when only onMeasure is provided 1`] = `
+<div
+  dangerouslySetInnerHTML={
+    Object {
+      "__html": "
+		<script>
+			if(window.UX) {
+				window.UX.config({
+					
+					\\"onMeasure\\": function onMeasure(bar, noop) {
+		if (bar && noop) {
+			return bar;
+		}
+	},
+				});
+			}
+		</script>
+	",
+    }
+  }
+/>
+`;
+
+exports[`UXCaptureConfig renders the correct markup when unsupported props are provided 1`] = `
+<div
+  dangerouslySetInnerHTML={
+    Object {
+      "__html": "
+		<script>
+			if(window.UX) {
+				window.UX.config({
+					\\"onMark\\": function onMark(foo) {
+		if (foo) {
+			return foo;
+		}
+	},
+					\\"onMeasure\\": function onMeasure(bar, noop) {
+		if (bar && noop) {
+			return bar;
+		}
+	},
+				});
+			}
+		</script>
+	",
+    }
+  }
+/>
+`;
