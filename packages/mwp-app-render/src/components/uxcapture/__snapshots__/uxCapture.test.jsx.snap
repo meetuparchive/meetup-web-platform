@@ -2,10 +2,7 @@
 
 exports[`UXCapture renders correct markup when all props are defined 1`] = `
 <Fragment>
-  <Component
-    onMark={[Function]}
-    onMeasure={[Function]}
-  />
+  <Component />
   <Component
     primaryActionAvailable={
       Array [

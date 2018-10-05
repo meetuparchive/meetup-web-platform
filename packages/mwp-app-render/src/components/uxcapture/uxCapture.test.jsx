@@ -11,16 +11,6 @@ const MOCK_PROPS = {
 		'ux-secondary-content-2',
 		'ux-secondary-content-3',
 	],
-	onMark: foo => {
-		if (foo) {
-			return foo;
-		}
-	},
-	onMeasure: (bar, noop) => {
-		if (bar && noop) {
-			return bar;
-		}
-	},
 };
 
 const renderComponent = (props = MOCK_PROPS) =>
