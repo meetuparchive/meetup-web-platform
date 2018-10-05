@@ -8,25 +8,18 @@ type Props = {|
 |};
 
 export default ({ onMark, onMeasure }: Props) => {
-	const config = {};
-
 	// No need to inject `UX.config()` script if no callbacks provided
 	if (!onMark && !onMeasure) {
 		return null;
 	}
 
-	if (onMark) {
-		config['onMark'] = onMark.toString();
-	}
-
-	if (onMeasure) {
-		config['onMeasure'] = onMeasure.toString();
-	}
-
 	const uxCaptureConfigJS = `
 		<script>
 			if(window.UX) {
-				window.UX.config(${JSON.stringify(config)});
+				window.UX.config({
+					${onMark ? `"onMark": ${onMark.toString()},` : ''}
+					${onMeasure ? `"onMeasure": ${onMeasure.toString()},` : ''}
+				});
 			}
 		</script>
 	`;
