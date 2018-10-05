@@ -17,6 +17,7 @@ import { parseMemberCookie } from 'mwp-core/lib/util/cookieUtils';
 import { getVariants } from '../util/cookieUtils';
 
 const DOCTYPE = '<!DOCTYPE html>';
+const DUMMY_DOMAIN = 'http://mwp-dummy-domain.com';
 
 /**
  * An async module that renders the full app markup for a particular URL/location
@@ -35,10 +36,14 @@ export function getRedirect(context) {
 		return;
 	}
 	// use `URL` to ensure valid character encoding (e.g. escaped emoji)
-	const url = new URL(context.url).toString();
+	const isFragment = context.url.startsWith('/');
+	const urlToFormat = isFragment
+		? `${DUMMY_DOMAIN}${context.url}`
+		: context.url;
+	const formattedUrl = new URL(urlToFormat).toString();
 	return {
 		redirect: {
-			url,
+			url: formattedUrl.replace(DUMMY_DOMAIN, ''),
 			permanent: context.permanent,
 		},
 	};
