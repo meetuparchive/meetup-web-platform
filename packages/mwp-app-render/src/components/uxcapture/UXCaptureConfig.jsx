@@ -1,7 +1,7 @@
 // @flow
 import React from 'react';
 
-type callbackType = (label: string) => mixed;
+type callbackType = (label: string) => void;
 type Props = {|
 	onMark?: callbackType,
 	onMeasure?: callbackType,
