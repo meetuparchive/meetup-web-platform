@@ -76,6 +76,7 @@ const DOM = props => {
 	const uxCaptureFilename = require.resolve('ux-capture/js/ux-capture.min.js');
 	const uxCaptureJS = fs.readFileSync(uxCaptureFilename, 'utf8');
 
+	// newRelicJS should come *before* uxCaptureJS to help avoid race conditions
 	return (
 		<html lang={htmlLang}>
 			<head>
