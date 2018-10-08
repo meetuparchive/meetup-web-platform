@@ -13,8 +13,8 @@ exports[`UXCaptureConfig renders correct markup when all props are defined 1`] =
 			return foo;
 		}
 	},
-					\\"onMeasure\\": function onMeasure(bar, noop) {
-		if (bar && noop) {
+					\\"onMeasure\\": function onMeasure(bar) {
+		if (bar) {
 			return bar;
 		}
 	},
@@ -61,8 +61,8 @@ exports[`UXCaptureConfig renders the correct markup when only onMeasure is provi
 			if(window.UX) {
 				window.UX.config({
 					
-					\\"onMeasure\\": function onMeasure(bar, noop) {
-		if (bar && noop) {
+					\\"onMeasure\\": function onMeasure(bar) {
+		if (bar) {
 			return bar;
 		}
 	},
@@ -88,8 +88,8 @@ exports[`UXCaptureConfig renders the correct markup when unsupported props are p
 			return foo;
 		}
 	},
-					\\"onMeasure\\": function onMeasure(bar, noop) {
-		if (bar && noop) {
+					\\"onMeasure\\": function onMeasure(bar) {
+		if (bar) {
 			return bar;
 		}
 	},

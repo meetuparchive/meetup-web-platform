@@ -8,8 +8,8 @@ const MOCK_PROPS = {
 			return foo;
 		}
 	},
-	onMeasure: (bar, noop) => {
-		if (bar && noop) {
+	onMeasure: bar => {
+		if (bar) {
 			return bar;
 		}
 	},
