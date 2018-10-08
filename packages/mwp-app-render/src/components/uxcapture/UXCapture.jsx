@@ -11,44 +11,56 @@ type Props = {|
 |};
 
 export const onMark = (mark: string) => {
-	if (!window.newrelic) {
+	if (!(window.newrelic && window.performance)) {
 		return;
 	}
 
-	const now = new Date().getTime();
+	const markStartTime = window.performance
+		.getEntriesByType('mark')
+		.find(entry => entry.name === mark).startTime;
 
 	// Set a marker in the trace details
 	window.newrelic.addToTrace({
 		name: mark,
-		start: now,
+		start: markStartTime,
 		type: 'UX Capture mark',
 	});
 
 	//  Add a custom attribute to the PageView & BrowserInteraction events in Insights
-	if (window.performance) {
-		// `window performance.timing.navigationStart` is the event that NR uses as 'start' of page load
-		const timeToMark = now - window.performance.timing.navigationStart;
-		window.newrelic.setCustomAttribute(mark, timeToMark);
-	}
+	// `window performance.timing.navigationStart` is the event that NR uses as 'start' of page load
+	const timeToMark = markStartTime - window.performance.timeing.navigationStart;
+	window.newrelic.setCustomAttribute(mark, timeToMark);
 };
 
 export const onMeasure = (measure: string) => {
-	if (!window.newrelic) {
+	if (!(window.newrelic && window.performance)) {
 		return;
 	}
 
-	const now = new Date().getTime();
+	const performanceMeasure = window.performance
+		.getEntriesByType('measure')
+		.find(entry => entry.name === measure);
 
+	// Set a start time marker in trace details
 	window.newrelic.addToTrace({
-		name: measure,
-		start: now,
+		name: `${measure}-startTime`,
+		start: performanceMeasure.startTime,
 		type: 'UX Capture measure',
 	});
 
-	if (window.performance) {
-		const timeToMeasure = now - window.performance.timing.navigationStart;
-		window.newrelic.setCustomAttribute(measure, timeToMeasure);
-	}
+	// Set an end time marker in trace details:
+	// TBD: not sure if we'll actually need this
+	window.newrelic.addToTrace({
+		name: `${measure}-endTime`,
+		start: performanceMeasure.startTime + performanceMeasure.duration,
+		type: 'UX Capture measure',
+	});
+
+	//  Add a custom attribute to the PageView & BrowserInteraction events in Insights
+	// `window performance.timing.navigationStart` is the event that NR uses as 'start' of page load
+	const timeToMeasure =
+		performanceMeasure.startTime - window.performance.timing.navigationStart;
+	window.newrelic.setCustomAttribute(measure, timeToMeasure);
 };
 
 export default ({
