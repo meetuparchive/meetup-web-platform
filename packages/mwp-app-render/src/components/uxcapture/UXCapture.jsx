@@ -22,7 +22,8 @@ export const onMark = (mark: string) => {
 	// Set a marker in the trace details
 	window.newrelic.addToTrace({
 		name: mark,
-		start: performanceMark.startTime, // this is an epoch ms timestamp
+		start:
+			window.performance.timing.navigationStart + performanceMark.startTime, // this is an epoch ms timestamp
 		type: 'UX Capture mark',
 	});
 };
