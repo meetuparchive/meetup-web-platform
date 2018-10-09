@@ -15,21 +15,16 @@ export const onMark = (mark: string) => {
 		return;
 	}
 
-	const markStartTime = window.performance
+	const performanceMark = window.performance
 		.getEntriesByType('mark')
-		.find(entry => entry.name === mark).startTime;
+		.find(entry => entry.name === mark);
 
 	// Set a marker in the trace details
 	window.newrelic.addToTrace({
 		name: mark,
-		start: markStartTime,
+		start: performanceMark.startTime, // this is an epoch ms timestamp
 		type: 'UX Capture mark',
 	});
-
-	//  Add a custom attribute to the PageView & BrowserInteraction events in Insights
-	// `window performance.timing.navigationStart` is the event that NR uses as 'start' of page load
-	const timeToMark = markStartTime - window.performance.timing.navigationStart;
-	window.newrelic.setCustomAttribute(mark, timeToMark);
 };
 
 export const onMeasure = (measure: string) => {
@@ -41,26 +36,8 @@ export const onMeasure = (measure: string) => {
 		.getEntriesByType('measure')
 		.find(entry => entry.name === measure);
 
-	// Set a start time marker in trace details
-	window.newrelic.addToTrace({
-		name: `${measure}-startTime`,
-		start: performanceMeasure.startTime,
-		type: 'UX Capture measure',
-	});
-
-	// Set an end time marker in trace details:
-	// TBD: not sure if we'll actually need this
-	window.newrelic.addToTrace({
-		name: `${measure}-endTime`,
-		start: performanceMeasure.startTime + performanceMeasure.duration,
-		type: 'UX Capture measure',
-	});
-
 	//  Add a custom attribute to the PageView & BrowserInteraction events in Insights
-	// `window performance.timing.navigationStart` is the event that NR uses as 'start' of page load
-	const timeToMeasure =
-		performanceMeasure.startTime - window.performance.timing.navigationStart;
-	window.newrelic.setCustomAttribute(measure, timeToMeasure);
+	window.newrelic.setCustomAttribute(measure, performanceMeasure.duration);
 };
 
 export default ({
