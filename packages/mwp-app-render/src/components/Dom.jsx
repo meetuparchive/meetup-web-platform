@@ -76,6 +76,7 @@ const DOM = props => {
 	const uxCaptureFilename = require.resolve('ux-capture/js/ux-capture.min.js');
 	const uxCaptureJS = fs.readFileSync(uxCaptureFilename, 'utf8');
 
+	// newRelicJS should come *before* uxCaptureJS to help avoid race conditions
 	return (
 		<html lang={htmlLang}>
 			<head>
@@ -83,9 +84,9 @@ const DOM = props => {
 				{head.meta.toComponent()}
 				{head.link.toComponent()}
 				{head.script.toComponent()}
-				<script dangerouslySetInnerHTML={getInnerHTML(uxCaptureJS)} />
 				{newrelicJS &&
 					<script dangerouslySetInnerHTML={getInnerHTML(newrelicJS)} />}
+				<script dangerouslySetInnerHTML={getInnerHTML(uxCaptureJS)} />
 				{cssLinks &&
 					cssLinks.map((href, key) =>
 						<link rel="stylesheet" type="text/css" href={href} key={key} />
