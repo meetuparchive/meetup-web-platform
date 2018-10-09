@@ -28,7 +28,7 @@ export const onMark = (mark: string) => {
 
 	//  Add a custom attribute to the PageView & BrowserInteraction events in Insights
 	// `window performance.timing.navigationStart` is the event that NR uses as 'start' of page load
-	const timeToMark = markStartTime - window.performance.timeing.navigationStart;
+	const timeToMark = markStartTime - window.performance.timing.navigationStart;
 	window.newrelic.setCustomAttribute(mark, timeToMark);
 };
 
