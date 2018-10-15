@@ -34,27 +34,43 @@ export const getTrackApiResponses: TrackGetter = trackOpts => request => (
 /*
  * This is the core tracking handler - called on every request that generates
  * REST API call(s)
+ * 
+ * 1. Server render (initial navigation)
+ *    - url: target URL (request.url.path)
+ *    - referrer: previous URL (request.referrer)
+ * 2. SPA navigation
+ *    - url: target URL (provided by querystring params)
+ *    - referrer: previous URL (provided by querystring params)
+ * 3. lazy-loaded data
+ *    - url: proxy endpoint path (request.url.path)
+ *    - referrer: current URL (request.referrer)
+ * 4. tracking-only request
+ *    - url: proxy endpoint path (request.url.path)
+ *    - referrer: current URL (request.referrer)
  */
-export const getTrackActivity: TrackGetter = trackOpts => request => (
+export const getTrackActivity: TrackGetter = () => request => (
 	fields: ActivityFields
 ) => {
-	const { method, payload, query, info: { referrer } } = request;
+	const { url, method, payload, query, info: { referrer } } = request;
 	const requestReferrer = referrer || '';
-
 	const reqData = method === 'post' ? payload : query;
 
-	if (reqData.metadata) {
-		// this is an API-proxy request, so the referrer needs to be read from
-		// the reqData. The 'url' is the 'requestReferrer'
-		const metadataRison = reqData.metadata || rison.encode_object({});
-		const { referrer } = rison.decode_object(metadataRison);
-		const url = requestReferrer;
-		return request.trackApiResponses({ url, referrer, ...fields });
-	}
+	// the request may specify a referrer that should be used instead of the `request.referrer`
+	const referrerOverride =
+		reqData.metadata && (rison.decode_object(reqData.metadata) || {}).referrer;
+
+	const urlFields = referrerOverride
+		? {
+				url: requestReferrer, // original request referrer is passed through as URL
+				referrer: referrerOverride,
+			}
+		: {
+				url: url.path,
+				referrer: requestReferrer,
+			};
 
 	return request.trackApiResponses({
-		url: request.url.path, // requested url
-		referrer: requestReferrer, // referer
+		...urlFields,
 		...fields,
 	});
 };

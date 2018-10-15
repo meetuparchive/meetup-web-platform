@@ -1,3 +1,9 @@
+## [17.4]
+
+- **Refactor** `mwp-tracking-plugin` now explicitly handles each type of request
+  that results in an activity record to ensure that the expected `url` and
+  `referrer` values are populated
+
 ## [17.3]
 
 - **New feature** added support for `put` request
