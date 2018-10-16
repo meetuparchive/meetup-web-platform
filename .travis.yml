@@ -42,7 +42,8 @@ before_install:
 
 before_script:
   - lerna run build
-  - git diff --exit-code
+  - git diff --exit-code yarn.lock
+  - yarn check
 
 script:
   - yarn flow
