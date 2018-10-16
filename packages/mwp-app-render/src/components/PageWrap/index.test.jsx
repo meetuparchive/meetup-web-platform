@@ -28,7 +28,18 @@ describe('PageWrap', () => {
 		delete global.window;
 	});
 	it('Calls NR trace in componentDidMount', () => {
-		global.window = { newrelic: { addToTrace: jest.fn() } };
+		global.window = {
+			newrelic: {
+				addToTrace: jest.fn(),
+				setCustomAttribute: jest.fn(),
+			},
+			performance: {
+				timing: {
+					navigationStart: 0,
+				},
+				now: jest.fn(),
+			},
+		};
 		shallow(<PageWrap {...PROPS} />).instance().componentDidMount();
 		expect(global.window.newrelic.addToTrace).toHaveBeenCalled();
 		delete global.window;
