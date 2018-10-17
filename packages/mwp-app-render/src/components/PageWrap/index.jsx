@@ -40,7 +40,7 @@ class PageWrap extends React.Component {
 			});
 
 			// Add a custom attribute to the PageView & BrowserInteraction events in Insights
-span class="pl-c1"> 			window.newrelic.setCustomAttribute('timeToAppInteractive', now);
+			window.newrelic.setCustomAttribute('timeToAppInteractive', now);
 		}
 
 		// Add W3C UserTiming mark for TTI and measure (from navigationStart to newly created mark)
