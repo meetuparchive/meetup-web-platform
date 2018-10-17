@@ -40,7 +40,6 @@ class PageWrap extends React.Component {
 			});
 
 			// Add a custom attribute to the PageView & BrowserInteraction events in Insights
-			window.performance &&
 				window.newrelic.setCustomAttribute('timeToAppInteractive', now);
 		}
 
