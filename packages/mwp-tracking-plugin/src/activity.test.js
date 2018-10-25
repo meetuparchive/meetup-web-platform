@@ -79,6 +79,9 @@ describe('getLogger', () => {
 			state: {},
 			id: 1234,
 		};
+		jest
+			.spyOn(Date.prototype, 'toISOString')
+			.mockImplementation(() => 'mock ISO date');
 		const logger = getLogger('FOO');
 		expect(logger(MOCK_REQUEST, { foo: 'bar' })).toMatchInlineSnapshot(`
 Object {
@@ -91,9 +94,10 @@ Object {
   "platformAgent": "FOO",
   "referer": "",
   "requestId": 1234,
-  "timestamp": "2018-10-25T16:58:15.000Z",
+  "timestamp": "mock ISO date",
   "trax": Object {},
 }
 `);
+		jest.restoreAllMocks(); // restore toISOString behavior
 	});
 });
