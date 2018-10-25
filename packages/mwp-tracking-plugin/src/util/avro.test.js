@@ -68,6 +68,7 @@ describe('Activity tracking', () => {
 	const request = {
 		id: 'foo',
 		headers: {},
+		state: {},
 		log() {},
 		server: { settings: { app: { api: {} } } },
 	};

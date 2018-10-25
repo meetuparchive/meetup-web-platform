@@ -61,7 +61,7 @@ export const getLogger: string => (Object, Object) => mixed = (
 			ip: requestHeaders['remote-addr'] || '',
 			agent: requestHeaders['user-agent'] || '',
 			platform: 'WEB',
-			platformAgent: agent,
+			platformAgent: request.state.isNativeApp ? 'NATIVE_APP_WEB_VIEW' : agent,
 			mobileWeb: false,
 			referer: '', // misspelled to align with schema
 			trax: {},
