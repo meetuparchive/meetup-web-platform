@@ -100,4 +100,31 @@ Object {
 `);
 		jest.restoreAllMocks(); // restore toISOString behavior
 	});
+	it('sets platformAgent to NATIVE_APP_WEB_VIEW for isNativeApp cookie', () => {
+		const MOCK_REQUEST = {
+			headers: {},
+			state: { isNativeApp: 'true' },
+			id: 1234,
+		};
+		jest
+			.spyOn(Date.prototype, 'toISOString')
+			.mockImplementation(() => 'mock ISO date');
+		const logger = getLogger('FOO');
+		expect(logger(MOCK_REQUEST, { foo: 'bar' })).toMatchInlineSnapshot(`
+Object {
+  "agent": "",
+  "foo": "bar",
+  "ip": "",
+  "isUserActivity": true,
+  "mobileWeb": false,
+  "platform": "WEB",
+  "platformAgent": "NATIVE_APP_WEB_VIEW",
+  "referer": "",
+  "requestId": 1234,
+  "timestamp": "mock ISO date",
+  "trax": Object {},
+}
+`);
+		jest.restoreAllMocks(); // restore toISOString behavior
+	});
 });
