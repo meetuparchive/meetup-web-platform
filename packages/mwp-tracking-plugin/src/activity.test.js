@@ -1,5 +1,12 @@
-import { fakeUTCinTimezone } from './activity';
+import { fakeUTCinTimezone, getLogger } from './activity';
 import { updateId } from './util/idUtils';
+
+jest.mock('./util/avro', () => ({
+	loggers: {
+		activity: jest.fn(),
+	},
+}));
+
 // RegEx to verify UUID
 const UUID_V4_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -60,6 +67,64 @@ describe('updateId', () => {
 		const updatedTrackId = updateId(trackIdCookieName)(request, doRefresh);
 		expect(updatedTrackId).not.toBe(trackId); // no change
 		expect(request.plugins.tracking[trackIdCookieName]).not.toBeUndefined();
-		expect(request.plugins.tracking[trackIdCookieName]).toContain(updatedTrackId);
+		expect(request.plugins.tracking[trackIdCookieName]).toContain(
+			updatedTrackId
+		);
+	});
+});
+describe('getLogger', () => {
+	it('returns expected record shape', () => {
+		const MOCK_REQUEST = {
+			headers: {},
+			state: {},
+			id: 1234,
+		};
+		jest
+			.spyOn(Date.prototype, 'toISOString')
+			.mockImplementation(() => 'mock ISO date');
+		const logger = getLogger('FOO');
+		expect(logger(MOCK_REQUEST, { foo: 'bar' })).toMatchInlineSnapshot(`
+Object {
+  "agent": "",
+  "foo": "bar",
+  "ip": "",
+  "isUserActivity": true,
+  "mobileWeb": false,
+  "platform": "WEB",
+  "platformAgent": "FOO",
+  "referer": "",
+  "requestId": 1234,
+  "timestamp": "mock ISO date",
+  "trax": Object {},
+}
+`);
+		jest.restoreAllMocks(); // restore toISOString behavior
+	});
+	it('sets platformAgent to NATIVE_APP_WEB_VIEW for isNativeApp cookie', () => {
+		const MOCK_REQUEST = {
+			headers: {},
+			state: { isNativeApp: 'true' },
+			id: 1234,
+		};
+		jest
+			.spyOn(Date.prototype, 'toISOString')
+			.mockImplementation(() => 'mock ISO date');
+		const logger = getLogger('FOO');
+		expect(logger(MOCK_REQUEST, { foo: 'bar' })).toMatchInlineSnapshot(`
+Object {
+  "agent": "",
+  "foo": "bar",
+  "ip": "",
+  "isUserActivity": true,
+  "mobileWeb": false,
+  "platform": "WEB",
+  "platformAgent": "NATIVE_APP_WEB_VIEW",
+  "referer": "",
+  "requestId": 1234,
+  "timestamp": "mock ISO date",
+  "trax": Object {},
+}
+`);
+		jest.restoreAllMocks(); // restore toISOString behavior
 	});
 });
