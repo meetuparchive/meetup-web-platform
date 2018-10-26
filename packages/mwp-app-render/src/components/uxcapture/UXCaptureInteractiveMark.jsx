@@ -6,8 +6,8 @@ type InteractiveMarkProps = {
 	children: React$Node,
 };
 
-// inject inline UX.mark() call into rendered markup
-// @see https://github.com/meetup/ux-capture#text-without-custom-font
+// inject interactive UX.mark() call that only triggers in browser and not in in server-side render
+// @see https://github.com/meetup/ux-capture#event-handler-attachment
 class UXCaptureInteractiveMark extends React.Component<InteractiveMarkProps> {
 	render() {
 		return this.props.children;
