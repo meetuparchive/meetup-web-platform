@@ -50,13 +50,13 @@ const ANDROID_APP_ID = 'com.meetup';
 export const getRequestPlatform = (request: HapiRequest): ActivityPlatform => {
 	const { headers, state, query = {} } = request;
 	const isNativeApp = state.isNativeApp || query.isNativeApp;
-	if (!isNativeApp) {
-		return 'WEB';
+	if (isNativeApp) {
+		// recommended test for Android WebView - not perfect but should be adequate
+		// https://stackoverflow.com/questions/24291315/android-webview-detection-in-php
+		const isAndroid = headers.http_x_requested_with === ANDROID_APP_ID;
+		return isAndroid ? 'ANDROID' : 'IOS';
 	}
-	// recommended test for Android WebView - not perfect but should be adequate
-	// https://stackoverflow.com/questions/24291315/android-webview-detection-in-php
-	const isAndroid = headers.http_x_requested_with === ANDROID_APP_ID;
-	return isAndroid ? 'ANDROID' : 'IOS';
+	return 'WEB';
 };
 export const getLogger: string => (Object, Object) => mixed = (
 	agent: string
