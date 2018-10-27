@@ -48,7 +48,7 @@ type ActivityPlatform = 'WEB' | 'IOS' | 'ANDROID';
 const ANDROID_APP_ID = 'com.meetup';
 
 export const getRequestPlatform = (request: HapiRequest): ActivityPlatform => {
-	const { headers, query = {}, state } = request;
+	const { headers, state, query = {} } = request;
 	const isNativeApp = state.isNativeApp || query.isNativeApp;
 	if (!isNativeApp) {
 		return 'WEB';
