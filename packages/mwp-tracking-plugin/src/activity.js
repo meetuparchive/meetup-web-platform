@@ -44,6 +44,20 @@ export const fakeUTCinTimezone = (timezone: string) => {
  * - `trackActivity`
  */
 
+type ActivityPlatform = 'WEB' | 'IOS' | 'ANDROID';
+const ANDROID_APP_ID = 'com.meetup';
+
+export const getRequestPlatform = (request: HapiRequest): ActivityPlatform => {
+	const { headers, state, query = {} } = request;
+	const isNativeApp = state.isNativeApp || query.isNativeApp;
+	if (isNativeApp) {
+		// recommended test for Android WebView - not perfect but should be adequate
+		// https://stackoverflow.com/questions/24291315/android-webview-detection-in-php
+		const isAndroid = headers.http_x_requested_with === ANDROID_APP_ID;
+		return isAndroid ? 'ANDROID' : 'IOS';
+	}
+	return 'WEB';
+};
 export const getLogger: string => (Object, Object) => mixed = (
 	agent: string
 ) => {
@@ -53,14 +67,14 @@ export const getLogger: string => (Object, Object) => mixed = (
 	const getTime = fakeUTCinTimezone('America/New_York');
 
 	return (request: Object, trackInfo: Object) => {
-		const requestHeaders = request.headers;
+		const { headers } = request;
 
 		const record = {
 			timestamp: getTime().toISOString(),
 			requestId: request.id,
-			ip: requestHeaders['remote-addr'] || '',
-			agent: requestHeaders['user-agent'] || '',
-			platform: 'WEB',
+			ip: headers['remote-addr'] || '',
+			agent: headers['user-agent'] || '',
+			platform: getRequestPlatform(request),
 			platformAgent: agent,
 			mobileWeb: false,
 			referer: '', // misspelled to align with schema
