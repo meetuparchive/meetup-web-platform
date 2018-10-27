@@ -82,7 +82,7 @@ describe('getLogger', () => {
 		jest
 			.spyOn(Date.prototype, 'toISOString')
 			.mockImplementation(() => 'mock ISO date');
-		const logger = getLogger('FOO');
+		const logger = getLogger('MOCK_PLATFORM_AGENT');
 		expect(logger(MOCK_REQUEST, { foo: 'bar' })).toMatchInlineSnapshot(`
 Object {
   "agent": "",
@@ -91,7 +91,7 @@ Object {
   "isUserActivity": true,
   "mobileWeb": false,
   "platform": "WEB",
-  "platformAgent": "FOO",
+  "platformAgent": "MOCK_PLATFORM_AGENT",
   "referer": "",
   "requestId": 1234,
   "timestamp": "mock ISO date",
@@ -100,31 +100,28 @@ Object {
 `);
 		jest.restoreAllMocks(); // restore toISOString behavior
 	});
-	it('sets platformAgent to NATIVE_APP_WEB_VIEW for isNativeApp cookie', () => {
+	it('sets `platform` to IOS for isNativeApp without Android header', () => {
 		const MOCK_REQUEST = {
 			headers: {},
 			state: { isNativeApp: 'true' },
 			id: 1234,
 		};
-		jest
-			.spyOn(Date.prototype, 'toISOString')
-			.mockImplementation(() => 'mock ISO date');
-		const logger = getLogger('FOO');
-		expect(logger(MOCK_REQUEST, { foo: 'bar' })).toMatchInlineSnapshot(`
-Object {
-  "agent": "",
-  "foo": "bar",
-  "ip": "",
-  "isUserActivity": true,
-  "mobileWeb": false,
-  "platform": "WEB",
-  "platformAgent": "NATIVE_APP_WEB_VIEW",
-  "referer": "",
-  "requestId": 1234,
-  "timestamp": "mock ISO date",
-  "trax": Object {},
-}
-`);
-		jest.restoreAllMocks(); // restore toISOString behavior
+		const platformAgent = 'MOCK_PLATFORM_AGENT';
+		const logger = getLogger(platformAgent);
+		const record = logger(MOCK_REQUEST, {});
+		expect(record.platform).toBe('IOS');
+		expect(record.platformAgent).toBe(platformAgent);
+	});
+	it('sets `platform` to ANDROID for isNativeApp with Android header', () => {
+		const MOCK_REQUEST = {
+			headers: {},
+			state: { isNativeApp: 'true' },
+			id: 1234,
+		};
+		const platformAgent = 'MOCK_PLATFORM_AGENT';
+		const logger = getLogger(platformAgent);
+		const record = logger(MOCK_REQUEST, {});
+		expect(record.platform).toBe('IOS');
+		expect(record.platformAgent).toBe(platformAgent);
 	});
 });
