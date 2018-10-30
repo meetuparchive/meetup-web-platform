@@ -29,7 +29,16 @@ export const getCookieLang: ParseRequestLang = (request: HapiRequest) => {
 export const getUrlLang: ParseRequestLang = (request: HapiRequest) => {
 	const { supportedLangs } = getServerSettings(request);
 	const urlLang = request.url.path.split('/')[1];
-	return supportedLangs.includes(urlLang) && urlLang;
+	const validRequestLang = supportedLangs.includes(urlLang) && urlLang;
+
+	// If request url language is invalid, look at referer for language code
+	// This is for cases when the request url is the api proxy path ie `/mu_api/`
+	if (!validRequestLang && request.headers['referer']) {
+		const refererUrl = new URL(request.headers['referer']);
+		const refererLang = refererUrl.pathname.split('/')[1];
+		return supportedLangs.includes(refererLang) && refererLang;
+	}
+	return validRequestLang;
 };
 
 /*
