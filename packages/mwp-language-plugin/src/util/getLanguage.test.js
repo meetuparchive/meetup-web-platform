@@ -21,12 +21,14 @@ const supportedLangs = [
 	altLang2,
 	altLang3,
 ];
+const HEADERS = {
+	'accept-language': unsupportedLang, // must test unsupported lang by default
+	referer: '',
+};
 const MOCK_HAPI_REQUEST = {
 	log() {},
 	url: url.parse(rootUrl),
-	headers: {
-		'accept-language': unsupportedLang, // must test unsupported lang by default
-	},
+	headers: { ...HEADERS },
 	state: {},
 	server: { settings: { app: { supportedLangs, api: {} } } },
 };
@@ -64,6 +66,32 @@ describe('getUrlLang', () => {
 		const request = {
 			...MOCK_HAPI_REQUEST,
 			url: url.parse(`${rootUrl}${requestLang}/`),
+		};
+		const lang = getUrlLang(request);
+		expect(lang).toEqual(requestLang);
+	});
+	it('returns false for unsupported lang in both referer url and request url', () => {
+		const requestLang = 'this-isnt-even-a-language';
+		const request = {
+			...MOCK_HAPI_REQUEST,
+			url: url.parse(`${rootUrl}${requestLang}/`),
+			headers: {
+				...HEADERS,
+				referer: `${rootUrl}${requestLang}/`,
+			},
+		};
+		const lang = getUrlLang(request);
+		expect(lang).toBe(false);
+	});
+	it('returns supported language from referer URL pathname, if present and a valid lang was not in request url', () => {
+		const requestLang = altLang;
+		const request = {
+			...MOCK_HAPI_REQUEST,
+			url: url.parse(`${rootUrl}${unsupportedLang}/`),
+			headers: {
+				...HEADERS,
+				referer: `${rootUrl}${requestLang}/`,
+			},
 		};
 		const lang = getUrlLang(request);
 		expect(lang).toEqual(requestLang);
