@@ -27,18 +27,18 @@ export const getCookieLang: ParseRequestLang = (request: HapiRequest) => {
  * get the URL-specified language - check for existing language path prefixes
  */
 export const getUrlLang: ParseRequestLang = (request: HapiRequest) => {
+	const { url, info: { referrer }, route } = request;
 	const { supportedLangs } = getServerSettings(request);
-	const urlLang = request.url.path.split('/')[1];
-	const validRequestLang = supportedLangs.includes(urlLang) && urlLang;
+	const { plugins = {} } = route.settings || {};
 
-	// If request url language is invalid, look at referer for language code
-	// This is for cases when the request url is the api proxy path ie `/mu_api/`
-	if (!validRequestLang && request.headers['referer']) {
-		const refererUrl = new URL(request.headers['referer']);
-		const refererLang = refererUrl.pathname.split('/')[1];
-		return supportedLangs.includes(refererLang) && refererLang;
-	}
-	return validRequestLang;
+	// Whether to use the language code in the referrer url, rather than the request url
+	// set to `true` for API proxy request ie `/mu_api/` in the api proxy plugin route config
+	const { useReferrerUrlLangCode } = plugins['mwp-language-plugin'] || {};
+
+	const urlPath =
+		useReferrerUrlLangCode && referrer ? new URL(referrer).pathname : url.path;
+	const urlLang = urlPath.split('/')[1];
+	return supportedLangs.includes(urlLang) && urlLang;
 };
 
 /*

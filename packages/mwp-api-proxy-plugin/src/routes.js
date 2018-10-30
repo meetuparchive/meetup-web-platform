@@ -28,6 +28,9 @@ const getApiProxyRoutes = path => {
 				'electrode-csrf-jwt': {
 					enabled: true,
 				},
+				'mwp-language-plugin': {
+					useReferrerUrlLangCode: true,
+				},
 				[CLICK_PLUGIN_NAME]: {
 					click: request => {
 						// only consume click data when the querystring includes `?metadata={clickTracking:true}` (rison-encoded)

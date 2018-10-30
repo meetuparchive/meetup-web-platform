@@ -14,6 +14,7 @@ const altLang = 'fr-FR';
 const altLang2 = 'de-DE';
 const altLang3 = 'es-ES';
 const unsupportedLang = 'xx-XX';
+const muApiNotLang = 'mu_api';
 const supportedLangs = [
 	defaultLang,
 	similarToDefault,
@@ -21,16 +22,23 @@ const supportedLangs = [
 	altLang2,
 	altLang3,
 ];
-const HEADERS = {
-	'accept-language': unsupportedLang, // must test unsupported lang by default
-	referer: '',
+
+const API_PROXY_ROUTE = {
+	settings: {
+		plugins: { 'mwp-language-plugin': { useReferrerUrlLangCode: true } },
+	},
 };
+
 const MOCK_HAPI_REQUEST = {
 	log() {},
 	url: url.parse(rootUrl),
-	headers: { ...HEADERS },
+	info: { referrer: '' },
+	headers: {
+		'accept-language': unsupportedLang, // must test unsupported lang by default
+	},
 	state: {},
 	server: { settings: { app: { supportedLangs, api: {} } } },
+	route: { settings: { plugins: {} } },
 };
 describe('getCookieLang', () => {
 	it('returns undefined when no cookie in state', () => {
@@ -70,31 +78,29 @@ describe('getUrlLang', () => {
 		const lang = getUrlLang(request);
 		expect(lang).toEqual(requestLang);
 	});
-	it('returns false for unsupported lang in both referer url and request url', () => {
-		const requestLang = 'this-isnt-even-a-language';
-		const request = {
-			...MOCK_HAPI_REQUEST,
-			url: url.parse(`${rootUrl}${requestLang}/`),
-			headers: {
-				...HEADERS,
-				referer: `${rootUrl}${requestLang}/`,
-			},
-		};
-		const lang = getUrlLang(request);
-		expect(lang).toBe(false);
-	});
-	it('returns supported language from referer URL pathname, if present and a valid lang was not in request url', () => {
-		const requestLang = altLang;
-		const request = {
-			...MOCK_HAPI_REQUEST,
-			url: url.parse(`${rootUrl}${unsupportedLang}/`),
-			headers: {
-				...HEADERS,
-				referer: `${rootUrl}${requestLang}/`,
-			},
-		};
-		const lang = getUrlLang(request);
-		expect(lang).toEqual(requestLang);
+	describe('useReferrerUrl is true', () => {
+		it('returns false for unsupported language in url', () => {
+			const requestLang = 'this-isnt-even-a-language';
+			const request = {
+				...MOCK_HAPI_REQUEST,
+				route: API_PROXY_ROUTE,
+				url: url.parse(`${rootUrl}${muApiNotLang}/`),
+				info: { referrer: `${rootUrl}${requestLang}/` },
+			};
+			const lang = getUrlLang(request);
+			expect(lang).toBe(false);
+		});
+		it('returns supported language from referrer URL pathname', () => {
+			const requestLang = altLang;
+			const request = {
+				...MOCK_HAPI_REQUEST,
+				route: API_PROXY_ROUTE,
+				url: url.parse(`${rootUrl}${muApiNotLang}/`),
+				info: { referrer: `${rootUrl}${requestLang}/` },
+			};
+			const lang = getUrlLang(request);
+			expect(lang).toEqual(requestLang);
+		});
 	});
 });
 describe('getBrowserLang', () => {
