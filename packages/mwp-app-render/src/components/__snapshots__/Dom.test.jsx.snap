@@ -13,6 +13,9 @@ exports[`Dom renders with mock props 1`] = `
         }
       }
     />
+    <script
+      src="https://ajax.googleapis.com/ajax/libs/webfont/1.5.10/webfont.js"
+    />
     <link
       href="style.css"
       key="0"
