@@ -6,19 +6,18 @@ type Props = {
 	mark: string,
 };
 
-export const fontLoaderJS = `<script src="https://ajax.googleapis.com/ajax/libs/webfont/1.5.10/webfont.js" />`;
+export const fontLoaderSrc =
+	'https://ajax.googleapis.com/ajax/libs/webfont/1.5.10/webfont.js';
 
 const generateUXCaptureFontJS = (fontFamily: string, mark: string) => `
-    <script>
-        WebFont.load({
-            custom: {
-                families: ['${fontFamily}']
-            },
-            active: function() {
-                window.performance.mark('${mark}');
-            },
-        });
-    </script>
+    WebFont.load({
+        custom: {
+            families: ['${fontFamily}']
+        },
+        active: function() {
+            window.performance.mark('${mark}');
+        },
+    });
 `;
 const UXCaptureFont = ({ fontFamily, mark }: Props) =>
 	<script
