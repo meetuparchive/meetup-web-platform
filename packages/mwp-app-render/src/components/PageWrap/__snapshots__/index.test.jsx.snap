@@ -36,6 +36,9 @@ exports[`PageWrap renders correct UI elements 1`] = `
       content="h5EhuAEkLFlZmMxwpH5wnRaoDEmqYCCEUE+FLcrRNvE="
       name="verify-v1"
     />
+    <script
+      src="https://ajax.googleapis.com/ajax/libs/webfont/1.5.10/webfont.js"
+    />
   </HelmetWrapper>
   <div
     key="0/.0"
