@@ -6,8 +6,8 @@ exports[`UXCaptureInlineMark renders component markup 1`] = `
     Object {
       "__html": "
 	<script>
-		if(window.UX) {
-			UX.mark(\\"foo\\");
+		if(window.UXCapture) {
+			window.UXCapture.mark(\\"foo\\");
 		}
 	</script>
 ",

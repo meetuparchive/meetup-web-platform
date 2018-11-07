@@ -5,9 +5,9 @@ type Props = React$ElementConfig<typeof HTMLImageElement> & { mark: string };
 
 export const getOnLoadJS = (mark: string): string => {
 	const onload = `
-		if (window.UX && !window.UX['${mark}-LOADED']) {
-			window.UX.mark('${mark}');
-			window.UX['${mark}-LOADED'] = true;
+		if (window.UXCapture && !window.UXCapture['${mark}-LOADED']) {
+			window.UXCapture.mark('${mark}');
+			window.UXCapture['${mark}-LOADED'] = true;
 		}
 	`;
 

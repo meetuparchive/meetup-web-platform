@@ -6,8 +6,8 @@ exports[`UXCaptureConfig renders correct markup when all props are defined 1`] =
     Object {
       "__html": "
 		<script>
-			if(window.UX) {
-				window.UX.config({
+			if(window.UXCapture) {
+				window.UXCapture.create({
 					\\"onMark\\": function onMark(foo) {
 		if (foo) {
 			return foo;
@@ -35,8 +35,8 @@ exports[`UXCaptureConfig renders the correct markup when only onMark is provided
     Object {
       "__html": "
 		<script>
-			if(window.UX) {
-				window.UX.config({
+			if(window.UXCapture) {
+				window.UXCapture.create({
 					\\"onMark\\": function onMark(foo) {
 		if (foo) {
 			return foo;
@@ -58,8 +58,8 @@ exports[`UXCaptureConfig renders the correct markup when only onMeasure is provi
     Object {
       "__html": "
 		<script>
-			if(window.UX) {
-				window.UX.config({
+			if(window.UXCapture) {
+				window.UXCapture.create({
 					
 					\\"onMeasure\\": function onMeasure(bar) {
 		if (bar) {
@@ -81,8 +81,8 @@ exports[`UXCaptureConfig renders the correct markup when unsupported props are p
     Object {
       "__html": "
 		<script>
-			if(window.UX) {
-				window.UX.config({
+			if(window.UXCapture) {
+				window.UXCapture.create({
 					\\"onMark\\": function onMark(foo) {
 		if (foo) {
 			return foo;

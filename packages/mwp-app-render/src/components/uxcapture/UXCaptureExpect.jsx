@@ -18,28 +18,28 @@ export default ({
 
 	if (destinationVerified && destinationVerified.length > 0) {
 		zones.push({
-			label: 'ux-destination-verified',
+			name: 'ux-destination-verified',
 			marks: destinationVerified,
 		});
 	}
 
 	if (primaryContentDisplayed && primaryContentDisplayed.length > 0) {
 		zones.push({
-			label: 'ux-primary-content-displayed',
+			name: 'ux-primary-content-displayed',
 			marks: primaryContentDisplayed,
 		});
 	}
 
 	if (primaryActionAvailable && primaryActionAvailable.length > 0) {
 		zones.push({
-			label: 'ux-primary-action-available',
+			name: 'ux-primary-action-available',
 			marks: primaryActionAvailable,
 		});
 	}
 
 	if (secondaryContentDisplayed && secondaryContentDisplayed.length > 0) {
 		zones.push({
-			label: 'ux-secondary-content-displayed',
+			name: 'ux-secondary-content-displayed',
 			marks: secondaryContentDisplayed,
 		});
 	}
@@ -51,8 +51,8 @@ export default ({
 
 	const uxCaptureJS = `
 		<script>
-			if(window.UX) {
-				window.UX.expect(${JSON.stringify(zones)});
+			if(window.UXCapture) {
+				window.UXCapture.startView(${JSON.stringify(zones)});
 			}
 		</script>
 	`;

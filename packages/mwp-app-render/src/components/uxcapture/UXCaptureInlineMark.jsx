@@ -7,13 +7,13 @@ type Props = {
 
 const generateUXCaptureJS = (mark: string) => `
 	<script>
-		if(window.UX) {
-			UX.mark("${mark}");
+		if(window.UXCapture) {
+			window.UXCapture.mark("${mark}");
 		}
 	</script>
 `;
 
-// inject inline UX.mark() call into rendered markup
+// inject inline UXCapture.mark() call into rendered markup
 // @see https://github.com/meetup/ux-capture#text-without-custom-font
 const UXCaptureInlineMark = ({ mark }: Props) =>
 	<div dangerouslySetInnerHTML={{ __html: generateUXCaptureJS(mark) }} />; // eslint-disable-line react/no-danger
