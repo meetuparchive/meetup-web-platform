@@ -15,7 +15,9 @@ const generateUXCaptureFontJS = (fontFamily: string, mark: string) => `
             families: ['${fontFamily}']
         },
         active: function() {
-            window.performance.mark('${mark}');
+            if (window.UX) {
+                window.UX.mark('${mark}');
+            }
         }
     });
 `;
