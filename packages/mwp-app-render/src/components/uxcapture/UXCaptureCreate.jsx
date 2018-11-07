@@ -8,15 +8,15 @@ type Props = {|
 |};
 
 export default ({ onMark, onMeasure }: Props) => {
-	// No need to inject `UX.config()` script if no callbacks provided
+	// No need to inject `UXCapture.create()` script if no callbacks provided
 	if (!onMark && !onMeasure) {
 		return null;
 	}
 
 	const uxCaptureConfigJS = `
 		<script>
-			if(window.UX) {
-				window.UX.config({
+			if(window.UXCapture) {
+				window.UXCapture.create({
 					${onMark ? `"onMark": ${onMark.toString()},` : ''}
 					${onMeasure ? `"onMeasure": ${onMeasure.toString()},` : ''}
 				});
