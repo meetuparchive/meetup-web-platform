@@ -16,12 +16,14 @@ const generateUXCaptureFontJS = (fontFamily: string, mark: string) => `
         },
         active: function() {
             window.performance.mark('${mark}');
-        },
+        }
     });
 `;
 const UXCaptureFont = ({ fontFamily, mark }: Props) =>
 	<script
-		dangerouslySetInnerHTML={generateUXCaptureFontJS(fontFamily, mark)}
+		dangerouslySetInnerHTML={{
+			__html: generateUXCaptureFontJS(fontFamily, mark),
+		}}
 	/>; // eslint-disable-line react/no-danger
 
 export default UXCaptureFont;
