@@ -19,6 +19,11 @@ const generateUXCaptureFontJS = (fontFamily: string, mark: string) => `
         }
     });
 `;
+
+// fontFamily attribute should include individual weights if separate files are used
+// Example: "Graphik Meetup:n4,n5,n6"
+// Attention, if no weight specified, only n4 (e.g. font-weight: 400) is tested for!
+// See https://github.com/typekit/webfontloader#events for more detail
 const UXCaptureFont = ({ fontFamily, mark }: Props) =>
 	<script
 		dangerouslySetInnerHTML={{
