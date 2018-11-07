@@ -1,6 +1,6 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import UXCaptureExpect from './UXCaptureExpect';
+import UXCaptureStartView from './UXCaptureStartView';
 
 const MOCK_PROPS = {
 	destinationVerfied: ['ux-destination-verified'],
@@ -14,9 +14,9 @@ const MOCK_PROPS = {
 };
 
 const renderComponent = (props = MOCK_PROPS) =>
-	shallow(<UXCaptureExpect {...props} />);
+	shallow(<UXCaptureStartView {...props} />);
 
-describe('UXCaptureExpect', () => {
+describe('UXCaptureStartView', () => {
 	it('renders correct markup when all props are defined', () => {
 		expect(renderComponent()).toMatchSnapshot();
 	});

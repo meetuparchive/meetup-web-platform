@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
-import UXCaptureExpect from './UXCaptureExpect';
 import UXCaptureCreate from './UXCaptureCreate';
+import UXCaptureStartView from './UXCaptureStartView';
 
 type Props = {|
 	destinationVerified?: Array<string>,
@@ -49,7 +49,7 @@ export default ({
 }: Props) =>
 	<React.Fragment>
 		<UXCaptureCreate onMark={onMark} onMeasure={onMeasure} />
-		<UXCaptureExpect
+		<UXCaptureStartView
 			destinationVerified={destinationVerified}
 			primaryContentDisplayed={primaryContentDisplayed}
 			primaryActionAvailable={primaryActionAvailable}
