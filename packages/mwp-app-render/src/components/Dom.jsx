@@ -73,7 +73,7 @@ const DOM = props => {
 		? newrelicHTML.replace(scriptPattern, '').replace(/<\/script>$/, '')
 		: false;
 
-	const uxCaptureFilename = require.resolve('ux-capture/js/ux-capture.min.js');
+	const uxCaptureFilename = require.resolve('ux-capture/lib/ux-capture.min.js');
 	const uxCaptureJS = fs.readFileSync(uxCaptureFilename, 'utf8');
 
 	// newRelicJS should come *before* uxCaptureJS to help avoid race conditions

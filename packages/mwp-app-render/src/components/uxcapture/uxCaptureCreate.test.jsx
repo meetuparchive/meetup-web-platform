@@ -1,6 +1,6 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import UXCaptureConfig from './UXCaptureConfig';
+import UXCaptureCreate from './UXCaptureCreate';
 
 const MOCK_PROPS = {
 	onMark: foo => {
@@ -16,9 +16,9 @@ const MOCK_PROPS = {
 };
 
 const renderComponent = (props = MOCK_PROPS) =>
-	shallow(<UXCaptureConfig {...props} />);
+	shallow(<UXCaptureCreate {...props} />);
 
-describe('UXCaptureConfig', () => {
+describe('UXCaptureCreate', () => {
 	it('renders correct markup when all props are defined', () => {
 		expect(renderComponent()).toMatchSnapshot();
 	});

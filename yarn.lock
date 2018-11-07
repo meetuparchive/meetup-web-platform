@@ -8101,9 +8101,9 @@ uuid@^2.0.1:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-2.0.3.tgz#67e2e863797215530dff318e5bf9dcebfd47b21a"
 
-ux-capture@1.0.8:
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/ux-capture/-/ux-capture-1.0.8.tgz#0ba69f1f689acac969d1aa197083266b4f805431"
+ux-capture@3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/ux-capture/-/ux-capture-3.0.0.tgz#e0ef5c923877f1177bac71f4fb351807b9dc586c"
 
 v8flags@^2.0.10:
   version "2.1.1"
