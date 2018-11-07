@@ -1,3 +1,9 @@
+## [18.0]
+
+-  **BREAKING CHANGE** Upgraded to ux-capture 3.0.0.
+- **Renamed**: `UXCaptureConfig` is `UXCaptureCreate`
+- **Renamed**: `UXCaptureExpect` is `UXCaptureStartView`
+
 ## [17.4]
 
 - **Refactor** `mwp-tracking-plugin` now explicitly handles each type of request
