@@ -89,7 +89,6 @@ class PageWrap extends React.Component {
 						name="verify-v1"
 						content="h5EhuAEkLFlZmMxwpH5wnRaoDEmqYCCEUE+FLcrRNvE="
 					/>
-					<script src={fontLoaderSrc} />
 				</Helmet>
 
 				{iconSprite &&
