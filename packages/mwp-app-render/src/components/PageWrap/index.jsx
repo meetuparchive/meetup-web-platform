@@ -2,6 +2,8 @@ import React from 'react';
 import Helmet from 'react-helmet';
 import PropTypes from 'prop-types';
 
+import { fontLoaderSrc } from '../uxcapture/UXCaptureFont';
+
 /**
  * This component wraps all pages on the website, and through [Helmet](https://github.com/nfl/react-helmet/)
  * sets up base CSS, favicons, & javascript
