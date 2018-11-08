@@ -35,16 +35,13 @@
     "mwp-app-route-plugin": ">=0.0.1",
     "mwp-auth-plugin": ">=0.0.1",
     "mwp-config": ">=0.0.1",
-    "mwp-core": ">=0.0.1",
     "mwp-csp-plugin": ">=0.0.1",
     "mwp-language-plugin": ">=0.0.1",
     "mwp-logger-plugin": ">=0.0.1",
-    "mwp-router": ">=0.0.1",
     "mwp-sw-plugin": ">=0.0.1",
     "mwp-tracking-plugin": ">=0.0.1",
     "pino": "4.7.1",
     "spdy": "3.4.7",
     "uuid": "3.1.0"
-  },
-  "devDependencies": {}
+  }
 }

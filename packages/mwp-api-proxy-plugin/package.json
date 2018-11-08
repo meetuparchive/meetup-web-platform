@@ -39,6 +39,5 @@
     "qs": "6.5.0",
     "request": "2.88.0",
     "rison": "0.1.1"
-  },
-  "devDependencies": {}
+  }
 }
