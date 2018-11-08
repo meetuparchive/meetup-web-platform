@@ -1,12 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import Link from 'react-router-dom/Link';
-import { logger } from 'mwp-logger-plugin';
 
 export const fooPathContent = 'Looking good';
 
 function mapStateToProps(state) {
-	logger.info(state);
 	return {
 		data: (state.api.foo || {}).value,
 	};
