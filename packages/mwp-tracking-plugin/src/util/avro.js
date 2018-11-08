@@ -2,22 +2,22 @@
 const log = require('mwp-logger-plugin').logger;
 const avro = require('avsc');
 
+const canUsePubSub =
+	process.env.GAE_INSTANCE || process.env.GOOGLE_APPLICATION_CREDENTIALS;
+
 /*
  * There are currently 2 distinct analytics logging methods
- * 1. `stdout`, which will be consumed automatically from apps running in
- *    Google Container Engine
- * 2. Google Pub/Sub, which is used from inside Google App Engine
- *
- * The Pub/Sub setup _only_ works when the environment is configured to
- * automatically authorize Pub/Sub messages, so we use an `isGAE` env variable
- * to determine whether the app is running in GAE.
+ * 1. `stdout`: used in dev and compatible with https://github.com/meetup/blt-fluentd
+ *    in k8s-based applications in GCP 
+ * 2. Google Pub/Sub, which is used in GAE and any environment with GOOGLE_APPLICATION_CREDENTIALS
+ *    environment variable set to point toward Google JSON client credentials file
  *
  * @see https://meetup.atlassian.net/wiki/display/MUP/Analytics+Logging#AnalyticsLogging-Theinputmechanism
  */
 const getPlatformAnalyticsLog = (
-	isGAE: ?string = process.env.GAE_INSTANCE
+	usePubSub: ?string = canUsePubSub
 ): (string => void) => {
-	if (isGAE) {
+	if (usePubSub) {
 		const pubsub = require('@google-cloud/pubsub')({
 			projectId: 'meetup-prod',
 		});
@@ -28,6 +28,8 @@ const getPlatformAnalyticsLog = (
 				.catch(err => log.error(err));
 		};
 	}
+
+	// stdout log - can be used with https://github.com/meetup/blt-fluentd or generic environment
 	return (serializedRecord: string) => {
 		process.stdout.write(`analytics=${serializedRecord}\n`);
 	};
