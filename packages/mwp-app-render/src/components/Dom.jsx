@@ -6,8 +6,6 @@ import fs from 'fs';
 
 import { getPolyfill } from 'mwp-app-render/lib/util/browserPolyfill';
 
-import { fontLoaderInlineCode } from 'mwp-app-render/lib/components/uxcapture/UXCaptureFont';
-
 const getInnerHTML = __html => ({ __html });
 
 /**
@@ -89,7 +87,6 @@ const DOM = props => {
 				{newrelicJS &&
 					<script dangerouslySetInnerHTML={getInnerHTML(newrelicJS)} />}
 				<script dangerouslySetInnerHTML={getInnerHTML(uxCaptureJS)} />
-				<script dangerouslySetInnerHTML={getInnerHTML(fontLoaderInlineCode)} />
 				{cssLinks &&
 					cssLinks.map((href, key) =>
 						<link rel="stylesheet" type="text/css" href={href} key={key} />
