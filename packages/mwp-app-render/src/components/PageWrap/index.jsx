@@ -2,10 +2,6 @@ import React from 'react';
 import Helmet from 'react-helmet';
 import PropTypes from 'prop-types';
 
-import { fontLoaderInlineCode } from 'mwp-app-render/lib/components/uxcapture/UXCaptureFont';
-
-const getInnerHTML = __html => ({ __html });
-
 /**
  * This component wraps all pages on the website, and through [Helmet](https://github.com/nfl/react-helmet/)
  * sets up base CSS, favicons, & javascript
@@ -90,9 +86,6 @@ class PageWrap extends React.Component {
 					<meta
 						name="verify-v1"
 						content="h5EhuAEkLFlZmMxwpH5wnRaoDEmqYCCEUE+FLcrRNvE="
-					/>
-					<script
-						dangerouslySetInnerHTML={getInnerHTML(fontLoaderInlineCode)}
 					/>
 				</Helmet>
 
