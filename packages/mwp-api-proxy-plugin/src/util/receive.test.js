@@ -253,9 +253,7 @@ describe('makeApiResponseToQueryResponse', () => {
 	});
 });
 
-describe('makeLogResponse', async () => {
-	const server = await getServer();
-	const request = { server };
+describe('makeLogResponse', () => {
 	const MOCK_INCOMINGMESSAGE_GET = {
 		elapsedTime: 1234,
 		request: {
@@ -270,6 +268,16 @@ describe('makeLogResponse', async () => {
 			uri: {},
 		},
 	};
+
+	let server, request, botRequest;
+	beforeAll(async () => {
+		server = await getServer();
+		request = { server, headers: {} };
+		botRequest = {
+			...request,
+			headers: { ...request.headers, 'user-agent': 'bot' },
+		};
+	});
 	it('emits parsed request and response data for GET request', () => {
 		MOCK_LOGGER.info.mockClear();
 		makeLogResponse(request)([MOCK_INCOMINGMESSAGE_GET, 'foo']);
@@ -290,6 +298,17 @@ describe('makeLogResponse', async () => {
 		MOCK_LOGGER.error.mockClear();
 		makeLogResponse(request)([responseErr, body]);
 		expect(MOCK_LOGGER.error).toHaveBeenCalled();
+	});
+	it('does _not_ log error from a bot request user agent', () => {
+		const body = 'foo';
+		const responseErr = { ...MOCK_INCOMINGMESSAGE_GET, statusCode: 500 };
+		MOCK_LOGGER.error.mockClear();
+		MOCK_LOGGER.info.mockClear();
+		MOCK_LOGGER.warn.mockClear();
+		makeLogResponse(botRequest)([responseErr, body]);
+		expect(MOCK_LOGGER.error).not.toHaveBeenCalled();
+		expect(MOCK_LOGGER.info).not.toHaveBeenCalled();
+		expect(MOCK_LOGGER.warn).not.toHaveBeenCalled();
 	});
 	it('logs html <title> content on HTML error', () => {
 		const title = 'Doom doom ruin';
