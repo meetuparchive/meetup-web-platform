@@ -1,3 +1,4 @@
+import isBot from 'isbot';
 import querystring from 'qs';
 import { logger } from 'mwp-logger-plugin';
 
@@ -198,6 +199,10 @@ export const makeLogResponse = request => ([response, body]) => {
 		statusCode >= 500 || // REST API had an internal error
 		(method.toLowerCase() === 'get' && statusCode >= 400) // something fishy with a GET
 	) {
+		if (isBot(request.headers['user-agent'])) {
+			// don't log errors from bots - e.g. for deleted groups/events/whatever
+			return;
+		}
 		const logError = (statusCode < 500 ? logger.warn : logger.error).bind(
 			logger
 		);
