@@ -39,7 +39,7 @@ const generateUXCaptureJS = (mark: string) => `
 // @see https://github.com/meetup/ux-capture#text-without-custom-font
 const UXCaptureInlineMarkWithSelector = ({ mark, children }: Props) => {
 	const child = React.cloneElement(children, {
-		className: cx(child.props.className, mark),
+		className: cx(children.props.className, mark),
 	});
 
 	// eslint-disable-next react/no-danger
