@@ -63,7 +63,10 @@ describe('getListState', () => {
 	});
 	it('returns a new object with dynamicRef', () => {
 		expect(getListState(state, resp)).toEqual({
-			[resp.query.list.dynamicRef]: resp.response,
+			[resp.query.list.dynamicRef]: {
+				value: resp.response.value,
+				query: resp.query,
+			},
 		});
 	});
 	it('merges new response with existing dynamicRef, sorted', () => {
@@ -75,6 +78,7 @@ describe('getListState', () => {
 				value: [...value, ...resp.response.value].sort(
 					resp.query.list.merge.sort
 				),
+				query: resp.query,
 			},
 		});
 	});
@@ -85,6 +89,7 @@ describe('getListState', () => {
 		).toEqual({
 			[resp.query.list.dynamicRef]: {
 				value: [...value, ...resp.response.value],
+				query: respWithoutSort.query,
 			},
 		});
 	});
@@ -102,6 +107,7 @@ describe('getListState', () => {
 				value: [...value.value, ...response.response.value.value].sort(
 					resp.query.list.merge.sort
 				),
+				query: response.query,
 			},
 		});
 	});
