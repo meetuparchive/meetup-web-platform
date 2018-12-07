@@ -13,7 +13,7 @@ export function register(
 	});
 
 	server.ext('onRequest', sigsci.hapi());
-	server.on('response', sigsci.hapiEnding());
+	server.events.on('response', sigsci.hapiEnding());
 }
 
 export const plugin = {
