@@ -3,10 +3,7 @@ import Sigsci from './sigsci';
 
 // Plugin used to monitor traffic and potentially block bad actors from
 // receiving requests from our application
-export function register(
-	server: HapiServer,
-	options: ?{ [string]: string }
-): Promise<any> {
+export function register(server: HapiServer, options: ?{ [string]: string }) {
 	const sigsci = new Sigsci({
 		path: '/var/run/sigsci.sock',
 		...options,
