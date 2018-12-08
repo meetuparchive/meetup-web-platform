@@ -11,6 +11,7 @@ import { plugin as serviceWorkerPlugin } from 'mwp-sw-plugin';
 import { plugin as apiProxyPlugin } from 'mwp-api-proxy-plugin';
 import { plugin as requestAuthPlugin } from 'mwp-auth-plugin';
 import { plugin as cspPlugin } from 'mwp-csp-plugin';
+import { plugin as raspPlugin } from 'mwp-rasp-plugin';
 
 // single quotes are required around these keywords
 const CSP_KEYWORDS = {
@@ -39,20 +40,20 @@ export function setCsrfCookies(request, h) {
 }
 
 /**
- * The CSRF plugin we use, 'electrode-csrf-jwt', generates a token for each request 
+ * The CSRF plugin we use, 'electrode-csrf-jwt', generates a token for each request
  * that we make and sets the token in an HTTP-only cookie (CSRF_COOKIE_NAME) and in
  * the HTTP response header (also CSRF_COOKIE_NAME). In non-GET requests we must supply
  * the latest generated token from the response header as an HTTP request header - the
  * plugin will compare the cookie token and the request header token and return a
  * BAD_TOKEN error if they do not match.
- * 
- * We updated this flow to set the token from the response header as a cookie 
+ *
+ * We updated this flow to set the token from the response header as a cookie
  * (CSRF_COOKIE_NAME-header) and use the cookie value to set the request header
  * so that it syncs across browser tabs.
  *
  * We set similar but different cookie names for dev and prod environments so the prod
  * cookies are not read in the dev environment.
- * 
+ *
  * In order to ensure that both cookie values have parallel settings, this
  * function calls `server.state` for both cookie names before registering the
  * plugin.
@@ -104,6 +105,12 @@ export function getCspPlugin(options) {
 	return {
 		plugin: cspPlugin,
 		options,
+	};
+}
+
+export function getRaspPlugin() {
+	return {
+		plugin: raspPlugin,
 	};
 }
 
@@ -167,6 +174,7 @@ export default function getPlugins({ languageRenderers }) {
 			),
 			generateNonces: 'false',
 		}),
+		getRaspPlugin(),
 		requestAuthPlugin,
 		getActivityTrackingPlugin({ agent, isProdApi }),
 		clickPlugin,

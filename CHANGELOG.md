@@ -1,30 +1,38 @@
+## [18.1]
+
+-   Adds new rasp plugin which monitors and prevents traffic from bad actors.
+    This RASP integration uses Signal Sciences.
+    @see https://docs.signalsciences.net/install-guides/nodejs-module/#usage-for-nodejs-hapi
+
 ## [18.0]
 
--  **BREAKING CHANGE** Upgraded to ux-capture 3.0.0.
-- **Renamed**: `UXCaptureConfig` is `UXCaptureCreate`
-- **Renamed**: `UXCaptureExpect` is `UXCaptureStartView`
+-   **BREAKING CHANGE** Upgraded to ux-capture 3.0.0.
+-   **Renamed**: `UXCaptureConfig` is `UXCaptureCreate`
+-   **Renamed**: `UXCaptureExpect` is `UXCaptureStartView`
 
 ## [17.4]
 
-- **Refactor** `mwp-tracking-plugin` now explicitly handles each type of request
-  that results in an activity record to ensure that the expected `url` and
-  `referrer` values are populated
+-   **Refactor** `mwp-tracking-plugin` now explicitly handles each type of request
+    that results in an activity record to ensure that the expected `url` and
+    `referrer` values are populated
 
 ## [17.3]
 
-- **New feature** added support for `put` request
+-   **New feature** added support for `put` request
 
 ## [17.2]
-- **Refactor** click tracking provided by `mwp-tracking-plugin` now keeps click
-  state in a cookie rather than Redux state.
+
+-   **Refactor** click tracking provided by `mwp-tracking-plugin` now keeps click
+    state in a cookie rather than Redux state.
 
 ## [17.1]
-- **NEW FEATURE** Create 'mwp-csp-plugin' which adds some useful security headers
+
+-   **NEW FEATURE** Create 'mwp-csp-plugin' which adds some useful security headers
 
 ## [17.0]
 
--  **BREAKING CHANGE** Upgrade to hapi v17, which requires updating of
-   much of the platform code. Consumer apps that leverage the hapi server
+-   **BREAKING CHANGE** Upgrade to hapi v17, which requires updating of
+    much of the platform code. Consumer apps that leverage the hapi server
 
 ## [16.6]
 
