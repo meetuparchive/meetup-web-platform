@@ -19,5 +19,8 @@
 	"bugs": {
 		"url": "https://github.com/meetup/meetup-web-platform/issues"
 	},
-	"homepage": "https://github.com/meetup/meetup-web-platform#readme"
+	"homepage": "https://github.com/meetup/meetup-web-platform#readme",
+	"dependencies": {
+		"msgpack5rpc": "https://registry.npmjs.org/msgpack5rpc/-/msgpack5rpc-1.1.0.tgz"
+	}
 }
