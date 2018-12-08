@@ -5,7 +5,7 @@ import Sigsci from './sigsci';
 // receiving requests from our application
 export function register(
 	server: HapiServer,
-	options: ?{ [string]: string } // see documentation below for options for sigsci
+	options: ?{ [string]: string }
 ): Promise<any> {
 	const sigsci = new Sigsci({
 		path: '/var/run/sigsci.sock',
@@ -20,5 +20,4 @@ export const plugin = {
 	register,
 	name: 'mwp-rasp',
 	version: '1.0.0',
-	depencencies: [],
 };

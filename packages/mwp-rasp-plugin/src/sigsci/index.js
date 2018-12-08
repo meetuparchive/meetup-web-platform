@@ -535,8 +535,9 @@ Sigsci.prototype.onPostResponse = function(err /* , rpcResponse */) {
 
 Sigsci.prototype.hapi = function() {
 	var self = this;
-	return function(request, reply) {
-		return self.middlewareHapi(request, reply);
+	return function(request, h) {
+		self.middlewareHapi(request, h);
+		return h.continue;
 	};
 };
 
