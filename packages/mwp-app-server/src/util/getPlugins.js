@@ -108,9 +108,10 @@ export function getCspPlugin(options) {
 	};
 }
 
-export function getRaspPlugin() {
+export function getRaspPlugin(options) {
 	return {
 		plugin: raspPlugin,
+		options,
 	};
 }
 
