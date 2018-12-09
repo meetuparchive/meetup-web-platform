@@ -547,6 +547,12 @@ Sigsci.prototype.hapiEnding = function() {
 Sigsci.prototype.middlewareHapi = function(request, h) {
 	var req = request.raw.req;
 	req._sigsciRequestStart = Date.now();
+	if (!req.socket) {
+		// In test cases where socket is not defined in the request
+		// though should be, we are mocking in a bytesWritten value
+		// to allow tests to pass
+		req.socket = { bytesWritten: 0 };
+	}
 	req._sigsciBytesWritten = req.socket.bytesWritten;
 
 	// skip methods we don't care about
