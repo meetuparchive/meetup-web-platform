@@ -675,7 +675,7 @@ Sigsci.prototype.onPreHapi = function(request, h, err, rpcResponse) {
 
 	var blocking = rpcResponse.WAFResponse;
 	if (blocking === 406) {
-		return h.response(406).code(406);
+		return h.response(blocking).code(406);
 	}
 	return h.continue;
 };
