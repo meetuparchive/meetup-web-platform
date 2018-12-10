@@ -534,11 +534,7 @@ Sigsci.prototype.onPostResponse = function(err /* , rpcResponse */) {
 // ------------------------------------
 
 Sigsci.prototype.hapi = function() {
-	var self = this;
-	return function(request, h) {
-		self.middlewareHapi(request, h);
-		return h.continue;
-	};
+	return this.middlewareHapi.bind(this);
 };
 
 Sigsci.prototype.hapiEnding = function() {
@@ -551,6 +547,12 @@ Sigsci.prototype.hapiEnding = function() {
 Sigsci.prototype.middlewareHapi = function(request, h) {
 	var req = request.raw.req;
 	req._sigsciRequestStart = Date.now();
+	if (!req.socket) {
+		// In test cases where socket is not defined in the request
+		// though should be, we are mocking in a bytesWritten value
+		// to allow tests to pass
+		req.socket = { bytesWritten: 0 };
+	}
 	req._sigsciBytesWritten = req.socket.bytesWritten;
 
 	// skip methods we don't care about
@@ -596,12 +598,13 @@ Sigsci.prototype.middlewareHapi = function(request, h) {
 		request._sigsciSession.attach(client, client);
 		self.afterConnectHapi(request, h);
 	});
+	return h.continue;
 };
 
-Sigsci.prototype.afterConnectHapi = function(request, reply) {
+Sigsci.prototype.afterConnectHapi = function(request, h) {
 	var self = this;
 	var callback = function(err, rpcResponse) {
-		self.onPreHapi(request, reply, err, rpcResponse);
+		self.onPreHapi(request, h, err, rpcResponse);
 	};
 
 	// GET or other method without body
@@ -658,13 +661,13 @@ Sigsci.prototype.afterConnectHapi = function(request, reply) {
 	request.raw.req.on('end', fnOnEnd);
 };
 
-Sigsci.prototype.onPreHapi = function(request, reply, err, rpcResponse) {
+Sigsci.prototype.onPreHapi = function(request, h, err, rpcResponse) {
 	request._sigsciClient.destroy();
 
 	if (err) {
 		// fail open.
 		this.options.log(util.format('onPre error: %s', err));
-		return reply.continue();
+		return h.continue;
 	}
 
 	// save agent response since we'll use it later.
@@ -672,9 +675,9 @@ Sigsci.prototype.onPreHapi = function(request, reply, err, rpcResponse) {
 
 	var blocking = rpcResponse.WAFResponse;
 	if (blocking === 406) {
-		return reply(406).code(406);
+		return h.response(blocking).code(406);
 	}
-	return reply.continue();
+	return h.continue;
 };
 
 module.version = '1.4.7';
