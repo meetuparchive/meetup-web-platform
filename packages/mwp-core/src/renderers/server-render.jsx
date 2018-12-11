@@ -240,6 +240,8 @@ const makeRenderer = (
 			'X-Meetup-Client-Ip': headers['X-Meetup-Client-Ip'] || '',
 			'fastly-client-ip': headers['fastly-client-ip'] || '',
 			'request.query.__set_geoip': request.query.__set_geoip || '',
+			'request.info.remoteAddress': info.remoteAddress || '',
+			'x-forwarded-for': headers['x-forwarded-for'] || '',
 		};
 		const host = `${requestProtocol}://${domain}`;
 		const userAgent = headers['user-agent'];
