@@ -1,6 +1,7 @@
 // Signal Science NodeJS plugin
-// This was grabbed from the source provided by Signal Science, this is needed
-// as our current code requires Hapi 17 and this code is optimized for Hapi 14
+// This was copied from the source provided by Signal Science:
+// https://dl.signalsciences.net/sigsci-module-nodejs/sigsci-module-nodejs_latest.tgz
+// The code has been updated to support the Hapi 17 plugin API
 // https://docs.signalsciences.net/install-guides/nodejs-module/
 
 /*
@@ -170,6 +171,8 @@ var getResponseHeaders = function(res) {
 
 function Sigsci(userOptions) {
 	this.options = merge(defaultOptions, userOptions);
+	this.middlewareHapi = this.middlewareHapi.bind(this);
+	this.hapiEnding = this.hapiEnding.bind(this);
 
 	// Determine if we are UDS or TCP
 	//
@@ -533,15 +536,8 @@ Sigsci.prototype.onPostResponse = function(err /* , rpcResponse */) {
 // HAPI.JS Support
 // ------------------------------------
 
-Sigsci.prototype.hapi = function() {
-	return this.middlewareHapi.bind(this);
-};
-
-Sigsci.prototype.hapiEnding = function() {
-	var self = this;
-	return function(request) {
-		self.onAfterResponse(request.raw.req, request.raw.res);
-	};
+Sigsci.prototype.hapiEnding = function(request) {
+	this.onAfterResponse(request.raw.req, request.raw.res);
 };
 
 Sigsci.prototype.middlewareHapi = function(request, h) {
@@ -571,7 +567,6 @@ Sigsci.prototype.middlewareHapi = function(request, h) {
 			util.format('PreRequestHapi connection error ' + JSON.stringify(err)) // eslint-disable-line
 		);
 		client.destroy(); // kill client after server's response
-		return h.continue;
 	});
 
 	client.on('timeout', function(err) {
@@ -585,7 +580,6 @@ Sigsci.prototype.middlewareHapi = function(request, h) {
 			)
 		);
 		client.destroy(); // kill client after server's response
-		return h.continue;
 	});
 
 	// Add a 'close' event handler for the client socket

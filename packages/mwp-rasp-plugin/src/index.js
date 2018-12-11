@@ -15,8 +15,8 @@ export function register(server: HapiServer, options: ?{ [string]: string }) {
 		...options,
 	});
 
-	server.ext('onRequest', sigsci.hapi());
-	server.events.on('response', sigsci.hapiEnding());
+	server.ext('onRequest', sigsci.middlewareHapi);
+	server.events.on('response', sigsci.hapiEnding);
 }
 
 export const plugin = {
