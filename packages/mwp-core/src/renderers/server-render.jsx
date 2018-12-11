@@ -14,7 +14,7 @@ import Dom from 'mwp-app-render/lib/components/Dom';
 import ServerApp from 'mwp-app-render/lib/components/ServerApp';
 import { parseMemberCookie } from 'mwp-core/lib/util/cookieUtils';
 
-import { getVariants } from '../util/cookieUtils';
+import { getVariants, parseBrowserIdCookie } from '../util/cookieUtils';
 
 const DOCTYPE = '<!DOCTYPE html>';
 const DUMMY_DOMAIN = 'http://mwp-dummy-domain.com';
@@ -236,6 +236,13 @@ const makeRenderer = (
 			headers['x-forwarded-proto'] || server.info.protocol;
 		const domain: string =
 			headers['x-forwarded-host'] || headers['x-meetup-host'] || info.host;
+		const clientIp = {
+			'X-Meetup-Client-Ip': headers['X-Meetup-Client-Ip'] || '',
+			'fastly-client-ip': headers['fastly-client-ip'] || '',
+			'request.query.__set_geoip': request.query.__set_geoip || '',
+			'request.info.remoteAddress': info.remoteAddress || '',
+			'x-forwarded-for': headers['x-forwarded-for'] || '',
+		};
 		const host = `${requestProtocol}://${domain}`;
 		const userAgent = headers['user-agent'];
 		const userAgentDevice = headers['x-ua-device'] || ''; // set by fastly
@@ -259,6 +266,8 @@ const makeRenderer = (
 					variants: getVariants(state),
 					entryPath: url.pathname, // the path that the user entered the app on
 					media: getMedia(userAgent, userAgentDevice),
+					browserId: parseBrowserIdCookie(state),
+					clientIp,
 				},
 			};
 
