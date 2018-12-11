@@ -1,4 +1,10 @@
-import { MEMBER_COOKIE, parseMemberCookie, getVariants } from './cookieUtils';
+import {
+	MEMBER_COOKIE,
+	parseMemberCookie,
+	getVariants,
+	BROWSER_ID_COOKIE,
+	parseBrowserIdCookie,
+} from './cookieUtils';
 
 describe('parseMemberCookie', () => {
 	it('returns the parsed cookie', () => {
@@ -35,6 +41,21 @@ describe('parseMemberCookie', () => {
 	});
 	it('returns {id:0} for no-cookie case', () => {
 		expect(parseMemberCookie({})).toEqual({ id: 0 });
+	});
+});
+
+describe('parseBrowserIdCookie', () => {
+	it('returns a browser id', () => {
+		const requestState = { [BROWSER_ID_COOKIE]: 'id=abc-def-g1234' };
+		expect(parseBrowserIdCookie(requestState)).toEqual({
+			id: 'abc-def-g1234',
+		});
+	});
+	it('returns an empty string for the id value when there is no id', () => {
+		const requestState = { [BROWSER_ID_COOKIE]: '' };
+		expect(parseBrowserIdCookie(requestState)).toEqual({
+			id: '',
+		});
 	});
 });
 
