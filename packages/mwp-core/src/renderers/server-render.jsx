@@ -236,7 +236,11 @@ const makeRenderer = (
 			headers['x-forwarded-proto'] || server.info.protocol;
 		const domain: string =
 			headers['x-forwarded-host'] || headers['x-meetup-host'] || info.host;
-		const clientIp = headers['X-Meetup-Client-Ip'] || '';
+		const clientIp = {
+			'X-Meetup-Client-Ip': headers['X-Meetup-Client-Ip'] || '',
+			'fastly-client-ip': headers['fastly-client-ip'] || '',
+			'request.query.__set_geoip': request.query.__set_geoip || '',
+		};
 		const host = `${requestProtocol}://${domain}`;
 		const userAgent = headers['user-agent'];
 		const userAgentDevice = headers['x-ua-device'] || ''; // set by fastly
