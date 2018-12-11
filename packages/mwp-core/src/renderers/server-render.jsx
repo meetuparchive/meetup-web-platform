@@ -236,6 +236,7 @@ const makeRenderer = (
 			headers['x-forwarded-proto'] || server.info.protocol;
 		const domain: string =
 			headers['x-forwarded-host'] || headers['x-meetup-host'] || info.host;
+		const clientIp = headers['X-Meetup-Client-Ip'] || '';
 		const host = `${requestProtocol}://${domain}`;
 		const userAgent = headers['user-agent'];
 		const userAgentDevice = headers['x-ua-device'] || ''; // set by fastly
@@ -260,6 +261,7 @@ const makeRenderer = (
 					entryPath: url.pathname, // the path that the user entered the app on
 					media: getMedia(userAgent, userAgentDevice),
 					browserId: parseBrowserIdCookie(state),
+					clientIp,
 				},
 			};
 
