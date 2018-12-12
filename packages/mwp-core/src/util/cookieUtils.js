@@ -24,7 +24,6 @@ export const parseMemberCookie = state => {
 
 export const parseBrowserIdCookie = state => {
 	if (!state[BROWSER_ID_COOKIE]) {
-		logger.warn('No browser id cookie found');
 		return { id: '' };
 	}
 	const browserId = querystring.parse(state[BROWSER_ID_COOKIE]);

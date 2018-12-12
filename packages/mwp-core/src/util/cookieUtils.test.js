@@ -57,6 +57,11 @@ describe('parseBrowserIdCookie', () => {
 			id: '',
 		});
 	});
+	it('returns an empty string for the id value when there is no browser id cookie', () => {
+		expect(parseBrowserIdCookie({})).toEqual({
+			id: '',
+		});
+	});
 });
 
 describe('getVariants', () => {
