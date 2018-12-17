@@ -7,6 +7,10 @@ export const MEMBER_COOKIE = appConfig.api.isProd
 	? 'MEETUP_MEMBER'
 	: 'MEETUP_MEMBER_DEV';
 
+export const BROWSER_ID_COOKIE = appConfig.api.isProd
+	? 'MEETUP_BROWSER_ID'
+	: 'MEETUP_BROWSER_ID_DEV';
+
 export const parseMemberCookie = state => {
 	if (!state[MEMBER_COOKIE]) {
 		logger.warn('No member cookie found - there might be a problem with auth');
@@ -16,6 +20,14 @@ export const parseMemberCookie = state => {
 	const member = querystring.parse(state[MEMBER_COOKIE]);
 	member.id = parseInt(member.id, 10) || 0;
 	return member;
+};
+
+export const parseBrowserIdCookie = state => {
+	if (!state[BROWSER_ID_COOKIE]) {
+		return { id: '' };
+	}
+	const browserId = querystring.parse(state[BROWSER_ID_COOKIE]);
+	return browserId;
 };
 
 /*
