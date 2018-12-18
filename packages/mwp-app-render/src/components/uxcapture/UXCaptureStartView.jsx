@@ -8,56 +8,64 @@ type Props = {|
 	secondaryContentDisplayed?: Array<string>,
 |};
 
-export default ({
-	destinationVerified,
-	primaryContentDisplayed,
-	primaryActionAvailable,
-	secondaryContentDisplayed,
-}: Props) => {
-	const zones = [];
-
-	if (destinationVerified && destinationVerified.length > 0) {
-		zones.push({
+const makeZones = (props: Props) =>
+	[
+		{
 			name: 'ux-destination-verified',
-			marks: destinationVerified,
-		});
-	}
-
-	if (primaryContentDisplayed && primaryContentDisplayed.length > 0) {
-		zones.push({
+			marks: this.props.destinationVerified,
+		},
+		{
 			name: 'ux-primary-content-displayed',
-			marks: primaryContentDisplayed,
-		});
-	}
-
-	if (primaryActionAvailable && primaryActionAvailable.length > 0) {
-		zones.push({
+			marks: this.props.primaryContentDisplayed,
+		},
+		{
 			name: 'ux-primary-action-available',
-			marks: primaryActionAvailable,
-		});
-	}
+			marks: this.props.primaryActionAvailable,
+		},
+		{
+			name: 'ux-secondary-action-available',
+			marks: this.props.secondaryContentDisplayed,
+		},
+	].filter(({ marks }) => marks && marks.length > 0);
 
-	if (secondaryContentDisplayed && secondaryContentDisplayed.length > 0) {
-		zones.push({
-			name: 'ux-secondary-content-displayed',
-			marks: secondaryContentDisplayed,
-		});
+export default class UXCaptureStartView extends React.Component<Props> {
+	zones = makeZones(this.props);
+	componentDidUpdate(prevProps: Props) {
+		// updated on client - if mark name has changed, clear old mark and trigger new
+		if (prevProps !== this.props && window.UXCapture) {
+			window.UXCapture.startView(this.props);
+		}
 	}
-
-	// Don't add UX.expect() to page is no zones specified
-	if (!zones.length) {
-		return null;
+	componentDidMount() {
+		if (window.UXCapture) {
+			if (window.UXCapture.ignoreNextViewMount) {
+				// view already started by server rendered markup - do not call startView
+				// again
+				// Also, set ignoreNextViewMount to false so that future view instances can
+				// call startView
+				window.UXCapture.ignoreNextViewMount = false;
+				return;
+			}
+			window.UXCapture.startView(this.props);
+		}
 	}
+	render() {
+		// Don't add UX.expect() to page is no zones specified
+		if (!this.zones.length) {
+			return null;
+		}
 
-	const uxCaptureJS = `
+		const uxCaptureJS = `
 		<script>
 			if(window.UXCapture) {
-				window.UXCapture.startView(${JSON.stringify(zones)});
+				window.UXCapture.startView(${JSON.stringify(this.zones)});
+				window.UXCapture.ignoreNextViewMount = true;
 			}
 		</script>
 	`;
 
-	return (
-		<div dangerouslySetInnerHTML={{ __html: uxCaptureJS }} /> // eslint-disable-line react/no-danger
-	);
-};
+		return (
+			<div dangerouslySetInnerHTML={{ __html: uxCaptureJS }} /> // eslint-disable-line react/no-danger
+		);
+	}
+}

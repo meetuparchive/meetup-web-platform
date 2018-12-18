@@ -7,12 +7,9 @@ type Props = {|
 	onMeasure?: callbackType,
 |};
 
+// This component should be rendered in server markup - it will not work if only
+// rendered client-side
 export default ({ onMark, onMeasure }: Props) => {
-	// No need to inject `UXCapture.create()` script if no callbacks provided
-	if (!onMark && !onMeasure) {
-		return null;
-	}
-
 	const uxCaptureConfigJS = `
 		<script>
 			if(window.UXCapture) {
