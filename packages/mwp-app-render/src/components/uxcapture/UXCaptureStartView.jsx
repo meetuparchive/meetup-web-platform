@@ -12,19 +12,19 @@ const makeZones = (props: Props) =>
 	[
 		{
 			name: 'ux-destination-verified',
-			marks: this.props.destinationVerified,
+			marks: props.destinationVerified,
 		},
 		{
 			name: 'ux-primary-content-displayed',
-			marks: this.props.primaryContentDisplayed,
+			marks: props.primaryContentDisplayed,
 		},
 		{
 			name: 'ux-primary-action-available',
-			marks: this.props.primaryActionAvailable,
+			marks: props.primaryActionAvailable,
 		},
 		{
-			name: 'ux-secondary-action-available',
-			marks: this.props.secondaryContentDisplayed,
+			name: 'ux-secondary-content-displayed',
+			marks: props.secondaryContentDisplayed,
 		},
 	].filter(({ marks }) => marks && marks.length > 0);
 
@@ -32,8 +32,11 @@ export default class UXCaptureStartView extends React.Component<Props> {
 	zones = makeZones(this.props);
 	componentDidUpdate(prevProps: Props) {
 		// updated on client - if mark name has changed, clear old mark and trigger new
-		if (prevProps !== this.props && window.UXCapture) {
-			window.UXCapture.startView(this.props);
+		if (
+			prevProps.destinationVerified !== this.props.destinationVerified &&
+			window.UXCapture
+		) {
+			window.UXCapture.startView(this.zones);
 		}
 	}
 	componentDidMount() {
@@ -46,7 +49,7 @@ export default class UXCaptureStartView extends React.Component<Props> {
 				window.UXCapture.ignoreNextViewMount = false;
 				return;
 			}
-			window.UXCapture.startView(this.props);
+			window.UXCapture.startView(this.zones);
 		}
 	}
 	render() {
