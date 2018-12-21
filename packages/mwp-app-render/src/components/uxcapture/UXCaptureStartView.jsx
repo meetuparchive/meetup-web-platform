@@ -30,10 +30,13 @@ const makeZones = (props: Props) =>
 
 export default class UXCaptureStartView extends React.Component<Props> {
 	zones = makeZones(this.props);
-	componentDidUpdate(prevProps: Props) {
+	componentDidUpdate(prev: Props) {
 		// updated on client - if mark name has changed, clear old mark and trigger new
 		if (
-			prevProps.destinationVerified !== this.props.destinationVerified &&
+			prev.destinationVerified !== this.props.destinationVerified &&
+			prev.primaryContentDisplayed !== this.props.primaryContentDisplayed &&
+			prev.primaryActionAvailable !== this.props.primaryActionAvailable &&
+			prev.secondaryContentDisplayed !== this.props.secondaryContentDisplayed &&
 			window.UXCapture
 		) {
 			window.UXCapture.startView(this.zones);
