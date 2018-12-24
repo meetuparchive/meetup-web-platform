@@ -1,3 +1,11 @@
+## [18.2]
+
+-   **Refactor** `mwp-app-route-plugin` defines a `LaunchDarklyUser` type for a LaunchDarkly user object
+    based on the official [documentation](https://docs.launchdarkly.com/docs/node-sdk-reference#section-users)
+-   **Refactor** `mwp-core` uses a `LaunchDarklyUser` object to call `getFlags` method of `mwp-app-route-plugin`.
+-   **New Feature** `mwp-core` adds a request country and region provided by Fastly to LaunchDarkly user
+    custom attributes.
+
 ## [18.1]
 
 -   Adds new rasp plugin which monitors and prevents traffic from bad actors.
