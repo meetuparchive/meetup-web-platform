@@ -63,14 +63,11 @@ const getCustomAttributes = (
 		.split('/')
 		.map(value => (value ? value.toUpperCase() : value));
 
-	const custom: LaunchDarklyUser$CustomAttributes = {};
+	const requestCountry = country ? { RequestCountry: country } : {};
+	const requestRegion = region ? { RequestRegion: region } : {};
 
-	if (country) {
-		custom.RequestCountry = country;
-	}
-	if (region) {
-		custom.RequestRegion = region;
-	}
-
-	return custom;
+	return {
+		...requestCountry,
+		...requestRegion,
+	};
 };
