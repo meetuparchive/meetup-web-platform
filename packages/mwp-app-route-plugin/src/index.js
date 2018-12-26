@@ -20,14 +20,13 @@ export function register(
 	const ldClient = LaunchDarkly.init(options.ldkey || LAUNCH_DARKLY_SDK_KEY, {
 		offline: process.env.NODE_ENV === 'test',
 	});
-	server.expose('getFlags', memberObj => {
-		const key = (memberObj && memberObj.id) || 0;
-		return ldClient.allFlags({ ...memberObj, key, anonymous: key === 0 }).then(
+	server.expose('getFlags', (user: LaunchDarklyUser) => {
+		return ldClient.allFlags(user).then(
 			flags => flags,
 			err => {
 				server.app.logger.error({
 					err,
-					member: memberObj,
+					launchDarklyUser: user,
 				});
 				return {}; // return empty flags on error
 			}
