@@ -143,3 +143,28 @@ declare type CookieOpts = {
 	isSecure?: boolean,
 	encoding?: string,
 };
+
+declare type GeoLocation = {
+	country?: string,
+	region?: string
+}
+
+// See https://docs.launchdarkly.com/docs/node-sdk-reference#section-users
+declare type LaunchDarklyUser$CustomAttributes = {
+	RequestCountry?: string,
+	RequestRegion?: string,
+	[string]: string | boolean | number | Array<string> | Array<boolean> | Array<number>
+};
+
+declare type LaunchDarklyUser = {|
+	key: string,
+	ip?: string,
+	firstName?: string,
+	lastName?: string,
+	country?: string,
+	email?: string,
+	avatar?: string,
+	name?: string,
+	anonymous?: boolean,
+	custom?: LaunchDarklyUser$CustomAttributes
+|};

@@ -15,6 +15,7 @@ import ServerApp from 'mwp-app-render/lib/components/ServerApp';
 import { parseMemberCookie } from 'mwp-core/lib/util/cookieUtils';
 
 import { getVariants, parseBrowserIdCookie } from '../util/cookieUtils';
+import { getLaunchDarklyUser } from '../util/launchDarkly';
 
 const DOCTYPE = '<!DOCTYPE html>';
 const DUMMY_DOMAIN = 'http://mwp-dummy-domain.com';
@@ -31,15 +32,14 @@ function getHtml(el) {
 	return `${DOCTYPE}${htmlMarkup}`;
 }
 
-export function getRedirect(context) {
+export function getRedirect(context: { url?: string, permanent?: boolean }) {
 	if (!context || !context.url) {
 		return;
 	}
 	// use `URL` to ensure valid character encoding (e.g. escaped emoji)
-	const isFragment = context.url.startsWith('/');
-	const urlToFormat = isFragment
-		? `${DUMMY_DOMAIN}${context.url}`
-		: context.url;
+	const url: string = context.url;
+	const isFragment = url.startsWith('/');
+	const urlToFormat = isFragment ? `${DUMMY_DOMAIN}${url}` : url;
 	const formattedUrl = new URL(urlToFormat).toString();
 	return {
 		redirect: {
@@ -282,15 +282,18 @@ const makeRenderer = (
 		// feature flags can be selected based on member id,
 		// email, and other properties.
 		// feature flags based on member id are available before the store is populated.
-		const addFlags = (populatedStore, member) =>
-			// getFlags needs as much member info as possible, but particularly id and email
-			// in order to match on common targeting rules
-			request.server.plugins['mwp-app-route'].getFlags(member).then(flags =>
-				populatedStore.dispatch({
-					type: 'UPDATE_FLAGS',
-					payload: flags,
-				})
-			);
+		const addFlags = (populatedStore, member) => {
+			// Populate a LaunchDarklyUser object from member and request details
+			const launchDarklyUser = getLaunchDarklyUser(member, request);
+			return request.server.plugins['mwp-app-route']
+				.getFlags(launchDarklyUser)
+				.then(flags =>
+					populatedStore.dispatch({
+						type: 'UPDATE_FLAGS',
+						payload: flags,
+					})
+				);
+		};
 
 		const checkReady = state =>
 			state.preRenderChecklist.every(isReady => isReady);
