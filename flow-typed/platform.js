@@ -144,6 +144,11 @@ declare type CookieOpts = {
 	encoding?: string,
 };
 
+declare type GeoLocation = {
+	country?: string,
+	region?: string
+}
+
 // See https://docs.launchdarkly.com/docs/node-sdk-reference#section-users
 declare type LaunchDarklyUser$CustomAttributes = {
 	RequestCountry?: string,

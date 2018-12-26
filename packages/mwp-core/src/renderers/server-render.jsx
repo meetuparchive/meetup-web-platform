@@ -32,15 +32,14 @@ function getHtml(el) {
 	return `${DOCTYPE}${htmlMarkup}`;
 }
 
-export function getRedirect(context) {
+export function getRedirect(context: { url?: string, permanent?: boolean }) {
 	if (!context || !context.url) {
 		return;
 	}
 	// use `URL` to ensure valid character encoding (e.g. escaped emoji)
-	const isFragment = context.url.startsWith('/');
-	const urlToFormat = isFragment
-		? `${DUMMY_DOMAIN}${context.url}`
-		: context.url;
+	const url: string = context.url;
+	const isFragment = url.startsWith('/');
+	const urlToFormat = isFragment ? `${DUMMY_DOMAIN}${url}` : url;
 	const formattedUrl = new URL(urlToFormat).toString();
 	return {
 		redirect: {

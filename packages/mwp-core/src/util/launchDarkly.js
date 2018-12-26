@@ -1,7 +1,6 @@
 // @flow
 
-const HEADER_FASTLY_CLIENT_IP = 'fastly-client-ip';
-const HEADER_FASTLY_X_REGION = 'x-region';
+import { getRemoteIp, getRemoteGeoLocation } from './requestUtils';
 
 /**
  * Populates a LaunchDarklyUser object with member and request properties.
@@ -42,32 +41,21 @@ export const getLaunchDarklyUser = (
 	return user;
 };
 
-const getRemoteIp = (request: HapiRequest): ?string => {
-	const { headers, info, query } = request;
-	const fromQuery = query && query.__set_geoip && query.__set_geoip.toString();
-	const fromHeaders = headers && headers[HEADER_FASTLY_CLIENT_IP];
-	const fromInfo =
-		info && typeof info.remoteAddress === 'string'
-			? info.remoteAddress
-			: undefined;
-	return fromQuery || fromHeaders || fromInfo;
-};
-
+// Builds LaunchDarklyUser custom attributes. Custom attributes can contain arbitrary values
+// and can be used for targeting. Read more at https://docs.launchdarkly.com/docs/node-sdk-reference#section-users.
 const getCustomAttributes = (
 	request: HapiRequest
 ): LaunchDarklyUser$CustomAttributes => {
-	const { headers } = request;
+	const geoLocation = getRemoteGeoLocation(request);
 
-	const location = (headers && headers[HEADER_FASTLY_X_REGION]) || '';
-	const [country, region] = location
-		.split('/')
-		.map(value => (value ? value.toUpperCase() : value));
+	const custom: LaunchDarklyUser$CustomAttributes = {};
 
-	const requestCountry = country ? { RequestCountry: country } : {};
-	const requestRegion = region ? { RequestRegion: region } : {};
+	if (geoLocation.country) {
+		custom.RequestCountry = geoLocation.country.toUpperCase();
+	}
+	if (geoLocation.region) {
+		custom.RequestRegion = geoLocation.region.toUpperCase();
+	}
 
-	return {
-		...requestCountry,
-		...requestRegion,
-	};
+	return custom;
 };

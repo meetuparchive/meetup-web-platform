@@ -26,7 +26,7 @@ export function register(
 			err => {
 				server.app.logger.error({
 					err,
-					launchDarklyUser: user,
+					member: user,
 				});
 				return {}; // return empty flags on error
 			}

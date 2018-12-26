@@ -51,154 +51,54 @@ describe('getLaunchDarklyUser', () => {
 		});
 	});
 
-	describe('user IP address', () => {
-		const member = {
-			id: 12345,
-			name: 'Test User',
-			email: 'test@test.test',
-			country: 'US',
+	it('sets an IP address if it was resolved from a request', () => {
+		const request = {
+			...REQUEST_MOCK,
+			query: {
+				__set_geoip: '89.22.50.79',
+			},
 		};
 
-		it('sets a user IP address from a query string parameter', () => {
-			const request = {
-				...REQUEST_MOCK,
-				info: {
-					remoteAddress: '127.0.0.1',
-				},
-				headers: {
-					'fastly-client-ip': '192.168.0.1',
-				},
-				query: {
-					__set_geoip: '89.22.50.79',
-				},
-			};
+		const user = getLaunchDarklyUser({}, request);
 
-			const user = getLaunchDarklyUser(member, request);
-
-			expect(user.ip).toEqual('89.22.50.79');
-		});
-
-		it('sets a user IP address from Fastly header', () => {
-			const request = {
-				...REQUEST_MOCK,
-				info: {
-					remoteAddress: '127.0.0.1',
-				},
-				headers: {
-					'fastly-client-ip': '192.168.0.1',
-				},
-				query: {},
-			};
-
-			const user = getLaunchDarklyUser(member, request);
-
-			expect(user.ip).toEqual('192.168.0.1');
-		});
-
-		it('sets a user IP address from a request remote address', () => {
-			const request = {
-				...REQUEST_MOCK,
-				info: {
-					remoteAddress: '127.0.0.1',
-				},
-				headers: {},
-				query: {},
-			};
-
-			const user = getLaunchDarklyUser(member, request);
-
-			expect(user.ip).toEqual('127.0.0.1');
-		});
-
-		it('does not set a user IP address if none of the methods above yielded a result', () => {
-			const request = {
-				...REQUEST_MOCK,
-				info: {},
-				headers: {},
-				query: {},
-			};
-
-			const user = getLaunchDarklyUser(member, request);
-
-			expect(user.ip).toBeUndefined();
-		});
+		expect(user.ip).toBe('89.22.50.79');
 	});
 
-	describe('custom attributes', () => {
-		const member = {
-			id: 12345,
-			name: 'Test User',
-			email: 'test@test.test',
-			country: 'US',
-		};
-
-		it('sets empty custom attributes if a request has no X-Region header', () => {
-			const request = {
-				...REQUEST_MOCK,
-				headers: {},
-			};
-
-			const user = getLaunchDarklyUser(member, request);
+	describe('Custom attributes', () => {
+		it('does not populate custom attributes if neither country nor region were resolved from a request', () => {
+			const user = getLaunchDarklyUser({}, REQUEST_MOCK);
 
 			expect(user.custom).toEqual({});
 		});
 
-		it('sets empty custom attributes if X-Region header has empty country and region', () => {
+		it('sets RequestCountry custom attribute to an uppercased request country', () => {
 			const request = {
 				...REQUEST_MOCK,
 				headers: {
-					'x-region': '/',
+					'x-region': 'us/',
 				},
 			};
 
-			const user = getLaunchDarklyUser(member, request);
-
-			expect(user.custom).toEqual({});
-		});
-
-		it('sets only an uppercased country to custom attributes if X-Region header contains a non-empty country and an empty region', () => {
-			const request = {
-				...REQUEST_MOCK,
-				headers: {
-					'x-region': 'ru/',
-				},
-			};
-
-			const user = getLaunchDarklyUser(member, request);
-
-			expect(user.custom).toEqual({
-				RequestCountry: 'RU',
-			});
-		});
-
-		it('sets only an uppercased region to custom attributes if X-Region header contains an empty country and a non-empty region', () => {
-			const request = {
-				...REQUEST_MOCK,
-				headers: {
-					'x-region': '/ny',
-				},
-			};
-
-			const user = getLaunchDarklyUser(member, request);
-
-			expect(user.custom).toEqual({
-				RequestRegion: 'NY',
-			});
-		});
-
-		it('sets both uppercased country and region custom attributes if X-Region header contains non-empty country and region', () => {
-			const request = {
-				...REQUEST_MOCK,
-				headers: {
-					'x-region': 'us/ny',
-				},
-			};
-
-			const user = getLaunchDarklyUser(member, request);
+			const user = getLaunchDarklyUser({}, request);
 
 			expect(user.custom).toEqual({
 				RequestCountry: 'US',
-				RequestRegion: 'NY',
+			});
+		});
+
+		it('sets RequestRegion custom attribute to an uppercased request region', () => {
+			const request = {
+				...REQUEST_MOCK,
+				headers: {
+					'x-region': 'us/ut',
+				},
+			};
+
+			const user = getLaunchDarklyUser({}, request);
+
+			expect(user.custom).toEqual({
+				RequestCountry: 'US',
+				RequestRegion: 'UT',
 			});
 		});
 	});
