@@ -1417,7 +1417,13 @@ boom@5.x.x:
   dependencies:
     hoek "4.x.x"
 
-boom@7.2.0, boom@7.x.x, boom@^7.2.0:
+boom@7.3.0:
+  version "7.3.0"
+  resolved "https://registry.yarnpkg.com/boom/-/boom-7.3.0.tgz#733a6d956d33b0b1999da3fe6c12996950d017b9"
+  dependencies:
+    hoek "6.x.x"
+
+boom@7.x.x, boom@^7.2.0:
   version "7.2.0"
   resolved "https://registry.yarnpkg.com/boom/-/boom-7.2.0.tgz#2bff24a55565767fde869ec808317eb10c48e966"
   dependencies:
@@ -3462,9 +3468,9 @@ handlebars@^4.0.2, handlebars@^4.0.3:
   optionalDependencies:
     uglify-js "^2.6"
 
-hapi@17.4.0:
-  version "17.4.0"
-  resolved "https://registry.yarnpkg.com/hapi/-/hapi-17.4.0.tgz#c56c0ec3b8d678cc941bdb943bcbddc4107e838b"
+hapi@17.8.1:
+  version "17.8.1"
+  resolved "https://registry.yarnpkg.com/hapi/-/hapi-17.8.1.tgz#63cc5bbc138b6ae0919e977764647a17556e4c87"
   dependencies:
     accept "3.x.x"
     ammo "3.x.x"
@@ -3474,11 +3480,12 @@ hapi@17.4.0:
     catbox "10.x.x"
     catbox-memory "3.x.x"
     heavy "6.x.x"
-    hoek "5.x.x"
-    joi "13.x.x"
+    hoek "6.x.x"
+    joi "14.x.x"
     mimos "4.x.x"
     podium "3.x.x"
     shot "4.x.x"
+    somever "2.x.x"
     statehood "6.x.x"
     subtext "6.x.x"
     teamwork "3.x.x"
@@ -3582,6 +3589,10 @@ hoek@4.2.1, hoek@4.x.x:
 hoek@5.x.x, hoek@^5.0.2:
   version "5.0.4"
   resolved "https://registry.yarnpkg.com/hoek/-/hoek-5.0.4.tgz#0f7fa270a1cafeb364a4b2ddfaa33f864e4157da"
+
+hoek@6.x.x:
+  version "6.1.2"
+  resolved "https://registry.yarnpkg.com/hoek/-/hoek-6.1.2.tgz#99e6d070561839de74ee427b61aa476bd6bddfd6"
 
 hoist-non-react-statics@^2.3.1, hoist-non-react-statics@^2.5.0:
   version "2.5.5"
@@ -4542,6 +4553,14 @@ joi@13.x.x, joi@^13.0.2:
   resolved "https://registry.yarnpkg.com/joi/-/joi-13.6.0.tgz#877d820e3ad688a49c32421ffefc746bfbe2d0a0"
   dependencies:
     hoek "5.x.x"
+    isemail "3.x.x"
+    topo "3.x.x"
+
+joi@14.x.x:
+  version "14.3.1"
+  resolved "https://registry.yarnpkg.com/joi/-/joi-14.3.1.tgz#164a262ec0b855466e0c35eea2a885ae8b6c703c"
+  dependencies:
+    hoek "6.x.x"
     isemail "3.x.x"
     topo "3.x.x"
 
@@ -7259,6 +7278,13 @@ snapdragon@^0.8.1:
     source-map "^0.5.6"
     source-map-resolve "^0.5.0"
     use "^3.1.0"
+
+somever@2.x.x:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/somever/-/somever-2.0.0.tgz#7bdbed3bee8ece2c7c8a2e7d9a1c022bd98d6c89"
+  dependencies:
+    bounce "1.x.x"
+    hoek "6.x.x"
 
 sort-keys@^2.0.0:
   version "2.0.0"
