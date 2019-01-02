@@ -1,4 +1,6 @@
-import { fakeUTCinTimezone, getLogger } from './activity';
+import Boom from 'boom';
+
+import { fakeUTCinTimezone, getLogger, getOnPreResponse } from './activity';
 import { updateId } from './util/idUtils';
 
 jest.mock('./util/avro', () => ({
@@ -11,19 +13,77 @@ jest.mock('./util/avro', () => ({
 const UUID_V4_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 const trackIdCookieName = 'track_bar';
+const browserIdCookieName = 'browser_foo';
+const memberCookieName = 'member_foo';
 
 const MOCK_HAPI_RESPONSE = {
 	state: (name, value, opts) => {},
 	unstate: name => {},
 };
+
+const MOCK_HAPI_TOOLKIT = {
+	state: jest.fn(),
+};
+
 // create new object for each call
-const getMockRequest = () => ({
+const getMockRequest = (
+	mockResponse = MOCK_HAPI_RESPONSE,
+	pluginData = {}
+) => ({
 	state: {},
 	info: { referrer: 'baz' },
 	url: { path: 'affogato' },
 	query: {},
-	response: MOCK_HAPI_RESPONSE,
-	plugins: { tracking: {} },
+	response: mockResponse,
+	plugins: { tracking: pluginData },
+});
+
+const mockCookieConfig = {
+	browserIdCookieName,
+	memberCookieName,
+	trackIdCookieName,
+	domain: '.meetup.com',
+};
+
+describe('getOnPreResponse', () => {
+	const browserId = 'browserFoo';
+	const trackId = 'trackBar';
+
+	const pluginData = {
+		[browserIdCookieName]: browserId,
+		[trackIdCookieName]: trackId,
+	};
+
+	const requestState = {
+		[trackIdCookieName]: `id=${trackId}`,
+		[browserIdCookieName]: `id=${browserId}`,
+	};
+
+	const preResponseMethod = getOnPreResponse(mockCookieConfig);
+
+	it('does not set cookies when response contains an error', () => {
+		const errorRequest = {
+			...getMockRequest(new Boom('error'), pluginData),
+			state: requestState,
+		};
+
+		preResponseMethod(errorRequest, MOCK_HAPI_TOOLKIT);
+
+		expect(MOCK_HAPI_TOOLKIT.state).not.toHaveBeenCalled();
+		MOCK_HAPI_TOOLKIT.state.mockClear();
+	});
+
+	it('sets cookies when response is valid', () => {
+		const request = {
+			...getMockRequest(MOCK_HAPI_RESPONSE, pluginData),
+			state: requestState,
+		};
+
+		preResponseMethod(request, MOCK_HAPI_TOOLKIT);
+
+		expect(MOCK_HAPI_TOOLKIT.state).toHaveBeenCalledTimes(2);
+		MOCK_HAPI_TOOLKIT.state.mockClear();
+	});
 });
 
 describe('fakeUTCinTimezone', () => {

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Div = ({ location, children }) =>
+const Div = ({ location }) =>
 	<div>
 		<h1>MWP-Consumer</h1>
 		<pre>

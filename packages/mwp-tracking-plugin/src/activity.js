@@ -134,7 +134,7 @@ const onRequest = (request, h) => {
  * Read from request data to prepare/modify response. Mainly looking for new
  * tracking cookies that need to be set using request.response.state.
  */
-const getOnPreResponse = cookieConfig => (request, h) => {
+export const getOnPreResponse = cookieConfig => (request, h) => {
 	const { browserIdCookieName, trackIdCookieName, domain } = cookieConfig;
 	const pluginData = request.plugins[ACTIVITY_PLUGIN_NAME];
 	const browserId = pluginData[browserIdCookieName];
@@ -149,12 +149,15 @@ const getOnPreResponse = cookieConfig => (request, h) => {
 		strictHeader: false, // skip strict cookie format validation (no quotes)
 	};
 
-	if (browserId) {
-		request.response.state(browserIdCookieName, browserId, FOREVER);
+	if (!request.response.isBoom) {
+		if (browserId) {
+			h.state(browserIdCookieName, browserId, FOREVER);
+		}
+		if (trackId) {
+			h.state(trackIdCookieName, trackId, FOREVER);
+		}
 	}
-	if (trackId) {
-		request.response.state(trackIdCookieName, trackId, FOREVER);
-	}
+
 	return h.continue;
 };
 
