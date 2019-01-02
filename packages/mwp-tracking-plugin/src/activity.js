@@ -149,12 +149,15 @@ const getOnPreResponse = cookieConfig => (request, h) => {
 		strictHeader: false, // skip strict cookie format validation (no quotes)
 	};
 
-	if (browserId) {
-		request.response.state(browserIdCookieName, browserId, FOREVER);
+	if (!request.response.isBoom) {
+		if (browserId) {
+			h.state(browserIdCookieName, browserId, FOREVER);
+		}
+		if (trackId) {
+			h.state(trackIdCookieName, trackId, FOREVER);
+		}
 	}
-	if (trackId) {
-		request.response.state(trackIdCookieName, trackId, FOREVER);
-	}
+
 	return h.continue;
 };
 
