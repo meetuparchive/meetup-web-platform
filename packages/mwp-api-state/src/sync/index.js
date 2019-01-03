@@ -73,26 +73,17 @@ export const getNavEpic = findMatches => (action, store) => {
 };
 
 /**
- * Old apiRequest maps directly onto new api.get
- * @deprecated
- */
-export const apiRequestToApiReq = action =>
-	action.type === 'API_REQUEST'
-		? Promise.resolve([api.get(action.payload, action.meta)])
-		: IGNORE_ACTION;
-
-/**
  * Listen for API_REQ and generate response actions from fetch results
  *
  * emits
  * - 1 or more API_RESP_SUCCESS
  * - 1 or more API_RESP_ERROR
- * - API_COMPLETE
+ * - API_RESP_COMPLETE
  *
  * or
  *
  * - API_RESP_FAIL
- * - API_COMPLETE
+ * - API_RESP_COMPLETE
  */
 export const getFetchQueriesEpic = (findMatches, fetchQueriesFn) => {
 	// keep track of location changes - will first be set by SERVER_RENDER
@@ -146,6 +137,5 @@ export const getFetchQueriesEpic = (findMatches, fetchQueriesFn) => {
 export default (findMatches, fetchQueriesFn) =>
 	combineEpics(
 		getNavEpic(findMatches),
-		getFetchQueriesEpic(findMatches, fetchQueriesFn),
-		apiRequestToApiReq
+		getFetchQueriesEpic(findMatches, fetchQueriesFn)
 	);
