@@ -459,8 +459,8 @@ function mapDispatchToProps(dispatch) {
 }
 
 class Example extends React.Component {
-	componentWillReceiveProps(nextProps) {
-		if (nextProps[NEW_STUFF_REF]) {
+	componentDidUpdate(prevProps) {
+		if (prevProps[NEW_STUFF_REF] !== this.props[NEW_STUFF_REF]) {
 			// the POST returned _something_ - maybe an error
 			// you probably want to call `this.setState` or something here
 		}
@@ -514,8 +514,8 @@ function mapDispatchToProps(dispatch) {
 }
 
 class Example extends React.Component {
-	componentWillReceiveProps(nextProps) {
-		if (nextProps[NEW_FILE_STUFF]) {
+	componentDidUpdate(prevProps) {
+		if (prevProps[NEW_FILE_STUFF] !== this.props[NEW_FILE_STUFF]) {
 			// the POST returned _something_ - maybe an error
 			// you probably want to call `this.setState` or something here
 		}
