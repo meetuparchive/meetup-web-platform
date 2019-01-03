@@ -13,12 +13,7 @@ import {
 
 import { CACHE_CLEAR } from '../cache/cacheActionCreators';
 import * as api from './apiActionCreators';
-import * as syncActionCreators from './syncActionCreators';
-import getSyncEpic, {
-	getFetchQueriesEpic,
-	getNavEpic,
-	apiRequestToApiReq,
-} from './';
+import getSyncEpic, { getFetchQueriesEpic, getNavEpic } from './';
 import { API_RESP_COMPLETE } from '../../lib/sync/apiActionCreators';
 
 MOCK_APP_STATE.config = {};
@@ -81,7 +76,7 @@ describe('Sync epic', () => {
 				expect(types.includes(CACHE_CLEAR)).toBe(true);
 			});
 		});
-		it('emits API_COMPLETE for nav-related actions without matched query', () => {
+		it('emits API_RESP_COMPLETE for nav-related actions without matched query', () => {
 			const pathname = '/noQuery';
 			const noMatchLocation = { ...MOCK_RENDERPROPS.location, pathname };
 			const locationChange = {
@@ -104,7 +99,7 @@ describe('Sync epic', () => {
 				});
 			});
 		});
-		it('emits API_COMPLETE for nav-related actions with query functions that return null', () => {
+		it('emits API_RESP_COMPLETE for nav-related actions with query functions that return null', () => {
 			const pathname = '/nullQuery';
 			const noMatchLocation = { ...MOCK_RENDERPROPS.location, pathname };
 			const locationChange = {
@@ -144,7 +139,6 @@ describe('Sync epic', () => {
 			return doFetch.then(actions => {
 				expect(actions.map(({ type }) => type)).toEqual([
 					api.API_RESP_SUCCESS,
-					'API_SUCCESS',
 					api.API_RESP_COMPLETE,
 				]);
 			});
@@ -232,7 +226,6 @@ describe('Sync epic', () => {
 			).then(actions => {
 				expect(actions.map(a => a.type)).toEqual([
 					api.API_RESP_FAIL,
-					'API_ERROR',
 					api.API_RESP_COMPLETE, // DO NOT REMOVE - must _ALWAYS_ be called in order to clean up inFlight state
 				]);
 			});
@@ -251,17 +244,6 @@ describe('Sync epic', () => {
 			).then(actions =>
 				expect(apiRequest.meta.reject).toHaveBeenCalledWith(expectedError)
 			);
-		});
-	});
-});
-
-describe('DEPRECATED apiRequestToApiReq', () => {
-	it('emits API_REQ for API_REQUEST', function() {
-		const queries = [mockQuery({})];
-		const apiRequest = syncActionCreators.apiRequest(queries);
-		return apiRequestToApiReq(apiRequest).then(actions => {
-			expect(actions).toHaveLength(1);
-			expect(actions[0].type).toBe(api.API_REQ);
 		});
 	});
 });

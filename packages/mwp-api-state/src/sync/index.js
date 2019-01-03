@@ -4,41 +4,15 @@ import { LOCATION_CHANGE, SERVER_RENDER } from 'mwp-router';
 import { getMatchedQueries } from 'mwp-router/lib/util';
 
 import * as api from './apiActionCreators';
-import {
-	apiSuccess, // DEPRECATED
-	apiError, // DEPRECATED
-} from './syncActionCreators';
 
 const IGNORE_ACTION = Promise.resolve([]);
-/**
- * @deprecated
- */
-export function getDeprecatedSuccessPayload(successes, errors) {
-	const allQueryResponses = [...successes, ...errors];
-	return allQueryResponses.reduce(
-		(payload, { query, response }) => {
-			if (!response) {
-				return payload;
-			}
-			const { ref, error, ...responseBody } = response;
-			if (error) {
-				// old payload expects error as a property of `value`
-				responseBody.value = { error };
-			}
-			payload.queries.push(query);
-			payload.responses.push({ [ref]: responseBody });
-			return payload;
-		},
-		{ queries: [], responses: [] }
-	);
-}
 
 /**
  * Any operations that keep the browser application in sync with the
  * server should be implemented here.
  *
  * - Navigation-generated API request handling
- * - Arbitrary API request handling (syncActionCreators.apiSuccess)
+ * - Arbitrary API request handling
  *
  * @module syncEpic
  */
@@ -99,28 +73,17 @@ export const getNavEpic = findMatches => (action, store) => {
 };
 
 /**
- * Old apiRequest maps directly onto new api.get
- * @deprecated
- */
-export const apiRequestToApiReq = action =>
-	action.type === 'API_REQUEST'
-		? Promise.resolve([api.get(action.payload, action.meta)])
-		: IGNORE_ACTION;
-
-/**
  * Listen for API_REQ and generate response actions from fetch results
  *
  * emits
  * - 1 or more API_RESP_SUCCESS
  * - 1 or more API_RESP_ERROR
- * - API_SUCCESS  // deprecated
- * - API_COMPLETE
+ * - API_RESP_COMPLETE
  *
  * or
  *
  * - API_RESP_FAIL
- * - API_ERROR  // deprecated
- * - API_COMPLETE
+ * - API_RESP_COMPLETE
  */
 export const getFetchQueriesEpic = (findMatches, fetchQueriesFn) => {
 	// keep track of location changes - will first be set by SERVER_RENDER
@@ -156,28 +119,15 @@ export const getFetchQueriesEpic = (findMatches, fetchQueriesFn) => {
 			.then(({ successes = [], errors = [] }) => {
 				// meta contains a Promise that must be resolved
 				meta.resolve([...successes, ...errors]);
-				const deprecatedSuccessPayload = getDeprecatedSuccessPayload(
-					successes,
-					errors
-				);
-				const deprecatedActions = [apiSuccess(deprecatedSuccessPayload)];
-				if (meta && meta.onSuccess) {
-					deprecatedActions.push(meta.onSuccess(deprecatedSuccessPayload));
-				}
 				return [
 					...successes.map(api.success), // send the successes to success
 					...errors.map(api.error), // send errors to error
-					...deprecatedActions,
 				];
 			})
 			.catch(err => {
 				// meta contains a Promise that must be rejected
 				meta.reject(err);
-				const deprecatedActions = [apiError(err)];
-				if (meta && meta.onError) {
-					deprecatedActions.push(meta.onError(err));
-				}
-				return [api.fail(err), ...deprecatedActions];
+				return [api.fail(err)];
 			})
 			.then(ignoreIfLocationChange(locationIndex))
 			.then(actions => [...actions, api.complete(queries)]);
@@ -187,6 +137,5 @@ export const getFetchQueriesEpic = (findMatches, fetchQueriesFn) => {
 export default (findMatches, fetchQueriesFn) =>
 	combineEpics(
 		getNavEpic(findMatches),
-		getFetchQueriesEpic(findMatches, fetchQueriesFn),
-		apiRequestToApiReq
+		getFetchQueriesEpic(findMatches, fetchQueriesFn)
 	);

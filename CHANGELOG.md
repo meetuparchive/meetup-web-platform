@@ -1,3 +1,11 @@
+## [19.0]
+- **Removed** the deprecated `syncActionCreators` from `mwp-api-state`. These include:
+  - API_REQUEST
+  - API_SUCCESS,
+  - API_ERROR,
+  - API_COMPLETE
+- **Removed** `state.app` reducers. Consumers must convert to using `state.api`.
+
 ## [18.2]
 
 -   **Refactor** `mwp-app-route-plugin` defines a `LaunchDarklyUser` type for a LaunchDarkly user object

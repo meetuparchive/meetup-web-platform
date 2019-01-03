@@ -1,13 +1,5 @@
 import { LOCATION_CHANGE } from 'mwp-router';
-import {
-	DEFAULT_API_STATE,
-	DEFAULT_APP_STATE, // DEPRECATED
-	api,
-	filterKeys,
-	getListState,
-	app, // DEPRECATED
-} from './reducer';
-import { apiRequest } from './sync/syncActionCreators';
+import { DEFAULT_API_STATE, api, filterKeys, getListState } from './reducer';
 import * as apiActions from './sync/apiActionCreators';
 
 describe('getListState', () => {
@@ -110,42 +102,6 @@ describe('getListState', () => {
 				query: response.query,
 			},
 		});
-	});
-});
-
-describe('app reducer', () => {
-	beforeEach(function() {
-		this.MOCK_STATE = { foo: 'bar' };
-	});
-	it('returns default state for empty action', () => {
-		expect(app(undefined, {})).toEqual(DEFAULT_APP_STATE);
-	});
-	it('re-sets app state on logout API_REQUEST', function() {
-		const logoutRequest = apiRequest([], {
-			logout: true,
-		});
-		expect(app(this.MOCK_STATE, logoutRequest)).toEqual(DEFAULT_APP_STATE);
-	});
-	it('assembles success responses into single state tree', () => {
-		const API_SUCCESS = {
-			type: 'API_SUCCESS',
-			payload: {
-				responses: [{ foo: 'bar' }, { bar: 'baz' }, { baz: 'foo' }],
-			},
-		};
-		expect(app(undefined, API_SUCCESS)).toEqual({
-			foo: 'bar',
-			bar: 'baz',
-			baz: 'foo',
-		});
-	});
-	it('populates an `error` key on API_ERROR', () => {
-		const API_ERROR = {
-			type: 'API_ERROR',
-			payload: new Error('this is the worst'),
-		};
-		const errorState = app(undefined, API_ERROR);
-		expect(errorState.error).toBe(API_ERROR.payload);
 	});
 });
 
