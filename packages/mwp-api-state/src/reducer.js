@@ -10,7 +10,6 @@ import {
 import { CACHE_SUCCESS } from './cache/cacheActionCreators';
 
 export const DEFAULT_API_STATE: ApiState = { inFlight: [] };
-export const DEFAULT_APP_STATE = {};
 
 type ObjectFilter = (Object, ...args?: Array<any>) => Object;
 export const filterKeys: ObjectFilter = (
@@ -151,46 +150,6 @@ export function api(
 				inFlight,
 			};
 		}
-		default:
-			return state;
-	}
-}
-
-/**
- * The old API results store
- * @deprecated
- */
-export function app(
-	state: { error?: Object } = DEFAULT_APP_STATE,
-	action: {
-		type: string,
-		payload: { responses: Array<Object> },
-		error?: Error,
-		meta?: any,
-	}
-) {
-	let newState;
-
-	switch (action.type) {
-		case 'API_REQUEST':
-			if ((action.meta || {}).logout) {
-				return DEFAULT_APP_STATE; // clear app state during logout
-			}
-			return state;
-		case 'API_SUCCESS':
-			// API_SUCCESS contains an array of responses, but we just need to build a single
-			// object to update state with
-			newState = action.payload.responses.reduce(
-				(s, r) => ({ ...s, ...r }),
-				{}
-			);
-			delete state.error;
-			return { ...state, ...newState };
-		case 'API_ERROR':
-			return {
-				...state,
-				error: action.payload,
-			};
 		default:
 			return state;
 	}
