@@ -7,7 +7,6 @@ import {
 	getListState,
 	app, // DEPRECATED
 } from './reducer';
-import { apiRequest } from './sync/syncActionCreators';
 import * as apiActions from './sync/apiActionCreators';
 
 describe('getListState', () => {
@@ -119,12 +118,6 @@ describe('app reducer', () => {
 	});
 	it('returns default state for empty action', () => {
 		expect(app(undefined, {})).toEqual(DEFAULT_APP_STATE);
-	});
-	it('re-sets app state on logout API_REQUEST', function() {
-		const logoutRequest = apiRequest([], {
-			logout: true,
-		});
-		expect(app(this.MOCK_STATE, logoutRequest)).toEqual(DEFAULT_APP_STATE);
 	});
 	it('assembles success responses into single state tree', () => {
 		const API_SUCCESS = {

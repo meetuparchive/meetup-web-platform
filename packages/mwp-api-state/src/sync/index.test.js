@@ -13,12 +13,7 @@ import {
 
 import { CACHE_CLEAR } from '../cache/cacheActionCreators';
 import * as api from './apiActionCreators';
-import * as syncActionCreators from './syncActionCreators';
-import getSyncEpic, {
-	getFetchQueriesEpic,
-	getNavEpic,
-	apiRequestToApiReq,
-} from './';
+import getSyncEpic, { getFetchQueriesEpic, getNavEpic } from './';
 import { API_RESP_COMPLETE } from '../../lib/sync/apiActionCreators';
 
 MOCK_APP_STATE.config = {};
@@ -249,17 +244,6 @@ describe('Sync epic', () => {
 			).then(actions =>
 				expect(apiRequest.meta.reject).toHaveBeenCalledWith(expectedError)
 			);
-		});
-	});
-});
-
-describe('DEPRECATED apiRequestToApiReq', () => {
-	it('emits API_REQ for API_REQUEST', function() {
-		const queries = [mockQuery({})];
-		const apiRequest = syncActionCreators.apiRequest(queries);
-		return apiRequestToApiReq(apiRequest).then(actions => {
-			expect(actions).toHaveLength(1);
-			expect(actions[0].type).toBe(api.API_REQ);
 		});
 	});
 });
