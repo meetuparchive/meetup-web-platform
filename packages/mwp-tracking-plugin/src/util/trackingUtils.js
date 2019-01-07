@@ -1,7 +1,12 @@
 // @flow
 import querystring from 'qs';
 import uuid from 'uuid';
+import { ZonedDateTime, ZoneId } from 'js-joda';
+
 import { ACTIVITY_PLUGIN_NAME } from '../config';
+
+// Ensure timezone info is available
+require('js-joda-timezone');
 
 type UpdateId = string => (Object, ?boolean) => string;
 /*
@@ -52,3 +57,10 @@ export const parseIdCookie = (
 	}
 	return parsed.id;
 };
+
+// ZoneId.toString() adds the timezone in brackets, which we want to remove
+// e.g.: 2019-01-07T10:27:02.791-05:00[America/New_York]
+export const getZonedDateTimeStringWithUTCOffset = () =>
+	ZonedDateTime.now(ZoneId.of('America/New_York'))
+		.toString()
+		.replace(/\[.*\]$/, '');
