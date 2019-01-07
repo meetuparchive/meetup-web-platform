@@ -76,7 +76,7 @@ describe('Sync epic', () => {
 				expect(types.includes(CACHE_CLEAR)).toBe(true);
 			});
 		});
-		it('emits API_RESP_COMPLETE for nav-related actions without matched query', () => {
+		it('emits API_COMPLETE for nav-related actions without matched query', () => {
 			const pathname = '/noQuery';
 			const noMatchLocation = { ...MOCK_RENDERPROPS.location, pathname };
 			const locationChange = {
@@ -99,7 +99,7 @@ describe('Sync epic', () => {
 				});
 			});
 		});
-		it('emits API_RESP_COMPLETE for nav-related actions with query functions that return null', () => {
+		it('emits API_COMPLETE for nav-related actions with query functions that return null', () => {
 			const pathname = '/nullQuery';
 			const noMatchLocation = { ...MOCK_RENDERPROPS.location, pathname };
 			const locationChange = {
