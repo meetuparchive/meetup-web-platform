@@ -144,6 +144,7 @@ describe('Sync epic', () => {
 			return doFetch.then(actions => {
 				expect(actions.map(({ type }) => type)).toEqual([
 					api.API_RESP_SUCCESS,
+					'API_SUCCESS',
 					api.API_RESP_COMPLETE,
 				]);
 			});
@@ -231,6 +232,7 @@ describe('Sync epic', () => {
 			).then(actions => {
 				expect(actions.map(a => a.type)).toEqual([
 					api.API_RESP_FAIL,
+					'API_ERROR',
 					api.API_RESP_COMPLETE, // DO NOT REMOVE - must _ALWAYS_ be called in order to clean up inFlight state
 				]);
 			});
