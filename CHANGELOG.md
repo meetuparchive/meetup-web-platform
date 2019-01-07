@@ -1,3 +1,6 @@
+## [19.0]
+- **Removed** `state.app` reducers. Consumers must convert to using `state.api`.
+
 ## [18.2]
 
 -   **Refactor** `mwp-app-route-plugin` defines a `LaunchDarklyUser` type for a LaunchDarkly user object

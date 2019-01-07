@@ -56,7 +56,7 @@ export function getDeprecatedSuccessPayload(successes, errors) {
  * new `routing` data has already been populated in `state`
  *
  * @param {Object} routes The application's React Router routes
- * @returns {Function} an Epic function that emits an API_REQUEST action
+ * @returns {Function} an Epic function that emits an API_RESP_REQUEST action
  */
 export const getNavEpic = findMatches => (action, store) => {
 	if (![LOCATION_CHANGE, SERVER_RENDER].includes(action.type)) {
