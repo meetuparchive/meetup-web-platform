@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getLogger returns expected record shape 1`] = `
+Object {
+  "agent": "",
+  "foo": "bar",
+  "ip": "",
+  "isUserActivity": true,
+  "mobileWeb": false,
+  "platform": "WEB",
+  "platformAgent": "MOCK_PLATFORM_AGENT",
+  "referer": "",
+  "requestId": 1234,
+  "timestamp": Any<String>,
+  "trax": Any<Object>,
+}
+`;

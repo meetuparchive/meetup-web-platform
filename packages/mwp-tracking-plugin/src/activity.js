@@ -2,39 +2,12 @@
 import avro from './util/avro';
 import { getTrackActivity, getTrackApiResponses } from './_activityTrackers';
 import { ACTIVITY_PLUGIN_NAME } from './config';
+import { ZonedDateTime, ZoneId } from 'js-joda';
+
+// Ensure timezone info is available
+require('js-joda-timezone');
 
 const YEAR_IN_MS: number = 1000 * 60 * 60 * 24 * 365;
-
-/*
- * Get a date object that is shifted by the offset of the supplied timezone
- */
-export const fakeUTCinTimezone = (timezone: string) => {
-	const formatOptions = {
-		year: 'numeric',
-		month: 'numeric',
-		day: 'numeric',
-		hour: 'numeric',
-		minute: 'numeric',
-		second: 'numeric',
-		timeZone: timezone,
-		hour12: false,
-	};
-	const formatter = new Intl.DateTimeFormat('en-US', formatOptions);
-
-	return (date: ?Date) => {
-		if (!date) {
-			date = new Date();
-		}
-		const { year, month, day, hour, minute, second } = formatter
-			.formatToParts(date)
-			.reduce((parts, part) => {
-				parts[part.type] = parseInt(part.value, 10);
-				return parts;
-			}, {});
-
-		return new Date(Date.UTC(year, month - 1, day, hour, minute, second));
-	};
-};
 
 /*
  * This plugin provides `request.track...` methods that track events related to
@@ -47,6 +20,13 @@ export const fakeUTCinTimezone = (timezone: string) => {
 type ActivityPlatform = 'WEB' | 'IOS' | 'ANDROID';
 const ANDROID_APP_ID = 'com.meetup';
 
+// ZoneId.toString() adds the timezone in brackets, which we want to remove
+// e.g.: 2019-01-07T10:27:02.791-05:00[America/New_York]
+export const getZonedDateTimeStringWithUTCOffset = () =>
+	ZonedDateTime.now(ZoneId.of('America/New_York'))
+		.toString()
+		.replace(/\[.*\]$/, '');
+
 export const getRequestPlatform = (request: HapiRequest): ActivityPlatform => {
 	const { headers, state, query = {} } = request;
 	const isNativeApp = state.isNativeApp || query.isNativeApp;
@@ -58,19 +38,15 @@ export const getRequestPlatform = (request: HapiRequest): ActivityPlatform => {
 	}
 	return 'WEB';
 };
+
 export const getLogger: string => (Object, Object) => mixed = (
 	agent: string
 ) => {
-	// activity record wants an ISO 8601 timestamp in the New York timezone,
-	// so we have to fake a UTC date object shifted into NYC's timezone before
-	// calling `toISOString()`
-	const getTime = fakeUTCinTimezone('America/New_York');
-
 	return (request: Object, trackInfo: Object) => {
 		const { headers } = request;
 
 		const record = {
-			timestamp: getTime().toISOString(),
+			timestamp: getZonedDateTimeStringWithUTCOffset(),
 			requestId: request.id,
 			ip: headers['remote-addr'] || '',
 			agent: headers['user-agent'] || '',

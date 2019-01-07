@@ -1,6 +1,5 @@
 import Boom from 'boom';
-
-import { fakeUTCinTimezone, getLogger, getOnPreResponse } from './activity';
+import * as activity from './activity';
 import { updateId } from './util/idUtils';
 
 jest.mock('./util/avro', () => ({
@@ -59,7 +58,7 @@ describe('getOnPreResponse', () => {
 		[browserIdCookieName]: `id=${browserId}`,
 	};
 
-	const preResponseMethod = getOnPreResponse(mockCookieConfig);
+	const preResponseMethod = activity.getOnPreResponse(mockCookieConfig);
 
 	it('does not set cookies when response contains an error', () => {
 		const errorRequest = {
@@ -86,17 +85,18 @@ describe('getOnPreResponse', () => {
 	});
 });
 
-describe('fakeUTCinTimezone', () => {
-	const fakeTime = new Date(Date.UTC(2017, 6, 4)); // midnight July 4th in UTC
-	it('shifts the time correctly', () => {
-		expect(fakeUTCinTimezone('America/New_York')(fakeTime).toISOString()).toBe(
-			'2017-07-03T20:00:00.000Z' // 10PM July 3rd in NYC
-		);
-		expect(fakeUTCinTimezone('Pacific/Auckland')(fakeTime).toISOString()).toBe(
-			'2017-07-04T12:00:00.000Z' // noon July 4th in New Zealand
-		);
+describe('getZonedDateTimeStringWithUTCOffset', () => {
+	it('returns a zonedDateTime string with the correct format', () => {
+		// regex to match format: 2019-01-07T11:03:28.262-05:00
+		const re = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+-\d{2}:\d{2}$/;
+		const zdt = activity.getZonedDateTimeStringWithUTCOffset();
+		const matches = zdt.match(re);
+
+		expect(matches).not.toBeNull();
+		expect(matches[0]).toEqual(zdt);
 	});
 });
+
 describe('updateId', () => {
 	it('sets cookiename if not set', () => {
 		const requestWithoutTrackId = getMockRequest();
@@ -139,26 +139,20 @@ describe('getLogger', () => {
 			state: {},
 			id: 1234,
 		};
-		jest
-			.spyOn(Date.prototype, 'toISOString')
-			.mockImplementation(() => 'mock ISO date');
-		const logger = getLogger('MOCK_PLATFORM_AGENT');
-		expect(logger(MOCK_REQUEST, { foo: 'bar' })).toMatchInlineSnapshot(`
-Object {
-  "agent": "",
-  "foo": "bar",
-  "ip": "",
-  "isUserActivity": true,
-  "mobileWeb": false,
-  "platform": "WEB",
-  "platformAgent": "MOCK_PLATFORM_AGENT",
-  "referer": "",
-  "requestId": 1234,
-  "timestamp": "mock ISO date",
-  "trax": Object {},
-}
-`);
-		jest.restoreAllMocks(); // restore toISOString behavior
+		const logger = activity.getLogger('MOCK_PLATFORM_AGENT');
+		expect(logger(MOCK_REQUEST, { foo: 'bar' })).toMatchSnapshot({
+			agent: '',
+			foo: 'bar',
+			ip: '',
+			isUserActivity: true,
+			mobileWeb: false,
+			platform: 'WEB',
+			platformAgent: 'MOCK_PLATFORM_AGENT',
+			referer: '',
+			requestId: 1234,
+			timestamp: expect.any(String),
+			trax: expect.any(Object),
+		});
 	});
 	it('sets `platform` to IOS for isNativeApp without Android header', () => {
 		const MOCK_REQUEST = {
@@ -167,7 +161,7 @@ Object {
 			id: 1234,
 		};
 		const platformAgent = 'MOCK_PLATFORM_AGENT';
-		const logger = getLogger(platformAgent);
+		const logger = activity.getLogger(platformAgent);
 		const record = logger(MOCK_REQUEST, {});
 		expect(record.platform).toBe('IOS');
 		expect(record.platformAgent).toBe(platformAgent);
@@ -179,7 +173,7 @@ Object {
 			id: 1234,
 		};
 		const platformAgent = 'MOCK_PLATFORM_AGENT';
-		const logger = getLogger(platformAgent);
+		const logger = activity.getLogger(platformAgent);
 		const record = logger(MOCK_REQUEST, {});
 		expect(record.platform).toBe('IOS');
 		expect(record.platformAgent).toBe(platformAgent);
