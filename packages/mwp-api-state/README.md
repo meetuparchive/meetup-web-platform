@@ -25,9 +25,9 @@ user navigation.
 **on `API_REQ`**, which provides `queries`:
 1. Send the queries to the application server, which will make the
 	 corresponding external API calls.
-2. When the application server returns data, trigger `API_SUCCESS` action
+2. When the application server returns data, trigger `API_RESP_SUCCESS` action
    containing API response array and query array
-3. If the application server responds with an error, trigger `API_ERROR`
+3. If the application server responds with an error, trigger `API_RESP_ERROR`
 
 ### Cache `/cache.js`
 
