@@ -12,7 +12,7 @@ const IGNORE_ACTION = Promise.resolve([]);
  * server should be implemented here.
  *
  * - Navigation-generated API request handling
- * - Arbitrary API request handling
+ * - Arbitrary API request handling (syncActionCreators.apiSuccess)
  *
  * @module syncEpic
  */
