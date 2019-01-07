@@ -1,6 +1,6 @@
 import Boom from 'boom';
 import { getOnPreResponse, getLogger } from './activity';
-import { updateId } from './util/idUtils';
+import { updateId } from './util/trackingUtils';
 
 jest.mock('./util/avro', () => ({
 	loggers: {

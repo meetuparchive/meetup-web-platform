@@ -1,4 +1,4 @@
-import { getZonedDateTimeStringWithUTCOffset } from './idUtils';
+import { getZonedDateTimeStringWithUTCOffset } from './trackingUtils';
 
 describe('getZonedDateTimeStringWithUTCOffset', () => {
 	it('returns a zonedDateTime string with the correct format', () => {

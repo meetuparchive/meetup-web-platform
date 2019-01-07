@@ -1,4 +1,7 @@
-import { parseIdCookie, getZonedDateTimeStringWithUTCOffset } from './idUtils'; // TODO: provide this info through new plugin
+import {
+	parseIdCookie,
+	getZonedDateTimeStringWithUTCOffset,
+} from './trackingUtils'; // TODO: provide this info through new plugin
 import avro from './avro';
 import { COOKIE_NAME } from './clickState';
 

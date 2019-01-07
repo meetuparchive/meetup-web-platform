@@ -2,7 +2,7 @@
 import avro from './util/avro';
 import { getTrackActivity, getTrackApiResponses } from './_activityTrackers';
 import { ACTIVITY_PLUGIN_NAME } from './config';
-import { getZonedDateTimeStringWithUTCOffset } from './util/idUtils';
+import { getZonedDateTimeStringWithUTCOffset } from './util/trackingUtils';
 
 const YEAR_IN_MS: number = 1000 * 60 * 60 * 24 * 365;
 

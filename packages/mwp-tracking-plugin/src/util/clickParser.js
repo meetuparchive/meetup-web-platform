@@ -1,4 +1,4 @@
-import { getZonedDateTimeStringWithUTCOffset } from './idUtils';
+import { getZonedDateTimeStringWithUTCOffset } from './trackingUtils';
 
 const DATA_ATTR = 'clicktrack';
 
