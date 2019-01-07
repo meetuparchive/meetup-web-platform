@@ -1,5 +1,5 @@
 import Boom from 'boom';
-import * as activity from './activity';
+import { getOnPreResponse, getLogger } from './activity';
 import { updateId } from './util/idUtils';
 
 jest.mock('./util/avro', () => ({
@@ -58,7 +58,7 @@ describe('getOnPreResponse', () => {
 		[browserIdCookieName]: `id=${browserId}`,
 	};
 
-	const preResponseMethod = activity.getOnPreResponse(mockCookieConfig);
+	const preResponseMethod = getOnPreResponse(mockCookieConfig);
 
 	it('does not set cookies when response contains an error', () => {
 		const errorRequest = {
@@ -82,18 +82,6 @@ describe('getOnPreResponse', () => {
 
 		expect(MOCK_HAPI_TOOLKIT.state).toHaveBeenCalledTimes(2);
 		MOCK_HAPI_TOOLKIT.state.mockClear();
-	});
-});
-
-describe('getZonedDateTimeStringWithUTCOffset', () => {
-	it('returns a zonedDateTime string with the correct format', () => {
-		// regex to match format: 2019-01-07T11:03:28.262-05:00
-		const re = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+-\d{2}:\d{2}$/;
-		const zdt = activity.getZonedDateTimeStringWithUTCOffset();
-		const matches = zdt.match(re);
-
-		expect(matches).not.toBeNull();
-		expect(matches[0]).toEqual(zdt);
 	});
 });
 
@@ -139,7 +127,7 @@ describe('getLogger', () => {
 			state: {},
 			id: 1234,
 		};
-		const logger = activity.getLogger('MOCK_PLATFORM_AGENT');
+		const logger = getLogger('MOCK_PLATFORM_AGENT');
 		expect(logger(MOCK_REQUEST, { foo: 'bar' })).toMatchSnapshot({
 			agent: '',
 			foo: 'bar',
@@ -161,7 +149,7 @@ describe('getLogger', () => {
 			id: 1234,
 		};
 		const platformAgent = 'MOCK_PLATFORM_AGENT';
-		const logger = activity.getLogger(platformAgent);
+		const logger = getLogger(platformAgent);
 		const record = logger(MOCK_REQUEST, {});
 		expect(record.platform).toBe('IOS');
 		expect(record.platformAgent).toBe(platformAgent);
@@ -173,7 +161,7 @@ describe('getLogger', () => {
 			id: 1234,
 		};
 		const platformAgent = 'MOCK_PLATFORM_AGENT';
-		const logger = activity.getLogger(platformAgent);
+		const logger = getLogger(platformAgent);
 		const record = logger(MOCK_REQUEST, {});
 		expect(record.platform).toBe('IOS');
 		expect(record.platformAgent).toBe(platformAgent);

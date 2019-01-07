@@ -1,4 +1,4 @@
-import { parseIdCookie } from './idUtils'; // TODO: provide this info through new plugin
+import { parseIdCookie, getZonedDateTimeStringWithUTCOffset } from './idUtils'; // TODO: provide this info through new plugin
 import avro from './avro';
 import { COOKIE_NAME } from './clickState';
 
@@ -20,7 +20,7 @@ export const clickToClickRecord = request => click => {
 		? 'MEETUP_MEMBER'
 		: 'MEETUP_MEMBER_DEV';
 	return {
-		timestamp: click.timestamp || new Date().toISOString(),
+		timestamp: click.timestamp || getZonedDateTimeStringWithUTCOffset(),
 		requestId: request.id,
 		memberId: parseIdCookie(request.state[memberCookieName], true), // force integer
 		lineage: click.lineage,

@@ -2,10 +2,7 @@
 import avro from './util/avro';
 import { getTrackActivity, getTrackApiResponses } from './_activityTrackers';
 import { ACTIVITY_PLUGIN_NAME } from './config';
-import { ZonedDateTime, ZoneId } from 'js-joda';
-
-// Ensure timezone info is available
-require('js-joda-timezone');
+import { getZonedDateTimeStringWithUTCOffset } from './util/idUtils';
 
 const YEAR_IN_MS: number = 1000 * 60 * 60 * 24 * 365;
 
@@ -19,13 +16,6 @@ const YEAR_IN_MS: number = 1000 * 60 * 60 * 24 * 365;
 
 type ActivityPlatform = 'WEB' | 'IOS' | 'ANDROID';
 const ANDROID_APP_ID = 'com.meetup';
-
-// ZoneId.toString() adds the timezone in brackets, which we want to remove
-// e.g.: 2019-01-07T10:27:02.791-05:00[America/New_York]
-export const getZonedDateTimeStringWithUTCOffset = () =>
-	ZonedDateTime.now(ZoneId.of('America/New_York'))
-		.toString()
-		.replace(/\[.*\]$/, '');
 
 export const getRequestPlatform = (request: HapiRequest): ActivityPlatform => {
 	const { headers, state, query = {} } = request;
