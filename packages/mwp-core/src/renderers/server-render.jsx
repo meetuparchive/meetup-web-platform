@@ -161,7 +161,7 @@ const getRouterRenderer = ({
 	console.log(initialState);
 	const flag = initialState.flags['exp-flag'];
 	if (flag) {
-		cssLinks = 'foo-bar.css';
+		cssLinks = ['foo-bar.css', 'blah.css'];
 	}
 
 	const result = getHtml(
