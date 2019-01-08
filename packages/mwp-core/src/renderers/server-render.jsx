@@ -14,7 +14,8 @@ import Dom from 'mwp-app-render/lib/components/Dom';
 import ServerApp from 'mwp-app-render/lib/components/ServerApp';
 import { parseMemberCookie } from 'mwp-core/lib/util/cookieUtils';
 
-import { getVariants } from '../util/cookieUtils';
+import { getVariants, parseBrowserIdCookie } from '../util/cookieUtils';
+import { getLaunchDarklyUser } from '../util/launchDarkly';
 
 const DOCTYPE = '<!DOCTYPE html>';
 const DUMMY_DOMAIN = 'http://mwp-dummy-domain.com';
@@ -31,15 +32,14 @@ function getHtml(el) {
 	return `${DOCTYPE}${htmlMarkup}`;
 }
 
-export function getRedirect(context) {
+export function getRedirect(context: { url?: string, permanent?: boolean }) {
 	if (!context || !context.url) {
 		return;
 	}
 	// use `URL` to ensure valid character encoding (e.g. escaped emoji)
-	const isFragment = context.url.startsWith('/');
-	const urlToFormat = isFragment
-		? `${DUMMY_DOMAIN}${context.url}`
-		: context.url;
+	const url: string = context.url;
+	const isFragment = url.startsWith('/');
+	const urlToFormat = isFragment ? `${DUMMY_DOMAIN}${url}` : url;
 	const formattedUrl = new URL(urlToFormat).toString();
 	return {
 		redirect: {
@@ -236,6 +236,10 @@ const makeRenderer = (
 			headers['x-forwarded-proto'] || server.info.protocol;
 		const domain: string =
 			headers['x-forwarded-host'] || headers['x-meetup-host'] || info.host;
+		const clientIp =
+			request.query.__set_geoip ||
+			headers['fastly-client-ip'] ||
+			info.remoteAddress;
 		const host = `${requestProtocol}://${domain}`;
 		const userAgent = headers['user-agent'];
 		const userAgentDevice = headers['x-ua-device'] || ''; // set by fastly
@@ -259,6 +263,8 @@ const makeRenderer = (
 					variants: getVariants(state),
 					entryPath: url.pathname, // the path that the user entered the app on
 					media: getMedia(userAgent, userAgentDevice),
+					browserId: parseBrowserIdCookie(state),
+					clientIp,
 				},
 			};
 
@@ -276,15 +282,18 @@ const makeRenderer = (
 		// feature flags can be selected based on member id,
 		// email, and other properties.
 		// feature flags based on member id are available before the store is populated.
-		const addFlags = (populatedStore, member) =>
-			// getFlags needs as much member info as possible, but particularly id and email
-			// in order to match on common targeting rules
-			request.server.plugins['mwp-app-route'].getFlags(member).then(flags =>
-				populatedStore.dispatch({
-					type: 'UPDATE_FLAGS',
-					payload: flags,
-				})
-			);
+		const addFlags = (populatedStore, member) => {
+			// Populate a LaunchDarklyUser object from member and request details
+			const launchDarklyUser = getLaunchDarklyUser(member, request);
+			return request.server.plugins['mwp-app-route']
+				.getFlags(launchDarklyUser)
+				.then(flags =>
+					populatedStore.dispatch({
+						type: 'UPDATE_FLAGS',
+						payload: flags,
+					})
+				);
+		};
 
 		const checkReady = state =>
 			state.preRenderChecklist.every(isReady => isReady);

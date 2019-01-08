@@ -5,7 +5,7 @@
   "engineStrict": true,
   "engines": {
     "node": "^8.11.4",
-    "yarn": "1.9.4"
+    "yarn": "^1.9.4"
   },
   "main": "./lib/index.js",
   "scripts": {
@@ -29,13 +29,14 @@
   "dependencies": {
     "convict": "4.0.1",
     "electrode-csrf-jwt": "git+https://github.com/meetup/electrode-csrf-jwt.git#793431729d8fb4ee315f28709f323f198b25d460",
-    "hapi": "17.4.0",
+    "hapi": "17.8.1",
     "inert": "5.1.0",
     "mwp-api-proxy-plugin": ">=0.0.1",
     "mwp-app-route-plugin": ">=0.0.1",
     "mwp-auth-plugin": ">=0.0.1",
     "mwp-config": ">=0.0.1",
     "mwp-csp-plugin": ">=0.0.1",
+    "mwp-rasp-plugin": ">=0.0.1",
     "mwp-language-plugin": ">=0.0.1",
     "mwp-logger-plugin": ">=0.0.1",
     "mwp-sw-plugin": ">=0.0.1",

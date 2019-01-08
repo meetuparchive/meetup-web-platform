@@ -1,6 +1,11 @@
 import { getRedirect } from './server-render';
 
 describe('getRedirect', () => {
+	test('does nothing if url is empty', () => {
+		expect(getRedirect({})).toBeUndefined();
+		expect(getRedirect({ url: undefined })).toBeUndefined();
+		expect(getRedirect({ url: '' })).toBeUndefined();
+	});
 	test('escapes UTF-8', () => {
 		const path = '/驚くばかり';
 		expect(

@@ -69,7 +69,7 @@ export const getListState: ResponseStateSetter = (
 	if (sort) {
 		mergedList.sort(sort);
 	}
-	return { [dynamicRef]: { value: mergedList } };
+	return { [dynamicRef]: { value: mergedList, query } };
 };
 
 export const responseToState: ResponseStateSetter = (
