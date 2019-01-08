@@ -25,7 +25,7 @@
     "mwp-api-proxy-plugin": ">=0.0.1",
     "mwp-app-render": ">=0.0.1",
     "mwp-core": ">=0.0.1",
-    "mwp-config": "^18.2.2819",
+    "mwp-config": ">=0.0.1",
     "mwp-logger-plugin": ">=0.0.1",
     "mwp-router": ">=0.0.1",
     "mwp-store": ">=0.0.1",
