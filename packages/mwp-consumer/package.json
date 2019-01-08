@@ -27,7 +27,7 @@
 	"peerDependencies": {
 		"mwp-app-server": ">=0.0.1",
 		"mwp-core": ">=0.0.1",
-		"mwp-store": ">=0.0.1",
+		"mwp-store": ">=0.0.1"
 	},
 	"dependencies": {
 		"classnames": "2.2.5",
