@@ -41,6 +41,5 @@
     "node-fetch": "1.7.2",
     "pino": "4.7.1",
     "qs": "6.5.0"
-  },
-  "devDependencies": {}
+  }
 }

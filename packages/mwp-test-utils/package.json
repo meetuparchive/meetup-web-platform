@@ -35,12 +35,9 @@
     "inert": "5.1.0",
     "meetup-web-mocks": "1.0.217",
     "mwp-core": ">=0.0.1",
-    "mwp-logger-plugin": ">=0.0.1",
-    "mwp-router": ">=0.0.1",
     "mwp-store": ">=0.0.1",
     "react-helmet": "5.2.0",
     "redux": "3.7.2",
     "tough-cookie": "2.3.3"
-  },
-  "devDependencies": {}
+  }
 }

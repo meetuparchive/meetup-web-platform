@@ -1,4 +1,4 @@
-import { testCreateStore } from 'mwp-test-utils';
+import { testCreateStore } from '../util/testUtils';
 
 import { getInitialState, getBrowserCreateStore } from './';
 
