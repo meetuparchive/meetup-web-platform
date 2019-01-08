@@ -28,18 +28,17 @@
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "peerDependencies": {
     "newrelic": "^4.8.1",
-    "rxjs": "^5.4.3"
+    "rxjs": "^5.4.3",
+    "mwp-auth-plugin": ">=0.0.1",
+    "mwp-config": ">=0.0.1",
+    "mwp-logger-plugin": ">=0.0.1"
   },
   "dependencies": {
     "ajv": "5.5.2",
     "isbot": "2.2.0",
     "joi": "13.4.0",
-    "mwp-auth-plugin": ">=0.0.1",
-    "mwp-config": ">=0.0.1",
-    "mwp-logger-plugin": ">=0.0.1",
     "qs": "6.5.0",
     "request": "2.88.0",
     "rison": "0.1.1"
-  },
-  "devDependencies": {}
+  }
 }

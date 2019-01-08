@@ -26,11 +26,8 @@
     "url": "https://github.com/meetup/meetup-web-platform/issues"
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
-  "dependencies": {
-    "mwp-config": ">=0.0.1"
-  },
-  "devDependencies": {},
   "peerDependencies": {
-    "inert": "5.1.0"
+    "inert": "5.1.0",
+    "mwp-config": ">=0.0.1"
   }
 }

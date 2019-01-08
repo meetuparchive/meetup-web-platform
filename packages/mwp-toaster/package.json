@@ -24,8 +24,6 @@
     "url": "https://github.com/meetup/meetup-web-platform/issues"
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
-  "dependencies": {},
-  "devDependencies": {},
   "peerDependencies": {
     "classnames": "^2.2.6",
     "js-joda": "^1.8.2",
