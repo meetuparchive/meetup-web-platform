@@ -158,6 +158,12 @@ const getRouterRenderer = ({
 
 	// all the data for the full `<html>` element has been initialized by the app
 	// so go ahead and assemble the full response body
+	console.log(initialState);
+	const flag = initialState.flags['exp-flag'];
+	if (flag) {
+		cssLinks = 'foo-bar.css';
+	}
+
 	const result = getHtml(
 		<Dom
 			basename={basename}
