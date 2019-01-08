@@ -30,7 +30,6 @@
     "mwp-router": ">=0.0.1"
   },
   "dependencies": {
-    "idb-keyval": "2.3.0",
-    "mwp-router": ">=0.0.1"
+    "idb-keyval": "2.3.0"
   }
 }

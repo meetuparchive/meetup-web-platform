@@ -26,11 +26,7 @@
     "url": "https://github.com/meetup/meetup-web-platform/issues"
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
-  "dependencies": {
-    "convict": "4.0.1",
-    "electrode-csrf-jwt": "git+https://github.com/meetup/electrode-csrf-jwt.git#793431729d8fb4ee315f28709f323f198b25d460",
-    "hapi": "17.8.1",
-    "inert": "5.1.0",
+  "peerDependencies": {
     "mwp-api-proxy-plugin": ">=0.0.1",
     "mwp-app-route-plugin": ">=0.0.1",
     "mwp-auth-plugin": ">=0.0.1",
@@ -40,7 +36,13 @@
     "mwp-language-plugin": ">=0.0.1",
     "mwp-logger-plugin": ">=0.0.1",
     "mwp-sw-plugin": ">=0.0.1",
-    "mwp-tracking-plugin": ">=0.0.1",
+    "mwp-tracking-plugin": ">=0.0.1"
+  },
+  "dependencies": {
+    "convict": "4.0.1",
+    "electrode-csrf-jwt": "git+https://github.com/meetup/electrode-csrf-jwt.git#793431729d8fb4ee315f28709f323f198b25d460",
+    "hapi": "17.8.1",
+    "inert": "5.1.0",
     "pino": "4.7.1",
     "spdy": "3.4.7",
     "uuid": "3.1.0"

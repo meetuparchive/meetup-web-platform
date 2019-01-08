@@ -27,14 +27,14 @@
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "peerDependencies": {
+    "mwp-api-state": ">=0.0.1",
     "mwp-router": ">=0.0.1",
+    "mwp-tracking-plugin": ">=0.0.1",
     "redux": "^3.7.2",
     "rxjs": "^5.4.3"
   },
   "dependencies": {
     "js-cookie": "2.1.4",
-    "mwp-api-state": ">=0.0.1",
-    "mwp-tracking-plugin": ">=0.0.1",
     "rison": "0.1.1"
   }
 }
