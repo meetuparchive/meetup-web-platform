@@ -1,7 +1,6 @@
 import Boom from 'boom';
-
-import { fakeUTCinTimezone, getLogger, getOnPreResponse } from './activity';
-import { updateId } from './util/idUtils';
+import { getOnPreResponse, getLogger } from './activity';
+import { updateId } from './util/trackingUtils';
 
 jest.mock('./util/avro', () => ({
 	loggers: {
@@ -86,17 +85,6 @@ describe('getOnPreResponse', () => {
 	});
 });
 
-describe('fakeUTCinTimezone', () => {
-	const fakeTime = new Date(Date.UTC(2017, 6, 4)); // midnight July 4th in UTC
-	it('shifts the time correctly', () => {
-		expect(fakeUTCinTimezone('America/New_York')(fakeTime).toISOString()).toBe(
-			'2017-07-03T20:00:00.000Z' // 10PM July 3rd in NYC
-		);
-		expect(fakeUTCinTimezone('Pacific/Auckland')(fakeTime).toISOString()).toBe(
-			'2017-07-04T12:00:00.000Z' // noon July 4th in New Zealand
-		);
-	});
-});
 describe('updateId', () => {
 	it('sets cookiename if not set', () => {
 		const requestWithoutTrackId = getMockRequest();
@@ -139,26 +127,20 @@ describe('getLogger', () => {
 			state: {},
 			id: 1234,
 		};
-		jest
-			.spyOn(Date.prototype, 'toISOString')
-			.mockImplementation(() => 'mock ISO date');
 		const logger = getLogger('MOCK_PLATFORM_AGENT');
-		expect(logger(MOCK_REQUEST, { foo: 'bar' })).toMatchInlineSnapshot(`
-Object {
-  "agent": "",
-  "foo": "bar",
-  "ip": "",
-  "isUserActivity": true,
-  "mobileWeb": false,
-  "platform": "WEB",
-  "platformAgent": "MOCK_PLATFORM_AGENT",
-  "referer": "",
-  "requestId": 1234,
-  "timestamp": "mock ISO date",
-  "trax": Object {},
-}
-`);
-		jest.restoreAllMocks(); // restore toISOString behavior
+		expect(logger(MOCK_REQUEST, { foo: 'bar' })).toMatchSnapshot({
+			agent: '',
+			foo: 'bar',
+			ip: '',
+			isUserActivity: true,
+			mobileWeb: false,
+			platform: 'WEB',
+			platformAgent: 'MOCK_PLATFORM_AGENT',
+			referer: '',
+			requestId: 1234,
+			timestamp: expect.any(String),
+			trax: expect.any(Object),
+		});
 	});
 	it('sets `platform` to IOS for isNativeApp without Android header', () => {
 		const MOCK_REQUEST = {

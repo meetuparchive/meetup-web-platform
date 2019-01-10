@@ -1,3 +1,5 @@
+import { getISOStringNow } from './trackingUtils';
+
 const DATA_ATTR = 'clicktrack';
 
 /*
@@ -120,9 +122,8 @@ function getTrackClick() {
 			const data = _getData(e);
 
 			// 2. Create click action with metadata
-			const now = new Date(); // TODO: make this a America/New_York timestamp
 			return {
-				timestamp: now.toISOString(),
+				timestamp: getISOStringNow(),
 				lineage: clickLineage.join('<'),
 				linkText: linkText,
 				coords: [x, y],
