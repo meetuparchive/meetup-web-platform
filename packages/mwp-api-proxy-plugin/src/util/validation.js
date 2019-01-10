@@ -15,6 +15,7 @@ export const querySchema = Joi.object({
 	list: Joi.object({
 		dynamicRef: Joi.string(),
 		merge: Joi.object({
+			isReverse: Joi.bool(),
 			sort: Joi.func(),
 			idTest: Joi.func(),
 		}),
