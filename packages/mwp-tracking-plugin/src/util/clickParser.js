@@ -1,4 +1,4 @@
-import { getZonedDateTimeStringWithUTCOffset } from './trackingUtils';
+import { getISOStringNow } from './trackingUtils';
 
 const DATA_ATTR = 'clicktrack';
 
@@ -123,7 +123,7 @@ function getTrackClick() {
 
 			// 2. Create click action with metadata
 			return {
-				timestamp: getZonedDateTimeStringWithUTCOffset(),
+				timestamp: getISOStringNow(),
 				lineage: clickLineage.join('<'),
 				linkText: linkText,
 				coords: [x, y],

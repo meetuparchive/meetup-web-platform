@@ -2,7 +2,7 @@
 import avro from './util/avro';
 import { getTrackActivity, getTrackApiResponses } from './_activityTrackers';
 import { ACTIVITY_PLUGIN_NAME } from './config';
-import { getZonedDateTimeStringWithUTCOffset } from './util/trackingUtils';
+import { getISOStringNow } from './util/trackingUtils';
 
 const YEAR_IN_MS: number = 1000 * 60 * 60 * 24 * 365;
 
@@ -36,7 +36,7 @@ export const getLogger: string => (Object, Object) => mixed = (
 		const { headers } = request;
 
 		const record = {
-			timestamp: getZonedDateTimeStringWithUTCOffset(),
+			timestamp: getISOStringNow(),
 			requestId: request.id,
 			ip: headers['remote-addr'] || '',
 			agent: headers['user-agent'] || '',

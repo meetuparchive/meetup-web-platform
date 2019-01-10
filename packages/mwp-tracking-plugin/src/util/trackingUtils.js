@@ -58,9 +58,11 @@ export const parseIdCookie = (
 	return parsed.id;
 };
 
-// ZoneId.toString() adds the timezone in brackets, which we want to remove
+// `toString()` adds the timezone in brackets, which we want to remove
 // e.g.: 2019-01-07T10:27:02.791-05:00[America/New_York]
-export const getZonedDateTimeStringWithUTCOffset = () =>
-	ZonedDateTime.now(ZoneId.of('America/New_York'))
-		.toString()
-		.replace(/\[.*\]$/, '');
+export const getISOStringWithUTCOffset = zonedDateTime =>
+	zonedDateTime.toString().replace(/\[.*\]$/, '');
+
+// Get current time as an ISO Date Time String with UTC offset
+export const getISOStringNow = (tz = 'America/New_York') =>
+	getISOStringWithUTCOffset(ZonedDateTime.now(ZoneId.of(tz)));
