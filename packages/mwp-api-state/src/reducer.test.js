@@ -45,6 +45,19 @@ describe('getListState', () => {
 			},
 		},
 	};
+	const respWithReverse = {
+		response: { value: ['foo'] },
+		query: {
+			ref: 'bar',
+			list: {
+				dynamicRef: 'baz',
+				merge: {
+					idTest: () => false,
+					isReverse: true,
+				},
+			},
+		},
+	};
 	it('ignores no-response responses', () => {
 		expect(
 			getListState(state, {
@@ -90,6 +103,17 @@ describe('getListState', () => {
 			[resp.query.list.dynamicRef]: {
 				value: [...value, ...resp.response.value],
 				query: respWithoutSort.query,
+			},
+		});
+	});
+	it('merges new response with existing dynamicRef adding new items at the top of the list', () => {
+		const value = ['qux'];
+		expect(
+			getListState({ [resp.query.list.dynamicRef]: { value } }, respWithReverse)
+		).toEqual({
+			[resp.query.list.dynamicRef]: {
+				value: [...resp.response.value, ...value],
+				query: respWithReverse.query,
 			},
 		});
 	});
