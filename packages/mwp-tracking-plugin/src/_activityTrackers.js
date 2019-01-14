@@ -1,6 +1,6 @@
 // @flow
 import rison from 'rison';
-import { parseIdCookie, updateId } from './util/idUtils';
+import { parseIdCookie, updateId } from './util/trackingUtils';
 
 /*
  * This module exports specific tracking functions that consume the `request`
@@ -34,7 +34,7 @@ export const getTrackApiResponses: TrackGetter = trackOpts => request => (
 /*
  * This is the core tracking handler - called on every request that generates
  * REST API call(s)
- * 
+ *
  * 1. Server render (initial navigation)
  *    - url: target URL (request.url.path)
  *    - referrer: previous URL (request.referrer)
