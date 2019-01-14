@@ -45,6 +45,19 @@ describe('getListState', () => {
 			},
 		},
 	};
+	const respWithReverse = {
+		response: { value: ['foo'] },
+		query: {
+			ref: 'bar',
+			list: {
+				dynamicRef: 'baz',
+				merge: {
+					idTest: () => false,
+					isReverse: true,
+				},
+			},
+		},
+	};
 	it('ignores no-response responses', () => {
 		expect(
 			getListState(state, {
@@ -62,8 +75,9 @@ describe('getListState', () => {
 		).toEqual({});
 	});
 	it('returns a new object with dynamicRef', () => {
+		const ref = resp.query.list.dynamicRef;
 		expect(getListState(state, resp)).toEqual({
-			[resp.query.list.dynamicRef]: {
+			[ref]: {
 				value: resp.response.value,
 				query: resp.query,
 			},
@@ -71,10 +85,9 @@ describe('getListState', () => {
 	});
 	it('merges new response with existing dynamicRef, sorted', () => {
 		const value = ['qux'];
-		expect(
-			getListState({ [resp.query.list.dynamicRef]: { value } }, resp)
-		).toEqual({
-			[resp.query.list.dynamicRef]: {
+		const ref = resp.query.list.dynamicRef;
+		expect(getListState({ [ref]: { value } }, resp)).toEqual({
+			[ref]: {
 				value: [...value, ...resp.response.value].sort(
 					resp.query.list.merge.sort
 				),
@@ -84,12 +97,21 @@ describe('getListState', () => {
 	});
 	it('merges new response with existing dynamicRef, not sorted if sort callback undefined', () => {
 		const value = ['qux'];
-		expect(
-			getListState({ [resp.query.list.dynamicRef]: { value } }, respWithoutSort)
-		).toEqual({
-			[resp.query.list.dynamicRef]: {
-				value: [...value, ...resp.response.value],
+		const ref = respWithoutSort.query.list.dynamicRef;
+		expect(getListState({ [ref]: { value } }, respWithoutSort)).toEqual({
+			[ref]: {
+				value: [...value, ...respWithoutSort.response.value],
 				query: respWithoutSort.query,
+			},
+		});
+	});
+	it('merges new response with existing dynamicRef adding new items at the top of the list', () => {
+		const value = ['qux'];
+		const ref = respWithReverse.query.list.dynamicRef;
+		expect(getListState({ [ref]: { value } }, respWithReverse)).toEqual({
+			[ref]: {
+				value: [...respWithReverse.response.value, ...value],
+				query: respWithReverse.query,
 			},
 		});
 	});
@@ -100,12 +122,11 @@ describe('getListState', () => {
 			response: { value: { value: ['foo'] } },
 			query: resp.query,
 		};
-		expect(
-			getListState({ [resp.query.list.dynamicRef]: { value: list } }, response)
-		).toEqual({
-			[resp.query.list.dynamicRef]: {
+		const ref = response.query.list.dynamicRef;
+		expect(getListState({ [ref]: { value: list } }, response)).toEqual({
+			[ref]: {
 				value: [...value.value, ...response.response.value.value].sort(
-					resp.query.list.merge.sort
+					response.query.list.merge.sort
 				),
 				query: response.query,
 			},
