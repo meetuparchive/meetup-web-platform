@@ -36,7 +36,7 @@ const getMemberId = state => state.config.member.id.toString();
  * Listen for any action that should set cached state with a
  * `{ queries, responses }` payload
  *
- * API_SUCCESS means there is fresh data ready to be stored - extract the
+ * API_RESP_SUCCESS means there is fresh data ready to be stored - extract the
  * queries and their responses, then dispatch `CACHE_SET` actions with each
  * pair
  *

@@ -29,7 +29,7 @@ function makeCacheEpic() {
 	return Promise.resolve(getCacheEpic(makeCache()));
 }
 function populateCacheEpic(CacheEpic) {
-	// set the cache with API_SUCCESS
+	// set the cache with API_RESP_SUCCESS
 	return CacheEpic(MOCK_SUCCESS_ACTION, fakeStore).then(() => CacheEpic);
 }
 
@@ -56,7 +56,7 @@ describe('getCacheEpic', () => {
 
 	it('emits CACHE_SUCCESS when there is a cache hit for API_REQ', () =>
 		makeCacheEpic()
-			.then(populateCacheEpic) // also indirectly testing for successful cache set on API_SUCCESS
+			.then(populateCacheEpic) // also indirectly testing for successful cache set on API_RESP_SUCCESS
 			.then(testForPopulatedCache()));
 
 	it('does not emit CACHE_SUCCESS after CACHE_CLEAR is dispatched', () =>
