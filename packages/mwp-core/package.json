@@ -24,7 +24,7 @@
   "peerDependencies": {
     "mwp-router": ">=0.0.1",
     "newrelic": "^4.8.1",
-    "react": "^16.3.1",
+    "react": "^16.4.0",
     "react-dom": "^16.4.2",
     "react-helmet": "^5.2.0",
     "react-intl": "^2.4.0"

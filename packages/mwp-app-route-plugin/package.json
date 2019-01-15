@@ -37,7 +37,7 @@
     "mwp-core": ">=0.0.1",
     "mwp-language-plugin": ">=0.0.1",
     "mwp-router": ">=0.0.1",
-    "react": "^16.3.1",
+    "react": "^16.4.0",
     "react-dom": "^16.4.2"
   }
 }
