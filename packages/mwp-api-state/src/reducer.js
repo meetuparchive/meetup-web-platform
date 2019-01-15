@@ -57,13 +57,16 @@ export const getListState: ResponseStateSetter = (
 	}
 
 	// do some smart merging
-	const { idTest, sort } = merge;
+	const { idTest, sort, isReverse } = merge;
 	// remove anything in old list that is part of new list
 	const oldList = ((state[dynamicRef] || {}).value || [])
 		.filter(valOld => !newList.find(valNew => idTest(valOld, valNew)));
 
 	// combine the new list and the old list
-	const mergedList = [...oldList, ...newList];
+	const mergedList = isReverse
+		? [...newList, ...oldList]
+		: [...oldList, ...newList];
+
 	// sort is optional
 	if (sort) {
 		mergedList.sort(sort);
