@@ -39,7 +39,7 @@ export const getTrackApiResponses: TrackGetter = trackOpts => request => (
  *    - url: target URL (request.url.path)
  *    - referrer: previous URL (request.referrer)
  * 2. SPA navigation
- *    - url: target URL (provided by querystring params)
+ *    - url: target URL (provided by request.referrer)
  *    - referrer: previous URL (provided by querystring params)
  * 3. lazy-loaded data
  *    - url: proxy endpoint path (request.url.path)
