@@ -118,6 +118,7 @@ const getRouterRenderer = ({
 	basename,
 	scripts,
 	cssLinks,
+	newCSSLinks,
 	userAgent,
 }): RenderResult => {
 	// pre-render the app-specific markup, this is the string of markup that will
@@ -156,6 +157,14 @@ const getRouterRenderer = ({
 		return redirect;
 	}
 
+	// Check launch darkly flags to determine if we should
+	// be rendering the new swarm global styles as well.
+	// The new global styles must be loaded after the old css styles
+	const ldStyleFlag = initialState.flags['new-swarm-assets'];
+	if (ldStyleFlag) {
+		cssLinks = [...cssLinks, ...newCSSLinks];
+	}
+
 	// all the data for the full `<html>` element has been initialized by the app
 	// so go ahead and assemble the full response body
 	const result = getHtml(
@@ -186,6 +195,7 @@ const makeRenderer$ = (renderConfig: {
 	scripts: Array<string>,
 	enableServiceWorker: boolean,
 	cssLinks: ?Array<string>,
+	newCSSLinks: ?Array<string>,
 }) =>
 	makeRenderer(
 		renderConfig.routes,
@@ -193,7 +203,8 @@ const makeRenderer$ = (renderConfig: {
 		renderConfig.middleware,
 		renderConfig.scripts,
 		renderConfig.enableServiceWorker,
-		renderConfig.cssLinks
+		renderConfig.cssLinks,
+		renderConfig.newCSSLinks
 	);
 
 /**
@@ -209,7 +220,8 @@ const makeRenderer = (
 	middleware: Array<Function> = [],
 	scripts: Array<string> = [],
 	enableServiceWorker: boolean,
-	cssLinks: ?Array<string>
+	cssLinks: ?Array<string>,
+	newCSSLinks: ?Array<string>
 ) => {
 	// set up a Promise that emits the resolved routes - this single Promise will
 	// be reused for all subsequent requests, so we're not resolving the routes repeatedly
@@ -327,6 +339,16 @@ const makeRenderer = (
 		return routesPromise.then(resolvedRoutes =>
 			initializeStore(resolvedRoutes).then(store => {
 				if ('skeleton' in request.query) {
+					// TODO: what is the skeleton? Do we need to also check the ld flags for css styles here too?
+					// Check launch darkly flags to determine if we should
+					// be rendering the new swarm global styles as well.
+					// The new global styles must be loaded after the old css styles
+					const initialState = store.getState();
+					const ldStyleFlag = initialState.flags['new-swarm-assets'];
+					if (ldStyleFlag) {
+						cssLinks = [...cssLinks, ...newCSSLinks];
+					}
+
 					// render skeleton if requested - the store is ready
 					return {
 						result: getHtml(
@@ -355,6 +377,7 @@ const makeRenderer = (
 								basename,
 								scripts,
 								cssLinks,
+								newCSSLinks,
 								userAgent,
 							}) // immediately invoke callback
 					);
