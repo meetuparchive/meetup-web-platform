@@ -67,7 +67,6 @@
     "jest": "23.6.0",
     "joi": "13.4.0",
     "js-joda": "1.9.2",
-    "js-joda-timezone": "2.0.1",
     "lint-staged": "4.0.1",
     "meetup-web-components": "5.2.2434",
     "meetup-web-mocks": "1.0.217",
