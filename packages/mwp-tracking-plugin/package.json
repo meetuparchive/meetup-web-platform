@@ -24,6 +24,9 @@
     "url": "https://github.com/meetup/meetup-web-platform/issues"
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
+  "peerDependencies": {
+    "js-joda-timezone": "^2.0.1"
+  },
   "dependencies": {
     "@google-cloud/pubsub": "0.18.0",
     "avsc": "5.1.1",
@@ -33,6 +36,5 @@
     "rison": "0.1.1",
     "url": "0.11.0",
     "uuid": "3.3.2"
-  },
-  "devDependencies": {}
+  }
 }

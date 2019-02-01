@@ -7,7 +7,6 @@
 import { combineReducers } from 'redux';
 import { api, API_RESP_COMPLETE } from 'mwp-api-state';
 import { routing } from 'mwp-router';
-import { reducer as clickTracking } from 'mwp-tracking-plugin/lib/util/clickState';
 
 export function config(state = {}, action) {
 	if (action.type === 'CONFIGURE') {
@@ -37,7 +36,6 @@ export function preRenderChecklist([apiDataLoaded] = [false], action) {
 
 export const platformReducers = {
 	api,
-	clickTracking,
 	config,
 	flags,
 	preRenderChecklist,

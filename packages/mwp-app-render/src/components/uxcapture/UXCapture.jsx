@@ -11,7 +11,13 @@ type Props = {|
 |};
 
 export const onMark = (mark: string) => {
-	if (!(window.newrelic && window.performance)) {
+	if (
+		!(
+			window.newrelic &&
+			window.performance &&
+			window.performance.getEntriesByType
+		)
+	) {
 		return;
 	}
 
@@ -29,7 +35,13 @@ export const onMark = (mark: string) => {
 };
 
 export const onMeasure = (measure: string) => {
-	if (!(window.newrelic && window.performance)) {
+	if (
+		!(
+			window.newrelic &&
+			window.performance &&
+			window.performance.getEntriesByType
+		)
+	) {
 		return;
 	}
 
