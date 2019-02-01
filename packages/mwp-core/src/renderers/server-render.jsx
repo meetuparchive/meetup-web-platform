@@ -338,31 +338,6 @@ const makeRenderer = (
 
 		return routesPromise.then(resolvedRoutes =>
 			initializeStore(resolvedRoutes).then(store => {
-				if ('skeleton' in request.query) {
-					// TODO: what is the skeleton? Do we need to also check the ld flags for css styles here too?
-					// Check launch darkly flags to determine if we should
-					// be rendering the new swarm global styles as well.
-					// The new global styles must be loaded after the old css styles
-					const initialState = store.getState();
-					const ldStyleFlag = initialState.flags['new-swarm-assets'];
-					if (ldStyleFlag) {
-						cssLinks = [...cssLinks, ...newCSSLinks];
-					}
-
-					// render skeleton if requested - the store is ready
-					return {
-						result: getHtml(
-							<Dom
-								basename={basename}
-								head={Helmet.rewind()}
-								initialState={store.getState()}
-								scripts={scripts}
-								cssLinks={cssLinks}
-							/>
-						),
-						statusCode: 200,
-					};
-				}
 				// the initial addFlags call will only be key'd by member ID
 				return addFlags(store, { id: parseMemberCookie(state).id })
 					.then(() => populateStore(store))
