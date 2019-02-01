@@ -118,7 +118,6 @@ const getRouterRenderer = ({
 	basename,
 	scripts,
 	cssLinks,
-	newCSSLinks,
 	userAgent,
 }): RenderResult => {
 	// pre-render the app-specific markup, this is the string of markup that will
@@ -153,16 +152,15 @@ const getRouterRenderer = ({
 	const externalRedirect = getRedirect(sideEffects.redirect);
 	const internalRedirect = getRedirect(staticContext);
 	const redirect = internalRedirect || externalRedirect;
+
 	if (redirect) {
 		return redirect;
 	}
 
-	// Check launch darkly flags to determine if we should
-	// be rendering the new swarm global styles as well.
-	// The new global styles must be loaded after the old css styles
-	const ldStyleFlag = initialState.flags['new-swarm-assets'];
-	if (ldStyleFlag) {
-		cssLinks = [...cssLinks, ...newCSSLinks];
+	// cssLinks can be an Array or a Function that returns an array
+	if (typeof cssLinks === 'function') {
+		// invoke function and provide initialState
+		cssLinks = cssLinks(initialState);
 	}
 
 	// all the data for the full `<html>` element has been initialized by the app
@@ -194,8 +192,7 @@ const makeRenderer$ = (renderConfig: {
 	middleware: Array<Function>,
 	scripts: Array<string>,
 	enableServiceWorker: boolean,
-	cssLinks: ?Array<string>,
-	newCSSLinks: ?Array<string>,
+	cssLinks: ?(Array<string> | Function),
 }) =>
 	makeRenderer(
 		renderConfig.routes,
@@ -203,8 +200,7 @@ const makeRenderer$ = (renderConfig: {
 		renderConfig.middleware,
 		renderConfig.scripts,
 		renderConfig.enableServiceWorker,
-		renderConfig.cssLinks,
-		renderConfig.newCSSLinks
+		renderConfig.cssLinks
 	);
 
 /**
@@ -220,8 +216,7 @@ const makeRenderer = (
 	middleware: Array<Function> = [],
 	scripts: Array<string> = [],
 	enableServiceWorker: boolean,
-	cssLinks: ?Array<string>,
-	newCSSLinks: ?Array<string>
+	cssLinks: ?(Array<string> | Function)
 ) => {
 	// set up a Promise that emits the resolved routes - this single Promise will
 	// be reused for all subsequent requests, so we're not resolving the routes repeatedly
@@ -352,7 +347,6 @@ const makeRenderer = (
 								basename,
 								scripts,
 								cssLinks,
-								newCSSLinks,
 								userAgent,
 							}) // immediately invoke callback
 					);
