@@ -152,8 +152,15 @@ const getRouterRenderer = ({
 	const externalRedirect = getRedirect(sideEffects.redirect);
 	const internalRedirect = getRedirect(staticContext);
 	const redirect = internalRedirect || externalRedirect;
+
 	if (redirect) {
 		return redirect;
+	}
+
+	// cssLinks can be an Array or a Function that returns an array
+	if (typeof cssLinks === 'function') {
+		// invoke function and provide initialState
+		cssLinks = cssLinks(initialState);
 	}
 
 	// all the data for the full `<html>` element has been initialized by the app
@@ -185,7 +192,7 @@ const makeRenderer$ = (renderConfig: {
 	middleware: Array<Function>,
 	scripts: Array<string>,
 	enableServiceWorker: boolean,
-	cssLinks: ?Array<string>,
+	cssLinks: ?(Array<string> | Function),
 }) =>
 	makeRenderer(
 		renderConfig.routes,
@@ -209,7 +216,7 @@ const makeRenderer = (
 	middleware: Array<Function> = [],
 	scripts: Array<string> = [],
 	enableServiceWorker: boolean,
-	cssLinks: ?Array<string>
+	cssLinks: ?(Array<string> | Function)
 ) => {
 	// set up a Promise that emits the resolved routes - this single Promise will
 	// be reused for all subsequent requests, so we're not resolving the routes repeatedly
@@ -326,21 +333,6 @@ const makeRenderer = (
 
 		return routesPromise.then(resolvedRoutes =>
 			initializeStore(resolvedRoutes).then(store => {
-				if ('skeleton' in request.query) {
-					// render skeleton if requested - the store is ready
-					return {
-						result: getHtml(
-							<Dom
-								basename={basename}
-								head={Helmet.rewind()}
-								initialState={store.getState()}
-								scripts={scripts}
-								cssLinks={cssLinks}
-							/>
-						),
-						statusCode: 200,
-					};
-				}
 				// the initial addFlags call will only be key'd by member ID
 				return addFlags(store, { id: parseMemberCookie(state).id })
 					.then(() => populateStore(store))
