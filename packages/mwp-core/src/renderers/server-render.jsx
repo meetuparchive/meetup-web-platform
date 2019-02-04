@@ -192,7 +192,7 @@ const makeRenderer$ = (renderConfig: {
 	middleware: Array<Function>,
 	scripts: Array<string>,
 	enableServiceWorker: boolean,
-	cssLinks: ?(Array<string> | Function),
+	cssLinks: ?(Array<string> | (MWPState => Array<string>)),
 }) =>
 	makeRenderer(
 		renderConfig.routes,
@@ -216,7 +216,7 @@ const makeRenderer = (
 	middleware: Array<Function> = [],
 	scripts: Array<string> = [],
 	enableServiceWorker: boolean,
-	cssLinks: ?(Array<string> | Function)
+	cssLinks: ?(Array<string> | (MWPState => Array<string>))
 ) => {
 	// set up a Promise that emits the resolved routes - this single Promise will
 	// be reused for all subsequent requests, so we're not resolving the routes repeatedly
