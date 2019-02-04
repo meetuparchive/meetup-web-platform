@@ -129,6 +129,10 @@
     through2 "^2.0.3"
     uuid "^3.1.0"
 
+"@meetup/ux-capture@4.2.1":
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/@meetup/ux-capture/-/ux-capture-4.2.1.tgz#c2af639ff7b48d40d86b9830c573781c2b3e1e97"
+
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/@mrmlnc/readdir-enhanced/-/readdir-enhanced-2.2.1.tgz#524af240d1a360527b730475ecfa1344aa540dde"
@@ -8160,10 +8164,6 @@ uuid@3.3.2, uuid@^3.0.1, uuid@^3.1.0, uuid@^3.2.1, uuid@^3.3.2:
 uuid@^2.0.1:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-2.0.3.tgz#67e2e863797215530dff318e5bf9dcebfd47b21a"
-
-ux-capture@3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/ux-capture/-/ux-capture-3.0.0.tgz#e0ef5c923877f1177bac71f4fb351807b9dc586c"
 
 v8flags@^2.0.10:
   version "2.1.1"
