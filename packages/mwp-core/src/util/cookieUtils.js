@@ -36,7 +36,7 @@ export const parseBrowserIdCookie = state => {
 
 export const parseSiftSessionCookie = state => {
 	if (!state[SIFT_SESSION_COOKIE]) {
-		return { id: '' };
+		return '';
 	}
 	const siftSessionId = querystring.parse(state[SIFT_SESSION_COOKIE]);
 	return siftSessionId;
