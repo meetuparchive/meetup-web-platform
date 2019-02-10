@@ -34,13 +34,7 @@ export const parseBrowserIdCookie = state => {
 	return browserId;
 };
 
-export const parseSiftSessionCookie = state => {
-	if (!state[SIFT_SESSION_COOKIE]) {
-		return '';
-	}
-	const siftSessionId = querystring.parse(state[SIFT_SESSION_COOKIE]);
-	return siftSessionId;
-};
+export const parseSiftSessionCookie = state => state[SIFT_SESSION_COOKIE] || '';
 
 /*
  * Some variant settings can be passed in from MEETUP_VARIANT_XXX cookies. This
