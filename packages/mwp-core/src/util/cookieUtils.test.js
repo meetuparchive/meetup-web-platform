@@ -3,7 +3,9 @@ import {
 	parseMemberCookie,
 	getVariants,
 	BROWSER_ID_COOKIE,
+	SIFT_SESSION_COOKIE,
 	parseBrowserIdCookie,
+	parseSiftSessionCookie,
 } from './cookieUtils';
 
 describe('parseMemberCookie', () => {
@@ -61,6 +63,21 @@ describe('parseBrowserIdCookie', () => {
 		expect(parseBrowserIdCookie({})).toEqual({
 			id: '',
 		});
+	});
+});
+
+describe('parseSiftSessionIdCookie', () => {
+	it('returns a sift session id', () => {
+		const requestState = {
+			[SIFT_SESSION_COOKIE]: 'bfb3860d-36b4-417c-9ead-99bcc036cf88',
+		};
+		expect(parseSiftSessionCookie(requestState)).toEqual(
+			'bfb3860d-36b4-417c-9ead-99bcc036cf88'
+		);
+	});
+	it('returns an empty object when there is no SIFT_SESSION_COOKIE', () => {
+		const requestState = { [SIFT_SESSION_COOKIE]: '' };
+		expect(parseSiftSessionCookie(requestState)).toEqual('');
 	});
 });
 

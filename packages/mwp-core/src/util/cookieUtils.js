@@ -11,6 +11,10 @@ export const BROWSER_ID_COOKIE = appConfig.api.isProd
 	? 'MEETUP_BROWSER_ID'
 	: 'MEETUP_BROWSER_ID_DEV';
 
+export const SIFT_SESSION_COOKIE = appConfig.api.isProd
+	? 'SIFT_SESSION_ID'
+	: 'SIFT_SESSION_ID_DEV';
+
 export const parseMemberCookie = state => {
 	if (!state[MEMBER_COOKIE]) {
 		logger.warn('No member cookie found - there might be a problem with auth');
@@ -29,6 +33,8 @@ export const parseBrowserIdCookie = state => {
 	const browserId = querystring.parse(state[BROWSER_ID_COOKIE]);
 	return browserId;
 };
+
+export const parseSiftSessionCookie = state => state[SIFT_SESSION_COOKIE] || '';
 
 /*
  * Some variant settings can be passed in from MEETUP_VARIANT_XXX cookies. This
