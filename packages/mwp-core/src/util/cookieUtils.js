@@ -11,6 +11,9 @@ export const BROWSER_ID_COOKIE = appConfig.api.isProd
 	? 'MEETUP_BROWSER_ID'
 	: 'MEETUP_BROWSER_ID_DEV';
 
+// SIFT_SESSION_ID cookie created in fastly and used by sift science to correlate spammy
+// behavior to user activity; cookie has an expiration time of 4 hours and should be
+// reset on logout. For more details please refer  https://sift.com/resources/tutorials/anonymous-users
 export const SIFT_SESSION_COOKIE = appConfig.api.isProd
 	? 'SIFT_SESSION_ID'
 	: 'SIFT_SESSION_ID_DEV';
