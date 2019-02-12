@@ -14,7 +14,11 @@ import Dom from 'mwp-app-render/lib/components/Dom';
 import ServerApp from 'mwp-app-render/lib/components/ServerApp';
 import { parseMemberCookie } from 'mwp-core/lib/util/cookieUtils';
 
-import { getVariants, parseBrowserIdCookie } from '../util/cookieUtils';
+import {
+	getVariants,
+	parseBrowserIdCookie,
+	parseSiftSessionCookie,
+} from '../util/cookieUtils';
 import { getLaunchDarklyUser } from '../util/launchDarkly';
 
 const DOCTYPE = '<!DOCTYPE html>';
@@ -272,6 +276,7 @@ const makeRenderer = (
 					media: getMedia(userAgent, userAgentDevice),
 					browserId: parseBrowserIdCookie(state),
 					clientIp,
+					siftSessionId: parseSiftSessionCookie(state),
 				},
 			};
 
