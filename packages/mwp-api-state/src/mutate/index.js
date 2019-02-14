@@ -1,7 +1,4 @@
 import * as api from '../sync/apiActionCreators';
-import 'rxjs/add/operator/do';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/filter';
 
 /**
  * Mutate epic  provides a generic interface for triggering POST and DELETE requests
