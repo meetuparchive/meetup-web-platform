@@ -100,13 +100,23 @@ const onRequest = (request, h) => {
  * Read from request data to prepare/modify response. Mainly looking for new
  * tracking cookies that need to be set using request.response.state.
  */
-export const getOnPreResponse = cookieConfig => (request, h) => {
+
+type CookieOpts = {
+	browserIdCookieName: string,
+	memberCookieName: string,
+	trackIdCookieName: string,
+	domain: string,
+};
+export const getOnPreResponse = (cookieConfig: CookieOpts) => (
+	request: HapiRequest,
+	h: HapiResponseToolkit
+) => {
 	const { browserIdCookieName, trackIdCookieName, domain } = cookieConfig;
 	const pluginData = request.plugins[ACTIVITY_PLUGIN_NAME];
 	const browserId = pluginData[browserIdCookieName];
 	const trackId = pluginData[trackIdCookieName];
 
-	const FOREVER: CookieOpts = {
+	const FOREVER: HapiServerStateCookieOptions = {
 		domain,
 		encoding: 'none',
 		path: '/',
