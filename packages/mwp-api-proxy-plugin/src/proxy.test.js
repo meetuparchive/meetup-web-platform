@@ -1,13 +1,10 @@
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/toPromise';
 import { getServer } from 'mwp-test-utils';
 import { mockQuery, MOCK_RENDERPROPS } from 'meetup-web-mocks/lib/app';
 
 import * as send from './util/send';
 import * as receive from './util/receive';
 
-import apiProxy$ from './proxy';
+import apiProxy from './proxy';
 
 jest.mock('mwp-config', () => {
 	const config = require.requireActual('mwp-config');
@@ -30,9 +27,9 @@ const MOCK_HAPI_REQUEST = {
 	getLanguage: () => 'en-US',
 };
 
-describe('apiProxy$', () => {
+describe('apiProxy', () => {
 	const queries = [mockQuery(MOCK_RENDERPROPS), mockQuery(MOCK_RENDERPROPS)];
-	it('returns an observable that emits an array of results', async () => {
+	it('returns an Promise that emits an array of results', async () => {
 		const server = await getServer();
 		const mockRequest = {
 			...MOCK_HAPI_REQUEST,
@@ -43,14 +40,16 @@ describe('apiProxy$', () => {
 			value: { foo: 'bar' },
 		};
 
-		spyOn(send, 'makeSend$').and.returnValue(() => Observable.of(1));
+		spyOn(send, 'makeSendQuery').and.returnValue(() =>
+			Promise.resolve([{}, ''])
+		);
 		spyOn(receive, 'makeReceive').and.returnValue(query => response =>
 			requestResult
 		);
 		const expectedResults = [requestResult, requestResult];
-		return apiProxy$(mockRequest)(queries)
-			.toPromise()
-			.then(results => expect(results).toEqual(expectedResults));
+		return apiProxy(mockRequest)(queries).then(results =>
+			expect(results).toEqual(expectedResults)
+		);
 	});
 
 	const endpoint = 'foo';
@@ -62,8 +61,7 @@ describe('apiProxy$', () => {
 			method: 'get',
 		};
 		const query = { ...mockQuery(MOCK_RENDERPROPS) };
-		return apiProxy$(mockRequest)([query])
-			.toPromise()
+		return apiProxy(mockRequest)([query])
 			.then(() => require('request').mock.calls.pop()[0])
 			.then(arg => expect(arg.method).toBe('get'));
 	});
@@ -75,8 +73,7 @@ describe('apiProxy$', () => {
 			method: 'post',
 		};
 		const query = { ...mockQuery(MOCK_RENDERPROPS), meta: { method: 'post' } };
-		return apiProxy$(mockRequest)([query])
-			.toPromise()
+		return apiProxy(mockRequest)([query])
 			.then(() => require('request').mock.calls.pop()[0])
 			.then(arg => expect(arg.method).toBe('post'));
 	});
@@ -102,8 +99,8 @@ describe('apiProxy$', () => {
 				error: undefined,
 			},
 		];
-		return apiProxy$(mockRequest)([query])
-			.toPromise()
-			.then(responses => expect(responses).toEqual(expectedResponses));
+		return apiProxy(mockRequest)([query]).then(responses =>
+			expect(responses).toEqual(expectedResponses)
+		);
 	});
 });

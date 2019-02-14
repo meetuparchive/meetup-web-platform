@@ -4,7 +4,7 @@ The API proxy plugin provides methods for requesting data from the Meetup REST
 API using [Queries](../../../docs/Queries.md). It provides two major features
 to a server.
 
-1. a `request.proxyApi$(queries)` method that will generate REST API requests
+1. a `request.proxyApi(queries)` method that will generate REST API requests
 for `queries` that are passed in as an argument
 2. a route for HTTP requests from the application, which default to `/mu_api`.
 
