@@ -17,7 +17,7 @@ import { API_PROXY_PLUGIN_NAME } from './config';
  * The logic for sending the requests is in './util/send' and the logic for
  * receiving the responses is in './util/receive'
  */
-export default (request: HapiRequest) => {
+const apiProxy = (request: HapiRequest) => {
 	const setApiResponseDuotones = apiResponseDuotoneSetter(
 		request.server.plugins[API_PROXY_PLUGIN_NAME].duotoneUrls
 	);
@@ -51,3 +51,4 @@ export default (request: HapiRequest) => {
 		});
 	};
 };
+export default apiProxy;
