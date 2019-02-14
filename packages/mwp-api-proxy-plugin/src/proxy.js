@@ -1,13 +1,9 @@
 // @flow
 import newrelic from 'newrelic';
 // Implicit dependency: tracking plugin providing request.trackActivity method
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/zip';
-import 'rxjs/add/operator/first';
-import 'rxjs/add/operator/do';
 
 import { apiResponseDuotoneSetter } from './util/duotone';
-import { makeSend$ } from './util/send';
+import { makeSendQuery } from './util/send';
 import { makeReceive } from './util/receive';
 
 import { API_PROXY_PLUGIN_NAME } from './config';
@@ -25,35 +21,33 @@ export default (request: HapiRequest) => {
 	const setApiResponseDuotones = apiResponseDuotoneSetter(
 		request.server.plugins[API_PROXY_PLUGIN_NAME].duotoneUrls
 	);
-	return (queries: Array<Query>): Observable<Array<QueryResponse>> => {
+	return (queries: Array<Query>): Promise<Array<QueryResponse>> => {
 		const [query] = queries;
 		// special case handling of tracking call - must supply a response, but
 		// empty object is fine
 		if (queries.length === 1 && query.endpoint === 'track') {
-			return Observable.of([{ ref: query.ref, value: {} }]).do(responses =>
-				request.trackActivity(query.params)
-			);
+			request.trackActivity(query.params);
+			return Promise.resolve([{ ref: query.ref, value: {} }]);
 		}
 
 		// send$ and receive must be assigned here rather than when the `request`
 		// is first passed in because the `request.state` isn't guaranteed to be
 		// available until after the `queries` have been parsed
-		const send$ = makeSend$(request);
+		const sendQuery = makeSendQuery(request);
 		const receive = makeReceive(request);
 
-		// create an array of in-flight API request Observables
-		const apiRequests$ = queries.map(query =>
-			send$(query)
-				.map(newrelic.createTracer('meetupApiRequest', receive(query)))
-				.map(setApiResponseDuotones)
+		// create an array of in-flight API request Promises
+		const apiRequests = queries.map(query =>
+			sendQuery(query)
+				.then(newrelic.createTracer('meetupApiRequest', receive(query)))
+				.then(setApiResponseDuotones)
 		);
 
-		// Zip them together to make requests in parallel and return responses in order.
-		// This call uses `.first()` to guarantee a single response because WP-596
-		// indicated there were sporadic duplicate activity tracking logs, possibly
-		// related to request errors
-		return Observable.zip(...apiRequests$)
-			.first()
-			.do(() => request.trackActivity());
+		// wait for all requests to response and aggregate into array.
+		// caller should catch any errors
+		return Promise.all(apiRequests).then(responses => {
+			request.trackActivity();
+			return responses;
+		});
 	};
 };

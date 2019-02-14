@@ -13,7 +13,6 @@ A set of selectors to enable easy selection from our Redux store.
 
 -   js-cookie
 -   rison
--   rxjs (peer)
 -   mwp-api-proxy-plugin
 -   mwp-api-state
 -   mwp-tracking/util/clickWriter
