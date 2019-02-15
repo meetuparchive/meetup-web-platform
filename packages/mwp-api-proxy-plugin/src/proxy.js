@@ -51,7 +51,7 @@ const apiProxy = (request: HapiRequest) => {
 				.then(setApiResponseDuotones);
 		});
 
-		// wait for all requests to response
+		// wait for all requests to respond
 		// caller should catch any errors
 		return Promise.all(apiRequests).then(responses => {
 			// tracking side effect only
