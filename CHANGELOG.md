@@ -1,3 +1,12 @@
+## [20.0]
+
+- **BREAKING CHANGE** - `makeRenderer$` interface into server renderer removed -
+  must use object-based `makeRenderer`
+- **Refactor** `mwp-api-proxy-plugin` now provides `request.apiProxy` interface,
+  which uses native Promises instead of Observables.
+
+  `rxjs` is no longer a peer dependency of any MWP packages.
+
 ## [19.0]
 - **Removed** `state.app` reducers. Consumers must convert to using `state.api`.
 
