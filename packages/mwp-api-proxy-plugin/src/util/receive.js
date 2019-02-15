@@ -186,6 +186,7 @@ export const makeApiResponseToQueryResponse = query => ({
 });
 
 export const makeLogResponse = request => ([response, body]) => {
+	// `response` may contain private (user-specific) data. Log with caution
 	const {
 		request: { headers, method, uri: { href: url } },
 		statusCode,
@@ -260,14 +261,16 @@ export const makeInjectResponseCookies = request => ([response, _, jar]) => {
 	});
 };
 
-export const makeReceive = request => {
+// curried function(request, query, response) that will format an API response into
+// a 'standard' response format
+export const makeReceiver = request => {
 	const logResponse = makeLogResponse(request);
 	const injectResponseCookies = makeInjectResponseCookies(request);
 	return query => {
 		const parseApiResponse = makeParseApiResponse(query);
 		const apiResponseToQueryResponse = makeApiResponseToQueryResponse(query);
 		return response => {
-			logResponse(response); // this will leak private API response data into production logs
+			logResponse(response);
 			injectResponseCookies(response);
 			try {
 				return apiResponseToQueryResponse(parseApiResponse(response));
