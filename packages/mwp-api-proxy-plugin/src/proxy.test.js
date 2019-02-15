@@ -43,7 +43,7 @@ describe('apiProxy', () => {
 		spyOn(send, 'makeSendQuery').and.returnValue(() =>
 			Promise.resolve([{}, ''])
 		);
-		spyOn(receive, 'makeReceive').and.returnValue(query => response =>
+		spyOn(receive, 'makeReceiver').and.returnValue(query => response =>
 			requestResult
 		);
 		const expectedResults = [requestResult, requestResult];
