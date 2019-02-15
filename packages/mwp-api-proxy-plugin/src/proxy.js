@@ -30,7 +30,7 @@ const apiProxy = (request: HapiRequest) => {
 			return Promise.resolve([{ ref: query.ref, value: {} }]);
 		}
 
-		// send$ and receive must be assigned here rather than when the `request`
+		// sendQuery and receiver must be assigned here rather than when the `request`
 		// is first passed in because the `request.state` isn't guaranteed to be
 		// available until after the `queries` have been parsed
 		const sendQuery = makeSendQuery(request);
