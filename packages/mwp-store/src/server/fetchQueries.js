@@ -1,7 +1,5 @@
 // @flow
 import querystring from 'querystring';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/toPromise';
 import { parseQueryResponse, getAuthedQueryFilter } from '../util/fetchUtils';
 
 const getCookieMember = memberCookie => {
@@ -29,8 +27,7 @@ export default (request: HapiRequest) => () => (
 	const authedQueries = getAuthedQueryFilter(member);
 	const validQueries = queries.filter(authedQueries);
 	return request
-		.proxyApi$(validQueries)
-		.map(responses => ({ responses })) // package the responses in object like the API proxy endpoint does
-		.toPromise()
+		.proxyApi(validQueries)
+		.then(responses => ({ responses })) // package the responses in object like the API proxy endpoint does
 		.then(parseQueryResponse(validQueries));
 };

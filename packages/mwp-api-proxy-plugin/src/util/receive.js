@@ -260,7 +260,9 @@ export const makeInjectResponseCookies = request => ([response, _, jar]) => {
 	});
 };
 
-export const makeReceive = request => {
+// curried function(request, query, response) that will format an API response into
+// a 'standard' response format
+export const makeReceiver = request => {
 	const logResponse = makeLogResponse(request);
 	const injectResponseCookies = makeInjectResponseCookies(request);
 	return query => {

@@ -1,7 +1,7 @@
 // @flow
 import { duotones, getDuotoneUrls } from './util/duotone';
 import getApiProxyRoutes from './routes';
-import proxyApi$ from './proxy';
+import proxyApi from './proxy';
 
 import { API_ROUTE_PATH, API_PROXY_PLUGIN_NAME } from './config';
 export { API_ROUTE_PATH } from './config';
@@ -25,8 +25,8 @@ export function register(server: Object, options: void) {
 	);
 
 	// add a method to the `request` object that can call REST API
-	server.decorate('request', 'proxyApi$', proxyApi$, { apply: true });
-	// plugin state must be available to all routes that use `request.proxyApi$`
+	server.decorate('request', 'proxyApi', proxyApi, { apply: true });
+	// plugin state must be available to all routes that use `request.proxyApi`
 	server.ext('onRequest', setPluginState);
 
 	// add a route that will receive query requests as querystring params
