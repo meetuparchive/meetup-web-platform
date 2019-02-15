@@ -9,6 +9,19 @@ import config from 'mwp-config';
 
 export const API_META_HEADER = 'X-Meta-Request-Headers';
 
+// create a promisified version of `externalRequest` - can't use `util.promisify`
+// because the callback gets 2 additional arguments, and promisify only supports 1.
+const externalRequestPromise = options =>
+	new Promise((resolve, reject) => {
+		externalRequest(options, (err, response, body) => {
+			if (err) {
+				reject(err);
+				return;
+			}
+			resolve([response, body]); // emit response and body as tuple
+		});
+	});
+
 const _makeGetCookieNames = () => {
 	// memoize the cookie names - they don't change
 	let memberCookieName;
@@ -310,16 +323,6 @@ export const makeMockRequest = (
 		JSON.stringify(mockResponseContent),
 	]);
 
-const externalRequestPromise = options =>
-	new Promise((resolve, reject) => {
-		externalRequest(options, (err, response, body) => {
-			if (err) {
-				reject(err);
-				return;
-			}
-			resolve([response, body]);
-		});
-	});
 /**
  * Make a real external API request, return response body string
  */
@@ -357,6 +360,7 @@ export const makeSendQuery = request => {
 
 	return query => {
 		const requestOpts = queryToRequestOpts(query);
+		// decide whether to make a _real_ request or a mock request
 		const doRequest = query.mockResponse
 			? makeMockRequest(query.mockResponse)
 			: makeExternalApiRequest(request);
