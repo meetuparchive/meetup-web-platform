@@ -186,6 +186,7 @@ export const makeApiResponseToQueryResponse = query => ({
 });
 
 export const makeLogResponse = request => ([response, body]) => {
+	// `response` may contain private (user-specific) data. Log with caution
 	const {
 		request: { headers, method, uri: { href: url } },
 		statusCode,
@@ -269,7 +270,7 @@ export const makeReceiver = request => {
 		const parseApiResponse = makeParseApiResponse(query);
 		const apiResponseToQueryResponse = makeApiResponseToQueryResponse(query);
 		return response => {
-			logResponse(response); // this will leak private API response data into production logs
+			logResponse(response);
 			injectResponseCookies(response);
 			try {
 				return apiResponseToQueryResponse(parseApiResponse(response));
