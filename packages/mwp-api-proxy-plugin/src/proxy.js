@@ -39,8 +39,8 @@ const apiProxy = (request: HapiRequest) => {
 		// create an array of in-flight API request Promises
 		const apiRequests = queries.map(query => {
 			const receive = receiver(query);
-			// start the meetupApiRequest trace, which will return when the `receive(query)`
-			// returned function completes
+			// start the meetupApiRequest trace, which will end when the function
+			// returned by `receiver(query)` finishes execution
 			const tracedResponseReceiver = newrelic.createTracer(
 				'meetupApiRequest',
 				receive
