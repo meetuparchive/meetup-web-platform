@@ -4,7 +4,7 @@ import newrelic from 'newrelic';
 
 import { apiResponseDuotoneSetter } from './util/duotone';
 import { makeSendQuery } from './util/send';
-import { makeReceive } from './util/receive';
+import { makeReceiver } from './util/receive';
 
 import { API_PROXY_PLUGIN_NAME } from './config';
 
@@ -34,19 +34,20 @@ const apiProxy = (request: HapiRequest) => {
 		// is first passed in because the `request.state` isn't guaranteed to be
 		// available until after the `queries` have been parsed
 		const sendQuery = makeSendQuery(request);
-		const receive = makeReceive(request);
+		const receiver = makeReceiver(request);
 
 		// create an array of in-flight API request Promises
 		const apiRequests = queries.map(query => {
+			const receive = receiver(query);
 			// start the meetupApiRequest trace, which will return when the `receive(query)`
 			// returned function completes
-			const tracedResponseHandler = newrelic.createTracer(
+			const tracedResponseReceiver = newrelic.createTracer(
 				'meetupApiRequest',
-				receive(query)
+				receive
 			);
 			// now send the query and return the Promise of resolved responses
 			return sendQuery(query)
-				.then(tracedResponseHandler)
+				.then(tracedResponseReceiver)
 				.then(setApiResponseDuotones);
 		});
 
