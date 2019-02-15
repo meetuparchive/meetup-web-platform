@@ -191,7 +191,7 @@ const getRouterRenderer = ({
 };
 
 /**
- * Curry a function that takes a Hapi request and returns a Promis
+ * Curry a function that takes a Hapi request and returns a Promise
  * that will emit the rendered HTML
  *
  * The outer function takes app-specific information about the routes,
