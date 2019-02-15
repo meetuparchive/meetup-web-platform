@@ -4,18 +4,23 @@ import querystring from 'qs';
 import url from 'url';
 
 import externalRequest from 'request';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/observable/bindNodeCallback';
-import 'rxjs/add/observable/defer';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/operator/do';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/timeout';
 
 import config from 'mwp-config';
 
 export const API_META_HEADER = 'X-Meta-Request-Headers';
+
+// create a promisified version of `externalRequest` - can't use `util.promisify`
+// because the callback gets 2 additional arguments, and promisify only supports 1.
+const externalRequestPromise = options =>
+	new Promise((resolve, reject) => {
+		externalRequest(options, (err, response, body) => {
+			if (err) {
+				reject(err);
+				return;
+			}
+			resolve([response, body]); // emit response and body as tuple
+		});
+	});
 
 const _makeGetCookieNames = () => {
 	// memoize the cookie names - they don't change
@@ -313,17 +318,16 @@ export const makeMockRequest = (
 	mockResponseContent,
 	responseMeta
 ) => requestOpts =>
-	Observable.of([
+	Promise.resolve([
 		makeMockResponse(requestOpts, responseMeta),
 		JSON.stringify(mockResponseContent),
 	]);
 
-const externalRequest$ = Observable.bindNodeCallback(externalRequest);
 /**
  * Make a real external API request, return response body string
  */
 export const makeExternalApiRequest = request => requestOpts => {
-	return externalRequest$(requestOpts)
+	return externalRequestPromise(requestOpts)
 		.catch(err => {
 			request.server.app.logger.error({
 				err,
@@ -338,14 +342,14 @@ export const makeExternalApiRequest = request => requestOpts => {
 			}
 			return makeMockRequest(errorObj, makeAPIErrorResponse(err))(requestOpts);
 		})
-		.map(([response, body]) => [response, body, requestOpts.jar]);
+		.then(([response, body]) => [response, body, requestOpts.jar]);
 };
 
 /*
  * Make an API request and parse the response into the expected `response`
  * object shape
  */
-export const makeSend$ = request => {
+export const makeSendQuery = request => {
 	// 1. get the queries and the shared `externalRequestOpts` from the request
 	//    that will be applied to all queries
 	const externalRequestOpts = getExternalRequestOpts(request);
@@ -356,10 +360,11 @@ export const makeSend$ = request => {
 
 	return query => {
 		const requestOpts = queryToRequestOpts(query);
-		const request$ = query.mockResponse
+		// decide whether to make a _real_ request or a mock request
+		const doRequest = query.mockResponse
 			? makeMockRequest(query.mockResponse)
 			: makeExternalApiRequest(request);
 
-		return Observable.defer(() => request$(requestOpts));
+		return doRequest(requestOpts);
 	};
 };

@@ -190,38 +190,29 @@ const getRouterRenderer = ({
 	};
 };
 
-const makeRenderer$ = (renderConfig: {
+/**
+ * Curry a function that takes a Hapi request and returns a Promise
+ * that will emit the rendered HTML
+ *
+ * The outer function takes app-specific information about the routes,
+ * reducer, and optional additional middleware
+ */
+const makeRenderer = (renderConfig: {
 	routes: Array<Object>,
 	reducer: Reducer<MWPState, FluxStandardAction>,
 	middleware: Array<Function>,
 	scripts: Array<string>,
 	enableServiceWorker: boolean,
 	cssLinks: ?(Array<string> | (MWPState => Array<string>)),
-}) =>
-	makeRenderer(
-		renderConfig.routes,
-		renderConfig.reducer,
-		renderConfig.middleware,
-		renderConfig.scripts,
-		renderConfig.enableServiceWorker,
-		renderConfig.cssLinks
-	);
-
-/**
- * Curry a function that takes a Hapi request and returns an observable
- * that will emit the rendered HTML
- *
- * The outer function takes app-specific information about the routes,
- * reducer, and optional additional middleware
- */
-const makeRenderer = (
-	routes: Array<Object>,
-	reducer: Reducer<MWPState, FluxStandardAction>,
-	middleware: Array<Function> = [],
-	scripts: Array<string> = [],
-	enableServiceWorker: boolean,
-	cssLinks: ?(Array<string> | (MWPState => Array<string>))
-) => {
+}) => {
+	const {
+		routes,
+		reducer,
+		middleware,
+		scripts,
+		enableServiceWorker,
+		cssLinks,
+	} = renderConfig;
 	// set up a Promise that emits the resolved routes - this single Promise will
 	// be reused for all subsequent requests, so we're not resolving the routes repeatedly
 	// hooray performance
@@ -230,8 +221,6 @@ const makeRenderer = (
 		request: HapiRequest,
 		h: HapiResponseToolkit
 	): Promise<RenderResult> => {
-		middleware = middleware || [];
-
 		if (!scripts.length) {
 			throw new Error('No client script assets specified');
 		}
@@ -282,7 +271,7 @@ const makeRenderer = (
 
 			const createStore = getServerCreateStore(
 				getFindMatches(resolvedRoutes, basename),
-				middleware,
+				middleware || [],
 				request
 			);
 			return Promise.resolve(createStore(reducer, initialState));
@@ -360,5 +349,4 @@ const makeRenderer = (
 	};
 };
 
-export { makeRenderer$, makeRenderer };
 export default makeRenderer;
