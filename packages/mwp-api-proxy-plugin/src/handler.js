@@ -25,14 +25,14 @@ export function parseRequestQueries(request) {
 }
 
 /*
- * The default API proxy handler - just calls the decorated `proxyApi$` method
+ * The default API proxy handler - just calls the decorated `proxyApi` method
  * and serializes the API responses
  */
 export default (request, h) => {
 	const handleResponses = responses =>
 		h.response({ responses }).type('application/json');
 
-	return request.proxyApi$(parseRequestQueries(request)).toPromise().then(
+	return request.proxyApi(parseRequestQueries(request)).then(
 		handleResponses,
 		err => err // 500 error - will only be thrown on bad implementation
 	);

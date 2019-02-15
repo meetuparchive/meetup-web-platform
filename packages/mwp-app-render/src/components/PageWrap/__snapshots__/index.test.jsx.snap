@@ -53,6 +53,7 @@ exports[`PageWrap renders correct UI elements 1`] = `
         "name": "mocky mcmockerson",
         "photo": Object {
           "photo_link": "http://placekitten.com/g/400/400",
+          "thumb_link": "http://placekitten.com/g/200/200",
         },
       }
     }
