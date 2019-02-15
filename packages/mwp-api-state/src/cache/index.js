@@ -54,7 +54,7 @@ export const cacheSetEpic = cache => (action, store) => {
 /**
  * Listen for any action that should query the cache using a payload of queries
  *
- * Observables are heavily used in CACHE_REQUEST because each query results in
+ * Promises are heavily used in CACHE_REQUEST because each query results in
  * an async 'get' (Promise) from the Cache - all 'gets' happen in parallel and
  * the results are collated into a single response object containing the cache
  * hits.

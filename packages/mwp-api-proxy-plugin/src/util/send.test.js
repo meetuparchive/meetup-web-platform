@@ -1,7 +1,5 @@
 import { getServer } from 'mwp-test-utils';
 
-import 'rxjs/add/operator/toPromise';
-
 import {
 	mockQuery,
 	MOCK_RENDERPROPS,
@@ -316,7 +314,6 @@ describe('makeExternalApiRequest', () => {
 		};
 
 		return makeExternalApiRequest(mockRequest)(requestOpts)
-			.toPromise()
 			.then(() => require('request').mock.calls.pop()[0])
 			.then(arg => expect(arg).toBe(requestOpts));
 	});
@@ -335,11 +332,9 @@ describe('makeExternalApiRequest', () => {
 				settings: { app: { api: { timeout: 100 } } },
 			},
 			raw: {},
-		})(requestOpts)
-			.toPromise()
-			.then(([resp, body]) =>
-				expect(JSON.parse(body).errors[0].code).toBe('ETIMEDOUT')
-			);
+		})(requestOpts).then(([resp, body]) =>
+			expect(JSON.parse(body).errors[0].code).toBe('ETIMEDOUT')
+		);
 	});
 	it('returns the requestOpts jar at array index 2', async () => {
 		const server = await getServer();
@@ -354,9 +349,9 @@ describe('makeExternalApiRequest', () => {
 			url: 'http://example.com',
 			jar: 'fooJar',
 		};
-		return makeExternalApiRequest(mockRequest)(requestOpts)
-			.toPromise()
-			.then(([response, body, jar]) => expect(jar).toBe(requestOpts.jar));
+		return makeExternalApiRequest(mockRequest)(
+			requestOpts
+		).then(([response, body, jar]) => expect(jar).toBe(requestOpts.jar));
 	});
 });
 
