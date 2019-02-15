@@ -37,15 +37,23 @@ const apiProxy = (request: HapiRequest) => {
 		const receive = makeReceive(request);
 
 		// create an array of in-flight API request Promises
-		const apiRequests = queries.map(query =>
-			sendQuery(query)
-				.then(newrelic.createTracer('meetupApiRequest', receive(query)))
-				.then(setApiResponseDuotones)
-		);
+		const apiRequests = queries.map(query => {
+			// start the meetupApiRequest trace, which will return when the `receive(query)`
+			// returned function completes
+			const tracedResponseHandler = newrelic.createTracer(
+				'meetupApiRequest',
+				receive(query)
+			);
+			// now send the query and return the Promise of resolved responses
+			return sendQuery(query)
+				.then(tracedResponseHandler)
+				.then(setApiResponseDuotones);
+		});
 
-		// wait for all requests to response and aggregate into array.
+		// wait for all requests to response
 		// caller should catch any errors
 		return Promise.all(apiRequests).then(responses => {
+			// tracking side effect only
 			request.trackActivity();
 			return responses;
 		});
