@@ -5289,9 +5289,9 @@ meetup-web-components@5.2.2434:
     react-portal "4.1.2"
     recompose "0.26.0"
 
-meetup-web-mocks@1.0.217:
-  version "1.0.217"
-  resolved "https://registry.yarnpkg.com/meetup-web-mocks/-/meetup-web-mocks-1.0.217.tgz#a3bd6d458ab8a8b9c38fa96a2125c5b5e74b5330"
+meetup-web-mocks@1.0.262:
+  version "1.0.262"
+  resolved "https://registry.yarnpkg.com/meetup-web-mocks/-/meetup-web-mocks-1.0.262.tgz#cf3f529e29a8c943d857d02a35d84235485d6a21"
 
 mem@^1.1.0:
   version "1.1.0"

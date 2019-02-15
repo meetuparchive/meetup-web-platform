@@ -70,7 +70,7 @@
     "js-joda-timezone": "2.0.1",
     "lint-staged": "8.1.4",
     "meetup-web-components": "5.2.2434",
-    "meetup-web-mocks": "1.0.217",
+    "meetup-web-mocks": "1.0.262",
     "mwp-router": ">=0.0.1",
     "mwp-test-utils": ">=0.0.1",
     "newrelic": "^4.8.1",
