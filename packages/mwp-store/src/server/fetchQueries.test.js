@@ -7,10 +7,8 @@ describe('serverFetchQueries', () => {
 	// 	.then(parseQueryResponse(queries));
 	it('calls apiProxy$ with request and queries, passes ', () => {
 		const request = {
-			proxyApi$: jest.fn(() => {
-				const { Observable } = require('rxjs/Observable');
-				require('rxjs/add/observable/of');
-				return Observable.of('response');
+			proxyApi: jest.fn(() => {
+				return Promise.resolve('response');
 			}),
 			trackActivity: jest.fn(),
 			state: {},
@@ -22,7 +20,7 @@ describe('serverFetchQueries', () => {
 			expectedParsedResponse
 		);
 		return serverFetchQueries(request)()(queries).then(parsedResponse => {
-			expect(request.proxyApi$).toHaveBeenCalledWith(queries);
+			expect(request.proxyApi).toHaveBeenCalledWith(queries);
 			expect(parsedResponse).toEqual(expectedParsedResponse);
 		});
 	});

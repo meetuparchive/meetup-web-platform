@@ -80,6 +80,7 @@ declare type QueryListParam = {|
 	merge?: {
 		idTest: (Object, Object) => boolean, // test for same object identity
 		sort?: (Object, Object) => number, // test for order
+		isReverse?: boolean,
 	},
 |};
 // API query structure
@@ -136,13 +137,6 @@ type StaticPlatformRoute = {|
 |};
 
 declare type PlatformRoute = AsyncPlatformRoute | StaticPlatformRoute;
-
-declare type CookieOpts = {
-	path?: string,
-	isHttpOnly?: boolean,
-	isSecure?: boolean,
-	encoding?: string,
-};
 
 declare type GeoLocation = {
 	country?: string,
