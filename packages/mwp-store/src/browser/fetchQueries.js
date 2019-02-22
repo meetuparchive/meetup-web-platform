@@ -46,6 +46,8 @@ const makeSerializable = queries => {
 	return queries;
 };
 
+const getHeaders = () => {};
+
 /**
  * Build the arguments for the `fetch` call to the app server that will
  * contain the batched queries
