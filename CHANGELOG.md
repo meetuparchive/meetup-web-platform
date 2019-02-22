@@ -6,7 +6,7 @@
   - API proxy method (`mwp-api-proxy-plugin`) takes `activityInfo` argument to inject fields into
     activity records
   - `mwp-store` browser `fetchQueries` sends `x-meetup-activity` header
-  - `mwp-store` server `fetchQueries` sends passes `activityInfo to 
+  - `mwp-store` server `fetchQueries` passes `activityInfo` to 
   - `mwp-api-store` supplies `activityInfo` argument to `fetchQueries`
 
 ## [20.0]
