@@ -57,7 +57,7 @@ const makeSerializable = queries => {
  *   click tracking data
  * @return {Object} { url, config } arguments for a fetch call
  */
-export const getFetchArgs = (apiUrl, queries, meta) => {
+export const getFetchArgs = (apiUrl, queries, meta, activityInfo) => {
 	const headers = {};
 	const method = ((queries[0].meta || {}).method || 'GET') // fallback to 'get'
 		.toUpperCase(); // must be upper case - requests can fail silently otherwise
@@ -117,13 +117,13 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 	};
 };
 
-const _fetchQueryResponse = (apiUrl, queries, meta) => {
+const _fetchQueryResponse = ({ apiUrl, queries, meta, activityInfo }) => {
 	if (queries.length === 0) {
 		// no queries => no responses (no need to fetch)
 		return Promise.resolve({ responses: [] });
 	}
 
-	const { url, config } = getFetchArgs(apiUrl, queries, meta);
+	const { url, config } = getFetchArgs(apiUrl, queries, meta, activityInfo);
 	return fetch(url, config)
 		.catch(err => {
 			console.error(err);
@@ -152,7 +152,7 @@ const _fetchQueryResponse = (apiUrl, queries, meta) => {
  *   click tracking data
  * @return {Promise} resolves with a `{queries, responses}` object
  */
-const fetchQueries = (apiUrl, member) => (queries, meta) => {
+const fetchQueries = (apiUrl, member) => (queries, meta, activityInfo) => {
 	if (
 		typeof window === 'undefined' &&
 		typeof test === 'undefined' // not in browser // not in testing env (global set by Jest)
@@ -162,11 +162,12 @@ const fetchQueries = (apiUrl, member) => (queries, meta) => {
 
 	const authedQueries = getAuthedQueryFilter(member);
 	const validQueries = queries.filter(authedQueries);
-	return _fetchQueryResponse(
+	return _fetchQueryResponse({
 		apiUrl,
-		validQueries,
-		meta
-	).then(queryResponse => ({
+		queries: validQueries,
+		meta,
+		activityInfo,
+	}).then(queryResponse => ({
 		...parseQueryResponse(validQueries)(queryResponse),
 	}));
 };
