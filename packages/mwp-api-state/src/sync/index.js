@@ -152,7 +152,10 @@ export const getFetchQueriesEpic = (findMatches, fetchQueriesFn) => {
 		// construct the fetch call using match.path
 		const fetchUrl = `${config.apiUrl}${apiPath}`;
 		const fetchQueries = fetchQueriesFn(fetchUrl, (self || {}).value);
+
+		// supply additional request info, e.g. for tracking
 		const requestInfo = { standardized_url: apiPath };
+
 		return fetchQueries(queries, meta, requestInfo)
 			.then(({ successes = [], errors = [] }) => {
 				// meta contains a Promise that must be resolved

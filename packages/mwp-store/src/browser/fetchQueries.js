@@ -46,8 +46,6 @@ const makeSerializable = queries => {
 	return queries;
 };
 
-const getHeaders = () => {};
-
 /**
  * Build the arguments for the `fetch` call to the app server that will
  * contain the batched queries
@@ -103,6 +101,10 @@ export const getFetchArgs = (apiUrl, queries, meta, activityInfo) => {
 		headers[CSRF_COOKIE_NAME] = JSCookie.get(CSRF_HEADER_COOKIE_NAME);
 	}
 
+	if (activityInfo) {
+		headers['x-meetup-activity'] = new URLSearchParams(activityInfo).toString();
+	}
+
 	const config = {
 		method,
 		headers,
@@ -152,6 +154,8 @@ const _fetchQueryResponse = ({ apiUrl, queries, meta, activityInfo }) => {
  * @param {Array} queries the queries to send - must all use the same `method`
  * @param {Object} meta additional characteristics of the request, e.g.
  *   click tracking data
+ * @param {Object} activityInfo optional map of additional activity record data
+ *   to pass along with fetch request
  * @return {Promise} resolves with a `{queries, responses}` object
  */
 const fetchQueries = (apiUrl, member) => (queries, meta, activityInfo) => {
@@ -169,9 +173,7 @@ const fetchQueries = (apiUrl, member) => (queries, meta, activityInfo) => {
 		queries: validQueries,
 		meta,
 		activityInfo,
-	}).then(queryResponse => ({
-		...parseQueryResponse(validQueries)(queryResponse),
-	}));
+	}).then(parseQueryResponse(validQueries));
 };
 
 export default fetchQueries;

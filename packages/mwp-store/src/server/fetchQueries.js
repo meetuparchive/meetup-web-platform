@@ -21,7 +21,7 @@ type ActivityInfo = {
  */
 export default (request: HapiRequest) => () => (
 	queries: Array<Query>,
-	_: void,
+	meta: { string: string },
 	activityInfo: ActivityInfo
 ): Promise<ParsedQueryResponses> => {
 	if (isProdApi === undefined) {
