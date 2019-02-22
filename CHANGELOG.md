@@ -1,7 +1,7 @@
 ## [20.1]
 
 - **New Feature** activity tracking support for `standardized_url` and
-  `standardized_referer` (new fields in Activty v9).
+  `standardized_referer` (new fields in Activity v9).
   - API proxy endpoint (`mwp-api-proxy-plugin`) reads from url-encoded `x-meetup-activity` header
   - API proxy method (`mwp-api-proxy-plugin`) takes `activityInfo` argument to inject fields into
     activity records
