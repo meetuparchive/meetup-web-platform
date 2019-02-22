@@ -125,6 +125,11 @@ export const apiRequestToApiReq = action =>
 export const getFetchQueriesEpic = (findMatches, fetchQueriesFn) => {
 	// keep track of location changes - will first be set by SERVER_RENDER
 	let locationIndex = 0;
+	const standardizeUrl = location => {
+		return findMatches(location).matched
+			.pop()
+			.match.path.replace(/[^a-zA-Z0-9/]/gi, '');
+	};
 
 	// set up a closure that will compare the partially-applied location to the current value
 	// of `locationIndex` - if `locationIndex` has changed since `currentLocation`
@@ -143,18 +148,24 @@ export const getFetchQueriesEpic = (findMatches, fetchQueriesFn) => {
 		}
 		const { payload: queries, meta } = action;
 		// set up the fetch call to the app server
-		const { config, api: { self }, routing: { location } } = store.getState();
+		const {
+			config,
+			api: { self },
+			routing: { location, referrer },
+		} = store.getState();
 
-		// first get the current route 'match' data
-		const matched = findMatches(location);
 		// clean up path for use as endpoint URL
-		const apiPath = matched.pop().match.path.replace(/[^a-zA-Z0-9/]/gi, '');
+		const standardizedUrlPath = standardizeUrl(location);
+		const standardizedReferrerPath = standardizeUrl(referrer);
 		// construct the fetch call using match.path
-		const fetchUrl = `${config.apiUrl}${apiPath}`;
+		const fetchUrl = `${config.apiUrl}${standardizedUrlPath}`;
 		const fetchQueries = fetchQueriesFn(fetchUrl, (self || {}).value);
 
 		// supply additional request info, e.g. for tracking
-		const requestInfo = { standardized_url: apiPath };
+		const requestInfo = {
+			standardized_url: standardizedUrlPath,
+			standardized_referer: standardizedReferrerPath,
+		};
 
 		return fetchQueries(queries, meta, requestInfo)
 			.then(({ successes = [], errors = [] }) => {
