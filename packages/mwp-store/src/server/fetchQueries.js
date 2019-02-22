@@ -11,10 +11,6 @@ const getCookieMember = memberCookie => {
 // prod API only needs to be set once, but is only accessible from the request object
 let isProdApi;
 
-type ActivityInfo = {
-	standardized_url?: string,
-	standardized_referer?: string,
-};
 /**
  * on the server, we can proxy the API requests directly without making a
  * request to the server's own API proxy endpoint

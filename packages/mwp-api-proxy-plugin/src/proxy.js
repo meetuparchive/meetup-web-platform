@@ -21,14 +21,29 @@ const apiProxy = (request: HapiRequest) => {
 	const setApiResponseDuotones = apiResponseDuotoneSetter(
 		request.server.plugins[API_PROXY_PLUGIN_NAME].duotoneUrls
 	);
-	return (queries: Array<Query>): Promise<Array<QueryResponse>> => {
+	return (
+		queries: Array<Query>,
+		activityInfo: ActivityInfo
+	): Promise<Array<QueryResponse>> => {
 		const [query] = queries;
-		// special case handling of tracking call - must supply a response, but
-		// empty object is fine
+
 		if (queries.length === 1 && query.endpoint === 'track') {
-			request.trackActivity(query.params);
+			// special case handling of tracking call - must supply a response, but
+			// empty object is fine
+
+			const { viewName, subViewName } = query.params;
+			if (viewName) {
+				activityInfo.viewName = viewName;
+			}
+			if (subViewName) {
+				activityInfo.subViewName = subViewName;
+			}
+
+			request.trackActivity(activityInfo);
 			return Promise.resolve([{ ref: query.ref, value: {} }]);
 		}
+
+		request.trackActivity(activityInfo);
 
 		// sendQuery and receiver must be assigned here rather than when the `request`
 		// is first passed in because the `request.state` isn't guaranteed to be
@@ -53,11 +68,7 @@ const apiProxy = (request: HapiRequest) => {
 
 		// wait for all requests to respond
 		// caller should catch any errors
-		return Promise.all(apiRequests).then(responses => {
-			// tracking side effect only
-			request.trackActivity();
-			return responses;
-		});
+		return Promise.all(apiRequests);
 	};
 };
 export default apiProxy;
