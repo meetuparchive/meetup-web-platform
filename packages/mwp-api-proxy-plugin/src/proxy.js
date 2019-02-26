@@ -31,11 +31,9 @@ const apiProxy = (request: HapiRequest) => {
 			// special case handling of tracking call - must supply a response, but
 			// empty object is fine
 
-			const { viewName, subViewName } = query.params;
-			if (viewName) {
+			if (query.params !== undefined) {
+				const { viewName, subViewName } = query.params;
 				activityInfo.viewName = viewName;
-			}
-			if (subViewName) {
 				activityInfo.subViewName = subViewName;
 			}
 
