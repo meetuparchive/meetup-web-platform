@@ -126,9 +126,10 @@ export const getFetchQueriesEpic = (findMatches, fetchQueriesFn) => {
 	// keep track of location changes - will first be set by SERVER_RENDER
 	let locationIndex = 0;
 	const standardizeUrl = location => {
-		return findMatches(location).matched
-			.pop()
-			.match.path.replace(/[^a-zA-Z0-9/]/gi, '');
+		const matches = findMatches(location);
+		return matches && matches.matched
+			? matches.matched.pop().match.path.replace(/[^a-zA-Z0-9/]/gi, '')
+			: location;
 	};
 
 	// set up a closure that will compare the partially-applied location to the current value
