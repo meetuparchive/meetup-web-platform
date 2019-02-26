@@ -16,7 +16,9 @@ let isProdApi;
  * request to the server's own API proxy endpoint
  */
 export default (request: HapiRequest) => () => (
-	queries: Array<Query>
+	queries: Array<Query>,
+	meta: { string: string },
+	activityInfo: ActivityInfo
 ): Promise<ParsedQueryResponses> => {
 	if (isProdApi === undefined) {
 		isProdApi = request.server.settings.app.api.isProd;
@@ -27,7 +29,7 @@ export default (request: HapiRequest) => () => (
 	const authedQueries = getAuthedQueryFilter(member);
 	const validQueries = queries.filter(authedQueries);
 	return request
-		.proxyApi(validQueries)
+		.proxyApi(validQueries, activityInfo)
 		.then(responses => ({ responses })) // package the responses in object like the API proxy endpoint does
 		.then(parseQueryResponse(validQueries));
 };

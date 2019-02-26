@@ -131,7 +131,10 @@ export const groupDuotoneSetter = duotoneUrls => group => {
 	const photo = group.key_photo || group.group_photo || {};
 	const duotoneKey =
 		group.photo_gradient &&
-		duotoneRef(group.photo_gradient.light_color, group.photo_gradient.dark_color);
+		duotoneRef(
+			group.photo_gradient.light_color,
+			group.photo_gradient.dark_color
+		);
 	const duotoneUrlRoot = duotoneKey && duotoneUrls[duotoneKey];
 	if (duotoneUrlRoot && photo.id) {
 		group.duotoneUrl = {
@@ -166,9 +169,8 @@ export const apiResponseDuotoneSetter = duotoneUrls => {
 				groups.forEach(setGroupDuotone);
 				break;
 			case 'home':
-				(value.most_popular || []).forEach(
-					event => (event.group = setGroupDuotone(event.group || {}))
-				);
+				(value.most_popular || [])
+					.forEach(event => (event.group = setGroupDuotone(event.group || {})));
 				break;
 		}
 		return queryResponse;

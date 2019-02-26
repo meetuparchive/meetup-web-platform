@@ -1,6 +1,10 @@
 import { mockQuery } from 'meetup-web-mocks/lib/app';
 
-import { MOCK_DUOTONE_URLS, MOCK_GROUP, MOCK_MEMBER } from 'meetup-web-mocks/lib/api';
+import {
+	MOCK_DUOTONE_URLS,
+	MOCK_GROUP,
+	MOCK_MEMBER,
+} from 'meetup-web-mocks/lib/api';
 
 import {
 	apiResponseDuotoneSetter,

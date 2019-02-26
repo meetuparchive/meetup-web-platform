@@ -1,3 +1,4 @@
+import querystring from 'querystring';
 import Joi from 'joi';
 import rison from 'rison';
 import { querySchema } from './util/validation';
@@ -29,11 +30,10 @@ export function parseRequestQueries(request) {
  * and serializes the API responses
  */
 export default (request, h) => {
-	const handleResponses = responses =>
-		h.response({ responses }).type('application/json');
-
-	return request.proxyApi(parseRequestQueries(request)).then(
-		handleResponses,
+	const activityHeader = request.headers['x-meetup-activity'];
+	const activityInfo = activityHeader ? querystring.parse(activityHeader) : {};
+	return request.proxyApi(parseRequestQueries(request), activityInfo).then(
+		responses => h.response({ responses }).type('application/json'),
 		err => err // 500 error - will only be thrown on bad implementation
 	);
 };

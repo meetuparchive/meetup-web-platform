@@ -162,3 +162,10 @@ declare type LaunchDarklyUser = {|
 	anonymous?: boolean,
 	custom?: LaunchDarklyUser$CustomAttributes
 |};
+
+declare type ActivityInfo = {
+	viewName?: string,
+	subViewName?: string,
+	standardized_url?: string,
+	standardized_referer?: string,
+};
