@@ -16,6 +16,8 @@ Activity {
   "platformAgent": "WEB",
   "referer": "",
   "requestId": "foo",
+  "standardized_referer": null,
+  "standardized_url": null,
   "subViewName": "foo subview",
   "trackId": "foo",
   "trax": Object {},

@@ -64,19 +64,19 @@ const activity = {
 	namespace: 'com.meetup.base.avro',
 	type: 'record',
 	name: 'Activity',
-	doc: 'v8',
+	doc: 'v9',
 	fields: [
 		{ name: 'requestId', type: 'string' },
 		{ name: 'timestamp', type: 'string' },
 		{ name: 'url', type: 'string' },
-		{ name: 'aggregratedUrl', type: 'string', default: '' }, // it's misspelled in the original spec
+		{ name: 'aggregratedUrl', type: 'string', default: '' },
 		{ name: 'ip', type: 'string', default: '' },
 		{ name: 'agent', type: 'string', default: '' },
 		{ name: 'memberId', type: 'int' },
 		{ name: 'trackId', type: 'string' },
 		{ name: 'mobileWeb', type: 'boolean' },
 		{ name: 'platform', type: 'string' },
-		{ name: 'referer', type: 'string' }, // it's misspelled in the original spec
+		{ name: 'referer', type: 'string' },
 		{ name: 'trax', type: { type: 'map', values: 'string' } },
 		{
 			name: 'platformAgent',
@@ -102,6 +102,8 @@ const activity = {
 		{ name: 'apiVersion', type: ['null', 'string'], default: null },
 		{ name: 'viewName', type: ['null', 'string'], default: null },
 		{ name: 'subViewName', type: ['null', 'string'], default: null },
+		{ name: 'standardized_url', type: ['null', 'string'], default: null },
+		{ name: 'standardized_referer', type: ['null', 'string'], default: null },
 	],
 };
 
