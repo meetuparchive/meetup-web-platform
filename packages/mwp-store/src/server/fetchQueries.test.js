@@ -20,7 +20,7 @@ describe('serverFetchQueries', () => {
 			expectedParsedResponse
 		);
 		return serverFetchQueries(request)()(queries).then(parsedResponse => {
-			expect(request.proxyApi).toHaveBeenCalledWith(queries);
+			expect(request.proxyApi).toHaveBeenCalledWith(queries, undefined);
 			expect(parsedResponse).toEqual(expectedParsedResponse);
 		});
 	});
