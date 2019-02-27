@@ -129,7 +129,7 @@ export const getFetchQueriesEpic = (findMatches, fetchQueriesFn) => {
 		const matches = findMatches(location);
 		return matches && matches.matched
 			? matches.matched.pop().match.path.replace(/[^a-zA-Z0-9/]/gi, '')
-			: location;
+			: '';
 	};
 
 	// set up a closure that will compare the partially-applied location to the current value
@@ -157,7 +157,8 @@ export const getFetchQueriesEpic = (findMatches, fetchQueriesFn) => {
 
 		// clean up path for use as endpoint URL
 		const standardizedUrlPath = standardizeUrl(location);
-		const standardizedReferrerPath = standardizeUrl(referrer);
+		const standardizedReferrerPath =
+			referrer && referrer.pathname ? standardizeUrl(referrer) : undefined;
 		// construct the fetch call using match.path
 		const fetchUrl = `${config.apiUrl}${standardizedUrlPath}`;
 		const fetchQueries = fetchQueriesFn(fetchUrl, (self || {}).value);
