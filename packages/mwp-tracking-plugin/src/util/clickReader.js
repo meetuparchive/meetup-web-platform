@@ -27,6 +27,7 @@ export const clickToClickRecord = request => click => {
 		linkText: click.linkText || '',
 		coordX: click.coords[0] || 0,
 		coordY: click.coords[1] || 0,
+		tag: click.tag,
 	};
 };
 

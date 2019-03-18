@@ -60,13 +60,8 @@ function _getData(e) {
 		e.type === 'change' && target.tagName.toLowerCase() === 'select';
 	const el = useChildData ? target.children[target.selectedIndex] : target;
 
-	try {
-		const data = (el.dataset || {})[DATA_ATTR] || '{}';
-		return JSON.parse(data);
-	} catch (err) {
-		// data is not JSON-formatted
-		return {};
-	}
+	// pass along _any_ string value in data-clicktrack attribute
+	return (el.dataset || {})[DATA_ATTR] || '';
 }
 
 // recursive function to build an array of 'element shorthand' strings for the
@@ -127,7 +122,7 @@ function getTrackClick() {
 				lineage: clickLineage.join('<'),
 				linkText: linkText,
 				coords: [x, y],
-				data: data,
+				tag: data,
 			};
 		} catch (err) {
 			console.error(err);
