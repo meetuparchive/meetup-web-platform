@@ -40,18 +40,18 @@ export class ToastContainer extends React.Component {
 	 * renders linked from chapstick
 	 */
 	componentDidMount() {
-		const {
-			showToasts,
-			location: { search },
-			sysmsgsKey,
-			sysmsgs,
-		} = this.props;
+		const { showToasts, location: { search }, sysmsgs } = this.props;
 		showToasts(); // dispatch action to tell app that toasts are shown
 		if (search) {
 			const searchParams = new URLSearchParams(search);
-			const sysmsgToast = sysmsgs[searchParams.get(sysmsgsKey)];
-			if (sysmsgToast) {
-				this.props.makeToast(sysmsgToast);
+			const sysmsgsKey = Object.keys(sysmsgs).find(sysmsgKey =>
+				searchParams.has(sysmsgKey)
+			);
+			if (sysmsgsKey) {
+				const sysmsgToast = sysmsgs[sysmsgsKey][searchParams.get(sysmsgsKey)];
+				if (sysmsgToast) {
+					this.props.makeToast(sysmsgToast);
+				}
 			}
 		}
 	}
@@ -60,7 +60,6 @@ export class ToastContainer extends React.Component {
 			makeToast, // eslint-disable-line no-unused-vars
 			readyToasts,
 			sysmsgs, // eslint-disable-line no-unused-vars
-			sysmsgsKey, // eslint-disable-line no-unused-vars
 			showToasts, // eslint-disable-line no-unused-vars
 			location, // eslint-disable-line no-unused-vars
 			match, // eslint-disable-line no-unused-vars
@@ -80,8 +79,7 @@ export class ToastContainer extends React.Component {
 ToastContainer.propTyes = {
 	makeToast: PropTypes.func.isRequired, // provided by `mapDispatchToProps`
 	readyToasts: PropTypes.arrayOf(PropTypes.object).isRequired, // array of Toast props from `mapStateToProps`
-	sysmsgs: PropTypes.object.isRequired, // map of sysmsg to <Toast> props
-	sysmsgsKey: PropTypes.string.isRequired, // querystring param key
+	sysmsgs: PropTypes.objectOf(PropTypes.string, PropTypes.object).isRequired, // map of sysmsg keys to <Toast> props for each sysmsg value
 	showToasts: PropTypes.func.isRequired, // provided by `mapDispatchToProps`
 	location: PropTypes.object.isRequired, // provided by `withRouter`
 	history: PropTypes.object.isRequired, // provided by `withRouter`
@@ -90,8 +88,9 @@ ToastContainer.propTyes = {
 };
 ToastContainer.defaultProps = {
 	readyToasts: [],
-	sysmsgsKey: 'sysmsg', // e.g. ?sysmsg=account_suspended
-	sysmsgs: {},
+	sysmsgs: {
+		sysmsg: {}, // e.g. ?sysmsg=account_suspended
+	},
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(
