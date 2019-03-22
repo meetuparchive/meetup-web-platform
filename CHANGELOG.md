@@ -1,3 +1,7 @@
+## [21.0]
+- **BREAKING CHANGE** - `mwp-toaster`: `<ToastContainer>` now takes an object with system messages mappings instead
+ of a message key and an array of messages.
+
 ## [20.1]
 
 - **New Feature** activity tracking support for `standardized_url` and
