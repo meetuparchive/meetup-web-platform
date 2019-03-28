@@ -59,6 +59,10 @@ export const parseIdCookie = (
 };
 
 // Format `zonedDateTime` as an ISO 8601 datetime with UTC offset.
+// For example, a `ZonedDateTime` instance representing the datetime of
+// January 7, 2019 at 10:27:02 (and 791 microseconds), in the timezone of NYC
+// (EST, or 5 hours behind UTC/GMT), would be formatted as:
+//   2019-01-07T10:27:02.791-05:00
 export const getISOStringWithUTCOffset = (zonedDateTime: ZonedDateTime) =>
 	DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(zonedDateTime);
 
