@@ -58,8 +58,7 @@ export const parseIdCookie = (
 	return parsed.id;
 };
 
-// `toString()` adds the timezone in brackets, which we want to remove
-// e.g.: 2019-01-07T10:27:02.791-05:00[America/New_York]
+// Format `zonedDateTime` as an ISO 8601 datetime with UTC offset.
 export const getISOStringWithUTCOffset = (zonedDateTime: ZonedDateTime) =>
 	DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(zonedDateTime);
 
