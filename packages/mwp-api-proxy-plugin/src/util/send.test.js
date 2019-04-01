@@ -263,6 +263,18 @@ describe('buildRequestArgs', () => {
 		const { pathname } = require('url').parse(getArgs.url);
 		expect(pathname).toBe(`/${decodedQuery.endpoint}`); // eslint-disable-line no-control-regex
 	});
+
+	it('sets baseUrl to undefined when given a fully-qualified URL endpoint', () => {
+		const method = 'get';
+		const endpoint = 'https://example.com/foo';
+		const decodedQuery = {
+			endpoint,
+			params: {},
+		};
+		const getArgs = buildRequestArgs({ ...options, method })(decodedQuery);
+		expect(getArgs.baseUrl).toBeUndefined();
+		expect(getArgs.url).toBe(endpoint);
+	});
 });
 
 describe('getExternalRequestOpts', () => {

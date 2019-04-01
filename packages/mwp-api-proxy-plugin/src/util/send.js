@@ -124,9 +124,9 @@ export const buildRequestArgs = externalRequestOpts => ({
 	const dataParams = querystring.stringify(params);
 	const headers = { ...externalRequestOpts.headers };
 	// endpoint may or may not be URI-encoded, so we decode before encoding
-	let url = endpoint.startsWith('http')
-		? endpoint
-		: encodeURI(`/${decodeURI(endpoint)}`);
+	const encodedUrl = encodeURI(decodeURI(endpoint));
+	// add leading slash if it's not a fully-qualified URL
+	let url = endpoint.startsWith('http') ? encodedUrl : `/${encodedUrl}`;
 	let body;
 	const jar = createCookieJar(url);
 
