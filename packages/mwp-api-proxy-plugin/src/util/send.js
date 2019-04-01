@@ -124,7 +124,9 @@ export const buildRequestArgs = externalRequestOpts => ({
 	const dataParams = querystring.stringify(params);
 	const headers = { ...externalRequestOpts.headers };
 	// endpoint may or may not be URI-encoded, so we decode before encoding
-	let url = encodeURI(`/${decodeURI(endpoint)}`);
+	let url = endpoint.startsWith('http')
+		? endpoint
+		: encodeURI(`/${decodeURI(endpoint)}`);
 	let body;
 	const jar = createCookieJar(url);
 
@@ -170,6 +172,7 @@ export const buildRequestArgs = externalRequestOpts => ({
 		headers,
 		jar,
 		url,
+		baseUrl: url.startsWith('http') ? undefined : externalRequestOpts.baseUrl, // allow fully-qualified URL to override baseUrl
 		timeout: externalRequestOpts.formData
 			? 60 * 1000 // 60sec upload timeout
 			: externalRequestOpts.timeout,
