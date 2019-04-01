@@ -13,6 +13,7 @@ type Props = { requestLanguage: string, __locale?: string, [string]: any };
 const mapStateToProps = (state: MWPState) => ({
 	requestLanguage: state.config.requestLanguage,
 });
+const mapDispatchToProps = () => ({}); // swallow the injected 'dispatch' props
 
 /*
  * A HOC function that applies the necessary context to the component that is
@@ -34,12 +35,7 @@ export default (
 	}
 
 	const WithIntl = (props: Props) => {
-		const {
-			__locale,
-			requestLanguage,
-			dispatch, // eslint-disable-line no-unused-vars
-			...wrappedProps
-		} = props;
+		const { __locale, requestLanguage, ...wrappedProps } = props;
 
 		const providerProps: typeof IntlProvider.propTypes = {
 			defaultLocale: DEFAULT_LOCALE,
@@ -60,7 +56,9 @@ export default (
 	const ConnectedWithIntl =
 		process.env.NODE_ENV === 'test' // avoid Redux context dependency in tests
 			? WithIntl
-			: connect(mapStateToProps)(WithIntl);
+			: connect(mapStateToProps, mapDispatchToProps, null, { pure: false })(
+					WithIntl
+				);
 
 	// modify display name to hide internal 'connect' implementation
 	const wrappedComponentName =
