@@ -162,7 +162,7 @@ export const buildRequestArgs = externalRequestOpts => ({
 		case 'delete':
 		case 'get':
 		default:
-			url += `?${dataParams}`;
+			url += dataParams ? `?${dataParams}` : '';
 			headers['content-type'] = 'application/json';
 			headers['X-Meta-Photo-Host'] = 'secure';
 	}

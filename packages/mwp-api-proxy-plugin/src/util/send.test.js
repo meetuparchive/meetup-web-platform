@@ -261,7 +261,7 @@ describe('buildRequestArgs', () => {
 		};
 		const getArgs = buildRequestArgs({ ...options, method })(decodedQuery);
 		const { pathname } = require('url').parse(getArgs.url);
-		expect(pathname).toBe(`/${decodedQuery.endpoint}`); // eslint-disable-line no-control-regex
+		expect(pathname).toBe(`/${decodedQuery.endpoint}`);
 	});
 
 	it('sets baseUrl to undefined when given a fully-qualified URL endpoint', () => {
