@@ -1,3 +1,8 @@
+## [21.1]
+
+- **New Feature** the query `endpoint` property can now be a fully-qualified URL
+  in order to call APIs on domains other than https://api.meetup.com
+
 ## [21.0]
 - **BREAKING CHANGE** - `mwp-toaster`: `<ToastContainer>` now takes an object with system messages mappings instead
  of a message key and an array of messages.

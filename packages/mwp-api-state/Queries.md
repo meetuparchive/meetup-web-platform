@@ -71,9 +71,16 @@ the query _and_ uniquely assign the resulting API data to Redux state at
 
 #### `endpoint`
 
-The Meetup API endpoint as a URL pathname, e.g. `/members/123456`. Note that
-this URL should not include any parameter placeholders like `/:urlname` - the
-values should be filled in as needed.
+The endpoint can either be a URL pathname that assumes the REST API domain
+api.meetup.com, e.g. `members/123456` will call https://api.meetup.com/members/123456,
+or a fully-qualified URL that specifies an alternative domain, e.g. `https://example.com/list`
+will be used as-is.
+
+`endpoint: 'members/123456'` and `endpoint: 'https://api.meetup.com/members/123456'`
+are functionally equivalent
+
+*Note*: this URL should not include any parameter placeholders
+like `/:urlname` - the values should be filled in as needed.
 
 #### `params`
 
