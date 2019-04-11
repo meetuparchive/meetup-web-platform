@@ -1,6 +1,6 @@
 import url from 'url';
 import rison from 'rison';
-import { getTrackActivity } from './_activityTrackers';
+import { getTrackActivity, getTrackApiResponses } from './_activityTrackers';
 
 describe('getTrackActivity', () => {
 	const PROXY_URL = url.parse('http://www.example.com/mu_api');
@@ -80,6 +80,28 @@ Object {
   "foo": "bar",
   "referrer": "http://www.current.com/foo",
   "url": "/mu_api",
+}
+`);
+	});
+});
+
+describe('getTrackApiResponses', () => {
+	test('passes along arbitrary fields', () => {
+		const trackApiResponses = getTrackApiResponses({
+			log: (x, record) => record,
+		})({
+			state: {},
+			plugins: { tracking: {} },
+		});
+		expect(trackApiResponses({ foo: 'bar' })).toMatchInlineSnapshot(`
+Object {
+  "browserId": "91272839-f70e-48fd-909a-0401f85a8cb6",
+  "description": "nav",
+  "foo": "bar",
+  "memberId": 0,
+  "referer": "",
+  "trackId": "91272839-f70e-48fd-909a-0401f85a8cb6",
+  "url": "",
 }
 `);
 	});
