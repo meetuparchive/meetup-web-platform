@@ -93,16 +93,6 @@ describe('getTrackApiResponses', () => {
 			state: {},
 			plugins: { tracking: {} },
 		});
-		expect(trackApiResponses({ foo: 'bar' })).toMatchInlineSnapshot(`
-Object {
-  "browserId": "91272839-f70e-48fd-909a-0401f85a8cb6",
-  "description": "nav",
-  "foo": "bar",
-  "memberId": 0,
-  "referer": "",
-  "trackId": "91272839-f70e-48fd-909a-0401f85a8cb6",
-  "url": "",
-}
-`);
+		expect(trackApiResponses({ foo: 'bar' }).foo).toBe('bar');
 	});
 });
