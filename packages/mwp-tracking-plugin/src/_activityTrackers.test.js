@@ -1,6 +1,6 @@
 import url from 'url';
 import rison from 'rison';
-import { getTrackActivity } from './_activityTrackers';
+import { getTrackActivity, getTrackApiResponses } from './_activityTrackers';
 
 describe('getTrackActivity', () => {
 	const PROXY_URL = url.parse('http://www.example.com/mu_api');
@@ -82,5 +82,17 @@ Object {
   "url": "/mu_api",
 }
 `);
+	});
+});
+
+describe('getTrackApiResponses', () => {
+	test('passes along arbitrary fields', () => {
+		const trackApiResponses = getTrackApiResponses({
+			log: (x, record) => record,
+		})({
+			state: {},
+			plugins: { tracking: {} },
+		});
+		expect(trackApiResponses({ foo: 'bar' }).foo).toBe('bar');
 	});
 });

@@ -18,7 +18,7 @@ type ActivityFields = {
 export const getTrackApiResponses: TrackGetter = trackOpts => request => (
 	fields: ActivityFields
 ) => {
-	const { url = '', referrer = '', viewName, subViewName } = fields;
+	const { url = '', referrer = '', ...fieldLiterals } = fields;
 	return trackOpts.log(request, {
 		description: 'nav',
 		memberId: parseIdCookie(request.state[trackOpts.memberCookieName], true), // read memberId
@@ -26,8 +26,7 @@ export const getTrackApiResponses: TrackGetter = trackOpts => request => (
 		trackId: updateId(trackOpts.trackIdCookieName)(request), // read/add trackId
 		referer: referrer,
 		url,
-		viewName,
-		subViewName,
+		...fieldLiterals,
 	});
 };
 
