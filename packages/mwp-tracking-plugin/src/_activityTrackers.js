@@ -45,7 +45,7 @@ export const getTrackApiResponses: TrackGetter = trackOpts => request => (
  * 3. lazy-loaded data
  *    - url: proxy endpoint path (request.url.path)
  *    - referrer: current URL (request.referrer)
- * 4. tracking-only request:
+ * 4. tracking-only request
  *    - url: proxy endpoint path (request.url.path)
  *    - referrer: current URL (request.referrer)
  */
@@ -56,7 +56,7 @@ export const getTrackActivity: TrackGetter = () => (request: HapiRequest) => (
 	// proxy endpoint that should be tracked differently
 	const { getFields } =
 		request.route.settings.plugins[ACTIVITY_PLUGIN_NAME] || {};
-	console.log('request.route', request.route, getFields);
+	console.log('request.route', request.route.path, getFields);
 	const trackFields = getFields
 		? getFields(request, fields)
 		: {
