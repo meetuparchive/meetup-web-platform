@@ -1,6 +1,6 @@
 // @flow
 import { parseIdCookie, updateId } from './util/trackingUtils';
-import { ACTIVITY_PLUGIN_NAME } from '../config';
+import { ACTIVITY_PLUGIN_NAME } from './config';
 
 /*
  * This module exports specific tracking functions that consume the `request`
