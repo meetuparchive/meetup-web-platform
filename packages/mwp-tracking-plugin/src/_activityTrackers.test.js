@@ -5,7 +5,10 @@ import { getTrackActivity, getTrackApiResponses } from './_activityTrackers';
 describe('getTrackActivity', () => {
 	const PROXY_URL = url.parse('http://www.example.com/mu_api');
 	const trackApiResponses = jest.fn();
-	const REQUEST_BASE = { trackApiResponses };
+	const REQUEST_BASE = {
+		trackApiResponses,
+		route: { settings: { plugins: {} } },
+	};
 	const trackActivity = getTrackActivity();
 	const fields = { foo: 'bar' }; // arbitrary additional params to merge with url+referrer
 	test('server render record', () => {
@@ -42,8 +45,8 @@ Object {
 		expect(trackApiResponses.mock.calls[0][0]).toMatchInlineSnapshot(`
 Object {
   "foo": "bar",
-  "referrer": "http://www.previous.com/foo",
-  "url": "http://www.current.com/bar",
+  "referrer": "http://www.current.com/bar",
+  "url": "/mu_api",
 }
 `);
 	});
