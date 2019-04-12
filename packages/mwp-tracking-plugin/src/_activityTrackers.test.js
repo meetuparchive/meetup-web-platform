@@ -1,9 +1,8 @@
 import url from 'url';
-import rison from 'rison';
 import { getTrackActivity, getTrackApiResponses } from './_activityTrackers';
+import { ACTIVITY_PLUGIN_NAME } from './config';
 
 describe('getTrackActivity', () => {
-	const PROXY_URL = url.parse('http://www.example.com/mu_api');
 	const trackApiResponses = jest.fn();
 	const REQUEST_BASE = {
 		trackApiResponses,
@@ -11,7 +10,7 @@ describe('getTrackActivity', () => {
 	};
 	const trackActivity = getTrackActivity();
 	const fields = { foo: 'bar' }; // arbitrary additional params to merge with url+referrer
-	test('server render record', () => {
+	test('standard field values', () => {
 		const request = {
 			...REQUEST_BASE,
 			url: url.parse('http://www.current.com/foo'),
@@ -28,66 +27,29 @@ Object {
 }
 `);
 	});
-	test('SPA navigation (referrer override)', () => {
+	test('custom getFields', () => {
 		trackApiResponses.mockClear();
+		const mockFields = { foo: 'bar', route: 'overrides' };
 		const request = {
 			...REQUEST_BASE,
-			url: PROXY_URL,
-			method: 'get',
-			query: {
-				metadata: rison.encode_object({
-					referrer: 'http://www.previous.com/foo',
-				}),
+			route: {
+				settings: {
+					plugins: {
+						[ACTIVITY_PLUGIN_NAME]: {
+							getFields: (request, fields) => mockFields,
+						},
+					},
+				},
 			},
-			info: { referrer: 'http://www.current.com/bar' },
-		};
-		trackActivity(request)(fields);
-		expect(trackApiResponses.mock.calls[0][0]).toMatchInlineSnapshot(`
-Object {
-  "foo": "bar",
-  "referrer": "http://www.current.com/bar",
-  "url": "/mu_api",
-}
-`);
-	});
-	test('lazy-loaded data', () => {
-		trackApiResponses.mockClear();
-		const request = {
-			...REQUEST_BASE,
-			url: PROXY_URL,
+			url: url.parse('http://www.current.com/foo'),
 			method: 'get',
 			query: {},
-			info: { referrer: 'http://www.current.com/foo' },
+			info: { referrer: 'http://www.previous.com/bar' },
 		};
 		trackActivity(request)(fields);
-		expect(trackApiResponses.mock.calls[0][0]).toMatchInlineSnapshot(`
-Object {
-  "foo": "bar",
-  "referrer": "http://www.current.com/foo",
-  "url": "/mu_api",
-}
-`);
-	});
-	test('lazy-track', () => {
-		trackApiResponses.mockClear();
-		const request = {
-			...REQUEST_BASE,
-			url: PROXY_URL,
-			method: 'get',
-			query: {},
-			info: { referrer: 'http://www.current.com/foo' },
-		};
-		trackActivity(request)(fields);
-		expect(trackApiResponses.mock.calls[0][0]).toMatchInlineSnapshot(`
-Object {
-  "foo": "bar",
-  "referrer": "http://www.current.com/foo",
-  "url": "/mu_api",
-}
-`);
+		expect(trackApiResponses.mock.calls[0][0]).toEqual(mockFields);
 	});
 });
-
 describe('getTrackApiResponses', () => {
 	test('passes along arbitrary fields', () => {
 		const trackApiResponses = getTrackApiResponses({
