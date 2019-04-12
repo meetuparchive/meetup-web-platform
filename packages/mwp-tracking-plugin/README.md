@@ -51,6 +51,38 @@ responsibilities:
 1. Manage tracking IDs that are passed into the request through cookies
 2. Log the formatted, encoded tracking ID state of the request to `stdout`
 
+### Route config
+
+If a particular route needs to handle activity tracking parameters in unique ways,
+it can supply a plugin config object containing a `getFields(request, fields)`
+property. This function will be called with the Hapi request object and any
+custom field values passed to `request.trackActivity`. It must return an object
+that, at a minimum, contains the a `url` parameter for the Activity record.
+
+Example that simply returns the `request.url.path` for the `url` param:
+
+```js
+import { ACTIVITY_PLUGIN_NAME } from 'mwp-tracking-plugin/lib/config';
+
+const route = {
+	path: '/foo',
+	handler: () => 'Hello world',
+	options: {
+		plugins: {
+			[ACTIVITY_PLUGIN_NAME]: {
+				getFields: (request, fields) => ({
+					url: request.url.path,
+				})
+			}
+		}
+	}
+}
+```
+
+		}
+
+
+}
 ## Click tracking
 
 Click tracking consists of 4 related modules:

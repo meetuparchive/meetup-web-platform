@@ -1,7 +1,9 @@
 import Joi from 'joi';
 import rison from 'rison';
 import { CLICK_PLUGIN_NAME } from 'mwp-tracking-plugin/lib/click';
+import { ACTIVITY_PLUGIN_NAME } from 'mwp-tracking-plugin/lib/config';
 
+import { API_ROUTE_PATH } from './config';
 import handler from './handler'; // import allows easier mocking in integration tests
 
 const validApiPayloadSchema = Joi.object({
@@ -30,6 +32,35 @@ const getApiProxyRoutes = path => {
 				},
 				'mwp-language-plugin': {
 					useReferrerUrlLangCode: true,
+				},
+				[ACTIVITY_PLUGIN_NAME]: {
+					getFields: (request, fields) => {
+						const { url, method, payload, query, info: { referrer } } = request;
+						const requestReferrer = referrer || '';
+						const reqData = method === 'post' ? payload : query;
+
+						// the request may specify a referrer that should be used instead of the `request.referrer`
+						// usually set for SPA navigation
+						const referrerOverride =
+							reqData.metadata &&
+							(rison.decode_object(reqData.metadata) || {}).referrer;
+
+						if (referrerOverride) {
+							return {
+								...fields, // pass along existing standardized_url, standardized_referer
+								url: requestReferrer, // navigation requests come from the 'target' url
+								referrer: referrerOverride, // navigation referrer is in override
+							};
+						}
+
+						return {
+							...fields,
+							url: url.path,
+							referrer: requestReferrer,
+							standardized_url: API_ROUTE_PATH,
+							standardized_referer: fields.standardized_url, // the current location supplied by app
+						};
+					},
 				},
 				[CLICK_PLUGIN_NAME]: {
 					click: request => {
