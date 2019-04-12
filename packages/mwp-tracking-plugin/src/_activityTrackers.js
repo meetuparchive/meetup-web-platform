@@ -56,7 +56,6 @@ export const getTrackActivity: TrackGetter = () => (request: HapiRequest) => (
 	// proxy endpoint that should be tracked differently
 	const { getFields } =
 		request.route.settings.plugins[ACTIVITY_PLUGIN_NAME] || {};
-	console.log('request.route', request.route.path, getFields);
 	const trackFields = getFields
 		? getFields(request, fields)
 		: {
@@ -64,6 +63,5 @@ export const getTrackActivity: TrackGetter = () => (request: HapiRequest) => (
 				url: request.url.path,
 				referrer: request.info.referrer || '',
 			};
-	console.log(trackFields);
 	return request.trackApiResponses(trackFields);
 };

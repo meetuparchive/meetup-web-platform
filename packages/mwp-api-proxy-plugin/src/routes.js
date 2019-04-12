@@ -53,7 +53,6 @@ const getApiProxyRoutes = path => {
 							};
 						}
 
-						console.log('here', url.path);
 						return {
 							...fields,
 							url: url.path,
