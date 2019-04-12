@@ -4,6 +4,8 @@ import getApiProxyRoutes from './routes';
 import proxyApi from './proxy';
 
 import { API_ROUTE_PATH, API_PROXY_PLUGIN_NAME } from './config';
+
+// immediately export the API_ROUTE_PATH
 export { API_ROUTE_PATH } from './config';
 
 export const setPluginState = (

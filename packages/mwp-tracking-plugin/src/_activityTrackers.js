@@ -1,6 +1,6 @@
 // @flow
-import rison from 'rison';
 import { parseIdCookie, updateId } from './util/trackingUtils';
+import { ACTIVITY_PLUGIN_NAME } from './config';
 
 /*
  * This module exports specific tracking functions that consume the `request`
@@ -13,12 +13,14 @@ type ActivityFields = {
 	referrer?: string,
 	viewName?: string,
 	subViewName?: string,
+	standardized_url?: string,
+	standardized_referer?: string,
 };
 
 export const getTrackApiResponses: TrackGetter = trackOpts => request => (
 	fields: ActivityFields
 ) => {
-	const { url = '', referrer = '', viewName, subViewName } = fields;
+	const { url = '', referrer = '', ...fieldLiterals } = fields;
 	return trackOpts.log(request, {
 		description: 'nav',
 		memberId: parseIdCookie(request.state[trackOpts.memberCookieName], true), // read memberId
@@ -26,8 +28,7 @@ export const getTrackApiResponses: TrackGetter = trackOpts => request => (
 		trackId: updateId(trackOpts.trackIdCookieName)(request), // read/add trackId
 		referer: referrer,
 		url,
-		viewName,
-		subViewName,
+		...fieldLiterals,
 	});
 };
 
@@ -48,29 +49,19 @@ export const getTrackApiResponses: TrackGetter = trackOpts => request => (
  *    - url: proxy endpoint path (request.url.path)
  *    - referrer: current URL (request.referrer)
  */
-export const getTrackActivity: TrackGetter = () => request => (
+export const getTrackActivity: TrackGetter = () => (request: HapiRequest) => (
 	fields: ActivityFields
 ) => {
-	const { url, method, payload, query, info: { referrer } } = request;
-	const requestReferrer = referrer || '';
-	const reqData = method === 'post' ? payload : query;
-
-	// the request may specify a referrer that should be used instead of the `request.referrer`
-	const referrerOverride =
-		reqData.metadata && (rison.decode_object(reqData.metadata) || {}).referrer;
-
-	const urlFields = referrerOverride
-		? {
-				url: requestReferrer, // original request referrer is passed through as URL
-				referrer: referrerOverride,
-			}
+	// route may specify a custom 'getFields', which usually means that it is a
+	// proxy endpoint that should be tracked differently
+	const { getFields } =
+		request.route.settings.plugins[ACTIVITY_PLUGIN_NAME] || {};
+	const trackFields = getFields
+		? getFields(request, fields)
 		: {
-				url: url.path,
-				referrer: requestReferrer,
+				...fields,
+				url: request.url.path,
+				referrer: request.info.referrer || '',
 			};
-
-	return request.trackApiResponses({
-		...urlFields,
-		...fields,
-	});
+	return request.trackApiResponses(trackFields);
 };

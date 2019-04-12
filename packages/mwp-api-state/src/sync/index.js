@@ -127,8 +127,8 @@ export const getFetchQueriesEpic = (findMatches, fetchQueriesFn) => {
 	let locationIndex = 0;
 	const standardizeUrl = location => {
 		const matches = findMatches(location);
-		return matches && matches.matched
-			? matches.matched.pop().match.path.replace(/[^a-zA-Z0-9/]/gi, '')
+		return matches
+			? matches.pop().match.path.replace(/[^a-zA-Z0-9/]/gi, '')
 			: '';
 	};
 
