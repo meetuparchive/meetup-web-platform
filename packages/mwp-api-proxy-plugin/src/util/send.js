@@ -8,6 +8,7 @@ import externalRequest from 'request';
 import config from 'mwp-config';
 
 export const API_META_HEADER = 'X-Meta-Request-Headers';
+const FULL_URL_PATTERN = /^https?:\/\//;
 
 // create a promisified version of `externalRequest` - can't use `util.promisify`
 // because the callback gets 2 additional arguments, and promisify only supports 1.
@@ -126,7 +127,7 @@ export const buildRequestArgs = externalRequestOpts => ({
 	// endpoint may or may not be URI-encoded, so we decode before encoding
 	const encodedUrl = encodeURI(decodeURI(endpoint));
 	// add leading slash if it's not a fully-qualified URL
-	let url = endpoint.test(/^https?:\/\//) ? encodedUrl : `/${encodedUrl}`;
+	let url = FULL_URL_PATTERN.test(endpoint) ? encodedUrl : `/${encodedUrl}`;
 	let body;
 	const jar = createCookieJar(url);
 
@@ -172,7 +173,9 @@ export const buildRequestArgs = externalRequestOpts => ({
 		headers,
 		jar,
 		url,
-		baseUrl: url.test(/^https?:\/\//) ? undefined : externalRequestOpts.baseUrl, // allow fully-qualified URL to override baseUrl
+		baseUrl: FULL_URL_PATTERN.test(url)
+			? undefined
+			: externalRequestOpts.baseUrl, // allow fully-qualified URL to override baseUrl
 		timeout: externalRequestOpts.formData
 			? 60 * 1000 // 60sec upload timeout
 			: externalRequestOpts.timeout,
