@@ -126,7 +126,7 @@ export const buildRequestArgs = externalRequestOpts => ({
 	// endpoint may or may not be URI-encoded, so we decode before encoding
 	const encodedUrl = encodeURI(decodeURI(endpoint));
 	// add leading slash if it's not a fully-qualified URL
-	let url = endpoint.startsWith('http') ? encodedUrl : `/${encodedUrl}`;
+	let url = endpoint.test(/^https?:\/\//) ? encodedUrl : `/${encodedUrl}`;
 	let body;
 	const jar = createCookieJar(url);
 
@@ -172,7 +172,7 @@ export const buildRequestArgs = externalRequestOpts => ({
 		headers,
 		jar,
 		url,
-		baseUrl: url.startsWith('http') ? undefined : externalRequestOpts.baseUrl, // allow fully-qualified URL to override baseUrl
+		baseUrl: url.test(/^https?:\/\//) ? undefined : externalRequestOpts.baseUrl, // allow fully-qualified URL to override baseUrl
 		timeout: externalRequestOpts.formData
 			? 60 * 1000 // 60sec upload timeout
 			: externalRequestOpts.timeout,
