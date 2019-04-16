@@ -193,7 +193,7 @@ const getRouterRenderer = ({
 
 // get initial server-rendered app metadata that can be consumed by the application
 // from mwp-app-render/src/components/AppContext.Consumer
-const getAppContext = (request: HapiRequest, enableServiceWorker: Boolean) => {
+const getAppContext = (request: HapiRequest, enableServiceWorker: boolean) => {
 	const { url, headers, info, server, state } = request;
 	// request protocol and host might be different from original request that hit proxy
 	// we want to use the proxy's protocol and host

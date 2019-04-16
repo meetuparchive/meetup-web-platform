@@ -13,8 +13,7 @@ import BrowserApp from 'mwp-app-render/lib/components/BrowserApp';
 type AppProps = {
 	routes: Array<PlatformRoute>,
 	store: Object,
-	basename: string,
-	appContext: Object,
+	appContext: { basename: string },
 };
 
 /*
