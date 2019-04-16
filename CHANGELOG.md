@@ -1,34 +1,48 @@
+## [21.2]
+
+-   **New Feature** `AppContext` context provider for server-side request data.
+    This feature supersedes accessing `state.config` through Redux in favor
+    of a more conventional React context implementation. Check out
+    [the docs](https://github.com/meetup/meetup-web-platform/blob/master/packages/mwp-app-render/README.md#server-config-values-appcontext)
+    for more info.
+
+    `withIntl` has been refactored to use this interface instead of `react-redux`
+    `connect` in order to avoid issues with the pure rendering constraints of
+    `connect`
+
 ## [21.1]
 
-- **New Feature** the query `endpoint` property can now be a fully-qualified URL
-  in order to call APIs on domains other than https://api.meetup.com
+-   **New Feature** the query `endpoint` property can now be a fully-qualified URL
+    in order to call APIs on domains other than https://api.meetup.com
 
 ## [21.0]
-- **BREAKING CHANGE** - `mwp-toaster`: `<ToastContainer>` now takes an object with system messages mappings instead
- of a message key and an array of messages.
+
+-   **BREAKING CHANGE** - `mwp-toaster`: `<ToastContainer>` now takes an object with system messages mappings instead
+    of a message key and an array of messages.
 
 ## [20.1]
 
-- **New Feature** activity tracking support for `standardized_url` and
-  `standardized_referer` (new fields in Activity v9).
-  - API proxy endpoint (`mwp-api-proxy-plugin`) reads from url-encoded `x-meetup-activity` header
-  - API proxy method (`mwp-api-proxy-plugin`) takes `activityInfo` argument to inject fields into
-    activity records
-  - `mwp-store` browser `fetchQueries` sends `x-meetup-activity` header
-  - `mwp-store` server `fetchQueries` passes `activityInfo` to 
-  - `mwp-api-store` supplies `activityInfo` argument to `fetchQueries`
+-   **New Feature** activity tracking support for `standardized_url` and
+    `standardized_referer` (new fields in Activity v9).
+    -   API proxy endpoint (`mwp-api-proxy-plugin`) reads from url-encoded `x-meetup-activity` header
+    -   API proxy method (`mwp-api-proxy-plugin`) takes `activityInfo` argument to inject fields into
+        activity records
+    -   `mwp-store` browser `fetchQueries` sends `x-meetup-activity` header
+    -   `mwp-store` server `fetchQueries` passes `activityInfo` to
+    -   `mwp-api-store` supplies `activityInfo` argument to `fetchQueries`
 
 ## [20.0]
 
-- **BREAKING CHANGE** - `makeRenderer$` interface into server renderer removed -
-  must use object-based `makeRenderer`
-- **Refactor** `mwp-api-proxy-plugin` now provides `request.apiProxy` interface,
-  which uses native Promises instead of Observables.
+-   **BREAKING CHANGE** - `makeRenderer$` interface into server renderer removed -
+    must use object-based `makeRenderer`
+-   **Refactor** `mwp-api-proxy-plugin` now provides `request.apiProxy` interface,
+    which uses native Promises instead of Observables.
 
-  `rxjs` is no longer a peer dependency of any MWP packages.
+    `rxjs` is no longer a peer dependency of any MWP packages.
 
 ## [19.0]
-- **Removed** `state.app` reducers. Consumers must convert to using `state.api`.
+
+-   **Removed** `state.app` reducers. Consumers must convert to using `state.api`.
 
 ## [18.2]
 

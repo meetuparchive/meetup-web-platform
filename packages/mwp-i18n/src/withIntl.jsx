@@ -2,18 +2,13 @@
 import React from 'react';
 import type { ComponentType } from 'react';
 import { IntlProvider, injectIntl } from 'react-intl';
-import { connect } from 'react-redux';
+import { AppContext } from 'mwp-app-render/lib/components/shared/PlatformApp';
 
 const DEFAULT_LOCALE = 'en-US';
 type TRNSource = { [string]: string };
 // Messages must support 'en-US'
 type Messages = { 'en-US': TRNSource, [string]: TRNSource };
 type Props = { requestLanguage: string, __locale?: string, [string]: any };
-
-const mapStateToProps = (state: MWPState) => ({
-	requestLanguage: state.config.requestLanguage,
-});
-const mapDispatchToProps = () => ({}); // swallow the injected 'dispatch' props
 
 /*
  * A HOC function that applies the necessary context to the component that is
@@ -30,10 +25,13 @@ export default (
 	messages: Messages = { [DEFAULT_LOCALE]: {} },
 	doInjectIntl?: boolean
 ) => (WrappedComponent: ComponentType<any>): ComponentType<*> => {
+	// first, provide 'intl' prop through injectIntl HOC, if requested
 	if (doInjectIntl) {
 		WrappedComponent = injectIntl(WrappedComponent);
 	}
 
+	// create a wrapped component that receives a 'requestLanguage' prop and
+	// loads the corresponding messages into an IntlProvider HOC
 	const WithIntl = (props: Props) => {
 		const { __locale, requestLanguage, ...wrappedProps } = props;
 
@@ -53,12 +51,24 @@ export default (
 			</IntlProvider>
 		);
 	};
-	const ConnectedWithIntl =
-		process.env.NODE_ENV === 'test' // avoid Redux context dependency in tests
-			? WithIntl
-			: connect(mapStateToProps, mapDispatchToProps)(WithIntl);
 
-	// modify display name to hide internal 'connect' implementation
+	// Except in testing, wrap the component in an AppContext provider in order
+	// to pass in the correct 'requestLanguage'
+	const ConnectedWithIntl =
+		process.env.NODE_ENV === 'test' // avoid AppContext dependency in tests
+			? WithIntl
+			: props => (
+					<AppContext.Consumer>
+						{appContext => {
+							<WithIntl
+								{...props}
+								requestLanguage={appContext.requestLanguage}
+							/>;
+						}}
+					</AppContext.Consumer>
+			  );
+
+	// modify display name to hide internal context implementation
 	const wrappedComponentName =
 		WrappedComponent.displayName || WrappedComponent.name || 'Component';
 
