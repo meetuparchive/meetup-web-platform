@@ -32,7 +32,7 @@ export default (
 
 	// create a wrapped component that receives a 'requestLanguage' prop and
 	// loads the corresponding messages into an IntlProvider HOC
-	const WithIntl = (props: Props) => {
+	const BaseWithIntl = (props: Props) => {
 		const { __locale, requestLanguage, ...wrappedProps } = props;
 
 		const providerProps: typeof IntlProvider.propTypes = {
@@ -52,27 +52,30 @@ export default (
 		);
 	};
 
-	// Except in testing, wrap the component in an AppContext provider in order
-	// to pass in the correct 'requestLanguage'
-	const ConnectedWithIntl =
+	// define component that consumes requestLanguage from context
+	const ContextEnhancedWithIntl = props => (
+		<AppContext.Consumer>
+			{appContext => {
+				<BaseWithIntl
+					{...props}
+					requestLanguage={appContext.requestLanguage}
+				/>;
+			}}
+		</AppContext.Consumer>
+	);
+
+	// Define returned component - context-free component for tests, context-enhanced
+	// component otherwise
+	const WithIntl =
 		process.env.NODE_ENV === 'test' // avoid AppContext dependency in tests
-			? WithIntl
-			: props => (
-					<AppContext.Consumer>
-						{appContext => {
-							<WithIntl
-								{...props}
-								requestLanguage={appContext.requestLanguage}
-							/>;
-						}}
-					</AppContext.Consumer>
-			  );
+			? BaseWithIntl
+			: ContextEnhancedWithIntl;
 
 	// modify display name to hide internal context implementation
 	const wrappedComponentName =
 		WrappedComponent.displayName || WrappedComponent.name || 'Component';
 
-	ConnectedWithIntl.displayName = `WithIntl(${wrappedComponentName})`;
+	WithIntl.displayName = `WithIntl(${wrappedComponentName})`;
 
-	return ConnectedWithIntl;
+	return WithIntl;
 };
