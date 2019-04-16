@@ -7,44 +7,51 @@ declare type MatchMedia = {
 	isAtLargeUp: boolean,
 };
 
+declare type AppContext = {
+	apiUrl: string, // base API URL for queries
+	baseUrl: string, // server host
+	basename: string, // base path for routing - e.g. locale-specific base paths '/fr-FR/'
+	enableServiceWorker: boolean,
+	requestLanguage: string,
+	supportedLangs: Array<string>,
+	member:
+		| {|
+				id: number,
+				status: number,
+				timestamp: number,
+				// board status, related to permissions on message boards https://github.com/meetup/meetup/blob/master/modules/base/src/main/java/com/meetup/base/util/MeetupStatus.java#L743-L752
+				bs: number,
+				// time zone
+				tz: string,
+				zip: number,
+				country: string,
+				city: string,
+				state?: string,
+				lat: number,
+				lon: number,
+				ql: boolean,
+				scope?: string,
+				// whether the member selected remember me or not
+				rem?: number,
+				// whether the member is an organizer or not
+				org?: 1,
+		  |}
+		| {| id: 0 |},
+	initialNow: number, // timestamp that React-Intl uses to initialize date strings on initial client render
+	isQL: boolean,
+	isProdApi: boolean, // whether the data is coming from Prod instead of Dev DB
+	variants: mixed, // parsed X-Meetup-Variants header
+	entryPath: string, // URL path that the user landed on (server-rendered path)
+	media: MatchMedia,
+	browserId: string, // from browser id cookie
+	clientIp: string, // best guess at client IP address
+	siftSessionId: string, // from Sift Science cookie
+};
+
 declare type MWPState = {
 	api: ApiState,
 	flags?: FeatureFlags,
-	config: {
-		apiUrl: string,
-		baseUrl: string,
-		enableServiceWorker: boolean,
-		requestLanguage: string,
-		supportedLangs: Array<string>,
-		member:
-			| {|
-					id: number,
-					status: number,
-					timestamp: number,
-					// board status, related to permissions on message boards https://github.com/meetup/meetup/blob/master/modules/base/src/main/java/com/meetup/base/util/MeetupStatus.java#L743-L752
-					bs: number,
-					// time zone
-					tz: string,
-					zip: number,
-					country: string,
-					city: string,
-					state?: string,
-					lat: number,
-					lon: number,
-					ql: boolean,
-					scope?: string,
-					// whether the member selected remember me or not
-					rem?: number,
-					// whether the member is an organizer or not
-					org?: 1,
-				|}
-			| {| id: 0 |},
-		initialNow: number,
-		isQL: boolean,
-		variants: mixed,
-		entryPath: string,
-		media: MatchMedia,
-	},
+	config: AppContext,
 };
 
 declare type FeatureFlags = { [string]: boolean | string };
@@ -140,14 +147,20 @@ declare type PlatformRoute = AsyncPlatformRoute | StaticPlatformRoute;
 
 declare type GeoLocation = {
 	country?: string,
-	region?: string
-}
+	region?: string,
+};
 
 // See https://docs.launchdarkly.com/docs/node-sdk-reference#section-users
 declare type LaunchDarklyUser$CustomAttributes = {
 	RequestCountry?: string,
 	RequestRegion?: string,
-	[string]: string | boolean | number | Array<string> | Array<boolean> | Array<number>
+	[string]:
+		| string
+		| boolean
+		| number
+		| Array<string>
+		| Array<boolean>
+		| Array<number>,
 };
 
 declare type LaunchDarklyUser = {|
@@ -160,7 +173,7 @@ declare type LaunchDarklyUser = {|
 	avatar?: string,
 	name?: string,
 	anonymous?: boolean,
-	custom?: LaunchDarklyUser$CustomAttributes
+	custom?: LaunchDarklyUser$CustomAttributes,
 |};
 
 declare type ActivityInfo = {

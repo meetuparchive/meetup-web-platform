@@ -3,22 +3,19 @@ import { Provider } from 'react-redux';
 import { SyncContainer, RouteLayout } from 'mwp-router';
 import ServiceWorker from './ServiceWorker';
 
-/**
- * @module PlatformApp
- */
-class PlatformApp extends React.Component {
-	render() {
-		const { store, routes } = this.props;
-		return (
-			<Provider store={store}>
-				<ServiceWorker>
-					<SyncContainer>
-						<RouteLayout routes={routes} />
-					</SyncContainer>
-				</ServiceWorker>
-			</Provider>
-		);
-	}
-}
+// Special context provider for config values supplied by server
+export const AppContext = React.createContext();
+
+const PlatformApp = props => (
+	<AppContext.Provider value={props.context}>
+		<Provider store={props.store}>
+			<ServiceWorker>
+				<SyncContainer>
+					<RouteLayout routes={props.routes} />
+				</SyncContainer>
+			</ServiceWorker>
+		</Provider>
+	</AppContext.Provider>
+);
 
 export default PlatformApp;

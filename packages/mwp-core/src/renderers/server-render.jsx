@@ -116,13 +116,12 @@ type RenderResult =
 	| { redirect: { url: string, permanent?: boolean } };
 
 const getRouterRenderer = ({
+	appContext,
 	routes,
 	store,
 	location,
-	basename,
 	scripts,
 	cssLinks,
-	userAgent,
 }): RenderResult => {
 	// pre-render the app-specific markup, this is the string of markup that will
 	// be managed by React on the client.
@@ -132,14 +131,14 @@ const getRouterRenderer = ({
 	// `<head>` contents
 	const initialState = store.getState();
 	let appMarkup;
-	const staticContext: { url?: string, permanent?: boolean } = {};
+	const routerContext: { url?: string, permanent?: boolean } = {};
 
 	try {
 		appMarkup = ReactDOMServer.renderToString(
 			<ServerApp
-				basename={basename}
+				appContext={appContext}
 				location={location}
-				context={staticContext}
+				routerContext={routerContext}
 				store={store}
 				routes={routes}
 			/>
@@ -154,7 +153,7 @@ const getRouterRenderer = ({
 	const sideEffects = resolveSideEffects();
 
 	const externalRedirect = getRedirect(sideEffects.redirect);
-	const internalRedirect = getRedirect(staticContext);
+	const internalRedirect = getRedirect(routerContext);
 	const redirect = internalRedirect || externalRedirect;
 
 	if (redirect) {
@@ -171,13 +170,12 @@ const getRouterRenderer = ({
 	// so go ahead and assemble the full response body
 	const result = getHtml(
 		<Dom
-			basename={basename}
 			head={sideEffects.head}
 			initialState={initialState}
+			appContext={appContext}
 			appMarkup={appMarkup}
 			scripts={scripts}
 			cssLinks={cssLinks}
-			userAgent={userAgent}
 		/>
 	);
 
@@ -187,6 +185,47 @@ const getRouterRenderer = ({
 	return {
 		statusCode,
 		result,
+	};
+};
+
+// get initial server-rendered app metadata that can be consumed by the application
+// from mwp-app-render/src/components/AppContext.Consumer
+const getAppContext = (request: HapiRequest, enableServiceWorker: boolean) => {
+	const { url, headers, info, server, state } = request;
+	// request protocol and host might be different from original request that hit proxy
+	// we want to use the proxy's protocol and host
+	const requestProtocol = headers['x-forwarded-proto'] || server.info.protocol;
+	const domain: string =
+		headers['x-forwarded-host'] || headers['x-meetup-host'] || info.host;
+	const clientIp =
+		request.query.__set_geoip ||
+		headers['fastly-client-ip'] ||
+		info.remoteAddress;
+	const host = `${requestProtocol}://${domain}`;
+	const userAgent = headers['user-agent'];
+	const userAgentDevice = headers['x-ua-device'] || ''; // set by fastly
+	const requestLanguage = request.getLanguage();
+
+	return {
+		apiUrl: API_ROUTE_PATH,
+		baseUrl: host,
+		basename: requestLanguage === 'en-US' ? '' : `/${requestLanguage}`, // basename is the 'base path' for the application - usually a localeCode
+		enableServiceWorker,
+		requestLanguage,
+		supportedLangs: server.settings.app.supportedLangs,
+		initialNow: new Date().getTime(),
+		isProdApi: server.settings.app.api.isProd,
+		isQL: parseMemberCookie(state).ql === 'true',
+		memberId: parseMemberCookie(state).id, // deprecated, use member.id
+		// the member cookie is not structured the same way as the member object returned from /member/self
+		// be careful relying on it to have the same properties downstream
+		member: parseMemberCookie(state),
+		variants: getVariants(state),
+		entryPath: url.pathname, // the path that the user entered the app on
+		media: getMedia(userAgent, userAgentDevice),
+		browserId: parseBrowserIdCookie(state),
+		clientIp,
+		siftSessionId: parseSiftSessionCookie(state),
 	};
 };
 
@@ -210,70 +249,28 @@ const makeRenderer = (renderConfig: {
 		reducer,
 		middleware,
 		scripts,
-		enableServiceWorker,
 		cssLinks,
+		enableServiceWorker,
 	} = renderConfig;
 	// set up a Promise that emits the resolved routes - this single Promise will
 	// be reused for all subsequent requests, so we're not resolving the routes repeatedly
 	// hooray performance
 	const routesPromise = resolveAllRoutes(routes);
-	return (
-		request: HapiRequest,
-		h: HapiResponseToolkit
-	): Promise<RenderResult> => {
+	return (request: HapiRequest, h: HapiResponseToolkit): Promise<RenderResult> => {
 		if (!scripts.length) {
 			throw new Error('No client script assets specified');
 		}
 
-		const { headers, info, url, server, state } = request;
-		const requestLanguage = request.getLanguage();
-		// basename is the 'base path' for the application - usually a localeCode
-		const basename = requestLanguage === 'en-US' ? '' : `/${requestLanguage}`;
-
-		// request protocol and host might be different from original request that hit proxy
-		// we want to use the proxy's protocol and host
-		const requestProtocol =
-			headers['x-forwarded-proto'] || server.info.protocol;
-		const domain: string =
-			headers['x-forwarded-host'] || headers['x-meetup-host'] || info.host;
-		const clientIp =
-			request.query.__set_geoip ||
-			headers['fastly-client-ip'] ||
-			info.remoteAddress;
-		const host = `${requestProtocol}://${domain}`;
-		const userAgent = headers['user-agent'];
-		const userAgentDevice = headers['x-ua-device'] || ''; // set by fastly
+		const appContext = getAppContext(request, enableServiceWorker);
 
 		// create the store with populated `config`
 		const initializeStore = resolvedRoutes => {
-			const initialState = {
-				config: {
-					apiUrl: API_ROUTE_PATH,
-					baseUrl: host,
-					enableServiceWorker,
-					requestLanguage,
-					supportedLangs: server.settings.app.supportedLangs,
-					initialNow: new Date().getTime(),
-					isProdApi: server.settings.app.api.isProd,
-					isQL: parseMemberCookie(state).ql === 'true',
-					memberId: parseMemberCookie(state).id, // deprecated, use member.id
-					// the member cookie is not structured the same way as the member object returned from /member/self
-					// be careful relying on it to have the same properties downstream
-					member: parseMemberCookie(state),
-					variants: getVariants(state),
-					entryPath: url.pathname, // the path that the user entered the app on
-					media: getMedia(userAgent, userAgentDevice),
-					browserId: parseBrowserIdCookie(state),
-					clientIp,
-					siftSessionId: parseSiftSessionCookie(state),
-				},
-			};
-
 			const createStore = getServerCreateStore(
-				getFindMatches(resolvedRoutes, basename),
+				getFindMatches(resolvedRoutes, appContext.basename),
 				middleware || [],
 				request
 			);
+			const initialState = { config: appContext };
 			return Promise.resolve(createStore(reducer, initialState));
 		};
 
@@ -301,7 +298,7 @@ const makeRenderer = (renderConfig: {
 		const populateStore = store =>
 			new Promise((resolve, reject) => {
 				// dispatch SERVER_RENDER to kick off API middleware
-				store.dispatch({ type: SERVER_RENDER, payload: url });
+				store.dispatch({ type: SERVER_RENDER, payload: request.url });
 
 				if (checkReady(store.getState())) {
 					// we need to use the _latest_ version of the member object
@@ -316,7 +313,8 @@ const makeRenderer = (renderConfig: {
 					if (checkReady(store.getState())) {
 						// we need to use the _latest_ version of the member object
 						// which is why memberObj is defined after the checkReady call.
-						const memberObj = (store.getState().api.self || {}).value || {};
+						const memberObj =
+							(store.getState().api.self || {}).value || {};
 						addFlags(store, memberObj).then(() => {
 							resolve(store);
 							unsubscribe();
@@ -328,20 +326,19 @@ const makeRenderer = (renderConfig: {
 		return routesPromise.then(resolvedRoutes =>
 			initializeStore(resolvedRoutes).then(store => {
 				// the initial addFlags call will only be key'd by member ID
-				return addFlags(store, { id: parseMemberCookie(state).id })
+				return addFlags(store, { id: parseMemberCookie(request.state).id })
 					.then(() => populateStore(store))
 					.then(
 						store =>
 							// create tracer and immediately invoke the resulting function.
 							// trace should start before rendering, finish after rendering
 							newrelic.createTracer('serverRender', getRouterRenderer)({
+								appContext,
 								routes: resolvedRoutes,
 								store,
-								location: url,
-								basename,
+								location: request.url,
 								scripts,
 								cssLinks,
-								userAgent,
 							}) // immediately invoke callback
 					);
 			})
