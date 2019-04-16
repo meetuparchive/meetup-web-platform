@@ -31,7 +31,7 @@ const getInnerHTML = __html => ({ __html });
 const DOM = props => {
 	const {
 		appMarkup = '',
-		basename,
+		appContext,
 		head,
 		initialState = {},
 		scripts,
@@ -61,7 +61,7 @@ const DOM = props => {
 	const escapedState = escapeHtml(initialStateJson);
 
 	const APP_RUNTIME = {
-		basename,
+		appContext,
 		escapedState,
 	};
 
@@ -86,13 +86,19 @@ const DOM = props => {
 				{head.meta.toComponent()}
 				{head.link.toComponent()}
 				{head.script.toComponent()}
-				{newrelicJS &&
-					<script dangerouslySetInnerHTML={getInnerHTML(newrelicJS)} />}
+				{newrelicJS && (
+					<script dangerouslySetInnerHTML={getInnerHTML(newrelicJS)} />
+				)}
 				<script dangerouslySetInnerHTML={getInnerHTML(uxCaptureJS)} />
 				{cssLinks &&
-					cssLinks.map((href, key) =>
-						<link rel="stylesheet" type="text/css" href={href} key={key} />
-					)}
+					cssLinks.map((href, key) => (
+						<link
+							rel="stylesheet"
+							type="text/css"
+							href={href}
+							key={key}
+						/>
+					))}
 				{head.style && head.style.toComponent()}
 			</head>
 			<body>
@@ -102,7 +108,9 @@ const DOM = props => {
 						`window.APP_RUNTIME=${JSON.stringify(APP_RUNTIME)};`
 					)}
 				/>
-				{js.map((url, key) => <script src={url} key={key} />)}
+				{js.map((url, key) => (
+					<script src={url} key={key} />
+				))}
 			</body>
 		</html>
 	);
@@ -110,7 +118,6 @@ const DOM = props => {
 
 DOM.propTypes = {
 	appMarkup: PropTypes.string,
-	basename: PropTypes.string,
 	head: PropTypes.shape({
 		// this is expected to come from Helmet.rewind()
 		title: PropTypes.shape({ toComponent: PropTypes.func }),

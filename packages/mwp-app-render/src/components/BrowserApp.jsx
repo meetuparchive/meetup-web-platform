@@ -12,10 +12,10 @@ class BrowserApp extends React.Component {
 		initClickTracking();
 	}
 	render() {
-		const { basename, store, routes } = this.props;
+		const { appContext, store, routes } = this.props;
 		return (
-			<BrowserRouter basename={basename}>
-				<PlatformApp store={store} routes={routes} />
+			<BrowserRouter basename={appContext.basename}>
+				<PlatformApp context={appContext} store={store} routes={routes} />
 			</BrowserRouter>
 		);
 	}
@@ -24,7 +24,7 @@ class BrowserApp extends React.Component {
 BrowserApp.propTypes = {
 	routes: PropTypes.array.isRequired,
 	store: PropTypes.object.isRequired,
-	basename: PropTypes.string.isRequired,
+	appContext: PropTypes.object.isRequired,
 };
 BrowserApp.defaultProps = {
 	basename: '',
