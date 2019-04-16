@@ -52,6 +52,8 @@ export function resolveAppProps(
 		});
 	};
 
+	// when component chunks are resolved, return the props expected by
+	// <BrowserApp>
 	return resolveComponents().then(() => ({
 		routes,
 		store,

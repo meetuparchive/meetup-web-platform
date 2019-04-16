@@ -24,7 +24,6 @@ class ServerApp extends React.Component {
 ServerApp.propTypes = {
 	routes: PropTypes.array.isRequired,
 	store: PropTypes.object.isRequired,
-	basename: PropTypes.string.isRequired,
 	location: PropTypes.oneOfType([PropTypes.object, PropTypes.string]).isRequired,
 	routerContext: PropTypes.object.isRequired,
 	appContext: PropTypes.object.isRequired,

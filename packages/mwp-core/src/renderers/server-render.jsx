@@ -137,7 +137,6 @@ const getRouterRenderer = ({
 		appMarkup = ReactDOMServer.renderToString(
 			<ServerApp
 				appContext={appContext}
-				basename={appContext.basename}
 				location={location}
 				routerContext={routerContext}
 				store={store}
@@ -171,14 +170,12 @@ const getRouterRenderer = ({
 	// so go ahead and assemble the full response body
 	const result = getHtml(
 		<Dom
-			basename={appContext.basename}
 			head={sideEffects.head}
 			initialState={initialState}
 			appContext={appContext}
 			appMarkup={appMarkup}
 			scripts={scripts}
 			cssLinks={cssLinks}
-			userAgent={appContext.userAgent}
 		/>
 	);
 
@@ -247,7 +244,14 @@ const makeRenderer = (renderConfig: {
 	enableServiceWorker: boolean,
 	cssLinks: ?(Array<string> | (MWPState => Array<string>)),
 }) => {
-	const { routes, reducer, middleware, scripts, cssLinks } = renderConfig;
+	const {
+		routes,
+		reducer,
+		middleware,
+		scripts,
+		cssLinks,
+		enableServiceWorker,
+	} = renderConfig;
 	// set up a Promise that emits the resolved routes - this single Promise will
 	// be reused for all subsequent requests, so we're not resolving the routes repeatedly
 	// hooray performance
@@ -257,7 +261,7 @@ const makeRenderer = (renderConfig: {
 			throw new Error('No client script assets specified');
 		}
 
-		const appContext = getAppContext(request, renderConfig.enableServiceWorker);
+		const appContext = getAppContext(request, enableServiceWorker);
 
 		// create the store with populated `config`
 		const initializeStore = resolvedRoutes => {

@@ -36,7 +36,6 @@ const DOM = props => {
 		initialState = {},
 		scripts,
 		cssLinks,
-		userAgent,
 	} = props;
 
 	const localeCode = initialState.config.requestLanguage;
@@ -45,7 +44,7 @@ const DOM = props => {
 	/**
 	 * Add polyfill.io script if needed
 	 */
-	const polyfill = getPolyfill(userAgent, localeCode);
+	const polyfill = getPolyfill(appContext.userAgent, localeCode);
 	const js = polyfill ? [polyfill, ...scripts] : [...scripts];
 
 	/**
@@ -129,7 +128,6 @@ DOM.propTypes = {
 	initialState: PropTypes.object.isRequired,
 	scripts: PropTypes.array.isRequired,
 	cssLinks: PropTypes.arrayOf(PropTypes.string),
-	userAgent: PropTypes.string,
 };
 
 export default DOM;
