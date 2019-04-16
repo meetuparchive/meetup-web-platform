@@ -56,9 +56,7 @@ export default (
 	const ConnectedWithIntl =
 		process.env.NODE_ENV === 'test' // avoid Redux context dependency in tests
 			? WithIntl
-			: connect(mapStateToProps, mapDispatchToProps, null, { pure: false })(
-					WithIntl
-				);
+			: connect(mapStateToProps, mapDispatchToProps)(WithIntl);
 
 	// modify display name to hide internal 'connect' implementation
 	const wrappedComponentName =
