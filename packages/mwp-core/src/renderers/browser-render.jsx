@@ -14,6 +14,7 @@ type AppProps = {
 	routes: Array<PlatformRoute>,
 	store: Object,
 	basename: string,
+	appContext: Object,
 };
 
 /*
@@ -25,7 +26,7 @@ export function resolveAppProps(
 	reducer: Reducer<MWPState, FluxStandardAction>,
 	middleware: Array<Object> = []
 ): Promise<AppProps> {
-	const basename = window.APP_RUNTIME.basename || '';
+	const basename = window.APP_RUNTIME.appContext.basename || '';
 	const findMatches = getFindMatches(routes, basename);
 	const createStore = getBrowserCreateStore(findMatches, middleware);
 	const store = createStore(reducer, getInitialState(window.APP_RUNTIME));
@@ -55,7 +56,7 @@ export function resolveAppProps(
 	return resolveComponents().then(() => ({
 		routes,
 		store,
-		basename,
+		appContext: window.APP_RUNTIME.appContext,
 	}));
 }
 

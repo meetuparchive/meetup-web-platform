@@ -12,10 +12,8 @@ const noopMiddleware = store => next => action => next(action);
  * containing the HTML-escaped JSON string in `window.INITIAL_STATE.escapedState`.
  * unescape the text using native `textarea.textContent` unescaping
  */
-export const getInitialState = (APP_RUNTIME: {
-	escapedState: string,
-}): ?Object => {
-	if (!APP_RUNTIME) {
+export const getInitialState = (APP_RUNTIME: { escapedState: string }): ?Object => {
+	if (!APP_RUNTIME || !APP_RUNTIME.escapedState) {
 		return;
 	}
 	const escape = document.createElement('textarea');

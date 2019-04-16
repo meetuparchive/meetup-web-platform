@@ -7,6 +7,11 @@ exports[`ServerApp exists 1`] = `
   location="/foo"
 >
   <PlatformApp
+    context={
+      Object {
+        "basename": "",
+      }
+    }
     routes={Array []}
     store={Object {}}
   />
