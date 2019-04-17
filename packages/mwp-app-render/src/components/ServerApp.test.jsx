@@ -9,8 +9,8 @@ describe('ServerApp', function() {
 		<ServerApp
 			routes={routes}
 			store={{}}
-			basename={basename}
-			context={{}}
+			appContext={{ basename }}
+			routerContext={{}}
 			location="/foo"
 		/>
 	);

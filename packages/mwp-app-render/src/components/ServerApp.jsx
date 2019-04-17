@@ -8,14 +8,14 @@ import PlatformApp from './shared/PlatformApp';
  */
 class ServerApp extends React.Component {
 	render() {
-		const { basename, location, context, store, routes } = this.props;
+		const { appContext, location, routerContext, store, routes } = this.props;
 		return (
 			<StaticRouter
-				basename={basename}
+				basename={appContext.basename}
 				location={location}
-				context={context}
+				context={routerContext}
 			>
-				<PlatformApp store={store} routes={routes} />
+				<PlatformApp appContext={appContext} store={store} routes={routes} />
 			</StaticRouter>
 		);
 	}
@@ -24,10 +24,9 @@ class ServerApp extends React.Component {
 ServerApp.propTypes = {
 	routes: PropTypes.array.isRequired,
 	store: PropTypes.object.isRequired,
-	basename: PropTypes.string.isRequired,
-	location: PropTypes.oneOfType([PropTypes.object, PropTypes.string])
-		.isRequired,
-	context: PropTypes.object.isRequired,
+	location: PropTypes.oneOfType([PropTypes.object, PropTypes.string]).isRequired,
+	routerContext: PropTypes.object.isRequired,
+	appContext: PropTypes.object.isRequired,
 };
 ServerApp.defaultProps = {
 	basename: '',

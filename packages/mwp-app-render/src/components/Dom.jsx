@@ -31,12 +31,11 @@ const getInnerHTML = __html => ({ __html });
 const DOM = props => {
 	const {
 		appMarkup = '',
-		basename,
+		appContext,
 		head,
 		initialState = {},
 		scripts,
 		cssLinks,
-		userAgent,
 	} = props;
 
 	const localeCode = initialState.config.requestLanguage;
@@ -45,7 +44,7 @@ const DOM = props => {
 	/**
 	 * Add polyfill.io script if needed
 	 */
-	const polyfill = getPolyfill(userAgent, localeCode);
+	const polyfill = getPolyfill(appContext.userAgent, localeCode);
 	const js = polyfill ? [polyfill, ...scripts] : [...scripts];
 
 	/**
@@ -61,7 +60,7 @@ const DOM = props => {
 	const escapedState = escapeHtml(initialStateJson);
 
 	const APP_RUNTIME = {
-		basename,
+		appContext,
 		escapedState,
 	};
 
@@ -86,13 +85,19 @@ const DOM = props => {
 				{head.meta.toComponent()}
 				{head.link.toComponent()}
 				{head.script.toComponent()}
-				{newrelicJS &&
-					<script dangerouslySetInnerHTML={getInnerHTML(newrelicJS)} />}
+				{newrelicJS && (
+					<script dangerouslySetInnerHTML={getInnerHTML(newrelicJS)} />
+				)}
 				<script dangerouslySetInnerHTML={getInnerHTML(uxCaptureJS)} />
 				{cssLinks &&
-					cssLinks.map((href, key) =>
-						<link rel="stylesheet" type="text/css" href={href} key={key} />
-					)}
+					cssLinks.map((href, key) => (
+						<link
+							rel="stylesheet"
+							type="text/css"
+							href={href}
+							key={key}
+						/>
+					))}
 				{head.style && head.style.toComponent()}
 			</head>
 			<body>
@@ -102,7 +107,9 @@ const DOM = props => {
 						`window.APP_RUNTIME=${JSON.stringify(APP_RUNTIME)};`
 					)}
 				/>
-				{js.map((url, key) => <script src={url} key={key} />)}
+				{js.map((url, key) => (
+					<script src={url} key={key} />
+				))}
 			</body>
 		</html>
 	);
@@ -110,7 +117,7 @@ const DOM = props => {
 
 DOM.propTypes = {
 	appMarkup: PropTypes.string,
-	basename: PropTypes.string,
+	appContext: PropTypes.object.isRequired,
 	head: PropTypes.shape({
 		// this is expected to come from Helmet.rewind()
 		title: PropTypes.shape({ toComponent: PropTypes.func }),
@@ -122,7 +129,6 @@ DOM.propTypes = {
 	initialState: PropTypes.object.isRequired,
 	scripts: PropTypes.array.isRequired,
 	cssLinks: PropTypes.arrayOf(PropTypes.string),
-	userAgent: PropTypes.string,
 };
 
 export default DOM;
