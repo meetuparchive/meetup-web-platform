@@ -35,10 +35,7 @@ const appReducers = require('./reducers'); // map of reducer keys to reducer fun
 const reducer = makeRootReducer(appReducers); // create the root reducer function
 
 resolveAppProps(routes, reducer, middleware).then(props =>
-  ReactDOM.render(
-    <BrowserApp {...props} />,
-    document.getElementById('outlet')
-  )
+	ReactDOM.render(<BrowserApp {...props} />, document.getElementById('outlet'))
 );
 ```
 
@@ -49,6 +46,30 @@ Notes:
 2. If you need direct access to the `store`, it can be read from `props.store`
    in the resolved value from `resolveAppProps`.
 
+# Server config values - AppContext
+
+The server has access to the original browser HTTP request and passes information
+about it into the React application through the `AppContext` React Context provider.
+
+The available properties are documented in the
+[`type AppContext`](https://github.com/meetup/meetup-web-platform/blob/master/flow-typed/platform.js#L10)
+
+To access these properties, import the `AppContext` component and use the [React
+Context Consumer API](https://reactjs.org/docs/context.html#contextconsumer)
+to expose the `appContext` object to child components.
+
+Example:
+
+```jsx
+import { AppContext } from 'mwp-app-render/lib/components/shared/PlatformApp';
+
+const MyComponent = props => (
+	<AppContext.Consumer>
+		{appContext => <p>My language is {appContext.requestLanguage}</p>}
+	</AppContext.Consumer>
+);
+```
+
 ## Components
 
 The React components in `components/` are application-general wrappers of app-
@@ -56,24 +77,24 @@ specific UIs that provide the necessary React component lifecycle behavior to
 enable navigation-related data fetching, and shared document structure like
 `<head>` content and the icon SVG sprite.
 
-- The app wrapper components: `<BrowserApp>` and `<ServerApp>`
+-   The app wrapper components: `<BrowserApp>` and `<ServerApp>`
 
-  These components provide the top-level entry point for the React application
-  tree. They should be used with `ReactDOM.render` and
-  `ReactDOMServer.renderToString`, respectively
+    These components provide the top-level entry point for the React application
+    tree. They should be used with `ReactDOM.render` and
+    `ReactDOMServer.renderToString`, respectively
 
-- `<PageWrap>`
-  
-  The top-level _rendering_ component for the React application - this should
-  generally be used at root-level route in the passed in routes. _This could be
-  phased out as a public component, and instead built into `<BrowserApp>` and
-  `<ServerApp>`_
+-   `<PageWrap>`
 
-  The code for `PageWrap` is organized in a directory as a standalone 'package'
-  because the relevant code is organized into a few separate 'internal' modules.
+    The top-level _rendering_ component for the React application - this should
+    generally be used at root-level route in the passed in routes. _This could be
+    phased out as a public component, and instead built into `<BrowserApp>` and
+    `<ServerApp>`_
 
-- `<Dom>`
+    The code for `PageWrap` is organized in a directory as a standalone 'package'
+    because the relevant code is organized into a few separate 'internal' modules.
 
-  A React component used on the server to get a full `<html>` document string
-  from `ReactDOMServer.renderToString()`. The actual application markup must
-  be supplied as a raw HTML string in the `appMarkup` prop.
+-   `<Dom>`
+
+    A React component used on the server to get a full `<html>` document string
+    from `ReactDOMServer.renderToString()`. The actual application markup must
+    be supplied as a raw HTML string in the `appMarkup` prop.
