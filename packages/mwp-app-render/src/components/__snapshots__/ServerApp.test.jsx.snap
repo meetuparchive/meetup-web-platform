@@ -7,7 +7,7 @@ exports[`ServerApp exists 1`] = `
   location="/foo"
 >
   <PlatformApp
-    context={
+    appContext={
       Object {
         "basename": "",
       }
