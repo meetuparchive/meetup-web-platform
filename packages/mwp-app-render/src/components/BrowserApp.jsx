@@ -15,7 +15,7 @@ class BrowserApp extends React.Component {
 		const { appContext, store, routes } = this.props;
 		return (
 			<BrowserRouter basename={appContext.basename}>
-				<PlatformApp context={appContext} store={store} routes={routes} />
+				<PlatformApp appContext={appContext} store={store} routes={routes} />
 			</BrowserRouter>
 		);
 	}

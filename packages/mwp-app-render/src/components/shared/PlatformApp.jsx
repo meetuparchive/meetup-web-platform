@@ -7,7 +7,7 @@ import ServiceWorker from './ServiceWorker';
 export const AppContext = React.createContext();
 
 const PlatformApp = props => (
-	<AppContext.Provider value={props.context}>
+	<AppContext.Provider value={props.appContext}>
 		<Provider store={props.store}>
 			<ServiceWorker>
 				<SyncContainer>

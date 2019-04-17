@@ -117,6 +117,7 @@ const DOM = props => {
 
 DOM.propTypes = {
 	appMarkup: PropTypes.string,
+	appContext: PropTypes.object.isRequired,
 	head: PropTypes.shape({
 		// this is expected to come from Helmet.rewind()
 		title: PropTypes.shape({ toComponent: PropTypes.func }),

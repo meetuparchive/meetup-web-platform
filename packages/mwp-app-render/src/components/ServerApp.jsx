@@ -15,7 +15,7 @@ class ServerApp extends React.Component {
 				location={location}
 				context={routerContext}
 			>
-				<PlatformApp context={appContext} store={store} routes={routes} />
+				<PlatformApp appContext={appContext} store={store} routes={routes} />
 			</StaticRouter>
 		);
 	}
