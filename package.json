@@ -33,11 +33,9 @@
     "url": "https://github.com/meetup/meetup-web-platform/issues"
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
-  "dependencies": {
-    "@alrra/travis-scripts": "3.0.1",
-    "lerna": "2.11.0"
-  },
+  "dependencies": {},
   "devDependencies": {
+    "@alrra/travis-scripts": "3.0.1",
     "babel-cli": "6.24.1",
     "babel-core": "6.26.0",
     "babel-eslint": "7.2.3",
@@ -69,8 +67,9 @@
     "joi": "13.4.0",
     "js-joda": "1.9.2",
     "js-joda-timezone": "2.0.1",
+    "lerna": "3.13.3",
     "lint-staged": "8.1.4",
-    "meetup-web-components": "5.2.2434",
+    "meetup-web-components": "7.0.2796",
     "meetup-web-mocks": "1.0.262",
     "mwp-router": ">=0.0.1",
     "mwp-test-utils": ">=0.0.1",
@@ -79,8 +78,8 @@
     "prettier": "1.17.0",
     "prop-types": "15.6.0",
     "querystring": "0.2.0",
-    "react": "16.3.1",
-    "react-dom": "16.4.2",
+    "react": "16.8.6",
+    "react-dom": "16.8.6",
     "react-helmet": "5.2.0",
     "react-intl": "2.4.0",
     "react-redux": "5.0.7",
@@ -92,8 +91,8 @@
     "rison": "0.1.1",
     "swarm-animation": "^0.0.95",
     "swarm-constants": "2.2.122",
-    "swarm-icons": "^3.8.349",
-    "swarm-sasstools": "^5.0.417",
+    "swarm-icons": "3.8.354",
+    "swarm-sasstools": "5.0.428",
     "tough-cookie": "2.3.3",
     "uuid": "3.3.2"
   },
