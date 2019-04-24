@@ -91,8 +91,8 @@
     "rison": "0.1.1",
     "swarm-animation": "^0.0.95",
     "swarm-constants": "2.2.122",
-    "swarm-icons": "^3.8.349",
-    "swarm-sasstools": "^5.0.417",
+    "swarm-icons": "3.8.354",
+    "swarm-sasstools": "5.0.428",
     "tough-cookie": "2.3.3",
     "uuid": "3.3.2"
   },

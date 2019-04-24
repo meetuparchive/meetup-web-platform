@@ -9385,9 +9385,10 @@ swarm-icons@3.5.336:
   version "3.5.336"
   resolved "https://registry.yarnpkg.com/swarm-icons/-/swarm-icons-3.5.336.tgz#a6d551421d1b3994b153770ed1161ffd82d232d2"
 
-swarm-icons@^3.8.349:
-  version "3.8.349"
-  resolved "https://registry.yarnpkg.com/swarm-icons/-/swarm-icons-3.8.349.tgz#af520f40843d3186b7eac66b174b6df2fcc21594"
+swarm-icons@3.8.354:
+  version "3.8.354"
+  resolved "https://registry.yarnpkg.com/swarm-icons/-/swarm-icons-3.8.354.tgz#c248865e8ddedaeed8ef62eac3c1c98ff82fa2e2"
+  integrity sha512-kM7sQcRKSYQvO6/e9ggASA98a6qXVZIepbSzER74r+LeSWQqlfDSdcNu8TzaDL2D7TEC2wqoxp4JGu50ZQAR/w==
 
 swarm-sasstools@5.0.415:
   version "5.0.415"
@@ -9395,9 +9396,10 @@ swarm-sasstools@5.0.415:
   dependencies:
     sass-rem "^1.2.4"
 
-swarm-sasstools@^5.0.417:
-  version "5.0.417"
-  resolved "https://registry.yarnpkg.com/swarm-sasstools/-/swarm-sasstools-5.0.417.tgz#f13aec5678df480473e058256901ebf5f921a4b6"
+swarm-sasstools@5.0.428:
+  version "5.0.428"
+  resolved "https://registry.yarnpkg.com/swarm-sasstools/-/swarm-sasstools-5.0.428.tgz#848a348574da729198e2297256ca2e72e078a80f"
+  integrity sha512-4VxDvzc4sMFC4YjeFD/VImWbeCIpim8PYaPqVwc3SGqze102O01Ize3PGOWGvTShs6Khj0iWN1NLNiWvZiQh0Q==
   dependencies:
     sass-rem "^1.2.4"
 
