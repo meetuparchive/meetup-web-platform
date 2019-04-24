@@ -6334,6 +6334,19 @@ meetup-web-components@5.2.2434:
     react-portal "4.1.2"
     recompose "0.26.0"
 
+meetup-web-components@7.0.2796:
+  version "7.0.2796"
+  resolved "https://registry.yarnpkg.com/meetup-web-components/-/meetup-web-components-7.0.2796.tgz#4b928eda849a3a294b598a08d4606670c252996a"
+  integrity sha512-hNiNJiJpwayYB8h6PUUjDgy2xrtu5ttWCvJ/YH4Cjytta+gbc9dxze+fTanWn5xLEEwp/h38ZorHcVnlbaYdSQ==
+  dependencies:
+    autosize "3.0.21"
+    downshift "1.31.12"
+    focus-trap-react "3.1.2"
+    raf-schd "2.1.0"
+    react-flatpickr "3.6.4"
+    react-portal "4.1.2"
+    recompose "0.26.0"
+
 meetup-web-mocks@1.0.262:
   version "1.0.262"
   resolved "https://registry.yarnpkg.com/meetup-web-mocks/-/meetup-web-mocks-1.0.262.tgz#cf3f529e29a8c943d857d02a35d84235485d6a21"
@@ -7973,6 +7986,16 @@ react-dom@16.4.2:
     object-assign "^4.1.1"
     prop-types "^15.6.0"
 
+react-dom@16.8.6:
+  version "16.8.6"
+  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.8.6.tgz#71d6303f631e8b0097f56165ef608f051ff6e10f"
+  integrity sha512-1nL7PIq9LTL3fthPqwkvr2zY7phIPjYrT0jp4HjyEQrEROnw4dG41VVwi/wfoCneoleqrNX7iAD+pXebJZwrwA==
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
+    prop-types "^15.6.2"
+    scheduler "^0.13.6"
+
 react-flatpickr@3.6.4:
   version "3.6.4"
   resolved "https://registry.yarnpkg.com/react-flatpickr/-/react-flatpickr-3.6.4.tgz#41a8406d00d787b629839ae1f5a01ed3bb6e84ac"
@@ -8113,6 +8136,16 @@ react@16.3.1:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
     prop-types "^15.6.0"
+
+react@16.8.6:
+  version "16.8.6"
+  resolved "https://registry.yarnpkg.com/react/-/react-16.8.6.tgz#ad6c3a9614fd3a4e9ef51117f54d888da01f2bbe"
+  integrity sha512-pC0uMkhLaHm11ZSJULfOBqV4tIZkx87ZLvbbQYunNixAAvjnC+snJCg0XQXn9VIsttVsbZP/H/ewzgsd5fxKXw==
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
+    prop-types "^15.6.2"
+    scheduler "^0.13.6"
 
 read-cmd-shim@^1.0.1:
   version "1.0.1"
@@ -8685,6 +8718,14 @@ sass-rem@^1.2.4:
 sax@^1.2.4:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
+
+scheduler@^0.13.6:
+  version "0.13.6"
+  resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.13.6.tgz#466a4ec332467b31a91b9bf74e5347072e4cd889"
+  integrity sha512-IWnObHt413ucAYKsD9J1QShUKkbKLQQHdxRyw73sw4FN26iWr3DY/H34xGPe4nmL1DwXyWmSWmMrA9TfQbE/XQ==
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
 
 schema-utils@^0.4.5:
   version "0.4.7"
