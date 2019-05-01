@@ -4,7 +4,7 @@
  * create a function that, when called, will determine the desired
  * language-prefixed path for the request. This can be used to redirect the
  * request to the 'correct' URL.
- * 
+ *
  * If the current request.url.pathname is correct, it will be returned
  * unmodified
  */
