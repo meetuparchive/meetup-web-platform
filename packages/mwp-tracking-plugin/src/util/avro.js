@@ -8,7 +8,7 @@ const canUsePubSub =
 /*
  * There are currently 2 distinct analytics logging methods
  * 1. `stdout`: used in dev and compatible with https://github.com/meetup/blt-fluentd
- *    in k8s-based applications in GCP 
+ *    in k8s-based applications in GCP
  * 2. Google Pub/Sub, which is used in GAE and any environment with GOOGLE_APPLICATION_CREDENTIALS
  *    environment variable set to point toward Google JSON client credentials file
  *
@@ -112,7 +112,9 @@ type Deserializer = string => Object;
 
 const avroSerializer: Object => Serializer = schema => {
 	const codec = avro.parse(schema);
-	const schemaPath = `gs://meetup-logs/avro_schemas/${schema.name}_${schema.doc}.avsc`;
+	const schemaPath = `gs://meetup-logs/avro_schemas/${schema.name}_${
+		schema.doc
+	}.avsc`;
 	return data => {
 		const record = codec.toBuffer(data);
 		// data.timestamp _must_ be ISOString if it exists
