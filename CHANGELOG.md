@@ -1,3 +1,11 @@
+## [21.3]
+
+-   **Refactor** Upgraded MWP build to Babel7 and corresponding plugins. All
+    built packages are now the same size or slightly smaller, but there is some
+    risk that the assets will no longer work in some older browsers, so
+    consumer beware - you should upgrade MWP packages independently of other
+    code changes so that it is easier to isolate problems and revert.
+
 ## [21.2]
 
 -   **New Feature** `AppContext` context provider for server-side request data.
