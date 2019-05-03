@@ -98,7 +98,7 @@
     "uuid": "3.3.2"
   },
   "resolutions": {
-    "semver": "5.7.0"
+    "semver": "6.0.0"
   },
   "private": true,
   "workspaces": [
