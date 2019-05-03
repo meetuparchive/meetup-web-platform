@@ -18,7 +18,7 @@
     "lint": "eslint . --ext .js,.jsx --fix",
     "typecheck": "flow",
     "test": "yarn && yarn build && yarn test:unit",
-    "test:unit": "NODE_ENV=test jest --config jest.config.json",
+    "test:unit": "NODE_ENV=test jest",
     "test:integration": "NODE_ENV=test jest --config jest.int.config.json"
   },
   "repository": {
@@ -64,7 +64,7 @@
     "intl-messageformat": "2.1.0",
     "intl-relativeformat": "2.0.0",
     "iron": "4.0.5",
-    "jest": "23.6.0",
+    "jest": "24.7.1",
     "joi": "13.4.0",
     "js-joda": "1.9.2",
     "js-joda-timezone": "2.0.1",
