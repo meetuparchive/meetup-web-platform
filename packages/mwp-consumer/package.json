@@ -10,7 +10,7 @@
 	"config": {},
 	"main": "./lib/index.js",
 	"scripts": {
-		"build": "babel src --out-dir build --ignore test.js,test.jsx",
+		"build": "babel src --out-dir build --ignore test.js,test.jsx --root-mode upward",
 		"start": "yarn build && node scripts/runServer.js",
 		"start:dev": "yarn build && node --inspect scripts/runServer.js"
 	},
