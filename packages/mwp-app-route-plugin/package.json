@@ -27,9 +27,9 @@
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "dependencies": {
-    "ldclient-node": "5.2.0",
-    "redbox-react": "1.5.0",
-    "electrode-csrf-jwt": "git+https://github.com/meetup/electrode-csrf-jwt.git#793431729d8fb4ee315f28709f323f198b25d460"
+    "electrode-csrf-jwt": "git+https://github.com/meetup/electrode-csrf-jwt.git#793431729d8fb4ee315f28709f323f198b25d460",
+    "ldclient-node": "5.8.0",
+    "redbox-react": "1.5.0"
   },
   "devDependencies": {},
   "peerDependencies": {
