@@ -19,11 +19,11 @@ export function register(
 		return h.continue;
 	});
 	/**
-     * We are using Blankie to set our Content-Security-Policy header, which uses Scooter to
-     * detect the user agent and apply the appropriate CSP header, usually Content-Security-Policy
-     * but some older browsers are slightly different. A CSP compatible browser will use the header
-     * to ignore scripts not whitelisted in our policy header. https://github.com/nlf/blankie 
-     */
+	 * We are using Blankie to set our Content-Security-Policy header, which uses Scooter to
+	 * detect the user agent and apply the appropriate CSP header, usually Content-Security-Policy
+	 * but some older browsers are slightly different. A CSP compatible browser will use the header
+	 * to ignore scripts not whitelisted in our policy header. https://github.com/nlf/blankie
+	 */
 	return blankie.plugin.register(server, options);
 }
 
