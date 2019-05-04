@@ -3,8 +3,8 @@ import withSideEffect from 'react-side-effect';
 import jsCookie from 'js-cookie';
 import type { CookieOptions } from 'js-cookie';
 
-// subset of HapiServerStateCookieOptions that will work with Hapi `h.state()` and
-// js-cookie `Cookie.set()`
+// subset of HapiServerStateCookieOptions (see flow-typed libdef) that can be
+// used to supply cookie config opts to Hapi `h.state()` and js-cookie `Cookie.set()`
 type CookieOpts = {
 	value?: string,
 	ttl?: number, // milliseconds
@@ -28,6 +28,10 @@ const defaults = {
 /*
  * This component, when rendered, is solely responsible for triggering side effects
  * that write cookies, both on the server and on the client.
+ *
+ * See https://github.com/gaearon/react-side-effect for details about how
+ * `reducePropsToState` and `handleStateChangeOnClient` are used by the `withSideEffect`
+ * HOC
  */
 const Cookie = (props: CookieProps) => null;
 
