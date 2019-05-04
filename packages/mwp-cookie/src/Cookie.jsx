@@ -1,6 +1,7 @@
 // @flow
 import withSideEffect from 'react-side-effect';
 import jsCookie from 'js-cookie';
+import type { CookieOptions } from 'js-cookie';
 
 // subset of HapiServerStateCookieOptions that will work with Hapi `h.state()` and
 // js-cookie `Cookie.set()`
@@ -12,12 +13,11 @@ type CookieOpts = {
 	path?: string,
 	domain?: string,
 };
-type CookieProps = {
+type CookieProps = CookieOpts & {
 	children: string,
 	name: string,
-	...CookieOpts,
 };
-type CookieState = { [name: string]: CookieOpts };
+type CookieState = { [string]: CookieOpts };
 
 const defaults = {
 	path: '/',
@@ -31,11 +31,12 @@ const defaults = {
  */
 const Cookie = (props: CookieProps) => null;
 
-const reducePropsToState = (propsList: CookieState): CookieState =>
+const reducePropsToState = (propsList: Array<CookieProps>): CookieState =>
 	// consolidate cookie defs with the same name - innermost <Cookie> has precedent
 	propsList.reduce((acc: CookieState, props: CookieProps) => {
 		const { name, children, ...options } = props;
-		acc[name] = Object.assign({ value: children }, options, defaults);
+		const baseOptions: CookieOpts = { value: children };
+		acc[name] = Object.assign(baseOptions, options, defaults);
 		return acc;
 	}, {});
 
@@ -54,7 +55,7 @@ export const handleStateChangeOnClient = (state: CookieState) => {
 
 		// set up cookie attributes argument for js-cookie
 		// https://github.com/js-cookie/js-cookie/blob/master/README.md#cookie-attributes
-		const options = {
+		const options: CookieOptions = {
 			path,
 			domain,
 			secure: isSecure,
