@@ -8,6 +8,7 @@ import MobileDetect from 'mobile-detect';
 
 import { API_ROUTE_PATH } from 'mwp-api-proxy-plugin';
 import { Forbidden, NotFound, Redirect, SERVER_RENDER } from 'mwp-router';
+import Cookie from '@meetup/mwp-cookie/lib/Cookie';
 import { getFindMatches, resolveAllRoutes } from 'mwp-router/lib/util';
 import { getServerCreateStore } from 'mwp-store/lib/server';
 import Dom from 'mwp-app-render/lib/components/Dom';
@@ -66,6 +67,7 @@ const resolveSideEffects = () => ({
 	redirect: Redirect.rewind(),
 	forbidden: Forbidden.rewind(),
 	notFound: NotFound.rewind(),
+	cookie: Cookie.rewind(),
 });
 
 /**
@@ -97,23 +99,8 @@ const getMedia = (userAgent: string, userAgentDevice: string) => {
 
 /**
  * Using the current route information and Redux store, render the app to an
- * HTML string and server response code.
- *
- * There are three parts to the render:
- *
- * 1. `appMarkup`, which corresponds to the markup that will be rendered
- * on the client by React. This string is built before the full markup because
- * it sets the data needed by other parts of the DOM, such as `<head>`.
- * 2. `htmlMarkup`, which wraps `appMarkup` with the remaining DOM markup.
- * 3. `doctype`, which is just the doctype element that is a sibling of `<html>`
- *
- * @param {Object} renderProps
- * @param {ReduxStore} store the store containing the initial state of the app
- * @return {Object} the statusCode and result used by Hapi's response API
+ * HTML string and server response code, with optional cookies to write
  */
-type RenderResult =
-	| { result: string, statusCode: number }
-	| { redirect: { url: string, permanent?: boolean } };
 
 const getRouterRenderer = ({
 	appContext,
@@ -152,12 +139,17 @@ const getRouterRenderer = ({
 
 	const sideEffects = resolveSideEffects();
 
+	const cookies = sideEffects.cookie;
+
 	const externalRedirect = getRedirect(sideEffects.redirect);
 	const internalRedirect = getRedirect(routerContext);
 	const redirect = internalRedirect || externalRedirect;
 
 	if (redirect) {
-		return redirect;
+		return {
+			...redirect,
+			cookies,
+		};
 	}
 
 	// cssLinks can be an Array or a Function that returns an array
@@ -183,6 +175,7 @@ const getRouterRenderer = ({
 	const statusCode = sideEffects.forbidden || sideEffects.notFound || 200;
 
 	return {
+		cookies,
 		statusCode,
 		result,
 	};

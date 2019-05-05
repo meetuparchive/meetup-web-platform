@@ -58,15 +58,33 @@ declare type FeatureFlags = { [string]: boolean | string };
 
 declare type Params = { [string]: string };
 
+type CookieOpts = {|
+	value: string,
+	ttl?: number | null, // milliseconds
+	isHttpOnly?: boolean,
+	isSecure?: boolean,
+	isSameSite?: false | 'Strict' | 'Lax',
+	path?: string | null,
+	domain?: string | null,
+|};
+type CookieMap = {
+	[string]: {
+		...HapiServerStateCookieOptions,
+		value: string,
+	},
+};
+
 type RedirectResult = {|
 	redirect: {
 		url: string,
 		permanent?: boolean,
 	},
+	cookies: CookieMap,
 |};
 type HTMLResult = {|
 	statusCode: number,
 	result: string,
+	cookies: CookieMap,
 |};
 declare type RenderResult = RedirectResult | HTMLResult;
 

@@ -5,24 +5,15 @@ import type { CookieOptions } from 'js-cookie';
 
 // subset of HapiServerStateCookieOptions (see flow-typed libdef) that can be
 // used to supply cookie config opts to Hapi `h.state()` and js-cookie `Cookie.set()`
-type CookieOpts = {
-	value?: string,
-	ttl?: number, // milliseconds
-	isHttpOnly?: boolean,
-	isSecure?: boolean,
-	path?: string,
-	domain?: string,
-};
 type CookieProps = CookieOpts & {
-	children: string,
+	children?: string,
 	name: string,
 };
-type CookieState = { [string]: CookieOpts };
-
 const defaults = {
 	path: '/',
 	domain: '.meetup.com',
 	isSecure: true,
+	isSameSite: false,
 };
 
 /*
@@ -35,11 +26,16 @@ const defaults = {
  */
 const Cookie = (props: CookieProps) => null;
 
-const reducePropsToState = (propsList: Array<CookieProps>): CookieState =>
+const reducePropsToState = (propsList: Array<CookieProps>): CookieMap =>
 	// consolidate cookie defs with the same name - innermost <Cookie> has precedent
-	propsList.reduce((acc: CookieState, props: CookieProps) => {
+	propsList.reduce((acc: CookieMap, props: CookieProps) => {
 		const { name, children, ...options } = props;
-		const baseOptions: CookieOpts = { value: children };
+		const baseOptions: {
+			...HapiServerStateCookieOptions,
+			value: string,
+		} = {
+			value: children || '',
+		};
 		acc[name] = Object.assign(baseOptions, options, defaults);
 		return acc;
 	}, {});
@@ -48,7 +44,7 @@ const reducePropsToState = (propsList: Array<CookieProps>): CookieState =>
 // This will be called on initial render, so any server-supplied cookies will
 // effectively be overwritten on the client with approximately the same information
 // (server may supply 'max-age' while client provides 'expires' value)
-export const handleStateChangeOnClient = (state: CookieState) => {
+export const handleStateChangeOnClient = (state: CookieMap) => {
 	// loop through cookie key-values and set a cookie for each
 	Object.keys(state).forEach(name => {
 		const { value, path, domain, isSecure, ttl, isHttpOnly } = state[name];

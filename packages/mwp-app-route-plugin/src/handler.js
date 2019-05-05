@@ -15,9 +15,10 @@ import url from 'url';
  *    the Vary header to 'User-Agent', in order for the google bots
  *    to crawl mobile and desktop versions of the site
  */
-export default (languageRenderers: {
-	[string]: LanguageRenderer,
-}): HapiHandler => (request: HapiRequest, h: HapiResponseToolkit) => {
+export default (languageRenderers: { [string]: LanguageRenderer }): HapiHandler => (
+	request: HapiRequest,
+	h: HapiResponseToolkit
+) => {
 	const pathname = request.getLangPrefixPath();
 	if (pathname !== request.url.pathname) {
 		return h.redirect(url.format({ ...request.url, pathname }));
@@ -27,11 +28,23 @@ export default (languageRenderers: {
 
 	return renderRequest(request).then(
 		(renderResult: RenderResult) => {
+			// assign Set-Cookie headers for all responses
+			if (renderResult.cookies) {
+				Object.keys(renderResult.cookies).forEach(name => {
+					const { value, ...options } = renderResult.cookies[name];
+					// assign new 'Set-Cookie' header per cookie in the map
+					h.state(name, value, options);
+				});
+			}
+
 			if (renderResult.redirect) {
+				// redirect without a response body
 				return h
 					.redirect(renderResult.redirect.url)
 					.permanent(Boolean(renderResult.redirect.permanent));
 			}
+
+			// return response body
 			return h
 				.response(renderResult.result)
 				.code(renderResult.statusCode)
