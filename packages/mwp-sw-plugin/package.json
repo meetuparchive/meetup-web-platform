@@ -9,7 +9,7 @@
   },
   "main": "./lib/index.js",
   "scripts": {
-    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps",
+    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps --root-mode upward",
     "flow": "flow",
     "lint": "eslint . --ext .js,.jsx --fix",
     "test": "yarn run test:unit",
