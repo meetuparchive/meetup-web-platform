@@ -5,7 +5,7 @@ import type { CookieOptions } from 'js-cookie';
 
 // subset of HapiServerStateCookieOptions (see flow-typed libdef) that can be
 // used to supply cookie config opts to Hapi `h.state()` and js-cookie `Cookie.set()`
-type CookieProps = CookieOpts & {
+type SetCookieProps = CookieOpts & {
 	children?: string,
 	name: string,
 };
@@ -24,11 +24,11 @@ const defaults = {
  * `reducePropsToState` and `handleStateChangeOnClient` are used by the `withSideEffect`
  * HOC
  */
-const Cookie = (props: CookieProps) => null;
+const SetCookie = (props: SetCookieProps) => null;
 
-const reducePropsToState = (propsList: Array<CookieProps>): CookieMap =>
+const reducePropsToState = (propsList: Array<SetCookieProps>): CookieMap =>
 	// consolidate cookie defs with the same name - innermost <Cookie> has precedent
-	propsList.reduce((acc: CookieMap, props: CookieProps) => {
+	propsList.reduce((acc: CookieMap, props: SetCookieProps) => {
 		const { name, children, ...options } = props;
 		const baseOptions: {
 			...HapiServerStateCookieOptions,
@@ -71,4 +71,6 @@ export const handleStateChangeOnClient = (state: CookieMap) => {
 	});
 };
 
-export default withSideEffect(reducePropsToState, handleStateChangeOnClient)(Cookie);
+export default withSideEffect(reducePropsToState, handleStateChangeOnClient)(
+	SetCookie
+);

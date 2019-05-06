@@ -2,22 +2,22 @@
 
 A cookie management library
 
-## Writing cookies in React - `<Cookie />`
+## Writing cookies in React - `<SetCookie />`
 
 To support writing cookies both on the server and the client in a 'universal'
-React application, use the `<Cookie />` component in `src/Cookie.jsx`.
+React application, use the `<SetCookie />` component in `src/SetCookie.jsx`.
 
 In the client, this component will write to `window.document.cookie` every time
 it is rendered, using the supplied props to configure the cookie behavior (e.g.
 time-to-live, `domain`). On the server, this component exposes the props for each
 instance rendered by `ReactDOMServer.renderToString()` or `.renderToStaticMarkup`
-through a `Cookie.rewind()` static interface.
+through a `SetCookie.rewind()` static interface.
 
-In your application code, a basic `<Cookie />` requires a `name` prop and the
+In your application code, a basic `<SetCookie />` requires a `name` prop and the
 string `value` as the element's only child.
 
 ```jsx
-<Cookie name="MY_COOKIE">my cookie value</Cookie>
+<SetCookie name="MY_COOKIE">my cookie value</SetCookie>
 ```
 
 This component does not currently _read_ cookies.
@@ -25,9 +25,9 @@ This component does not currently _read_ cookies.
 ### Props
 
 ```js
-<Cookie name="MY_COOKIE" ttl=1234 isHttpOnly isSecure path='/foo' domain='foo.meetup.com'>
+<SetCookie name="MY_COOKIE" ttl=1234 isHttpOnly isSecure path='/foo' domain='foo.meetup.com'>
   My cookie value
-</Cookie>
+</SetCookie>
 ```
 
 #### `name: string`
@@ -85,14 +85,14 @@ header.
 In Hapi, the code for a request handler might look like this:
 
 ```js
-const Cookie = require('@meetup/mwp-cookie/lib/Cookie');
-const App = require('./path/to/my/App.jsx'); // App renders multiple '<Cookie />' instances
+const SetCookie = require('@meetup/mwp-cookie/lib/SetCookie');
+const App = require('./path/to/my/App.jsx'); // App renders multiple '<SetCookie />' instances
 
 const handler = (request, h) => {
 	const markup = ReactDOMServer.renderToString(<App />);
 	const response = h.response(markup);
 
-	const cookieMap = Cookie.rewind();
+	const cookieMap = SetCookie.rewind();
 	Object.keys(cookieMap).forEach(name => {
 		const { value, ...options } = cookieMap[name];
 		// assign new 'Set-Cookie' header per cookie in the map
@@ -104,7 +104,7 @@ const handler = (request, h) => {
 ```
 
 On the client, the updates to `window.document.cookie` are handled internally -
-just render the `<Cookie />` element.
+just render the `<SetCookie />` element.
 
 ```jsx
 React.render(document.body, <App />);
@@ -116,17 +116,17 @@ If you don't want the client to interact with a cookie at all, pass in the
 `isHttpOnly` boolean prop.
 
 ```jsx
-<Cookie name="MY_COOKIE" isHttpOnly>
+<SetCookie name="MY_COOKIE" isHttpOnly>
 	my cookie value not visible to client code
-</Cookie>
+</SetCookie>
 ```
 
 #### Client-side-only cookie
 
-The `<Cookie />` element is generally the wrong abstraction for setting cookies
+The `<SetCookie />` element is generally the wrong abstraction for setting cookies
 on the client, since client-side cookie setting is by definition done with
 callbacks (e.g. `componentDidMount`, `onClick`) that do not need to interact
 with app rendering.
 
 We recommend using [js-cookie](https://github.com/js-cookie/js-cookie/) in these
-cases, with its `Cookie.set()` method.
+cases, with its `SetCooke.set()` method.
