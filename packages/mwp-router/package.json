@@ -9,7 +9,7 @@
   },
   "main": "./lib/index.js",
   "scripts": {
-    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps"
+    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps --root-mode upward"
   },
   "repository": {
     "type": "git",
