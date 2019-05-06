@@ -8,7 +8,7 @@ import MobileDetect from 'mobile-detect';
 
 import { API_ROUTE_PATH } from 'mwp-api-proxy-plugin';
 import { Forbidden, NotFound, Redirect, SERVER_RENDER } from 'mwp-router';
-import Cookie from '@meetup/mwp-cookie/lib/Cookie';
+import SetCookie from '@meetup/mwp-cookie/lib/SetCookie';
 import { getFindMatches, resolveAllRoutes } from 'mwp-router/lib/util';
 import { getServerCreateStore } from 'mwp-store/lib/server';
 import Dom from 'mwp-app-render/lib/components/Dom';
@@ -67,7 +67,7 @@ const resolveSideEffects = () => ({
 	redirect: Redirect.rewind(),
 	forbidden: Forbidden.rewind(),
 	notFound: NotFound.rewind(),
-	cookie: Cookie.rewind(),
+	cookie: SetCookie.rewind(),
 });
 
 /**
