@@ -106,7 +106,6 @@ const getRouterRenderer = ({
 	appContext,
 	routes,
 	store,
-	location,
 	scripts,
 	cssLinks,
 }): RenderResult => {
@@ -126,7 +125,6 @@ const getRouterRenderer = ({
 				request={request}
 				h={h}
 				appContext={appContext}
-				location={location}
 				routerContext={routerContext}
 				store={store}
 				routes={routes}

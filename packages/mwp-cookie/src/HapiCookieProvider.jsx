@@ -9,7 +9,12 @@ type HapiCookieProviderProps = {
 };
 
 const HapiCookieProvider = (props: HapiCookieProviderProps) => (
-	<CookieProvider get={props.request.state} set={props.h.state}>
+	<CookieProvider
+		get={(name: ?string) =>
+			name ? props.request.state[name] : props.request.state
+		}
+		set={props.h.state}
+	>
 		{props.children}
 	</CookieProvider>
 );
