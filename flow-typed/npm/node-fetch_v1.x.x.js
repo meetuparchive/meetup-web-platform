@@ -1,7 +1,10 @@
-// flow-typed signature: 284e255a331cbe00e3ddf88897c9452d
-// flow-typed version: 7e7beb7540/node-fetch_v1.x.x/flow_>=v0.44.x
+// flow-typed signature: fe6e6c19a20d24e309d8c769a4a7bd24
+// flow-typed version: d49c81a8d4/node-fetch_v1.x.x/flow_>=v0.44.x
 
 declare module 'node-fetch' {
+  import type http from 'http';
+  import type https from 'https';
+
   declare export class Request mixins Body {
     constructor(input: string | Request, init?: RequestInit): this;
     method: string;
@@ -13,7 +16,7 @@ declare module 'node-fetch' {
 
     // node-fetch extensions
     compress: boolean;
-    agent: http$Agent;
+    agent: http.Agent | https.Agent;
     counter: number;
     follow: number;
     hostname: string;
@@ -37,7 +40,7 @@ declare module 'node-fetch' {
     timeout?: number,
     compress?: boolean,
     size?: number,
-    agent?: http$Agent,
+    agent?: http.Agent | https.Agent,
     follow?: number
   }
 

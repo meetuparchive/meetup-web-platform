@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 
-type Props = React$ElementConfig<typeof HTMLImageElement> & { mark: string };
+type Props = React$ElementConfig<'img'> & { mark: string };
 
 export const getOnLoadJS = (mark: string): string => {
 	const onload = `
@@ -15,9 +15,7 @@ export const getOnLoadJS = (mark: string): string => {
 	return onload.replace(/[\n\t]+/g, ' ');
 };
 
-export const getPropsAsHTMLAttrs = (
-	props: React$ElementConfig<typeof HTMLImageElement>
-): string => {
+export const getPropsAsHTMLAttrs = (props: React$ElementProps<'img'>): string => {
 	return Object.keys(props)
 		.map(prop => {
 			let attribute = prop;
@@ -35,7 +33,17 @@ export const getPropsAsHTMLAttrs = (
 				attribute = attribute.toLowerCase();
 			}
 
-			return `${attribute}="${props[prop]}"`;
+			if (typeof props[prop] === 'boolean') {
+				return props[prop] ? attribute : '';
+			}
+			if (props[prop] === null || props[prop] === undefined) {
+				return attribute;
+			}
+			const value = JSON.stringify(props[prop]);
+			if (value === undefined) {
+				return '';
+			}
+			return `${attribute}="${value}"`;
 		})
 		.join(' ');
 };
