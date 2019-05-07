@@ -8,7 +8,6 @@ import MobileDetect from 'mobile-detect';
 
 import { API_ROUTE_PATH } from 'mwp-api-proxy-plugin';
 import { Forbidden, NotFound, Redirect, SERVER_RENDER } from 'mwp-router';
-import SetCookie from '@meetup/mwp-cookie/lib/SetCookie';
 import { getFindMatches, resolveAllRoutes } from 'mwp-router/lib/util';
 import { getServerCreateStore } from 'mwp-store/lib/server';
 import Dom from 'mwp-app-render/lib/components/Dom';
@@ -67,7 +66,6 @@ const resolveSideEffects = () => ({
 	redirect: Redirect.rewind(),
 	forbidden: Forbidden.rewind(),
 	notFound: NotFound.rewind(),
-	cookie: SetCookie.rewind(),
 });
 
 /**
@@ -143,17 +141,12 @@ const getRouterRenderer = ({
 
 	const sideEffects = resolveSideEffects();
 
-	const cookies = sideEffects.cookie;
-
 	const externalRedirect = getRedirect(sideEffects.redirect);
 	const internalRedirect = getRedirect(routerContext);
 	const redirect = internalRedirect || externalRedirect;
 
 	if (redirect) {
-		return {
-			...redirect,
-			cookies,
-		};
+		return redirect;
 	}
 
 	// cssLinks can be an Array or a Function that returns an array
@@ -179,7 +172,6 @@ const getRouterRenderer = ({
 	const statusCode = sideEffects.forbidden || sideEffects.notFound || 200;
 
 	return {
-		cookies,
 		statusCode,
 		result,
 	};
