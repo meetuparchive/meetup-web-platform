@@ -1,0 +1,47 @@
+// @flow
+import React from 'react';
+
+const CookieContext = React.createContext();
+export const CookieProvider = props => (
+	<CookieContext.Provider value={{ get: props.get, set: props.set }}>
+		{props.children}
+	</CookieContext.Provider>
+);
+
+// subset of HapiServerStateCookieOptions (see flow-typed libdef) that can be
+// used to supply cookie config opts to Hapi `h.state()` and js-cookie `Cookie.set()`
+type SetCookieProps = CookieOpts & {
+	children?: string,
+	name: string,
+};
+const defaults = {
+	path: '/',
+	domain: '.meetup.com',
+	isSecure: true,
+	isSameSite: false,
+};
+
+/*
+ * This component, when rendered, is solely responsible for triggering side effects
+ * that write cookies, both on the server and on the client.
+ */
+export const SetCookie = React.memo((props: SetCookieProps) => {
+	const { name, children, ...options } = props;
+	Object.assign(options, defaults);
+	return (
+		<CookieContext.Consumer>
+			{Cookie => {
+				Cookie.set(name, children || '', options);
+				return null; // no render
+			}}
+		</CookieContext.Consumer>
+	);
+});
+
+// Simpler consumer that calls children function with the value of
+// the cookie named by props.name
+export const CookieConsumer = props => (
+	<CookieContext.Consumer>
+		{Cookie => props.children(Cookie.get(props.name))}
+	</CookieContext.Consumer>
+);

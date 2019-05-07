@@ -103,6 +103,8 @@ const getMedia = (userAgent: string, userAgentDevice: string) => {
  */
 
 const getRouterRenderer = ({
+	request,
+	h,
 	appContext,
 	routes,
 	store,
@@ -123,6 +125,8 @@ const getRouterRenderer = ({
 	try {
 		appMarkup = ReactDOMServer.renderToString(
 			<ServerApp
+				request={request}
+				h={h}
 				appContext={appContext}
 				location={location}
 				routerContext={routerContext}
@@ -326,10 +330,11 @@ const makeRenderer = (renderConfig: {
 							// create tracer and immediately invoke the resulting function.
 							// trace should start before rendering, finish after rendering
 							newrelic.createTracer('serverRender', getRouterRenderer)({
+								request,
+								h,
 								appContext,
 								routes: resolvedRoutes,
 								store,
-								location: request.url,
 								scripts,
 								cssLinks,
 							}) // immediately invoke callback
