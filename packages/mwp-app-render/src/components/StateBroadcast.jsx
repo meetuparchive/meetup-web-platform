@@ -2,7 +2,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
+type OwnProps = {||}; // expected to be called with NO props
 type Props = {
+	...OwnProps,
 	state: MWPState,
 };
 const mapStateToProps = state => ({ state });
@@ -18,4 +20,7 @@ export class StateBroadcastComponent extends React.PureComponent<Props> {
 	}
 }
 
-export default connect(mapStateToProps, () => ({}))(StateBroadcastComponent);
+export default connect<Props, OwnProps, _, _, _, _>(
+	mapStateToProps,
+	() => ({})
+)(StateBroadcastComponent);
