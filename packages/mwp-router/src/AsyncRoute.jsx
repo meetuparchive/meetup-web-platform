@@ -19,7 +19,7 @@ type State = ComponentState;
 const _componentCache = {};
 
 // simple pass through component to use while real component is loading
-const Placeholder = (children: React$Node) => <div />;
+const Placeholder = ({ children: React$Node }) => <div />;
 
 const keyFromRoute = (route: PlatformRoute): string =>
 	(route.getComponent || '').toString();
@@ -92,8 +92,9 @@ class AsyncRoute extends React.Component<Props, State> {
 
 		return (
 			<Component {...props} route={route} match={{ ...match, params }}>
-				{childRoutes.length > 0 &&
-					<RouteLayout routes={childRoutes} matchedPath={match.path} />}
+				{childRoutes.length > 0 && (
+					<RouteLayout routes={childRoutes} matchedPath={match.path} />
+				)}
 			</Component>
 		);
 	}

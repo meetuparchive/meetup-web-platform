@@ -34,10 +34,7 @@ type ResponseStateSetter = (
  * stored in a `dyanmicRef` in state. If a `list.merge` param is specified,
  * the response will be merged with the existing list state stored in `dynamicRef`
  */
-export const getListState: ResponseStateSetter = (
-	state,
-	{ response, query }
-) => {
+export const getListState: ResponseStateSetter = (state, { response, query }) => {
 	if (!response || !query.list) {
 		// no list no problem
 		return {};
@@ -59,8 +56,9 @@ export const getListState: ResponseStateSetter = (
 	// do some smart merging
 	const { idTest, sort, isReverse } = merge;
 	// remove anything in old list that is part of new list
-	const oldList = ((state[dynamicRef] || {}).value || [])
-		.filter(valOld => !newList.find(valNew => idTest(valOld, valNew)));
+	const oldList = ((state[dynamicRef] || {}).value || []).filter(
+		valOld => !newList.find(valNew => idTest(valOld, valNew))
+	);
 
 	// combine the new list and the old list
 	const mergedList = isReverse
@@ -74,10 +72,7 @@ export const getListState: ResponseStateSetter = (
 	return { [dynamicRef]: { value: mergedList, query } };
 };
 
-export const responseToState: ResponseStateSetter = (
-	state,
-	{ response, query }
-) => ({
+export const responseToState: ResponseStateSetter = (state, { response, query }) => ({
 	[query.ref]: { ...response, query },
 	...getListState(state, { response, query }),
 });
@@ -95,7 +90,7 @@ export function api(
 			return Object.keys(refs).reduce(
 				(cleanState, ref) => {
 					// throw out data from queries that are not 'GET' - it should not be kept in state
-					const queryMethod = (state[ref].query.meta || {}).method;
+					const queryMethod = ((state[ref].query || {}).meta || {}).method;
 					if (queryMethod && queryMethod !== 'get') {
 						return cleanState;
 					}
