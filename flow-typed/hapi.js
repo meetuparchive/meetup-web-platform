@@ -18,15 +18,8 @@ declare type HapiRequestUrl = URL & {
 	path: string,
 };
 
-declare type HapiHandlerReturnValue =
-	| HapiResponseObject
-	| Error
-	| string
-	| { [string]: any };
-declare type HapiHandler = (
-	HapiRequest,
-	HapiResponseToolkit
-) => HapiHandlerReturnValue | Promise<HapiHandlerReturnValue>;
+declare type HapiHandlerReturnValue = HapiResponseObject | Error | string | { [string]: any };
+declare type HapiHandler = (HapiRequest, HapiResponseToolkit) => HapiHandlerReturnValue | Promise<HapiHandlerReturnValue>;
 
 declare type HapiRoute = Object;
 
@@ -82,22 +75,14 @@ declare type HapiServer = {
 	auth: any,
 	bind: (context: Object) => void,
 	cache: any,
-	decoder: (encoding: string, decoder: (options: any) => any) => void,
-	decorate: (
-		type: 'handler' | 'request' | 'toolkit' | 'server',
-		property: string,
-		method: (...args: any[]) => any,
-		options?: { apply?: boolean, extend?: boolean }
-	) => void,
+	decoder: (encoding: string, decoder: ((options: any) => any)) => void,
+	decorate: (type: 'handler' | 'request' | 'toolkit' | 'server', property: string, method: (...args: any[]) => any, options?: {apply?: boolean, extend?: boolean}) => void,
 	decorations: {
 		request: string[],
 		toolkit: string[],
 		server: string[],
 	},
-	dependency: (
-		dependencies: string | string[],
-		after?: (server: HapiServer) => Promise<void>
-	) => void,
+	dependency: (dependencies: string | string[], after?: ((server: HapiServer) => Promise<void>)) => void,
 	encoder: any,
 	event: (events: any) => void,
 	events: {
@@ -116,11 +101,7 @@ declare type HapiServer = {
 		heapUsed: number,
 		rss: number,
 	},
-	log: (
-		tags: string | string[],
-		data?: string | Object | (() => any),
-		timestamp?: number
-	) => void,
+	log: (tags: string | string[], data?: string | Object | (() => any), timestamp?: number) => void,
 	lookup: (id: string) => any,
 	match: (method: any, path: string, host?: string) => any,
 	method: (...args: any[]) => void,
@@ -143,7 +124,7 @@ declare type HapiServer = {
 	state: (name: string, options?: HapiServerStateCookieOptions) => void,
 	states: any,
 	stop: (options?: { timeout: number }) => Promise<void>,
-	table: (host?: string) => Array<{ settings: any, method: any, path: string }>,
+	table: (host?: string) => Array<{settings: any; method: any; path: string;}>,
 	type: 'socket' | 'tcp',
 	version: string,
 };
@@ -184,42 +165,18 @@ declare type HapiResponseObject = {
 	code: (statusCode: number) => HapiResponseObject,
 	message: (httpMessage: string) => HapiResponseObject,
 	created: (uri: string) => HapiResponseObject,
-	encoding: (
-		encoding:
-			| 'ascii'
-			| 'utf8'
-			| 'utf16le'
-			| 'ucs2'
-			| 'base64'
-			| 'latin1'
-			| 'binary'
-			| 'hex'
-	) => HapiResponseObject,
-	etag: (
-		tag: string,
-		options?: { weak: boolean, vary: boolean }
-	) => HapiResponseObject,
-	header: (
-		name: string,
-		value: string,
-		options?: HapiResponseObjectHeaderOptions
-	) => HapiResponseObject,
+	encoding: (encoding: 'ascii' | 'utf8' | 'utf16le' | 'ucs2' | 'base64' | 'latin1' | 'binary' | 'hex') => HapiResponseObject,
+	etag: (tag: string, options?: {weak: boolean, vary: boolean}) => HapiResponseObject,
+	header: (name: string, value: string, options?: HapiResponseObjectHeaderOptions) => HapiResponseObject,
 	location: (uri: string) => HapiResponseObject,
 	redirect: (uri: string) => HapiResponseObject,
 	replacer: any,
 	spaces: (count: number) => HapiResponseObject,
-	state: (
-		name: string,
-		value: Object | string,
-		options?: HapiServerStateCookieOptions
-	) => HapiResponseObject,
+	state: (name: string, value: Object | string, options?: HapiServerStateCookieOptions) => HapiResponseObject,
 	suffix: (suffix: string) => HapiResponseObject,
 	ttl: (msec: number) => HapiResponseObject,
 	type: (mimeType: string) => HapiResponseObject,
-	unstate: (
-		name: string,
-		options?: HapiServerStateCookieOptions
-	) => HapiResponseObject,
+	unstate: (name: string, options?: HapiServerStateCookieOptions) => HapiResponseObject,
 	vary: (header: string) => HapiResponseObject,
 	takeover: () => HapiResponseObject,
 	temporary: (isTemporary: boolean) => HapiResponseObject,
@@ -235,21 +192,10 @@ declare type HapiResponseToolkit = {
 	realm: any,
 	request: HapiRequest,
 	authenticated: (data: HapiAuthenticationData) => Object,
-	entity: (options?: {
-		etag?: string,
-		modified?: string,
-		vary?: boolean,
-	}) => HapiResponseObject | void,
+	entity: (options?: {etag?: string, modified?: string, vary?: boolean}) => HapiResponseObject | void,
 	redirect: (uri?: string) => HapiResponseObject,
 	response: (value?: HapiResponseValue) => HapiResponseObject,
-	state: (
-		key: string,
-		value: string | Object,
-		options?: HapiServerStateCookieOptions
-	) => HapiResponseObject,
+	state: (key: string, value: string | Object, options?: HapiServerStateCookieOptions) => HapiResponseObject,
 	unauthenticated: (error: Error, data?: HapiAuthenticationData) => void,
-	unstate: (
-		key: string,
-		options?: HapiServerStateCookieOptions
-	) => HapiResponseObject,
+	unstate: (key: string, options?: HapiServerStateCookieOptions) => HapiResponseObject,
 };
