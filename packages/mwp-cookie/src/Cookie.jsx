@@ -1,8 +1,24 @@
 // @flow
 import React from 'react';
 
-const CookieContext = React.createContext();
-export const CookieProvider = props => (
+type CookieMap = { [string]: string };
+export type CookieOpts = {
+	ttl?: number | null,
+	isSecure?: boolean,
+	isHttpOnly?: boolean,
+	isSameSite?: false | 'Strict' | 'Lax', // https://www.owasp.org/index.php/SameSite - server side only
+	path?: string | null,
+	domain?: string | null,
+};
+type ContextProps = {
+	get: (name?: string) => string | CookieMap,
+	set: (name: string, value: string, opts: CookieOpts) => void,
+};
+const CookieContext = React.createContext<ContextProps>({
+	set: () => undefined,
+	get: (name?: string) => '',
+});
+export const CookieProvider = (props: ContextProps & { children: React$Node }) => (
 	<CookieContext.Provider value={{ get: props.get, set: props.set }}>
 		{props.children}
 	</CookieContext.Provider>
@@ -25,7 +41,7 @@ const defaults = {
  * This component, when rendered, is solely responsible for triggering side effects
  * that write cookies, both on the server and on the client.
  */
-export const SetCookie = React.memo((props: SetCookieProps) => {
+const _SetCookie = (props: SetCookieProps) => {
 	const { name, children, ...options } = props;
 	Object.assign(options, defaults);
 	return (
@@ -36,11 +52,15 @@ export const SetCookie = React.memo((props: SetCookieProps) => {
 			}}
 		</CookieContext.Consumer>
 	);
-});
+};
+export const SetCookie = React.memo<typeof _SetCookie>(_SetCookie);
 
 // Simpler consumer that calls children function with the value of
 // the cookie named by props.name
-export const CookieConsumer = props => (
+export const CookieConsumer = (props: {
+	name: string,
+	children: (string | CookieMap) => React$Node,
+}) => (
 	<CookieContext.Consumer>
 		{Cookie => props.children(Cookie.get(props.name))}
 	</CookieContext.Consumer>

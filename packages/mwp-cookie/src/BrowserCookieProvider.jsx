@@ -4,6 +4,10 @@ import { CookieProvider } from './Cookie';
 import jsCookie from 'js-cookie';
 import type { CookieOptions } from 'js-cookie';
 
+type Props = {
+	children: React$Node,
+};
+
 const set = (name, value, options) => {
 	const { path, domain, isSecure, ttl, isHttpOnly } = options;
 	if (isHttpOnly) {
@@ -22,12 +26,13 @@ const set = (name, value, options) => {
 		// js-cookie treats integer `expires` as whole-day values, so we will
 		// convert the millisecond `ttl` value to `Date`, which is supported
 		// for arbitrary times.
-		options.expires = new Date(new Date().getTime() + ttl);
+		jsCookieOpts.expires = new Date(new Date().getTime() + ttl);
 	}
 
 	jsCookie.set(name, value, jsCookieOpts);
 };
-export default props => (
+
+export default (props: Props) => (
 	<CookieProvider get={jsCookie.get} set={set}>
 		{props.children}
 	</CookieProvider>
