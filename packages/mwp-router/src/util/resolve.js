@@ -18,10 +18,11 @@ export const addComponentToRoute = (route: PlatformRoute) => (
 
 // resolve the `component` property
 const resolveComponent = (route: PlatformRoute): Promise<React$ComponentType<*>> => {
-	if (route.component) {
-		return Promise.resolve(route.component);
+	if (route.getComponent) {
+		return route.getComponent();
 	}
-	return route.getComponent();
+
+	return Promise.resolve(route.component);
 };
 
 /*
