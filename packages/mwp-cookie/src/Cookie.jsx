@@ -27,9 +27,11 @@ export type CookieOpts = {
 	path?: string | null,
 	domain?: string | null,
 };
-type ContextProps = {
+type ContextValue = {
 	get: (name?: string) => string | CookieMap,
 	set: (name: string, value: string, opts: CookieOpts) => void,
+};
+type ContextProps = ContextValue & {
 	children: React$Node,
 };
 type SetCookieProps = CookieOpts & {
@@ -50,13 +52,13 @@ const OPT_DEFAULT = {
  * of the application - it should not be used directly, but is used to compose
  * other exported components in this module.
  */
-const CookieContext = React.createContext<ContextProps>({
+const CookieContext = React.createContext<ContextValue>({
 	set: () => undefined,
 	get: (name?: string) => '',
 });
 
 // The context provider - this should generally wrap the entire React application
-export const CookieProvider = (props: ContextProps & { children: React$Node }) => (
+export const CookieProvider = (props: ContextProps) => (
 	<CookieContext.Provider value={{ get: props.get, set: props.set }}>
 		{props.children}
 	</CookieContext.Provider>
