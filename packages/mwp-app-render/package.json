@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "peerDependencies": {
+    "@meetup/mwp-cookie": ">=0.0.1",
     "mwp-router": ">=0.0.1",
     "mwp-tracking-plugin": ">=0.0.1",
     "prop-types": "^15.6.0",
@@ -33,7 +34,6 @@
   },
   "dependencies": {
     "@meetup/ux-capture": "4.2.1",
-    "@meetup/mwp-cookie": ">=0.0.1",
     "browser-detect": "0.2.22",
     "escape-html": "1.0.3"
   },
