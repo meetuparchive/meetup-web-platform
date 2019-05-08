@@ -6,14 +6,23 @@ exports[`ServerApp exists 1`] = `
   context={Object {}}
   location="/foo"
 >
-  <PlatformApp
-    appContext={
+  <Component
+    h={Object {}}
+    request={
       Object {
-        "basename": "",
+        "url": "/foo",
       }
     }
-    routes={Array []}
-    store={Object {}}
-  />
+  >
+    <PlatformApp
+      appContext={
+        Object {
+          "basename": "",
+        }
+      }
+      routes={Array []}
+      store={Object {}}
+    />
+  </Component>
 </StaticRouter>
 `;

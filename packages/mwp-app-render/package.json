@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "@meetup/ux-capture": "4.2.1",
+    "@meetup/mwp-cookie": ">=0.0.1",
     "browser-detect": "0.2.22",
     "escape-html": "1.0.3"
   },
