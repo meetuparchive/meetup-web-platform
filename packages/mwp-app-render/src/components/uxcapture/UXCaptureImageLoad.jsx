@@ -33,13 +33,14 @@ export const getPropsAsHTMLAttrs = (props: React$ElementProps<'img'>): string =>
 				attribute = attribute.toLowerCase();
 			}
 
-			if (typeof props[prop] === 'boolean') {
-				return props[prop] ? attribute : '';
+			const raw = props[prop];
+			if (typeof raw === 'boolean') {
+				return raw ? attribute : '';
 			}
-			if (props[prop] === null || props[prop] === undefined) {
+			if (raw === null || raw === undefined) {
 				return attribute;
 			}
-			const value = JSON.stringify(props[prop]);
+			const value = typeof raw === 'string' ? raw : JSON.stringify(raw);
 			if (value === undefined) {
 				return '';
 			}
