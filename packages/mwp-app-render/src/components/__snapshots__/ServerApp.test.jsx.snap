@@ -6,7 +6,7 @@ exports[`ServerApp exists 1`] = `
   context={Object {}}
   location="/foo"
 >
-  <Component
+  <HapiCookieProvider
     h={Object {}}
     request={
       Object {
@@ -23,6 +23,6 @@ exports[`ServerApp exists 1`] = `
       routes={Array []}
       store={Object {}}
     />
-  </Component>
+  </HapiCookieProvider>
 </StaticRouter>
 `;
