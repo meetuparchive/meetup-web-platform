@@ -41,7 +41,7 @@ const defaults = {
  * This component, when rendered, is solely responsible for triggering side effects
  * that write cookies, both on the server and on the client.
  */
-const _SetCookie = (props: SetCookieProps) => {
+export const SetCookie = (props: SetCookieProps) => {
 	const { name, children, ...options } = props;
 	Object.assign(options, defaults);
 	return (
@@ -53,7 +53,6 @@ const _SetCookie = (props: SetCookieProps) => {
 		</CookieContext.Consumer>
 	);
 };
-export const SetCookie = React.memo<typeof _SetCookie>(_SetCookie);
 
 // Simpler consumer that calls children function with the value of
 // the cookie named by props.name
