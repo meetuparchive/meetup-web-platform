@@ -1,7 +1,7 @@
 {
-  "name": "mwp-toaster",
+  "name": "@meetup/mwp-cookie",
   "version": "0.0.1",
-  "description": "Toast UI controller for MWP apps",
+  "description": "Platform cookie-management code",
   "engineStrict": true,
   "engines": {
     "node": "^8.11.4",
@@ -10,9 +10,7 @@
   "main": "./lib/index.js",
   "scripts": {
     "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps --root-mode upward",
-    "test": "yarn run test:unit",
-    "test:unit": "NODE_ENV=test jest --config jest.config.json",
-    "test:watch": "yarn test:unit -- --watch"
+    "test": "NODE_ENV=test jest --config jest.config.json"
   },
   "repository": {
     "type": "git",
@@ -24,19 +22,14 @@
     "url": "https://github.com/meetup/meetup-web-platform/issues"
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
-  "dependencies": {},
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "js-cookie": "2.2.0"
+  },
   "devDependencies": {},
   "peerDependencies": {
-    "classnames": "^2.2.6",
-    "js-joda": "^1.8.2",
-    "meetup-web-components": ">=3",
-    "react": "^16.8.6",
-    "react-router-dom": "^5.0.0",
-    "react-transition-group": "^2.2.1",
-    "reselect": "^3.0.1",
-    "swarm-animation": "^0.0.95",
-    "swarm-constants": "2.2.122",
-    "swarm-icons": "^3.8.349",
-    "swarm-sasstools": "^5.0.412"
+    "react": "^16.8.6"
   }
 }

@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import StaticRouter from 'react-router-dom/StaticRouter';
+import HapiCookieProvider from '@meetup/mwp-cookie/lib/HapiCookieProvider';
 import PlatformApp from './shared/PlatformApp';
 
 /**
@@ -8,14 +9,20 @@ import PlatformApp from './shared/PlatformApp';
  */
 class ServerApp extends React.Component {
 	render() {
-		const { appContext, location, routerContext, store, routes } = this.props;
+		const { request, h, appContext, routerContext, store, routes } = this.props;
 		return (
 			<StaticRouter
 				basename={appContext.basename}
-				location={location}
+				location={request.url}
 				context={routerContext}
 			>
-				<PlatformApp appContext={appContext} store={store} routes={routes} />
+				<HapiCookieProvider request={request} h={h}>
+					<PlatformApp
+						appContext={appContext}
+						store={store}
+						routes={routes}
+					/>
+				</HapiCookieProvider>
 			</StaticRouter>
 		);
 	}
@@ -24,7 +31,8 @@ class ServerApp extends React.Component {
 ServerApp.propTypes = {
 	routes: PropTypes.array.isRequired,
 	store: PropTypes.object.isRequired,
-	location: PropTypes.oneOfType([PropTypes.object, PropTypes.string]).isRequired,
+	request: PropTypes.object.isRequired,
+	h: PropTypes.object.isRequired,
 	routerContext: PropTypes.object.isRequired,
 	appContext: PropTypes.object.isRequired,
 };

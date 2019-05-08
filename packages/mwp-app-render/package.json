@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "peerDependencies": {
+    "@meetup/mwp-cookie": ">=0.0.1",
     "mwp-router": ">=0.0.1",
     "mwp-tracking-plugin": ">=0.0.1",
     "prop-types": "^15.6.0",
