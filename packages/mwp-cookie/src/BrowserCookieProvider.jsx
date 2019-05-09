@@ -1,6 +1,7 @@
 // @flow
 import React from 'react';
 import { CookieProvider } from './Cookie';
+import type { ContextValue, CookieOpts } from './Cookie';
 import jsCookie from 'js-cookie';
 import type { CookieOptions } from 'js-cookie';
 
@@ -8,7 +9,11 @@ type Props = {
 	children: React$Node,
 };
 
-export const set = (name, value, options) => {
+export const set: $PropertyType<ContextValue, 'set'> = (
+	name: string,
+	value: string,
+	options: CookieOpts
+) => {
 	const { path, domain, isSecure, ttl, isHttpOnly } = options;
 	if (isHttpOnly) {
 		// httpOnly cookies are only for server - cannot be handled on client
