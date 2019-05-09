@@ -8,7 +8,7 @@ type Props = {
 	children: React$Node,
 };
 
-const set = (name, value, options) => {
+export const set = (name, value, options) => {
 	const { path, domain, isSecure, ttl, isHttpOnly } = options;
 	if (isHttpOnly) {
 		// httpOnly cookies are only for server - cannot be handled on client

@@ -148,7 +148,7 @@ generally the expected cookie behavior.
 
 ### Recipes
 
-#### Server-side-only cookie (`httpOnly`)
+#### Setting server-side-only cookie (`httpOnly`)
 
 If you don't want the client to interact with a cookie at all, pass in the
 `isHttpOnly` boolean prop.
@@ -159,7 +159,7 @@ If you don't want the client to interact with a cookie at all, pass in the
 </SetCookie>
 ```
 
-#### Client-side-only cookie
+#### Setting client-side-only cookie
 
 The `<SetCookie />` element is generally the wrong abstraction for setting cookies
 on the client, since client-side cookie setting is by definition done with
@@ -167,4 +167,4 @@ callbacks (e.g. `componentDidMount`, `onClick`) that do not need to interact
 with app rendering.
 
 We recommend using [js-cookie](https://github.com/js-cookie/js-cookie/) in these
-cases, with its `SetCooke.set()` method.
+cases, with its `Cookie.set()` method.
