@@ -27,7 +27,7 @@ export type CookieOpts = {
 	path?: string | null,
 	domain?: string | null,
 };
-type ContextValue = {
+export type ContextValue = {
 	get: (name?: string) => string | CookieMap,
 	set: (name: string, value: string, opts: CookieOpts) => void,
 };

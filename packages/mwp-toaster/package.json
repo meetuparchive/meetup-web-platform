@@ -31,7 +31,7 @@
     "js-joda": "^1.8.2",
     "meetup-web-components": ">=3",
     "react": "^16.8.6",
-    "react-router-dom": "^5.0.0",
+    "react-router-dom": "^4.2.2",
     "react-transition-group": "^2.2.1",
     "reselect": "^3.0.1",
     "swarm-animation": "^0.0.95",
