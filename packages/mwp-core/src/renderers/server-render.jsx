@@ -97,29 +97,15 @@ const getMedia = (userAgent: string, userAgentDevice: string) => {
 
 /**
  * Using the current route information and Redux store, render the app to an
- * HTML string and server response code.
- *
- * There are three parts to the render:
- *
- * 1. `appMarkup`, which corresponds to the markup that will be rendered
- * on the client by React. This string is built before the full markup because
- * it sets the data needed by other parts of the DOM, such as `<head>`.
- * 2. `htmlMarkup`, which wraps `appMarkup` with the remaining DOM markup.
- * 3. `doctype`, which is just the doctype element that is a sibling of `<html>`
- *
- * @param {Object} renderProps
- * @param {ReduxStore} store the store containing the initial state of the app
- * @return {Object} the statusCode and result used by Hapi's response API
+ * HTML string and server response code, with optional cookies to write
  */
-type RenderResult =
-	| { result: string, statusCode: number }
-	| { redirect: { url: string, permanent?: boolean } };
 
 const getRouterRenderer = ({
+	request,
+	h,
 	appContext,
 	routes,
 	store,
-	location,
 	scripts,
 	cssLinks,
 }): RenderResult => {
@@ -136,8 +122,9 @@ const getRouterRenderer = ({
 	try {
 		appMarkup = ReactDOMServer.renderToString(
 			<ServerApp
+				request={request}
+				h={h}
 				appContext={appContext}
-				location={location}
 				routerContext={routerContext}
 				store={store}
 				routes={routes}
@@ -333,10 +320,11 @@ const makeRenderer = (renderConfig: {
 							// create tracer and immediately invoke the resulting function.
 							// trace should start before rendering, finish after rendering
 							newrelic.createTracer('serverRender', getRouterRenderer)({
+								request,
+								h,
 								appContext,
 								routes: resolvedRoutes,
 								store,
-								location: request.url,
 								scripts,
 								cssLinks,
 							}) // immediately invoke callback
