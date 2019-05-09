@@ -39,7 +39,7 @@ type SetCookieProps = CookieOpts & {
 	name: string,
 };
 
-const OPT_DEFAULT = {
+export const OPT_DEFAULT = {
 	path: '/',
 	domain: '.meetup.com',
 	isSecure: true,
@@ -70,11 +70,11 @@ export const CookieProvider = (props: ContextProps) => (
  */
 export const SetCookie = (props: SetCookieProps) => {
 	const { name, children, ...options } = props;
-	Object.assign(options, OPT_DEFAULT);
+	const optsWithDefaults = Object.assign({}, OPT_DEFAULT, options);
 	return (
 		<CookieContext.Consumer>
 			{Cookie => {
-				Cookie.set(name, children || '', options);
+				Cookie.set(name, children || '', optsWithDefaults);
 				return null; // no render
 			}}
 		</CookieContext.Consumer>
