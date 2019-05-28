@@ -4,11 +4,12 @@
   "description": "Redux store management for MWP apps",
   "engineStrict": true,
   "engines": {
-    "node": ">=8.1.0"
+    "node": "^8.11.4",
+    "yarn": "^1.9.4"
   },
   "main": "./lib/index.js",
   "scripts": {
-    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps",
+    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps --root-mode upward",
     "flow": "flow",
     "lint": "eslint . --ext .js,.jsx --fix",
     "test": "yarn run test:unit",
@@ -27,8 +28,7 @@
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "peerDependencies": {
     "mwp-router": ">=0.0.1",
-    "redux": "^3.7.2",
-    "rxjs": "^5.4.3"
+    "redux": "^3.7.2"
   },
   "dependencies": {
     "js-cookie": "2.1.4",
@@ -36,7 +36,5 @@
     "mwp-tracking-plugin": ">=0.0.1",
     "rison": "0.1.1"
   },
-  "devDependencies": {
-    "mwp-test-utils": ">=0.0.1"
-  }
+  "devDependencies": {}
 }

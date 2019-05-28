@@ -12,10 +12,17 @@ import { getFindMatches, resolveAllRoutes } from 'mwp-router/lib/util';
 import { getServerCreateStore } from 'mwp-store/lib/server';
 import Dom from 'mwp-app-render/lib/components/Dom';
 import ServerApp from 'mwp-app-render/lib/components/ServerApp';
+import { parseMemberCookie } from 'mwp-core/lib/util/cookieUtils';
 
-import { getVariants } from '../util/cookieUtils';
+import {
+	getVariants,
+	parseBrowserIdCookie,
+	parseSiftSessionCookie,
+} from '../util/cookieUtils';
+import { getLaunchDarklyUser } from '../util/launchDarkly';
 
 const DOCTYPE = '<!DOCTYPE html>';
+const DUMMY_DOMAIN = 'http://mwp-dummy-domain.com';
 
 /**
  * An async module that renders the full app markup for a particular URL/location
@@ -29,13 +36,18 @@ function getHtml(el) {
 	return `${DOCTYPE}${htmlMarkup}`;
 }
 
-function getRedirect(context) {
+export function getRedirect(context: { url?: string, permanent?: boolean }) {
 	if (!context || !context.url) {
 		return;
 	}
+	// use `URL` to ensure valid character encoding (e.g. escaped emoji)
+	const url: string = context.url;
+	const isFragment = url.startsWith('/');
+	const urlToFormat = isFragment ? `${DUMMY_DOMAIN}${url}` : url;
+	const formattedUrl = new URL(urlToFormat).toString();
 	return {
 		redirect: {
-			url: encodeURI(decodeURI(context.url)), // ensure that the url is encoded for the redirect header
+			url: formattedUrl.replace(DUMMY_DOMAIN, ''),
 			permanent: context.permanent,
 		},
 	};
@@ -85,33 +97,17 @@ const getMedia = (userAgent: string, userAgentDevice: string) => {
 
 /**
  * Using the current route information and Redux store, render the app to an
- * HTML string and server response code.
- *
- * There are three parts to the render:
- *
- * 1. `appMarkup`, which corresponds to the markup that will be rendered
- * on the client by React. This string is built before the full markup because
- * it sets the data needed by other parts of the DOM, such as `<head>`.
- * 2. `htmlMarkup`, which wraps `appMarkup` with the remaining DOM markup.
- * 3. `doctype`, which is just the doctype element that is a sibling of `<html>`
- *
- * @param {Object} renderProps
- * @param {ReduxStore} store the store containing the initial state of the app
- * @return {Object} the statusCode and result used by Hapi's `reply` API
- *   {@link http://hapijs.com/api#replyerr-result}
+ * HTML string and server response code, with optional cookies to write
  */
-type RenderResult =
-	| { result: string, statusCode: number }
-	| { redirect: { url: string, permanent?: boolean } };
 
 const getRouterRenderer = ({
+	request,
+	h,
+	appContext,
 	routes,
 	store,
-	location,
-	basename,
 	scripts,
 	cssLinks,
-	userAgent,
 }): RenderResult => {
 	// pre-render the app-specific markup, this is the string of markup that will
 	// be managed by React on the client.
@@ -121,14 +117,15 @@ const getRouterRenderer = ({
 	// `<head>` contents
 	const initialState = store.getState();
 	let appMarkup;
-	const staticContext: { url?: string, permanent?: boolean } = {};
+	const routerContext: { url?: string, permanent?: boolean } = {};
 
 	try {
 		appMarkup = ReactDOMServer.renderToString(
 			<ServerApp
-				basename={basename}
-				location={location}
-				context={staticContext}
+				request={request}
+				h={h}
+				appContext={appContext}
+				routerContext={routerContext}
 				store={store}
 				routes={routes}
 			/>
@@ -143,23 +140,29 @@ const getRouterRenderer = ({
 	const sideEffects = resolveSideEffects();
 
 	const externalRedirect = getRedirect(sideEffects.redirect);
-	const internalRedirect = getRedirect(staticContext);
+	const internalRedirect = getRedirect(routerContext);
 	const redirect = internalRedirect || externalRedirect;
+
 	if (redirect) {
 		return redirect;
+	}
+
+	// cssLinks can be an Array or a Function that returns an array
+	if (typeof cssLinks === 'function') {
+		// invoke function and provide initialState
+		cssLinks = cssLinks(initialState);
 	}
 
 	// all the data for the full `<html>` element has been initialized by the app
 	// so go ahead and assemble the full response body
 	const result = getHtml(
 		<Dom
-			basename={basename}
 			head={sideEffects.head}
 			initialState={initialState}
+			appContext={appContext}
 			appMarkup={appMarkup}
 			scripts={scripts}
 			cssLinks={cssLinks}
-			userAgent={userAgent}
 		/>
 	);
 
@@ -172,123 +175,134 @@ const getRouterRenderer = ({
 	};
 };
 
-const makeRenderer$ = (renderConfig: {
-	routes: Array<Object>,
-	reducer: Reducer<MWPState, FluxStandardAction>,
-	middleware: Array<Function>,
-	scripts: Array<string>,
-	enableServiceWorker: boolean,
-	cssLinks: ?Array<string>,
-}) =>
-	makeRenderer(
-		renderConfig.routes,
-		renderConfig.reducer,
-		renderConfig.middleware,
-		renderConfig.scripts,
-		renderConfig.enableServiceWorker,
-		renderConfig.cssLinks
-	);
+// get initial server-rendered app metadata that can be consumed by the application
+// from mwp-app-render/src/components/AppContext.Consumer
+const getAppContext = (request: HapiRequest, enableServiceWorker: boolean) => {
+	const { url, headers, info, server, state } = request;
+	// request protocol and host might be different from original request that hit proxy
+	// we want to use the proxy's protocol and host
+	const requestProtocol = headers['x-forwarded-proto'] || server.info.protocol;
+	const domain: string =
+		headers['x-forwarded-host'] || headers['x-meetup-host'] || info.host;
+	const clientIp =
+		request.query.__set_geoip ||
+		headers['fastly-client-ip'] ||
+		info.remoteAddress;
+	const host = `${requestProtocol}://${domain}`;
+	const userAgent = headers['user-agent'];
+	const userAgentDevice = headers['x-ua-device'] || ''; // set by fastly
+	const requestLanguage = request.getLanguage();
+
+	return {
+		apiUrl: API_ROUTE_PATH,
+		baseUrl: host,
+		basename: requestLanguage === 'en-US' ? '' : `/${requestLanguage}`, // basename is the 'base path' for the application - usually a localeCode
+		enableServiceWorker,
+		requestLanguage,
+		supportedLangs: server.settings.app.supportedLangs,
+		initialNow: new Date().getTime(),
+		isProdApi: server.settings.app.api.isProd,
+		isQL: parseMemberCookie(state).ql === 'true',
+		memberId: parseMemberCookie(state).id, // deprecated, use member.id
+		// the member cookie is not structured the same way as the member object returned from /member/self
+		// be careful relying on it to have the same properties downstream
+		member: parseMemberCookie(state),
+		variants: getVariants(state),
+		entryPath: url.pathname, // the path that the user entered the app on
+		media: getMedia(userAgent, userAgentDevice),
+		browserId: parseBrowserIdCookie(state),
+		clientIp,
+		siftSessionId: parseSiftSessionCookie(state),
+	};
+};
 
 /**
- * Curry a function that takes a Hapi request and returns an observable
+ * Curry a function that takes a Hapi request and returns a Promise
  * that will emit the rendered HTML
  *
  * The outer function takes app-specific information about the routes,
  * reducer, and optional additional middleware
  */
-const makeRenderer = (
+const makeRenderer = (renderConfig: {
 	routes: Array<Object>,
 	reducer: Reducer<MWPState, FluxStandardAction>,
-	middleware: Array<Function> = [],
-	scripts: Array<string> = [],
+	middleware: Array<Function>,
+	scripts: Array<string>,
 	enableServiceWorker: boolean,
-	cssLinks: ?Array<string>
-) => {
+	cssLinks: ?(Array<string> | (MWPState => Array<string>)),
+}) => {
+	const {
+		routes,
+		reducer,
+		middleware,
+		scripts,
+		cssLinks,
+		enableServiceWorker,
+	} = renderConfig;
 	// set up a Promise that emits the resolved routes - this single Promise will
 	// be reused for all subsequent requests, so we're not resolving the routes repeatedly
 	// hooray performance
 	const routesPromise = resolveAllRoutes(routes);
-	return (request: HapiRequest, reply: HapiReply): Promise<RenderResult> => {
-		middleware = middleware || [];
-
+	return (request: HapiRequest, h: HapiResponseToolkit): Promise<RenderResult> => {
 		if (!scripts.length) {
 			throw new Error('No client script assets specified');
 		}
 
-		const {
-			connection,
-			headers,
-			info,
-			url,
-			server: { settings: { app: { supportedLangs } } },
-			state,
-		} = request;
-		const requestLanguage = request.getLanguage();
-		// basename is the 'base path' for the application - usually a localeCode
-		const basename = requestLanguage === 'en-US' ? '' : `/${requestLanguage}`;
-
-		// request protocol and host might be different from original request that hit proxy
-		// we want to use the proxy's protocol and host
-		const requestProtocol =
-			headers['x-forwarded-proto'] || connection.info.protocol;
-		const domain: string =
-			headers['x-forwarded-host'] || headers['x-meetup-host'] || info.host;
-		const host = `${requestProtocol}://${domain}`;
-		const userAgent = headers['user-agent'];
-		const userAgentDevice = headers['x-ua-device'] || ''; // set by fastly
+		const appContext = getAppContext(request, enableServiceWorker);
 
 		// create the store with populated `config`
 		const initializeStore = resolvedRoutes => {
-			const initialState = {
-				config: {
-					apiUrl: API_ROUTE_PATH,
-					baseUrl: host,
-					enableServiceWorker,
-					requestLanguage,
-					supportedLangs,
-					initialNow: new Date().getTime(),
-					variants: getVariants(state),
-					entryPath: url.pathname, // the path that the user entered the app on
-					media: getMedia(userAgent, userAgentDevice),
-				},
-			};
-
 			const createStore = getServerCreateStore(
-				getFindMatches(resolvedRoutes, basename),
-				middleware,
+				getFindMatches(resolvedRoutes, appContext.basename),
+				middleware || [],
 				request
 			);
+			const initialState = { config: appContext };
 			return Promise.resolve(createStore(reducer, initialState));
 		};
 
 		// otherwise render using the API and React router
-		const addFlags = store => {
-			const memberObj = (store.getState().api.self || {}).value || {};
+		// addFlags is called twice in order to ensure that
+		// there is a full member object available in state
+		// feature flags can be selected based on member id,
+		// email, and other properties.
+		// feature flags based on member id are available before the store is populated.
+		const addFlags = (populatedStore, member) => {
+			// Populate a LaunchDarklyUser object from member and request details
+			const launchDarklyUser = getLaunchDarklyUser(member, request);
 			return request.server.plugins['mwp-app-route']
-				.getFlags(memberObj)
+				.getFlags(launchDarklyUser)
 				.then(flags =>
-					store.dispatch({
+					populatedStore.dispatch({
 						type: 'UPDATE_FLAGS',
 						payload: flags,
 					})
 				);
 		};
+
 		const checkReady = state =>
 			state.preRenderChecklist.every(isReady => isReady);
 		const populateStore = store =>
 			new Promise((resolve, reject) => {
 				// dispatch SERVER_RENDER to kick off API middleware
-				store.dispatch({ type: SERVER_RENDER, payload: url });
+				store.dispatch({ type: SERVER_RENDER, payload: request.url });
 
 				if (checkReady(store.getState())) {
-					addFlags(store).then(() => {
+					// we need to use the _latest_ version of the member object
+					// which is why memberObj is defined after the checkReady call.
+					const memberObj = (store.getState().api.self || {}).value || {};
+					addFlags(store, memberObj).then(() => {
 						resolve(store);
 					});
 					return;
 				}
 				const unsubscribe = store.subscribe(() => {
 					if (checkReady(store.getState())) {
-						addFlags(store).then(() => {
+						// we need to use the _latest_ version of the member object
+						// which is why memberObj is defined after the checkReady call.
+						const memberObj =
+							(store.getState().api.self || {}).value || {};
+						addFlags(store, memberObj).then(() => {
 							resolve(store);
 							unsubscribe();
 						});
@@ -298,39 +312,26 @@ const makeRenderer = (
 
 		return routesPromise.then(resolvedRoutes =>
 			initializeStore(resolvedRoutes).then(store => {
-				if ('skeleton' in request.query) {
-					// render skeleton if requested - the store is ready
-					return {
-						result: getHtml(
-							<Dom
-								basename={basename}
-								head={Helmet.rewind()}
-								initialState={store.getState()}
-								scripts={scripts}
-								cssLinks={cssLinks}
-							/>
-						),
-						statusCode: 200,
-					};
-				}
-				return populateStore(store).then(
-					store =>
-						// create tracer and immediately invoke the resulting function.
-						// trace should start before rendering, finish after rendering
-						newrelic.createTracer('serverRender', getRouterRenderer)({
-							routes: resolvedRoutes,
-							store,
-							location: url,
-							basename,
-							scripts,
-							cssLinks,
-							userAgent,
-						}) // immediately invoke callback
-				);
+				// the initial addFlags call will only be key'd by member ID
+				return addFlags(store, { id: parseMemberCookie(request.state).id })
+					.then(() => populateStore(store))
+					.then(
+						store =>
+							// create tracer and immediately invoke the resulting function.
+							// trace should start before rendering, finish after rendering
+							newrelic.createTracer('serverRender', getRouterRenderer)({
+								request,
+								h,
+								appContext,
+								routes: resolvedRoutes,
+								store,
+								scripts,
+								cssLinks,
+							}) // immediately invoke callback
+					);
 			})
 		);
 	};
 };
 
-export { makeRenderer$, makeRenderer };
 export default makeRenderer;

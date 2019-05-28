@@ -2,39 +2,9 @@
 import avro from './util/avro';
 import { getTrackActivity, getTrackApiResponses } from './_activityTrackers';
 import { ACTIVITY_PLUGIN_NAME } from './config';
+import { getISOStringNow } from './util/trackingUtils';
 
 const YEAR_IN_MS: number = 1000 * 60 * 60 * 24 * 365;
-
-/*
- * Get a date object that is shifted by the offset of the supplied timezone
- */
-export const fakeUTCinTimezone = (timezone: string) => {
-	const formatOptions = {
-		year: 'numeric',
-		month: 'numeric',
-		day: 'numeric',
-		hour: 'numeric',
-		minute: 'numeric',
-		second: 'numeric',
-		timeZone: timezone,
-		hour12: false,
-	};
-	const formatter = new Intl.DateTimeFormat('en-US', formatOptions);
-
-	return (date: ?Date) => {
-		if (!date) {
-			date = new Date();
-		}
-		const { year, month, day, hour, minute, second } = formatter
-			.formatToParts(date)
-			.reduce((parts, part) => {
-				parts[part.type] = parseInt(part.value, 10);
-				return parts;
-			}, {});
-
-		return new Date(Date.UTC(year, month - 1, day, hour, minute, second));
-	};
-};
 
 /*
  * This plugin provides `request.track...` methods that track events related to
@@ -44,21 +14,33 @@ export const fakeUTCinTimezone = (timezone: string) => {
  * - `trackActivity`
  */
 
-export const getLogger: string => (Object, Object) => mixed = (agent: string) => {
-	// activity record wants an ISO 8601 timestamp in the New York timezone,
-	// so we have to fake a UTC date object shifted into NYC's timezone before
-	// calling `toISOString()`
-	const getTime = fakeUTCinTimezone('America/New_York');
+type ActivityPlatform = 'WEB' | 'IOS' | 'ANDROID';
+const ANDROID_APP_ID = 'com.meetup';
 
+export const getRequestPlatform = (request: HapiRequest): ActivityPlatform => {
+	const { headers, state, query = {} } = request;
+	const isNativeApp = state.isNativeApp || query.isNativeApp;
+	if (isNativeApp) {
+		// recommended test for Android WebView - not perfect but should be adequate
+		// https://stackoverflow.com/questions/24291315/android-webview-detection-in-php
+		const isAndroid = headers.http_x_requested_with === ANDROID_APP_ID;
+		return isAndroid ? 'ANDROID' : 'IOS';
+	}
+	return 'WEB';
+};
+
+export const getLogger: string => (Object, Object) => mixed = (
+	agent: string
+) => {
 	return (request: Object, trackInfo: Object) => {
-		const requestHeaders = request.headers;
+		const { headers } = request;
 
 		const record = {
-			timestamp: getTime().toISOString(),
+			timestamp: getISOStringNow(),
 			requestId: request.id,
-			ip: requestHeaders['remote-addr'] || '',
-			agent: requestHeaders['user-agent'] || '',
-			platform: 'WEB',
+			ip: headers['remote-addr'] || '',
+			agent: headers['user-agent'] || '',
+			platform: getRequestPlatform(request),
 			platformAgent: agent,
 			mobileWeb: false,
 			referer: '', // misspelled to align with schema
@@ -109,35 +91,50 @@ export function getTrackers(options: {
 /*
  * Run request-initialization routines, e.g. creating plugin data store
  */
-const onRequest = (request, reply) => {
+const onRequest = (request, h) => {
 	// initialize request.plugins[ACTIVITY_PLUGIN_NAME] to store cookie vals
 	request.plugins[ACTIVITY_PLUGIN_NAME] = {};
-	reply.continue();
+	return h.continue;
 };
 /*
  * Read from request data to prepare/modify response. Mainly looking for new
  * tracking cookies that need to be set using request.response.state.
  */
-const getOnPreResponse = cookieConfig => (request, reply) => {
-	const { browserIdCookieName, trackIdCookieName } = cookieConfig;
-	const pluginData = request.plugins[ACTIVITY_PLUGIN_NAME];
-	const browserId = pluginData.browserIdCookieName;
-	const trackId = pluginData.trackIdCookieName;
 
-	const FOREVER: CookieOpts = {
+type CookieOpts = {
+	browserIdCookieName: string,
+	memberCookieName: string,
+	trackIdCookieName: string,
+	domain: string,
+};
+export const getOnPreResponse = (cookieConfig: CookieOpts) => (
+	request: HapiRequest,
+	h: HapiResponseToolkit
+) => {
+	const { browserIdCookieName, trackIdCookieName, domain } = cookieConfig;
+	const pluginData = request.plugins[ACTIVITY_PLUGIN_NAME];
+	const browserId = pluginData[browserIdCookieName];
+	const trackId = pluginData[trackIdCookieName];
+
+	const FOREVER: HapiServerStateCookieOptions = {
+		domain,
 		encoding: 'none',
 		path: '/',
 		isHttpOnly: true,
 		ttl: YEAR_IN_MS * 20,
+		strictHeader: false, // skip strict cookie format validation (no quotes)
 	};
 
-	if (browserId) {
-		request.response.state(browserIdCookieName, browserId, FOREVER);
+	if (!request.response.isBoom) {
+		if (browserId) {
+			h.state(browserIdCookieName, browserId, FOREVER);
+		}
+		if (trackId) {
+			h.state(trackIdCookieName, trackId, FOREVER);
+		}
 	}
-	if (trackId) {
-		request.response.state(trackIdCookieName, trackId, FOREVER);
-	}
-	reply.continue();
+
+	return h.continue;
 };
 
 /*
@@ -145,18 +142,21 @@ const getOnPreResponse = cookieConfig => (request, reply) => {
  * all tracking functions returned from `getTrackers`, as well as assign request
  * lifecycle event handlers that can affect the response, e.g. by setting cookies
  */
-export default function register(
+export function register(
 	server: Object,
-	options: { agent: string, isProd: boolean },
-	next: () => void
+	options: { agent: string, isProdApi: boolean }
 ) {
-	const { agent, isProd } = options;
+	const { agent, isProdApi } = options;
 
-	const trackIdCookieName: string = isProd ? 'MEETUP_TRACK' : 'MEETUP_TRACK_DEV';
-	const browserIdCookieName: string = isProd
+	const trackIdCookieName: string = isProdApi
+		? 'MEETUP_TRACK'
+		: 'MEETUP_TRACK_DEV';
+	const browserIdCookieName: string = isProdApi
 		? 'MEETUP_BROWSER_ID'
 		: 'MEETUP_BROWSER_ID_DEV';
-	const memberCookieName: string = isProd ? 'MEETUP_MEMBER' : 'MEETUP_MEMBER_DEV';
+	const memberCookieName: string = isProdApi
+		? 'MEETUP_MEMBER'
+		: 'MEETUP_MEMBER_DEV';
 
 	const trackers: { [string]: Tracker } = getTrackers({
 		agent,
@@ -178,13 +178,13 @@ export default function register(
 			browserIdCookieName,
 			memberCookieName,
 			trackIdCookieName,
+			domain: isProdApi ? '.meetup.com' : '.dev.meetup.com',
 		})
 	);
-
-	next();
 }
 
-register.attributes = {
+export const plugin = {
+	register,
 	name: ACTIVITY_PLUGIN_NAME,
 	version: '1.0.0',
 };

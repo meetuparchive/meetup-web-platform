@@ -25,21 +25,37 @@ class PageWrap extends React.Component {
 	}
 
 	componentDidMount() {
-		// Browser has now rendered client-side application - fire the browser TTI trigger
-		if (window.newrelic) {
-			const now = new Date().getTime();
-			// 1. Set a marker in the trace details
+		// Browser has now rendered client-side application - fire the browser TTI triggers
+
+		// Fire TTI trigger to be sent to NewRelic
+		if (window.performance && window.newrelic) {
+			// window.performance.now is a high resolution timer
+			const now = window.performance.now();
+
+			// Set a marker in the trace details
 			window.newrelic.addToTrace({
 				name: 'appInteractive',
-				start: now,
+				start: window.performance.timing.navigationStart + now,
 				type: 'Browser app has rendered and is interactive',
 			});
-			// 2. Add a custom attribute to the PageView & BrowserInteraction events in Insights
+
+			// Add a custom attribute to the PageView & BrowserInteraction events in Insights
+			window.newrelic.setCustomAttribute('timeToAppInteractive', now);
+		}
+
+		// Add W3C UserTiming mark for TTI and measure (from navigationStart to newly created mark)
+		if (
 			window.performance &&
-				window.newrelic.setCustomAttribute(
-					'timeToAppInteractive',
-					now - window.performance.timing.navigationStart // this is the event that NR uses as 'start' of page load
-				);
+			window.performance.mark &&
+			window.performance.measure
+		) {
+			window.performance.mark('meetup-tti');
+			window.performance.measure('meetup-tti', 'navigationStart', 'meetup-tti');
+		}
+
+		// Specially for Developer Tools in the browsers (Chrome & Firefox), create entry for the event so it shows up on Performance timeline
+		if (console && console.timeStamp) {
+			console.timeStamp('meetup-tti');
 		}
 	}
 

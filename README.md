@@ -24,8 +24,9 @@ In general, application-specific code will live outside of this package.
 - [Click and Activity tracking](packages/mwp-tracking-plugin/README.md)
 - [API State module](packages/mwp-api-state/README.md)
   - ['Query': structuring data requests](packages/mwp-api-state/Queries.md) -
-	  GET/POST/PATCH/DELETE requests to REST API
+	  GET/POST/PATCH/PUT/DELETE requests to REST API
 - [Redux store modules](packages/mwp-store/README.md) - browser and server
+- [Security Policy headers](packages/mwp-csp-plugin/README.md)
 
 # Releases
 

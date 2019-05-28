@@ -42,7 +42,7 @@ Note that we do not currently have a unique place to store tracking data from
 dev, so any tracking data that you produce will be merged into production
 tracking data. For small amounts of data, this shouldn't significantly affect
 analytics.
- 
+
 ## Activity tracking
 
 Activity tracking is provided by a `request.trackActivity` method, which has two
@@ -51,13 +51,44 @@ responsibilities:
 1. Manage tracking IDs that are passed into the request through cookies
 2. Log the formatted, encoded tracking ID state of the request to `stdout`
 
+### Route config
+
+If a particular route needs to handle activity tracking parameters in unique ways,
+it can supply a plugin config object containing a `getFields(request, fields)`
+property. This function will be called with the Hapi request object and any
+custom field values passed to `request.trackActivity`. It must return an object
+that, at a minimum, contains the a `url` parameter for the Activity record.
+
+Example that simply returns the `request.url.path` for the `url` param:
+
+```js
+import { ACTIVITY_PLUGIN_NAME } from 'mwp-tracking-plugin/lib/config';
+
+const route = {
+	path: '/foo',
+	handler: () => 'Hello world',
+	options: {
+		plugins: {
+			[ACTIVITY_PLUGIN_NAME]: {
+				getFields: (request, fields) => ({
+					url: request.url.path,
+				})
+			}
+		}
+	}
+}
+```
+
+		}
+
+
+}
 ## Click tracking
 
-Click tracking consists of 3 related modules:
+Click tracking consists of 4 related modules:
 
-1. `clickWriter` for writing the click `Event` data to a Redux action.
-2. `clickState` for defining Redux click actions and reducing those actions into
-   Redux state, and writing click tracking data into a cookie.
+1. `clickParser` for converting a DOM click or change event into a click record
+2. `clickState` for connecting click records to a cookie 'history'.
 3. `clickReader` for reading the click tracking data cookie on the server.
 
 Ultimately, the only 'fixed' requirements are that the click tracking data must
@@ -67,24 +98,34 @@ with parallel behavior implemented in Meetup Classic.
 
 ### Behavior
 
-The platform currently adds `click` _and_ `change` listeners when creating the
-Redux store for the browser - this is done on application setup and is
-guaranteed not to run on the server. Each `click` and `change` event is sent
-to `clickWriter`, which dispatches a Redux `CLICK_TRACK` action.
+`browserInit` can be called by a client application whenever it is ready to start
+listening for clicks (usually in `componentDidMount` in the application wrapper
+component). The platform does the rest. The init code attaches `click` _and_
+`change` listeners to the `<body>`. Each `click` and `change` event is converted
+to a click record and stored in a cookie that will be sent to the server on the
+next HTTP request.
 
-The click reducer is built into the platform reducer, and will store
-click tracking data for the lifetime of the session, or until it is cleared with
-a particular click 'clear' Redux action.
+Server routes must opt-in to consuming the click cookie using `route.options.plugins['mwp-tracking-plugin']`,
+which should define an object with a `click` property defining a function that
+accepts the `request` as an argument and returns `true` when the click cookie
+should be read (e.g. based on querystring parameters or other header info).
 
-When the user navigates to a new page, the generated API request will read the
-click tracking data from state, clear the click tracking state, and then set the
-click tracking cookie. The cookie value will be sent with the API request, read
-by the server, and then the server will force-clear the cookie.
+Example:
 
-### Leakage
+```js
+const route = {
+	method: 'GET',
+	path: '/foo',
+	config: {
+		plugins: {
+			'mwp-tracking-plugin': {
+				// only track clicks when `?trackClicks=true` in querystring
+				click: request => Boolean(request.query.trackClicks),
+			},
+		},
+	},
+};
+```
 
-Because click data only gets sent to the server when a user navigates to another
-location within the application, there is a possibility of losing data when a
-user navigates to another site, or even back to Meetup Classic, because a
-'location change' action will not be dispatched and the Redux store will be
-destroyed upon navigation.
+The click plugin will 'unset' the click tracking cookie when the data has been
+consumed.

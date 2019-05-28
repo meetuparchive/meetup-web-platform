@@ -2,22 +2,22 @@
 const log = require('mwp-logger-plugin').logger;
 const avro = require('avsc');
 
+const canUsePubSub =
+	process.env.GAE_INSTANCE || process.env.GOOGLE_APPLICATION_CREDENTIALS;
+
 /*
  * There are currently 2 distinct analytics logging methods
- * 1. `stdout`, which will be consumed automatically from apps running in
- *    Google Container Engine
- * 2. Google Pub/Sub, which is used from inside Google App Engine
- *
- * The Pub/Sub setup _only_ works when the environment is configured to
- * automatically authorize Pub/Sub messages, so we use an `isGAE` env variable
- * to determine whether the app is running in GAE.
+ * 1. `stdout`: used in dev and compatible with https://github.com/meetup/blt-fluentd
+ *    in k8s-based applications in GCP
+ * 2. Google Pub/Sub, which is used in GAE and any environment with GOOGLE_APPLICATION_CREDENTIALS
+ *    environment variable set to point toward Google JSON client credentials file
  *
  * @see https://meetup.atlassian.net/wiki/display/MUP/Analytics+Logging#AnalyticsLogging-Theinputmechanism
  */
 const getPlatformAnalyticsLog = (
-	isGAE: ?string = process.env.GAE_INSTANCE
+	usePubSub: ?string = canUsePubSub
 ): (string => void) => {
-	if (isGAE) {
+	if (usePubSub) {
 		const pubsub = require('@google-cloud/pubsub')({
 			projectId: 'meetup-prod',
 		});
@@ -28,6 +28,8 @@ const getPlatformAnalyticsLog = (
 				.catch(err => log.error(err));
 		};
 	}
+
+	// stdout log - can be used with https://github.com/meetup/blt-fluentd or generic environment
 	return (serializedRecord: string) => {
 		process.stdout.write(`analytics=${serializedRecord}\n`);
 	};
@@ -57,24 +59,24 @@ const click = {
 };
 
 // currently the schema is manually copied from
-// https://github.com/meetup/meetup/blob/master/modules/base/src/main/versioned_avro/Activity_v6.avsc
+// https://github.com/meetup/meetup/blob/master/modules/base/src/main/versioned_avro/Activity_v8.avsc
 const activity = {
 	namespace: 'com.meetup.base.avro',
 	type: 'record',
 	name: 'Activity',
-	doc: 'v6',
+	doc: 'v9',
 	fields: [
 		{ name: 'requestId', type: 'string' },
 		{ name: 'timestamp', type: 'string' },
 		{ name: 'url', type: 'string' },
-		{ name: 'aggregratedUrl', type: 'string', default: '' }, // it's misspelled in the original spec
+		{ name: 'aggregratedUrl', type: 'string', default: '' },
 		{ name: 'ip', type: 'string', default: '' },
 		{ name: 'agent', type: 'string', default: '' },
 		{ name: 'memberId', type: 'int' },
 		{ name: 'trackId', type: 'string' },
 		{ name: 'mobileWeb', type: 'boolean' },
 		{ name: 'platform', type: 'string' },
-		{ name: 'referer', type: 'string' }, // it's misspelled in the original spec
+		{ name: 'referer', type: 'string' },
 		{ name: 'trax', type: { type: 'map', values: 'string' } },
 		{
 			name: 'platformAgent',
@@ -95,6 +97,13 @@ const activity = {
 		},
 		{ name: 'isUserActivity', type: 'boolean', default: true },
 		{ name: 'browserId', type: 'string', default: '' },
+		{ name: 'parentRequestId', type: ['null', 'string'], default: null },
+		{ name: 'oauthConsumerId', type: ['null', 'int'], default: null },
+		{ name: 'apiVersion', type: ['null', 'string'], default: null },
+		{ name: 'viewName', type: ['null', 'string'], default: null },
+		{ name: 'subViewName', type: ['null', 'string'], default: null },
+		{ name: 'standardized_url', type: ['null', 'string'], default: null },
+		{ name: 'standardized_referer', type: ['null', 'string'], default: null },
 	],
 };
 
@@ -134,7 +143,9 @@ const logger = (serializer: Serializer, deserializer: Deserializer) => (
 	const serializedRecord = serializer(record);
 	const deserializedRecord = deserializer(serializedRecord);
 	analyticsLog(serializedRecord);
-	debugLog(deserializedRecord);
+	if (process.argv.includes('--debug')) {
+		debugLog(deserializedRecord);
+	}
 };
 
 const schemas = {

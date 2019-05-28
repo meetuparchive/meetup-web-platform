@@ -4,11 +4,12 @@
   "description": "Hapi plugin for serving a service worker script",
   "engineStrict": true,
   "engines": {
-    "node": ">=8.1.0"
+    "node": "^8.11.4",
+    "yarn": "^1.9.4"
   },
   "main": "./lib/index.js",
   "scripts": {
-    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps",
+    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps --root-mode upward",
     "flow": "flow",
     "lint": "eslint . --ext .js,.jsx --fix",
     "test": "yarn run test:unit",
@@ -30,6 +31,6 @@
   },
   "devDependencies": {},
   "peerDependencies": {
-    "inert": "4.2.1"
+    "inert": "5.1.0"
   }
 }

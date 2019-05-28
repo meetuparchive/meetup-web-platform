@@ -1,37 +1,58 @@
 import Inert from 'inert';
-import CsrfPlugin from 'electrode-csrf-jwt';
+import CsrfPlugin from 'electrode-csrf-jwt/lib/csrf-hapi17';
 
 import config from 'mwp-config';
-import loggerPlugin from 'mwp-logger-plugin';
-import appRoutePlugin from 'mwp-app-route-plugin';
-import requestAuthPlugin from 'mwp-auth-plugin';
-import activityPlugin from 'mwp-tracking-plugin/lib/activity';
-import clickPlugin from 'mwp-tracking-plugin/lib/click';
-import languagePlugin from 'mwp-language-plugin';
-import serviceWorkerPlugin from 'mwp-sw-plugin';
-import apiProxyPlugin from 'mwp-api-proxy-plugin';
+import { plugin as loggerPlugin } from 'mwp-logger-plugin';
+import { plugin as appRoutePlugin } from 'mwp-app-route-plugin';
+import { plugin as activityPlugin } from 'mwp-tracking-plugin/lib/activity';
+import { plugin as clickPlugin } from 'mwp-tracking-plugin/lib/click';
+import { plugin as languagePlugin } from 'mwp-language-plugin';
+import { plugin as serviceWorkerPlugin } from 'mwp-sw-plugin';
+import { plugin as apiProxyPlugin } from 'mwp-api-proxy-plugin';
+import { plugin as requestAuthPlugin } from 'mwp-auth-plugin';
+import { plugin as cspPlugin } from 'mwp-csp-plugin';
+import { plugin as raspPlugin } from 'mwp-rasp-plugin';
+
+// single quotes are required around these keywords
+const CSP_KEYWORDS = {
+	self: "'self'",
+	unsafeInline: "'unsafe-inline'",
+	unsafeEval: "'unsafe-eval'",
+};
 
 /**
  * Hapi plugins for the dev server
  *
  * @module ServerPlugins
  */
+const CSRF_COOKIE_NAME =
+	process.env.NODE_ENV === 'production' ? 'x-mwp-csrf' : 'x-mwp-csrf_dev';
+const CSRF_HEADER_COOKIE_NAME = `${CSRF_COOKIE_NAME}-header`;
+const CSRF_HEADER_NAME = CSRF_COOKIE_NAME;
 
-export function setCsrfCookies(request, reply) {
-	const csrfHeader = (request.response.headers || {})['x-csrf-jwt'];
+// Sets the csrf header token from plugin into a cookie
+export function setCsrfCookies(request, h) {
+	const csrfHeader = (request.response.headers || {})[CSRF_COOKIE_NAME];
 	if (csrfHeader) {
-		reply.state('x-csrf-jwt-header', csrfHeader);
+		h.state(CSRF_HEADER_COOKIE_NAME, csrfHeader);
 	}
-	return reply.continue();
+	return h.continue;
 }
 
 /**
- * The CSRF plugin we use - 'electrode-csrf-jwt' compares a cookie token to a
- * header token in non-GET requests. By default, it will set the cookie token
- * itself ('x-csrf-jwt'), and supply the corresponding header token in a custom
- * header (also 'x-csrf-jwt'). However, we update this flow to also supply the
- * header token as a cookie ('x-csrf-jwt-header') so that it syncs across
- * browser tabs.
+ * The CSRF plugin we use, 'electrode-csrf-jwt', generates a token for each request
+ * that we make and sets the token in an HTTP-only cookie (CSRF_COOKIE_NAME) and in
+ * the HTTP response header (also CSRF_COOKIE_NAME). In non-GET requests we must supply
+ * the latest generated token from the response header as an HTTP request header - the
+ * plugin will compare the cookie token and the request header token and return a
+ * BAD_TOKEN error if they do not match.
+ *
+ * We updated this flow to set the token from the response header as a cookie
+ * (CSRF_COOKIE_NAME-header) and use the cookie value to set the request header
+ * so that it syncs across browser tabs.
+ *
+ * We set similar but different cookie names for dev and prod environments so the prod
+ * cookies are not read in the dev environment.
  *
  * In order to ensure that both cookie values have parallel settings, this
  * function calls `server.state` for both cookie names before registering the
@@ -39,110 +60,126 @@ export function setCsrfCookies(request, reply) {
  *
  * @return {Object} the { register } object for a `server.register` call.
  */
-export function getCsrfPlugin() {
-	const register = (server, options, next) => {
+export function getCsrfPlugin(electrodeOptions) {
+	const register = (server, options) => {
+		const { isProd } = server.settings.app;
+
 		const cookieOptions = {
 			path: '/',
-			isSecure: server.settings.app.isProd,
+			isSecure: isProd, // No need to worry about https in dev
+			isSameSite: false, // Firefox will not read SameSite cookies set on redirect (e.g. from email link), so we disable that setting
+			domain: isProd ? '.meetup.com' : '.dev.meetup.com', // target the current app server domain
 		};
 
-		options.secret = server.settings.app.csrf_secret;
+		Object.assign(
+			options,
+			{ secret: server.settings.app.csrf_secret },
+			electrodeOptions
+		);
 
 		server.state(
-			'x-csrf-jwt', // set by plugin
+			CSRF_COOKIE_NAME, // set by plugin
 			{ ...cookieOptions, isHttpOnly: true } // no client-side interaction needed
 		);
 
 		server.state(
-			'x-csrf-jwt-header', // set by onPreResponse
+			CSRF_HEADER_COOKIE_NAME, // set by onPreResponse
 			{ ...cookieOptions, isHttpOnly: false } // the client must read this cookie and return as a custom header
 		);
 
-		const registration = CsrfPlugin.register(server, options, next);
+		const registration = CsrfPlugin.register(server, options);
 		server.ext('onPreResponse', setCsrfCookies); // this extension must be registered _after_ plugin is registered
 
 		return registration;
 	};
 
-	register.attributes = CsrfPlugin.register.attributes;
-
 	return {
-		register,
+		plugin: {
+			register,
+			pkg: CsrfPlugin.pkg,
+		},
+	};
+}
+
+export function getCspPlugin(options) {
+	return {
+		plugin: cspPlugin,
+		options,
+	};
+}
+
+export function getRaspPlugin(options) {
+	return {
+		plugin: raspPlugin,
+		options,
 	};
 }
 
 export function getAppRoutePlugin(options) {
 	return {
-		register: appRoutePlugin,
+		plugin: appRoutePlugin,
 		options,
 	};
 }
-/**
- * configure and return the plugin that
- * allows requests to get anonymous oauth tokens
- * to communicate with the API
- */
-export function getRequestAuthPlugin() {
-	return {
-		register: requestAuthPlugin,
-	};
-}
 
-export function getLogger(
+export function getLoggerPlugin(
 	options = { logEvents: ['onPostStart', 'onPostStop', 'response'] }
 ) {
 	return {
-		register: loggerPlugin,
+		plugin: loggerPlugin,
 		options,
 	};
 }
 
-export function getActivityTrackingPlugin({ agent, isProd }) {
+export function getActivityTrackingPlugin({ agent, isProdApi }) {
 	return {
-		register: activityPlugin,
+		plugin: activityPlugin,
 		options: {
 			agent,
-			isProd,
+			isProdApi,
 		},
 	};
 }
 
-export function getClickTrackingPlugin() {
-	return {
-		register: clickPlugin,
-	};
-}
-
-function getServiceWorkerPlugin() {
-	return {
-		register: serviceWorkerPlugin,
-	};
-}
-
-export function getApiProxyPlugin() {
-	return {
-		register: apiProxyPlugin,
-	};
-}
-
-function getLanguagePlugin() {
-	return {
-		register: languagePlugin,
-	};
-}
-
 export default function getPlugins({ languageRenderers }) {
-	const { package: { agent }, env: { properties: { isProd } } } = config;
+	const {
+		package: { agent },
+		getServer,
+		env: { schema: { asset_server } },
+	} = config;
+	const server = getServer();
+	const isProdApi = server.properties.api.isProd;
+
 	return [
 		getAppRoutePlugin({ languageRenderers }),
-		getApiProxyPlugin(),
-		getLanguagePlugin(),
-		getLogger(),
-		getCsrfPlugin(),
-		getRequestAuthPlugin(),
-		getActivityTrackingPlugin({ agent, isProd }),
-		getClickTrackingPlugin(),
-		getServiceWorkerPlugin(),
+		apiProxyPlugin,
+		languagePlugin,
+		getLoggerPlugin(),
+		getCsrfPlugin({
+			headerName: CSRF_HEADER_NAME,
+			cookieName: CSRF_COOKIE_NAME,
+		}),
+		getCspPlugin({
+			defaultSrc: [
+				CSP_KEYWORDS.self,
+				'*.meetup.com',
+				`*.dev.meetup.com:${asset_server.port.default}`,
+			].join(' '),
+			connectSrc: '*',
+			frameSrc: '*',
+			fontSrc: '* data:',
+			imgSrc: '* data: blob:',
+			styleSrc: ['*', CSP_KEYWORDS.unsafeInline].join(' '),
+			scriptSrc: ['*', CSP_KEYWORDS.unsafeEval, CSP_KEYWORDS.unsafeInline].join(
+				' '
+			),
+			generateNonces: 'false',
+		}),
+		getRaspPlugin(),
+		requestAuthPlugin,
+		getActivityTrackingPlugin({ agent, isProdApi }),
+		clickPlugin,
+		serviceWorkerPlugin,
 		Inert,
 	];
 }

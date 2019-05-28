@@ -8,38 +8,42 @@ const LAUNCH_DARKLY_SDK_KEY = 'sdk-86b4c7a9-a450-4527-a572-c80a603a200f';
  * The server app route plugin - this applies a wildcard catch-all route that
  * will call the server app rendering function for the correct request language.
  */
-export default function register(
+export function register(
 	server: HapiServer,
 	options: {
 		languageRenderers: { [string]: LanguageRenderer },
 		ldkey?: string,
-	},
-	next: () => void
-) {
+	}
+): Promise<any> {
 	server.route(getRoute(options.languageRenderers));
 
 	const ldClient = LaunchDarkly.init(options.ldkey || LAUNCH_DARKLY_SDK_KEY, {
 		offline: process.env.NODE_ENV === 'test',
 	});
-	server.expose('getFlags', memberObj => {
-		const key = (memberObj && memberObj.id) || 0;
-		return ldClient.all_flags({ ...memberObj, key, anonymous: key === 0 }).then(
+	server.expose('getFlags', (user: LaunchDarklyUser) => {
+		return ldClient.allFlags(user).then(
 			flags => flags,
 			err => {
 				server.app.logger.error({
 					err,
-					member: memberObj,
+					member: user,
 				});
 				return {}; // return empty flags on error
 			}
 		);
 	});
 	// set up launchdarkly instance before continuing
-	server.on('stop', ldClient.close);
-	ldClient.once(`ready`, () => next());
+	server.events.on('stop', ldClient.close);
+
+	// https://github.com/launchdarkly/node-client/issues/96
+	// use waitForInitialization to catch launch darkly failures
+	return ldClient.waitForInitialization().catch(error => {
+		console.error(error);
+	});
 }
 
-register.attributes = {
+export const plugin = {
+	register,
 	name: 'mwp-app-route',
 	version: '1.0.0',
 	dependencies: [

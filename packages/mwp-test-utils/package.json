@@ -4,11 +4,12 @@
   "description": "Helpers for running unit tests in MWP apps",
   "engineStrict": true,
   "engines": {
-    "node": ">=8.1.0"
+    "node": "^8.11.4",
+    "yarn": "^1.9.4"
   },
   "main": "./lib/index.js",
   "scripts": {
-    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps",
+    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps --root-mode upward",
     "flow": "flow",
     "lint": "eslint . --ext .js,.jsx --fix",
     "test": "yarn run test:unit",
@@ -29,16 +30,17 @@
     "mwp-router": ">=0.0.1"
   },
   "dependencies": {
-    "electrode-csrf-jwt": "1.2.1",
-    "hapi": "16.5.2",
-    "inert": "4.2.1",
-    "meetup-web-mocks": "1.0.217",
+    "electrode-csrf-jwt": "git+https://github.com/meetup/electrode-csrf-jwt.git#793431729d8fb4ee315f28709f323f198b25d460",
+    "hapi": "17.8.1",
+    "inert": "5.1.0",
+    "meetup-web-mocks": "1.0.262",
     "mwp-core": ">=0.0.1",
     "mwp-logger-plugin": ">=0.0.1",
+    "mwp-router": ">=0.0.1",
     "mwp-store": ">=0.0.1",
     "react-helmet": "5.2.0",
     "redux": "3.7.2",
-    "tough-cookie": "2.3.2"
+    "tough-cookie": "2.3.3"
   },
   "devDependencies": {}
 }

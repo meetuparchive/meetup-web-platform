@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import Helmet from 'react-helmet';
 
@@ -26,20 +26,20 @@ import Helmet from 'react-helmet';
 const StyleWith = props => {
 	const { styles, children } = props;
 
-	const moduleCSS = new Set();
+	const moduleCSS = [];
 	styles.forEach(style => {
-		moduleCSS.add(style._getCss()); // eslint-disable-line no-underscore-dangle
+		moduleCSS.push(style._getCss()); // eslint-disable-line no-underscore-dangle
 	});
 
 	return (
-		<div>
+		<Fragment>
 			<Helmet defer={false}>
 				<style type="text/css">
-					{[...moduleCSS].join('')}
+					{moduleCSS.join('')}
 				</style>
 			</Helmet>
 			{children}
-		</div>
+		</Fragment>
 	);
 };
 StyleWith.propTypes = {

@@ -4,11 +4,12 @@
   "description": "MWP application rendering tools",
   "engineStrict": true,
   "engines": {
-    "node": ">=8.1.0"
+    "node": "^8.11.4",
+    "yarn": "^1.9.4"
   },
   "main": "./lib/index.js",
   "scripts": {
-    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps"
+    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps --root-mode upward"
   },
   "repository": {
     "type": "git",
@@ -21,15 +22,18 @@
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "peerDependencies": {
+    "@meetup/mwp-cookie": ">=0.0.1",
     "mwp-router": ">=0.0.1",
+    "mwp-tracking-plugin": ">=0.0.1",
     "prop-types": "^15.6.0",
-    "react": "^16.3.1",
+    "react": "^16.8.6",
     "react-helmet": "^5.2.0",
     "react-redux": "^5.0.6",
     "react-router-dom": "^4.2.2",
     "redux": "^3.7.2"
   },
   "dependencies": {
+    "@meetup/ux-capture": "4.2.1",
     "browser-detect": "0.2.22",
     "escape-html": "1.0.3"
   },

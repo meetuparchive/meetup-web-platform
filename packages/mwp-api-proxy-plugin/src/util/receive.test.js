@@ -22,14 +22,15 @@ jest.mock('mwp-logger-plugin', () => {
 	};
 });
 
-describe('makeInjectResponseCookies', () => {
+describe('makeInjectResponseCookies', async () => {
+	const server = await getServer();
 	const request = {
 		plugins: {
 			[API_PROXY_PLUGIN_NAME]: {
 				setState() {},
 			},
 		},
-		server: getServer(),
+		server,
 	};
 	const responseObj = {
 		request: {
@@ -49,7 +50,7 @@ describe('makeInjectResponseCookies', () => {
 		makeInjectResponseCookies(request)([response, null, null]);
 		expect(response.toJSON).not.toHaveBeenCalled();
 	});
-	it('sets the provided cookies on the reply state', () => {
+	it('sets the provided cookies on the response state', () => {
 		const mockJar = externalRequest.jar();
 		spyOn(request.plugins[API_PROXY_PLUGIN_NAME], 'setState');
 
@@ -59,7 +60,9 @@ describe('makeInjectResponseCookies', () => {
 		mockJar.setCookie(`${key}=${value}`, responseObj.request.uri.href);
 
 		makeInjectResponseCookies(request)([response, null, mockJar]);
-		expect(request.plugins[API_PROXY_PLUGIN_NAME].setState).toHaveBeenCalledWith(
+		expect(
+			request.plugins[API_PROXY_PLUGIN_NAME].setState
+		).toHaveBeenCalledWith(
 			key,
 			value,
 			jasmine.any(Object) // don't actually care about the cookie options
@@ -136,10 +139,10 @@ describe('parseApiValue', () => {
 		);
 	});
 	it('returns a value without any JS-literal unfriendly newline characters', () => {
-		const fragileValue = 'foo \\u2028 \\u2029';
+		const fragileValue = 'foo \u2028 \u2029';
 		const fragileJSON = JSON.stringify({ foo: fragileValue });
 		const parsed = parseApiValue([MOCK_RESPONSE, fragileJSON]).value.foo;
-		expect(parsed).toEqual('foo \\n \\n');
+		expect(parsed).toEqual('foo \n \n');
 	});
 });
 
@@ -251,7 +254,6 @@ describe('makeApiResponseToQueryResponse', () => {
 });
 
 describe('makeLogResponse', () => {
-	const request = { server: getServer() };
 	const MOCK_INCOMINGMESSAGE_GET = {
 		elapsedTime: 1234,
 		request: {
@@ -266,6 +268,16 @@ describe('makeLogResponse', () => {
 			uri: {},
 		},
 	};
+
+	let server, request, botRequest;
+	beforeAll(async () => {
+		server = await getServer();
+		request = { server, headers: {} };
+		botRequest = {
+			...request,
+			headers: { ...request.headers, 'user-agent': 'bot' },
+		};
+	});
 	it('emits parsed request and response data for GET request', () => {
 		MOCK_LOGGER.info.mockClear();
 		makeLogResponse(request)([MOCK_INCOMINGMESSAGE_GET, 'foo']);
@@ -286,6 +298,17 @@ describe('makeLogResponse', () => {
 		MOCK_LOGGER.error.mockClear();
 		makeLogResponse(request)([responseErr, body]);
 		expect(MOCK_LOGGER.error).toHaveBeenCalled();
+	});
+	it('does _not_ log error from a bot request user agent', () => {
+		const body = 'foo';
+		const responseErr = { ...MOCK_INCOMINGMESSAGE_GET, statusCode: 500 };
+		MOCK_LOGGER.error.mockClear();
+		MOCK_LOGGER.info.mockClear();
+		MOCK_LOGGER.warn.mockClear();
+		makeLogResponse(botRequest)([responseErr, body]);
+		expect(MOCK_LOGGER.error).not.toHaveBeenCalled();
+		expect(MOCK_LOGGER.info).not.toHaveBeenCalled();
+		expect(MOCK_LOGGER.warn).not.toHaveBeenCalled();
 	});
 	it('logs html <title> content on HTML error', () => {
 		const title = 'Doom doom ruin';

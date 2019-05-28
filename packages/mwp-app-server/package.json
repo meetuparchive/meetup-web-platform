@@ -4,11 +4,12 @@
   "description": "Hapi server startup module for MWP applications",
   "engineStrict": true,
   "engines": {
-    "node": ">=8.1.0"
+    "node": "^8.11.4",
+    "yarn": "^1.9.4"
   },
   "main": "./lib/index.js",
   "scripts": {
-    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps",
+    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps --root-mode upward",
     "flow": "flow",
     "lint": "eslint . --ext .js,.jsx --fix",
     "test": "yarn run test:unit",
@@ -27,23 +28,24 @@
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "dependencies": {
     "convict": "4.0.1",
-    "electrode-csrf-jwt": "1.2.1",
-    "hapi": "16.5.2",
-    "inert": "4.2.1",
+    "electrode-csrf-jwt": "git+https://github.com/meetup/electrode-csrf-jwt.git#793431729d8fb4ee315f28709f323f198b25d460",
+    "hapi": "17.8.1",
+    "inert": "5.1.0",
     "mwp-api-proxy-plugin": ">=0.0.1",
     "mwp-app-route-plugin": ">=0.0.1",
     "mwp-auth-plugin": ">=0.0.1",
-    "mwp-core": ">=0.0.1",
     "mwp-config": ">=0.0.1",
+    "mwp-core": ">=0.0.1",
+    "mwp-csp-plugin": ">=0.0.1",
+    "mwp-rasp-plugin": ">=0.0.1",
     "mwp-language-plugin": ">=0.0.1",
     "mwp-logger-plugin": ">=0.0.1",
+    "mwp-router": ">=0.0.1",
     "mwp-sw-plugin": ">=0.0.1",
     "mwp-tracking-plugin": ">=0.0.1",
     "pino": "4.7.1",
     "spdy": "3.4.7",
     "uuid": "3.1.0"
   },
-  "devDependencies": {
-    "mwp-test-utils": ">=0.0.1"
-  }
+  "devDependencies": {}
 }

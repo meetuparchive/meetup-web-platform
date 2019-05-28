@@ -2,7 +2,6 @@ import { combineEpics } from '../redux-promise-epic';
 
 import { LOCATION_CHANGE, SERVER_RENDER } from 'mwp-router';
 import { getMatchedQueries } from 'mwp-router/lib/util';
-import { actions as clickActions } from 'mwp-tracking-plugin/lib/util/clickState';
 
 import * as api from './apiActionCreators';
 import {
@@ -10,6 +9,7 @@ import {
 	apiError, // DEPRECATED
 } from './syncActionCreators';
 
+const IGNORE_ACTION = Promise.resolve([]);
 /**
  * @deprecated
  */
@@ -56,11 +56,11 @@ export function getDeprecatedSuccessPayload(successes, errors) {
  * new `routing` data has already been populated in `state`
  *
  * @param {Object} routes The application's React Router routes
- * @returns {Function} an Epic function that emits an API_REQUEST action
+ * @returns {Function} an Epic function that emits an API_RESP_REQUEST action
  */
 export const getNavEpic = findMatches => (action, store) => {
-	if (![LOCATION_CHANGE, SERVER_RENDER].some(type => type === action.type)) {
-		return Promise.resolve([]);
+	if (![LOCATION_CHANGE, SERVER_RENDER].includes(action.type)) {
+		return IGNORE_ACTION;
 	}
 	const { payload: location } = action;
 	const state = store.getState();
@@ -69,15 +69,15 @@ export const getNavEpic = findMatches => (action, store) => {
 	const requestMetadata = {
 		referrer: referrer.pathname || state.config.entryPath || '',
 		logout: location.pathname.endsWith('logout'), // assume logout route ends with logout - not currently implemented in any app
-		clickTracking: state.clickTracking,
+		clickTracking: true, // clicks should be tracked with this request
 		retainRefs: [],
 	};
 	const cacheAction = requestMetadata.logout && { type: 'CACHE_CLEAR' };
 
 	const previousQueries = referrer.pathname
-		? getMatchedQueries(referrer)(findMatches(referrer))
+		? getMatchedQueries(referrer, state)(findMatches(referrer))
 		: [];
-	const newQueries = getMatchedQueries(location)(findMatches(location));
+	const newQueries = getMatchedQueries(location, state)(findMatches(location));
 	if (newQueries.filter(q => q).length === 0) {
 		// no valid queries - jump straight to 'complete'
 		return [api.complete([])];
@@ -94,11 +94,7 @@ export const getNavEpic = findMatches => (action, store) => {
 	requestMetadata.retainRefs = sharedRefs;
 
 	return Promise.resolve(
-		[
-			cacheAction,
-			api.get(newQueries, requestMetadata),
-			clickActions.clear(),
-		].filter(a => a)
+		[cacheAction, api.get(newQueries, requestMetadata)].filter(a => a)
 	);
 };
 
@@ -107,9 +103,9 @@ export const getNavEpic = findMatches => (action, store) => {
  * @deprecated
  */
 export const apiRequestToApiReq = action =>
-	Promise.resolve(
-		action.type === 'API_REQUEST' ? [api.get(action.payload, action.meta)] : []
-	);
+	action.type === 'API_REQUEST'
+		? Promise.resolve([api.get(action.payload, action.meta)])
+		: IGNORE_ACTION;
 
 /**
  * Listen for API_REQ and generate response actions from fetch results
@@ -129,6 +125,12 @@ export const apiRequestToApiReq = action =>
 export const getFetchQueriesEpic = (findMatches, fetchQueriesFn) => {
 	// keep track of location changes - will first be set by SERVER_RENDER
 	let locationIndex = 0;
+	const standardizeUrl = location => {
+		const matches = findMatches(location);
+		return matches
+			? matches.pop().match.path.replace(/[^a-zA-Z0-9/]/gi, '')
+			: '';
+	};
 
 	// set up a closure that will compare the partially-applied location to the current value
 	// of `locationIndex` - if `locationIndex` has changed since `currentLocation`
@@ -143,20 +145,31 @@ export const getFetchQueriesEpic = (findMatches, fetchQueriesFn) => {
 			locationIndex = locationIndex + 1;
 		}
 		if (action.type !== api.API_REQ) {
-			return Promise.resolve([]);
+			return IGNORE_ACTION;
 		}
 		const { payload: queries, meta } = action;
 		// set up the fetch call to the app server
-		const { config, api: { self }, routing: { location } } = store.getState();
+		const {
+			config,
+			api: { self },
+			routing: { location, referrer },
+		} = store.getState();
 
-		// first get the current route 'match' data
-		const matched = findMatches(location);
 		// clean up path for use as endpoint URL
-		const apiPath = matched.pop().match.path.replace(/[^a-z0-9/]/gi, '');
+		const standardizedUrlPath = standardizeUrl(location);
+		const standardizedReferrerPath =
+			referrer && referrer.pathname ? standardizeUrl(referrer) : undefined;
 		// construct the fetch call using match.path
-		const fetchUrl = `${config.apiUrl}${apiPath}`;
+		const fetchUrl = `${config.apiUrl}${standardizedUrlPath}`;
 		const fetchQueries = fetchQueriesFn(fetchUrl, (self || {}).value);
-		return fetchQueries(queries, meta)
+
+		// supply additional request info, e.g. for tracking
+		const requestInfo = {
+			standardized_url: standardizedUrlPath,
+			standardized_referer: standardizedReferrerPath,
+		};
+
+		return fetchQueries(queries, meta, requestInfo)
 			.then(({ successes = [], errors = [] }) => {
 				// meta contains a Promise that must be resolved
 				meta.resolve([...successes, ...errors]);

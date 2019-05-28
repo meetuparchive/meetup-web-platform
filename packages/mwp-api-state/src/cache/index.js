@@ -30,14 +30,13 @@ export const cacheClearEpic = cache => action => {
 	return cache.clear().then(() => []);
 };
 
-const getMemberId = state =>
-	(((state.api.self || {}).value || {}).id || 0).toString();
+const getMemberId = state => state.config.member.id.toString();
 
 /**
  * Listen for any action that should set cached state with a
  * `{ queries, responses }` payload
  *
- * API_SUCCESS means there is fresh data ready to be stored - extract the
+ * API_RESP_SUCCESS means there is fresh data ready to be stored - extract the
  * queries and their responses, then dispatch `CACHE_SET` actions with each
  * pair
  *
@@ -55,7 +54,7 @@ export const cacheSetEpic = cache => (action, store) => {
 /**
  * Listen for any action that should query the cache using a payload of queries
  *
- * Observables are heavily used in CACHE_REQUEST because each query results in
+ * Promises are heavily used in CACHE_REQUEST because each query results in
  * an async 'get' (Promise) from the Cache - all 'gets' happen in parallel and
  * the results are collated into a single response object containing the cache
  * hits.
@@ -77,7 +76,7 @@ const getCacheEpic = (cache = makeCache()) =>
 				cacheClearEpic(cache),
 				cacheSetEpic(cache),
 				cacheQueryEpic(cache)
-		  )
+			)
 		: action => Promise.resolve([]);
 
 export default getCacheEpic;

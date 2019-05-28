@@ -5,11 +5,14 @@ The Redux `createStore` helpers for MWP applications - `store/browser` and
 signature - the main difference is that the `store/server` function takes an
 additional `request` parameter corresponding to a Hapi request.
 
+# Selectors
+
+A set of selectors to enable easy selection from our Redux store.
+
 ## Dependencies
 
-- js-cookie
-- rison
-- rxjs (peer)
-- mwp-api-proxy-plugin
-- mwp-api-state
-- mwp-tracking/util/clickWriter
+-   js-cookie
+-   rison
+-   mwp-api-proxy-plugin
+-   mwp-api-state
+-   mwp-tracking/util/clickWriter

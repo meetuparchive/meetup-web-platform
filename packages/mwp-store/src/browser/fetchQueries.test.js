@@ -3,13 +3,14 @@ import { mockQuery } from 'meetup-web-mocks/lib/app';
 import { MOCK_GROUP } from 'meetup-web-mocks/lib/api';
 import * as clickState from 'mwp-tracking-plugin/lib/util/clickState';
 
-import fetchQueries, { CSRF_HEADER_COOKIE } from './fetchQueries';
+import fetchQueries from './fetchQueries';
 
 const { URLSearchParams } = url;
 clickState.setClickCookie = jest.fn();
 
 global.FormData = function() {};
 global.URLSearchParams = URLSearchParams;
+global.window = { location: { search: '' } };
 
 jest.mock('js-cookie', () => {
 	const get = jest.fn(name => `${name} value`);
@@ -26,9 +27,11 @@ jest.mock('js-cookie', () => {
 
 describe('fetchQueries', () => {
 	const API_URL = new URL('http://api.example.com/');
-	const csrfJwt = `${CSRF_HEADER_COOKIE} value`;
+	const csrfJwt = 'x-mwp-csrf_dev-header value';
 	const getQueries = [mockQuery({ params: {} })];
-	const POSTQueries = [{ ...mockQuery({ params: {} }), meta: { method: 'POST' } }];
+	const POSTQueries = [
+		{ ...mockQuery({ params: {} }), meta: { method: 'POST' } },
+	];
 	const meta = { foo: 'bar', clickTracking: { history: [] } };
 	const responses = [MOCK_GROUP];
 	const fakeSuccess = () =>
@@ -37,7 +40,7 @@ describe('fetchQueries', () => {
 			headers: {
 				get: key =>
 					({
-						'x-csrf-jwt': csrfJwt,
+						'x-mwp-csrf_dev-header': csrfJwt,
 					}[key]),
 			},
 		});
@@ -48,7 +51,7 @@ describe('fetchQueries', () => {
 			headers: {
 				get: key =>
 					({
-						'x-csrf-jwt': csrfJwt,
+						'x-mwp-csrf_dev-': csrfJwt,
 					}[key]),
 			},
 		});
@@ -85,6 +88,7 @@ describe('fetchQueries', () => {
 		};
 		return methodTest('POST')()
 			.then(methodTest('PATCH'))
+			.then(methodTest('PUT'))
 			.then(methodTest('DELETE'));
 	});
 	describe('GET', () => {
@@ -103,18 +107,18 @@ describe('fetchQueries', () => {
 			});
 		});
 
-		it('GET calls clickState.setClickCookie', () => {
-			const clickTracking = {
-				history: [{ bar: 'foo' }],
-			};
+		it('passes along __set_geoip querystring param', () => {
 			spyOn(global, 'fetch').and.callFake(fakeSuccess);
+			const _window = global.window;
+			global.window = { location: { search: '?__set_geoip=1234' } };
 
 			return fetchQueries(API_URL.toString())(getQueries, {
 				...meta,
-				clickTracking,
-				logout: true,
 			}).then(() => {
-				expect(clickState.setClickCookie).toHaveBeenCalledWith(clickTracking);
+				const calledWith = global.fetch.calls.mostRecent().args;
+				const url = new URL(calledWith[0]);
+				expect(url.searchParams.has('__set_geoip')).toBe(true);
+				global.window = _window;
 			});
 		});
 
@@ -145,7 +149,7 @@ describe('fetchQueries', () => {
 				const dummyUrl = new URL(`http://example.com?${options.body}`);
 				expect(dummyUrl.searchParams.has('queries')).toBe(true);
 				expect(dummyUrl.searchParams.has('metadata')).toBe(true);
-				expect(options.headers['x-csrf-jwt']).toEqual(csrfJwt);
+				expect(options.headers['x-mwp-csrf_dev']).toEqual(csrfJwt);
 			});
 		});
 		it('POST without meta calls fetch without metadata body params', () => {
@@ -160,7 +164,7 @@ describe('fetchQueries', () => {
 				const dummyUrl = new URL(`http://example.com?${options.body}`);
 				expect(dummyUrl.searchParams.has('queries')).toBe(true);
 				expect(dummyUrl.searchParams.has('metadata')).toBe(false);
-				expect(options.headers['x-csrf-jwt']).toEqual(csrfJwt);
+				expect(options.headers['x-mwp-csrf_dev']).toEqual(csrfJwt);
 			});
 		});
 	});
@@ -188,7 +192,7 @@ describe('fetchQueries', () => {
 				expect(options.method).toEqual('POST');
 				expect(url.searchParams.has('queries')).toBe(true);
 				expect(url.searchParams.has('metadata')).toBe(false);
-				expect(options.headers['x-csrf-jwt']).toEqual(csrfJwt);
+				expect(options.headers['x-mwp-csrf_dev']).toEqual(csrfJwt);
 			});
 		});
 	});

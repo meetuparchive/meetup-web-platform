@@ -1,7 +1,5 @@
 import { getServer } from 'mwp-test-utils';
 
-import 'rxjs/add/operator/toPromise';
-
 import {
 	mockQuery,
 	MOCK_RENDERPROPS,
@@ -34,7 +32,6 @@ const MOCK_HAPI_REQUEST = {
 		credentials: { memberCookie: 'foo member', csrfToken: 'bar token' },
 	},
 	id: 'mock-uuid-1234',
-	server: getServer(),
 	method: 'get',
 	headers: {},
 	query: {},
@@ -50,6 +47,7 @@ const MOCK_HAPI_REQUEST = {
 describe('getAuthHeaders', () => {
 	it('sets MEETUP_CSRF', () => {
 		const authHeaders = getAuthHeaders({
+			server: { settings: { app: { api: {} } } },
 			auth: {
 				credentials: {
 					memberCookie: 'foo member',
@@ -83,13 +81,13 @@ describe('getClientIpHeader', () => {
 		};
 		expect(getClientIpHeader(request)).toEqual(clientIpHeader);
 	});
-	it('returns a x-meetup-client-ip header when _set_geoip header is set', () => {
+	it('returns a x-meetup-client-ip header when __set_geoip header is set', () => {
 		const clientIpHeader = {
 			'X-Meetup-Client-Ip': '127.0.0.2',
 		};
 		const request = {
 			query: {
-				_set_geoip: '127.0.0.2',
+				__set_geoip: '127.0.0.2',
 			},
 			headers: {},
 		};
@@ -263,23 +261,43 @@ describe('buildRequestArgs', () => {
 		};
 		const getArgs = buildRequestArgs({ ...options, method })(decodedQuery);
 		const { pathname } = require('url').parse(getArgs.url);
-		expect(pathname).toBe(`/${decodedQuery.endpoint}`); // eslint-disable-line no-control-regex
+		expect(pathname).toBe(`/${decodedQuery.endpoint}`);
+	});
+
+	it('sets baseUrl to undefined when given a fully-qualified URL endpoint', () => {
+		const method = 'get';
+		const endpoint = 'https://example.com/foo';
+		const decodedQuery = {
+			endpoint,
+			params: {},
+		};
+		const getArgs = buildRequestArgs({ ...options, method })(decodedQuery);
+		expect(getArgs.baseUrl).toBeUndefined();
+		expect(getArgs.url).toBe(endpoint);
 	});
 });
 
 describe('getExternalRequestOpts', () => {
-	it('returns the expected object from a vanilla request', () => {
-		expect(getExternalRequestOpts(MOCK_HAPI_REQUEST)).toMatchSnapshot();
+	it('returns the expected object from a vanilla request', async () => {
+		const server = await getServer();
+		const mockRequest = {
+			...MOCK_HAPI_REQUEST,
+			server,
+		};
+		expect(getExternalRequestOpts(mockRequest)).toMatchSnapshot();
 	});
-	it('returns the expected object from a multipart request', () => {
+	it('returns the expected object from a multipart request', async () => {
+		const server = await getServer();
+
 		// most important difference is that multipart has a 'formData' key
-		expect(
-			getExternalRequestOpts({
-				...MOCK_HAPI_REQUEST,
-				mime: 'multipart/form-data',
-				payload: { foo: 'bar' },
-			})
-		).toMatchSnapshot();
+		const mockRequest = {
+			...MOCK_HAPI_REQUEST,
+			server,
+			mime: 'multipart/form-data',
+			payload: { foo: 'bar' },
+		};
+
+		expect(getExternalRequestOpts(mockRequest)).toMatchSnapshot();
 	});
 });
 
@@ -295,13 +313,19 @@ describe('createCookieJar', () => {
 });
 
 describe('makeExternalApiRequest', () => {
-	it('calls externalRequest with requestOpts', () => {
+	it('calls externalRequest with requestOpts', async () => {
+		const server = await getServer();
+		const mockRequest = {
+			...MOCK_HAPI_REQUEST,
+			server,
+		};
+
 		const requestOpts = {
 			foo: 'bar',
 			url: 'http://example.com',
 		};
-		return makeExternalApiRequest(MOCK_HAPI_REQUEST)(requestOpts)
-			.toPromise()
+
+		return makeExternalApiRequest(mockRequest)(requestOpts)
 			.then(() => require('request').mock.calls.pop()[0])
 			.then(arg => expect(arg).toBe(requestOpts));
 	});
@@ -320,21 +344,26 @@ describe('makeExternalApiRequest', () => {
 				settings: { app: { api: { timeout: 100 } } },
 			},
 			raw: {},
-		})(requestOpts)
-			.toPromise()
-			.then(([resp, body]) =>
-				expect(JSON.parse(body).errors[0].code).toBe('ETIMEDOUT')
-			);
+		})(requestOpts).then(([resp, body]) =>
+			expect(JSON.parse(body).errors[0].code).toBe('ETIMEDOUT')
+		);
 	});
-	it('returns the requestOpts jar at array index 2', () => {
+	it('returns the requestOpts jar at array index 2', async () => {
+		const server = await getServer();
+
+		const mockRequest = {
+			...MOCK_HAPI_REQUEST,
+			server,
+		};
+
 		const requestOpts = {
 			foo: 'bar',
 			url: 'http://example.com',
 			jar: 'fooJar',
 		};
-		return makeExternalApiRequest(MOCK_HAPI_REQUEST)(requestOpts)
-			.toPromise()
-			.then(([response, body, jar]) => expect(jar).toBe(requestOpts.jar));
+		return makeExternalApiRequest(mockRequest)(
+			requestOpts
+		).then(([response, body, jar]) => expect(jar).toBe(requestOpts.jar));
 	});
 });
 

@@ -11,7 +11,7 @@ const getServerSettings = (request: HapiRequest) => request.server.settings.app;
  * Get cookie-specified language using MEETUP_LANGUAGE cookie value
  */
 export const getCookieLang: ParseRequestLang = (request: HapiRequest) => {
-	const { isProd, supportedLangs } = getServerSettings(request);
+	const { api: { isProd }, supportedLangs } = getServerSettings(request);
 	const LANGUAGE_COOKIE = isProd ? 'MEETUP_LANGUAGE' : 'MEETUP_LANGUAGE_DEV';
 
 	const cookie = request.state[LANGUAGE_COOKIE];
@@ -27,8 +27,17 @@ export const getCookieLang: ParseRequestLang = (request: HapiRequest) => {
  * get the URL-specified language - check for existing language path prefixes
  */
 export const getUrlLang: ParseRequestLang = (request: HapiRequest) => {
+	const { url, info: { referrer }, route } = request;
 	const { supportedLangs } = getServerSettings(request);
-	const urlLang = request.url.path.split('/')[1];
+
+	// Whether to use the language code in the referrer url, rather than the request url
+	// set to `true` for API proxy request ie `/mu_api/` in the api proxy plugin route config
+	const { useReferrerUrlLangCode } =
+		route.settings.plugins['mwp-language-plugin'] || {};
+
+	const urlPath =
+		useReferrerUrlLangCode && referrer ? new URL(referrer).pathname : url.path;
+	const urlLang = urlPath.split('/')[1];
 	return supportedLangs.includes(urlLang) && urlLang;
 };
 

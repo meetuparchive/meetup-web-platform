@@ -5,6 +5,8 @@ const path = require('path');
 const chalk = require('chalk');
 const convict = require('convict');
 
+const packageConfig = require('../package');
+
 const { schema: envSchema, properties: envProperties } = require('../env');
 
 const {
@@ -13,7 +15,6 @@ const {
 	validateCsrfSecret,
 	validatePhotoScalerSalt,
 	validateProtocol,
-	validateServerHost,
 } = require('./util');
 
 /**
@@ -55,6 +56,11 @@ const schema = Object.assign({}, envSchema, {
 			arg: 'app-port',
 			env: process.env.NODE_ENV !== 'test' && 'DEV_SERVER_PORT', // don't read env in tests
 		},
+		api_proxy_path: {
+			format: String,
+			default: packageConfig.apiProxyPath || '/mu_api',
+			env: 'API_PROXY_PATH',
+		},
 		key_file: {
 			format: String,
 			default: path.resolve(os.homedir(), '.certs', 'star.dev.meetup.com.key'),
@@ -73,7 +79,7 @@ const schema = Object.assign({}, envSchema, {
 			env: 'API_PROTOCOL',
 		},
 		host: {
-			format: validateServerHost,
+			format: String,
 			default: 'api.dev.meetup.com',
 			env: 'API_HOST',
 		},
@@ -85,6 +91,11 @@ const schema = Object.assign({}, envSchema, {
 		root_url: {
 			format: String,
 			default: '',
+		},
+		// Using the prod API is _independent_ of env.isProd
+		isProd: {
+			format: Boolean,
+			default: false,
 		},
 	},
 	cookie_encrypt_secret: {
@@ -112,7 +123,10 @@ const config = convict(schema);
 config.load(envProperties);
 
 // Load environment dependent configuration
-const configPath = path.resolve(process.cwd(), `config.${config.get('env')}.json`);
+const configPath = path.resolve(
+	process.cwd(),
+	`config.${config.get('env')}.json`
+);
 
 const localConfig = fs.existsSync(configPath) ? require(configPath) : {};
 
@@ -122,6 +136,8 @@ config.set(
 	'api.root_url',
 	`${config.get('api.protocol')}://${config.get('api.host')}`
 );
+// api.isProd is determined exclusively by api.host value
+config.set('api.isProd', !config.get('api.host').includes('.dev.'));
 
 config.set('isProd', config.get('env') === 'production');
 config.set('isDev', config.get('env') === 'development');
@@ -134,13 +150,15 @@ if (
 	if (config.isProd) {
 		throw new Error(message);
 	}
-	console.error(chalk.red(message));
-	console.warn(
-		chalk.yellow(
-			'Re-setting protocol to HTTP - some features may not work as expected'
-		)
-	);
-	console.warn(chalk.yellow('See MWP config docs to configure HTTPS'));
+	if (process.NODE_ENV !== 'test') {
+		console.error(chalk.red(message));
+		console.warn(
+			chalk.yellow(
+				'Re-setting protocol to HTTP - some features may not work as expected'
+			)
+		);
+		console.warn(chalk.yellow('See MWP config docs to configure HTTPS'));
+	}
 	config.set('app_server.protocol', 'http');
 }
 config.validate();

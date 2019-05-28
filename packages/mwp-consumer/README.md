@@ -2,7 +2,7 @@ Mock MWP consumer app for platform testing
 
 # Setup
 
-1. Go to the `meetup-web-platform` repo root and run `lerna bootstrap`. You
+1. Go to the `meetup-web-platform` repo root and run `yarn install`. You
    may need to first install lerna if you haven't already
    `npm install --global lerna`
 2. Go to the `meetup-web-platform/packages/mwp-consumer/` directory and run
@@ -25,7 +25,7 @@ Mock MWP consumer app for platform testing
     ```
 
 5. **Important** If you are making changes to files, you must _re-build_ and
-   _restart_ the dev server with `lerna run build && yarn start | grep "GC HAPPENED"`  
+   _restart_ the dev server with `lerna run build && yarn start | grep "GC HAPPENED"`
 
 # Performance monitoring strategies
 
@@ -44,7 +44,7 @@ points for testing how the server behaves when each function returns early, i.e.
 checking the performance impact of skipping some rendering steps.
 
 - For the most part, every part of the server startup routine is required.
-- The route handler just needs to call `reply('<SOME RESPONSE STRING>')` - adding
+- The route handler just needs to `return '<SOME RESPONSE STRING>'` - adding
   that and a `return` before the renderer is called will show the the theoretical
   performance of a fully-configured server that executes _no_ rendering logic
 - The main rendering function in `server-render.jsx` is `makeRenderer`, which

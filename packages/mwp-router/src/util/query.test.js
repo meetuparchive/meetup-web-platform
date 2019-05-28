@@ -54,6 +54,7 @@ describe('getMatchedQueries', () => {
 		expect(queries).toEqual([]);
 	});
 	it('calls query functions with params + location object', () => {
+		const state = {};
 		const location = new URL('http://foo.com/bar/baz');
 		const path = '/';
 		const match = {
@@ -69,10 +70,13 @@ describe('getMatchedQueries', () => {
 			},
 			match,
 		};
-		getMatchedQueries(location)([matchedRoute]);
-		expect(matchedRoute.route.query).toHaveBeenCalledWith({
-			...match,
-			location,
-		});
+		getMatchedQueries(location, state)([matchedRoute]);
+		expect(matchedRoute.route.query).toHaveBeenCalledWith(
+			{
+				...match,
+				location,
+			},
+			state
+		);
 	});
 });

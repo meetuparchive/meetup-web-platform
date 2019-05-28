@@ -4,11 +4,12 @@
   "description": "Data collection for MWP apps, including activity and click tracking",
   "engineStrict": true,
   "engines": {
-    "node": ">=8.1.0"
+    "node": "^8.11.4",
+    "yarn": "^1.9.4"
   },
   "main": "./lib/index.js",
   "scripts": {
-    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps",
+    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps --root-mode upward",
     "lint": "eslint . --ext .js,.jsx --fix",
     "test": "yarn run test:unit",
     "test:unit": "NODE_ENV=test jest --config jest.config.json"
@@ -23,15 +24,17 @@
     "url": "https://github.com/meetup/meetup-web-platform/issues"
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
+  "peerDependencies": {
+    "js-joda-timezone": "^2.0.1"
+  },
   "dependencies": {
-    "@google-cloud/pubsub": "0.14.2",
+    "@google-cloud/pubsub": "0.18.0",
     "avsc": "5.1.1",
     "js-cookie": "2.1.4",
     "mwp-logger-plugin": ">=0.0.1",
     "qs": "6.5.0",
     "rison": "0.1.1",
     "url": "0.11.0",
-    "uuid": "3.1.0"
-  },
-  "devDependencies": {}
+    "uuid": "3.3.2"
+  }
 }

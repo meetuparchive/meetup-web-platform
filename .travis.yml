@@ -1,74 +1,55 @@
 sudo: false
 language: node_js
 node_js:
-  - "8.9"
+    - '8.11'
 cache:
-  directories:
-    - node_modules
+    directories:
+        - node_modules
 
 branches:
-  only:
-    - master # (PRs to master, master merges, master pushes)
-    - next # consolidating branch for breaking changes
+    only:
+        - master # (PRs to master, master merges, master pushes)
+        - next # consolidating branch for breaking changes
 
 env:
-  global:
-    - CI_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER
-    - NPM_TOKEN="$NPM_TOKEN"
+    global:
+        - CI_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER
+        - NPM_TOKEN="$NPM_TOKEN"
 
 before_install:
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-api-proxy-plugin/.npmrc
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-api-state/.npmrc
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-app-render/.npmrc
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-app-route-plugin/.npmrc
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-app-server/.npmrc
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-auth-plugin/.npmrc
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-core/.npmrc
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-config/.npmrc
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-consumer/.npmrc
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-i18n/.npmrc
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-language-plugin/.npmrc
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-logger-plugin/.npmrc
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-router/.npmrc
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-store/.npmrc
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-sw-plugin/.npmrc
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-test-utils/.npmrc
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-toaster/.npmrc
-  - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > packages/mwp-tracking-plugin/.npmrc
-  - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.3.2
-  - export PATH=$HOME/.yarn/bin:$PATH
-  - yarn --version
+    - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > $HOME/.npmrc
+    - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.9.4
+    - export PATH=$HOME/.yarn/bin:$PATH
+    - yarn --version
 
 before_script:
-  - lerna run build
-  - lerna bootstrap
-  - git diff --exit-code
+    - lerna run build
+    - git diff --exit-code yarn.lock
+    - yarn check
 
 script:
-  - yarn flow
-  - yarn test
-
-after_script:
-  - git config --global user.email "builds@travis-ci.com"
-  - git config --global user.name "Travis CI"
-  - >
-   [ "${TRAVIS_BRANCH}" = "master" ] && [ "${TRAVIS_PULL_REQUEST}" = "false" ] &&
-   export GIT_TAG=$(make version) ||
-   export GIT_TAG=$(make version)-beta
-  - >
-    [ "${TRAVIS_BRANCH}" = "master" ] && [ "${TRAVIS_PULL_REQUEST}" = "false" ] &&
-    export NPM_TAG=latest ||
-    export NPM_TAG=beta
-  - echo "GIT_TAG=$GIT_TAG"
-  - echo "NPM_TAG=$NPM_TAG"
-  - eval "$(ssh-agent)"
-  - echo "$GITHUB_DEPLOY_KEY" > /tmp/github_deploy_key
-  - chmod 600 /tmp/github_deploy_key
-  - ssh-add /tmp/github_deploy_key
-  - >
-   lerna publish --yes --force-publish --skip-git --npm-tag $NPM_TAG --repo-version $GIT_TAG &&
-   git tag -a $GIT_TAG -m "Version $GIT_TAG built by Travis CI - https://travis-ci.com/$TRAVIS_REPO_SLUG/builds/$TRAVIS_JOB_ID" &&
-   git push --tags git@github.com:$TRAVIS_REPO_SLUG.git
+    - yarn flow
+    - yarn test
 
 after_success:
-  - npm run coveralls
+    - git config --global user.email "builds@travis-ci.com"
+    - git config --global user.name "Travis CI"
+    - >
+        [ "${TRAVIS_BRANCH}" = "master" ] && [ "${TRAVIS_PULL_REQUEST}" = "false" ] &&
+        export GIT_TAG=$(make version) ||
+        export GIT_TAG=$(make version)-beta
+    - >
+        [ "${TRAVIS_BRANCH}" = "master" ] && [ "${TRAVIS_PULL_REQUEST}" = "false" ] &&
+        export NPM_TAG=latest ||
+        export NPM_TAG=beta
+    - echo "GIT_TAG=$GIT_TAG"
+    - echo "NPM_TAG=$NPM_TAG"
+    - eval "$(ssh-agent)"
+    - echo "$GITHUB_DEPLOY_KEY" > /tmp/github_deploy_key
+    - chmod 600 /tmp/github_deploy_key
+    - ssh-add /tmp/github_deploy_key
+    - >
+        lerna publish --yes --force-publish --skip-git --npm-tag $NPM_TAG --repo-version $GIT_TAG &&
+        git tag -a $GIT_TAG -m "Version $GIT_TAG built by Travis CI - https://travis-ci.com/$TRAVIS_REPO_SLUG/builds/$TRAVIS_JOB_ID" &&
+        git push --tags git@github.com:$TRAVIS_REPO_SLUG.git
+    - npm run coveralls

@@ -52,4 +52,7 @@ config.*.json
 # visual studio code settings
 .vscode
 
+# IntelliJ IDEA settings
+.idea
+
 .DS_Store

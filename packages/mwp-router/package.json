@@ -4,11 +4,12 @@
   "description": "React routing tools for MWP apps",
   "engineStrict": true,
   "engines": {
-    "node": ">=8.1.0"
+    "node": "^8.11.4",
+    "yarn": "^1.9.4"
   },
   "main": "./lib/index.js",
   "scripts": {
-    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps"
+    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps --root-mode upward"
   },
   "repository": {
     "type": "git",
@@ -24,14 +25,12 @@
     "mwp-auth-plugin": ">=0.0.1",
     "react-side-effect": "1.1.3"
   },
-  "devDependencies": {
-    "mwp-test-utils": ">=0.0.1"
-  },
   "peerDependencies": {
     "prop-types": "^15.5.10",
-    "react": "^16.3.1",
-    "react-dom": "^16.3.1",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
     "react-router-dom": "^4.2.2",
     "redux": "^3.7.2 || ^4"
-  }
+  },
+  "devDependencies": {}
 }

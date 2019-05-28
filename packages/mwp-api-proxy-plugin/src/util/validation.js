@@ -15,12 +15,15 @@ export const querySchema = Joi.object({
 	list: Joi.object({
 		dynamicRef: Joi.string(),
 		merge: Joi.object({
+			isReverse: Joi.bool(),
 			sort: Joi.func(),
 			idTest: Joi.func(),
 		}),
 	}),
 	meta: Joi.object({
-		method: Joi.string().valid('get', 'post', 'delete', 'patch').insensitive(),
+		method: Joi.string()
+			.valid('get', 'post', 'delete', 'patch', 'put')
+			.insensitive(),
 		noCache: Joi.bool(),
 		flags: Joi.array(),
 		variants: Joi.object().pattern(/\w+/, stringOrArray),

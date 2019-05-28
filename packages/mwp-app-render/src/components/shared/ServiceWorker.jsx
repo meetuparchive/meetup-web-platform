@@ -6,21 +6,24 @@ const mapStateToProps = (state: MWPState) => ({
 	requestLanguage: state.config.requestLanguage,
 	enableServiceWorker: state.config.enableServiceWorker,
 });
-
+type OwnProps = {|
+	children: React$Element<*>,
+|};
+type Props = {
+	...OwnProps,
+	requestLanguage: string,
+	enableServiceWorker: boolean,
+};
 /*
  * A lifecycle-only component that registers the platform service worker when
  * the component mounts on the client.
  */
-class ServiceWorker extends React.Component<*> {
-	props: {
-		requestLanguage: string,
-		enableServiceWorker: boolean,
-		children: React$Element<*>,
-	};
+class ServiceWorker extends React.Component<Props> {
 	componentDidMount() {
 		if (
 			this.props.enableServiceWorker &&
 			navigator.serviceWorker &&
+			!window.location.search.includes('__disable_sw') && // opt-in disable SW
 			process.env.NODE_ENV === 'production' // sw caching creates confusion in dev
 		) {
 			navigator.serviceWorker.register(
@@ -33,4 +36,4 @@ class ServiceWorker extends React.Component<*> {
 	}
 }
 
-export default connect(mapStateToProps)(ServiceWorker);
+export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps)(ServiceWorker);

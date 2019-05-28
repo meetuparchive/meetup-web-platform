@@ -1,13 +1,5 @@
 import { LOCATION_CHANGE } from 'mwp-router';
-import {
-	DEFAULT_API_STATE,
-	DEFAULT_APP_STATE, // DEPRECATED
-	api,
-	filterKeys,
-	getListState,
-	app, // DEPRECATED
-} from './reducer';
-import { apiRequest } from './sync/syncActionCreators';
+import { DEFAULT_API_STATE, api, filterKeys, getListState } from './reducer';
 import * as apiActions from './sync/apiActionCreators';
 
 describe('getListState', () => {
@@ -33,6 +25,31 @@ describe('getListState', () => {
 			},
 		},
 	};
+	const respWithoutSort = {
+		response: { value: ['foo'] },
+		query: {
+			ref: 'bar',
+			list: {
+				dynamicRef: 'baz',
+				merge: {
+					idTest: () => false,
+				},
+			},
+		},
+	};
+	const respWithReverse = {
+		response: { value: ['foo'] },
+		query: {
+			ref: 'bar',
+			list: {
+				dynamicRef: 'baz',
+				merge: {
+					idTest: () => false,
+					isReverse: true,
+				},
+			},
+		},
+	};
 	it('ignores no-response responses', () => {
 		expect(
 			getListState(state, {
@@ -50,57 +67,62 @@ describe('getListState', () => {
 		).toEqual({});
 	});
 	it('returns a new object with dynamicRef', () => {
+		const ref = resp.query.list.dynamicRef;
 		expect(getListState(state, resp)).toEqual({
-			[resp.query.list.dynamicRef]: resp.response,
+			[ref]: {
+				value: resp.response.value,
+				query: resp.query,
+			},
 		});
 	});
 	it('merges new response with existing dynamicRef, sorted', () => {
 		const value = ['qux'];
-		expect(
-			getListState({ [resp.query.list.dynamicRef]: { value } }, resp)
-		).toEqual({
-			[resp.query.list.dynamicRef]: {
+		const ref = resp.query.list.dynamicRef;
+		expect(getListState({ [ref]: { value } }, resp)).toEqual({
+			[ref]: {
 				value: [...value, ...resp.response.value].sort(
 					resp.query.list.merge.sort
 				),
+				query: resp.query,
 			},
 		});
 	});
-});
-
-describe('app reducer', () => {
-	beforeEach(function() {
-		this.MOCK_STATE = { foo: 'bar' };
-	});
-	it('returns default state for empty action', () => {
-		expect(app(undefined, {})).toEqual(DEFAULT_APP_STATE);
-	});
-	it('re-sets app state on logout API_REQUEST', function() {
-		const logoutRequest = apiRequest([], {
-			logout: true,
-		});
-		expect(app(this.MOCK_STATE, logoutRequest)).toEqual(DEFAULT_APP_STATE);
-	});
-	it('assembles success responses into single state tree', () => {
-		const API_SUCCESS = {
-			type: 'API_SUCCESS',
-			payload: {
-				responses: [{ foo: 'bar' }, { bar: 'baz' }, { baz: 'foo' }],
+	it('merges new response with existing dynamicRef, not sorted if sort callback undefined', () => {
+		const value = ['qux'];
+		const ref = respWithoutSort.query.list.dynamicRef;
+		expect(getListState({ [ref]: { value } }, respWithoutSort)).toEqual({
+			[ref]: {
+				value: [...value, ...respWithoutSort.response.value],
+				query: respWithoutSort.query,
 			},
-		};
-		expect(app(undefined, API_SUCCESS)).toEqual({
-			foo: 'bar',
-			bar: 'baz',
-			baz: 'foo',
 		});
 	});
-	it('populates an `error` key on API_ERROR', () => {
-		const API_ERROR = {
-			type: 'API_ERROR',
-			payload: new Error('this is the worst'),
+	it('merges new response with existing dynamicRef adding new items at the top of the list', () => {
+		const value = ['qux'];
+		const ref = respWithReverse.query.list.dynamicRef;
+		expect(getListState({ [ref]: { value } }, respWithReverse)).toEqual({
+			[ref]: {
+				value: [...respWithReverse.response.value, ...value],
+				query: respWithReverse.query,
+			},
+		});
+	});
+	it('merges new response with existing dynamicRef, sorted in case list is not top level value (is under `value` filed)', () => {
+		const list = ['qux'];
+		const value = { value: list };
+		const response = {
+			response: { value: { value: ['foo'] } },
+			query: resp.query,
 		};
-		const errorState = app(undefined, API_ERROR);
-		expect(errorState.error).toBe(API_ERROR.payload);
+		const ref = response.query.list.dynamicRef;
+		expect(getListState({ [ref]: { value: list } }, response)).toEqual({
+			[ref]: {
+				value: [...value.value, ...response.response.value.value].sort(
+					response.query.list.merge.sort
+				),
+				query: response.query,
+			},
+		});
 	});
 });
 

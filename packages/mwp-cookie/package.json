@@ -1,0 +1,35 @@
+{
+  "name": "@meetup/mwp-cookie",
+  "version": "0.0.1",
+  "description": "Platform cookie-management code",
+  "engineStrict": true,
+  "engines": {
+    "node": "^8.11.4",
+    "yarn": "^1.9.4"
+  },
+  "main": "./lib/index.js",
+  "scripts": {
+    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps --root-mode upward",
+    "test": "NODE_ENV=test jest --config jest.config.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meetup/meetup-web-platform.git"
+  },
+  "author": "Meetup",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/meetup/meetup-web-platform/issues"
+  },
+  "homepage": "https://github.com/meetup/meetup-web-platform#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "js-cookie": "2.2.0"
+  },
+  "devDependencies": {},
+  "peerDependencies": {
+    "react": "^16.8.6"
+  }
+}

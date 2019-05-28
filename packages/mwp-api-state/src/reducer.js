@@ -10,7 +10,6 @@ import {
 import { CACHE_SUCCESS } from './cache/cacheActionCreators';
 
 export const DEFAULT_API_STATE: ApiState = { inFlight: [] };
-export const DEFAULT_APP_STATE = {};
 
 type ObjectFilter = (Object, ...args?: Array<any>) => Object;
 export const filterKeys: ObjectFilter = (
@@ -35,36 +34,45 @@ type ResponseStateSetter = (
  * stored in a `dyanmicRef` in state. If a `list.merge` param is specified,
  * the response will be merged with the existing list state stored in `dynamicRef`
  */
-export const getListState: ResponseStateSetter = (
-	state,
-	{ response, query }
-) => {
+export const getListState: ResponseStateSetter = (state, { response, query }) => {
 	if (!response || !query.list) {
 		// no list no problem
 		return {};
 	}
 	const { dynamicRef, merge } = query.list;
 	// this query should be treated as a list-building query
-	const newList = response.value instanceof Array ? response.value : [];
+	// list can be either a root query result (response.value) or be under `value` field of the result (response.value.value)
+	let newList = [];
+	if (response.value instanceof Array) {
+		newList = response.value;
+	} else if (response.value && response.value.value instanceof Array) {
+		newList = response.value.value;
+	}
 	if (!merge) {
 		// no merge rules, so just make a new list
 		return { [dynamicRef]: { value: newList, query } };
 	}
 
 	// do some smart merging
-	const { idTest, sort } = merge;
+	const { idTest, sort, isReverse } = merge;
 	// remove anything in old list that is part of new list
-	const oldList = ((state[dynamicRef] || {}).value || [])
-		.filter(valOld => !newList.find(valNew => idTest(valOld, valNew)));
+	const oldList = ((state[dynamicRef] || {}).value || []).filter(
+		valOld => !newList.find(valNew => idTest(valOld, valNew))
+	);
 
-	// combine the new list and the old list and sort the results
-	return { [dynamicRef]: { value: [...oldList, ...newList].sort(sort) } };
+	// combine the new list and the old list
+	const mergedList = isReverse
+		? [...newList, ...oldList]
+		: [...oldList, ...newList];
+
+	// sort is optional
+	if (sort) {
+		mergedList.sort(sort);
+	}
+	return { [dynamicRef]: { value: mergedList, query } };
 };
 
-export const responseToState: ResponseStateSetter = (
-	state,
-	{ response, query }
-) => ({
+export const responseToState: ResponseStateSetter = (state, { response, query }) => ({
 	[query.ref]: { ...response, query },
 	...getListState(state, { response, query }),
 });
@@ -82,7 +90,7 @@ export function api(
 			return Object.keys(refs).reduce(
 				(cleanState, ref) => {
 					// throw out data from queries that are not 'GET' - it should not be kept in state
-					const queryMethod = (state[ref].query.meta || {}).method;
+					const queryMethod = ((state[ref].query || {}).meta || {}).method;
 					if (queryMethod && queryMethod !== 'get') {
 						return cleanState;
 					}
@@ -140,46 +148,6 @@ export function api(
 				inFlight,
 			};
 		}
-		default:
-			return state;
-	}
-}
-
-/**
- * The old API results store
- * @deprecated
- */
-export function app(
-	state: { error?: Object } = DEFAULT_APP_STATE,
-	action: {
-		type: string,
-		payload: { responses: Array<Object> },
-		error?: Error,
-		meta?: any,
-	}
-) {
-	let newState;
-
-	switch (action.type) {
-		case 'API_REQUEST':
-			if ((action.meta || {}).logout) {
-				return DEFAULT_APP_STATE; // clear app state during logout
-			}
-			return state;
-		case 'API_SUCCESS':
-			// API_SUCCESS contains an array of responses, but we just need to build a single
-			// object to update state with
-			newState = action.payload.responses.reduce(
-				(s, r) => ({ ...s, ...r }),
-				{}
-			);
-			delete state.error;
-			return { ...state, ...newState };
-		case 'API_ERROR':
-			return {
-				...state,
-				error: action.payload,
-			};
 		default:
 			return state;
 	}

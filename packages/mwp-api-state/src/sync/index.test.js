@@ -1,4 +1,3 @@
-import { CLICK_TRACK_CLEAR_ACTION } from 'mwp-tracking-plugin/lib/util/clickState';
 import { LOCATION_CHANGE, SERVER_RENDER } from 'mwp-router';
 import { createFakeStore } from 'mwp-test-utils';
 
@@ -40,7 +39,7 @@ describe('Sync epic', () => {
 			expect(actions).toHaveLength(0)
 		));
 	describe('getNavEpic', () => {
-		it('emits API_REQ and CLICK_TRACK_CLEAR for nav-related actions with matched query', function() {
+		it('emits API_REQ for nav-related actions with matched query', function() {
 			const locationChange = {
 				type: LOCATION_CHANGE,
 				payload: MOCK_RENDERPROPS.location,
@@ -59,11 +58,10 @@ describe('Sync epic', () => {
 				actionArrays.forEach(actions => {
 					const types = actions.map(a => a.type);
 					expect(types).toContain(api.API_REQ);
-					expect(types.includes(CLICK_TRACK_CLEAR_ACTION)).toBe(true);
 				});
 			});
 		});
-		it('emits API_REQ, CACHE_CLEAR, and CLICK_TRACK_CLEAR for nav-related actions with logout request', function() {
+		it('emits API_REQ, CACHE_CLEAR for nav-related actions with logout request', function() {
 			const logoutLocation = {
 				...MOCK_RENDERPROPS.location,
 				pathname: '/logout',
@@ -81,7 +79,6 @@ describe('Sync epic', () => {
 				const types = actions.map(a => a.type);
 				expect(types).toContain(api.API_REQ);
 				expect(types.includes(CACHE_CLEAR)).toBe(true);
-				expect(types.includes(CLICK_TRACK_CLEAR_ACTION)).toBe(true);
 			});
 		});
 		it('emits API_COMPLETE for nav-related actions without matched query', () => {

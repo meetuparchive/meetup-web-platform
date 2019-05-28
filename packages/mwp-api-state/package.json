@@ -4,11 +4,12 @@
   "description": "Redux helpers to manage API data in a MWP app",
   "engineStrict": true,
   "engines": {
-    "node": ">=8.1.0"
+    "node": "^8.11.4",
+    "yarn": "^1.9.4"
   },
   "main": "./lib/index.js",
   "scripts": {
-    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps",
+    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps --root-mode upward",
     "flow": "flow",
     "lint": "eslint . --ext .js,.jsx --fix",
     "test": "yarn run test:unit",
@@ -30,10 +31,8 @@
   },
   "dependencies": {
     "idb-keyval": "2.3.0",
+    "mwp-router": ">=0.0.1",
     "mwp-tracking-plugin": ">=0.0.1"
   },
-  "devDependencies": {
-    "mwp-router": ">=0.0.1",
-    "mwp-test-utils": ">=0.0.1"
-  }
+  "devDependencies": {}
 }

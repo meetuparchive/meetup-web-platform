@@ -1,11 +1,11 @@
 import JSCookie from 'js-cookie';
 import rison from 'rison';
-import { setClickCookie } from 'mwp-tracking-plugin/lib/util/clickState';
 
 import { parseQueryResponse, getAuthedQueryFilter } from '../util/fetchUtils';
 
-export const CSRF_HEADER = 'x-csrf-jwt';
-export const CSRF_HEADER_COOKIE = 'x-csrf-jwt-header';
+export const CSRF_COOKIE_NAME =
+	process.env.NODE_ENV === 'production' ? 'x-mwp-csrf' : 'x-mwp-csrf_dev';
+export const CSRF_HEADER_COOKIE_NAME = `${CSRF_COOKIE_NAME}-header`;
 
 /*
  * rison serialization fails for unserializable data, including params with
@@ -57,31 +57,30 @@ const makeSerializable = queries => {
  *   click tracking data
  * @return {Object} { url, config } arguments for a fetch call
  */
-export const getFetchArgs = (apiUrl, queries, meta) => {
+export const getFetchArgs = (apiUrl, queries, meta, activityInfo) => {
 	const headers = {};
 	const method = ((queries[0].meta || {}).method || 'GET') // fallback to 'get'
 		.toUpperCase(); // must be upper case - requests can fail silently otherwise
 
-	const hasBody = method === 'POST' || method === 'PATCH';
+	const hasBody = method === 'POST' || method === 'PATCH' || method === 'PUT';
 	const isFormData = queries[0].params instanceof FormData;
 	const isDelete = method === 'DELETE';
 
+	const pageSearchParams = new URLSearchParams(window.location.search);
 	const searchParams = new URLSearchParams();
 	searchParams.append('queries', rison.encode_array(makeSerializable(queries)));
+	if (pageSearchParams.has('__set_geoip')) {
+		searchParams.append('__set_geoip', pageSearchParams.get('__set_geoip'));
+	}
 
 	if (meta) {
 		const {
-			clickTracking,
 			onSuccess, // eslint-disable-line no-unused-vars
 			onError, // eslint-disable-line no-unused-vars
 			promise, // eslint-disable-line no-unused-vars
 			request, // eslint-disable-line no-unused-vars
 			...metadata
 		} = meta;
-
-		if (clickTracking) {
-			setClickCookie(clickTracking);
-		}
 
 		// send other metadata in searchParams
 		const encodedMetadata = metadata && rison.encode_object(metadata);
@@ -99,7 +98,11 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 	}
 
 	if (hasBody || isDelete) {
-		headers[CSRF_HEADER] = JSCookie.get(CSRF_HEADER_COOKIE);
+		headers[CSRF_COOKIE_NAME] = JSCookie.get(CSRF_HEADER_COOKIE_NAME);
+	}
+
+	if (activityInfo) {
+		headers['x-meetup-activity'] = new URLSearchParams(activityInfo).toString();
 	}
 
 	const config = {
@@ -118,13 +121,13 @@ export const getFetchArgs = (apiUrl, queries, meta) => {
 	};
 };
 
-const _fetchQueryResponse = (apiUrl, queries, meta) => {
+const _fetchQueryResponse = ({ apiUrl, queries, meta, activityInfo }) => {
 	if (queries.length === 0) {
 		// no queries => no responses (no need to fetch)
 		return Promise.resolve({ responses: [] });
 	}
 
-	const { url, config } = getFetchArgs(apiUrl, queries, meta);
+	const { url, config } = getFetchArgs(apiUrl, queries, meta, activityInfo);
 	return fetch(url, config)
 		.catch(err => {
 			console.error(err);
@@ -151,9 +154,11 @@ const _fetchQueryResponse = (apiUrl, queries, meta) => {
  * @param {Array} queries the queries to send - must all use the same `method`
  * @param {Object} meta additional characteristics of the request, e.g.
  *   click tracking data
+ * @param {Object} activityInfo optional map of additional activity record data
+ *   to pass along with fetch request
  * @return {Promise} resolves with a `{queries, responses}` object
  */
-const fetchQueries = (apiUrl, member) => (queries, meta) => {
+const fetchQueries = (apiUrl, member) => (queries, meta, activityInfo) => {
 	if (
 		typeof window === 'undefined' &&
 		typeof test === 'undefined' // not in browser // not in testing env (global set by Jest)
@@ -163,9 +168,12 @@ const fetchQueries = (apiUrl, member) => (queries, meta) => {
 
 	const authedQueries = getAuthedQueryFilter(member);
 	const validQueries = queries.filter(authedQueries);
-	return _fetchQueryResponse(apiUrl, validQueries, meta).then(queryResponse => ({
-		...parseQueryResponse(validQueries)(queryResponse),
-	}));
+	return _fetchQueryResponse({
+		apiUrl,
+		queries: validQueries,
+		meta,
+		activityInfo,
+	}).then(parseQueryResponse(validQueries));
 };
 
 export default fetchQueries;

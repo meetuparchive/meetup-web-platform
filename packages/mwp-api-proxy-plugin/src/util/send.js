@@ -4,22 +4,48 @@ import querystring from 'qs';
 import url from 'url';
 
 import externalRequest from 'request';
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/observable/bindNodeCallback';
-import 'rxjs/add/observable/defer';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/operator/do';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/timeout';
 
 import config from 'mwp-config';
 
 export const API_META_HEADER = 'X-Meta-Request-Headers';
-const MEMBER_COOKIE_NAME =
-	process.env.NODE_ENV === 'production' ? 'MEETUP_MEMBER' : 'MEETUP_MEMBER_DEV';
-const CSRF_COOKIE_NAME =
-	process.env.NODE_ENV === 'production' ? 'MEETUP_CSRF' : 'MEETUP_CSRF_DEV';
+const FULL_URL_PATTERN = /^https?:\/\//;
+
+// create a promisified version of `externalRequest` - can't use `util.promisify`
+// because the callback gets 2 additional arguments, and promisify only supports 1.
+const externalRequestPromise = options =>
+	new Promise((resolve, reject) => {
+		externalRequest(options, (err, response, body) => {
+			if (err) {
+				reject(err);
+				return;
+			}
+			resolve([response, body]); // emit response and body as tuple
+		});
+	});
+
+const _makeGetCookieNames = () => {
+	// memoize the cookie names - they don't change
+	let memberCookieName;
+	let csrfCookieName;
+	return request => {
+		if (!memberCookieName) {
+			memberCookieName = request.server.settings.app.api.isProd
+				? 'MEETUP_MEMBER'
+				: 'MEETUP_MEMBER_DEV';
+		}
+		if (!csrfCookieName) {
+			csrfCookieName = request.server.settings.app.api.isProd
+				? 'MEETUP_CSRF'
+				: 'MEETUP_CSRF_DEV';
+		}
+
+		return {
+			memberCookieName,
+			csrfCookieName,
+		};
+	};
+};
+const getCookieNames = _makeGetCookieNames();
 
 const MOCK_RESPONSE_OK = {
 	// minimal representation of http.IncomingMessage
@@ -99,7 +125,9 @@ export const buildRequestArgs = externalRequestOpts => ({
 	const dataParams = querystring.stringify(params);
 	const headers = { ...externalRequestOpts.headers };
 	// endpoint may or may not be URI-encoded, so we decode before encoding
-	let url = encodeURI(`/${decodeURI(endpoint)}`);
+	const encodedUrl = encodeURI(decodeURI(endpoint));
+	// add leading slash if it's not a fully-qualified URL
+	let url = FULL_URL_PATTERN.test(endpoint) ? encodedUrl : `/${encodedUrl}`;
 	let body;
 	const jar = createCookieJar(url);
 	console.log(
@@ -128,6 +156,7 @@ export const buildRequestArgs = externalRequestOpts => ({
 
 	switch (externalRequestOpts.method) {
 		case 'patch':
+		case 'put':
 		case 'post':
 			if (externalRequestOpts.formData) {
 				break;
@@ -138,7 +167,7 @@ export const buildRequestArgs = externalRequestOpts => ({
 		case 'delete':
 		case 'get':
 		default:
-			url += `?${dataParams}`;
+			url += dataParams ? `?${dataParams}` : '';
 			headers['content-type'] = 'application/json';
 			headers['X-Meta-Photo-Host'] = 'secure';
 	}
@@ -148,6 +177,9 @@ export const buildRequestArgs = externalRequestOpts => ({
 		headers,
 		jar,
 		url,
+		baseUrl: FULL_URL_PATTERN.test(url)
+			? undefined
+			: externalRequestOpts.baseUrl, // allow fully-qualified URL to override baseUrl
 		timeout: externalRequestOpts.formData
 			? 60 * 1000 // 60sec upload timeout
 			: externalRequestOpts.timeout,
@@ -165,10 +197,11 @@ export function getAuthHeaders(request) {
 	// Cookie + CSRF auth: need have matching UUID in MEETUP_CSRF cookie and 'csrf-token' header
 	// Valid cookie and CSRF are supplied by mwp-auth-plugin in request.auth.credentials
 	const cookies = { ...request.state };
+	const { memberCookieName, csrfCookieName } = getCookieNames(request);
 	const { memberCookie, csrfToken } = request.auth.credentials; // set by mwp-auth plugin
 
-	cookies[CSRF_COOKIE_NAME] = csrfToken;
-	cookies[MEMBER_COOKIE_NAME] = memberCookie;
+	cookies[memberCookieName] = memberCookie;
+	cookies[csrfCookieName] = csrfToken;
 
 	// rebuild a cookie header string from the parsed `cookies` object
 	const cookie = Object.keys(cookies)
@@ -193,7 +226,7 @@ export function getLanguageHeader(request) {
 
 export function getClientIpHeader(request) {
 	const clientIP =
-		request.query['_set_geoip'] || request.headers['fastly-client-ip'];
+		request.query.__set_geoip || request.headers['fastly-client-ip'];
 	if (clientIP) {
 		return { 'X-Meetup-Client-Ip': clientIP };
 	}
@@ -295,17 +328,16 @@ export const makeMockRequest = (
 	mockResponseContent,
 	responseMeta
 ) => requestOpts =>
-	Observable.of([
+	Promise.resolve([
 		makeMockResponse(requestOpts, responseMeta),
 		JSON.stringify(mockResponseContent),
 	]);
 
-const externalRequest$ = Observable.bindNodeCallback(externalRequest);
 /**
  * Make a real external API request, return response body string
  */
 export const makeExternalApiRequest = request => requestOpts => {
-	return externalRequest$(requestOpts)
+	return externalRequestPromise(requestOpts)
 		.catch(err => {
 			request.server.app.logger.error({
 				err,
@@ -320,14 +352,14 @@ export const makeExternalApiRequest = request => requestOpts => {
 			}
 			return makeMockRequest(errorObj, makeAPIErrorResponse(err))(requestOpts);
 		})
-		.map(([response, body]) => [response, body, requestOpts.jar]);
+		.then(([response, body]) => [response, body, requestOpts.jar]);
 };
 
 /*
  * Make an API request and parse the response into the expected `response`
  * object shape
  */
-export const makeSend$ = request => {
+export const makeSendQuery = request => {
 	// 1. get the queries and the shared `externalRequestOpts` from the request
 	//    that will be applied to all queries
 	const externalRequestOpts = getExternalRequestOpts(request);
@@ -338,10 +370,11 @@ export const makeSend$ = request => {
 
 	return query => {
 		const requestOpts = queryToRequestOpts(query);
-		const request$ = query.mockResponse
+		// decide whether to make a _real_ request or a mock request
+		const doRequest = query.mockResponse
 			? makeMockRequest(query.mockResponse)
 			: makeExternalApiRequest(request);
 
-		return Observable.defer(() => request$(requestOpts));
+		return doRequest(requestOpts);
 	};
 };

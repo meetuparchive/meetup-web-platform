@@ -3,7 +3,20 @@ import config from 'mwp-config';
 import { logger } from 'mwp-logger-plugin';
 const appConfig = config.getServer().properties;
 
-export const MEMBER_COOKIE = appConfig.isProd ? 'MEETUP_MEMBER' : 'MEETUP_MEMBER_DEV';
+export const MEMBER_COOKIE = appConfig.api.isProd
+	? 'MEETUP_MEMBER'
+	: 'MEETUP_MEMBER_DEV';
+
+export const BROWSER_ID_COOKIE = appConfig.api.isProd
+	? 'MEETUP_BROWSER_ID'
+	: 'MEETUP_BROWSER_ID_DEV';
+
+// SIFT_SESSION_ID cookie created in fastly and used by sift science to correlate spammy
+// behavior to user activity; cookie has an expiration time of 4 hours and should be
+// reset on logout. For more details please refer  https://sift.com/resources/tutorials/anonymous-users
+export const SIFT_SESSION_COOKIE = appConfig.api.isProd
+	? 'SIFT_SESSION_ID'
+	: 'SIFT_SESSION_ID_DEV';
 
 export const parseMemberCookie = state => {
 	if (!state[MEMBER_COOKIE]) {
@@ -16,13 +29,23 @@ export const parseMemberCookie = state => {
 	return member;
 };
 
+export const parseBrowserIdCookie = state => {
+	if (!state[BROWSER_ID_COOKIE]) {
+		return { id: '' };
+	}
+	const browserId = querystring.parse(state[BROWSER_ID_COOKIE]);
+	return browserId;
+};
+
+export const parseSiftSessionCookie = state => state[SIFT_SESSION_COOKIE] || '';
+
 /*
  * Some variant settings can be passed in from MEETUP_VARIANT_XXX cookies. This
  * function reads those cookie values from `state` and returns a map of values
  */
 export const getVariants = state =>
 	Object.keys(state).reduce((variants, cookieName) => {
-		const isEnvCookie = !(appConfig.isProd ^ !cookieName.endsWith('_DEV')); // XNOR - both conditions or neither condition
+		const isEnvCookie = !(appConfig.api.isProd ^ !cookieName.endsWith('_DEV')); // XNOR - both conditions or neither condition
 		if (cookieName.startsWith('MEETUP_VARIANT_') && isEnvCookie) {
 			variants[cookieName.replace(/^MEETUP_VARIANT_|_DEV$/g, '')] =
 				state[cookieName];

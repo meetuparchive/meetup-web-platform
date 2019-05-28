@@ -50,6 +50,11 @@ const config = {
 		'spaced-comment': [2, 'always'],
 		strict: 0,
 	},
+	settings: {
+		react: {
+			version: 'detect',
+		},
+	},
 };
 
 module.exports = config;

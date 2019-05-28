@@ -68,13 +68,17 @@ describe('Activity tracking', () => {
 	const request = {
 		id: 'foo',
 		headers: {},
+		state: {},
 		log() {},
+		server: { settings: { app: { api: {} } } },
 	};
 	const trackInfo = getLogger('WEB')(request, {
 		memberId: 1234,
 		trackId: 'foo',
 		sessionId: 'bar', // not part of v3 spec
 		url: 'asdf',
+		viewName: 'foo view',
+		subViewName: 'foo subview',
 	});
 
 	it('encodes standard output from getLogger', () => {
@@ -85,14 +89,11 @@ describe('Activity tracking', () => {
 		// create a new buffer from that string
 		const avroBuffer = new Buffer(valObj.record, 'base64');
 		// get the avro-encoded record
-		const recordedInfo = avsc.parse(avro.schemas.activity).fromBuffer(avroBuffer);
-		const expectedTrackedInfo = {
-			...trackInfo,
-			aggregratedUrl: '', // misspelled, unused field in v3 spec, default ''
-			browserId: '',
-		};
-		delete expectedTrackedInfo.sessionId; // not part of v3 spec
-		expect(recordedInfo).toEqual(expectedTrackedInfo);
+		const recordedInfo = avsc
+			.parse(avro.schemas.activity)
+			.fromBuffer(avroBuffer);
+		delete recordedInfo.timestamp;
+		expect(recordedInfo).toMatchSnapshot();
 	});
 });
 
@@ -100,6 +101,7 @@ describe('Click tracking', () => {
 	const request = {
 		id: 'foo',
 		state: {},
+		server: { settings: { app: { api: {} } } },
 	};
 	const click = {
 		timestamp: new Date(0).toISOString(),

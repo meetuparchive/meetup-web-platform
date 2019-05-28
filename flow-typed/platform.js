@@ -7,71 +7,56 @@ declare type MatchMedia = {
 	isAtLargeUp: boolean,
 };
 
+declare type AppContext = {
+	apiUrl: string, // base API URL for queries
+	baseUrl: string, // server host
+	basename: string, // base path for routing - e.g. locale-specific base paths '/fr-FR/'
+	enableServiceWorker: boolean,
+	requestLanguage: string,
+	supportedLangs: Array<string>,
+	member:
+		| {|
+				id: number,
+				status: number,
+				timestamp: number,
+				// board status, related to permissions on message boards https://github.com/meetup/meetup/blob/master/modules/base/src/main/java/com/meetup/base/util/MeetupStatus.java#L743-L752
+				bs: number,
+				// time zone
+				tz: string,
+				zip: number,
+				country: string,
+				city: string,
+				state?: string,
+				lat: number,
+				lon: number,
+				ql: boolean,
+				scope?: string,
+				// whether the member selected remember me or not
+				rem?: number,
+				// whether the member is an organizer or not
+				org?: 1,
+		  |}
+		| {| id: 0 |},
+	initialNow: number, // timestamp that React-Intl uses to initialize date strings on initial client render
+	isQL: boolean,
+	isProdApi: boolean, // whether the data is coming from Prod instead of Dev DB
+	variants: mixed, // parsed X-Meetup-Variants header
+	entryPath: string, // URL path that the user landed on (server-rendered path)
+	media: MatchMedia,
+	browserId: string, // from browser id cookie
+	clientIp: string, // best guess at client IP address
+	siftSessionId: string, // from Sift Science cookie
+};
+
 declare type MWPState = {
 	api: ApiState,
-	flags?: { [string]: boolean | string },
-	config: {
-		apiUrl: string,
-		baseUrl: string,
-		enableServiceWorker: boolean,
-		requestLanguage: string,
-		supportedLangs: Array<string>,
-		initialNow: number,
-		variants: mixed,
-		entryPath: string,
-		media: MatchMedia,
-	},
+	flags?: FeatureFlags,
+	config: AppContext,
 };
+
+declare type FeatureFlags = { [string]: boolean | string };
 
 declare type Params = { [string]: string };
-declare type HapiRequestUrl = URL & {
-	path: string,
-};
-declare type HapiRoute = Object;
-declare type HapiServer = {
-	app: {
-		logger: (...args: Array<any>) => void,
-	},
-	expose: (key: string, value: any) => void,
-	settings: {
-		app: { isProd: boolean, supportedLangs: Array<string>, [string]: any },
-	},
-	plugins: {
-		[string]: any,
-	},
-	route: (routes: HapiRoute | Array<HapiRoute>) => Promise<HapiServer>,
-	on: (eventName: string, cb: () => void) => void,
-};
-declare type HapiRequest = {
-	getLanguage: () => string,
-	getLangPrefixPath: () => string,
-	log: (Array<string>, string) => void,
-	url: HapiRequestUrl,
-	server: HapiServer,
-	state: {
-		[string]: string,
-	},
-	info: {
-		referrer: string,
-		host: string,
-		[string]: mixed,
-	},
-	headers: {
-		[string]: string,
-	},
-	[string]: any,
-};
-const HapiReplyFn = (reply: string | Object) => HapiReplyFn;
-HapiReplyFn.continue = () => {};
-HapiReplyFn.code = (code: number) => HapiReplyFn;
-HapiReplyFn.redirect = (url: string) => ({
-	permanent: (isPermanent: ?boolean) => HapiReplyFn,
-});
-HapiReplyFn.state = (key: string, value: string, opts: ?{ [string]: any }) =>
-	HapiReplyFn;
-HapiReplyFn.header = (key: string, value: string) => HapiReplyFn;
-
-declare type HapiReply = typeof HapiReplyFn;
 
 type RedirectResult = {|
 	redirect: {
@@ -87,7 +72,7 @@ declare type RenderResult = RedirectResult | HTMLResult;
 
 declare type LanguageRenderer = (
 	request: HapiRequest,
-	reply: ?HapiReply
+	h: ?HapiResponseToolkit
 ) => Promise<RenderResult>;
 
 declare type FluxStandardAction = {
@@ -101,7 +86,8 @@ declare type QueryListParam = {|
 	dynamicRef: string, // dynamic ref that will be kept forever
 	merge?: {
 		idTest: (Object, Object) => boolean, // test for same object identity
-		sort: (Object, Object) => number, // test for order
+		sort?: (Object, Object) => number, // test for order
+		isReverse?: boolean,
 	},
 |};
 // API query structure
@@ -114,7 +100,7 @@ declare type Query = {
 	mockResponse?: () => any,
 	meta?: {
 		flags?: Array<string>,
-		method?: 'get' | 'post' | 'delete' | 'patch',
+		method?: 'get' | 'post' | 'delete' | 'patch' | 'put',
 		noCache?: boolean,
 		metaRequestHeaders?: Array<string>,
 		variants?: {
@@ -133,7 +119,10 @@ declare type QueryResponse = {
 	error?: string,
 };
 
-declare type QueryFunction = (location: { [string]: mixed }) => Query;
+declare type QueryFunction = (
+	location: { [string]: mixed },
+	state: MWPState
+) => Query;
 
 type BasePlatformRoute = {|
 	path?: string,
@@ -156,9 +145,40 @@ type StaticPlatformRoute = {|
 
 declare type PlatformRoute = AsyncPlatformRoute | StaticPlatformRoute;
 
-declare type CookieOpts = {
-	path?: string,
-	isHttpOnly?: boolean,
-	isSecure?: boolean,
-	encoding?: string,
+declare type GeoLocation = {
+	country?: string,
+	region?: string,
+};
+
+// See https://docs.launchdarkly.com/docs/node-sdk-reference#section-users
+declare type LaunchDarklyUser$CustomAttributes = {
+	RequestCountry?: string,
+	RequestRegion?: string,
+	[string]:
+		| string
+		| boolean
+		| number
+		| Array<string>
+		| Array<boolean>
+		| Array<number>,
+};
+
+declare type LaunchDarklyUser = {|
+	key: string,
+	ip?: string,
+	firstName?: string,
+	lastName?: string,
+	country?: string,
+	email?: string,
+	avatar?: string,
+	name?: string,
+	anonymous?: boolean,
+	custom?: LaunchDarklyUser$CustomAttributes,
+|};
+
+declare type ActivityInfo = {
+	viewName?: string,
+	subViewName?: string,
+	standardized_url?: string,
+	standardized_referer?: string,
 };

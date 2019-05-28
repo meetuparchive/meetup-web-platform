@@ -1,13 +1,13 @@
 import http from 'http';
 import bunyan from 'bunyan';
 import bunyanDebugStream from 'bunyan-debug-stream';
-import LoggingBunyan from '@google-cloud/logging-bunyan';
+import { LoggingBunyan } from '@google-cloud/logging-bunyan';
 
 /*
  * convert a millisecond value into a 'Duration' object, defined as
  * `{ seconds, nanos }`, where `nanos` is the nanosecond component of the
  * time
- * 
+ *
  * https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#google.protobuf.Duration
  */
 const formatDuration = ms => {
@@ -151,7 +151,7 @@ serializers.httpRequest = request => {
 	return {};
 };
 
-const streams = []; // stdout by default
+const streams = [];
 const {
 	NODE_ENV,
 	GAE_INSTANCE,
@@ -168,7 +168,7 @@ if (!NODE_ENV || NODE_ENV === 'development') {
 }
 
 if (GAE_INSTANCE && !DISABLE_GAE_LOG) {
-	const GAELogger = LoggingBunyan({
+	const GAELogger = new LoggingBunyan({
 		logName: 'mwp_log',
 		resource: {
 			type: 'gae_app',

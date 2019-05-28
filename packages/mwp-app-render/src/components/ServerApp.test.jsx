@@ -7,11 +7,12 @@ describe('ServerApp', function() {
 	const basename = '';
 	const appWrapper = shallow(
 		<ServerApp
+			h={{}}
+			request={{ url: '/foo' }}
 			routes={routes}
 			store={{}}
-			basename={basename}
-			context={{}}
-			location="/foo"
+			appContext={{ basename }}
+			routerContext={{}}
 		/>
 	);
 	it('exists', function() {

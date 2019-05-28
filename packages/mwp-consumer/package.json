@@ -4,12 +4,13 @@
 	"description": "A minimal MWP consumer application that can be used for performance testing",
 	"engineStrict": true,
 	"engines": {
-		"node": ">=8.9.0"
+		"node": "^8.11.4",
+		"yarn": "^1.9.4"
 	},
 	"config": {},
 	"main": "./lib/index.js",
 	"scripts": {
-		"build": "babel src --out-dir build --ignore test.js,test.jsx",
+		"build": "babel src --out-dir build --ignore test.js,test.jsx --root-mode upward",
 		"start": "yarn build && node scripts/runServer.js",
 		"start:dev": "yarn build && node --inspect scripts/runServer.js"
 	},
@@ -23,9 +24,13 @@
 		"url": "https://github.com/meetup/meetup-web-platform/issues"
 	},
 	"homepage": "https://github.com/meetup/meetup-web-platform#readme",
+	"peerDependencies": {
+		"mwp-router": ">=0.0.1"
+	},
 	"dependencies": {
 		"classnames": "2.2.5",
-		"meetup-web-components": "4.8.2111",
+		"js-joda": "^1.8.0",
+		"meetup-web-components": "5.2.2434",
 		"mwp-api-state": ">=0.0.1",
 		"mwp-app-server": ">=0.0.1",
 		"mwp-core": ">=0.0.1",
@@ -33,20 +38,18 @@
 		"mwp-store": ">=0.0.1",
 		"mwp-toaster": ">=0.0.1",
 		"prop-types": "15.6.0",
-		"react": "16.3.1",
-		"react-dom": "16.3.1",
+		"react": "16.8.6",
+		"react-dom": "16.8.6",
 		"react-helmet": "5.2.0",
 		"react-intl": "2.4.0",
-		"react-redux": "5.0.6",
-		"react-router-dom": "4.2.2",
+		"react-redux": "5.0.7",
+		"react-router-dom": "4.3.1",
 		"react-transition-group": "2.2.1",
 		"redux": "3.7.2",
-		"redux-observable": "0.17.0",
 		"reselect": "3.0.1",
-		"rxjs": "5.5.2",
 		"swarm-animation": "0.0.95",
-		"swarm-icons": "1.3.268",
-		"swarm-sasstools": "2.0.296"
+		"swarm-icons": "3.5.336",
+		"swarm-sasstools": "5.0.415"
 	},
 	"devDependencies": {}
 }

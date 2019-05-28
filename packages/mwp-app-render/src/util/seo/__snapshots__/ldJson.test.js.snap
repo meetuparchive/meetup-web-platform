@@ -32,7 +32,7 @@ Object {
     "priceCurrency": "USD",
   },
   "startDate": "1970-01-18T04:01-05:00",
-  "url": undefined,
+  "url": "https://www.meetup.com/group/events/123456",
 }
 `;
 

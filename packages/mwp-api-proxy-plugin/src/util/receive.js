@@ -1,3 +1,4 @@
+import isBot from 'isbot';
 import querystring from 'qs';
 import { logger } from 'mwp-logger-plugin';
 
@@ -5,6 +6,7 @@ import { API_PROXY_PLUGIN_NAME } from '../config';
 import { coerceBool, toCamelCase } from './stringUtils';
 
 // match escpaed unicode characters that are treated as newline literals in JS
+const UNICODE_NEWLINES = /\u2028|\u2029/g;
 const ESCAPED_UNICODE_NEWLINES = /\\u2028|\\u2029/g;
 
 /**
@@ -98,7 +100,9 @@ const parseBody = body => {
 	// Some newline literals will not work in JS string literals - they must be
 	// converted to an escaped newline character that will work end to end ('\n')
 	// treat non-success HTTP code as an error
-	const safeBody = body.replace(ESCAPED_UNICODE_NEWLINES, '\\n');
+	const safeBody = body
+		.replace(UNICODE_NEWLINES, '\\n')
+		.replace(ESCAPED_UNICODE_NEWLINES, '\\n');
 	return JSON.parse(safeBody);
 };
 
@@ -169,7 +173,11 @@ export const makeParseApiResponse = query => ([response, body]) => {
  *
  * @param {Object} apiResponse JSON-parsed api response data
  */
-export const makeApiResponseToQueryResponse = query => ({ value, error, meta }) => ({
+export const makeApiResponseToQueryResponse = query => ({
+	value,
+	error,
+	meta,
+}) => ({
 	type: query.type,
 	ref: query.ref,
 	value,
@@ -178,9 +186,13 @@ export const makeApiResponseToQueryResponse = query => ({ value, error, meta }) 
 });
 
 export const makeLogResponse = request => ([response, body]) => {
-	const { request: { headers, method, uri: { href: url } }, statusCode } = response;
+	// `response` may contain private (user-specific) data. Log with caution
+	const {
+		request: { headers, method, uri: { href: url } },
+		statusCode,
+	} = response;
 	const logBase = {
-		...request.raw, // request to /mu_api
+		...request.raw, // request to API_ROUTE_PATH
 		externalRequest: { headers, method, url }, // request to https://api.meetup.com/
 	};
 
@@ -188,7 +200,13 @@ export const makeLogResponse = request => ([response, body]) => {
 		statusCode >= 500 || // REST API had an internal error
 		(method.toLowerCase() === 'get' && statusCode >= 400) // something fishy with a GET
 	) {
-		const logError = (statusCode < 500 ? logger.warn : logger.error).bind(logger);
+		if (isBot(request.headers['user-agent'])) {
+			// don't log errors from bots - e.g. for deleted groups/events/whatever
+			return;
+		}
+		const logError = (statusCode < 500 ? logger.warn : logger.error).bind(
+			logger
+		);
 		let errorMessage;
 		try {
 			// well-behaved API errors return a JSON object with an `errors` array
@@ -207,11 +225,13 @@ export const makeLogResponse = request => ([response, body]) => {
 		});
 		return;
 	}
-	// not an error response
-	logger.info({
-		...logBase,
-		httpRequest: response,
-	});
+	// not an error response - log in dev, not prod
+	if (process.env.NODE_ENV !== 'production') {
+		logger.info({
+			...logBase,
+			httpRequest: response,
+		});
+	}
 };
 
 /**
@@ -241,14 +261,16 @@ export const makeInjectResponseCookies = request => ([response, _, jar]) => {
 	});
 };
 
-export const makeReceive = request => {
+// curried function(request, query, response) that will format an API response into
+// a 'standard' response format
+export const makeReceiver = request => {
 	const logResponse = makeLogResponse(request);
 	const injectResponseCookies = makeInjectResponseCookies(request);
 	return query => {
 		const parseApiResponse = makeParseApiResponse(query);
 		const apiResponseToQueryResponse = makeApiResponseToQueryResponse(query);
 		return response => {
-			logResponse(response); // this will leak private API response data into production logs
+			logResponse(response);
 			injectResponseCookies(response);
 			try {
 				return apiResponseToQueryResponse(parseApiResponse(response));

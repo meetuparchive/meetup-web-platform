@@ -4,11 +4,12 @@
   "description": "Core utilities for MWP apps",
   "engineStrict": true,
   "engines": {
-    "node": ">=8.1.0"
+    "node": "^8.11.4",
+    "yarn": "^1.9.4"
   },
   "main": "./lib/index.js",
   "scripts": {
-    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps"
+    "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps --root-mode upward"
   },
   "repository": {
     "type": "git",
@@ -21,17 +22,15 @@
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "peerDependencies": {
-    "mwp-cli": ">=5",
-    "mwp-router": ">=0.0.1",
-    "newrelic": "^3.2.0",
-    "react": "^16.3.1",
-    "react-dom": "^16.3.1",
+    "newrelic": "^4.8.1",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
     "react-helmet": "^5.2.0",
     "react-intl": "^2.4.0"
   },
   "dependencies": {
-    "@google-cloud/pubsub": "0.15.0",
-    "joi": "10.6.0",
+    "@google-cloud/pubsub": "0.18.0",
+    "joi": "13.4.0",
     "mobile-detect": "1.4.1",
     "mwp-api-proxy-plugin": ">=0.0.1",
     "mwp-app-render": ">=0.0.1",

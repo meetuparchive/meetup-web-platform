@@ -50,7 +50,7 @@ describe('Full dummy app render', () => {
 					expect(response.payload).toContain(fakeApiProxyResponse);
 					expect(
 						response.headers['set-cookie'].find(h =>
-							h.startsWith('x-csrf-jwt-header')
+							h.startsWith('x-mwp-csrf-header')
 						)
 					).not.toBeUndefined();
 				})
