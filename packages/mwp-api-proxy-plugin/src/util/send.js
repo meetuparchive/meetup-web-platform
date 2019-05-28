@@ -130,7 +130,11 @@ export const buildRequestArgs = externalRequestOpts => ({
 	let url = FULL_URL_PATTERN.test(endpoint) ? encodedUrl : `/${encodedUrl}`;
 	let body;
 	const jar = createCookieJar(url);
-
+	console.log(
+		'\nEXTERNAL REQUEST\n',
+		externalRequestOpts.url,
+		JSON.stringify(externalRequestOpts.headers)
+	);
 	if (flags || meta.flags) {
 		headers['X-Meetup-Request-Flags'] = (flags || meta.flags).join(',');
 	}
