@@ -102,7 +102,11 @@ export const buildRequestArgs = externalRequestOpts => ({
 	let url = encodeURI(`/${decodeURI(endpoint)}`);
 	let body;
 	const jar = createCookieJar(url);
-
+	console.log(
+		'\nEXTERNAL REQUEST\n',
+		externalRequestOpts.url,
+		JSON.stringify(externalRequestOpts.headers)
+	);
 	if (flags || meta.flags) {
 		headers['X-Meetup-Request-Flags'] = (flags || meta.flags).join(',');
 	}
@@ -112,15 +116,14 @@ export const buildRequestArgs = externalRequestOpts => ({
 	}
 
 	if (meta.variants) {
-		headers['X-Meetup-Variants'] = Object.keys(meta.variants).reduce(
-			(header, experiment) => {
-				const context = meta.variants[experiment];
-				const contexts = context instanceof Array ? context : [context];
-				header += contexts.map(c => `${experiment}=${c}`).join(' ');
-				return header;
-			},
-			''
-		);
+		headers['X-Meetup-Variants'] = Object.keys(
+			meta.variants
+		).reduce((header, experiment) => {
+			const context = meta.variants[experiment];
+			const contexts = context instanceof Array ? context : [context];
+			header += contexts.map(c => `${experiment}=${c}`).join(' ');
+			return header;
+		}, '');
 	}
 
 	switch (externalRequestOpts.method) {
@@ -288,7 +291,10 @@ export function getExternalRequestOpts(request) {
 /**
  * Fake an API request and directly return the stringified mockResponse
  */
-export const makeMockRequest = (mockResponseContent, responseMeta) => requestOpts =>
+export const makeMockRequest = (
+	mockResponseContent,
+	responseMeta
+) => requestOpts =>
 	Observable.of([
 		makeMockResponse(requestOpts, responseMeta),
 		JSON.stringify(mockResponseContent),
