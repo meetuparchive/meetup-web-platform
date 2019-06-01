@@ -33,7 +33,7 @@
     "react": "^16.8.6",
     "react-router-dom": "^4.2.2",
     "react-transition-group": "^2.2.1",
-    "reselect": "^3.0.1",
+    "reselect": "^3.0.1 || ^4.0.0",
     "swarm-animation": "^0.0.95",
     "swarm-constants": "2.2.122",
     "swarm-icons": "^3.8.349",
