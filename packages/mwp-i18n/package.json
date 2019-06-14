@@ -24,7 +24,7 @@
   "peerDependencies": {
     "mwp-app-render": ">=0.0.1",
     "react": "^16.8.6",
-    "react-intl": "2.4.0",
+    "react-intl": "^2.4.0",
     "react-redux": ">=5"
   },
   "devDependencies": {}
