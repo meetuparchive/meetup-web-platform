@@ -1,4 +1,5 @@
 module.exports = {
+	babel: require('./babel'),
 	env: require('./env'),
 	locales: require('./locales'),
 	localesSecondary: require('./localesSecondary'),
