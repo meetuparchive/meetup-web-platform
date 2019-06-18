@@ -31,7 +31,7 @@
   "dependencies": {
     "@google-cloud/pubsub": "0.18.0",
     "joi": "13.4.0",
-    "mobile-detect": "1.4.1",
+    "mobile-detect": "1.4.3",
     "mwp-api-proxy-plugin": ">=0.0.1",
     "mwp-app-render": ">=0.0.1",
     "mwp-logger-plugin": ">=0.0.1",
@@ -39,7 +39,7 @@
     "mwp-store": ">=0.0.1",
     "node-fetch": "1.7.2",
     "pino": "4.7.1",
-    "qs": "6.5.0"
+    "qs": "6.7.0"
   },
   "devDependencies": {}
 }

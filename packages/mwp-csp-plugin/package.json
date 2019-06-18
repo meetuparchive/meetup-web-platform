@@ -23,6 +23,6 @@
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "dependencies": {
     "blankie": "4.0.0",
-    "scooter": "5.0.0"
+    "scooter": "5.0.2"
   }
 }
