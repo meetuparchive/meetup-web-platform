@@ -23,7 +23,7 @@
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "dependencies": {
     "mwp-auth-plugin": ">=0.0.1",
-    "react-side-effect": "1.1.3"
+    "react-side-effect": "1.1.5"
   },
   "peerDependencies": {
     "prop-types": "^15.5.10",
