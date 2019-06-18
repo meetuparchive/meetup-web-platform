@@ -28,8 +28,8 @@
 		"mwp-router": ">=0.0.1"
 	},
 	"dependencies": {
-		"classnames": "2.2.5",
-		"js-joda": "^1.8.0",
+		"classnames": "2.2.6",
+		"js-joda": "^1.10.1",
 		"meetup-web-components": "5.2.2434",
 		"mwp-api-state": ">=0.0.1",
 		"mwp-app-server": ">=0.0.1",
@@ -40,7 +40,7 @@
 		"prop-types": "15.6.0",
 		"react": "16.8.6",
 		"react-dom": "16.8.6",
-		"react-helmet": "5.2.0",
+		"react-helmet": "5.2.1",
 		"react-intl": "2.4.0",
 		"react-redux": "5.0.7",
 		"react-router-dom": "4.3.1",
@@ -48,8 +48,8 @@
 		"redux": "3.7.2",
 		"reselect": "3.0.1",
 		"swarm-animation": "0.0.95",
-		"swarm-icons": "3.5.336",
-		"swarm-sasstools": "5.0.415"
+		"swarm-icons": "3.8.354",
+		"swarm-sasstools": "5.0.428"
 	},
 	"devDependencies": {}
 }
