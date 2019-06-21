@@ -2,6 +2,7 @@ const path = require('path');
 
 const repoRoot = process.cwd(); // expect CLI to be run from consumer repo root
 const srcPath = path.resolve(repoRoot, 'src');
+const localPackages = path.resolve(repoRoot, 'packages');
 const buildPath = path.resolve(repoRoot, 'build');
 
 const output = {
@@ -37,5 +38,6 @@ module.exports = {
 	buildPath,
 	output,
 	src,
+	localPackages,
 	packages,
 };

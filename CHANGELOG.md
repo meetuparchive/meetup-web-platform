@@ -1,3 +1,14 @@
+## [22.1]
+
+-   **New feature** `mwp-config` now exports a `paths.localPackages` path pointing
+    to the `/packages` directory in monorepo consumers (e.g. mup-web)
+
+## [22.0]
+
+-   **Breaking change** `mwp-config` now specifies babel-loader rules for Babel 7
+    instead of Babel 6. Downstream consumers should work with the Web Platform
+    team to make the update
+
 ## [21.3]
 
 -   **Refactor** Upgraded MWP build to Babel7 and corresponding plugins. All
