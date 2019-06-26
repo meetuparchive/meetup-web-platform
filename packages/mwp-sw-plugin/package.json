@@ -31,6 +31,6 @@
   },
   "devDependencies": {},
   "peerDependencies": {
-    "inert": "5.1.0"
+    "inert": "5.1.3"
   }
 }
