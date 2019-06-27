@@ -1,3 +1,9 @@
+## [22.2]
+
+-   **New feature** The Google Tag Manager util now targets specific GTM Environments
+    based on the running environment (eg: prod, dev). Environments can also be 
+    manually chosen by passing parameters to the GTM util.
+
 ## [22.1]
 
 -   **New feature** `mwp-config` now exports a `paths.localPackages` path pointing

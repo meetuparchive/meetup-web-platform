@@ -5,11 +5,17 @@ exports[`getDataLayerInitSnippet() should match the snapshot with some \`data\` 
 exports[`getDataLayerInitSnippet() should match the snapshot without \`data\` passed 1`] = `"dataLayer=[]"`;
 
 exports[`getGoogleTagManagerSnippet() matches snap 1`] = `
-"(function(w,d,s,l,i){
-		w[l]=w[l]||[];
-		w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
-		var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
-		j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
-		f.parentNode.insertBefore(j,f);
-	})(window,document,'script','dataLayer','GTM-W9W847');"
+"(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl+ '&gtm_auth=OtzciJkDXO73MJ5VH2mTsA&gtm_preview=env-265&gtm_cookies_win=x';f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-T2LNGD');"
+`;
+
+exports[`getGoogleTagManagerSnippet() matches snap with parameters passed 1`] = `
+"(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl+ '&gtm_auth=qwertyuiopasdfghjklzxcvbnm&gtm_preview=env-42&gtm_cookies_win=x';f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-CONTAINER-ID');"
 `;
