@@ -64,7 +64,16 @@ If you click the disclosure arrow, the version number will be displayed, e.g.
 You can then install this beta version into your consumer application with
 
 ```sh
-> yarn install meetup-web-platform@<version tag>
+> yarn add -W \
+    mwp-api-state@<version tag> \
+    mwp-app-render@<version tag> \
+    mwp-app-server@<version tag> \
+    mwp-config@<version tag> \
+    mwp-core@<version tag> \
+    mwp-i18n@<version tag> \
+    mwp-router@<version tag> \
+    mwp-store@<version tag> \
+    mwp-toaster@<version tag>
 ```
 
 Each time you push a change to your `meetup-web-platform` PR, you'll need to
@@ -75,8 +84,9 @@ The overall workflow is:
 1. Open a PR for your `meetup-web-platform` branch
 2. Wait for Travis to successfully build your branch (this can take 5+ minutes)
 3. Get the version string from the build logs under `GIT_TAG`
-4. (if needed) Push changes to your `meetup-web-platform` branch
-5. Repeat steps 2-3
+4. Update the `mwp-*` (except `mwp-cli`) on your consumer application and test the changes
+5. (if needed) Push changes to your `meetup-web-platform` branch
+6. Repeat steps 2-3
 
 ## Adding a new package
 
