@@ -79,7 +79,7 @@ will be used as-is.
 `endpoint: 'members/123456'` and `endpoint: 'https://api.meetup.com/members/123456'`
 are functionally equivalent
 
-*Note*: this URL should not include any parameter placeholders
+_Note_: this URL should not include any parameter placeholders
 like `/:urlname` - the values should be filled in as needed.
 
 #### `params`
@@ -128,7 +128,7 @@ different `method`s.
 Alternatively, you can use method-specific action creators to automatically
 assingn the method and make the request for individual requests.
 
-##### `variants`
+##### `variants` [DEPRECATED - call variants endpoint directly]
 
 You can request variant names for particular experiments with particular
 contexts by populating `meta.variants` with an object containing keys that are
@@ -157,7 +157,7 @@ A query response is also a plain object
 
 #### `meta`
 
-#### `variants`
+#### `variants` [DEPRECATED - call variants endpoint directly]
 
 If a query contains a `meta.variants` request, the query response _might not
 contain a corresponding `variants` response_ if the variants service fails -
@@ -553,7 +553,7 @@ action creator from `apiActionCreators`.
 
 ### PUT
 
-The difference between PUT and POST is that PUT is idempotent: 
+The difference between PUT and POST is that PUT is idempotent:
 calling it once or several times successively has the same effect.
 
 ### DELETE
@@ -564,3 +564,30 @@ action creator from `apiActionCreators`.
 The response will generally be a '204 - No Content',
 so you'll have to read the 'updated' value in Redux state a little more
 carefully.
+
+## Calling the variants service
+
+The variants service provides its own public API endpoint returning JSON. See
+[the variants service README](https://github.com/meetup/variant/blob/master/README.md)
+and [the OpenAPI spec](https://github.com/meetup/variant/blob/master/src/main/openapi/meetup-scala-server/variant.yaml).
+
+To use it, set the `endpoint` to `https://variant-ext.data.meetuphq.io/variant/${experimentId}/${entityId}`
+where `expirementId` is the name of your experiment in the variants service,
+and `entityId` is a _member ID_, _chapter ID_, or group `urlname`, depending
+on the type of experiment.
+
+```js
+import { getProperty } from '@meetup/api-state-selectors';
+
+const MY_VARIANT_REF = 'my-cool-experiment-variant';
+const myVariantQuery = {
+	endpoint: `https://variant-ext.data.meetuphq.io/variant/my-cool-experiment/${member.id}`,
+	ref: MY_VARIANT_REF,
+};
+
+const myVariantSelector = state => {
+	const response = state.api[MY_VARIANT_REF] || {};
+	// get the assigned variant as a string, default to ''
+	return getProperty(response, 'variant', '');
+};
+```
