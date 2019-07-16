@@ -5,6 +5,7 @@ import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import Helmet from 'react-helmet';
 import MobileDetect from 'mobile-detect';
+import isBot from 'isbot';
 
 import { API_ROUTE_PATH } from 'mwp-api-proxy-plugin';
 import { Forbidden, NotFound, Redirect, SERVER_RENDER } from 'mwp-router';
@@ -213,6 +214,7 @@ const getAppContext = (request: HapiRequest, enableServiceWorker: boolean) => {
 		browserId: parseBrowserIdCookie(state),
 		clientIp,
 		siftSessionId: parseSiftSessionCookie(state),
+		isBot: isBot(request.headers['user-agent']),
 	};
 };
 
