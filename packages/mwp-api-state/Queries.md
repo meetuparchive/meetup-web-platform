@@ -571,17 +571,25 @@ The variants service provides its own public API endpoint returning JSON. See
 [the variants service README](https://github.com/meetup/variant/blob/master/README.md)
 and [the OpenAPI spec](https://github.com/meetup/variant/blob/master/src/main/openapi/meetup-scala-server/variant.yaml).
 
-To use it, set the `endpoint` to `https://variant-ext.data.meetuphq.io/variant/${experimentId}/${entityId}`
+To use it in production, set the `endpoint` to
+`https://variant-ext.data.meetuphq.io/variant/v2/${experimentId}/${entityId}`
 where `expirementId` is the name of your experiment in the variants service,
 and `entityId` is a _member ID_, _chapter ID_, or group `urlname`, depending
 on the type of experiment.
+
+_In dev_, use the `variantNoEnrollment` version of the endpoint (documented in the OpenAPI spec)
+in order to prevent the experiment data from showing up in site analytics (Looker), i.e.
+`https://variant-ext.data.meetuphq.io/variantNoEnrollment/v2/${experimentId}/${entityId}`
 
 ```js
 import { getProperty } from '@meetup/api-state-selectors';
 
 const MY_VARIANT_REF = 'my-cool-experiment-variant';
+const variantEndpoint =
+	process.env.NODE_ENV === 'production' ? 'variant' : 'variantNoEnrollment';
+
 const myVariantQuery = {
-	endpoint: `https://variant-ext.data.meetuphq.io/variant/my-cool-experiment/${member.id}`,
+	endpoint: `https://variant-ext.data.meetuphq.io/${variantEndpoint}/v2/my-cool-experiment/${member.id}`,
 	ref: MY_VARIANT_REF,
 };
 
