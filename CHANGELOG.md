@@ -1,3 +1,8 @@
+## [22.3]
+
+-   **New feature** `mwp-config` now exports a `packages.mupwebPackages` path Regex pointing
+    to the `/packages/<package-name>/lib` directory in monorepo consumers (e.g. mup-web)
+
 ## [22.2]
 
 -   **New feature** The Google Tag Manager util now targets specific GTM Environments
