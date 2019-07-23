@@ -46,6 +46,7 @@ declare type AppContext = {
 	browserId: string, // from browser id cookie
 	clientIp: string, // best guess at client IP address
 	siftSessionId: string, // from Sift Science cookie
+	isBot: boolean, // based on user agent, is this a bot?
 };
 
 declare type MWPState = {

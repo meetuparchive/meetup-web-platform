@@ -30,6 +30,9 @@ const packages = {
 		src: /node_modules\/meetup-web-components\/src/,
 		icons: /node_modules\/meetup-web-components\/icons/,
 	},
+	mupwebPackages: {
+		lib: /packages\/mupweb-.+\/lib/,
+	},
 };
 
 module.exports = {
