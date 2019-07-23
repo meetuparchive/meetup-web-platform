@@ -7,7 +7,6 @@ import {
 } from 'meetup-web-mocks/lib/app';
 
 import {
-	createCookieJar,
 	makeExternalApiRequest,
 	buildRequestArgs,
 	getAuthHeaders,
@@ -170,6 +169,7 @@ describe('buildRequestArgs', () => {
 		url,
 		headers: {
 			authorization: 'Bearer testtoken',
+			cookie: '',
 		},
 		mode: 'no-cors',
 	};
@@ -301,17 +301,6 @@ describe('getExternalRequestOpts', () => {
 	});
 });
 
-describe('createCookieJar', () => {
-	it('returns a cookie jar for /sessions endpoint', () => {
-		const jar = createCookieJar('/sessions?asdfasd');
-		expect(jar).not.toBeNull();
-	});
-	it('returns null for non-sessions endpoint', () => {
-		const jar = createCookieJar('/not-sessions?asdfasd');
-		expect(jar).toBeNull();
-	});
-});
-
 describe('makeExternalApiRequest', () => {
 	it('calls externalRequest with requestOpts', async () => {
 		const server = await getServer();
@@ -347,23 +336,6 @@ describe('makeExternalApiRequest', () => {
 		})(requestOpts).then(([resp, body]) =>
 			expect(JSON.parse(body).errors[0].code).toBe('ETIMEDOUT')
 		);
-	});
-	it('returns the requestOpts jar at array index 2', async () => {
-		const server = await getServer();
-
-		const mockRequest = {
-			...MOCK_HAPI_REQUEST,
-			server,
-		};
-
-		const requestOpts = {
-			foo: 'bar',
-			url: 'http://example.com',
-			jar: 'fooJar',
-		};
-		return makeExternalApiRequest(mockRequest)(
-			requestOpts
-		).then(([response, body, jar]) => expect(jar).toBe(requestOpts.jar));
 	});
 });
 
