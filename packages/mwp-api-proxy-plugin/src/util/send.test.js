@@ -7,16 +7,15 @@ import {
 } from 'meetup-web-mocks/lib/app';
 
 import {
-	createCookieJar,
-	makeExternalApiRequest,
+	makeDoApiRequest,
 	buildRequestArgs,
 	getAuthHeaders,
-	getExternalRequestOpts,
 	getLanguageHeader,
 	getClientIpHeader,
 	getTrackingHeaders,
 	parseMultipart,
 	API_META_HEADER,
+	getRequestOpts,
 } from './send';
 
 import { API_PROXY_PLUGIN_NAME } from '../config';
@@ -170,6 +169,7 @@ describe('buildRequestArgs', () => {
 		url,
 		headers: {
 			authorization: 'Bearer testtoken',
+			cookie: '',
 		},
 		mode: 'no-cors',
 	};
@@ -277,14 +277,14 @@ describe('buildRequestArgs', () => {
 	});
 });
 
-describe('getExternalRequestOpts', () => {
+describe('getRequestOpts', () => {
 	it('returns the expected object from a vanilla request', async () => {
 		const server = await getServer();
 		const mockRequest = {
 			...MOCK_HAPI_REQUEST,
 			server,
 		};
-		expect(getExternalRequestOpts(mockRequest)).toMatchSnapshot();
+		expect(getRequestOpts(mockRequest)).toMatchSnapshot();
 	});
 	it('returns the expected object from a multipart request', async () => {
 		const server = await getServer();
@@ -297,22 +297,11 @@ describe('getExternalRequestOpts', () => {
 			payload: { foo: 'bar' },
 		};
 
-		expect(getExternalRequestOpts(mockRequest)).toMatchSnapshot();
+		expect(getRequestOpts(mockRequest)).toMatchSnapshot();
 	});
 });
 
-describe('createCookieJar', () => {
-	it('returns a cookie jar for /sessions endpoint', () => {
-		const jar = createCookieJar('/sessions?asdfasd');
-		expect(jar).not.toBeNull();
-	});
-	it('returns null for non-sessions endpoint', () => {
-		const jar = createCookieJar('/not-sessions?asdfasd');
-		expect(jar).toBeNull();
-	});
-});
-
-describe('makeExternalApiRequest', () => {
+describe('makeDoApiRequest', () => {
 	it('calls externalRequest with requestOpts', async () => {
 		const server = await getServer();
 		const mockRequest = {
@@ -325,7 +314,7 @@ describe('makeExternalApiRequest', () => {
 			url: 'http://example.com',
 		};
 
-		return makeExternalApiRequest(mockRequest)(requestOpts)
+		return makeDoApiRequest(mockRequest)(requestOpts)
 			.then(() => require('request').mock.calls.pop()[0])
 			.then(arg => expect(arg).toBe(requestOpts));
 	});
@@ -338,7 +327,7 @@ describe('makeExternalApiRequest', () => {
 			err,
 		};
 
-		return makeExternalApiRequest({
+		return makeDoApiRequest({
 			server: {
 				app: { logger: { error: () => {} } },
 				settings: { app: { api: { timeout: 100 } } },
@@ -347,23 +336,6 @@ describe('makeExternalApiRequest', () => {
 		})(requestOpts).then(([resp, body]) =>
 			expect(JSON.parse(body).errors[0].code).toBe('ETIMEDOUT')
 		);
-	});
-	it('returns the requestOpts jar at array index 2', async () => {
-		const server = await getServer();
-
-		const mockRequest = {
-			...MOCK_HAPI_REQUEST,
-			server,
-		};
-
-		const requestOpts = {
-			foo: 'bar',
-			url: 'http://example.com',
-			jar: 'fooJar',
-		};
-		return makeExternalApiRequest(mockRequest)(
-			requestOpts
-		).then(([response, body, jar]) => expect(jar).toBe(requestOpts.jar));
 	});
 });
 
