@@ -88,13 +88,13 @@ function makeMockResponse(requestOpts, response = MOCK_RESPONSE_OK) {
  * Currently, cookies cannot be set by DIY edge endpoints. (e.g. using the
  * `jar` interface in `request`)
  */
-const buildGenericRequestArgs = requestOpts => {
+export const buildGenericRequestArgs = requestOpts => {
 	// make a copy of the 'global' headers set for all queries.
 	const headers = { ...requestOpts.headers };
 	// all DIY edges support JSON bodies for all methods
 	headers['content-type'] = 'application/json';
 	// strip clicktracking cookie 'click-track'
-	headers.cookie = headers.cookie.replace(/\s+?click-track=[^;]+/, '');
+	headers.cookie = headers.cookie.replace(/\s*click-track=[^;]+/, '');
 
 	return query => {
 		let body;
@@ -146,7 +146,7 @@ const buildGenericRequestArgs = requestOpts => {
  *
  * - 'set cookie' for login requests to /sessions (not used)
  */
-const buildSharedEdgeRequestArgs = requestOpts => query => {
+export const buildSharedEdgeRequestArgs = requestOpts => query => {
 	const { endpoint, params, flags, meta = {} } = query;
 	const dataParams = querystring.stringify(params);
 	const headers = { ...requestOpts.headers };
