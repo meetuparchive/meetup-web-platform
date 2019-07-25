@@ -145,7 +145,9 @@ export default function getPlugins({ languageRenderers }) {
 	const {
 		package: { agent },
 		getServer,
-		env: { schema: { asset_server } },
+		env: {
+			schema: { asset_server },
+		},
 	} = config;
 	const server = getServer();
 	const isProdApi = server.properties.api.isProd;
@@ -166,6 +168,7 @@ export default function getPlugins({ languageRenderers }) {
 				`*.dev.meetup.com:${asset_server.port.default}`,
 			].join(' '),
 			connectSrc: '*',
+			frameAncestors: 'self', // prevent site from being loaded in iframes from different domains
 			frameSrc: '*',
 			fontSrc: '* data:',
 			imgSrc: '* data: blob:',
