@@ -7,15 +7,15 @@ import {
 } from 'meetup-web-mocks/lib/app';
 
 import {
-	makeExternalApiRequest,
+	makeDoApiRequest,
 	buildRequestArgs,
 	getAuthHeaders,
-	getExternalRequestOpts,
 	getLanguageHeader,
 	getClientIpHeader,
 	getTrackingHeaders,
 	parseMultipart,
 	API_META_HEADER,
+	getRequestOpts,
 } from './send';
 
 import { API_PROXY_PLUGIN_NAME } from '../config';
@@ -277,14 +277,14 @@ describe('buildRequestArgs', () => {
 	});
 });
 
-describe('getExternalRequestOpts', () => {
+describe('getRequestOpts', () => {
 	it('returns the expected object from a vanilla request', async () => {
 		const server = await getServer();
 		const mockRequest = {
 			...MOCK_HAPI_REQUEST,
 			server,
 		};
-		expect(getExternalRequestOpts(mockRequest)).toMatchSnapshot();
+		expect(getRequestOpts(mockRequest)).toMatchSnapshot();
 	});
 	it('returns the expected object from a multipart request', async () => {
 		const server = await getServer();
@@ -297,11 +297,11 @@ describe('getExternalRequestOpts', () => {
 			payload: { foo: 'bar' },
 		};
 
-		expect(getExternalRequestOpts(mockRequest)).toMatchSnapshot();
+		expect(getRequestOpts(mockRequest)).toMatchSnapshot();
 	});
 });
 
-describe('makeExternalApiRequest', () => {
+describe('makeDoApiRequest', () => {
 	it('calls externalRequest with requestOpts', async () => {
 		const server = await getServer();
 		const mockRequest = {
@@ -314,7 +314,7 @@ describe('makeExternalApiRequest', () => {
 			url: 'http://example.com',
 		};
 
-		return makeExternalApiRequest(mockRequest)(requestOpts)
+		return makeDoApiRequest(mockRequest)(requestOpts)
 			.then(() => require('request').mock.calls.pop()[0])
 			.then(arg => expect(arg).toBe(requestOpts));
 	});
@@ -327,7 +327,7 @@ describe('makeExternalApiRequest', () => {
 			err,
 		};
 
-		return makeExternalApiRequest({
+		return makeDoApiRequest({
 			server: {
 				app: { logger: { error: () => {} } },
 				settings: { app: { api: { timeout: 100 } } },

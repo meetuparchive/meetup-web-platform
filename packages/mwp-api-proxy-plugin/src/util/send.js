@@ -3,18 +3,18 @@ import http from 'http';
 import querystring from 'qs';
 import url from 'url';
 
-import externalRequest from 'request';
+import _doRequest from 'request';
 
 import config from 'mwp-config';
 
 export const API_META_HEADER = 'X-Meta-Request-Headers';
-const IS_DIY_EDGE_URL_PATTERN = /^https?:\/\//;
+const FULL_URL_PATTERN = /^https?:\/\//;
 
-// create a promisified version of `externalRequest` - can't use `util.promisify`
+// create a promisified version of `_doRequest` - can't use `util.promisify`
 // because the callback gets 2 additional arguments, and promisify only supports 1.
-const externalRequestPromise = options =>
+const doRequest = options =>
 	new Promise((resolve, reject) => {
-		externalRequest(options, (err, response, body) => {
+		_doRequest(options, (err, response, body) => {
 			if (err) {
 				reject(err);
 				return;
@@ -88,9 +88,9 @@ function makeMockResponse(requestOpts, response = MOCK_RESPONSE_OK) {
  * Currently, cookies cannot be set by DIY edge endpoints. (e.g. using the
  * `jar` interface in `request`)
  */
-const buildDIYEdgeRequestArgs = externalRequestOpts => {
+const buildGenericRequestArgs = requestOpts => {
 	// make a copy of the 'global' headers set for all queries.
-	const headers = { ...externalRequestOpts.headers };
+	const headers = { ...requestOpts.headers };
 	// all DIY edges support JSON bodies for all methods
 	headers['content-type'] = 'application/json';
 	// strip clicktracking cookie 'click-track'
@@ -102,11 +102,11 @@ const buildDIYEdgeRequestArgs = externalRequestOpts => {
 		// create properly-escaped URL from endpoint
 		const url = new URL(query.endpoint);
 
-		switch (externalRequestOpts.method) {
+		switch (requestOpts.method) {
 			case 'patch':
 			case 'put':
 			case 'post':
-				if (externalRequestOpts.formData) {
+				if (requestOpts.formData) {
 					break;
 				}
 				// assume all DIY edge endpoints handle JSON body encoding
@@ -121,22 +121,22 @@ const buildDIYEdgeRequestArgs = externalRequestOpts => {
 				}
 			}
 		}
-		const externalRequestOptsQuery = {
-			...externalRequestOpts,
+		const queryRequestOpts = {
+			...requestOpts,
 			headers,
 			url: url.toString(),
 			baseUrl: undefined, // allow fully-qualified URL to override baseUrl
-			timeout: externalRequestOpts.formData
+			timeout: requestOpts.formData
 				? 60 * 1000 // 60sec upload timeout
-				: externalRequestOpts.timeout,
+				: requestOpts.timeout,
 		};
 
 		// only add body if defined
 		if (body) {
-			externalRequestOptsQuery.body = body;
+			queryRequestOpts.body = body;
 		}
 
-		return externalRequestOptsQuery;
+		return queryRequestOpts;
 	};
 };
 
@@ -146,10 +146,10 @@ const buildDIYEdgeRequestArgs = externalRequestOpts => {
  *
  * - 'set cookie' for login requests to /sessions (not used)
  */
-const buildSharedEdgeRequestArgs = externalRequestOpts => query => {
+const buildSharedEdgeRequestArgs = requestOpts => query => {
 	const { endpoint, params, flags, meta = {} } = query;
 	const dataParams = querystring.stringify(params);
-	const headers = { ...externalRequestOpts.headers };
+	const headers = { ...requestOpts.headers };
 	// endpoint may or may not be URI-encoded, so we decode before encoding
 	const encodedUrl = encodeURI(decodeURI(endpoint));
 	// add leading slash
@@ -177,11 +177,11 @@ const buildSharedEdgeRequestArgs = externalRequestOpts => query => {
 		);
 	}
 
-	switch (externalRequestOpts.method) {
+	switch (requestOpts.method) {
 		case 'patch':
 		case 'put':
 		case 'post':
-			if (externalRequestOpts.formData) {
+			if (requestOpts.formData) {
 				break;
 			}
 			body = dataParams;
@@ -195,21 +195,21 @@ const buildSharedEdgeRequestArgs = externalRequestOpts => query => {
 			headers['X-Meta-Photo-Host'] = 'secure';
 	}
 
-	const externalRequestOptsQuery = {
-		...externalRequestOpts,
+	const queryRequestOpts = {
+		...requestOpts,
 		headers,
 		url,
-		timeout: externalRequestOpts.formData
+		timeout: requestOpts.formData
 			? 60 * 1000 // 60sec upload timeout
-			: externalRequestOpts.timeout,
+			: requestOpts.timeout,
 	};
 
 	// only add body if defined
 	if (body) {
-		externalRequestOptsQuery.body = body;
+		queryRequestOpts.body = body;
 	}
 
-	return externalRequestOptsQuery;
+	return queryRequestOpts;
 };
 
 /**
@@ -221,20 +221,21 @@ const buildSharedEdgeRequestArgs = externalRequestOpts => query => {
  *
  * @see {@link https://www.npmjs.com/package/request}
  *
- * @param {Object} externalRequestOpts request options that will be applied to
+ * @param {Object} requestOpts request options that will be applied to
  *   every query request
  * @param {Object} query { endpoint, params, flags }
  *   call)
- * @return {Object} externalRequestOptsQuery argument for the call to
- *   `externalRequest` for the query
+ * @return {Object} queryRequestOpts argument for the call to
+ *   `_doRequest` for the query
  */
-export const buildRequestArgs = externalRequestOpts => query => {
-	// chapstick (shared edge) requests have some 'special' features, so its
-	// request args are built differently
-	const isDIYEdge = IS_DIY_EDGE_URL_PATTERN.test(query.endpoint);
-	const requestArgBuilder = isDIYEdge
-		? buildDIYEdgeRequestArgs(externalRequestOpts)
-		: buildSharedEdgeRequestArgs(externalRequestOpts);
+export const buildRequestArgs = requestOpts => query => {
+	// if the query.endpoint is fully-qualified URL, that indicates that it
+	// is _not_ a request to the shared Edge API (api.meeetup.com), and therefore
+	// does not need the shared-edge-specific request functionality (e.g. special
+	// headers, click-tracking cookies)
+	const requestArgBuilder = FULL_URL_PATTERN.test(query.endpoint)
+		? buildGenericRequestArgs(requestOpts)
+		: buildSharedEdgeRequestArgs(requestOpts);
 	return requestArgBuilder(query);
 };
 
@@ -298,7 +299,7 @@ export function getTrackingHeaders(request) {
 }
 
 export function parseRequestHeaders(request) {
-	const externalRequestHeaders = {
+	const requestOptsHeaders = {
 		...request.headers,
 		...getAuthHeaders(request),
 		...getClientIpHeader(request),
@@ -308,12 +309,12 @@ export function parseRequestHeaders(request) {
 		'x-meetup-parent-request-id': request.id,
 	};
 
-	delete externalRequestHeaders['host']; // let app server set 'host'
-	delete externalRequestHeaders['accept-encoding']; // let app server set 'accept'
-	delete externalRequestHeaders['content-length']; // original request content-length is irrelevant
-	delete externalRequestHeaders['content-type']; // the content type will be set in buildRequestArgs
+	delete requestOptsHeaders['host']; // let app server set 'host'
+	delete requestOptsHeaders['accept-encoding']; // let app server set 'accept'
+	delete requestOptsHeaders['content-length']; // original request content-length is irrelevant
+	delete requestOptsHeaders['content-type']; // the content type will be set in buildRequestArgs
 
-	return externalRequestHeaders;
+	return requestOptsHeaders;
 }
 
 /*
@@ -343,11 +344,11 @@ export const parseMultipart = payload =>
  * options for _every_ parallel REST API request made by the platform
  * corresponding to single incoming request.
  *
- * @return {Object} externalRequestOpts
+ * @return {Object} requestOpts
  */
-export function getExternalRequestOpts(request) {
+export function getRequestOpts(request) {
 	const { api } = request.server.settings.app;
-	const externalRequestOpts = {
+	const requestOpts = {
 		baseUrl: api.root_url,
 		method: request.method,
 		headers: parseRequestHeaders(request),
@@ -360,9 +361,9 @@ export function getExternalRequestOpts(request) {
 	};
 	if (request.mime === 'multipart/form-data') {
 		// multipart form data needs special treatment
-		externalRequestOpts.formData = parseMultipart(request.payload);
+		requestOpts.formData = parseMultipart(request.payload);
 	}
-	return externalRequestOpts;
+	return requestOpts;
 }
 
 /**
@@ -377,8 +378,8 @@ export const makeMockRequest = (mockResponseContent, responseMeta) => requestOpt
 /**
  * Make a real external API request, return response body string
  */
-export const makeExternalApiRequest = request => requestOpts => {
-	return externalRequestPromise(requestOpts).catch(err => {
+export const makeDoApiRequest = request => requestOpts => {
+	return doRequest(requestOpts).catch(err => {
 		request.server.app.logger.error({
 			err,
 			externalRequest: requestOpts, // for detailed debugging, including headers
@@ -399,20 +400,20 @@ export const makeExternalApiRequest = request => requestOpts => {
  * object shape
  */
 export const makeSendQuery = request => {
-	// 1. get the queries and the shared `externalRequestOpts` from the request
+	// 1. get the queries and the shared `requestOpts` from the request
 	//    that will be applied to all queries
-	const externalRequestOpts = getExternalRequestOpts(request);
+	const requestOpts = getRequestOpts(request);
 
-	// 2. create a function that uses `externalRequestOpts` as a base from which
+	// 2. create a function that uses `requestOpts` as a base from which
 	//    to build query-specific API request options objects
-	const queryToRequestOpts = buildRequestArgs(externalRequestOpts);
+	const queryToRequestOpts = buildRequestArgs(requestOpts);
 
 	return query => {
 		const requestOpts = queryToRequestOpts(query);
 		// decide whether to make a _real_ request or a mock request
 		const doRequest = query.mockResponse
 			? makeMockRequest(query.mockResponse)
-			: makeExternalApiRequest(request);
+			: makeDoApiRequest(request);
 
 		return doRequest(requestOpts);
 	};
