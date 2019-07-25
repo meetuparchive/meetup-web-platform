@@ -16,6 +16,10 @@ export function register(
 
 		// Enables XSS filtering. Browser will prevent rendering of the page if an attack is detected.
 		request.response.header('X-XSS-Protection', '1; mode=block');
+
+		// legacy header for suppressing iframe rendering on other domains
+		request.response.header('X-Frame-Options', 'SAMEORIGIN');
+
 		return h.continue;
 	});
 	/**
