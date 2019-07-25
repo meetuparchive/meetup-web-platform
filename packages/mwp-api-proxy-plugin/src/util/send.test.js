@@ -7,16 +7,16 @@ import {
 } from 'meetup-web-mocks/lib/app';
 
 import {
-	createCookieJar,
-	makeExternalApiRequest,
-	buildRequestArgs,
+	makeDoApiRequest,
+	buildGenericRequestArgs,
+	buildSharedEdgeRequestArgs,
 	getAuthHeaders,
-	getExternalRequestOpts,
 	getLanguageHeader,
 	getClientIpHeader,
 	getTrackingHeaders,
 	parseMultipart,
 	API_META_HEADER,
+	getRequestOpts,
 } from './send';
 
 import { API_PROXY_PLUGIN_NAME } from '../config';
@@ -163,22 +163,89 @@ describe('getLanguageHeader', () => {
 	});
 });
 
-describe('buildRequestArgs', () => {
+describe.only('buildGenericRequestArgs', () => {
+	const endpoint = 'https://example.com/foo';
+	const query = {
+		endpoint,
+		params: { foo: 'bar' },
+	};
+
+	const url = 'http://example.com';
+	const options = {
+		url,
+		headers: {
+			authorization: 'Bearer testtoken',
+			cookie: 'click-track=1234; foo=1',
+		},
+		mode: 'no-cors',
+	};
+
+	it('Transform GET query into GET args', () => {
+		const method = 'get';
+		const getArgs = buildGenericRequestArgs({ ...options, method })(query);
+		expect(getArgs).toEqual(jasmine.any(Object));
+		expect(getArgs.url).toMatch(/\?.+/); // get requests will add querystring
+		expect(getArgs.hasOwnProperty('body')).toBe(false); // get requests will not have a body
+		expect(getArgs.headers['content-type']).toEqual('application/json');
+		expect(getArgs.headers.cookie).not.toContain('click-track=1234');
+	});
+	it('Transform POST query into POST args', () => {
+		const method = 'post';
+		const postArgs = buildGenericRequestArgs({ ...options, method })(query);
+		expect(postArgs.url).not.toMatch(/\?.+/); // post requests will not add querystring
+		expect(postArgs.body).toEqual(jasmine.any(String)); // post requests will add body string
+		// post requests will add body string
+		expect(postArgs.headers['content-type']).toEqual('application/json');
+	});
+
+	it('Properly encodes the URL', () => {
+		const endpoint = 'https://www.example.com/バ-京';
+		const method = 'get';
+		const getArgs = buildGenericRequestArgs({ ...options, method })({
+			...query,
+			endpoint,
+		});
+		const { pathname } = require('url').parse(getArgs.url);
+		expect(/^[\x00-\xFF]*$/.test(pathname)).toBe(true); // eslint-disable-line no-control-regex
+	});
+	it('Does not double-encode the URL', () => {
+		const method = 'get';
+		const decodedQuery = {
+			endpoint: `https://www.example.com/${encodeURI('バ-京')}`, // 'pre-encode' the endpoint
+			params: {},
+		};
+		const getArgs = buildGenericRequestArgs({ ...options, method })(decodedQuery);
+		expect(getArgs.url).toBe(decodedQuery.endpoint);
+	});
+
+	it('sets baseUrl to undefined when given a fully-qualified URL endpoint', () => {
+		const method = 'get';
+		const getArgs = buildGenericRequestArgs({ ...options, method })(query);
+		expect(getArgs.baseUrl).toBeUndefined();
+	});
+});
+
+describe('buildSharedEdgeRequestArgs', () => {
 	const testQueryResults = mockQuery(MOCK_RENDERPROPS);
 	const url = 'http://example.com';
 	const options = {
 		url,
 		headers: {
 			authorization: 'Bearer testtoken',
+			cookie: '',
 		},
 		mode: 'no-cors',
 	};
 
 	it('Converts an api config to arguments for a node-request call', () => {
 		let method = 'get';
-		const getArgs = buildRequestArgs({ ...options, method })(testQueryResults);
+		const getArgs = buildSharedEdgeRequestArgs({ ...options, method })(
+			testQueryResults
+		);
 		method = 'post';
-		const postArgs = buildRequestArgs({ ...options, method })(testQueryResults);
+		const postArgs = buildSharedEdgeRequestArgs({ ...options, method })(
+			testQueryResults
+		);
 		expect(getArgs).toEqual(jasmine.any(Object));
 		expect(getArgs.url).toMatch(/\?.+/); // get requests will add querystring
 		expect(getArgs.hasOwnProperty('body')).toBe(false); // get requests will not have a body
@@ -199,9 +266,13 @@ describe('buildRequestArgs', () => {
 			},
 			flags: ['asdf'],
 		};
-		const getArgs = buildRequestArgs({ ...options, method: 'get' })(query);
+		const getArgs = buildSharedEdgeRequestArgs({ ...options, method: 'get' })(
+			query
+		);
 		expect(getArgs.headers['X-Meetup-Request-Flags']).not.toBeUndefined();
-		const postArgs = buildRequestArgs({ ...options, method: 'post' })(query);
+		const postArgs = buildSharedEdgeRequestArgs({ ...options, method: 'post' })(
+			query
+		);
 		expect(postArgs.headers['X-Meetup-Request-Flags']).not.toBeUndefined();
 	});
 
@@ -220,11 +291,15 @@ describe('buildRequestArgs', () => {
 				},
 			},
 		};
-		const getArgs = buildRequestArgs({ ...options, method: 'get' })(query);
+		const getArgs = buildSharedEdgeRequestArgs({ ...options, method: 'get' })(
+			query
+		);
 		expect(getArgs.headers['X-Meetup-Variants']).toEqual(
 			`${experiment}=${context}`
 		);
-		const postArgs = buildRequestArgs({ ...options, method: 'post' })(query);
+		const postArgs = buildSharedEdgeRequestArgs({ ...options, method: 'post' })(
+			query
+		);
 		expect(postArgs.headers['X-Meetup-Variants']).toEqual(
 			`${experiment}=${context}`
 		);
@@ -236,7 +311,9 @@ describe('buildRequestArgs', () => {
 			type: 'bar',
 			meta: { metaRequestHeaders: ['foo', 'bar'] },
 		};
-		const requestArgs = buildRequestArgs({ ...options, method: 'get' })(query);
+		const requestArgs = buildSharedEdgeRequestArgs({ ...options, method: 'get' })(
+			query
+		);
 		const requestHeaders = Object.keys(requestArgs.headers);
 		const expectedApiMetaHeader = 'foo,bar';
 
@@ -247,7 +324,7 @@ describe('buildRequestArgs', () => {
 	const testQueryResults_utf8 = mockQuery(MOCK_RENDERPROPS_UTF8);
 	it('Properly encodes the URL', () => {
 		const method = 'get';
-		const getArgs = buildRequestArgs({ ...options, method })(
+		const getArgs = buildSharedEdgeRequestArgs({ ...options, method })(
 			testQueryResults_utf8
 		);
 		const { pathname } = require('url').parse(getArgs.url);
@@ -259,7 +336,9 @@ describe('buildRequestArgs', () => {
 			endpoint: encodeURI('バ-京'), // 'pre-encode' the endpoint
 			params: {},
 		};
-		const getArgs = buildRequestArgs({ ...options, method })(decodedQuery);
+		const getArgs = buildSharedEdgeRequestArgs({ ...options, method })(
+			decodedQuery
+		);
 		const { pathname } = require('url').parse(getArgs.url);
 		expect(pathname).toBe(`/${decodedQuery.endpoint}`);
 	});
@@ -271,20 +350,22 @@ describe('buildRequestArgs', () => {
 			endpoint,
 			params: {},
 		};
-		const getArgs = buildRequestArgs({ ...options, method })(decodedQuery);
+		const getArgs = buildSharedEdgeRequestArgs({ ...options, method })(
+			decodedQuery
+		);
 		expect(getArgs.baseUrl).toBeUndefined();
 		expect(getArgs.url).toBe(endpoint);
 	});
 });
 
-describe('getExternalRequestOpts', () => {
+describe('getRequestOpts', () => {
 	it('returns the expected object from a vanilla request', async () => {
 		const server = await getServer();
 		const mockRequest = {
 			...MOCK_HAPI_REQUEST,
 			server,
 		};
-		expect(getExternalRequestOpts(mockRequest)).toMatchSnapshot();
+		expect(getRequestOpts(mockRequest)).toMatchSnapshot();
 	});
 	it('returns the expected object from a multipart request', async () => {
 		const server = await getServer();
@@ -297,22 +378,11 @@ describe('getExternalRequestOpts', () => {
 			payload: { foo: 'bar' },
 		};
 
-		expect(getExternalRequestOpts(mockRequest)).toMatchSnapshot();
+		expect(getRequestOpts(mockRequest)).toMatchSnapshot();
 	});
 });
 
-describe('createCookieJar', () => {
-	it('returns a cookie jar for /sessions endpoint', () => {
-		const jar = createCookieJar('/sessions?asdfasd');
-		expect(jar).not.toBeNull();
-	});
-	it('returns null for non-sessions endpoint', () => {
-		const jar = createCookieJar('/not-sessions?asdfasd');
-		expect(jar).toBeNull();
-	});
-});
-
-describe('makeExternalApiRequest', () => {
+describe('makeDoApiRequest', () => {
 	it('calls externalRequest with requestOpts', async () => {
 		const server = await getServer();
 		const mockRequest = {
@@ -325,7 +395,7 @@ describe('makeExternalApiRequest', () => {
 			url: 'http://example.com',
 		};
 
-		return makeExternalApiRequest(mockRequest)(requestOpts)
+		return makeDoApiRequest(mockRequest)(requestOpts)
 			.then(() => require('request').mock.calls.pop()[0])
 			.then(arg => expect(arg).toBe(requestOpts));
 	});
@@ -338,7 +408,7 @@ describe('makeExternalApiRequest', () => {
 			err,
 		};
 
-		return makeExternalApiRequest({
+		return makeDoApiRequest({
 			server: {
 				app: { logger: { error: () => {} } },
 				settings: { app: { api: { timeout: 100 } } },
@@ -347,23 +417,6 @@ describe('makeExternalApiRequest', () => {
 		})(requestOpts).then(([resp, body]) =>
 			expect(JSON.parse(body).errors[0].code).toBe('ETIMEDOUT')
 		);
-	});
-	it('returns the requestOpts jar at array index 2', async () => {
-		const server = await getServer();
-
-		const mockRequest = {
-			...MOCK_HAPI_REQUEST,
-			server,
-		};
-
-		const requestOpts = {
-			foo: 'bar',
-			url: 'http://example.com',
-			jar: 'fooJar',
-		};
-		return makeExternalApiRequest(mockRequest)(
-			requestOpts
-		).then(([response, body, jar]) => expect(jar).toBe(requestOpts.jar));
 	});
 });
 
