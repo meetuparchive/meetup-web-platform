@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`getExternalRequestOpts returns the expected object from a multipart request 1`] = `
+exports[`getRequestOpts returns the expected object from a multipart request 1`] = `
 Object {
   "agentOptions": Object {
     "rejectUnauthorized": false,
@@ -23,7 +23,7 @@ Object {
 }
 `;
 
-exports[`getExternalRequestOpts returns the expected object from a vanilla request 1`] = `
+exports[`getRequestOpts returns the expected object from a vanilla request 1`] = `
 Object {
   "agentOptions": Object {
     "rejectUnauthorized": false,

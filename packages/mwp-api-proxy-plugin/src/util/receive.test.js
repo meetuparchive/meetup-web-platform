@@ -1,14 +1,10 @@
-import externalRequest from 'request';
-
 import { MOCK_API_PROBLEM } from 'meetup-web-mocks/lib/app';
 import { MOCK_GROUP } from 'meetup-web-mocks/lib/api';
 
 import { getServer, MOCK_LOGGER } from 'mwp-test-utils';
 
-import { API_PROXY_PLUGIN_NAME } from '../config';
 import {
 	makeApiResponseToQueryResponse,
-	makeInjectResponseCookies,
 	makeLogResponse,
 	makeParseApiResponse,
 	parseApiValue,
@@ -20,54 +16,6 @@ jest.mock('mwp-logger-plugin', () => {
 	return {
 		logger: require('mwp-test-utils').MOCK_LOGGER,
 	};
-});
-
-describe('makeInjectResponseCookies', async () => {
-	const server = await getServer();
-	const request = {
-		plugins: {
-			[API_PROXY_PLUGIN_NAME]: {
-				setState() {},
-			},
-		},
-		server,
-	};
-	const responseObj = {
-		request: {
-			uri: {
-				href: 'http://example.com',
-			},
-		},
-	};
-	const response = {
-		toJSON() {
-			return responseObj;
-		},
-	};
-
-	it('does nothing without a cookie jar', () => {
-		spyOn(response, 'toJSON');
-		makeInjectResponseCookies(request)([response, null, null]);
-		expect(response.toJSON).not.toHaveBeenCalled();
-	});
-	it('sets the provided cookies on the response state', () => {
-		const mockJar = externalRequest.jar();
-		spyOn(request.plugins[API_PROXY_PLUGIN_NAME], 'setState');
-
-		// set up mock cookie jar with a dummy cookie for the response.request.uri
-		const key = 'foo';
-		const value = 'bar';
-		mockJar.setCookie(`${key}=${value}`, responseObj.request.uri.href);
-
-		makeInjectResponseCookies(request)([response, null, mockJar]);
-		expect(
-			request.plugins[API_PROXY_PLUGIN_NAME].setState
-		).toHaveBeenCalledWith(
-			key,
-			value,
-			jasmine.any(Object) // don't actually care about the cookie options
-		);
-	});
 });
 
 describe('parseApiValue', () => {
