@@ -231,12 +231,22 @@ describe('Full dummy app render', () => {
 			const errorRequest = {
 				method: 'get',
 				url: '/badImplementation',
-				credentials: 'whatever',
+				auth: {
+					credentials: {
+						user: 'whatever',
+					},
+					strategy: 'bypass',
+				},
 			};
 			const goodRequest = {
 				method: 'get',
 				url: '/foo',
-				credentials: 'whatever',
+				auth: {
+					credentials: {
+						user: 'whatever',
+					},
+					strategy: 'bypass',
+				},
 			};
 			return server
 				.inject(errorRequest)
