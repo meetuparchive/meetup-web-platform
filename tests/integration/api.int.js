@@ -60,10 +60,7 @@ const DELETE_BODY = { foo: 'patch' };
  */
 describe('API proxy GET endpoint integration tests', () => {
 	it('calls the GET handler for /mu_api', () => {
-		require('request').__setMockResponse(
-			GET_RESPONSE,
-			JSON.stringify(GET_BODY)
-		);
+		require('request').__setMockResponse(GET_RESPONSE, JSON.stringify(GET_BODY));
 		spyOn(apiProxyHandler, 'default').and.callFake((request, h) => 'okay');
 		return start({}, {}).then(server => {
 			const request = {
@@ -78,10 +75,7 @@ describe('API proxy GET endpoint integration tests', () => {
 		});
 	});
 	it('returns a formatted array of responses from GET /mu_api', () => {
-		require('request').__setMockResponse(
-			GET_RESPONSE,
-			JSON.stringify(GET_BODY)
-		);
+		require('request').__setMockResponse(GET_RESPONSE, JSON.stringify(GET_BODY));
 		const expectedResponse = {
 			responses: [
 				{
@@ -135,7 +129,12 @@ const runMutationTest = ({ csrfHeaders, method, test, queries }) => server => {
 				method,
 				url: `/mu_api${queries ? `?queries=${queries}` : ''}`,
 				payload: queries ? undefined : querystring.stringify(mockPostPayload),
-				credentials: 'whatever',
+				auth: {
+					credentials: {
+						user: 'whatever',
+					},
+					strategy: 'bypass',
+				},
 				headers,
 			};
 			return server.inject(request);
@@ -223,10 +222,7 @@ describe('API proxy PATCH endpoint integration tests', () => {
  */
 describe('API proxy PUT endpoint integration tests', () => {
 	it('calls the PUT handler for /mu_api', () => {
-		require('request').__setMockResponse(
-			PUT_RESPONSE,
-			JSON.stringify(PUT_BODY)
-		);
+		require('request').__setMockResponse(PUT_RESPONSE, JSON.stringify(PUT_BODY));
 		spyOn(apiProxyHandler, 'default').and.callFake((request, h) => 'okay');
 		const test = response => expect(apiProxyHandler.default).toHaveBeenCalled();
 
