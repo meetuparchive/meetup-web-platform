@@ -2,6 +2,7 @@
 
 /**
  * @see Typescript HapiJS v17 https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/hapi/index.d.ts
+ * Modified locally to support Hapi 18 `WHATWG URL` format
  */
 
 // ToDo: import { SealOptions, SealOptionsSub } from "iron";
@@ -14,8 +15,30 @@ declare type HapiResponseEvents = any;
 declare type HapiPluginsStates = any;
 declare type HapiResponseSettings = any;
 
-declare type HapiRequestUrl = URL & {
-	path: string,
+declare type URLSearchParams = {
+	append: (name: string, value: string) => void,
+    delete: (name: string) => void,
+    get: (name: string) => string|null,
+    getAll: (name: string) => string[],
+    has: (name: string) => boolean,
+    set: (name: string, value: string) => void,
+    sort: () => void
+};
+
+/** https://url.spec.whatwg.org/#url-class */
+declare type HapiRequestUrl = {
+    href: string,
+    origin: string,
+    protocol: string,
+    username: string,
+    password: string,
+    host: string,
+    hostname: string,
+    port: string,
+    pathname: string,
+    search: string,
+    searchParams: URLSearchParams,
+    hash: string,
 };
 
 declare type HapiHandlerReturnValue = HapiResponseObject | Error | string | { [string]: any };
