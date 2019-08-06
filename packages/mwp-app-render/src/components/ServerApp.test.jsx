@@ -8,7 +8,7 @@ describe('ServerApp', function() {
 	const appWrapper = shallow(
 		<ServerApp
 			h={{}}
-			request={{ raw: { url: '/foo' } }}
+			request={{ raw: { req: { url: '/foo' } } }}
 			routes={routes}
 			store={{}}
 			appContext={{ basename }}
