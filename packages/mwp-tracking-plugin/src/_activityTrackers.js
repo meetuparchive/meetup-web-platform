@@ -59,7 +59,7 @@ export const getTrackActivity: TrackGetter = () => (request: HapiRequest) => (
 		? getFields(request, fields)
 		: {
 				...fields,
-				url: `${request.url.pathname}${request.url.search}`,
+				url: request.url.pathname,
 				referrer: request.info.referrer || '',
 		  };
 	return request.trackApiResponses(trackFields);

@@ -13,7 +13,7 @@ class ServerApp extends React.Component {
 		return (
 			<StaticRouter
 				basename={appContext.basename}
-				location={request.raw.req.url}
+				location={request.url}
 				context={routerContext}
 			>
 				<HapiCookieProvider request={request} h={h}>
