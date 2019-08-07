@@ -10,10 +10,15 @@ import PlatformApp from './shared/PlatformApp';
 class ServerApp extends React.Component {
 	render() {
 		const { request, h, appContext, routerContext, store, routes } = this.props;
+		const location = {
+			pathname: request.url.pathname,
+			search: request.url.search,
+			hash: request.url.hash,
+		};
 		return (
 			<StaticRouter
 				basename={appContext.basename}
-				location={request.raw.req.url}
+				location={location}
 				context={routerContext}
 			>
 				<HapiCookieProvider request={request} h={h}>

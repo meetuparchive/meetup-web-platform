@@ -4,16 +4,22 @@ exports[`ServerApp exists 1`] = `
 <StaticRouter
   basename=""
   context={Object {}}
-  location="/foo"
+  location={
+    Object {
+      "hash": "",
+      "pathname": "/foo",
+      "search": "",
+    }
+  }
 >
   <HapiCookieProvider
     h={Object {}}
     request={
       Object {
-        "raw": Object {
-          "req": Object {
-            "url": "/foo",
-          },
+        "url": Object {
+          "hash": "",
+          "pathname": "/foo",
+          "search": "",
         },
       }
     }
