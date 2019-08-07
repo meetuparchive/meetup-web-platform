@@ -3,18 +3,18 @@ import http from 'http';
 import querystring from 'qs';
 import url from 'url';
 
-import _doRequest from 'request';
+import externalRequest from 'request';
 
 import config from 'mwp-config';
 
 export const API_META_HEADER = 'X-Meta-Request-Headers';
 const FULL_URL_PATTERN = /^https?:\/\//;
 
-// create a promisified version of `_doRequest` - can't use `util.promisify`
+// create a promisified version of `externalRequest` - can't use `util.promisify`
 // because the callback gets 2 additional arguments, and promisify only supports 1.
-const doRequest = options =>
+const externalRequestPromise = options =>
 	new Promise((resolve, reject) => {
-		_doRequest(options, (err, response, body) => {
+		externalRequest(options, (err, response, body) => {
 			if (err) {
 				reject(err);
 				return;
@@ -82,79 +82,54 @@ function makeMockResponse(requestOpts, response = MOCK_RESPONSE_OK) {
 }
 
 /**
- * Function to build argument for `request` for API requests to DIY edge endpoints,
- * i.e. endpoints served on a domain other than api.meetup.com
+ * In order to receive cookies from `externalRequest` requests, this function
+ * provides a cookie jar that is specific to the request.
  *
- * Currently, cookies cannot be set by DIY edge endpoints. (e.g. using the
- * `jar` interface in `request`)
+ * The `requestUrl` is used to determine whether a cookie jar is needed
+ *
+ * https://github.com/request/request#examples
+ *
+ * @param {String} requestUrl the URL that will be used in the external request
+ * @return {Object} a cookie jar compatible with the npm request `jar` API
  */
-export const buildGenericRequestArgs = requestOpts => {
-	// make a copy of the 'global' headers set for all queries.
-	const headers = { ...requestOpts.headers };
-	// all DIY edges support JSON bodies for all methods
-	headers['content-type'] = 'application/json';
-	// strip clicktracking cookie 'click-track'
-	headers.cookie = headers.cookie.replace(/\s*click-track=[^;]+/, '');
-
-	return query => {
-		let body;
-
-		// create properly-escaped URL from endpoint
-		const url = new URL(query.endpoint);
-
-		switch (requestOpts.method) {
-			case 'patch':
-			case 'put':
-			case 'post':
-				if (requestOpts.formData) {
-					break;
-				}
-				// assume all DIY edge endpoints handle JSON body encoding
-				body = JSON.stringify(query.params);
-				break;
-			case 'delete':
-			case 'get':
-			default: {
-				// copy query object params into `url.searchParams`
-				for (const p of new URLSearchParams(query.params)) {
-					url.searchParams.append(...p);
-				}
-			}
-		}
-		const queryRequestOpts = {
-			...requestOpts,
-			headers,
-			url: url.toString(),
-			baseUrl: undefined, // allow fully-qualified URL to override baseUrl
-			timeout: requestOpts.formData
-				? 60 * 1000 // 60sec upload timeout
-				: requestOpts.timeout,
-		};
-
-		// only add body if defined
-		if (body) {
-			queryRequestOpts.body = body;
-		}
-
-		return queryRequestOpts;
-	};
+export const createCookieJar = requestUrl => {
+	const parsedUrl = url.parse(requestUrl);
+	if (parsedUrl.pathname === '/sessions') {
+		return externalRequest.jar(); // create request/url-specific cookie jar
+	}
+	return null;
 };
 
 /**
- * Shared edge (api.meetup.com) requests have special features that are enabled
- * by this request arg builder, e.g.
+ * Transform each query into the arguments needed for a `request` call.
  *
- * - 'set cookie' for login requests to /sessions (not used)
+ * Some request options are constant for all queries, and these are curried into
+ * a function that can be called with a single query as part of the request
+ * stream
+ *
+ * @see {@link https://www.npmjs.com/package/request}
+ *
+ * @param {Object} externalRequestOpts request options that will be applied to
+ *   every query request
+ * @param {Object} query { endpoint, params, flags }
+ *   call)
+ * @return {Object} externalRequestOptsQuery argument for the call to
+ *   `externalRequest` for the query
  */
-export const buildSharedEdgeRequestArgs = requestOpts => query => {
-	const { endpoint, params, flags, meta = {} } = query;
+export const buildRequestArgs = externalRequestOpts => ({
+	endpoint,
+	params,
+	flags,
+	meta = {},
+}) => {
 	const dataParams = querystring.stringify(params);
-	const headers = { ...requestOpts.headers };
+	const headers = { ...externalRequestOpts.headers };
 	// endpoint may or may not be URI-encoded, so we decode before encoding
 	const encodedUrl = encodeURI(decodeURI(endpoint));
-	// add leading slash
-	let url = `/${encodedUrl}`;
+	// add leading slash if it's not a fully-qualified URL
+	let url = FULL_URL_PATTERN.test(endpoint) ? encodedUrl : `/${encodedUrl}`;
 	let body;
+	const jar = createCookieJar(url);
 
 	if (flags || meta.flags) {
 		headers['X-Meetup-Request-Flags'] = (flags || meta.flags).join(',');
@@ -164,24 +139,22 @@ export const buildSharedEdgeRequestArgs = requestOpts => query => {
 		headers[API_META_HEADER] = meta.metaRequestHeaders.join(',');
 	}
 
-	// @deprecated
 	if (meta.variants) {
-		headers['X-Meetup-Variants'] = Object.keys(meta.variants).reduce(
-			(header, experiment) => {
-				const context = meta.variants[experiment];
-				const contexts = context instanceof Array ? context : [context];
-				header += contexts.map(c => `${experiment}=${c}`).join(' ');
-				return header;
-			},
-			''
-		);
+		headers['X-Meetup-Variants'] = Object.keys(
+			meta.variants
+		).reduce((header, experiment) => {
+			const context = meta.variants[experiment];
+			const contexts = context instanceof Array ? context : [context];
+			header += contexts.map(c => `${experiment}=${c}`).join(' ');
+			return header;
+		}, '');
 	}
 
-	switch (requestOpts.method) {
+	switch (externalRequestOpts.method) {
 		case 'patch':
 		case 'put':
 		case 'post':
-			if (requestOpts.formData) {
+			if (externalRequestOpts.formData) {
 				break;
 			}
 			body = dataParams;
@@ -195,48 +168,25 @@ export const buildSharedEdgeRequestArgs = requestOpts => query => {
 			headers['X-Meta-Photo-Host'] = 'secure';
 	}
 
-	const queryRequestOpts = {
-		...requestOpts,
+	const externalRequestOptsQuery = {
+		...externalRequestOpts,
 		headers,
+		jar,
 		url,
-		timeout: requestOpts.formData
+		baseUrl: FULL_URL_PATTERN.test(url)
+			? undefined
+			: externalRequestOpts.baseUrl, // allow fully-qualified URL to override baseUrl
+		timeout: externalRequestOpts.formData
 			? 60 * 1000 // 60sec upload timeout
-			: requestOpts.timeout,
+			: externalRequestOpts.timeout,
 	};
 
 	// only add body if defined
 	if (body) {
-		queryRequestOpts.body = body;
+		externalRequestOptsQuery.body = body;
 	}
 
-	return queryRequestOpts;
-};
-
-/**
- * Transform each query into the arguments needed for a `request` call.
- *
- * Some request options are constant for all queries, and these are curried into
- * a function that can be called with a single query as part of the request
- * stream
- *
- * @see {@link https://www.npmjs.com/package/request}
- *
- * @param {Object} requestOpts request options that will be applied to
- *   every query request
- * @param {Object} query { endpoint, params, flags }
- *   call)
- * @return {Object} queryRequestOpts argument for the call to
- *   `_doRequest` for the query
- */
-export const buildRequestArgs = requestOpts => query => {
-	// if the query.endpoint is fully-qualified URL, that indicates that it
-	// is _not_ a request to the shared Edge API (api.meeetup.com), and therefore
-	// does not need the shared-edge-specific request functionality (e.g. special
-	// headers, click-tracking cookies)
-	const requestArgBuilder = FULL_URL_PATTERN.test(query.endpoint)
-		? buildGenericRequestArgs(requestOpts)
-		: buildSharedEdgeRequestArgs(requestOpts);
-	return requestArgBuilder(query);
+	return externalRequestOptsQuery;
 };
 
 export function getAuthHeaders(request) {
@@ -271,7 +221,8 @@ export function getLanguageHeader(request) {
 }
 
 export function getClientIpHeader(request) {
-	const clientIP = request.query.__set_geoip || request.headers['fastly-client-ip'];
+	const clientIP =
+		request.query.__set_geoip || request.headers['fastly-client-ip'];
 	if (clientIP) {
 		return { 'X-Meetup-Client-Ip': clientIP };
 	}
@@ -299,7 +250,7 @@ export function getTrackingHeaders(request) {
 }
 
 export function parseRequestHeaders(request) {
-	const requestOptsHeaders = {
+	const externalRequestHeaders = {
 		...request.headers,
 		...getAuthHeaders(request),
 		...getClientIpHeader(request),
@@ -309,12 +260,12 @@ export function parseRequestHeaders(request) {
 		'x-meetup-parent-request-id': request.id,
 	};
 
-	delete requestOptsHeaders['host']; // let app server set 'host'
-	delete requestOptsHeaders['accept-encoding']; // let app server set 'accept'
-	delete requestOptsHeaders['content-length']; // original request content-length is irrelevant
-	delete requestOptsHeaders['content-type']; // the content type will be set in buildRequestArgs
+	delete externalRequestHeaders['host']; // let app server set 'host'
+	delete externalRequestHeaders['accept-encoding']; // let app server set 'accept'
+	delete externalRequestHeaders['content-length']; // original request content-length is irrelevant
+	delete externalRequestHeaders['content-type']; // the content type will be set in buildRequestArgs
 
-	return requestOptsHeaders;
+	return externalRequestHeaders;
 }
 
 /*
@@ -344,11 +295,11 @@ export const parseMultipart = payload =>
  * options for _every_ parallel REST API request made by the platform
  * corresponding to single incoming request.
  *
- * @return {Object} requestOpts
+ * @return {Object} externalRequestOpts
  */
-export function getRequestOpts(request) {
+export function getExternalRequestOpts(request) {
 	const { api } = request.server.settings.app;
-	const requestOpts = {
+	const externalRequestOpts = {
 		baseUrl: api.root_url,
 		method: request.method,
 		headers: parseRequestHeaders(request),
@@ -361,15 +312,18 @@ export function getRequestOpts(request) {
 	};
 	if (request.mime === 'multipart/form-data') {
 		// multipart form data needs special treatment
-		requestOpts.formData = parseMultipart(request.payload);
+		externalRequestOpts.formData = parseMultipart(request.payload);
 	}
-	return requestOpts;
+	return externalRequestOpts;
 }
 
 /**
  * Fake an API request and directly return the stringified mockResponse
  */
-export const makeMockRequest = (mockResponseContent, responseMeta) => requestOpts =>
+export const makeMockRequest = (
+	mockResponseContent,
+	responseMeta
+) => requestOpts =>
 	Promise.resolve([
 		makeMockResponse(requestOpts, responseMeta),
 		JSON.stringify(mockResponseContent),
@@ -378,21 +332,23 @@ export const makeMockRequest = (mockResponseContent, responseMeta) => requestOpt
 /**
  * Make a real external API request, return response body string
  */
-export const makeDoApiRequest = request => requestOpts => {
-	return doRequest(requestOpts).catch(err => {
-		request.server.app.logger.error({
-			err,
-			externalRequest: requestOpts, // for detailed debugging, including headers
-			context: requestOpts, // for error report context
-			...request.raw,
-		});
+export const makeExternalApiRequest = request => requestOpts => {
+	return externalRequestPromise(requestOpts)
+		.catch(err => {
+			request.server.app.logger.error({
+				err,
+				externalRequest: requestOpts, // for detailed debugging, including headers
+				context: requestOpts, // for error report context
+				...request.raw,
+			});
 
-		const errorObj = { errors: [err] };
-		if (err.code === 'ETIMEDOUT') {
-			return makeMockRequest(errorObj, API_TIMEOUT_RESPONSE)(requestOpts);
-		}
-		return makeMockRequest(errorObj, makeAPIErrorResponse(err))(requestOpts);
-	});
+			const errorObj = { errors: [err] };
+			if (err.code === 'ETIMEDOUT') {
+				return makeMockRequest(errorObj, API_TIMEOUT_RESPONSE)(requestOpts);
+			}
+			return makeMockRequest(errorObj, makeAPIErrorResponse(err))(requestOpts);
+		})
+		.then(([response, body]) => [response, body, requestOpts.jar]);
 };
 
 /*
@@ -400,20 +356,20 @@ export const makeDoApiRequest = request => requestOpts => {
  * object shape
  */
 export const makeSendQuery = request => {
-	// 1. get the queries and the shared `requestOpts` from the request
+	// 1. get the queries and the shared `externalRequestOpts` from the request
 	//    that will be applied to all queries
-	const requestOpts = getRequestOpts(request);
+	const externalRequestOpts = getExternalRequestOpts(request);
 
-	// 2. create a function that uses `requestOpts` as a base from which
+	// 2. create a function that uses `externalRequestOpts` as a base from which
 	//    to build query-specific API request options objects
-	const queryToRequestOpts = buildRequestArgs(requestOpts);
+	const queryToRequestOpts = buildRequestArgs(externalRequestOpts);
 
 	return query => {
 		const requestOpts = queryToRequestOpts(query);
 		// decide whether to make a _real_ request or a mock request
 		const doRequest = query.mockResponse
 			? makeMockRequest(query.mockResponse)
-			: makeDoApiRequest(request);
+			: makeExternalApiRequest(request);
 
 		return doRequest(requestOpts);
 	};
