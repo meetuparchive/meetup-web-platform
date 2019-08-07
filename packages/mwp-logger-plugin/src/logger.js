@@ -44,7 +44,7 @@ export const httpRequestSerializers = {
 			requestInfo.responseSize = request.response.headers['content-length'];
 			requestInfo.status = request.response.statusCode;
 			requestInfo.latency = formatDuration(
-				request.info.responded - request.info.received
+				request.info.completed - request.info.received
 			);
 		}
 		return requestInfo;
