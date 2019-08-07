@@ -1,12 +1,11 @@
 import React from 'react';
 
-const Div = ({ location }) =>
+const Div = ({ location }) => (
 	<div>
 		<h1>MWP-Consumer</h1>
-		<pre>
-			{JSON.stringify(location.path, null, 2)}
-		</pre>
-	</div>;
+		<pre>{JSON.stringify(location.pathname, null, 2)}</pre>
+	</div>
+);
 
 const routes = [
 	{
