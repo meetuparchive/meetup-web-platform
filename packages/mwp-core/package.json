@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@google-cloud/pubsub": "0.18.0",
-    "joi": "13.4.0",
+    "joi": "14.3.1",
     "mobile-detect": "1.4.3",
     "mwp-api-proxy-plugin": ">=0.0.1",
     "mwp-app-render": ">=0.0.1",
