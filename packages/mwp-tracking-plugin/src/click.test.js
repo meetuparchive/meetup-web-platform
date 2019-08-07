@@ -40,7 +40,12 @@ describe('onPreHandlerExtension', () => {
 		const injectRequest = {
 			method: 'get',
 			url: '/foo',
-			credentials: 'whatever',
+			auth: {
+				credentials: {
+					user: 'whatever',
+				},
+				strategy: 'bypass',
+			},
 		};
 		const testRouteConfig = async route => {
 			const server = new Hapi.Server();
