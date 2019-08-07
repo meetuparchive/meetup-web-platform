@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "electrode-csrf-jwt": "git+https://github.com/meetup/electrode-csrf-jwt.git#793431729d8fb4ee315f28709f323f198b25d460",
-    "hapi": "18.1.0",
+    "hapi": "17.8.1",
     "inert": "5.1.3",
     "meetup-web-mocks": "1.0.265",
     "mwp-core": ">=0.0.1",
