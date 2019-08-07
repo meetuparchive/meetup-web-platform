@@ -10,11 +10,7 @@ exports[`ServerApp exists 1`] = `
     h={Object {}}
     request={
       Object {
-        "raw": Object {
-          "req": Object {
-            "url": "/foo",
-          },
-        },
+        "url": "/foo",
       }
     }
   >

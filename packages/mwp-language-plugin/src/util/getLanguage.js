@@ -11,10 +11,7 @@ const getServerSettings = (request: HapiRequest) => request.server.settings.app;
  * Get cookie-specified language using MEETUP_LANGUAGE cookie value
  */
 export const getCookieLang: ParseRequestLang = (request: HapiRequest) => {
-	const {
-		api: { isProd },
-		supportedLangs,
-	} = getServerSettings(request);
+	const { api: { isProd }, supportedLangs } = getServerSettings(request);
 	const LANGUAGE_COOKIE = isProd ? 'MEETUP_LANGUAGE' : 'MEETUP_LANGUAGE_DEV';
 
 	const cookie = request.state[LANGUAGE_COOKIE];
@@ -30,11 +27,7 @@ export const getCookieLang: ParseRequestLang = (request: HapiRequest) => {
  * get the URL-specified language - check for existing language path prefixes
  */
 export const getUrlLang: ParseRequestLang = (request: HapiRequest) => {
-	const {
-		url,
-		info: { referrer },
-		route,
-	} = request;
+	const { url, info: { referrer }, route } = request;
 	const { supportedLangs } = getServerSettings(request);
 
 	// Whether to use the language code in the referrer url, rather than the request url
@@ -43,9 +36,7 @@ export const getUrlLang: ParseRequestLang = (request: HapiRequest) => {
 		route.settings.plugins['mwp-language-plugin'] || {};
 
 	const urlPath =
-		useReferrerUrlLangCode && referrer
-			? new URL(referrer).pathname
-			: url.pathname;
+		useReferrerUrlLangCode && referrer ? new URL(referrer).pathname : url.path;
 	const urlLang = urlPath.split('/')[1];
 	return supportedLangs.includes(urlLang) && urlLang;
 };
