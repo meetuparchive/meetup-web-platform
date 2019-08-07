@@ -112,9 +112,7 @@ describe('getTrackingHeaders', () => {
 		};
 		const request = {
 			query: { _xtd: 'helloIAmRandom' },
-			url: {
-				href: '/cool-meetup/events/123',
-			},
+			url: new URL('https://www.meetup.com/cool-meetup/events/123'),
 			headers: {
 				'x-forwarded-proto': 'https',
 				'x-meetup-host': 'www.meetup.com',
@@ -361,9 +359,9 @@ describe('makeExternalApiRequest', () => {
 			url: 'http://example.com',
 			jar: 'fooJar',
 		};
-		return makeExternalApiRequest(mockRequest)(
-			requestOpts
-		).then(([response, body, jar]) => expect(jar).toBe(requestOpts.jar));
+		return makeExternalApiRequest(mockRequest)(requestOpts).then(
+			([response, body, jar]) => expect(jar).toBe(requestOpts.jar)
+		);
 	});
 });
 
