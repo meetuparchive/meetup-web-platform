@@ -13,7 +13,7 @@ describe('getTrackActivity', () => {
 	test('standard field values', () => {
 		const request = {
 			...REQUEST_BASE,
-			url: url.parse('http://www.current.com/foo?bar=baz'),
+			url: url.parse('http://www.current.com/foo'),
 			method: 'get',
 			query: {},
 			info: { referrer: 'http://www.previous.com/bar' },
@@ -23,7 +23,7 @@ describe('getTrackActivity', () => {
 Object {
   "foo": "bar",
   "referrer": "http://www.previous.com/bar",
-  "url": "/foo?bar=baz",
+  "url": "/foo",
 }
 `);
 	});
