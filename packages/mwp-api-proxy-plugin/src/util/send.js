@@ -140,14 +140,15 @@ export const buildRequestArgs = externalRequestOpts => ({
 	}
 
 	if (meta.variants) {
-		headers['X-Meetup-Variants'] = Object.keys(
-			meta.variants
-		).reduce((header, experiment) => {
-			const context = meta.variants[experiment];
-			const contexts = context instanceof Array ? context : [context];
-			header += contexts.map(c => `${experiment}=${c}`).join(' ');
-			return header;
-		}, '');
+		headers['X-Meetup-Variants'] = Object.keys(meta.variants).reduce(
+			(header, experiment) => {
+				const context = meta.variants[experiment];
+				const contexts = context instanceof Array ? context : [context];
+				header += contexts.map(c => `${experiment}=${c}`).join(' ');
+				return header;
+			},
+			''
+		);
 	}
 
 	switch (externalRequestOpts.method) {
@@ -173,9 +174,7 @@ export const buildRequestArgs = externalRequestOpts => ({
 		headers,
 		jar,
 		url,
-		baseUrl: FULL_URL_PATTERN.test(url)
-			? undefined
-			: externalRequestOpts.baseUrl, // allow fully-qualified URL to override baseUrl
+		baseUrl: FULL_URL_PATTERN.test(url) ? undefined : externalRequestOpts.baseUrl, // allow fully-qualified URL to override baseUrl
 		timeout: externalRequestOpts.formData
 			? 60 * 1000 // 60sec upload timeout
 			: externalRequestOpts.timeout,
@@ -221,8 +220,7 @@ export function getLanguageHeader(request) {
 }
 
 export function getClientIpHeader(request) {
-	const clientIP =
-		request.query.__set_geoip || request.headers['fastly-client-ip'];
+	const clientIP = request.query.__set_geoip || request.headers['fastly-client-ip'];
 	if (clientIP) {
 		return { 'X-Meetup-Client-Ip': clientIP };
 	}
@@ -241,9 +239,10 @@ export function getTrackingHeaders(request) {
 
 	const trackingParam = request.query._xtd;
 	if (trackingParam) {
+		console.log(request.url);
 		return {
 			'X-Meetup-External-Track': trackingParam,
-			'X-Meetup-External-Track-Url': `${host}${request.url.href}`,
+			'X-Meetup-External-Track-Url': `${host}${request.url.pathname}${request.url.search}`,
 		};
 	}
 	return {};
@@ -320,10 +319,7 @@ export function getExternalRequestOpts(request) {
 /**
  * Fake an API request and directly return the stringified mockResponse
  */
-export const makeMockRequest = (
-	mockResponseContent,
-	responseMeta
-) => requestOpts =>
+export const makeMockRequest = (mockResponseContent, responseMeta) => requestOpts =>
 	Promise.resolve([
 		makeMockResponse(requestOpts, responseMeta),
 		JSON.stringify(mockResponseContent),
