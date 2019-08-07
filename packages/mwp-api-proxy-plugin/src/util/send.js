@@ -239,6 +239,7 @@ export function getTrackingHeaders(request) {
 
 	const trackingParam = request.query._xtd;
 	if (trackingParam) {
+		console.log(request.url);
 		return {
 			'X-Meetup-External-Track': trackingParam,
 			'X-Meetup-External-Track-Url': `${host}${request.url.pathname}${request.url.search}`,
