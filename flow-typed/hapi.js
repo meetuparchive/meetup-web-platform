@@ -2,6 +2,7 @@
 
 /**
  * @see Typescript HapiJS v17 https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/hapi/index.d.ts
+ * Local updates to support v18
  */
 
 // ToDo: import { SealOptions, SealOptionsSub } from "iron";
@@ -14,9 +15,7 @@ declare type HapiResponseEvents = any;
 declare type HapiPluginsStates = any;
 declare type HapiResponseSettings = any;
 
-declare type HapiRequestUrl = URL & {
-	path: string,
-};
+declare type HapiRequestUrl = URL;
 
 declare type HapiHandlerReturnValue = HapiResponseObject | Error | string | { [string]: any };
 declare type HapiHandler = (HapiRequest, HapiResponseToolkit) => HapiHandlerReturnValue | Promise<HapiHandlerReturnValue>;
