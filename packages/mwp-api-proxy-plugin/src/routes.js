@@ -35,7 +35,13 @@ const getApiProxyRoutes = path => {
 				},
 				[ACTIVITY_PLUGIN_NAME]: {
 					getFields: (request, fields) => {
-						const { url, method, payload, query, info: { referrer } } = request;
+						const {
+							url,
+							method,
+							payload,
+							query,
+							info: { referrer },
+						} = request;
 						const requestReferrer = referrer || '';
 						const reqData = method === 'post' ? payload : query;
 
@@ -55,7 +61,7 @@ const getApiProxyRoutes = path => {
 
 						return {
 							...fields,
-							url: url.path,
+							url: `${url.pathname}${url.search}`,
 							referrer: requestReferrer,
 							standardized_url: API_ROUTE_PATH,
 							standardized_referer: fields.standardized_url, // the current location supplied by app
