@@ -287,7 +287,9 @@ const makeRenderer = (renderConfig: {
 		const populateStore = store =>
 			new Promise((resolve, reject) => {
 				// dispatch SERVER_RENDER to kick off API middleware
-				store.dispatch({ type: SERVER_RENDER, payload: request.url });
+				const { pathname, search, hash } = request.url;
+				const location = { pathname, search, hash };
+				store.dispatch({ type: SERVER_RENDER, payload: location });
 
 				if (checkReady(store.getState())) {
 					// we need to use the _latest_ version of the member object
