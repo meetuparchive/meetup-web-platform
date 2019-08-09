@@ -32,7 +32,7 @@
   "dependencies": {
     "ajv": "5.5.2",
     "isbot": "2.3.0",
-    "joi": "13.4.0",
+    "joi": "14.3.1",
     "mwp-auth-plugin": ">=0.0.1",
     "mwp-config": ">=0.0.1",
     "mwp-logger-plugin": ">=0.0.1",

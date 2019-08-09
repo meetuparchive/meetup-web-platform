@@ -108,12 +108,23 @@ describe('getTrackingHeaders', () => {
 		const externalTrackHeaders = {
 			'X-Meetup-External-Track': 'helloIAmRandom',
 			'X-Meetup-External-Track-Url':
-				'https://www.meetup.com/cool-meetup/events/123',
+				'https://www.meetup.com/cool-meetup/events/123?foo=bar',
 		};
 		const request = {
 			query: { _xtd: 'helloIAmRandom' },
 			url: {
-				href: '/cool-meetup/events/123',
+				href: 'https://meetup.com/cool-meetup/events/123?foo=bar',
+				origin: 'https://meetup.com',
+				protocol: 'https:',
+				username: '',
+				password: '',
+				host: 'meetup.com',
+				hostname: 'meetup.com',
+				port: '',
+				pathname: '/cool-meetup/events/123',
+				search: '?foo=bar',
+				searchParams: { a: 'b' },
+				hash: '',
 			},
 			headers: {
 				'x-forwarded-proto': 'https',

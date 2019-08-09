@@ -37,16 +37,16 @@ export const getTrackApiResponses: TrackGetter = trackOpts => request => (
  * REST API call(s)
  *
  * 1. Server render (initial navigation)
- *    - url: target URL (request.url.path)
+ *    - url: target URL (request.url.pathname)
  *    - referrer: previous URL (request.referrer)
  * 2. SPA navigation
  *    - url: target URL (provided by request.referrer)
  *    - referrer: previous URL (provided by querystring params)
  * 3. lazy-loaded data
- *    - url: proxy endpoint path (request.url.path)
+ *    - url: proxy endpoint path (request.url.pathname)
  *    - referrer: current URL (request.referrer)
  * 4. tracking-only request
- *    - url: proxy endpoint path (request.url.path)
+ *    - url: proxy endpoint path (request.url.pathname)
  *    - referrer: current URL (request.referrer)
  */
 export const getTrackActivity: TrackGetter = () => (request: HapiRequest) => (
@@ -54,14 +54,13 @@ export const getTrackActivity: TrackGetter = () => (request: HapiRequest) => (
 ) => {
 	// route may specify a custom 'getFields', which usually means that it is a
 	// proxy endpoint that should be tracked differently
-	const { getFields } =
-		request.route.settings.plugins[ACTIVITY_PLUGIN_NAME] || {};
+	const { getFields } = request.route.settings.plugins[ACTIVITY_PLUGIN_NAME] || {};
 	const trackFields = getFields
 		? getFields(request, fields)
 		: {
 				...fields,
-				url: request.url.path,
+				url: `${request.url.pathname}${request.url.search}`,
 				referrer: request.info.referrer || '',
-			};
+		  };
 	return request.trackApiResponses(trackFields);
 };
