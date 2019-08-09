@@ -1,5 +1,4 @@
 // @flow
-import url from 'url';
 
 /*
  * This is the Hapi route handler that will be applied to the React application
@@ -21,7 +20,8 @@ export default (languageRenderers: { [string]: LanguageRenderer }): HapiHandler 
 ) => {
 	const pathname = request.getLangPrefixPath();
 	if (pathname !== request.url.pathname) {
-		return h.redirect(url.format({ ...request.url, pathname }));
+		// redirect to a host relative path, keeping query params intact
+		return h.redirect(`${pathname}${request.url.search}`);
 	}
 	const requestLanguage = request.getLanguage();
 	const renderRequest = languageRenderers[requestLanguage];
