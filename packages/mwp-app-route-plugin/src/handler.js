@@ -20,7 +20,8 @@ export default (languageRenderers: { [string]: LanguageRenderer }): HapiHandler 
 ) => {
 	const pathname = request.getLangPrefixPath();
 	if (pathname !== request.url.pathname) {
-		return h.redirect({ ...request.url, pathname }.toString());
+		// redirect to a host relative path, keeping query params intact
+		return h.redirect(`${pathname}${request.url.search}`);
 	}
 	const requestLanguage = request.getLanguage();
 	const renderRequest = languageRenderers[requestLanguage];
