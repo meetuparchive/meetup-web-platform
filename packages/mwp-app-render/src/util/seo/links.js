@@ -27,7 +27,7 @@ export const generateCanonicalUrlLinkTags = (baseUrl, localeCode, route) => {
 	const localeLinks = locales.map(locale => (
 		<link
 			rel="alternate"
-			hreflang={locale == 'en-US' ? 'en' : locale}
+			hrefLang={locale == 'en-US' ? 'en' : locale}
 			href={generateCanonicalUrl(baseUrl, locale, route)}
 			key={locale}
 		/>
@@ -37,7 +37,7 @@ export const generateCanonicalUrlLinkTags = (baseUrl, localeCode, route) => {
 		...localeLinks,
 		<link
 			rel="alternate"
-			hreflang="x-default"
+			hrefLang="x-default"
 			href={`${baseUrl}${route}`}
 			key="default"
 		/>,

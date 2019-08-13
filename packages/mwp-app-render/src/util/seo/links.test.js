@@ -43,7 +43,7 @@ describe('generateCanonicalUrlLinkTags', () => {
 			MOCK_ROUTE
 		);
 		expect(
-			canonicalUrlMetaTags.filter(el => el.props.hreflang === 'x-default')
+			canonicalUrlMetaTags.filter(el => el.props.hrefLang === 'x-default')
 		).toMatchSnapshot();
 	});
 });

@@ -171,97 +171,97 @@ exports[`SEOHead imageUrl applies meet script logo to og:image, twitter:image an
   />
   <link
     href="https://baseUrl.com/mock/preview/route"
-    hreflang="en"
+    hrefLang="en"
     key="en-US"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/de-DE/mock/preview/route"
-    hreflang="de-DE"
+    hrefLang="de-DE"
     key="de-DE"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/en-AU/mock/preview/route"
-    hreflang="en-AU"
+    hrefLang="en-AU"
     key="en-AU"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/es/mock/preview/route"
-    hreflang="es"
+    hrefLang="es"
     key="es"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/es-ES/mock/preview/route"
-    hreflang="es-ES"
+    hrefLang="es-ES"
     key="es-ES"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/fr-FR/mock/preview/route"
-    hreflang="fr-FR"
+    hrefLang="fr-FR"
     key="fr-FR"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/it-IT/mock/preview/route"
-    hreflang="it-IT"
+    hrefLang="it-IT"
     key="it-IT"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/ja-JP/mock/preview/route"
-    hreflang="ja-JP"
+    hrefLang="ja-JP"
     key="ja-JP"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/ko-KR/mock/preview/route"
-    hreflang="ko-KR"
+    hrefLang="ko-KR"
     key="ko-KR"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/nl-NL/mock/preview/route"
-    hreflang="nl-NL"
+    hrefLang="nl-NL"
     key="nl-NL"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/pt-BR/mock/preview/route"
-    hreflang="pt-BR"
+    hrefLang="pt-BR"
     key="pt-BR"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/pl-PL/mock/preview/route"
-    hreflang="pl-PL"
+    hrefLang="pl-PL"
     key="pl-PL"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/ru-RU/mock/preview/route"
-    hreflang="ru-RU"
+    hrefLang="ru-RU"
     key="ru-RU"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/th-TH/mock/preview/route"
-    hreflang="th-TH"
+    hrefLang="th-TH"
     key="th-TH"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/tr-TR/mock/preview/route"
-    hreflang="tr-TR"
+    hrefLang="tr-TR"
     key="tr-TR"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/mock/preview/route"
-    hreflang="x-default"
+    hrefLang="x-default"
     key="default"
     rel="alternate"
   />
@@ -448,97 +448,97 @@ exports[`SEOHead renders component markup 1`] = `
   />
   <link
     href="https://baseUrl.com/mock/preview/route"
-    hreflang="en"
+    hrefLang="en"
     key="en-US"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/de-DE/mock/preview/route"
-    hreflang="de-DE"
+    hrefLang="de-DE"
     key="de-DE"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/en-AU/mock/preview/route"
-    hreflang="en-AU"
+    hrefLang="en-AU"
     key="en-AU"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/es/mock/preview/route"
-    hreflang="es"
+    hrefLang="es"
     key="es"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/es-ES/mock/preview/route"
-    hreflang="es-ES"
+    hrefLang="es-ES"
     key="es-ES"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/fr-FR/mock/preview/route"
-    hreflang="fr-FR"
+    hrefLang="fr-FR"
     key="fr-FR"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/it-IT/mock/preview/route"
-    hreflang="it-IT"
+    hrefLang="it-IT"
     key="it-IT"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/ja-JP/mock/preview/route"
-    hreflang="ja-JP"
+    hrefLang="ja-JP"
     key="ja-JP"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/ko-KR/mock/preview/route"
-    hreflang="ko-KR"
+    hrefLang="ko-KR"
     key="ko-KR"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/nl-NL/mock/preview/route"
-    hreflang="nl-NL"
+    hrefLang="nl-NL"
     key="nl-NL"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/pt-BR/mock/preview/route"
-    hreflang="pt-BR"
+    hrefLang="pt-BR"
     key="pt-BR"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/pl-PL/mock/preview/route"
-    hreflang="pl-PL"
+    hrefLang="pl-PL"
     key="pl-PL"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/ru-RU/mock/preview/route"
-    hreflang="ru-RU"
+    hrefLang="ru-RU"
     key="ru-RU"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/th-TH/mock/preview/route"
-    hreflang="th-TH"
+    hrefLang="th-TH"
     key="th-TH"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/tr-TR/mock/preview/route"
-    hreflang="tr-TR"
+    hrefLang="tr-TR"
     key="tr-TR"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/mock/preview/route"
-    hreflang="x-default"
+    hrefLang="x-default"
     key="default"
     rel="alternate"
   />
@@ -746,97 +746,97 @@ exports[`SEOHead strips out undefined json values 1`] = `
   />
   <link
     href="https://baseUrl.com/mock/preview/route"
-    hreflang="en"
+    hrefLang="en"
     key="en-US"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/de-DE/mock/preview/route"
-    hreflang="de-DE"
+    hrefLang="de-DE"
     key="de-DE"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/en-AU/mock/preview/route"
-    hreflang="en-AU"
+    hrefLang="en-AU"
     key="en-AU"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/es/mock/preview/route"
-    hreflang="es"
+    hrefLang="es"
     key="es"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/es-ES/mock/preview/route"
-    hreflang="es-ES"
+    hrefLang="es-ES"
     key="es-ES"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/fr-FR/mock/preview/route"
-    hreflang="fr-FR"
+    hrefLang="fr-FR"
     key="fr-FR"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/it-IT/mock/preview/route"
-    hreflang="it-IT"
+    hrefLang="it-IT"
     key="it-IT"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/ja-JP/mock/preview/route"
-    hreflang="ja-JP"
+    hrefLang="ja-JP"
     key="ja-JP"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/ko-KR/mock/preview/route"
-    hreflang="ko-KR"
+    hrefLang="ko-KR"
     key="ko-KR"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/nl-NL/mock/preview/route"
-    hreflang="nl-NL"
+    hrefLang="nl-NL"
     key="nl-NL"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/pt-BR/mock/preview/route"
-    hreflang="pt-BR"
+    hrefLang="pt-BR"
     key="pt-BR"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/pl-PL/mock/preview/route"
-    hreflang="pl-PL"
+    hrefLang="pl-PL"
     key="pl-PL"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/ru-RU/mock/preview/route"
-    hreflang="ru-RU"
+    hrefLang="ru-RU"
     key="ru-RU"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/th-TH/mock/preview/route"
-    hreflang="th-TH"
+    hrefLang="th-TH"
     key="th-TH"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/tr-TR/mock/preview/route"
-    hreflang="tr-TR"
+    hrefLang="tr-TR"
     key="tr-TR"
     rel="alternate"
   />
   <link
     href="https://baseUrl.com/mock/preview/route"
-    hreflang="x-default"
+    hrefLang="x-default"
     key="default"
     rel="alternate"
   />
