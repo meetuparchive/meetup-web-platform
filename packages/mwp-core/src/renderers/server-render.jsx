@@ -14,7 +14,7 @@ import { getServerCreateStore } from 'mwp-store/lib/server';
 import Dom from 'mwp-app-render/lib/components/Dom';
 import ServerApp from 'mwp-app-render/lib/components/ServerApp';
 import { parseMemberCookie } from 'mwp-core/lib/util/cookieUtils';
-import { getRemoteGeoLocation } from 'mwp-core/lib/requestUtils';
+import { getRemoteGeoLocation } from 'mwp-core/lib/util/requestUtils';
 
 import {
 	getVariants,
