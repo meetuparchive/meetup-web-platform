@@ -37,6 +37,7 @@ declare type AppContext = {
 				org?: 1,
 		  |}
 		| {| id: 0 |},
+	geo: GeoLocation,
 	initialNow: number, // timestamp that React-Intl uses to initialize date strings on initial client render
 	isQL: boolean,
 	isProdApi: boolean, // whether the data is coming from Prod instead of Dev DB
