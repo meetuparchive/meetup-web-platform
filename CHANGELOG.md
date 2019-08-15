@@ -11,6 +11,9 @@
 
     These headers will be custom-set in our www Fastly config
 
+    `state.config.geo` is currenty a `GeoLocation` object, with a flow type
+    [defined in flow-typed/platform/js](https://github.com/meetup/meetup-web-platform/blob/167933580_geo-state/flow-typed/platform.js#L149-L154)
+
 ## [22.3]
 
 -   **New feature** `mwp-config` now exports a `packages.mupwebPackages` path Regex pointing

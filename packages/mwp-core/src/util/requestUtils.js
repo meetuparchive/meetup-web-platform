@@ -46,8 +46,8 @@ export const getRemoteGeoLocation = (request: HapiRequest): GeoLocation => {
 		geoLocation.city = city;
 	}
 
-	// LATTITUDE/LONGITUDE
-	const [lat = '', lon = ''] = (headers['x-geo-latlon'] || '')
+	// LATITUDE/LONGITUDE
+	const [lat = NaN, lon = NaN] = (headers['x-geo-latlon'] || '')
 		.split(',')
 		.map(parseFloat);
 	if (!Number.isNaN(lat) && !Number.isNaN(lon)) {
