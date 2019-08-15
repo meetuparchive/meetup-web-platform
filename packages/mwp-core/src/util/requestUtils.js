@@ -1,7 +1,6 @@
 // @flow
 
 const HEADER_FASTLY_CLIENT_IP = 'fastly-client-ip';
-const HEADER_FASTLY_X_REGION = 'x-region';
 
 /**
  * Attempts to parse a client IP address from a request.
@@ -29,17 +28,30 @@ export const getRemoteIp = (request: HapiRequest): ?string => {
  */
 export const getRemoteGeoLocation = (request: HapiRequest): GeoLocation => {
 	const { headers } = request;
-
-	const location = (headers && headers[HEADER_FASTLY_X_REGION]) || '';
-	const [country, region] = location.split('/');
-
 	const geoLocation: GeoLocation = {};
 
+	// COUNTRY + REGION
+	const location = headers['x-region'] || '';
+	const [country, region] = location.split('/');
 	if (country) {
 		geoLocation.country = country;
 	}
 	if (region) {
 		geoLocation.region = region;
+	}
+
+	// CITY
+	const city = headers['x-geo-city'];
+	if (city) {
+		geoLocation.city = city;
+	}
+
+	// LATTITUDE/LONGITUDE
+	const [lat = '', lon = ''] = (headers['x-geo-latlon'] || '')
+		.split(',')
+		.map(parseFloat);
+	if (!Number.isNaN(lat) && !Number.isNaN(lon)) {
+		geoLocation.latlon = [lat, lon];
 	}
 
 	return geoLocation;

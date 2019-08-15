@@ -1,3 +1,16 @@
+## [22.4]
+
+-   **New feature** `state.config.geo`, which contains geolocation info provided
+    in `requestUtils.getRemoteGeoLocation`. Also added ability to read two new
+    geolocation headers, if they exist in the request:
+
+    -   `x-geo-city` - plain city name string, e.g. provided by
+        [`client.geo.city`](https://docs.fastly.com/vcl/variables/client-geo-city/)
+        in Fastly
+    -   `x-geo-latlon` - comma-separated lat/lon
+
+    These headers will be custom-set in our www Fastly config
+
 ## [22.3]
 
 -   **New feature** `mwp-config` now exports a `packages.mupwebPackages` path Regex pointing
@@ -6,7 +19,7 @@
 ## [22.2]
 
 -   **New feature** The Google Tag Manager util now targets specific GTM Environments
-    based on the running environment (eg: prod, dev). Environments can also be 
+    based on the running environment (eg: prod, dev). Environments can also be
     manually chosen by passing parameters to the GTM util.
 
 ## [22.1]

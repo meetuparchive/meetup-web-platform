@@ -14,6 +14,7 @@ import { getServerCreateStore } from 'mwp-store/lib/server';
 import Dom from 'mwp-app-render/lib/components/Dom';
 import ServerApp from 'mwp-app-render/lib/components/ServerApp';
 import { parseMemberCookie } from 'mwp-core/lib/util/cookieUtils';
+import { getRemoteGeoLocation } from 'mwp-core/lib/requestUtils';
 
 import {
 	getVariants,
@@ -208,6 +209,7 @@ const getAppContext = (request: HapiRequest, enableServiceWorker: boolean) => {
 		// the member cookie is not structured the same way as the member object returned from /member/self
 		// be careful relying on it to have the same properties downstream
 		member: parseMemberCookie(state),
+		geo: getRemoteGeoLocation(request),
 		variants: getVariants(state),
 		entryPath: url.pathname, // the path that the user entered the app on
 		media: getMedia(userAgent, userAgentDevice),

@@ -149,6 +149,8 @@ declare type PlatformRoute = AsyncPlatformRoute | StaticPlatformRoute;
 declare type GeoLocation = {
 	country?: string,
 	region?: string,
+	city?: string,
+	latlon?: Array<number>,
 };
 
 // See https://docs.launchdarkly.com/docs/node-sdk-reference#section-users

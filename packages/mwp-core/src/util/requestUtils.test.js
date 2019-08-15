@@ -65,63 +65,30 @@ describe('getRemoteIp', () => {
 });
 
 describe('getRemoteGeoLocation', () => {
-	it('returns an empty geo location if a request has no X-Region header', () => {
-		const request = {
-			...REQUEST_MOCK,
-			headers: {},
-		};
-
-		expect(getRemoteGeoLocation(request)).toEqual({});
-	});
-
-	it('returns an empty geo location if X-Region header has empty country and region', () => {
-		const request = {
-			...REQUEST_MOCK,
-			headers: {
-				'x-region': '/',
-			},
-		};
-
-		expect(getRemoteGeoLocation(request)).toEqual({});
-	});
-
-	it('returns only a country if X-Region header contains a non-empty country and an empty region', () => {
-		const request = {
-			...REQUEST_MOCK,
-			headers: {
-				'x-region': 'ru/',
-			},
-		};
-
-		expect(getRemoteGeoLocation(request)).toEqual({
-			country: 'ru',
-		});
-	});
-
-	it('returns only a region if X-Region header contains an empty country and a non-empty region', () => {
-		const request = {
-			...REQUEST_MOCK,
-			headers: {
-				'x-region': '/ny',
-			},
-		};
-
-		expect(getRemoteGeoLocation(request)).toEqual({
-			region: 'ny',
-		});
-	});
-
-	it('returns both a country and a region if X-Region header contains non-empty country and region', () => {
-		const request = {
-			...REQUEST_MOCK,
-			headers: {
-				'x-region': 'us/ny',
-			},
-		};
-
-		expect(getRemoteGeoLocation(request)).toEqual({
-			country: 'us',
-			region: 'ny',
-		});
+	it.each([
+		['empty object for empty geo headers', {}, {}],
+		[
+			'region and country for full x-region',
+			{ 'x-region': 'us/ny' },
+			{ country: 'us', region: 'ny' },
+		],
+		[
+			'country only for country-only x-region',
+			{ 'x-region': 'us/' },
+			{ country: 'us' },
+		],
+		[
+			'region ony for region-only x-region',
+			{ 'x-region': '/ny' },
+			{ region: 'ny' },
+		],
+		['city for x-geo-city', { 'x-geo-city': 'nyc' }, { city: 'nyc' }],
+		[
+			'latlon for x-geo-latlon',
+			{ 'x-geo-latlon': '1.2345,2.3456' },
+			{ latlon: [1.2345, 2.3456] },
+		],
+	])('%s', (_, headers, expected) => {
+		expect(getRemoteGeoLocation({ ...REQUEST_MOCK, headers })).toEqual(expected);
 	});
 });
