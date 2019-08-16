@@ -65,63 +65,55 @@ describe('getRemoteIp', () => {
 });
 
 describe('getRemoteGeoLocation', () => {
-	it('returns an empty geo location if a request has no X-Region header', () => {
-		const request = {
-			...REQUEST_MOCK,
-			headers: {},
-		};
-
-		expect(getRemoteGeoLocation(request)).toEqual({});
+	it.each([
+		['empty object for empty geo headers', {}, {}],
+		[
+			'region and country for full x-region',
+			{ 'x-region': 'us/ny' },
+			{ country: 'us', region: 'ny' },
+		],
+		[
+			'country only for country-only x-region',
+			{ 'x-region': 'us/' },
+			{ country: 'us' },
+		],
+		[
+			'region ony for region-only x-region',
+			{ 'x-region': '/ny' },
+			{ region: 'ny' },
+		],
+		[
+			'city for x-fastly-geo-city',
+			{ 'x-fastly-geo-city': 'nyc' },
+			{ city: 'nyc' },
+		],
+		[
+			'latlon for x-fastly-geo-latlon',
+			{ 'x-fastly-geo-latlon': '1.2345,2.3456' },
+			{ latlon: [1.2345, 2.3456] },
+		],
+	])('%s', (_, headers, expected) => {
+		expect(getRemoteGeoLocation({ ...REQUEST_MOCK, headers })).toEqual(expected);
 	});
-
-	it('returns an empty geo location if X-Region header has empty country and region', () => {
-		const request = {
-			...REQUEST_MOCK,
-			headers: {
-				'x-region': '/',
-			},
+	it('overrides all values using querystring', () => {
+		const headers = {
+			'x-region': 'header-country/header-region',
+			'x-fastly-geo-city': 'header-city',
+			'x-fastly-geo-latlon': '9.8765,8.76584',
 		};
-
-		expect(getRemoteGeoLocation(request)).toEqual({});
-	});
-
-	it('returns only a country if X-Region header contains a non-empty country and an empty region', () => {
-		const request = {
-			...REQUEST_MOCK,
-			headers: {
-				'x-region': 'ru/',
-			},
+		const query = {
+			'__geo-region': 'query-country/query-region',
+			'__geo-city': 'query-city',
+			'__geo-latlon': '1.2345,2.3456',
 		};
-
-		expect(getRemoteGeoLocation(request)).toEqual({
-			country: 'ru',
-		});
-	});
-
-	it('returns only a region if X-Region header contains an empty country and a non-empty region', () => {
-		const request = {
-			...REQUEST_MOCK,
-			headers: {
-				'x-region': '/ny',
-			},
+		const expected = {
+			country: 'query-country',
+			region: 'query-region',
+			city: 'query-city',
+			latlon: [1.2345, 2.3456],
 		};
-
-		expect(getRemoteGeoLocation(request)).toEqual({
-			region: 'ny',
-		});
-	});
-
-	it('returns both a country and a region if X-Region header contains non-empty country and region', () => {
-		const request = {
-			...REQUEST_MOCK,
-			headers: {
-				'x-region': 'us/ny',
-			},
-		};
-
-		expect(getRemoteGeoLocation(request)).toEqual({
-			country: 'us',
-			region: 'ny',
-		});
+		expect(getRemoteGeoLocation({ ...REQUEST_MOCK, headers, query })).toEqual(
+			expected
+		);
 	});
 });
