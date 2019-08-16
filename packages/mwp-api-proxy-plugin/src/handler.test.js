@@ -80,7 +80,7 @@ describe('parseRequestQueries', () => {
 			parseRequestQueries(patchRequest, 'http://dummy.api.meetup.com')
 		).toEqual(queries);
 	});
-	it('throws an error for mal-formed queries', async () => {
+	it('returns an error for mal-formed queries', async () => {
 		const notAQuery = { foo: 'bar' };
 		const data = { queries: rison.encode_array([notAQuery]) };
 		const server = await getServer();
@@ -93,8 +93,8 @@ describe('parseRequestQueries', () => {
 				oauth_token: 'foo',
 			},
 		};
-		expect(() =>
+		expect(
 			parseRequestQueries(getRequest, 'http://dummy.api.meetup.com')
-		).toThrow();
+		).toBeInstanceOf(Error);
 	});
 });
