@@ -29,7 +29,7 @@
 	"dependencies": {
 		"classnames": "2.2.6",
 		"js-joda": "^1.10.1",
-		"meetup-web-components": "5.2.2434",
+		"meetup-web-components": "8.0.2899-beta",
 		"mwp-api-state": ">=0.0.1",
 		"mwp-app-server": ">=0.0.1",
 		"mwp-core": ">=0.0.1",
