@@ -2,7 +2,10 @@
     "name": "mwp-config",
     "version": "0.0.1",
     "description": "All the config you might ever need for a MWP app",
-    "engineStrict": true,
+    "engines": {
+		"node": "^10.16.3",
+		"yarn": "^1.9.4"
+	},
     "config": {},
     "repository": {
         "type": "git",

@@ -1764,6 +1764,19 @@
     mkdirp "^0.5.1"
     rimraf "^2.5.2"
 
+"@meetup/swarm-components@0.13.19":
+  version "0.13.19"
+  resolved "https://registry.yarnpkg.com/@meetup/swarm-components/-/swarm-components-0.13.19.tgz#9d1ff569cd1f8cbb01ef750c726bcaa9ec485cef"
+  dependencies:
+    "@meetup/swarm-constants" "^0.3.2"
+    autosize "^4.0.2"
+    classnames "2.2.6"
+    swarm-icons "3.8.354"
+
+"@meetup/swarm-constants@^0.3.2":
+  version "0.3.4"
+  resolved "https://registry.yarnpkg.com/@meetup/swarm-constants/-/swarm-constants-0.3.4.tgz#54a7e1cb54be952a62f153779d11031f2650c51a"
+
 "@meetup/ux-capture@4.2.2":
   version "4.2.2"
   resolved "https://registry.yarnpkg.com/@meetup/ux-capture/-/ux-capture-4.2.2.tgz#8763daf530f0bf5fc71c237ac6264278f7c27beb"
@@ -2052,7 +2065,7 @@ airbnb-prop-types@^2.13.2:
     prop-types-exact "^1.2.0"
     react-is "^16.8.6"
 
-ajv-keywords@^3.0.0, ajv-keywords@^3.1.0:
+ajv-keywords@^3.0.0:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/ajv-keywords/-/ajv-keywords-3.2.0.tgz#e86b819c602cf8821ad637413698f1dec021847a"
 
@@ -2065,7 +2078,7 @@ ajv@5.5.2, ajv@^5.1.0, ajv@^5.3.0:
     fast-json-stable-stringify "^2.0.0"
     json-schema-traverse "^0.3.0"
 
-ajv@^6.0.1, ajv@^6.1.0:
+ajv@^6.0.1:
   version "6.5.2"
   resolved "https://registry.yarnpkg.com/ajv/-/ajv-6.5.2.tgz#678495f9b82f7cca6be248dd92f59bff5e1f4360"
   dependencies:
@@ -2324,9 +2337,9 @@ autoprefixer@^9.0.0:
     postcss "^7.0.2"
     postcss-value-parser "^3.2.3"
 
-autosize@3.0.21:
-  version "3.0.21"
-  resolved "https://registry.yarnpkg.com/autosize/-/autosize-3.0.21.tgz#f182f40d17757d978a139a4c9ca40c4c0e448603"
+autosize@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/autosize/-/autosize-4.0.2.tgz#073cfd07c8bf45da4b9fd153437f5bafbba1e4c9"
 
 avsc@5.1.1:
   version "5.1.1"
@@ -2553,10 +2566,6 @@ before-after-hook@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/before-after-hook/-/before-after-hook-1.4.0.tgz#2b6bf23dca4f32e628fd2747c10a37c74a4b484d"
 
-big.js@^3.1.3:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/big.js/-/big.js-3.2.0.tgz#a5fc298b81b9e0dca2e458824784b65c52ba588e"
-
 binary-extensions@^1.0.0:
   version "1.11.0"
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-1.11.0.tgz#46aa1751fb6a2f93ee5e689bb1087d4b14c6c205"
@@ -2586,7 +2595,6 @@ boolbase@~1.0.0:
 boom@7.3.0:
   version "7.3.0"
   resolved "https://registry.yarnpkg.com/boom/-/boom-7.3.0.tgz#733a6d956d33b0b1999da3fe6c12996950d017b9"
-  integrity sha512-Swpoyi2t5+GhOEGw8rEsKvTxFLIDiiKoUc2gsoV6Lyr43LHBIzch3k2MvYUs8RTROrIkVJ3Al0TkaOGjnb+B6A==
   dependencies:
     hoek "6.x.x"
 
@@ -3780,10 +3788,6 @@ emoji-regex@^7.0.1:
   version "7.0.3"
   resolved "https://registry.yarnpkg.com/emoji-regex/-/emoji-regex-7.0.3.tgz#933a04052860c85e83c122479c4748a8e4c72156"
 
-emojis-list@^2.0.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/emojis-list/-/emojis-list-2.1.0.tgz#4daa4d9db00f9819880c79fa457ae5b09a1fd389"
-
 empower-core@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/empower-core/-/empower-core-1.2.0.tgz#ce3fb2484d5187fa29c23fba8344b0b2fdf5601c"
@@ -4309,13 +4313,6 @@ file-entry-cache@^5.0.1:
   resolved "https://registry.yarnpkg.com/file-entry-cache/-/file-entry-cache-5.0.1.tgz#ca0f6efa6dd3d561333fb14515065c2fafdf439c"
   dependencies:
     flat-cache "^2.0.1"
-
-file-loader@1.1.11:
-  version "1.1.11"
-  resolved "https://registry.yarnpkg.com/file-loader/-/file-loader-1.1.11.tgz#6fe886449b0f2a936e43cabaac0cdbfb369506f8"
-  dependencies:
-    loader-utils "^1.0.2"
-    schema-utils "^0.4.5"
 
 filename-regex@^2.0.0:
   version "2.0.1"
@@ -6216,7 +6213,7 @@ json-stringify-safe@^5.0.0, json-stringify-safe@^5.0.1, json-stringify-safe@~5.0
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz#1296a2d58fd45f19a0f6ce01d65701e2c735b6eb"
 
-json5@0.5.1, json5@^0.5.0, json5@^0.5.1:
+json5@0.5.1, json5@^0.5.1:
   version "0.5.1"
   resolved "https://registry.yarnpkg.com/json5/-/json5-0.5.1.tgz#1eade7acc012034ad84e2396767ead9fa5495821"
 
@@ -6462,14 +6459,6 @@ load-json-file@^4.0.0:
     parse-json "^4.0.0"
     pify "^3.0.0"
     strip-bom "^3.0.0"
-
-loader-utils@^1.0.2:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/loader-utils/-/loader-utils-1.1.0.tgz#c98aef488bcceda2ffb5e2de646d6a754429f5cd"
-  dependencies:
-    big.js "^3.1.3"
-    emojis-list "^2.0.0"
-    json5 "^0.5.0"
 
 locate-path@^2.0.0:
   version "2.0.0"
@@ -6759,24 +6748,11 @@ mdast-util-compact@^1.0.0:
     unist-util-modify-children "^1.0.0"
     unist-util-visit "^1.1.0"
 
-meetup-web-components@5.2.2434:
-  version "5.2.2434"
-  resolved "https://registry.yarnpkg.com/meetup-web-components/-/meetup-web-components-5.2.2434.tgz#c44f7182bf0f8273c24fe95ac20f75f8640117fe"
+meetup-web-components@8.0.2899-beta:
+  version "8.0.2899-beta"
+  resolved "https://registry.yarnpkg.com/meetup-web-components/-/meetup-web-components-8.0.2899-beta.tgz#3b2def2007a478e54ed5f3f188afc12a122ea96e"
   dependencies:
-    autosize "3.0.21"
-    downshift "1.31.12"
-    file-loader "1.1.11"
-    focus-trap-react "3.1.2"
-    raf-schd "2.1.0"
-    react-flatpickr "3.6.4"
-    react-portal "4.1.2"
-    recompose "0.26.0"
-
-meetup-web-components@7.0.2796:
-  version "7.0.2796"
-  resolved "https://registry.yarnpkg.com/meetup-web-components/-/meetup-web-components-7.0.2796.tgz#4b928eda849a3a294b598a08d4606670c252996a"
-  dependencies:
-    autosize "3.0.21"
+    "@meetup/swarm-components" "0.13.19"
     downshift "1.31.12"
     focus-trap-react "3.1.2"
     raf-schd "2.1.0"
@@ -6784,9 +6760,9 @@ meetup-web-components@7.0.2796:
     react-portal "4.1.2"
     recompose "0.26.0"
 
-meetup-web-mocks@1.0.265:
-  version "1.0.265"
-  resolved "https://registry.yarnpkg.com/meetup-web-mocks/-/meetup-web-mocks-1.0.265.tgz#a38796ef51e09c02bb30d0312a080601ea17a850"
+meetup-web-mocks@1.0.267-beta:
+  version "1.0.267-beta"
+  resolved "https://registry.yarnpkg.com/meetup-web-mocks/-/meetup-web-mocks-1.0.267-beta.tgz#aa9154ae0f6df376b6ffc192fbca90136462a353"
 
 mem@^4.0.0:
   version "4.3.0"
@@ -9181,13 +9157,6 @@ scheduler@^0.13.6:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
 
-schema-utils@^0.4.5:
-  version "0.4.7"
-  resolved "https://registry.yarnpkg.com/schema-utils/-/schema-utils-0.4.7.tgz#ba74f597d2be2ea880131746ee17d0a093c68187"
-  dependencies:
-    ajv "^6.1.0"
-    ajv-keywords "^3.1.0"
-
 scooter@5.0.2:
   version "5.0.2"
   resolved "https://registry.yarnpkg.com/scooter/-/scooter-5.0.2.tgz#1163aae95a1e40c35ea4e616b83b0dd36760bdd2"
@@ -9206,7 +9175,6 @@ semver-compare@^1.0.0:
 "semver@2 || 3 || 4 || 5", "semver@2.x || 3.x || 4 || 5", semver@5.5.0, semver@5.6.0, semver@5.x.x, semver@6.0.0, semver@^5.3.0, semver@^5.4.1, semver@^5.5.0, semver@^5.5.1, semver@^5.6.0, semver@^5.7.0, semver@^6.0.0, semver@^6.1.1, semver@~5.3.0:
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/semver/-/semver-6.0.0.tgz#05e359ee571e5ad7ed641a6eec1e547ba52dea65"
-  integrity sha512-0UewU+9rFapKFnlbirLi3byoOuhrSsli/z/ihNnvM24vgF+8sNBiI1LZPBSH9wJKUwaUbw+s3hToDLCXkrghrQ==
 
 set-blocking@^2.0.0, set-blocking@~2.0.0:
   version "2.0.0"
