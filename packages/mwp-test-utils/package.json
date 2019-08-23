@@ -2,7 +2,6 @@
   "name": "mwp-test-utils",
   "version": "0.0.1",
   "description": "Helpers for running unit tests in MWP apps",
-  "engineStrict": true,
   "engines": {
     "node": "^10.16.3",
     "yarn": "^1.9.4"

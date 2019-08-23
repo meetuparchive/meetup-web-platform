@@ -2,9 +2,8 @@
 	"name": "mwp-rasp-plugin",
 	"version": "1.0.0",
 	"description": "Adds Signal Science monitoring + traffic blocking when site is under attack",
-	"engineStrict": true,
 	"engines": {
-		"node": ">=8.1.0"
+		"node": "^10.16.3"
 	},
 	"main": "./lib/index.js",
 	"scripts": {

@@ -2,7 +2,6 @@
   "name": "mwp-app-server",
   "version": "0.0.1",
   "description": "Hapi server startup module for MWP applications",
-  "engineStrict": true,
   "engines": {
     "node": "^10.16.3",
     "yarn": "^1.9.4"
