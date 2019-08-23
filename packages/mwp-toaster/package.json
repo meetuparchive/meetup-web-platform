@@ -2,9 +2,8 @@
   "name": "mwp-toaster",
   "version": "0.0.1",
   "description": "Toast UI controller for MWP apps",
-  "engineStrict": true,
   "engines": {
-    "node": "^8.11.4",
+    "node": "^10.16.3",
     "yarn": "^1.9.4"
   },
   "main": "./lib/index.js",
@@ -29,7 +28,7 @@
   "peerDependencies": {
     "classnames": "^2.2.6",
     "js-joda": "^1.8.2",
-    "meetup-web-components": ">=3",
+    "meetup-web-components": "^8.0.2901-beta",
     "react": "^16.8.6",
     "react-router-dom": "^4.2.2",
     "react-transition-group": "^2.2.1",
