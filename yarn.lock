@@ -1764,6 +1764,19 @@
     mkdirp "^0.5.1"
     rimraf "^2.5.2"
 
+"@meetup/swarm-components@0.13.19":
+  version "0.13.19"
+  resolved "https://registry.yarnpkg.com/@meetup/swarm-components/-/swarm-components-0.13.19.tgz#9d1ff569cd1f8cbb01ef750c726bcaa9ec485cef"
+  dependencies:
+    "@meetup/swarm-constants" "^0.3.2"
+    autosize "^4.0.2"
+    classnames "2.2.6"
+    swarm-icons "3.8.354"
+
+"@meetup/swarm-constants@^0.3.2":
+  version "0.3.4"
+  resolved "https://registry.yarnpkg.com/@meetup/swarm-constants/-/swarm-constants-0.3.4.tgz#54a7e1cb54be952a62f153779d11031f2650c51a"
+
 "@meetup/ux-capture@4.2.2":
   version "4.2.2"
   resolved "https://registry.yarnpkg.com/@meetup/ux-capture/-/ux-capture-4.2.2.tgz#8763daf530f0bf5fc71c237ac6264278f7c27beb"
@@ -2324,9 +2337,9 @@ autoprefixer@^9.0.0:
     postcss "^7.0.2"
     postcss-value-parser "^3.2.3"
 
-autosize@3.0.21:
-  version "3.0.21"
-  resolved "https://registry.yarnpkg.com/autosize/-/autosize-3.0.21.tgz#f182f40d17757d978a139a4c9ca40c4c0e448603"
+autosize@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/autosize/-/autosize-4.0.2.tgz#073cfd07c8bf45da4b9fd153437f5bafbba1e4c9"
 
 avsc@5.1.1:
   version "5.1.1"
@@ -2980,7 +2993,7 @@ class-utils@^0.3.5:
     isobject "^3.0.0"
     static-extend "^0.1.1"
 
-classnames@^2.2.5, classnames@^2.2.6:
+classnames@2.2.6, classnames@^2.2.5, classnames@^2.2.6:
   version "2.2.6"
   resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.2.6.tgz#43935bffdd291f326dad0a205309b38d00f650ce"
 
@@ -6735,11 +6748,11 @@ mdast-util-compact@^1.0.0:
     unist-util-modify-children "^1.0.0"
     unist-util-visit "^1.1.0"
 
-meetup-web-components@7.0.2796:
-  version "7.0.2796"
-  resolved "https://registry.yarnpkg.com/meetup-web-components/-/meetup-web-components-7.0.2796.tgz#4b928eda849a3a294b598a08d4606670c252996a"
+meetup-web-components@8.0.2902-beta:
+  version "8.0.2902-beta"
+  resolved "https://registry.yarnpkg.com/meetup-web-components/-/meetup-web-components-8.0.2902-beta.tgz#97d0cf5c02db62d0135ee76bf659a9d1c61a8340"
   dependencies:
-    autosize "3.0.21"
+    "@meetup/swarm-components" "0.13.19"
     downshift "1.31.12"
     focus-trap-react "3.1.2"
     raf-schd "2.1.0"
@@ -6747,9 +6760,9 @@ meetup-web-components@7.0.2796:
     react-portal "4.1.2"
     recompose "0.26.0"
 
-meetup-web-mocks@1.0.265:
-  version "1.0.265"
-  resolved "https://registry.yarnpkg.com/meetup-web-mocks/-/meetup-web-mocks-1.0.265.tgz#a38796ef51e09c02bb30d0312a080601ea17a850"
+meetup-web-mocks@1.0.267-beta:
+  version "1.0.267-beta"
+  resolved "https://registry.yarnpkg.com/meetup-web-mocks/-/meetup-web-mocks-1.0.267-beta.tgz#aa9154ae0f6df376b6ffc192fbca90136462a353"
 
 mem@^4.0.0:
   version "4.3.0"
@@ -7064,6 +7077,155 @@ mv@~2:
     mkdirp "~0.5.1"
     ncp "~2.0.0"
     rimraf "~2.4.0"
+
+mwp-api-proxy-plugin@22.4.3058-beta, mwp-api-proxy-plugin@^22.4.3058-beta:
+  version "22.4.3058-beta"
+  resolved "https://registry.yarnpkg.com/mwp-api-proxy-plugin/-/mwp-api-proxy-plugin-22.4.3058-beta.tgz#29ceced2d67a78eb5d344ae0aba81e3c2476a45b"
+  dependencies:
+    ajv "5.5.2"
+    boom "7.3.0"
+    isbot "2.3.0"
+    joi "14.3.1"
+    mwp-auth-plugin "^22.4.3058-beta"
+    mwp-config "^22.4.3058-beta"
+    mwp-logger-plugin "^22.4.3058-beta"
+    qs "6.7.0"
+    request "2.88.0"
+    rison "0.1.1"
+
+mwp-api-state@22.4.3058-beta, mwp-api-state@^22.4.3058-beta:
+  version "22.4.3058-beta"
+  resolved "https://registry.yarnpkg.com/mwp-api-state/-/mwp-api-state-22.4.3058-beta.tgz#2875c794590ed969e5cca217b3371307a74f2b09"
+  dependencies:
+    idb-keyval "2.3.0"
+    mwp-router "^22.4.3058-beta"
+    mwp-tracking-plugin "^22.4.3058-beta"
+
+mwp-app-render@22.4.3058-beta, mwp-app-render@^22.4.3058-beta:
+  version "22.4.3058-beta"
+  resolved "https://registry.yarnpkg.com/mwp-app-render/-/mwp-app-render-22.4.3058-beta.tgz#efeb8bb9ed6f7df13b46be0b6b3a856f1c8f8d30"
+  dependencies:
+    "@meetup/ux-capture" "4.2.2"
+    browser-detect "0.2.28"
+    escape-html "1.0.3"
+
+mwp-app-route-plugin@22.4.3058-beta:
+  version "22.4.3058-beta"
+  resolved "https://registry.yarnpkg.com/mwp-app-route-plugin/-/mwp-app-route-plugin-22.4.3058-beta.tgz#8cfe729eb2c9fd453eb05dc48f6d9a2a6e8099e0"
+  dependencies:
+    electrode-csrf-jwt "git+https://github.com/meetup/electrode-csrf-jwt.git#793431729d8fb4ee315f28709f323f198b25d460"
+    ldclient-node "5.8.0"
+    redbox-react "1.6.0"
+
+mwp-auth-plugin@22.4.3058-beta, mwp-auth-plugin@^22.4.3058-beta:
+  version "22.4.3058-beta"
+  resolved "https://registry.yarnpkg.com/mwp-auth-plugin/-/mwp-auth-plugin-22.4.3058-beta.tgz#7051cffd87713889d54d52f94ac8d070ba125575"
+  dependencies:
+    uuid "3.3.2"
+
+mwp-config@22.4.3058-beta, mwp-config@^22.4.3058-beta:
+  version "22.4.3058-beta"
+  resolved "https://registry.yarnpkg.com/mwp-config/-/mwp-config-22.4.3058-beta.tgz#d0529fb02770e19ebe1122bc91777950258356b2"
+  dependencies:
+    convict "4.0.1"
+    stylelint "9.4.0"
+    stylelint-order "1.0.0"
+    stylelint-scss "3.3.0"
+
+mwp-core@22.4.3058-beta, mwp-core@^22.4.3058-beta:
+  version "22.4.3058-beta"
+  resolved "https://registry.yarnpkg.com/mwp-core/-/mwp-core-22.4.3058-beta.tgz#a9e5d94ddffa009d66b0b0b201ab34d3ba0d975e"
+  dependencies:
+    "@google-cloud/pubsub" "0.18.0"
+    joi "14.3.1"
+    mobile-detect "1.4.3"
+    mwp-api-proxy-plugin "^22.4.3058-beta"
+    mwp-app-render "^22.4.3058-beta"
+    mwp-logger-plugin "^22.4.3058-beta"
+    mwp-router "^22.4.3058-beta"
+    mwp-store "^22.4.3058-beta"
+    node-fetch "1.7.2"
+    pino "4.7.1"
+    qs "6.7.0"
+
+mwp-csp-plugin@22.4.3058-beta:
+  version "22.4.3058-beta"
+  resolved "https://registry.yarnpkg.com/mwp-csp-plugin/-/mwp-csp-plugin-22.4.3058-beta.tgz#13bec0d65a08d8d1b6f3bd68be0acbe8b02d8e34"
+  dependencies:
+    blankie "4.0.0"
+    scooter "5.0.2"
+
+mwp-language-plugin@22.4.3058-beta:
+  version "22.4.3058-beta"
+  resolved "https://registry.yarnpkg.com/mwp-language-plugin/-/mwp-language-plugin-22.4.3058-beta.tgz#06226a9b2c1c939e24ed8699d17469aaef7109a1"
+  dependencies:
+    accepts "1.3.7"
+    qs "6.7.0"
+
+mwp-logger-plugin@22.4.3058-beta, mwp-logger-plugin@^22.4.3058-beta:
+  version "22.4.3058-beta"
+  resolved "https://registry.yarnpkg.com/mwp-logger-plugin/-/mwp-logger-plugin-22.4.3058-beta.tgz#b3aa00c2d7b71debee38bd6086e251a6295296bf"
+  dependencies:
+    "@google-cloud/logging-bunyan" "0.8.1"
+    bunyan "1.8.12"
+    bunyan-debug-stream "1.0.8"
+
+mwp-rasp-plugin@22.4.3058-beta:
+  version "22.4.3058-beta"
+  resolved "https://registry.yarnpkg.com/mwp-rasp-plugin/-/mwp-rasp-plugin-22.4.3058-beta.tgz#914f0b63195cf689bbefb7094d1241f9b2abb754"
+  dependencies:
+    msgpack5rpc "https://registry.npmjs.org/msgpack5rpc/-/msgpack5rpc-1.1.0.tgz"
+
+mwp-router@22.4.3058-beta, mwp-router@^22.4.3058-beta:
+  version "22.4.3058-beta"
+  resolved "https://registry.yarnpkg.com/mwp-router/-/mwp-router-22.4.3058-beta.tgz#0ba432f00f6c1d60f5cdf3e1399c0f061e079e2c"
+  dependencies:
+    mwp-auth-plugin "^22.4.3058-beta"
+    react-side-effect "1.1.5"
+
+mwp-store@22.4.3058-beta, mwp-store@^22.4.3058-beta:
+  version "22.4.3058-beta"
+  resolved "https://registry.yarnpkg.com/mwp-store/-/mwp-store-22.4.3058-beta.tgz#12a9d37fbe23ea7dd2806c7360867602a0bcc215"
+  dependencies:
+    js-cookie "2.2.0"
+    mwp-api-state "^22.4.3058-beta"
+    mwp-tracking-plugin "^22.4.3058-beta"
+    rison "0.1.1"
+
+mwp-sw-plugin@22.4.3058-beta:
+  version "22.4.3058-beta"
+  resolved "https://registry.yarnpkg.com/mwp-sw-plugin/-/mwp-sw-plugin-22.4.3058-beta.tgz#7042921eeaff3dbbebe05e3c4dfcb9a94dd993f8"
+  dependencies:
+    mwp-config "^22.4.3058-beta"
+
+mwp-test-utils@22.4.3058-beta:
+  version "22.4.3058-beta"
+  resolved "https://registry.yarnpkg.com/mwp-test-utils/-/mwp-test-utils-22.4.3058-beta.tgz#553a9e853e3154f784e23ac3e1d1d9e4350080b3"
+  dependencies:
+    electrode-csrf-jwt "git+https://github.com/meetup/electrode-csrf-jwt.git#793431729d8fb4ee315f28709f323f198b25d460"
+    hapi "18.1.0"
+    inert "5.1.3"
+    meetup-web-mocks "1.0.267-beta"
+    mwp-core "^22.4.3058-beta"
+    mwp-logger-plugin "^22.4.3058-beta"
+    mwp-router "^22.4.3058-beta"
+    mwp-store "^22.4.3058-beta"
+    react-helmet "5.2.1"
+    redux "3.7.2"
+    tough-cookie "2.3.3"
+
+mwp-tracking-plugin@22.4.3058-beta, mwp-tracking-plugin@^22.4.3058-beta:
+  version "22.4.3058-beta"
+  resolved "https://registry.yarnpkg.com/mwp-tracking-plugin/-/mwp-tracking-plugin-22.4.3058-beta.tgz#55a0e54bf1978ac126fbeae8ee0235a494eb9b7b"
+  dependencies:
+    "@google-cloud/pubsub" "0.18.0"
+    avsc "5.1.1"
+    js-cookie "2.2.0"
+    mwp-logger-plugin "^22.4.3058-beta"
+    qs "6.7.0"
+    rison "0.1.1"
+    url "0.11.0"
+    uuid "3.3.2"
 
 nan@^2.0.0, nan@^2.10.0:
   version "2.10.0"

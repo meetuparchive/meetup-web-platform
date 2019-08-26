@@ -2,9 +2,8 @@
   "name": "mwp-core",
   "version": "0.0.1",
   "description": "Core utilities for MWP apps",
-  "engineStrict": true,
   "engines": {
-    "node": "^8.11.4",
+    "node": "^10.16.3",
     "yarn": "^1.9.4"
   },
   "main": "./lib/index.js",
@@ -32,11 +31,11 @@
     "@google-cloud/pubsub": "0.18.0",
     "joi": "14.3.1",
     "mobile-detect": "1.4.3",
-    "mwp-api-proxy-plugin": ">=0.0.1",
-    "mwp-app-render": ">=0.0.1",
-    "mwp-logger-plugin": ">=0.0.1",
-    "mwp-router": ">=0.0.1",
-    "mwp-store": ">=0.0.1",
+    "mwp-api-proxy-plugin": "22.4.3058-beta",
+    "mwp-app-render": "22.4.3058-beta",
+    "mwp-logger-plugin": "22.4.3058-beta",
+    "mwp-router": "22.4.3058-beta",
+    "mwp-store": "22.4.3058-beta",
     "node-fetch": "1.7.2",
     "pino": "4.7.1",
     "qs": "6.7.0"

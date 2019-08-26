@@ -2,9 +2,8 @@
   "name": "mwp-api-state",
   "version": "0.0.1",
   "description": "Redux helpers to manage API data in a MWP app",
-  "engineStrict": true,
   "engines": {
-    "node": "^8.11.4",
+    "node": "^10.16.3",
     "yarn": "^1.9.4"
   },
   "main": "./lib/index.js",
@@ -27,12 +26,12 @@
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "peerDependencies": {
-    "mwp-router": ">=0.0.1"
+    "mwp-router": "^22.4.3058-beta"
   },
   "dependencies": {
     "idb-keyval": "2.3.0",
-    "mwp-router": ">=0.0.1",
-    "mwp-tracking-plugin": ">=0.0.1"
+    "mwp-router": "22.4.3058-beta",
+    "mwp-tracking-plugin": "22.4.3058-beta"
   },
   "devDependencies": {}
 }
