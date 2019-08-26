@@ -35,7 +35,7 @@ describe('serializers.avro', () => {
 		// parse stringified object
 		const valObj = JSON.parse(serialized);
 		// create a new buffer from that string
-		const avroBuffer = new Buffer(valObj.record, 'base64');
+		const avroBuffer = Buffer.from(valObj.record, 'base64');
 		// get the avro-encoded record
 		const recordedInfo = avsc.parse(schema).fromBuffer(avroBuffer);
 		expect(recordedInfo).toEqual(data);
@@ -87,11 +87,9 @@ describe('Activity tracking', () => {
 		// parse stringified object
 		const valObj = JSON.parse(serialized);
 		// create a new buffer from that string
-		const avroBuffer = new Buffer(valObj.record, 'base64');
+		const avroBuffer = Buffer.from(valObj.record, 'base64');
 		// get the avro-encoded record
-		const recordedInfo = avsc
-			.parse(avro.schemas.activity)
-			.fromBuffer(avroBuffer);
+		const recordedInfo = avsc.parse(avro.schemas.activity).fromBuffer(avroBuffer);
 		delete recordedInfo.timestamp;
 		expect(recordedInfo).toMatchSnapshot();
 	});
@@ -117,7 +115,7 @@ describe('Click tracking', () => {
 		// parse stringified object
 		const valObj = JSON.parse(serialized);
 		// create a new buffer from that string
-		const avroBuffer = new Buffer(valObj.record, 'base64');
+		const avroBuffer = Buffer.from(valObj.record, 'base64');
 		// get the avro-encoded record
 		const recordedInfo = avsc.parse(avro.schemas.click).fromBuffer(avroBuffer);
 		const expectedTrackedInfo = {
