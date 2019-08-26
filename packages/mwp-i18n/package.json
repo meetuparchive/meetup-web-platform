@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "peerDependencies": {
-    "mwp-app-render": "^22.4.3058-beta",
+    "mwp-app-render": ">=0.0.1",
     "react": "^16.8.6",
     "react-intl": "^2.4.0",
     "react-redux": ">=5"
