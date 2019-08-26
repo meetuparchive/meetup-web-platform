@@ -33,9 +33,9 @@
   "devDependencies": {},
   "peerDependencies": {
     "electrode-csrf-jwt": "git+https://github.com/meetup/electrode-csrf-jwt.git#793431729d8fb4ee315f28709f323f198b25d460",
-    "mwp-core": "^22.4.3056-beta",
-    "mwp-language-plugin": "^22.4.3056-beta",
-    "mwp-router": "^22.4.3056-beta",
+    "mwp-core": "^22.4.3058-beta",
+    "mwp-language-plugin": "^22.4.3058-beta",
+    "mwp-router": "^22.4.3058-beta",
     "react": "^16.8.6",
     "react-dom": "^16.8.6"
   }

@@ -26,13 +26,13 @@
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "peerDependencies": {
-    "mwp-router": "^22.4.3056-beta",
+    "mwp-router": "^22.4.3058-beta",
     "redux": "^3.7.2"
   },
   "dependencies": {
     "js-cookie": "2.2.0",
-    "mwp-api-state": "22.4.3056-beta",
-    "mwp-tracking-plugin": "22.4.3056-beta",
+    "mwp-api-state": "22.4.3058-beta",
+    "mwp-tracking-plugin": "22.4.3058-beta",
     "rison": "0.1.1"
   },
   "devDependencies": {}

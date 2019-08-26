@@ -26,12 +26,12 @@
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "peerDependencies": {
-    "mwp-router": "^22.4.3056-beta"
+    "mwp-router": "^22.4.3058-beta"
   },
   "dependencies": {
     "idb-keyval": "2.3.0",
-    "mwp-router": "22.4.3056-beta",
-    "mwp-tracking-plugin": "22.4.3056-beta"
+    "mwp-router": "22.4.3058-beta",
+    "mwp-tracking-plugin": "22.4.3058-beta"
   },
   "devDependencies": {}
 }
