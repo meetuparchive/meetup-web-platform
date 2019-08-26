@@ -6748,9 +6748,9 @@ mdast-util-compact@^1.0.0:
     unist-util-modify-children "^1.0.0"
     unist-util-visit "^1.1.0"
 
-meetup-web-components@8.0.2902-beta:
-  version "8.0.2902-beta"
-  resolved "https://registry.yarnpkg.com/meetup-web-components/-/meetup-web-components-8.0.2902-beta.tgz#97d0cf5c02db62d0135ee76bf659a9d1c61a8340"
+meetup-web-components@8.0.2903-beta:
+  version "8.0.2903-beta"
+  resolved "https://registry.yarnpkg.com/meetup-web-components/-/meetup-web-components-8.0.2903-beta.tgz#aeb729b823e3b580f5bfa4944d193539406a3296"
   dependencies:
     "@meetup/swarm-components" "0.13.19"
     downshift "1.31.12"
