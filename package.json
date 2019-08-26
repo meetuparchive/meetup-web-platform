@@ -2,9 +2,8 @@
   "name": "meetup-web-platform",
   "version": "0.0.1",
   "description": "A collection of Node web application utilities for the Meetup web platform",
-  "engineStrict": true,
   "engines": {
-    "node": "^8.11.4",
+    "node": "^10.16.3",
     "yarn": "^1.9.4"
   },
   "main": "./lib/index.js",
@@ -70,8 +69,8 @@
     "js-joda-timezone": "2.0.2",
     "lerna": "3.15.0",
     "lint-staged": "8.2.1",
-    "meetup-web-components": "7.0.2796",
-    "meetup-web-mocks": "1.0.265",
+    "meetup-web-components": "8.0.2903-beta",
+    "meetup-web-mocks": "1.0.267-beta",
     "mwp-router": ">=0.0.1",
     "mwp-test-utils": ">=0.0.1",
     "newrelic": "^4.8.1",
