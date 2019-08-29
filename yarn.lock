@@ -1764,6 +1764,21 @@
     mkdirp "^0.5.1"
     rimraf "^2.5.2"
 
+"@meetup/swarm-components@0.13.19":
+  version "0.13.19"
+  resolved "https://registry.yarnpkg.com/@meetup/swarm-components/-/swarm-components-0.13.19.tgz#9d1ff569cd1f8cbb01ef750c726bcaa9ec485cef"
+  integrity sha512-PJmmLL5UCHeEdi5BuliXyvO40ctfxN5J9ikbY848hx7DfXMJvZEg8AKdZt+z8Iy7HZ2KEoDLDX7UUcQxQFfyJA==
+  dependencies:
+    "@meetup/swarm-constants" "^0.3.2"
+    autosize "^4.0.2"
+    classnames "2.2.6"
+    swarm-icons "3.8.354"
+
+"@meetup/swarm-constants@^0.3.2":
+  version "0.3.4"
+  resolved "https://registry.yarnpkg.com/@meetup/swarm-constants/-/swarm-constants-0.3.4.tgz#54a7e1cb54be952a62f153779d11031f2650c51a"
+  integrity sha512-QUsxu1LCmSeaBBSKsBQJXu4s1PDmmTqS7SUMobqaOMGEAK4VgYQZ/ExwlUsFJwniGSHXvUqWn3oVxhqDheoxgQ==
+
 "@meetup/ux-capture@4.2.2":
   version "4.2.2"
   resolved "https://registry.yarnpkg.com/@meetup/ux-capture/-/ux-capture-4.2.2.tgz#8763daf530f0bf5fc71c237ac6264278f7c27beb"
@@ -2324,9 +2339,10 @@ autoprefixer@^9.0.0:
     postcss "^7.0.2"
     postcss-value-parser "^3.2.3"
 
-autosize@3.0.21:
-  version "3.0.21"
-  resolved "https://registry.yarnpkg.com/autosize/-/autosize-3.0.21.tgz#f182f40d17757d978a139a4c9ca40c4c0e448603"
+autosize@^4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/autosize/-/autosize-4.0.2.tgz#073cfd07c8bf45da4b9fd153437f5bafbba1e4c9"
+  integrity sha512-jnSyH2d+qdfPGpWlcuhGiHmqBJ6g3X+8T+iRwFrHPLVcdoGJE/x6Qicm6aDHfTsbgZKxyV8UU/YB2p4cjKDRRA==
 
 avsc@5.1.1:
   version "5.1.1"
@@ -2980,7 +2996,7 @@ class-utils@^0.3.5:
     isobject "^3.0.0"
     static-extend "^0.1.1"
 
-classnames@^2.2.5, classnames@^2.2.6:
+classnames@2.2.6, classnames@^2.2.5, classnames@^2.2.6:
   version "2.2.6"
   resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.2.6.tgz#43935bffdd291f326dad0a205309b38d00f650ce"
 
@@ -6735,11 +6751,12 @@ mdast-util-compact@^1.0.0:
     unist-util-modify-children "^1.0.0"
     unist-util-visit "^1.1.0"
 
-meetup-web-components@7.0.2796:
-  version "7.0.2796"
-  resolved "https://registry.yarnpkg.com/meetup-web-components/-/meetup-web-components-7.0.2796.tgz#4b928eda849a3a294b598a08d4606670c252996a"
+meetup-web-components@8.0.2907-beta:
+  version "8.0.2907-beta"
+  resolved "https://registry.yarnpkg.com/meetup-web-components/-/meetup-web-components-8.0.2907-beta.tgz#1269ba83adaaa3dd129f43fc7feeaa23760f8ec2"
+  integrity sha512-lt8DkJYEYB2RyuxgXHVhRsuRRg8UysZhPUs//yc0hjV3xcyhVk/3FfRAybxZ3mKo/D+EjR29QgBdBhG5SfO82g==
   dependencies:
-    autosize "3.0.21"
+    "@meetup/swarm-components" "0.13.19"
     downshift "1.31.12"
     focus-trap-react "3.1.2"
     raf-schd "2.1.0"
