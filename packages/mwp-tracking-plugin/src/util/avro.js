@@ -5,37 +5,6 @@ const avro = require('avsc');
 const canUsePubSub =
 	process.env.GAE_INSTANCE || process.env.GOOGLE_APPLICATION_CREDENTIALS;
 
-/*
- * There are currently 2 distinct analytics logging methods
- * 1. `stdout`: used in dev and compatible with https://github.com/meetup/blt-fluentd
- *    in k8s-based applications in GCP
- * 2. Google Pub/Sub, which is used in GAE and any environment with GOOGLE_APPLICATION_CREDENTIALS
- *    environment variable set to point toward Google JSON client credentials file
- *
- * @see https://meetup.atlassian.net/wiki/display/MUP/Analytics+Logging#AnalyticsLogging-Theinputmechanism
- */
-const getPlatformAnalyticsLog = (
-	usePubSub: ?string = canUsePubSub
-): (string => void) => {
-	if (usePubSub) {
-		const pubsub = require('@google-cloud/pubsub')({
-			projectId: 'meetup-prod',
-		});
-		const publisher = pubsub.topic('analytics-log-json').publisher();
-		return (serializedRecord: string) => {
-			publisher
-				.publish(new Buffer(serializedRecord))
-				.catch(err => log.error(err));
-		};
-	}
-
-	// stdout log - can be used with https://github.com/meetup/blt-fluentd or generic environment
-	return (serializedRecord: string) => {
-		process.stdout.write(`analytics=${serializedRecord}\n`);
-	};
-};
-
-const analyticsLog = getPlatformAnalyticsLog();
 const debugLog = deserializedRecord =>
 	console.log(JSON.stringify(deserializedRecord));
 
@@ -142,7 +111,6 @@ const logger = (serializer: Serializer, deserializer: Deserializer) => (
 ) => {
 	const serializedRecord = serializer(record);
 	const deserializedRecord = deserializer(serializedRecord);
-	analyticsLog(serializedRecord);
 	if (process.argv.includes('--debug')) {
 		debugLog(deserializedRecord);
 	}
@@ -169,7 +137,6 @@ const loggers = {
 
 module.exports = {
 	avroSerializer,
-	getPlatformAnalyticsLog,
 	schemas,
 	serializers,
 	deserializers,

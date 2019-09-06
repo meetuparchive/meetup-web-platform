@@ -29,7 +29,6 @@
     "react-intl": "^2.4.0"
   },
   "dependencies": {
-    "@google-cloud/pubsub": "0.18.0",
     "joi": "14.3.1",
     "mobile-detect": "1.4.3",
     "mwp-api-proxy-plugin": ">=0.0.1",
