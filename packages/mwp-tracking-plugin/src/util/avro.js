@@ -24,7 +24,7 @@ const getPlatformAnalyticsLog = (
 		const publisher = pubsub.topic('analytics-log-json').publisher();
 		return (serializedRecord: string) => {
 			publisher
-				.publish(new Buffer(serializedRecord))
+				.publish(Buffer.from(serializedRecord))
 				.catch(err => log.error(err));
 		};
 	}
@@ -112,9 +112,7 @@ type Deserializer = string => Object;
 
 const avroSerializer: Object => Serializer = schema => {
 	const codec = avro.parse(schema);
-	const schemaPath = `gs://meetup-logs/avro_schemas/${schema.name}_${
-		schema.doc
-	}.avsc`;
+	const schemaPath = `gs://meetup-logs/avro_schemas/${schema.name}_${schema.doc}.avsc`;
 	return data => {
 		const record = codec.toBuffer(data);
 		// data.timestamp _must_ be ISOString if it exists
@@ -132,7 +130,7 @@ const avroDeserializer: Object => Deserializer = schema => {
 	const codec = avro.parse(schema);
 	return serialized => {
 		const { record } = JSON.parse(serialized);
-		const avroBuffer = new Buffer(record, 'base64');
+		const avroBuffer = Buffer.from(record, 'base64');
 		return codec.fromBuffer(avroBuffer);
 	};
 };
