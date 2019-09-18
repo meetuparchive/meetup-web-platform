@@ -2,9 +2,8 @@
   "name": "mwp-logger-plugin",
   "version": "0.0.1",
   "description": "Hapi logging plugin for MWP apps",
-  "engineStrict": true,
   "engines": {
-    "node": "^8.11.4",
+    "node": "^10.16.3",
     "yarn": "^1.9.4"
   },
   "main": "./lib/index.js",

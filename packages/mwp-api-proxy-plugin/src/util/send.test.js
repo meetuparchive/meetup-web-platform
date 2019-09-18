@@ -384,7 +384,7 @@ describe('parseMultipart', () => {
 		expect(parseMultipart(payload)).toEqual(payload);
 	});
 	it('converts a Buffer to a { value, options: { filename } } object', () => {
-		const myfile = new Buffer(10);
+		const myfile = Buffer.alloc(10);
 		const payload = {
 			foo: 'bar',
 			myfile,
