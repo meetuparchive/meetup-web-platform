@@ -6748,9 +6748,10 @@ mdast-util-compact@^1.0.0:
     unist-util-modify-children "^1.0.0"
     unist-util-visit "^1.1.0"
 
-meetup-web-components@8.0.2907-beta:
-  version "8.0.2907-beta"
-  resolved "https://registry.yarnpkg.com/meetup-web-components/-/meetup-web-components-8.0.2907-beta.tgz#1269ba83adaaa3dd129f43fc7feeaa23760f8ec2"
+meetup-web-components@8.0.2915-beta:
+  version "8.0.2915-beta"
+  resolved "https://registry.yarnpkg.com/meetup-web-components/-/meetup-web-components-8.0.2915-beta.tgz#0228e6255f203b45f91e61b347f7fa94bc1c0c0b"
+  integrity sha512-Lp2oaiQ0D/bULjn49+wgZH1d61k1rhF5iUFbHNZ5gJyYwznltoh7hesYPM0hPknIEaKME6lsGEvXoQ55BBkAvg==
   dependencies:
     "@meetup/swarm-components" "0.13.19"
     downshift "1.31.12"
@@ -6763,6 +6764,11 @@ meetup-web-components@8.0.2907-beta:
 meetup-web-mocks@1.0.267-beta:
   version "1.0.267-beta"
   resolved "https://registry.yarnpkg.com/meetup-web-mocks/-/meetup-web-mocks-1.0.267-beta.tgz#aa9154ae0f6df376b6ffc192fbca90136462a353"
+
+meetup-web-mocks@1.0.268-beta:
+  version "1.0.268-beta"
+  resolved "https://registry.yarnpkg.com/meetup-web-mocks/-/meetup-web-mocks-1.0.268-beta.tgz#f526fa179e338316fd068bcb14239af0b14d540d"
+  integrity sha512-SbYxrdzQj0+2XG0mOt9HOpqX3rJU/IC/X5w6qF7ieeN3inEybfgs98qqhN7bgfPOLltPW7fMNzQ/glckzhY/oA==
 
 mem@^4.0.0:
   version "4.3.0"
