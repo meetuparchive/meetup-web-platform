@@ -1,5 +1,5 @@
 // @flow
-import LaunchDarkly from 'ldclient-node';
+import LaunchDarkly from 'launchdarkly-node-server-sdk';
 import getRoute from './route';
 
 const LAUNCH_DARKLY_SDK_KEY = 'sdk-86b4c7a9-a450-4527-a572-c80a603a200f';
@@ -21,8 +21,8 @@ export function register(
 		offline: process.env.NODE_ENV === 'test',
 	});
 	server.expose('getFlags', (user: LaunchDarklyUser) => {
-		return ldClient.allFlags(user).then(
-			flags => flags,
+		return ldClient.allFlagsState(user).then(
+			state => state.allValues(),
 			err => {
 				server.app.logger.error({
 					err,
