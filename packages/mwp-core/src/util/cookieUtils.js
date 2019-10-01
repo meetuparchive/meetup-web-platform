@@ -1,6 +1,5 @@
 import querystring from 'qs';
 import config from 'mwp-config';
-import { logger } from 'mwp-logger-plugin';
 const appConfig = config.getServer().properties;
 
 export const MEMBER_COOKIE = appConfig.api.isProd
@@ -20,8 +19,8 @@ export const SIFT_SESSION_COOKIE = appConfig.api.isProd
 
 export const parseMemberCookie = state => {
 	if (!state[MEMBER_COOKIE]) {
-		logger.warn('No member cookie found - there might be a problem with auth');
-		// no member cookie - always return id=0
+		// no member cookie - this is only possible for 'internal' requests, e.g. health checks.
+		// always return id=0 to keep basic member object valid
 		return { id: 0 };
 	}
 	const member = querystring.parse(state[MEMBER_COOKIE]);
