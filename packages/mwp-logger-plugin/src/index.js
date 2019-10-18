@@ -1,19 +1,32 @@
 import logger from './logger';
 
 export function logResponse(request) {
-	const { response, route, id, server: { app: { logger } } } = request;
+	const {
+		response,
+		route,
+		id,
+		server: {
+			app: { logger },
+		},
+	} = request;
+
+	const logRequestObj = {
+		request: request.raw.req,
+		headers: request.raw.headers,
+		response: request.raw.resp,
+	};
 
 	if (!response) {
 		// client hung up
-		logger.info({ httpRequest: request, id, ...request.raw });
+		logger.info({ id, ...logRequestObj });
 		return;
 	}
+
 	if (response.isBoom) {
 		// response is an Error object
 		logger.error({
 			err: response,
-			context: request,
-			...request.raw,
+			...logRequestObj,
 		});
 	}
 
@@ -24,12 +37,13 @@ export function logResponse(request) {
 		return;
 	}
 
-	const log = ((response.statusCode >= 500 && logger.error) ||
+	const log = (
+		(response.statusCode >= 500 && logger.error) ||
 		(response.statusCode >= 400 && logger.warn) ||
-		logger.info)
-		.bind(logger);
+		logger.info
+	).bind(logger);
 
-	log({ httpRequest: request, id, ...request.raw });
+	log({ id, ...logRequestObj });
 
 	return;
 }
@@ -45,28 +59,13 @@ const onRequestError = (request, event, tags) => {
 
 	logger.error({
 		err: `Request ${event.request} failed: ${err}`,
-		context: request,
-		...request.raw,
+		req: request.raw.req,
+		headers: request.raw.headers,
+		res: request.raw.res,
 	});
-};
-
-const onRequestExtension = (request, h) => {
-	// log at debug level to make it easy to filter out
-	logger.debug({
-		httpRequest: request,
-		...request.raw,
-	});
-	return h.continue;
 };
 
 export function register(server, options) {
-	// might also want to add default logging for 'onPostStart', 'onPostStop'
-	server.ext([
-		{
-			type: 'onRequest',
-			method: onRequestExtension,
-		},
-	]);
 	server.events.on({ name: 'request', channels: 'error' }, onRequestError);
 	server.events.on('response', logResponse);
 	server.app.logger = logger;
