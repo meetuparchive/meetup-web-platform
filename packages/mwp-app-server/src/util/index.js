@@ -27,6 +27,13 @@ export function onRequestExtension(request, h) {
 	return h.continue;
 }
 
+export function onPreResponseExtension(request, h) {
+	// set a response header with the value of the version tag env variable
+	request.response.header('x-version-tag', process.env.VERSION_TAG);
+
+	return h.continue;
+}
+
 /**
  * Use server.ext to add functions to request/server extension points
  * @see {@link https://hapijs.com/api#request-lifecycle}
@@ -38,6 +45,13 @@ export function registerExtensionEvents(server) {
 		type: 'onRequest',
 		method: onRequestExtension,
 	});
+
+	if (process.env.VERSION_TAG) {
+		server.ext({
+			type: 'onPreResponse',
+			method: onPreResponseExtension,
+		});
+	}
 
 	return server;
 }
