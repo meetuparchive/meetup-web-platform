@@ -12,7 +12,7 @@ export function logResponse(request) {
 
 	if (!response) {
 		// client hung up
-		logger.info({ httpRequest: request, id, ...request.raw });
+		logger.info({ httpRequest: request, id });
 		return;
 	}
 	if (response.isBoom) {
@@ -20,7 +20,6 @@ export function logResponse(request) {
 		logger.error({
 			err: response,
 			context: request,
-			...request.raw,
 		});
 	}
 
@@ -37,7 +36,7 @@ export function logResponse(request) {
 		logger.info
 	).bind(logger);
 
-	log({ httpRequest: request, id, ...request.raw });
+	log({ httpRequest: request, id });
 
 	return;
 }
@@ -54,7 +53,6 @@ const onRequestError = (request, event, tags) => {
 	logger.error({
 		err: `Request ${event.request} failed: ${err}`,
 		context: request,
-		...request.raw,
 	});
 };
 
