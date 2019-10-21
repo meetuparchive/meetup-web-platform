@@ -10,23 +10,17 @@ export function logResponse(request) {
 		},
 	} = request;
 
-	const logRequestObj = {
-		request: request.raw.req,
-		headers: request.raw.headers,
-		response: request.raw.resp,
-	};
-
 	if (!response) {
 		// client hung up
-		logger.info({ id, ...logRequestObj });
+		logger.info({ httpRequest: request, id, ...request.raw });
 		return;
 	}
-
 	if (response.isBoom) {
 		// response is an Error object
 		logger.error({
 			err: response,
-			...logRequestObj,
+			context: request,
+			...request.raw,
 		});
 	}
 
@@ -43,7 +37,7 @@ export function logResponse(request) {
 		logger.info
 	).bind(logger);
 
-	log({ id, ...logRequestObj });
+	log({ httpRequest: request, id, ...request.raw });
 
 	return;
 }
