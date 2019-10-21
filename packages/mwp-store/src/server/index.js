@@ -18,7 +18,6 @@ export function getServerCreateStore(findMatches, middleware, request) {
 			request.server.app.logger.error({
 				err,
 				context: request,
-				...request.raw,
 			})
 		),
 		getApiMiddleware(findMatches, getFetchQueries(request)),

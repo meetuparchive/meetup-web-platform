@@ -334,7 +334,6 @@ export const makeExternalApiRequest = request => requestOpts => {
 				err,
 				externalRequest: requestOpts, // for detailed debugging, including headers
 				context: requestOpts, // for error report context
-				...request.raw,
 			});
 
 			const errorObj = { errors: [err] };
