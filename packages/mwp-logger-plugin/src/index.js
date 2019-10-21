@@ -53,9 +53,8 @@ const onRequestError = (request, event, tags) => {
 
 	logger.error({
 		err: `Request ${event.request} failed: ${err}`,
-		req: request.raw.req,
-		headers: request.raw.headers,
-		res: request.raw.res,
+		context: request,
+		...request.raw,
 	});
 };
 
