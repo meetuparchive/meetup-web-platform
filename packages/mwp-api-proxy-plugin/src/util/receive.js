@@ -173,11 +173,7 @@ export const makeParseApiResponse = query => ([response, body]) => {
  *
  * @param {Object} apiResponse JSON-parsed api response data
  */
-export const makeApiResponseToQueryResponse = query => ({
-	value,
-	error,
-	meta,
-}) => ({
+export const makeApiResponseToQueryResponse = query => ({ value, error, meta }) => ({
 	type: query.type,
 	ref: query.ref,
 	value,
@@ -188,11 +184,14 @@ export const makeApiResponseToQueryResponse = query => ({
 export const makeLogResponse = request => ([response, body]) => {
 	// `response` may contain private (user-specific) data. Log with caution
 	const {
-		request: { headers, method, uri: { href: url } },
+		request: {
+			headers,
+			method,
+			uri: { href: url },
+		},
 		statusCode,
 	} = response;
 	const logBase = {
-		...request.raw, // request to API_ROUTE_PATH
 		externalRequest: { headers, method, url }, // request to https://api.meetup.com/
 	};
 
@@ -204,9 +203,7 @@ export const makeLogResponse = request => ([response, body]) => {
 			// don't log errors from bots - e.g. for deleted groups/events/whatever
 			return;
 		}
-		const logError = (statusCode < 500 ? logger.warn : logger.error).bind(
-			logger
-		);
+		const logError = (statusCode < 500 ? logger.warn : logger.error).bind(logger);
 		let errorMessage;
 		try {
 			// well-behaved API errors return a JSON object with an `errors` array
