@@ -9,6 +9,7 @@ import config from 'mwp-config';
 
 export const API_META_HEADER = 'X-Meta-Request-Headers';
 const FULL_URL_PATTERN = /^https?:\/\//;
+export const COOKIE_BLACKLIST = ['click-track'];
 
 // create a promisified version of `externalRequest` - can't use `util.promisify`
 // because the callback gets 2 additional arguments, and promisify only supports 1.
@@ -200,6 +201,7 @@ export function getAuthHeaders(request) {
 
 	// rebuild a cookie header string from the parsed `cookies` object
 	const cookie = Object.keys(cookies)
+		.filter(name => !COOKIE_BLACKLIST.includes(name))
 		.map(name => `${name}=${cookies[name]}`)
 		.join('; ');
 

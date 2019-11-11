@@ -17,6 +17,7 @@ import {
 	getTrackingHeaders,
 	parseMultipart,
 	API_META_HEADER,
+	COOKIE_BLACKLIST,
 } from './send';
 
 import { API_PROXY_PLUGIN_NAME } from '../config';
@@ -65,6 +66,29 @@ describe('getAuthHeaders', () => {
 
 		expect(cookies['MEETUP_CSRF_DEV']).not.toBeUndefined();
 		expect(authHeaders['csrf-token']).toEqual(cookies['MEETUP_CSRF_DEV']);
+	});
+	it('does not forward blacklisted cookies', () => {
+		const authHeaders = getAuthHeaders({
+			server: { settings: { app: { api: {} } } },
+			auth: {
+				credentials: {
+					memberCookie: 'foo member',
+					csrfToken: 'bar token',
+				},
+			},
+			state: {
+				okayCookie: 'wunderbar',
+				...COOKIE_BLACKLIST.reduce(
+					(acc, name) => ({ ...acc, [name]: 'do not forward' }),
+					{}
+				),
+			},
+		});
+
+		COOKIE_BLACKLIST.forEach(name => {
+			expect(authHeaders.cookie.includes(name)).toBe(false);
+		});
+		expect(authHeaders.cookie.includes('okayCookie')).toBe(true);
 	});
 });
 
