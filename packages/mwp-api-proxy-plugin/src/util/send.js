@@ -10,6 +10,11 @@ import config from 'mwp-config';
 export const API_META_HEADER = 'X-Meta-Request-Headers';
 const FULL_URL_PATTERN = /^https?:\/\//;
 
+// some cookies are only consumed by the API proxy server and should not be forwarded
+export const COOKIE_BLACKLIST = [
+	'click-track', // click-track is a potentially large cookie that gets consumed by the mwp-tracking-plugin clickReader module
+];
+
 // create a promisified version of `externalRequest` - can't use `util.promisify`
 // because the callback gets 2 additional arguments, and promisify only supports 1.
 const externalRequestPromise = options =>
@@ -200,6 +205,7 @@ export function getAuthHeaders(request) {
 
 	// rebuild a cookie header string from the parsed `cookies` object
 	const cookie = Object.keys(cookies)
+		.filter(name => !COOKIE_BLACKLIST.includes(name))
 		.map(name => `${name}=${cookies[name]}`)
 		.join('; ');
 
