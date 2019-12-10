@@ -29,9 +29,7 @@ export const getRequestPlatform = (request: HapiRequest): ActivityPlatform => {
 	return 'WEB';
 };
 
-export const getLogger: string => (Object, Object) => mixed = (
-	agent: string
-) => {
+export const getLogger: string => (Object, Object) => mixed = (agent: string) => {
 	return (request: Object, trackInfo: Object) => {
 		const { headers } = request;
 
@@ -50,6 +48,7 @@ export const getLogger: string => (Object, Object) => mixed = (
 		};
 
 		avro.loggers.activity(record);
+		avro.loggers.awsactivity(record);
 		return record;
 	};
 };
@@ -148,9 +147,7 @@ export function register(
 ) {
 	const { agent, isProdApi } = options;
 
-	const trackIdCookieName: string = isProdApi
-		? 'MEETUP_TRACK'
-		: 'MEETUP_TRACK_DEV';
+	const trackIdCookieName: string = isProdApi ? 'MEETUP_TRACK' : 'MEETUP_TRACK_DEV';
 	const browserIdCookieName: string = isProdApi
 		? 'MEETUP_BROWSER_ID'
 		: 'MEETUP_BROWSER_ID_DEV';

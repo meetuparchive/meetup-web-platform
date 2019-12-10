@@ -12,11 +12,9 @@ export function register(
 			return h.continue;
 		}
 
+		// happens with OPTIONS request
 		if (typeof request.response.header !== 'function') {
-			server.app.logger.error({
-				err: 'register: request.response.header is not a function',
-				context: request.response,
-			});
+			return h.continue;
 		}
 
 		// Tells browser that it should only be accessed using HTTPS & how long to remember that
