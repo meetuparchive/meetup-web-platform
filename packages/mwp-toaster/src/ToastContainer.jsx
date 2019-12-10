@@ -35,12 +35,16 @@ export class ToastContainer extends React.Component {
 	/*
 	 * When mounting on the client, check the current querystring params to
 	 * determine whether there is a 'sysmsg' that should be displayed
-	 * 
+	 *
 	 * This only needs to run on mount because it is only used for full-page
 	 * renders linked from chapstick
 	 */
 	componentDidMount() {
-		const { showToasts, location: { search }, sysmsgs } = this.props;
+		const {
+			showToasts,
+			location: { search },
+			sysmsgs,
+		} = this.props;
 		showToasts(); // dispatch action to tell app that toasts are shown
 		if (search) {
 			const searchParams = new URLSearchParams(search);
@@ -69,7 +73,9 @@ export class ToastContainer extends React.Component {
 		} = this.props; // support for injecting HTML attributes
 		return (
 			<Toaster
-				toasts={readyToasts.map((t, i) => <Toast {...t} key={i} />)}
+				toasts={readyToasts.map((t, i) => (
+					<Toast {...t} key={i} />
+				))}
 				{...other}
 			/>
 		);
@@ -93,6 +99,7 @@ ToastContainer.defaultProps = {
 	},
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(
-	withRouter(ToastContainer)
-);
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps
+)(withRouter(ToastContainer));

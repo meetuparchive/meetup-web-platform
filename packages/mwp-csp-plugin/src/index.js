@@ -11,6 +11,14 @@ export function register(
 			// don't set headers on error objects
 			return h.continue;
 		}
+
+		if (typeof request.response.header !== 'function') {
+			server.app.logger.error({
+				err: 'register: request.response.header is not a function',
+				context: request.response,
+			});
+		}
+
 		// Tells browser that it should only be accessed using HTTPS & how long to remember that
 		request.response.header('Strict-Transport-Security', 'max-age=7776000'); // 3 months
 
