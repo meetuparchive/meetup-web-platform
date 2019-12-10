@@ -28,11 +28,9 @@ export function onRequestExtension(request, h) {
 }
 
 export function onPreResponseExtension(request, h) {
+	// happens with OPTIONS request
 	if (typeof request.response.header !== 'function') {
-		request.server.app.logger.error({
-			err: 'onPreResponseExtension: request.response.header is not a function',
-			context: request.response,
-		});
+		return h.continue;
 	}
 
 	// set a response header with the value of the version tag env variable
