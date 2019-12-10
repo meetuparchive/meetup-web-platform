@@ -19,10 +19,10 @@ export class SyncContainer extends React.Component {
 	 * This container connects route changes to Redux actions. When the router
 	 * inject new props, the container determines whether or not to dispatch a
 	 * 'locationChange' action
-	 * 
+	 *
 	 * In order to prevent data fetches when the hash changes, we only compare
 	 * the new pathname and querystring with the current pathname and querystring
-	 * 
+	 *
 	 * @return {undefined} side effect only - dispatch
 	 */
 	componentWillReceiveProps({ location, history }) {
@@ -53,4 +53,7 @@ SyncContainer.propTypes = {
 	history: PropTypes.object.isRequired,
 };
 
-export default connect(null, mapDispatchToProps)(withRouter(SyncContainer));
+export default connect(
+	null,
+	mapDispatchToProps
+)(withRouter(SyncContainer));
