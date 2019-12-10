@@ -2345,9 +2345,19 @@ autosize@^4.0.2:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/autosize/-/autosize-4.0.2.tgz#073cfd07c8bf45da4b9fd153437f5bafbba1e4c9"
 
+avro@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/avro/-/avro-0.1.0.tgz#07fcd35e197a3bd4cb9db2fb61bfe71074100c68"
+  integrity sha1-B/zTXhl6O9TLnbL7Yb/nEHQQDGg=
+
 avsc@5.1.1:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/avsc/-/avsc-5.1.1.tgz#45cf97b44cfcb9c6e707b209a99b76a7d637d139"
+
+avsc@^5.2.3:
+  version "5.4.16"
+  resolved "https://registry.yarnpkg.com/avsc/-/avsc-5.4.16.tgz#ab57863760f69c11ed315a7b8bde95d92f2222e4"
+  integrity sha512-Z85B8ZaEU2PWNPRJYuMSp5Hg7Nw3KPKW47lW/Kus7AcwV7fr6uJG3UckagqIPLydIeO/Cm+yjnJG7g0tliICOg==
 
 aws-sign2@~0.7.0:
   version "0.7.0"
@@ -6758,6 +6768,18 @@ mdast-util-compact@^1.0.0:
     unist-util-modify-children "^1.0.0"
     unist-util-visit "^1.1.0"
 
+meetup-event-logger@0.2.9:
+  version "0.2.9"
+  resolved "https://registry.yarnpkg.com/meetup-event-logger/-/meetup-event-logger-0.2.9.tgz#51e0c2c4ae34738dea46564463769b2b45b26246"
+  integrity sha512-Qu7ZO00Np0TnZ/B480Vu3/jfUbUNPN7sq+uOqLtiOo+B0RP/8dqVfbFxKBUQPogZRKeanY5fVWXl5tC/j7qa7A==
+  dependencies:
+    avro "^0.1.0"
+    avsc "^5.2.3"
+    bluebird "^3.5.1"
+    moment "^2.24.0"
+    moment-timezone "^0.5.23"
+    uuid "^3.3.2"
+
 meetup-web-components@8.0.2918:
   version "8.0.2918"
   resolved "https://registry.yarnpkg.com/meetup-web-components/-/meetup-web-components-8.0.2918.tgz#5e9886c990a1aac1bebde83216c97ab1f43bd7ad"
@@ -7019,9 +7041,21 @@ modify-values@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/modify-values/-/modify-values-1.0.1.tgz#b3939fa605546474e3e3e3c63d64bd43b4ee6022"
 
+moment-timezone@^0.5.23:
+  version "0.5.27"
+  resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.5.27.tgz#73adec8139b6fe30452e78f210f27b1f346b8877"
+  integrity sha512-EIKQs7h5sAsjhPCqN6ggx6cEbs94GK050254TIJySD1bzoM5JTYDwAU1IoVOeTOL6Gm27kYJ51/uuvq1kIlrbw==
+  dependencies:
+    moment ">= 2.9.0"
+
 moment@2.18.1:
   version "2.18.1"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.18.1.tgz#c36193dd3ce1c2eed2adb7c802dbbc77a81b1c0f"
+
+"moment@>= 2.9.0", moment@^2.24.0:
+  version "2.24.0"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.24.0.tgz#0d055d53f5052aa653c9f6eb68bb5d12bf5c2b5b"
+  integrity sha512-bV7f+6l2QigeBBZSM/6yTNq4P2fNpSWj/0e7jQcy87A8e7o2nAfP/34/2ky5Vw4B9S446EtIhodAzkFCcR4dQg==
 
 moment@^2.10.6:
   version "2.22.2"
@@ -9142,10 +9176,35 @@ semver-compare@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/semver-compare/-/semver-compare-1.0.0.tgz#0dee216a1c941ab37e9efb1788f6afc5ff5537fc"
 
-"semver@2 || 3 || 4 || 5", "semver@2.x || 3.x || 4 || 5", semver@5.5.0, semver@5.6.0, semver@5.x.x, semver@6.0.0, semver@^5.3.0, semver@^5.4.1, semver@^5.5.0, semver@^5.5.1, semver@^5.6.0, semver@^5.7.0, semver@^6.0.0, semver@^6.1.1, semver@~5.3.0:
+"semver@2 || 3 || 4 || 5", "semver@2.x || 3.x || 4 || 5", semver@5.x.x, semver@^5.3.0, semver@^5.4.1, semver@^5.5.0, semver@^5.5.1, semver@^5.6.0, semver@^5.7.0:
+  version "5.7.1"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-5.7.1.tgz#a954f931aeba508d307bbf069eff0c01c96116f7"
+  integrity sha512-sauaDf/PZdVgrLTNYHRtpXa1iRiKcaebiKQ1BJdpQlWH2lCvexQdX55snPFyK7QzpudqbCI0qXFfOasHdyNDGQ==
+
+semver@5.5.0:
+  version "5.5.0"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-5.5.0.tgz#dc4bbc7a6ca9d916dee5d43516f0092b58f7b8ab"
+  integrity sha512-4SJ3dm0WAwWy/NVeioZh5AntkdJoWKxHxcmyP622fOkgHa4z3R0TdBJICINyaSDE6uNwVc8gZr+ZinwZAH4xIA==
+
+semver@5.6.0:
+  version "5.6.0"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-5.6.0.tgz#7e74256fbaa49c75aa7c7a205cc22799cac80004"
+  integrity sha512-RS9R6R35NYgQn++fkDWaOmqGoj4Ek9gGs+DPxNUZKuwE183xjJroKvyo1IzVFeXvUrvmALy6FWD5xrdJT25gMg==
+
+semver@^6.0.0:
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/semver/-/semver-6.0.0.tgz#05e359ee571e5ad7ed641a6eec1e547ba52dea65"
   integrity sha512-0UewU+9rFapKFnlbirLi3byoOuhrSsli/z/ihNnvM24vgF+8sNBiI1LZPBSH9wJKUwaUbw+s3hToDLCXkrghrQ==
+
+semver@^6.1.1:
+  version "6.3.0"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-6.3.0.tgz#ee0a64c8af5e8ceea67687b133761e1becbd1d3d"
+  integrity sha512-b39TBaTSfV6yBrapU89p5fKekE2m/NwnDocOVruQFS1/veMgdzuPcnOM34M6CwxW8jH/lxEa5rBoDeUwu5HHTw==
+
+semver@~5.3.0:
+  version "5.3.0"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-5.3.0.tgz#9b2ce5d3de02d17c6012ad326aa6b4d0cf54f94f"
+  integrity sha1-myzl094C0XxgEq0yaqa00M9U+U8=
 
 set-blocking@^2.0.0, set-blocking@~2.0.0:
   version "2.0.0"
