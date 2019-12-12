@@ -94,7 +94,8 @@
     "swarm-icons": "3.8.354",
     "swarm-sasstools": "5.0.434",
     "tough-cookie": "2.3.3",
-    "uuid": "3.3.2"
+    "uuid": "3.3.2",
+    "aws-sdk": "2.589.0"
   },
   "resolutions": {
     "semver": "6.0.0"

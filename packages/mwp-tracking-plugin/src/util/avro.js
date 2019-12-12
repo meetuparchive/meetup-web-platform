@@ -1,9 +1,22 @@
 // @flow
 const log = require('mwp-logger-plugin').logger;
 const avro = require('avsc');
+const uuidv1 = require('uuid/v1');
+const AWS = require('aws-sdk');
 
 const canUsePubSub =
 	process.env.GAE_INSTANCE || process.env.GOOGLE_APPLICATION_CREDENTIALS;
+
+const kinesisStreamName = 
+	process.env.KINESIS_STREAM_NAME
+
+AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+	IdentityPoolId: 'IDENTITY_POOL_ID' //TODO: Replace
+});
+
+AWS.config.region = 'us-east-1';
+
+const kinesis = new AWS.Kinesis({apiVersion: '2013-12-02'});
 
 /*
  * There are currently 2 distinct analytics logging methods
@@ -34,6 +47,23 @@ const getPlatformAnalyticsLog = (
 		process.stdout.write(`analytics=${serializedRecord}\n`);
 	};
 };
+
+function logAWSKinesis(record: Object) {
+	if (!record.length) {
+		return;
+	}
+
+	var params = {
+		Data: Buffer.from(record),
+		PartitionKey: uuidv1(),
+		StreamName: kinesisStreamName
+	};
+
+	kinesis.putRecord(params, function(err, data) {
+		if (err) console.log(err, err.stack); 
+		else     console.log(data);
+	});
+}
 
 const analyticsLog = getPlatformAnalyticsLog();
 const debugLog = deserializedRecord =>
@@ -141,6 +171,7 @@ const logger = (serializer: Serializer, deserializer: Deserializer) => (
 	const serializedRecord = serializer(record);
 	const deserializedRecord = deserializer(serializedRecord);
 	analyticsLog(serializedRecord);
+	logAWSKinesis(serializedRecord);
 	if (process.argv.includes('--debug')) {
 		debugLog(deserializedRecord);
 	}
