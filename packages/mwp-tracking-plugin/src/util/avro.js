@@ -7,17 +7,6 @@ const AWS = require('aws-sdk');
 const canUsePubSub =
 	process.env.GAE_INSTANCE || process.env.GOOGLE_APPLICATION_CREDENTIALS;
 
-const kinesisStreamName = 
-	process.env.KINESIS_STREAM_NAME
-
-AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-	IdentityPoolId: 'IDENTITY_POOL_ID' //TODO: Replace
-});
-
-AWS.config.region = 'us-east-1';
-
-const kinesis = new AWS.Kinesis({apiVersion: '2013-12-02'});
-
 /*
  * There are currently 2 distinct analytics logging methods
  * 1. `stdout`: used in dev and compatible with https://github.com/meetup/blt-fluentd
@@ -48,24 +37,30 @@ const getPlatformAnalyticsLog = (
 	};
 };
 
-function logAWSKinesis(record: Object) {
-	if (!record.length) {
-		return;
+// double write the avro records
+// thus, use canUsePubSub as feature gate
+const getLogAWSKinesis = (usePubSub: ?string = canUsePubSub): (string => void) => {
+	if (usePubSub) {
+		const kinesisStreamName = process.env.KINESIS_STREAM_NAME;
+		const kinesis = new AWS.Kinesis({ apiVersion: '2013-12-02' });
+
+		return (serializedRecord: string) => {
+			const options = {
+				Data: Buffer.from(serializedRecord),
+				PartitionKey: uuidv1(),
+				StreamName: kinesisStreamName,
+			};
+
+			kinesis.putRecord(options, function(err, data) {
+				if (err) console.log(err, err.stack);
+				else console.log(data);
+			});
+		};
 	}
-
-	var params = {
-		Data: Buffer.from(record),
-		PartitionKey: uuidv1(),
-		StreamName: kinesisStreamName
-	};
-
-	kinesis.putRecord(params, function(err, data) {
-		if (err) console.log(err, err.stack); 
-		else     console.log(data);
-	});
-}
+};
 
 const analyticsLog = getPlatformAnalyticsLog();
+const logAWSKinesis = getLogAWSKinesis();
 const debugLog = deserializedRecord =>
 	console.log(JSON.stringify(deserializedRecord));
 
@@ -137,6 +132,66 @@ const activity = {
 	],
 };
 
+const chapinEnvelope = {
+	namespace: 'com.meetup.base.avro',
+	type: 'record',
+	name: 'AvroEnvelope',
+	doc: 'v1',
+	fields: [
+		{
+			name: 'id',
+			type: 'string',
+		},
+		{
+			name: 'timestamp',
+			type: 'long',
+			logicalType: 'timestamp-millis',
+		},
+		{
+			name: 'schemaFullname',
+			type: 'string',
+		},
+		{
+			name: 'schemaVersion',
+			type: 'string',
+		},
+		{
+			name: 'source',
+			type: 'string',
+		},
+		{
+			name: 'data',
+			type: 'string',
+		},
+	],
+};
+
+const chapinEnvelopeSerializer = schema => {
+	const envelopeCodec = avro.parse(chapinEnvelope);
+	const codec = avro.parse(schema);
+	const analyticsSource =
+		process.env.ANALYTICS_SOURCE ||
+		process.env.AWS_LAMBDA_FUNCTION_NAME ||
+		console.error(
+			'Must have AWS_LAMBDA_FUNCTION_NAME or ANALYTICS_SOURCE set in your environment.'
+		);
+
+	return data => {
+		const record = codec.toBuffer(data);
+		const analytics = {
+			id: uuidv1(),
+			timestamp: Date.now(),
+			schemaFullname: `${schema.namespace}.${schema.name}`,
+			schemaVersion: schema.doc,
+			source: analyticsSource,
+			data: record.toString('base64'),
+		};
+		return JSON.stringify(
+			envelopeCodec.fromBuffer(envelopeCodec.toBuffer(analytics))
+		);
+	};
+};
+
 type Serializer = Object => string;
 type Deserializer = string => Object;
 
@@ -185,6 +240,8 @@ const serializers = {
 	avro: avroSerializer,
 	activity: avroSerializer(schemas.activity),
 	click: avroSerializer(schemas.click),
+	awsactivity: chapinEnvelopeSerializer(schemas.activity),
+	awsclick: chapinEnvelopeSerializer(schemas.activity),
 };
 const deserializers = {
 	avro: avroDeserializer,
@@ -194,6 +251,8 @@ const deserializers = {
 const loggers = {
 	activity: logger(serializers.activity, deserializers.activity),
 	click: logger(serializers.click, deserializers.click),
+	awsactivity: logger(serializers.awsactivity, deserializers.activity),
+	awsclick: logger(serializers.awsclick, deserializers.click),
 };
 
 module.exports = {
