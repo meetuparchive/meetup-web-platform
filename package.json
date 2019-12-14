@@ -42,6 +42,7 @@
     "@babel/preset-react": "7.0.0",
     "@commitlint/cli": "7.5.2",
     "@commitlint/config-conventional": "7.5.0",
+    "aws-sdk": "2.589.0",
     "babel-core": "6.26.3",
     "babel-eslint": "10.0.2",
     "babel-jest": "24.8.0",
@@ -94,8 +95,7 @@
     "swarm-icons": "3.8.354",
     "swarm-sasstools": "5.0.434",
     "tough-cookie": "2.3.3",
-    "uuid": "3.3.2",
-    "aws-sdk": "2.589.0"
+    "uuid": "3.3.2"
   },
   "resolutions": {
     "semver": "6.0.0"

@@ -41,14 +41,13 @@ const getPlatformAnalyticsLog = (
 // thus, use canUsePubSub as feature gate
 const getLogAWSKinesis = (usePubSub: ?string = canUsePubSub): (string => void) => {
 	if (usePubSub) {
-		const kinesisStreamName = process.env.KINESIS_STREAM_NAME;
 		const kinesis = new AWS.Kinesis({ apiVersion: '2013-12-02' });
 
 		return (serializedRecord: string) => {
 			const options = {
 				Data: Buffer.from(serializedRecord),
 				PartitionKey: uuidv1(),
-				StreamName: kinesisStreamName,
+				StreamName: process.env.KINESIS_STREAM_NAME,
 			};
 
 			kinesis.putRecord(options, function(err, data) {
@@ -57,6 +56,7 @@ const getLogAWSKinesis = (usePubSub: ?string = canUsePubSub): (string => void) =
 			});
 		};
 	}
+	return (serializedRecord: string) => {};
 };
 
 const analyticsLog = getPlatformAnalyticsLog();
@@ -169,12 +169,7 @@ const chapinEnvelope = {
 const chapinEnvelopeSerializer = schema => {
 	const envelopeCodec = avro.parse(chapinEnvelope);
 	const codec = avro.parse(schema);
-	const analyticsSource =
-		process.env.ANALYTICS_SOURCE ||
-		process.env.AWS_LAMBDA_FUNCTION_NAME ||
-		console.error(
-			'Must have AWS_LAMBDA_FUNCTION_NAME or ANALYTICS_SOURCE set in your environment.'
-		);
+	const analyticsSource = 'WEB';
 
 	return data => {
 		const record = codec.toBuffer(data);
@@ -189,6 +184,15 @@ const chapinEnvelopeSerializer = schema => {
 		return JSON.stringify(
 			envelopeCodec.fromBuffer(envelopeCodec.toBuffer(analytics))
 		);
+	};
+};
+
+const chapinEnvelopeDeserializer: Object => Deserializer = schema => {
+	const codec = avro.parse(schema);
+	return serialized => {
+		const { data } = JSON.parse(serialized);
+		const avroBuffer = Buffer.from(data, 'base64');
+		return codec.fromBuffer(avroBuffer);
 	};
 };
 
@@ -238,26 +242,30 @@ const schemas = {
 };
 const serializers = {
 	avro: avroSerializer,
+	awsavro: chapinEnvelopeSerializer,
 	activity: avroSerializer(schemas.activity),
 	click: avroSerializer(schemas.click),
 	awsactivity: chapinEnvelopeSerializer(schemas.activity),
-	awsclick: chapinEnvelopeSerializer(schemas.activity),
+	awsclick: chapinEnvelopeSerializer(schemas.click),
 };
 const deserializers = {
 	avro: avroDeserializer,
 	activity: avroDeserializer(schemas.activity),
 	click: avroDeserializer(schemas.click),
+	awsactivity: chapinEnvelopeDeserializer(schemas.activity),
+	awsclick: chapinEnvelopeDeserializer(schemas.click),
 };
 const loggers = {
 	activity: logger(serializers.activity, deserializers.activity),
 	click: logger(serializers.click, deserializers.click),
-	awsactivity: logger(serializers.awsactivity, deserializers.activity),
-	awsclick: logger(serializers.awsclick, deserializers.click),
+	awsactivity: logger(serializers.awsactivity, deserializers.awsactivity),
+	awsclick: logger(serializers.awsclick, deserializers.awsclick),
 };
 
 module.exports = {
 	avroSerializer,
 	getPlatformAnalyticsLog,
+	getLogAWSKinesis,
 	schemas,
 	serializers,
 	deserializers,
