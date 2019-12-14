@@ -166,7 +166,7 @@ const chapinEnvelope = {
 	],
 };
 
-const chapinEnvelopeSerializer = schema => {
+const chapinEnvelopeSerializer: Object => Serializer = schema => {
 	const envelopeCodec = avro.parse(chapinEnvelope);
 	const codec = avro.parse(schema);
 	const analyticsSource = 'WEB';
