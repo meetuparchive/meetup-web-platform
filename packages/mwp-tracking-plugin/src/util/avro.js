@@ -224,13 +224,14 @@ const avroDeserializer: Object => Deserializer = schema => {
 	};
 };
 
-const logger = (serializer: Serializer, deserializer: Deserializer) => (
-	record: Object
-) => {
+const logger = (
+	serializer: Serializer,
+	deserializer: Deserializer,
+	logFunc: Function
+) => (record: Object) => {
 	const serializedRecord = serializer(record);
 	const deserializedRecord = deserializer(serializedRecord);
-	analyticsLog(serializedRecord);
-	logAWSKinesis(serializedRecord);
+	logFunc(serializedRecord);
 	if (process.argv.includes('--debug')) {
 		debugLog(deserializedRecord);
 	}
@@ -256,10 +257,14 @@ const deserializers = {
 	awsclick: chapinEnvelopeDeserializer(schemas.click),
 };
 const loggers = {
-	activity: logger(serializers.activity, deserializers.activity),
-	click: logger(serializers.click, deserializers.click),
-	awsactivity: logger(serializers.awsactivity, deserializers.awsactivity),
-	awsclick: logger(serializers.awsclick, deserializers.awsclick),
+	activity: logger(serializers.activity, deserializers.activity, analyticsLog),
+	click: logger(serializers.click, deserializers.click, analyticsLog),
+	awsactivity: logger(
+		serializers.awsactivity,
+		deserializers.awsactivity,
+		logAWSKinesis
+	),
+	awsclick: logger(serializers.awsclick, deserializers.awsclick, logAWSKinesis),
 };
 
 module.exports = {
