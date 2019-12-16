@@ -93,6 +93,19 @@ describe('Activity tracking', () => {
 		delete recordedInfo.timestamp;
 		expect(recordedInfo).toMatchSnapshot();
 	});
+
+	it('encodes chapinEnvelope output from getLogger', () => {
+		const serialized = avro.serializers.awsactivity(trackInfo);
+
+		// // parse stringified object
+		const valObj = JSON.parse(serialized);
+		// // create a new buffer from that string
+		const avroBuffer = Buffer.from(valObj.data, 'base64');
+		// // get the avro-encoded record
+		const recordedInfo = avsc.parse(avro.schemas.activity).fromBuffer(avroBuffer);
+		delete recordedInfo.timestamp;
+		expect(recordedInfo).toMatchSnapshot();
+	});
 });
 
 describe('Click tracking', () => {
@@ -116,6 +129,23 @@ describe('Click tracking', () => {
 		const valObj = JSON.parse(serialized);
 		// create a new buffer from that string
 		const avroBuffer = Buffer.from(valObj.record, 'base64');
+		// get the avro-encoded record
+		const recordedInfo = avsc.parse(avro.schemas.click).fromBuffer(avroBuffer);
+		const expectedTrackedInfo = {
+			...trackInfo,
+			tag: '', // not used in our click data - defaults to empty string
+		};
+		expect(recordedInfo).toEqual(expectedTrackedInfo);
+	});
+
+	it('encodes chapinEnvelope output from clickToClickRecord', () => {
+		const trackInfo = clickToClickRecord(request)(click);
+		const serialized = avro.serializers.awsclick(trackInfo);
+
+		// parse stringified object
+		const valObj = JSON.parse(serialized);
+		// create a new buffer from that string
+		const avroBuffer = Buffer.from(valObj.data, 'base64');
 		// get the avro-encoded record
 		const recordedInfo = avsc.parse(avro.schemas.click).fromBuffer(avroBuffer);
 		const expectedTrackedInfo = {

@@ -5,6 +5,7 @@ import { updateId } from './util/trackingUtils';
 jest.mock('./util/avro', () => ({
 	loggers: {
 		activity: jest.fn(),
+		awsactivity: jest.fn(),
 	},
 }));
 
@@ -25,10 +26,7 @@ const MOCK_HAPI_TOOLKIT = {
 };
 
 // create new object for each call
-const getMockRequest = (
-	mockResponse = MOCK_HAPI_RESPONSE,
-	pluginData = {}
-) => ({
+const getMockRequest = (mockResponse = MOCK_HAPI_RESPONSE, pluginData = {}) => ({
 	state: {},
 	info: { referrer: 'baz' },
 	url: { path: 'affogato' },
@@ -115,9 +113,7 @@ describe('updateId', () => {
 		const updatedTrackId = updateId(trackIdCookieName)(request, doRefresh);
 		expect(updatedTrackId).not.toBe(trackId); // no change
 		expect(request.plugins.tracking[trackIdCookieName]).not.toBeUndefined();
-		expect(request.plugins.tracking[trackIdCookieName]).toContain(
-			updatedTrackId
-		);
+		expect(request.plugins.tracking[trackIdCookieName]).toContain(updatedTrackId);
 	});
 });
 describe('getLogger', () => {
