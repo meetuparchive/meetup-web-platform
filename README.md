@@ -1,10 +1,9 @@
+# Web Platform Components <!-- omit in toc -->
+
 [![npm version](https://badge.fury.io/js/mwp-core.svg)](https://badge.fury.io/js/mwp-core)
 [![Build Status](https://travis-ci.org/meetup/meetup-web-platform.svg?branch=master)](https://travis-ci.org/meetup/meetup-web-platform)
 [![Coverage Status](https://coveralls.io/repos/github/meetup/meetup-web-platform/badge.svg?branch=master)](https://coveralls.io/github/meetup/meetup-web-platform?branch=master)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
-
-
-# Web platform
 
 This is the base platform for serving Meetup web apps including the public
 website and admin. It provides a Hapi webserver and a set of conventions for
@@ -12,7 +11,12 @@ composing applications with React + Redux.
 
 In general, application-specific code will live outside of this package.
 
-## Public modules
+- [Public modules](#public-modules)
+- [Releases](#releases)
+  - [Development/Beta releases](#developmentbeta-releases)
+  - [Adding a new package](#adding-a-new-package)
+
+# Public modules
 
 - [Analytics/tracking](packages/mwp-tracking-plugin/README.md)
 - [App configuration](packages/mwp-config/README.md)
