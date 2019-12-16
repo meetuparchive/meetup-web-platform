@@ -48,6 +48,11 @@ export default function processClickTracking(request, h) {
 		.map(clickToClickRecord(request))
 		.forEach(avro.loggers.click);
 
+	history
+		.filter(click => click)
+		.map(clickToClickRecord(request))
+		.forEach(avro.loggers.awsclick);
+
 	h.unstate(COOKIE_NAME, clickCookieOptions);
 	return h.continue;
 }

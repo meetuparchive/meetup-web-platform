@@ -1,6 +1,8 @@
 // @flow
 const log = require('mwp-logger-plugin').logger;
 const avro = require('avsc');
+const uuidv1 = require('uuid/v1');
+const AWS = require('aws-sdk');
 
 const canUsePubSub =
 	process.env.GAE_INSTANCE || process.env.GOOGLE_APPLICATION_CREDENTIALS;
@@ -35,7 +37,30 @@ const getPlatformAnalyticsLog = (
 	};
 };
 
+// double write the avro records
+// thus, use canUsePubSub as feature gate
+const getLogAWSKinesis = (usePubSub: ?string = canUsePubSub): (string => void) => {
+	if (usePubSub) {
+		const kinesis = new AWS.Kinesis({ apiVersion: '2013-12-02' });
+
+		return (serializedRecord: string) => {
+			const options = {
+				Data: Buffer.from(serializedRecord),
+				PartitionKey: uuidv1(),
+				StreamName: process.env.KINESIS_STREAM_NAME,
+			};
+
+			kinesis.putRecord(options, function(err, data) {
+				if (err) console.log(err, err.stack);
+				else console.log(data);
+			});
+		};
+	}
+	return (serializedRecord: string) => {};
+};
+
 const analyticsLog = getPlatformAnalyticsLog();
+const logAWSKinesis = getLogAWSKinesis();
 const debugLog = deserializedRecord =>
 	console.log(JSON.stringify(deserializedRecord));
 
@@ -107,6 +132,70 @@ const activity = {
 	],
 };
 
+const chapinEnvelope = {
+	namespace: 'com.meetup.base.avro',
+	type: 'record',
+	name: 'AvroEnvelope',
+	doc: 'v1',
+	fields: [
+		{
+			name: 'id',
+			type: 'string',
+		},
+		{
+			name: 'timestamp',
+			type: 'long',
+			logicalType: 'timestamp-millis',
+		},
+		{
+			name: 'schemaFullname',
+			type: 'string',
+		},
+		{
+			name: 'schemaVersion',
+			type: 'string',
+		},
+		{
+			name: 'source',
+			type: 'string',
+		},
+		{
+			name: 'data',
+			type: 'string',
+		},
+	],
+};
+
+const chapinEnvelopeSerializer: Object => Serializer = schema => {
+	const envelopeCodec = avro.parse(chapinEnvelope);
+	const codec = avro.parse(schema);
+	const analyticsSource = 'WEB';
+
+	return data => {
+		const record = codec.toBuffer(data);
+		const analytics = {
+			id: uuidv1(),
+			timestamp: Date.now(),
+			schemaFullname: `${schema.namespace}.${schema.name}`,
+			schemaVersion: schema.doc,
+			source: analyticsSource,
+			data: record.toString('base64'),
+		};
+		return JSON.stringify(
+			envelopeCodec.fromBuffer(envelopeCodec.toBuffer(analytics))
+		);
+	};
+};
+
+const chapinEnvelopeDeserializer: Object => Deserializer = schema => {
+	const codec = avro.parse(schema);
+	return serialized => {
+		const { data } = JSON.parse(serialized);
+		const avroBuffer = Buffer.from(data, 'base64');
+		return codec.fromBuffer(avroBuffer);
+	};
+};
+
 type Serializer = Object => string;
 type Deserializer = string => Object;
 
@@ -135,12 +224,14 @@ const avroDeserializer: Object => Deserializer = schema => {
 	};
 };
 
-const logger = (serializer: Serializer, deserializer: Deserializer) => (
-	record: Object
-) => {
+const logger = (
+	serializer: Serializer,
+	deserializer: Deserializer,
+	logFunc: Function
+) => (record: Object) => {
 	const serializedRecord = serializer(record);
 	const deserializedRecord = deserializer(serializedRecord);
-	analyticsLog(serializedRecord);
+	logFunc(serializedRecord);
 	if (process.argv.includes('--debug')) {
 		debugLog(deserializedRecord);
 	}
@@ -152,22 +243,34 @@ const schemas = {
 };
 const serializers = {
 	avro: avroSerializer,
+	awsavro: chapinEnvelopeSerializer,
 	activity: avroSerializer(schemas.activity),
 	click: avroSerializer(schemas.click),
+	awsactivity: chapinEnvelopeSerializer(schemas.activity),
+	awsclick: chapinEnvelopeSerializer(schemas.click),
 };
 const deserializers = {
 	avro: avroDeserializer,
 	activity: avroDeserializer(schemas.activity),
 	click: avroDeserializer(schemas.click),
+	awsactivity: chapinEnvelopeDeserializer(schemas.activity),
+	awsclick: chapinEnvelopeDeserializer(schemas.click),
 };
 const loggers = {
-	activity: logger(serializers.activity, deserializers.activity),
-	click: logger(serializers.click, deserializers.click),
+	activity: logger(serializers.activity, deserializers.activity, analyticsLog),
+	click: logger(serializers.click, deserializers.click, analyticsLog),
+	awsactivity: logger(
+		serializers.awsactivity,
+		deserializers.awsactivity,
+		logAWSKinesis
+	),
+	awsclick: logger(serializers.awsclick, deserializers.awsclick, logAWSKinesis),
 };
 
 module.exports = {
 	avroSerializer,
 	getPlatformAnalyticsLog,
+	getLogAWSKinesis,
 	schemas,
 	serializers,
 	deserializers,
