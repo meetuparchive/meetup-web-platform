@@ -83,7 +83,9 @@ const getLogAWSKinesis = (usePubSub: ?string = canUsePubSub): (string => void) =
 			});
 		};
 	}
-	return async (serializedRecord: string) => {};
+	return async (serializedRecord: string) => {
+		Promise.resolve();
+	};
 };
 
 const analyticsLog = getPlatformAnalyticsLog();
