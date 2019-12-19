@@ -60,7 +60,9 @@ const getCrossAccountCredentials = async () => {
 
 // double write the avro records
 // thus, use canUsePubSub as feature gate
-const getLogAWSKinesis = (usePubSub: ?string = canUsePubSub): (string => void) => {
+const getLogAWSKinesis = (
+	usePubSub: ?string = canUsePubSub
+): (string => Promise<void>) => {
 	if (usePubSub) {
 		return async (serializedRecord: string) => {
 			const accessparams = await getCrossAccountCredentials();
