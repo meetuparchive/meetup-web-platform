@@ -2,7 +2,6 @@
 const log = require('mwp-logger-plugin').logger;
 const avro = require('avsc');
 const uuidv1 = require('uuid/v1');
-const AWS = require('aws-sdk');
 
 const canUsePubSub =
 	process.env.GAE_INSTANCE || process.env.GOOGLE_APPLICATION_CREDENTIALS;
@@ -42,17 +41,40 @@ const getPlatformAnalyticsLog = (
 const getLogAWSKinesis = (usePubSub: ?string = canUsePubSub): (string => void) => {
 	if (usePubSub) {
 		return (serializedRecord: string) => {
-			const options = {
-				Data: Buffer.from(serializedRecord),
-				PartitionKey: uuidv1(),
-				StreamName: process.env.KINESIS_STREAM_NAME,
-			};
+			const AWS = require('aws-sdk');
+			const sts = new AWS.STS();
+			sts.assumeRole(
+				{
+					RoleArn: process.env.ASSUME_ROLE_ARN,
+					RoleSessionName: 'awssdk',
+				},
+				function(err, data) {
+					if (err) {
+						// an error occurred
+						console.log('Cannot assume role');
+						console.log(err, err.stack);
+					} else {
+						// successful response
+						AWS.config.update({
+							accessKeyId: data.Credentials.AccessKeyId,
+							secretAccessKey: data.Credentials.SecretAccessKey,
+							sessionToken: data.Credentials.SessionToken,
+						});
 
-			const kinesis = new AWS.Kinesis({ apiVersion: '2013-12-02' });
-			kinesis.putRecord(options, function(err, data) {
-				if (err) console.log(err, err.stack);
-				else console.log(data);
-			});
+						const options = {
+							Data: Buffer.from(serializedRecord),
+							PartitionKey: uuidv1(),
+							StreamName: process.env.KINESIS_STREAM_NAME,
+						};
+
+						const kinesis = new AWS.Kinesis({ apiVersion: '2013-12-02' });
+						kinesis.putRecord(options, function(err, data) {
+							if (err) console.log(err, err.stack);
+							else console.log(data);
+						});
+					}
+				}
+			);
 		};
 	}
 	return (serializedRecord: string) => {};
