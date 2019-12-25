@@ -4,7 +4,6 @@ const uuidv1 = require('uuid/v1');
 const AWS = require('aws-sdk');
 
 const sts = new AWS.STS();
-const isKinesisEnabled = process.env.ASSUME_ROLE_ARN;
 
 const getCrossAccountCredentials = async () => {
 	return new Promise((resolve, reject) => {
@@ -27,7 +26,7 @@ const getCrossAccountCredentials = async () => {
 };
 
 const getLogAWSKinesis = (): (string => Promise<void>) => {
-	if (!isKinesisEnabled) {
+	if (process.env.NODE_ENV !== 'production') {
 		return async (serializedRecord: string) => {
 			Promise.resolve();
 		};
