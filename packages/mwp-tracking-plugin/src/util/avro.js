@@ -26,6 +26,12 @@ const getCrossAccountCredentials = async () => {
 };
 
 const getLogAWSKinesis = (): (string => Promise<void>) => {
+	if (process.env.NODE_ENV !== 'production') {
+		return async (serializedRecord: string) => {
+			Promise.resolve();
+		};
+	}
+
 	return async (serializedRecord: string) => {
 		const accessparams = await getCrossAccountCredentials();
 		const options = {
