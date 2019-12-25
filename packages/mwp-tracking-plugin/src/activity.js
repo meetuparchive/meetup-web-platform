@@ -47,7 +47,6 @@ export const getLogger: string => (Object, Object) => mixed = (agent: string) =>
 			...trackInfo,
 		};
 
-		avro.loggers.activity(record);
 		avro.loggers.awsactivity(record);
 		return record;
 	};
