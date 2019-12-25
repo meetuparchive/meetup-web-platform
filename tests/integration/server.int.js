@@ -103,9 +103,7 @@ describe('Cookie setting', () => {
 		history: [click, { ...click }],
 	};
 	it('calls loggers.click for each click and un-sets the click-track cookie', () => {
-		const cookie = `click-track=${encodeURIComponent(
-			JSON.stringify(clickData)
-		)}`;
+		const cookie = `click-track=${encodeURIComponent(JSON.stringify(clickData))}`;
 		const fooRoute = {
 			method: 'get',
 			path: '/ny-tech',
@@ -115,7 +113,7 @@ describe('Cookie setting', () => {
 		// spyOn(config, 'default').and.returnValue(Promise.resolve({}));
 		return start({}, { routes }, mockConfig).then(server => {
 			const avro = require('mwp-tracking-plugin/lib/util/avro');
-			avro.loggers.click.mockReturnValue('mocked clicktracking log');
+			avro.loggers.awsclick.mockReturnValue('mocked clicktracking log');
 			const request = {
 				method: 'get',
 				url: '/ny-tech',
@@ -126,7 +124,7 @@ describe('Cookie setting', () => {
 				.inject(request)
 				.then(response => {
 					const cookieUnsetString = 'click-track=;';
-					expect(avro.loggers.click).toHaveBeenCalledTimes(
+					expect(avro.loggers.awsclick).toHaveBeenCalledTimes(
 						clickData.history.length
 					);
 					expect(response.headers['set-cookie']).toContainEqual(
