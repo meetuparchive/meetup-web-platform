@@ -43,10 +43,6 @@ export default function processClickTracking(request, h) {
 
 	const cookieJSON = decodeURIComponent(cookieValue);
 	const { history } = JSON.parse(cookieJSON);
-	history
-		.filter(click => click)
-		.map(clickToClickRecord(request))
-		.forEach(avro.loggers.click);
 
 	history
 		.filter(click => click)

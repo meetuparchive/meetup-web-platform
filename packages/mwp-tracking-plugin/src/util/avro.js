@@ -1,42 +1,9 @@
 // @flow
-const log = require('mwp-logger-plugin').logger;
 const avro = require('avsc');
 const uuidv1 = require('uuid/v1');
 const AWS = require('aws-sdk');
 
-const canUsePubSub =
-	process.env.GAE_INSTANCE || process.env.GOOGLE_APPLICATION_CREDENTIALS;
 const sts = new AWS.STS();
-
-/*
- * There are currently 2 distinct analytics logging methods
- * 1. `stdout`: used in dev and compatible with https://github.com/meetup/blt-fluentd
- *    in k8s-based applications in GCP
- * 2. Google Pub/Sub, which is used in GAE and any environment with GOOGLE_APPLICATION_CREDENTIALS
- *    environment variable set to point toward Google JSON client credentials file
- *
- * @see https://meetup.atlassian.net/wiki/display/MUP/Analytics+Logging#AnalyticsLogging-Theinputmechanism
- */
-const getPlatformAnalyticsLog = (
-	usePubSub: ?string = canUsePubSub
-): (string => void) => {
-	if (usePubSub) {
-		const pubsub = require('@google-cloud/pubsub')({
-			projectId: 'meetup-prod',
-		});
-		const publisher = pubsub.topic('analytics-log-json').publisher();
-		return (serializedRecord: string) => {
-			publisher
-				.publish(Buffer.from(serializedRecord))
-				.catch(err => log.error(err));
-		};
-	}
-
-	// stdout log - can be used with https://github.com/meetup/blt-fluentd or generic environment
-	return (serializedRecord: string) => {
-		process.stdout.write(`analytics=${serializedRecord}\n`);
-	};
-};
 
 const getCrossAccountCredentials = async () => {
 	return new Promise((resolve, reject) => {
@@ -91,7 +58,6 @@ const getLogAWSKinesis = (): (string => Promise<void>) => {
 	};
 };
 
-const analyticsLog = getPlatformAnalyticsLog();
 const logAWSKinesis = getLogAWSKinesis();
 const debugLog = deserializedRecord =>
 	console.log(JSON.stringify(deserializedRecord));
@@ -276,21 +242,15 @@ const schemas = {
 const serializers = {
 	avro: avroSerializer,
 	awsavro: chapinEnvelopeSerializer,
-	activity: avroSerializer(schemas.activity),
-	click: avroSerializer(schemas.click),
 	awsactivity: chapinEnvelopeSerializer(schemas.activity),
 	awsclick: chapinEnvelopeSerializer(schemas.click),
 };
 const deserializers = {
 	avro: avroDeserializer,
-	activity: avroDeserializer(schemas.activity),
-	click: avroDeserializer(schemas.click),
 	awsactivity: chapinEnvelopeDeserializer(schemas.activity),
 	awsclick: chapinEnvelopeDeserializer(schemas.click),
 };
 const loggers = {
-	activity: logger(serializers.activity, deserializers.activity, analyticsLog),
-	click: logger(serializers.click, deserializers.click, analyticsLog),
 	awsactivity: logger(
 		serializers.awsactivity,
 		deserializers.awsactivity,
@@ -301,7 +261,6 @@ const loggers = {
 
 module.exports = {
 	avroSerializer,
-	getPlatformAnalyticsLog,
 	getLogAWSKinesis,
 	schemas,
 	serializers,
