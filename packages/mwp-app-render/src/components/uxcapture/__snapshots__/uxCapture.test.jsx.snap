@@ -3,8 +3,6 @@
 exports[`UXCapture renders correct markup when all props are defined 1`] = `
 <Fragment>
   <_default
-    onMark={[Function]}
-    onMeasure={[Function]}
   />
   <_default
     primaryActionAvailable={

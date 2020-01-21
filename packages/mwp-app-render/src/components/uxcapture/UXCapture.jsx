@@ -10,18 +10,6 @@ type Props = {|
 	secondaryContentDisplayed?: Array<string>,
 |};
 
-export const onMark = () => {
-	if (!(window.performance && window.performance.getEntriesByType)) {
-		return;
-	}
-};
-
-export const onMeasure = () => {
-	if (!(window.performance && window.performance.getEntriesByType)) {
-		return;
-	}
-};
-
 export default ({
 	destinationVerified,
 	primaryContentDisplayed,
@@ -29,7 +17,7 @@ export default ({
 	secondaryContentDisplayed,
 }: Props) => (
 	<React.Fragment>
-		<UXCaptureCreate onMark={onMark} onMeasure={onMeasure} />
+		<UXCaptureCreate />
 		<UXCaptureStartView
 			destinationVerified={destinationVerified}
 			primaryContentDisplayed={primaryContentDisplayed}
