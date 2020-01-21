@@ -10,47 +10,16 @@ type Props = {|
 	secondaryContentDisplayed?: Array<string>,
 |};
 
-export const onMark = (mark: string) => {
-	if (
-		!(
-			window.newrelic &&
-			window.performance &&
-			window.performance.getEntriesByType
-		)
-	) {
+export const onMark = () => {
+	if (!(window.performance && window.performance.getEntriesByType)) {
 		return;
 	}
-
-	const performanceMark = window.performance
-		.getEntriesByType('mark')
-		.find(entry => entry.name === mark);
-
-	// Set a marker in the trace details
-	window.newrelic.addToTrace({
-		name: mark,
-		start:
-			window.performance.timing.navigationStart + performanceMark.startTime, // this is an epoch ms timestamp
-		type: 'UX Capture mark',
-	});
 };
 
-export const onMeasure = (measure: string) => {
-	if (
-		!(
-			window.newrelic &&
-			window.performance &&
-			window.performance.getEntriesByType
-		)
-	) {
+export const onMeasure = () => {
+	if (!(window.performance && window.performance.getEntriesByType)) {
 		return;
 	}
-
-	const performanceMeasure = window.performance
-		.getEntriesByType('measure')
-		.find(entry => entry.name === measure);
-
-	//  Add a custom attribute to the PageView & BrowserInteraction events in Insights
-	window.newrelic.setCustomAttribute(measure, performanceMeasure.duration);
 };
 
 export default ({
@@ -58,7 +27,7 @@ export default ({
 	primaryContentDisplayed,
 	primaryActionAvailable,
 	secondaryContentDisplayed,
-}: Props) =>
+}: Props) => (
 	<React.Fragment>
 		<UXCaptureCreate onMark={onMark} onMeasure={onMeasure} />
 		<UXCaptureStartView
@@ -67,4 +36,5 @@ export default ({
 			primaryActionAvailable={primaryActionAvailable}
 			secondaryContentDisplayed={secondaryContentDisplayed}
 		/>
-	</React.Fragment>;
+	</React.Fragment>
+);

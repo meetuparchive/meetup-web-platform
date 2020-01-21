@@ -1,10 +1,8 @@
 // @flow
-import newrelic from 'newrelic';
 // Implicit dependency: tracking plugin providing request.trackActivity method
 
 import { apiResponseDuotoneSetter } from './util/duotone';
 import { makeSendQuery } from './util/send';
-import { makeReceiver } from './util/receive';
 
 import { API_PROXY_PLUGIN_NAME } from './config';
 
@@ -43,25 +41,15 @@ const apiProxy = (request: HapiRequest) => {
 
 		request.trackActivity(activityInfo);
 
-		// sendQuery and receiver must be assigned here rather than when the `request`
+		// sendQuery must be assigned here rather than when the `request`
 		// is first passed in because the `request.state` isn't guaranteed to be
 		// available until after the `queries` have been parsed
 		const sendQuery = makeSendQuery(request);
-		const receiver = makeReceiver(request);
 
 		// create an array of in-flight API request Promises
 		const apiRequests = queries.map(query => {
-			const receive = receiver(query);
-			// start the meetupApiRequest trace, which will end when the function
-			// returned by `receiver(query)` finishes execution
-			const tracedResponseReceiver = newrelic.createTracer(
-				'meetupApiRequest',
-				receive
-			);
 			// now send the query and return the Promise of resolved responses
-			return sendQuery(query)
-				.then(tracedResponseReceiver)
-				.then(setApiResponseDuotones);
+			return sendQuery(query).then(setApiResponseDuotones);
 		});
 
 		// wait for all requests to respond
