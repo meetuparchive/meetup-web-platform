@@ -1,7 +1,6 @@
-sudo: false
 language: node_js
 node_js:
-    - '10.16'
+    - '12.14'
 cache:
     directories:
         - node_modules
@@ -19,6 +18,11 @@ env:
 before_install:
     - echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > $HOME/.npmrc
 
+    # install more recent `yarn`
+    - curl -o- -L https://yarnpkg.com/install.sh | bash -s -- --version 1.21.1
+    - export PATH=$HOME/.yarn/bin:$PATH
+    - yarn --version
+
 before_script:
     - lerna run build
     - git diff --exit-code yarn.lock
@@ -32,13 +36,13 @@ after_success:
     - git config --global user.email "builds@travis-ci.com"
     - git config --global user.name "Travis CI"
     - >
-        [ "${TRAVIS_BRANCH}" = "master" ] && [ "${TRAVIS_PULL_REQUEST}" = "false" ] &&
-        export GIT_TAG=$(make version) ||
-        export GIT_TAG=$(make version)-beta
-    - >
-        [ "${TRAVIS_BRANCH}" = "master" ] && [ "${TRAVIS_PULL_REQUEST}" = "false" ] &&
-        export NPM_TAG=latest ||
-        export NPM_TAG=beta
+        if [ ${TRAVIS_BRANCH} = "master" ] && [ ${TRAVIS_PULL_REQUEST} = "false" ]; then
+            export GIT_TAG=$(make version)
+            export NPM_TAG=latest
+        else
+            export GIT_TAG=$(make version)-beta
+            export NPM_TAG=beta
+        fi
     - echo "GIT_TAG=$GIT_TAG"
     - echo "NPM_TAG=$NPM_TAG"
     - eval "$(ssh-agent)"
