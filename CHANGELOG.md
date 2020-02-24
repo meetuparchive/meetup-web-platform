@@ -1,3 +1,7 @@
+## [22.5]
+
+-   Migrate CI to github action
+
 ## [22.4]
 
 -   **New feature** `state.config.geo`, which contains geolocation info provided
