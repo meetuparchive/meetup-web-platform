@@ -120,6 +120,7 @@ export const getOnPreResponse = (cookieConfig: CookieOpts) => (
 		encoding: 'none',
 		path: '/',
 		isHttpOnly: true,
+		isSecure: true,
 		ttl: YEAR_IN_MS * 20,
 		strictHeader: false, // skip strict cookie format validation (no quotes)
 	};

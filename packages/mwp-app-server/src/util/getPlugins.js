@@ -34,7 +34,7 @@ const CSRF_HEADER_NAME = CSRF_COOKIE_NAME;
 export function setCsrfCookies(request, h) {
 	const csrfHeader = (request.response.headers || {})[CSRF_COOKIE_NAME];
 	if (csrfHeader) {
-		h.state(CSRF_HEADER_COOKIE_NAME, csrfHeader);
+		h.state(CSRF_HEADER_COOKIE_NAME, csrfHeader, { isSecure: true });
 	}
 	return h.continue;
 }
