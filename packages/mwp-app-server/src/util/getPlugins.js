@@ -11,7 +11,6 @@ import { plugin as serviceWorkerPlugin } from 'mwp-sw-plugin';
 import { plugin as apiProxyPlugin } from 'mwp-api-proxy-plugin';
 import { plugin as requestAuthPlugin } from 'mwp-auth-plugin';
 import { plugin as cspPlugin } from 'mwp-csp-plugin';
-import { plugin as raspPlugin } from 'mwp-rasp-plugin';
 
 // single quotes are required around these keywords
 const CSP_KEYWORDS = {
@@ -108,13 +107,6 @@ export function getCspPlugin(options) {
 	};
 }
 
-export function getRaspPlugin(options) {
-	return {
-		plugin: raspPlugin,
-		options,
-	};
-}
-
 export function getAppRoutePlugin(options) {
 	return {
 		plugin: appRoutePlugin,
@@ -178,7 +170,6 @@ export default function getPlugins({ languageRenderers }) {
 			),
 			generateNonces: 'false',
 		}),
-		getRaspPlugin(),
 		requestAuthPlugin,
 		getActivityTrackingPlugin({ agent, isProdApi }),
 		clickPlugin,
