@@ -1,3 +1,7 @@
+## [23.0]
+
+-   **Removed** Retire signalsciences integration
+
 ## [22.4]
 
 -   **New feature** `state.config.geo`, which contains geolocation info provided
