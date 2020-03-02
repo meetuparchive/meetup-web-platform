@@ -38,7 +38,6 @@
     "mwp-csp-plugin": ">=0.0.1",
     "mwp-language-plugin": ">=0.0.1",
     "mwp-logger-plugin": ">=0.0.1",
-    "mwp-rasp-plugin": ">=0.0.1",
     "mwp-router": ">=0.0.1",
     "mwp-sw-plugin": ">=0.0.1",
     "mwp-tracking-plugin": ">=0.0.1",
