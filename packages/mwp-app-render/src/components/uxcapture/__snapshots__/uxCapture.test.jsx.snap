@@ -2,8 +2,7 @@
 
 exports[`UXCapture renders correct markup when all props are defined 1`] = `
 <Fragment>
-  <_default
-  />
+  <_default />
   <_default
     primaryActionAvailable={
       Array [
