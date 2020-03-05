@@ -1788,19 +1788,6 @@
     call-me-maybe "^1.0.1"
     glob-to-regexp "^0.3.0"
 
-"@newrelic/koa@^1.0.0":
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/@newrelic/koa/-/koa-1.0.6.tgz#3f34a59472a29e0997bf62f78e01a938bcc099e7"
-  dependencies:
-    methods "^1.1.2"
-
-"@newrelic/native-metrics@^3.0.0":
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/@newrelic/native-metrics/-/native-metrics-3.1.1.tgz#b2413a11426a080e9fd288e201607d3bdb0f8d56"
-  dependencies:
-    nan "^2.10.0"
-    semver "^5.5.1"
-
 "@nodelib/fs.stat@^1.0.1":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@nodelib/fs.stat/-/fs.stat-1.1.0.tgz#50c1e2260ac0ed9439a181de3725a0168d59c48a"
@@ -1973,10 +1960,6 @@
 "@types/yargs@^12.0.2", "@types/yargs@^12.0.9":
   version "12.0.12"
   resolved "https://registry.yarnpkg.com/@types/yargs/-/yargs-12.0.12.tgz#45dd1d0638e8c8f153e87d296907659296873916"
-
-"@tyriar/fibonacci-heap@^2.0.7":
-  version "2.0.8"
-  resolved "https://registry.yarnpkg.com/@tyriar/fibonacci-heap/-/fibonacci-heap-2.0.8.tgz#819fdff85fb559790539ff8a347c246777b4011c"
 
 JSONStream@^1.0.4:
   version "1.3.4"
@@ -2304,7 +2287,7 @@ async@2.6.0:
   dependencies:
     lodash "^4.14.0"
 
-async@^2.1.4, async@^2.3.0, async@^2.4.0:
+async@^2.3.0, async@^2.4.0:
   version "2.6.1"
   resolved "https://registry.yarnpkg.com/async/-/async-2.6.1.tgz#b245a23ca71930044ec53fa46aa00a3e87c6a610"
   dependencies:
@@ -2602,13 +2585,6 @@ before-after-hook@^1.4.0:
 binary-extensions@^1.0.0:
   version "1.11.0"
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-1.11.0.tgz#46aa1751fb6a2f93ee5e689bb1087d4b14c6c205"
-
-bl@^1.2.1:
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/bl/-/bl-1.2.2.tgz#a160911717103c07410cef63ef51b397c025af9c"
-  dependencies:
-    readable-stream "^2.3.5"
-    safe-buffer "^5.1.1"
 
 blankie@4.0.0:
   version "4.0.0"
@@ -6285,7 +6261,7 @@ json-stable-stringify-without-jsonify@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/json-stable-stringify-without-jsonify/-/json-stable-stringify-without-jsonify-1.0.1.tgz#9db7b59496ad3f3cfef30a75142d2d930ad72651"
 
-json-stringify-safe@^5.0.0, json-stringify-safe@^5.0.1, json-stringify-safe@~5.0.1:
+json-stringify-safe@^5.0.1, json-stringify-safe@~5.0.1:
   version "5.0.1"
   resolved "https://registry.yarnpkg.com/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz#1296a2d58fd45f19a0f6ce01d65701e2c735b6eb"
 
@@ -6917,10 +6893,6 @@ methmeth@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/methmeth/-/methmeth-1.1.0.tgz#e80a26618e52f5c4222861bb748510bd10e29089"
 
-methods@^1.1.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/methods/-/methods-1.1.2.tgz#5529a4d67654134edcc5266656835b0f851afcee"
-
 micromatch@^2.3.11:
   version "2.3.11"
   resolved "https://registry.yarnpkg.com/micromatch/-/micromatch-2.3.11.tgz#86677c97d1720b363431d04d0d15293bd38c1565"
@@ -7134,21 +7106,6 @@ ms@^2.1.1:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.2.tgz#d09d1f357b443f493382a8eb3ccd183872ae6009"
   integrity sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==
 
-msgpack5@^3.3.0:
-  version "3.6.0"
-  resolved "https://registry.yarnpkg.com/msgpack5/-/msgpack5-3.6.0.tgz#13912ee47cb0ad037f70def7924ebf38afa19b4f"
-  dependencies:
-    bl "^1.2.1"
-    inherits "^2.0.3"
-    readable-stream "^2.3.3"
-    safe-buffer "^5.1.1"
-
-"msgpack5rpc@https://registry.npmjs.org/msgpack5rpc/-/msgpack5rpc-1.1.0.tgz":
-  version "1.1.0"
-  resolved "https://registry.npmjs.org/msgpack5rpc/-/msgpack5rpc-1.1.0.tgz#f4b7aa7f8b20b317b3d8f6d8b8b2c2436f716e90"
-  dependencies:
-    msgpack5 "^3.3.0"
-
 multimatch@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/multimatch/-/multimatch-2.1.0.tgz#9c7906a22fb4c02919e2f5f75161b4cdbd4b2a2b"
@@ -7232,21 +7189,6 @@ neo-async@^2.6.0:
   version "2.6.1"
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.1.tgz#ac27ada66167fa8849a6addd837f6b189ad2081c"
   integrity sha512-iyam8fBuCUpWeKPGpaNMetEocMt364qkCsfL9JuhjXX6dRnguRVOfk2GZaDpPjcOKiiXCPINZC1GczQ7iTq3Zw==
-
-newrelic@^4.8.1:
-  version "4.8.1"
-  resolved "https://registry.yarnpkg.com/newrelic/-/newrelic-4.8.1.tgz#b60ed5e0106f7fb84e4fa0da38514c58f19d99b6"
-  dependencies:
-    "@newrelic/koa" "^1.0.0"
-    "@tyriar/fibonacci-heap" "^2.0.7"
-    async "^2.1.4"
-    concat-stream "^1.5.0"
-    https-proxy-agent "^2.2.1"
-    json-stringify-safe "^5.0.0"
-    readable-stream "^2.1.4"
-    semver "^5.3.0"
-  optionalDependencies:
-    "@newrelic/native-metrics" "^3.0.0"
 
 nice-try@^1.0.4:
   version "1.0.5"
@@ -8708,7 +8650,7 @@ read@1, read@~1.0.1:
   dependencies:
     mute-stream "~0.0.4"
 
-"readable-stream@1 || 2", readable-stream@^2.0.0, readable-stream@^2.0.1, readable-stream@^2.0.2, readable-stream@^2.0.6, readable-stream@^2.1.4, readable-stream@^2.1.5, readable-stream@^2.2.2, readable-stream@^2.2.9, readable-stream@^2.3.3, readable-stream@^2.3.5, readable-stream@^2.3.6:
+"readable-stream@1 || 2", readable-stream@^2.0.0, readable-stream@^2.0.1, readable-stream@^2.0.2, readable-stream@^2.0.6, readable-stream@^2.1.5, readable-stream@^2.2.2, readable-stream@^2.2.9, readable-stream@^2.3.6:
   version "2.3.6"
   resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-2.3.6.tgz#b11c27d88b8ff1fbe070643cf94b0c79ae1b0aaf"
   dependencies:

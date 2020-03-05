@@ -1,3 +1,7 @@
+## [24.0]
+
+-   **Removed** Retire newrelic integration
+
 ## [23.0]
 
 -   **Removed** Retire signalsciences integration
