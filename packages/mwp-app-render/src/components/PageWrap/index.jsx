@@ -27,22 +27,6 @@ class PageWrap extends React.Component {
 	componentDidMount() {
 		// Browser has now rendered client-side application - fire the browser TTI triggers
 
-		// Fire TTI trigger to be sent to NewRelic
-		if (window.performance && window.newrelic) {
-			// window.performance.now is a high resolution timer
-			const now = window.performance.now();
-
-			// Set a marker in the trace details
-			window.newrelic.addToTrace({
-				name: 'appInteractive',
-				start: window.performance.timing.navigationStart + now,
-				type: 'Browser app has rendered and is interactive',
-			});
-
-			// Add a custom attribute to the PageView & BrowserInteraction events in Insights
-			window.newrelic.setCustomAttribute('timeToAppInteractive', now);
-		}
-
 		// Add W3C UserTiming mark for TTI and measure (from navigationStart to newly created mark)
 		if (
 			window.performance &&
@@ -79,8 +63,14 @@ class PageWrap extends React.Component {
 				{head}
 
 				<Helmet defaultTitle="Meetup" titleTemplate="%s - Meetup">
-					<meta name="viewport" content="width=device-width, initial-scale=1" />
-					<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+					<meta
+						name="viewport"
+						content="width=device-width, initial-scale=1"
+					/>
+					<meta
+						http-equiv="Content-Type"
+						content="text/html; charset=UTF-8"
+					/>
 					<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 					<meta name="robots" content="index,follow" />
 					<meta
@@ -89,11 +79,12 @@ class PageWrap extends React.Component {
 					/>
 				</Helmet>
 
-				{iconSprite &&
+				{iconSprite && (
 					<div
 						style={{ display: 'none' }}
 						dangerouslySetInnerHTML={{ __html: iconSprite }}
-					/>}
+					/>
+				)}
 
 				{this.renderChildren()}
 			</div>

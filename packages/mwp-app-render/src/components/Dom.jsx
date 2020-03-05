@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import escapeHtml from 'escape-html';
-import newrelic from 'newrelic';
 import fs from 'fs';
 
 import { getPolyfill } from 'mwp-app-render/lib/util/browserPolyfill';
@@ -64,20 +63,11 @@ const DOM = props => {
 		escapedState,
 	};
 
-	// strip <script> html tags
-	// in order to dangerouslySetInnerHTML in JSX
-	const scriptPattern = /^<script[^>]*>/;
-	const newrelicHTML = newrelic.getBrowserTimingHeader();
-	const newrelicJS = scriptPattern.test(newrelicHTML) // might just be HTML comment - skip it
-		? newrelicHTML.replace(scriptPattern, '').replace(/<\/script>$/, '')
-		: false;
-
 	const uxCaptureFilename = require.resolve(
 		'@meetup/ux-capture/lib/ux-capture.min.js'
 	);
 	const uxCaptureJS = fs.readFileSync(uxCaptureFilename, 'utf8');
 
-	// newRelicJS should come *before* uxCaptureJS to help avoid race conditions
 	return (
 		<html lang={htmlLang}>
 			<head>
@@ -85,9 +75,6 @@ const DOM = props => {
 				{head.meta.toComponent()}
 				{head.link.toComponent()}
 				{head.script.toComponent()}
-				{newrelicJS && (
-					<script dangerouslySetInnerHTML={getInnerHTML(newrelicJS)} />
-				)}
 				<script dangerouslySetInnerHTML={getInnerHTML(uxCaptureJS)} />
 				{cssLinks &&
 					cssLinks.map((href, key) => (
