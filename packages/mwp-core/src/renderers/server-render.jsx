@@ -1,12 +1,17 @@
 // @flow
 import type { Reducer } from 'redux';
+import React from 'react';
+import ReactDOMServer from 'react-dom/server';
+import Helmet from 'react-helmet';
 import MobileDetect from 'mobile-detect';
 import isBot from 'isbot';
 
 import { API_ROUTE_PATH } from 'mwp-api-proxy-plugin';
-import { SERVER_RENDER } from 'mwp-router';
+import { Forbidden, NotFound, Redirect, SERVER_RENDER } from 'mwp-router';
 import { getFindMatches, resolveAllRoutes } from 'mwp-router/lib/util';
 import { getServerCreateStore } from 'mwp-store/lib/server';
+import Dom from 'mwp-app-render/lib/components/Dom';
+import ServerApp from 'mwp-app-render/lib/components/ServerApp';
 import { parseMemberCookie } from 'mwp-core/lib/util/cookieUtils';
 import { getRemoteGeoLocation } from 'mwp-core/lib/util/requestUtils';
 
@@ -17,6 +22,7 @@ import {
 } from '../util/cookieUtils';
 import { getLaunchDarklyUser } from '../util/launchDarkly';
 
+const DOCTYPE = '<!DOCTYPE html>';
 const DUMMY_DOMAIN = 'http://mwp-dummy-domain.com';
 
 /**
@@ -25,6 +31,11 @@ const DUMMY_DOMAIN = 'http://mwp-dummy-domain.com';
  *
  * @module ServerRender
  */
+
+function getHtml(el) {
+	const htmlMarkup = ReactDOMServer.renderToString(el);
+	return `${DOCTYPE}${htmlMarkup}`;
+}
 
 export function getRedirect(context: { url?: string, permanent?: boolean }) {
 	if (!context || !context.url) {
@@ -42,6 +53,21 @@ export function getRedirect(context: { url?: string, permanent?: boolean }) {
 		},
 	};
 }
+
+/*
+ * A helper to collect react-side-effect data from all components in the
+ * application that utilize side effects
+ *
+ * Any component class that uses react-side-effect should be 'rewound' in this
+ * function to prevent memory leaks and invalid state carrying over into other
+ * requests
+ */
+const resolveSideEffects = () => ({
+	head: Helmet.rewind(),
+	redirect: Redirect.rewind(),
+	forbidden: Forbidden.rewind(),
+	notFound: NotFound.rewind(),
+});
 
 /**
  * Get media from X-UA-Device header set by Fastly which parses the user agent string
@@ -114,6 +140,86 @@ const getAppContext = (request: HapiRequest, enableServiceWorker: boolean) => {
 };
 
 /**
+ * Using the current route information and Redux store, render the app to an
+ * HTML string and server response code, with optional cookies to write
+ */
+
+const getRouterRenderer = ({
+	request,
+	h,
+	appContext,
+	routes,
+	store,
+	scripts,
+	cssLinks,
+}): RenderResult => {
+	// pre-render the app-specific markup, this is the string of markup that will
+	// be managed by React on the client.
+	//
+	// **IMPORTANT**: this string is built separately from `<Dom />` because it
+	// initializes page-specific state that `<Dom />` needs to render, e.g.
+	// `<head>` contents
+	const initialState = store.getState();
+	let appMarkup;
+	const routerContext: { url?: string, permanent?: boolean } = {};
+
+	try {
+		appMarkup = ReactDOMServer.renderToString(
+			<ServerApp
+				request={request}
+				h={h}
+				appContext={appContext}
+				routerContext={routerContext}
+				store={store}
+				routes={routes}
+			/>
+		);
+	} catch (err) {
+		// cleanup all react-side-effect components to prevent error/memory leaks
+		resolveSideEffects();
+		// now we can re-throw and let the caller handle the error
+		throw err;
+	}
+
+	const sideEffects = resolveSideEffects();
+
+	const externalRedirect = getRedirect(sideEffects.redirect);
+	const internalRedirect = getRedirect(routerContext);
+	const redirect = internalRedirect || externalRedirect;
+
+	if (redirect) {
+		return redirect;
+	}
+
+	// cssLinks can be an Array or a Function that returns an array
+	if (typeof cssLinks === 'function') {
+		// invoke function and provide initialState
+		cssLinks = cssLinks(initialState);
+	}
+
+	// all the data for the full `<html>` element has been initialized by the app
+	// so go ahead and assemble the full response body
+	const result = getHtml(
+		<Dom
+			head={sideEffects.head}
+			initialState={initialState}
+			appContext={appContext}
+			appMarkup={appMarkup}
+			scripts={scripts}
+			cssLinks={cssLinks}
+		/>
+	);
+
+	// prioritized status code fallbacks
+	const statusCode = sideEffects.forbidden || sideEffects.notFound || 200;
+
+	return {
+		statusCode,
+		result,
+	};
+};
+
+/**
  * Curry a function that takes a Hapi request and returns a Promise
  * that will emit the rendered HTML
  *
@@ -133,6 +239,7 @@ const makeRenderer = (renderConfig: {
 		reducer,
 		middleware,
 		scripts,
+		cssLinks,
 		enableServiceWorker,
 	} = renderConfig;
 	// set up a Promise that emits the resolved routes - this single Promise will
@@ -213,7 +320,19 @@ const makeRenderer = (renderConfig: {
 				// the initial addFlags call will only be key'd by member ID
 				return addFlags(store, {
 					id: parseMemberCookie(request.state).id,
-				}).then(() => populateStore(store));
+				})
+					.then(() => populateStore(store))
+					.then(store =>
+						getRouterRenderer({
+							request,
+							h,
+							appContext,
+							routes: resolvedRoutes,
+							store,
+							scripts,
+							cssLinks,
+						})
+					);
 			})
 		);
 	};
