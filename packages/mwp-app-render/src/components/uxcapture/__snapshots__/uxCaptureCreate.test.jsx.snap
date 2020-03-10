@@ -7,7 +7,7 @@ exports[`UXCaptureCreate renders the correct markup when no props are provided 1
       "__html": "
 		<script>
 			if(window.UXCapture) {
-				window.UXCapture.create();
+				window.UXCapture.create({});
 			}
 		</script>
 	",
