@@ -81,8 +81,12 @@ const getLogAWSKinesis = (): (string => Promise<void>) => {
 		});
 
 		kinesis.putRecord(options, function(err, data) {
-			if (err) console.log(err, err.stack);
-			else console.log(data);
+			if (err) {
+				console.log("Error sending message to Kinesis: "+ serializedRecord);
+				console.log(err, err.stack);
+			} else {
+				console.log("Kinesis recieved message: " + serializedRecord);
+			}
 		});
 	};
 };
