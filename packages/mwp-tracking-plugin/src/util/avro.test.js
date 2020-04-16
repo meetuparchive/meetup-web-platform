@@ -81,19 +81,6 @@ describe('Activity tracking', () => {
 		subViewName: 'foo subview',
 	});
 
-	it('encodes standard output from getLogger', () => {
-		const serialized = avro.serializers.activity(trackInfo);
-
-		// parse stringified object
-		const valObj = JSON.parse(serialized);
-		// create a new buffer from that string
-		const avroBuffer = Buffer.from(valObj.record, 'base64');
-		// get the avro-encoded record
-		const recordedInfo = avsc.parse(avro.schemas.activity).fromBuffer(avroBuffer);
-		delete recordedInfo.timestamp;
-		expect(recordedInfo).toMatchSnapshot();
-	});
-
 	it('encodes chapinEnvelope output from getLogger', () => {
 		const serialized = avro.serializers.awsactivity(trackInfo);
 
@@ -121,23 +108,6 @@ describe('Click tracking', () => {
 		coords: [23, 45],
 	};
 
-	it('encodes standard output from clickToClickRecord', () => {
-		const trackInfo = clickToClickRecord(request)(click);
-		const serialized = avro.serializers.click(trackInfo);
-
-		// parse stringified object
-		const valObj = JSON.parse(serialized);
-		// create a new buffer from that string
-		const avroBuffer = Buffer.from(valObj.record, 'base64');
-		// get the avro-encoded record
-		const recordedInfo = avsc.parse(avro.schemas.click).fromBuffer(avroBuffer);
-		const expectedTrackedInfo = {
-			...trackInfo,
-			tag: '', // not used in our click data - defaults to empty string
-		};
-		expect(recordedInfo).toEqual(expectedTrackedInfo);
-	});
-
 	it('encodes chapinEnvelope output from clickToClickRecord', () => {
 		const trackInfo = clickToClickRecord(request)(click);
 		const serialized = avro.serializers.awsclick(trackInfo);
@@ -153,20 +123,5 @@ describe('Click tracking', () => {
 			tag: '', // not used in our click data - defaults to empty string
 		};
 		expect(recordedInfo).toEqual(expectedTrackedInfo);
-	});
-});
-
-describe('getPlatformAnalyticsLog', () => {
-	it('logs to stdout by default', () => {
-		spyOn(process.stdout, 'write').and.callThrough();
-		const analyticsLog = avro.getPlatformAnalyticsLog();
-		analyticsLog('foo');
-		expect(process.stdout.write).toHaveBeenCalled();
-	});
-	it('calls pub/sub topic.publish when isGAE', () => {
-		const isGAE = true;
-		const analyticsLog = avro.getPlatformAnalyticsLog(isGAE);
-		analyticsLog('foo');
-		expect(require('@google-cloud/pubsub').publish).toHaveBeenCalled();
 	});
 });

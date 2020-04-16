@@ -21,11 +21,6 @@ describe('processClickTracking', () => {
 	};
 	process.stdout.write = jest.fn(process.stdout.write);
 
-	it('calls process.stdout.write for each click record', () => {
-		process.stdout.write.mockClear();
-		processClickTracking(request, h);
-		expect(process.stdout.write).toHaveBeenCalledTimes(clickData.history.length);
-	});
 	it('calls h.unstate for click-track cookie', () => {
 		h.unstate.mockClear();
 		processClickTracking(request, h);
