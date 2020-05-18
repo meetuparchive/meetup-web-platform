@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Redux helpers to manage API data in a MWP app",
   "engines": {
-    "node": "^10.16.3",
+    "node": "^10.20.1",
     "yarn": "^1.9.4"
   },
   "main": "./lib/index.js",
