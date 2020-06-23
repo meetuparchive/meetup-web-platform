@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Hapi plugin to activate the wildcard application route",
   "engines": {
-    "node": "^10.20.1",
+    "node": "^10.21.0",
     "yarn": "^1.9.4"
   },
   "main": "./lib/index.js",
