@@ -26,6 +26,9 @@ export function register(
 		// legacy header for suppressing iframe rendering on other domains
 		request.response.header('X-Frame-Options', 'SAMEORIGIN');
 
+		// prevents browsers from guessing the MIME type
+		request.response.header('X-Content-Type-Options', 'nosniff');
+
 		return h.continue;
 	});
 	/**
