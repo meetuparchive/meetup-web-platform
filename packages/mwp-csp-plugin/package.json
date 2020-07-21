@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Sets content security policy headers",
   "engines": {
-    "node": "^10.21.0",
+    "node": "^10.20.1",
     "yarn": "^1.9.4"
   },
   "main": "./lib/index.js",
