@@ -1,3 +1,7 @@
+## [25.0]
+
+-   **Removed** Retire `mwp-csp-plugin`. All common security headers have been consolidated in Fastly.
+
 ## [24.0]
 
 -   **Removed** Retire newrelic integration
