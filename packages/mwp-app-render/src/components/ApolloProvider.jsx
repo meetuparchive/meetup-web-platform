@@ -4,19 +4,32 @@ import fetch from 'isomorphic-fetch';
 import { ApolloProvider } from 'react-apollo';
 import { isServer } from '../util/isServer';
 
-const client = new ApolloClient({
-	ssrMode: isServer(),
-	name: 'mup-web',
-	cache: isServer()
-		? new InMemoryCache()
-		: new InMemoryCache().restore(window.__APOLLO_STATE__),
-	uri: 'https://api.meetup.com/gql',
-	credentials: 'include',
-	fetch,
-});
+let cachedClient;
+
+const getClient = () => {
+	if (!cachedClient || isServer()) {
+		const options = {
+			ssrMode: isServer(),
+			name: 'mup-web',
+			cache: isServer()
+				? new InMemoryCache()
+				: new InMemoryCache().restore(window.__APOLLO_STATE__),
+			uri: 'https://api.meetup.com/gql',
+			credentials: 'include',
+			fetch,
+		};
+		if (!isServer()) {
+			// @ts-ignore
+			options.cache = new InMemoryCache().restore(window.__APOLLO_STATE__);
+		}
+		cachedClient = new ApolloClient(options);
+	}
+
+	return cachedClient;
+};
 
 const Provider = ({ children }) => (
-	<ApolloProvider client={client}>{children}</ApolloProvider>
+	<ApolloProvider client={getClient()}>{children}</ApolloProvider>
 );
 
 export default Provider;
