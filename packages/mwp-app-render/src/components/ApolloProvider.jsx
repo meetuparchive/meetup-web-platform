@@ -2,23 +2,24 @@ import React from 'react';
 import ApolloClient, { InMemoryCache } from 'apollo-boost';
 import fetch from 'isomorphic-fetch';
 import { ApolloProvider } from 'react-apollo';
-import { isServer } from '../util/isServer';
+
+const GRAPHQL_ENDPOINT = process.env.GRAPHQL_ENDPOINT || 'https://api.meetup.com/gql';
 
 let cachedClient;
 
-const getClient = () => {
-	if (!cachedClient || isServer()) {
+const getClient = isServer => {
+	if (!cachedClient || isServer) {
 		const options = {
-			ssrMode: isServer(),
+			ssrMode: isServer,
 			name: 'mup-web',
-			cache: isServer()
+			cache: isServer
 				? new InMemoryCache()
 				: new InMemoryCache().restore(window.__APOLLO_STATE__),
-			uri: 'https://api.meetup.com/gql',
+			uri: GRAPHQL_ENDPOINT,
 			credentials: 'include',
 			fetch,
 		};
-		if (!isServer()) {
+		if (!isServer) {
 			// @ts-ignore
 			options.cache = new InMemoryCache().restore(window.__APOLLO_STATE__);
 		}
@@ -28,8 +29,8 @@ const getClient = () => {
 	return cachedClient;
 };
 
-const Provider = ({ children }) => (
-	<ApolloProvider client={getClient()}>{children}</ApolloProvider>
+const Provider = ({ children, isServer }) => (
+	<ApolloProvider client={getClient(isServer)}>{children}</ApolloProvider>
 );
 
 export default Provider;

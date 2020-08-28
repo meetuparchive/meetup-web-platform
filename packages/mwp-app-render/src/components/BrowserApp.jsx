@@ -18,7 +18,7 @@ class BrowserApp extends React.Component {
 		return (
 			<BrowserRouter basename={appContext.basename}>
 				<BrowserCookieProvider>
-					<ApolloProvider>
+					<ApolloProvider isServer={false}>
 						<PlatformApp
 							appContext={appContext}
 							store={store}

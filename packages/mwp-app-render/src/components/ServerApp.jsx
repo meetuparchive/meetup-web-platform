@@ -23,7 +23,7 @@ class ServerApp extends React.Component {
 				context={routerContext}
 			>
 				<HapiCookieProvider request={request} h={h}>
-					<ApolloProvider>
+					<ApolloProvider isServer>
 						<PlatformApp
 							appContext={appContext}
 							store={store}
