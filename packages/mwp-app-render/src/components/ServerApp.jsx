@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import StaticRouter from 'react-router-dom/StaticRouter';
 import HapiCookieProvider from '@meetup/mwp-cookie/lib/HapiCookieProvider';
 import PlatformApp from './shared/PlatformApp';
+import ApolloProvider from './ApolloProvider';
 
 /**
  * A simple component to wrap the base PlatformApp with a StaticRouter
@@ -22,11 +23,13 @@ class ServerApp extends React.Component {
 				context={routerContext}
 			>
 				<HapiCookieProvider request={request} h={h}>
-					<PlatformApp
-						appContext={appContext}
-						store={store}
-						routes={routes}
-					/>
+					<ApolloProvider>
+						<PlatformApp
+							appContext={appContext}
+							store={store}
+							routes={routes}
+						/>
+					</ApolloProvider>
 				</HapiCookieProvider>
 			</StaticRouter>
 		);
