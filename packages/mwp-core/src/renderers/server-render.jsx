@@ -155,7 +155,7 @@ const getRouterRenderer = async ({
 	store,
 	scripts,
 	cssLinks,
-}): RenderResult => {
+}): Promise<RenderResult> => {
 	// pre-render the app-specific markup, this is the string of markup that will
 	// be managed by React on the client.
 	//
