@@ -1,4 +1,4 @@
-import { getRedirect } from './server-render';
+import getRedirect from './getRedirect';
 
 describe('getRedirect', () => {
 	test('does nothing if url is empty', () => {

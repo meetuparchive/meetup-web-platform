@@ -24,15 +24,19 @@ exports[`ServerApp exists 1`] = `
       }
     }
   >
-    <PlatformApp
-      appContext={
-        Object {
-          "basename": "",
+    <Component
+      isServer={true}
+    >
+      <PlatformApp
+        appContext={
+          Object {
+            "basename": "",
+          }
         }
-      }
-      routes={Array []}
-      store={Object {}}
-    />
+        routes={Array []}
+        store={Object {}}
+      />
+    </Component>
   </HapiCookieProvider>
 </StaticRouter>
 `;
