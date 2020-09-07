@@ -1,8 +1,8 @@
 // @flow
 import type { Reducer } from 'redux';
 import React from 'react';
-import ReactDOMServer from 'react-dom/server';
 import Helmet from 'react-helmet';
+import { renderToStringWithData } from 'react-apollo';
 import MobileDetect from 'mobile-detect';
 import isBot from 'isbot';
 
@@ -21,9 +21,9 @@ import {
 	parseSiftSessionCookie,
 } from '../util/cookieUtils';
 import { getLaunchDarklyUser } from '../util/launchDarkly';
+import getRedirect from '../util/getRedirect';
 
 const DOCTYPE = '<!DOCTYPE html>';
-const DUMMY_DOMAIN = 'http://mwp-dummy-domain.com';
 
 /**
  * An async module that renders the full app markup for a particular URL/location
@@ -33,25 +33,11 @@ const DUMMY_DOMAIN = 'http://mwp-dummy-domain.com';
  */
 
 function getHtml(el) {
-	const htmlMarkup = ReactDOMServer.renderToString(el);
-	return `${DOCTYPE}${htmlMarkup}`;
-}
-
-export function getRedirect(context: { url?: string, permanent?: boolean }) {
-	if (!context || !context.url) {
-		return;
-	}
-	// use `URL` to ensure valid character encoding (e.g. escaped emoji)
-	const url: string = context.url;
-	const isFragment = url.startsWith('/');
-	const urlToFormat = isFragment ? `${DUMMY_DOMAIN}${url}` : url;
-	const formattedUrl = new URL(urlToFormat).toString();
-	return {
-		redirect: {
-			url: formattedUrl.replace(DUMMY_DOMAIN, ''),
-			permanent: context.permanent,
-		},
-	};
+	// const htmlMarkup = ReactDOMServer.renderToString(el);
+	// return `${DOCTYPE}${htmlMarkup}`;
+	return renderToStringWithData(el).then(htmlMarkup => {
+		return `${DOCTYPE}${htmlMarkup}`;
+	});
 }
 
 /*
@@ -144,7 +130,7 @@ const getAppContext = (request: HapiRequest, enableServiceWorker: boolean) => {
  * HTML string and server response code, with optional cookies to write
  */
 
-const getRouterRenderer = ({
+const getRouterRenderer = async ({
 	request,
 	h,
 	appContext,
@@ -152,7 +138,7 @@ const getRouterRenderer = ({
 	store,
 	scripts,
 	cssLinks,
-}): RenderResult => {
+}): Promise<RenderResult> => {
 	// pre-render the app-specific markup, this is the string of markup that will
 	// be managed by React on the client.
 	//
@@ -161,10 +147,13 @@ const getRouterRenderer = ({
 	// `<head>` contents
 	const initialState = store.getState();
 	let appMarkup;
-	const routerContext: { url?: string, permanent?: boolean } = {};
+	const routerContext: {
+		url?: string,
+		permanent?: boolean,
+	} = {};
 
 	try {
-		appMarkup = ReactDOMServer.renderToString(
+		appMarkup = await renderToStringWithData(
 			<ServerApp
 				request={request}
 				h={h}
@@ -199,7 +188,7 @@ const getRouterRenderer = ({
 
 	// all the data for the full `<html>` element has been initialized by the app
 	// so go ahead and assemble the full response body
-	const result = getHtml(
+	const result = await getHtml(
 		<Dom
 			head={sideEffects.head}
 			initialState={initialState}
