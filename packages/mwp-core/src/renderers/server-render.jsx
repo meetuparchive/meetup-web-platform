@@ -21,9 +21,9 @@ import {
 	parseSiftSessionCookie,
 } from '../util/cookieUtils';
 import { getLaunchDarklyUser } from '../util/launchDarkly';
+import getRedirect from '../util/getRedirect';
 
 const DOCTYPE = '<!DOCTYPE html>';
-const DUMMY_DOMAIN = 'http://mwp-dummy-domain.com';
 
 /**
  * An async module that renders the full app markup for a particular URL/location
@@ -38,23 +38,6 @@ function getHtml(el) {
 	return renderToStringWithData(el).then(htmlMarkup => {
 		return `${DOCTYPE}${htmlMarkup}`;
 	});
-}
-
-export function getRedirect(context: { url?: string, permanent?: boolean }) {
-	if (!context || !context.url) {
-		return;
-	}
-	// use `URL` to ensure valid character encoding (e.g. escaped emoji)
-	const url: string = context.url;
-	const isFragment = url.startsWith('/');
-	const urlToFormat = isFragment ? `${DUMMY_DOMAIN}${url}` : url;
-	const formattedUrl = new URL(urlToFormat).toString();
-	return {
-		redirect: {
-			url: formattedUrl.replace(DUMMY_DOMAIN, ''),
-			permanent: context.permanent,
-		},
-	};
 }
 
 /*
