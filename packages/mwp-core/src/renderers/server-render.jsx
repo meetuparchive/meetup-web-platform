@@ -11,6 +11,7 @@ import { Forbidden, NotFound, Redirect, SERVER_RENDER } from 'mwp-router';
 import { getFindMatches, resolveAllRoutes } from 'mwp-router/lib/util';
 import { getServerCreateStore } from 'mwp-store/lib/server';
 import Dom from 'mwp-app-render/lib/components/Dom';
+import getClient from 'mwp-app-render/lib/util/getClient';
 import ServerApp from 'mwp-app-render/lib/components/ServerApp';
 import { parseMemberCookie } from 'mwp-core/lib/util/cookieUtils';
 import { getRemoteGeoLocation } from 'mwp-core/lib/util/requestUtils';
@@ -138,6 +139,7 @@ const getRouterRenderer = async ({
 	store,
 	scripts,
 	cssLinks,
+	client,
 }): Promise<RenderResult> => {
 	// pre-render the app-specific markup, this is the string of markup that will
 	// be managed by React on the client.
@@ -155,6 +157,7 @@ const getRouterRenderer = async ({
 	try {
 		appMarkup = await renderToStringWithData(
 			<ServerApp
+				client={client}
 				request={request}
 				h={h}
 				appContext={appContext}
@@ -240,6 +243,7 @@ const makeRenderer = (renderConfig: {
 			throw new Error('No client script assets specified');
 		}
 
+		const client = getClient(true);
 		const appContext = getAppContext(request, enableServiceWorker);
 
 		// create the store with populated `config`
@@ -320,6 +324,7 @@ const makeRenderer = (renderConfig: {
 							store,
 							scripts,
 							cssLinks,
+							client,
 						})
 					);
 			})
