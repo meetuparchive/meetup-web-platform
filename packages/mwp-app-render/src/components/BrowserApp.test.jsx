@@ -5,6 +5,9 @@ import BrowserApp from './BrowserApp';
 jest.mock('./ApolloProvider', () => {
 	return props => <div {...props} />;
 });
+jest.mock('../util/getClient', () => {
+	return () => ({});
+});
 
 // TODO: skipping test until browser test environment enabled
 describe.skip('BrowserApp', function() {

@@ -12,20 +12,18 @@ exports[`ServerApp exists 1`] = `
     }
   }
 >
-  <HapiCookieProvider
-    h={Object {}}
-    request={
-      Object {
-        "url": Object {
-          "hash": "",
-          "pathname": "/foo",
-          "search": "",
-        },
+  <Component>
+    <HapiCookieProvider
+      h={Object {}}
+      request={
+        Object {
+          "url": Object {
+            "hash": "",
+            "pathname": "/foo",
+            "search": "",
+          },
+        }
       }
-    }
-  >
-    <Component
-      isServer={true}
     >
       <PlatformApp
         appContext={
@@ -36,7 +34,7 @@ exports[`ServerApp exists 1`] = `
         routes={Array []}
         store={Object {}}
       />
-    </Component>
-  </HapiCookieProvider>
+    </HapiCookieProvider>
+  </Component>
 </StaticRouter>
 `;

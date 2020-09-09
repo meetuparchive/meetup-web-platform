@@ -10,7 +10,15 @@ import ApolloProvider from './ApolloProvider';
  */
 class ServerApp extends React.Component {
 	render() {
-		const { request, h, appContext, routerContext, store, routes } = this.props;
+		const {
+			request,
+			h,
+			appContext,
+			routerContext,
+			store,
+			routes,
+			client,
+		} = this.props;
 		const location = {
 			pathname: request.url.pathname,
 			search: request.url.search,
@@ -22,15 +30,15 @@ class ServerApp extends React.Component {
 				location={location}
 				context={routerContext}
 			>
-				<HapiCookieProvider request={request} h={h}>
-					<ApolloProvider isServer>
+				<ApolloProvider client={client}>
+					<HapiCookieProvider request={request} h={h}>
 						<PlatformApp
 							appContext={appContext}
 							store={store}
 							routes={routes}
 						/>
-					</ApolloProvider>
-				</HapiCookieProvider>
+					</HapiCookieProvider>
+				</ApolloProvider>
 			</StaticRouter>
 		);
 	}

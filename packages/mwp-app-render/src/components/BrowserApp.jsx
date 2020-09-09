@@ -5,10 +5,14 @@ import PlatformApp from './shared/PlatformApp';
 import initClickTracking from 'mwp-tracking-plugin/lib/util/browserInit';
 import BrowserCookieProvider from '@meetup/mwp-cookie/lib/BrowserCookieProvider';
 import ApolloProvider from './ApolloProvider';
+import getClient from '../util/getClient';
 
 /**
  * A simple component to wrap the base PlatformApp with the BrowserRouter
  */
+
+let client = getClient(false);
+
 class BrowserApp extends React.Component {
 	componentDidMount() {
 		initClickTracking();
@@ -18,7 +22,7 @@ class BrowserApp extends React.Component {
 		return (
 			<BrowserRouter basename={appContext.basename}>
 				<BrowserCookieProvider>
-					<ApolloProvider isServer={false}>
+					<ApolloProvider client={client}>
 						<PlatformApp
 							appContext={appContext}
 							store={store}
