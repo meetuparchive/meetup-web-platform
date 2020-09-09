@@ -1,3 +1,7 @@
+## [25.1]
+
+-   **Improved** add `SameSite` policy to click-track cookie
+
 ## [25.0]
 
 -   **Removed** Retire `mwp-csp-plugin`. All common security headers have been consolidated in Fastly.
