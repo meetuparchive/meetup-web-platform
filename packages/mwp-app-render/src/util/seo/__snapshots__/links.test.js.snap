@@ -31,13 +31,18 @@ Array [
 exports[`generateCanonicalUrlLinkTags should generate locale <link />s for all locales 1`] = `
 Array [
   <link
-    href="http://www.mock-base-url.com/mockroute"
-    hrefLang="en"
+    href="http://www.mock-base-url.com/de/mockroute"
+    hrefLang="de"
     rel="alternate"
   />,
   <link
     href="http://www.mock-base-url.com/de-DE/mockroute"
     hrefLang="de-DE"
+    rel="alternate"
+  />,
+  <link
+    href="http://www.mock-base-url.com/mockroute"
+    hrefLang="en"
     rel="alternate"
   />,
   <link
@@ -56,8 +61,18 @@ Array [
     rel="alternate"
   />,
   <link
+    href="http://www.mock-base-url.com/fr/mockroute"
+    hrefLang="fr"
+    rel="alternate"
+  />,
+  <link
     href="http://www.mock-base-url.com/fr-FR/mockroute"
     hrefLang="fr-FR"
+    rel="alternate"
+  />,
+  <link
+    href="http://www.mock-base-url.com/it/mockroute"
+    hrefLang="it"
     rel="alternate"
   />,
   <link
@@ -66,8 +81,18 @@ Array [
     rel="alternate"
   />,
   <link
+    href="http://www.mock-base-url.com/ja/mockroute"
+    hrefLang="ja"
+    rel="alternate"
+  />,
+  <link
     href="http://www.mock-base-url.com/ja-JP/mockroute"
     hrefLang="ja-JP"
+    rel="alternate"
+  />,
+  <link
+    href="http://www.mock-base-url.com/ko/mockroute"
+    hrefLang="ko"
     rel="alternate"
   />,
   <link
@@ -76,13 +101,18 @@ Array [
     rel="alternate"
   />,
   <link
+    href="http://www.mock-base-url.com/nl/mockroute"
+    hrefLang="nl"
+    rel="alternate"
+  />,
+  <link
     href="http://www.mock-base-url.com/nl-NL/mockroute"
     hrefLang="nl-NL"
     rel="alternate"
   />,
   <link
-    href="http://www.mock-base-url.com/pt-BR/mockroute"
-    hrefLang="pt-BR"
+    href="http://www.mock-base-url.com/pl/mockroute"
+    hrefLang="pl"
     rel="alternate"
   />,
   <link
@@ -91,13 +121,38 @@ Array [
     rel="alternate"
   />,
   <link
+    href="http://www.mock-base-url.com/pt/mockroute"
+    hrefLang="pt"
+    rel="alternate"
+  />,
+  <link
+    href="http://www.mock-base-url.com/pt-BR/mockroute"
+    hrefLang="pt-BR"
+    rel="alternate"
+  />,
+  <link
+    href="http://www.mock-base-url.com/ru/mockroute"
+    hrefLang="ru"
+    rel="alternate"
+  />,
+  <link
     href="http://www.mock-base-url.com/ru-RU/mockroute"
     hrefLang="ru-RU"
     rel="alternate"
   />,
   <link
+    href="http://www.mock-base-url.com/th/mockroute"
+    hrefLang="th"
+    rel="alternate"
+  />,
+  <link
     href="http://www.mock-base-url.com/th-TH/mockroute"
     hrefLang="th-TH"
+    rel="alternate"
+  />,
+  <link
+    href="http://www.mock-base-url.com/tr/mockroute"
+    hrefLang="tr"
     rel="alternate"
   />,
   <link
