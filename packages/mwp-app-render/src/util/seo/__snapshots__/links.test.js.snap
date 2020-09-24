@@ -31,23 +31,18 @@ Array [
 exports[`generateCanonicalUrlLinkTags should generate locale <link />s for all locales 1`] = `
 Array [
   <link
-    href="http://www.mock-base-url.com/mockroute"
-    hrefLang="en"
-    rel="alternate"
-  />,
-  <link
     href="http://www.mock-base-url.com/de-DE/mockroute"
     hrefLang="de-DE"
     rel="alternate"
   />,
   <link
-    href="http://www.mock-base-url.com/en-AU/mockroute"
-    hrefLang="en-AU"
+    href="http://www.mock-base-url.com/mockroute"
+    hrefLang="en"
     rel="alternate"
   />,
   <link
-    href="http://www.mock-base-url.com/es/mockroute"
-    hrefLang="es"
+    href="http://www.mock-base-url.com/en-AU/mockroute"
+    hrefLang="en-AU"
     rel="alternate"
   />,
   <link
@@ -81,13 +76,13 @@ Array [
     rel="alternate"
   />,
   <link
-    href="http://www.mock-base-url.com/pt-BR/mockroute"
-    hrefLang="pt-BR"
+    href="http://www.mock-base-url.com/pl-PL/mockroute"
+    hrefLang="pl-PL"
     rel="alternate"
   />,
   <link
-    href="http://www.mock-base-url.com/pl-PL/mockroute"
-    hrefLang="pl-PL"
+    href="http://www.mock-base-url.com/pt-BR/mockroute"
+    hrefLang="pt-BR"
     rel="alternate"
   />,
   <link
