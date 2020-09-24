@@ -1,6 +1,6 @@
 module.exports = [
-	'en-US',
 	'de-DE',
+	'en-US',
 	'en-AU',
 	'es',
 	'es-ES',
@@ -9,8 +9,8 @@ module.exports = [
 	'ja-JP',
 	'ko-KR',
 	'nl-NL',
-	'pt-BR',
 	'pl-PL',
+	'pt-BR',
 	'ru-RU',
 	'th-TH',
 	'tr-TR',
