@@ -170,12 +170,6 @@ exports[`SEOHead imageUrl applies meet script logo to og:image, twitter:image an
     more="mock"
   />
   <link
-    href="https://baseUrl.com/de/mock/preview/route"
-    hrefLang="de"
-    key="de"
-    rel="alternate"
-  />
-  <link
     href="https://baseUrl.com/de-DE/mock/preview/route"
     hrefLang="de-DE"
     key="de-DE"
@@ -194,21 +188,9 @@ exports[`SEOHead imageUrl applies meet script logo to og:image, twitter:image an
     rel="alternate"
   />
   <link
-    href="https://baseUrl.com/es/mock/preview/route"
-    hrefLang="es"
-    key="es"
-    rel="alternate"
-  />
-  <link
     href="https://baseUrl.com/es-ES/mock/preview/route"
     hrefLang="es-ES"
     key="es-ES"
-    rel="alternate"
-  />
-  <link
-    href="https://baseUrl.com/fr/mock/preview/route"
-    hrefLang="fr"
-    key="fr"
     rel="alternate"
   />
   <link
@@ -218,21 +200,9 @@ exports[`SEOHead imageUrl applies meet script logo to og:image, twitter:image an
     rel="alternate"
   />
   <link
-    href="https://baseUrl.com/it/mock/preview/route"
-    hrefLang="it"
-    key="it"
-    rel="alternate"
-  />
-  <link
     href="https://baseUrl.com/it-IT/mock/preview/route"
     hrefLang="it-IT"
     key="it-IT"
-    rel="alternate"
-  />
-  <link
-    href="https://baseUrl.com/ja/mock/preview/route"
-    hrefLang="ja"
-    key="ja"
     rel="alternate"
   />
   <link
@@ -242,21 +212,9 @@ exports[`SEOHead imageUrl applies meet script logo to og:image, twitter:image an
     rel="alternate"
   />
   <link
-    href="https://baseUrl.com/ko/mock/preview/route"
-    hrefLang="ko"
-    key="ko"
-    rel="alternate"
-  />
-  <link
     href="https://baseUrl.com/ko-KR/mock/preview/route"
     hrefLang="ko-KR"
     key="ko-KR"
-    rel="alternate"
-  />
-  <link
-    href="https://baseUrl.com/nl/mock/preview/route"
-    hrefLang="nl"
-    key="nl"
     rel="alternate"
   />
   <link
@@ -266,21 +224,9 @@ exports[`SEOHead imageUrl applies meet script logo to og:image, twitter:image an
     rel="alternate"
   />
   <link
-    href="https://baseUrl.com/pl/mock/preview/route"
-    hrefLang="pl"
-    key="pl"
-    rel="alternate"
-  />
-  <link
     href="https://baseUrl.com/pl-PL/mock/preview/route"
     hrefLang="pl-PL"
     key="pl-PL"
-    rel="alternate"
-  />
-  <link
-    href="https://baseUrl.com/pt/mock/preview/route"
-    hrefLang="pt"
-    key="pt"
     rel="alternate"
   />
   <link
@@ -290,33 +236,15 @@ exports[`SEOHead imageUrl applies meet script logo to og:image, twitter:image an
     rel="alternate"
   />
   <link
-    href="https://baseUrl.com/ru/mock/preview/route"
-    hrefLang="ru"
-    key="ru"
-    rel="alternate"
-  />
-  <link
     href="https://baseUrl.com/ru-RU/mock/preview/route"
     hrefLang="ru-RU"
     key="ru-RU"
     rel="alternate"
   />
   <link
-    href="https://baseUrl.com/th/mock/preview/route"
-    hrefLang="th"
-    key="th"
-    rel="alternate"
-  />
-  <link
     href="https://baseUrl.com/th-TH/mock/preview/route"
     hrefLang="th-TH"
     key="th-TH"
-    rel="alternate"
-  />
-  <link
-    href="https://baseUrl.com/tr/mock/preview/route"
-    hrefLang="tr"
-    key="tr"
     rel="alternate"
   />
   <link
@@ -513,12 +441,6 @@ exports[`SEOHead renders component markup 1`] = `
     more="mock"
   />
   <link
-    href="https://baseUrl.com/de/mock/preview/route"
-    hrefLang="de"
-    key="de"
-    rel="alternate"
-  />
-  <link
     href="https://baseUrl.com/de-DE/mock/preview/route"
     hrefLang="de-DE"
     key="de-DE"
@@ -537,21 +459,9 @@ exports[`SEOHead renders component markup 1`] = `
     rel="alternate"
   />
   <link
-    href="https://baseUrl.com/es/mock/preview/route"
-    hrefLang="es"
-    key="es"
-    rel="alternate"
-  />
-  <link
     href="https://baseUrl.com/es-ES/mock/preview/route"
     hrefLang="es-ES"
     key="es-ES"
-    rel="alternate"
-  />
-  <link
-    href="https://baseUrl.com/fr/mock/preview/route"
-    hrefLang="fr"
-    key="fr"
     rel="alternate"
   />
   <link
@@ -561,21 +471,9 @@ exports[`SEOHead renders component markup 1`] = `
     rel="alternate"
   />
   <link
-    href="https://baseUrl.com/it/mock/preview/route"
-    hrefLang="it"
-    key="it"
-    rel="alternate"
-  />
-  <link
     href="https://baseUrl.com/it-IT/mock/preview/route"
     hrefLang="it-IT"
     key="it-IT"
-    rel="alternate"
-  />
-  <link
-    href="https://baseUrl.com/ja/mock/preview/route"
-    hrefLang="ja"
-    key="ja"
     rel="alternate"
   />
   <link
@@ -585,21 +483,9 @@ exports[`SEOHead renders component markup 1`] = `
     rel="alternate"
   />
   <link
-    href="https://baseUrl.com/ko/mock/preview/route"
-    hrefLang="ko"
-    key="ko"
-    rel="alternate"
-  />
-  <link
     href="https://baseUrl.com/ko-KR/mock/preview/route"
     hrefLang="ko-KR"
     key="ko-KR"
-    rel="alternate"
-  />
-  <link
-    href="https://baseUrl.com/nl/mock/preview/route"
-    hrefLang="nl"
-    key="nl"
     rel="alternate"
   />
   <link
@@ -609,21 +495,9 @@ exports[`SEOHead renders component markup 1`] = `
     rel="alternate"
   />
   <link
-    href="https://baseUrl.com/pl/mock/preview/route"
-    hrefLang="pl"
-    key="pl"
-    rel="alternate"
-  />
-  <link
     href="https://baseUrl.com/pl-PL/mock/preview/route"
     hrefLang="pl-PL"
     key="pl-PL"
-    rel="alternate"
-  />
-  <link
-    href="https://baseUrl.com/pt/mock/preview/route"
-    hrefLang="pt"
-    key="pt"
     rel="alternate"
   />
   <link
@@ -633,33 +507,15 @@ exports[`SEOHead renders component markup 1`] = `
     rel="alternate"
   />
   <link
-    href="https://baseUrl.com/ru/mock/preview/route"
-    hrefLang="ru"
-    key="ru"
-    rel="alternate"
-  />
-  <link
     href="https://baseUrl.com/ru-RU/mock/preview/route"
     hrefLang="ru-RU"
     key="ru-RU"
     rel="alternate"
   />
   <link
-    href="https://baseUrl.com/th/mock/preview/route"
-    hrefLang="th"
-    key="th"
-    rel="alternate"
-  />
-  <link
     href="https://baseUrl.com/th-TH/mock/preview/route"
     hrefLang="th-TH"
     key="th-TH"
-    rel="alternate"
-  />
-  <link
-    href="https://baseUrl.com/tr/mock/preview/route"
-    hrefLang="tr"
-    key="tr"
     rel="alternate"
   />
   <link
@@ -877,12 +733,6 @@ exports[`SEOHead strips out undefined json values 1`] = `
     more="mock"
   />
   <link
-    href="https://baseUrl.com/de/mock/preview/route"
-    hrefLang="de"
-    key="de"
-    rel="alternate"
-  />
-  <link
     href="https://baseUrl.com/de-DE/mock/preview/route"
     hrefLang="de-DE"
     key="de-DE"
@@ -901,21 +751,9 @@ exports[`SEOHead strips out undefined json values 1`] = `
     rel="alternate"
   />
   <link
-    href="https://baseUrl.com/es/mock/preview/route"
-    hrefLang="es"
-    key="es"
-    rel="alternate"
-  />
-  <link
     href="https://baseUrl.com/es-ES/mock/preview/route"
     hrefLang="es-ES"
     key="es-ES"
-    rel="alternate"
-  />
-  <link
-    href="https://baseUrl.com/fr/mock/preview/route"
-    hrefLang="fr"
-    key="fr"
     rel="alternate"
   />
   <link
@@ -925,21 +763,9 @@ exports[`SEOHead strips out undefined json values 1`] = `
     rel="alternate"
   />
   <link
-    href="https://baseUrl.com/it/mock/preview/route"
-    hrefLang="it"
-    key="it"
-    rel="alternate"
-  />
-  <link
     href="https://baseUrl.com/it-IT/mock/preview/route"
     hrefLang="it-IT"
     key="it-IT"
-    rel="alternate"
-  />
-  <link
-    href="https://baseUrl.com/ja/mock/preview/route"
-    hrefLang="ja"
-    key="ja"
     rel="alternate"
   />
   <link
@@ -949,21 +775,9 @@ exports[`SEOHead strips out undefined json values 1`] = `
     rel="alternate"
   />
   <link
-    href="https://baseUrl.com/ko/mock/preview/route"
-    hrefLang="ko"
-    key="ko"
-    rel="alternate"
-  />
-  <link
     href="https://baseUrl.com/ko-KR/mock/preview/route"
     hrefLang="ko-KR"
     key="ko-KR"
-    rel="alternate"
-  />
-  <link
-    href="https://baseUrl.com/nl/mock/preview/route"
-    hrefLang="nl"
-    key="nl"
     rel="alternate"
   />
   <link
@@ -973,21 +787,9 @@ exports[`SEOHead strips out undefined json values 1`] = `
     rel="alternate"
   />
   <link
-    href="https://baseUrl.com/pl/mock/preview/route"
-    hrefLang="pl"
-    key="pl"
-    rel="alternate"
-  />
-  <link
     href="https://baseUrl.com/pl-PL/mock/preview/route"
     hrefLang="pl-PL"
     key="pl-PL"
-    rel="alternate"
-  />
-  <link
-    href="https://baseUrl.com/pt/mock/preview/route"
-    hrefLang="pt"
-    key="pt"
     rel="alternate"
   />
   <link
@@ -997,33 +799,15 @@ exports[`SEOHead strips out undefined json values 1`] = `
     rel="alternate"
   />
   <link
-    href="https://baseUrl.com/ru/mock/preview/route"
-    hrefLang="ru"
-    key="ru"
-    rel="alternate"
-  />
-  <link
     href="https://baseUrl.com/ru-RU/mock/preview/route"
     hrefLang="ru-RU"
     key="ru-RU"
     rel="alternate"
   />
   <link
-    href="https://baseUrl.com/th/mock/preview/route"
-    hrefLang="th"
-    key="th"
-    rel="alternate"
-  />
-  <link
     href="https://baseUrl.com/th-TH/mock/preview/route"
     hrefLang="th-TH"
     key="th-TH"
-    rel="alternate"
-  />
-  <link
-    href="https://baseUrl.com/tr/mock/preview/route"
-    hrefLang="tr"
-    key="tr"
     rel="alternate"
   />
   <link
