@@ -46,6 +46,11 @@ Array [
     rel="alternate"
   />,
   <link
+    href="http://www.mock-base-url.com/es/mockroute"
+    hrefLang="es"
+    rel="alternate"
+  />,
+  <link
     href="http://www.mock-base-url.com/es-ES/mockroute"
     hrefLang="es-ES"
     rel="alternate"

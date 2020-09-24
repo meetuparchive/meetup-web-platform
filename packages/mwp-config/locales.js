@@ -2,6 +2,7 @@ module.exports = [
 	'de-DE',
 	'en-US',
 	'en-AU',
+	'es',
 	'es-ES',
 	'fr-FR',
 	'it-IT',

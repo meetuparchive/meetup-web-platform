@@ -1,5 +1,5 @@
 import localizedLanguageMap from './localizedLanguageMap';
-import { locales, localesShortNames } from 'mwp-config';
+import { locales, additionalLocales } from 'mwp-config';
 
 describe('localizedLanguageMap', () => {
 	it('has a localized name for every item in `mwp-config/locales`', () => {
@@ -7,8 +7,8 @@ describe('localizedLanguageMap', () => {
 			expect(Object.keys(localizedLanguageMap).includes(locale)).toBeTruthy();
 		});
 	});
-	it('has a localized name for every item in `mwp-config/localesShortNames`', () => {
-		localesShortNames.forEach(locale => {
+	it('has a localized name for every item in `mwp-config/additionalLocales`', () => {
+		additionalLocales.forEach(locale => {
 			expect(Object.keys(localizedLanguageMap).includes(locale)).toBeTruthy();
 		});
 	});

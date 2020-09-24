@@ -188,6 +188,12 @@ exports[`SEOHead imageUrl applies meet script logo to og:image, twitter:image an
     rel="alternate"
   />
   <link
+    href="https://baseUrl.com/es/mock/preview/route"
+    hrefLang="es"
+    key="es"
+    rel="alternate"
+  />
+  <link
     href="https://baseUrl.com/es-ES/mock/preview/route"
     hrefLang="es-ES"
     key="es-ES"
@@ -456,6 +462,12 @@ exports[`SEOHead renders component markup 1`] = `
     href="https://baseUrl.com/en-AU/mock/preview/route"
     hrefLang="en-AU"
     key="en-AU"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/es/mock/preview/route"
+    hrefLang="es"
+    key="es"
     rel="alternate"
   />
   <link
@@ -748,6 +760,12 @@ exports[`SEOHead strips out undefined json values 1`] = `
     href="https://baseUrl.com/en-AU/mock/preview/route"
     hrefLang="en-AU"
     key="en-AU"
+    rel="alternate"
+  />
+  <link
+    href="https://baseUrl.com/es/mock/preview/route"
+    hrefLang="es"
+    key="es"
     rel="alternate"
   />
   <link

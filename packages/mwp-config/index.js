@@ -1,7 +1,7 @@
 module.exports = {
 	env: require('./env'),
 	locales: require('./locales'),
-	localesShortNames: require('./localesShortNames'),
+	additionalLocales: require('./additionalLocales'),
 	localesSecondary: require('./localesSecondary'),
 	package: require('./package'),
 	paths: require('./paths'),
