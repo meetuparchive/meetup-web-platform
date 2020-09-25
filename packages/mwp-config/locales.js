@@ -1,6 +1,6 @@
 module.exports = [
-	'de-DE',
 	'en-US',
+	'de-DE',
 	'en-AU',
 	'es',
 	'es-ES',
