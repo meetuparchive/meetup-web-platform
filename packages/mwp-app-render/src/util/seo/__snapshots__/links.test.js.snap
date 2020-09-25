@@ -31,13 +31,13 @@ Array [
 exports[`generateCanonicalUrlLinkTags should generate locale <link />s for all locales 1`] = `
 Array [
   <link
-    href="http://www.mock-base-url.com/de-DE/mockroute"
-    hrefLang="de-DE"
+    href="http://www.mock-base-url.com/mockroute"
+    hrefLang="en"
     rel="alternate"
   />,
   <link
-    href="http://www.mock-base-url.com/mockroute"
-    hrefLang="en"
+    href="http://www.mock-base-url.com/de-DE/mockroute"
+    hrefLang="de-DE"
     rel="alternate"
   />,
   <link
