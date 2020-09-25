@@ -1,5 +1,6 @@
 import React from 'react';
 import locales from 'mwp-config/locales';
+import seoLocales from 'mwp-config/seoLocales';
 
 /**
  * Generates array of React.element's of <link />'s containing canonical + locale urls for the path provided
@@ -24,7 +25,7 @@ export const generateCanonicalUrl = (baseUrl, localeCode, route) => {
  * @return {Array}  array of React.element's
  */
 export const generateCanonicalUrlLinkTags = (baseUrl, localeCode, route) => {
-	const localeLinks = locales.map(locale => (
+	const localeLinks = [...locales, ...seoLocales].map(locale => (
 		<link
 			rel="alternate"
 			hrefLang={locale == 'en-US' ? 'en' : locale}
