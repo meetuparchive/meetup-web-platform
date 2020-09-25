@@ -1,3 +1,5 @@
+// Order here is important for dev environment. 'en-US' should go first.
+// It's used in mwp-cli in addLocaleOption.js
 module.exports = [
 	'en-US',
 	'de-DE',
