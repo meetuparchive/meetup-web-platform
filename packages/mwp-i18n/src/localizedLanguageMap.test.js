@@ -1,14 +1,9 @@
 import localizedLanguageMap from './localizedLanguageMap';
-import { locales, seoLocales } from 'mwp-config';
+import { locales } from 'mwp-config';
 
 describe('localizedLanguageMap', () => {
 	it('has a localized name for every item in `mwp-config/locales`', () => {
 		locales.forEach(locale => {
-			expect(Object.keys(localizedLanguageMap).includes(locale)).toBeTruthy();
-		});
-	});
-	it('has a localized name for every item in `mwp-config/seoLocales`', () => {
-		seoLocales.forEach(locale => {
 			expect(Object.keys(localizedLanguageMap).includes(locale)).toBeTruthy();
 		});
 	});
