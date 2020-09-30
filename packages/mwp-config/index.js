@@ -1,7 +1,6 @@
 module.exports = {
 	env: require('./env'),
 	locales: require('./locales'),
-	seoLocales: require('./seoLocales'),
 	localesSecondary: require('./localesSecondary'),
 	package: require('./package'),
 	paths: require('./paths'),
