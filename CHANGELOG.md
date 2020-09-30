@@ -1,3 +1,7 @@
+## [25.2]
+
+-   **Improved** upgraded node to v10.22.1
+
 ## [25.1]
 
 -   **Improved** add `SameSite` policy to click-track cookie
