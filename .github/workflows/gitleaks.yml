@@ -1,0 +1,19 @@
+name: gitleaks
+
+on:
+  push:
+    branches:
+      - '175067395-eval-gitleaks'
+  # schedule:
+  #   # every Tuesday noon (utc time)
+  #   - cron:  '0 12 * * 0'
+
+jobs:
+  gitleaks:
+    runs-on: ubuntu-latest
+    steps:
+      # intentionally using checkout v1 action in here
+      # see doc, https://github.com/marketplace/actions/gitleaks
+      - uses: actions/checkout@v1
+      - name: gitleaks-action
+        uses: zricethezav/gitleaks-action@master
