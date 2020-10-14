@@ -3,7 +3,7 @@ import AWS from 'aws-sdk';
 import LaunchDarkly from 'launchdarkly-node-server-sdk';
 import getRoute from './route';
 
-function fetchLaunchDarklySdkKey() {
+function fetchLaunchDarklySdkKey(): Promise<string> {
 	const secretsManager = new AWS.SecretsManager({ region: 'us-east-1' });
 
 	return secretsManager
@@ -19,6 +19,8 @@ function fetchLaunchDarklySdkKey() {
 // Only fetch from the param store once, wait for the promise to resolve in the reigster fn
 const ldSdkKeyPromise = fetchLaunchDarklySdkKey();
 
+console.log('Fetching SDK key from AWS')
+
 /*
  * The server app route plugin - this applies a wildcard catch-all route that
  * will call the server app rendering function for the correct request language.
@@ -33,6 +35,7 @@ export function register(
 	server.route(getRoute(options.languageRenderers));
 
 	return ldSdkKeyPromise.then(launchDarklySdkKey => {
+		console.log(`Using fetched key ${launchDarklySdkKey.substring(0,5)}`)
 		const ldClient = LaunchDarkly.init(options.ldkey || launchDarklySdkKey, {
 			offline: process.env.NODE_ENV === 'test',
 		});
