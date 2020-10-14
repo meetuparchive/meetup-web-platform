@@ -1,25 +1,8 @@
 // @flow
-import AWS from 'aws-sdk';
 import LaunchDarkly from 'launchdarkly-node-server-sdk';
+
 import getRoute from './route';
-
-function fetchLaunchDarklySdkKey(): Promise<string> {
-	const secretsManager = new AWS.SecretsManager({ region: 'us-east-1' });
-
-	return secretsManager
-		.getSecretValue({ SecretId: 'LaunchDarkly' })
-		.promise()
-		.then(({ SecretString }) => {
-			return SecretString === undefined
-				? ''
-				: JSON.parse(SecretString).apiAccessToken;
-		});
-}
-
-// Only fetch from the param store once, wait for the promise to resolve in the reigster fn
-const ldSdkKeyPromise = fetchLaunchDarklySdkKey();
-
-console.log('Fetching SDK key from AWS')
+import { fetchLaunchDarklySdkKey } from './util/secretsHelper';
 
 /*
  * The server app route plugin - this applies a wildcard catch-all route that
@@ -34,11 +17,12 @@ export function register(
 ): Promise<any> {
 	server.route(getRoute(options.languageRenderers));
 
-	return ldSdkKeyPromise.then(launchDarklySdkKey => {
-		console.log(`Using fetched key ${launchDarklySdkKey.substring(0,5)}`)
+	return fetchLaunchDarklySdkKey().then(launchDarklySdkKey => {
+		console.log(`Using fetched key ${launchDarklySdkKey.substring(0, 5)}`);
 		const ldClient = LaunchDarkly.init(options.ldkey || launchDarklySdkKey, {
 			offline: process.env.NODE_ENV === 'test',
 		});
+
 		server.expose('getFlags', (user: LaunchDarklyUser) => {
 			return ldClient.allFlagsState(user).then(
 				state => state.allValues(),
