@@ -5,7 +5,7 @@ const secretsManager = new AWS.SecretsManager({ region: 'us-east-1' });
 
 export function fetchLaunchDarklySdkKey(): Promise<string> {
 	return secretsManager
-		.getSecretValue({ SecretId: 'LaunchDarkly' })
+		.getSecretValue({ SecretId: 'LaunchDarkly-fail' })
 		.promise()
 		.then(({ SecretString }) => {
 			return SecretString === undefined
