@@ -31,7 +31,13 @@ export function register(
 				'The LaunchDarkly key may not have resolved properly.  Double check that it is in the SecretsManager, has a name of LaunchDarkly and a key of "apiAccessToken"'
 			);
 
-			return {}
+			server.expose('getFlags', (user: LaunchDarklyUser) => {
+				server.app.logger.error({
+					error,
+					member: user,
+				});
+				return {}; // return empty flags on error
+			});
 		}
 
 		server.expose('getFlags', (user: LaunchDarklyUser) => {
