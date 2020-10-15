@@ -1,8 +1,8 @@
 // @flow
 import LaunchDarkly from 'launchdarkly-node-server-sdk';
-import getRoute from './route';
 
-const LAUNCH_DARKLY_SDK_KEY = 'sdk-86b4c7a9-a450-4527-a572-c80a603a200f';
+import getRoute from './route';
+import { fetchLaunchDarklySdkKey } from './util/secretsHelper';
 
 /*
  * The server app route plugin - this applies a wildcard catch-all route that
@@ -17,28 +17,40 @@ export function register(
 ): Promise<any> {
 	server.route(getRoute(options.languageRenderers));
 
-	const ldClient = LaunchDarkly.init(options.ldkey || LAUNCH_DARKLY_SDK_KEY, {
-		offline: process.env.NODE_ENV === 'test',
-	});
-	server.expose('getFlags', (user: LaunchDarklyUser) => {
-		return ldClient.allFlagsState(user).then(
-			state => state.allValues(),
-			err => {
-				server.app.logger.error({
-					err,
-					member: user,
-				});
-				return {}; // return empty flags on error
-			}
+	return fetchLaunchDarklySdkKey().then(launchDarklySdkKey => {
+		console.log(
+			`Using fetched key ${(launchDarklySdkKey || '').substring(0, 5)}`
 		);
-	});
-	// set up launchdarkly instance before continuing
-	server.events.on('stop', ldClient.close);
 
-	// https://github.com/launchdarkly/node-client/issues/96
-	// use waitForInitialization to catch launch darkly failures
-	return ldClient.waitForInitialization().catch(error => {
-		console.error(error);
+		const ldClient = LaunchDarkly.init(options.ldkey || launchDarklySdkKey, {
+			offline: process.env.NODE_ENV === 'test',
+		});
+
+		server.expose('getFlags', (user: LaunchDarklyUser) => {
+			return ldClient.allFlagsState(user).then(
+				state => state.allValues(),
+				err => {
+					server.app.logger.error({
+						err,
+						member: user,
+					});
+					return {}; // return empty flags on error
+				}
+			);
+		});
+
+		// set up launchdarkly instance before continuing
+		server.events.on('stop', ldClient.close);
+
+		// https://github.com/launchdarkly/node-client/issues/96
+		// use waitForInitialization to catch launch darkly failures
+		return ldClient.waitForInitialization().catch(error => {
+			console.error(
+				'The LaunchDarkly key may not have resolved properly.  Double check that it is in the SecretsManager, has a name of LaunchDarkly and a key of "apiAccessToken"'
+			);
+			console.error(error);
+			return {}; // return empty flags on connection error
+		});
 	});
 }
 
