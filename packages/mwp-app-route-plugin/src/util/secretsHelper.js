@@ -12,6 +12,7 @@ export function fetchLaunchDarklySdkKey(): Promise<string> {
 				? ''
 				: JSON.parse(SecretString).apiAccessToken;
 		}).catch(error => {
-            return '';
+
+            return undefined;
         });
 }
