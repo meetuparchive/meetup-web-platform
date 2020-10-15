@@ -18,7 +18,9 @@ export function register(
 	server.route(getRoute(options.languageRenderers));
 
 	return fetchLaunchDarklySdkKey().then(launchDarklySdkKey => {
-		console.log(`Using fetched key ${launchDarklySdkKey.substring(0, 5)}`);
+		console.log(
+			`Using fetched key ${(launchDarklySdkKey || '').substring(0, 5)}`
+		);
 
 		const ldClient = LaunchDarkly.init(options.ldkey || launchDarklySdkKey, {
 			offline: process.env.NODE_ENV === 'test',
@@ -43,7 +45,9 @@ export function register(
 		// https://github.com/launchdarkly/node-client/issues/96
 		// use waitForInitialization to catch launch darkly failures
 		return ldClient.waitForInitialization().catch(error => {
-			console.error('The LaunchDarkly key may not have resolved properly.  Double check that it is in the SecretsManager, has a name of LaunchDarkly and a key of "apiAccessToken"');
+			console.error(
+				'The LaunchDarkly key may not have resolved properly.  Double check that it is in the SecretsManager, has a name of LaunchDarkly and a key of "apiAccessToken"'
+			);
 			console.error(error);
 			return {}; // return empty flags on connection error
 		});
