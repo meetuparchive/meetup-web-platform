@@ -4,6 +4,7 @@ import AWS from 'aws-sdk';
 const secretsManager = new AWS.SecretsManager({ region: 'us-east-1' });
 
 export function fetchLaunchDarklySdkKey(): Promise<string> {
+	console.warn('Calling fetchLaunchDarklySdkKey');
 	return secretsManager
 		.getSecretValue({ SecretId: 'LaunchDarkly-error' })
 		.promise()
