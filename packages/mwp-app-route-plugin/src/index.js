@@ -1,8 +1,8 @@
 // @flow
 import LaunchDarkly from 'launchdarkly-node-server-sdk';
-import getRoute from './route';
 
-const LAUNCH_DARKLY_SDK_KEY = 'sdk-86b4c7a9-a450-4527-a572-c80a603a200f';
+import getRoute from './route';
+import { fetchLaunchDarklySdkKey } from './util/secretsHelper';
 
 /*
  * The server app route plugin - this applies a wildcard catch-all route that
@@ -17,29 +17,47 @@ export function register(
 ): Promise<any> {
 	server.route(getRoute(options.languageRenderers));
 
-	const ldClient = LaunchDarkly.init(options.ldkey || LAUNCH_DARKLY_SDK_KEY, {
-		offline: process.env.NODE_ENV === 'test',
-	});
-	server.expose('getFlags', (user: LaunchDarklyUser) => {
-		return ldClient.allFlagsState(user).then(
-			state => state.allValues(),
-			err => {
+	return fetchLaunchDarklySdkKey()
+		.then(launchDarklySdkKey => {
+			const ldClient = LaunchDarkly.init(options.ldkey || launchDarklySdkKey, {
+				offline: process.env.NODE_ENV === 'test',
+			});
+
+			server.expose('getFlags', (user: LaunchDarklyUser) => {
+				return ldClient.allFlagsState(user).then(
+					state => state.allValues(),
+					err => {
+						server.app.logger.error({
+							err,
+							member: user,
+						});
+						return {}; // return empty flags on error
+					}
+				);
+			});
+
+			// set up launchdarkly instance before continuing
+			if (ldClient.close) {
+				server.events.on('stop', ldClient.close);
+			}
+
+			// https://github.com/launchdarkly/node-client/issues/96
+			// use waitForInitialization to catch launch darkly failures
+			return ldClient.waitForInitialization().catch(error => {
+				console.error(error);
+				return {}; // return empty flags on error
+			});
+		})
+		.catch(error => {
+			console.error(error);
+			server.expose('getFlags', (user: LaunchDarklyUser) => {
 				server.app.logger.error({
-					err,
+					error,
 					member: user,
 				});
-				return {}; // return empty flags on error
-			}
-		);
-	});
-	// set up launchdarkly instance before continuing
-	server.events.on('stop', ldClient.close);
-
-	// https://github.com/launchdarkly/node-client/issues/96
-	// use waitForInitialization to catch launch darkly failures
-	return ldClient.waitForInitialization().catch(error => {
-		console.error(error);
-	});
+				return new Promise(resolve => resolve({})); // return empty flags on error
+			});
+		});
 }
 
 export const plugin = {
