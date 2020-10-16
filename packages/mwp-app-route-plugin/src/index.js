@@ -45,7 +45,7 @@ export function register(
 			// use waitForInitialization to catch launch darkly failures
 			return ldClient.waitForInitialization().catch(error => {
 				console.error(error);
-				return new Promise(resolve => resolve({})); // return empty flags on error
+				return {}; // return empty flags on error
 			});
 		})
 		.catch(error => {
