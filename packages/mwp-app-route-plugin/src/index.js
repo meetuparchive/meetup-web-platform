@@ -17,20 +17,39 @@ export function register(
 ): Promise<any> {
 	server.route(getRoute(options.languageRenderers));
 
-	return fetchLaunchDarklySdkKey().then(launchDarklySdkKey => {
-		console.log(
-			`Using fetched key ${(launchDarklySdkKey || '').substring(0, 5)}`
-		);
-		let ldClient;
-		try {
-			ldClient = LaunchDarkly.init(options.ldkey || launchDarklySdkKey, {
+	return fetchLaunchDarklySdkKey()
+		.then(launchDarklySdkKey => {
+			const ldClient = LaunchDarkly.init(options.ldkey || launchDarklySdkKey, {
 				offline: process.env.NODE_ENV === 'test',
 			});
-		} catch (error) {
-			console.error(
-				'The LaunchDarkly key may not have resolved properly.  Double check that it is in the SecretsManager, has a name of LaunchDarkly and a key of "apiAccessToken"'
-			);
 
+			server.expose('getFlags', (user: LaunchDarklyUser) => {
+				return ldClient.allFlagsState(user).then(
+					state => state.allValues(),
+					err => {
+						server.app.logger.error({
+							err,
+							member: user,
+						});
+						return {}; // return empty flags on error
+					}
+				);
+			});
+
+			// set up launchdarkly instance before continuing
+			if (ldClient.close) {
+				server.events.on('stop', ldClient.close);
+			}
+
+			// https://github.com/launchdarkly/node-client/issues/96
+			// use waitForInitialization to catch launch darkly failures
+			return ldClient.waitForInitialization().catch(error => {
+				console.error(error);
+				return new Promise(resolve => resolve({})); // return empty flags on error
+			});
+		})
+		.catch(error => {
+			console.error(error);
 			server.expose('getFlags', (user: LaunchDarklyUser) => {
 				server.app.logger.error({
 					error,
@@ -38,33 +57,7 @@ export function register(
 				});
 				return new Promise(resolve => resolve({})); // return empty flags on error
 			});
-		}
-
-		server.expose('getFlags', (user: LaunchDarklyUser) => {
-			return ldClient.allFlagsState(user).then(
-				state => state.allValues(),
-				err => {
-					server.app.logger.error({
-						err,
-						member: user,
-					});
-					return {}; // return empty flags on error
-				}
-			);
 		});
-
-		// set up launchdarkly instance before continuing
-		if (ldClient.close) {
-			server.events.on('stop', ldClient.close);
-		}
-
-		// https://github.com/launchdarkly/node-client/issues/96
-		// use waitForInitialization to catch launch darkly failures
-		return ldClient.waitForInitialization().catch(error => {
-			console.error(error);
-			return new Promise(resolve => resolve({})); // return empty flags on error
-		});
-	});
 }
 
 export const plugin = {
