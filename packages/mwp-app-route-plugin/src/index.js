@@ -48,7 +48,7 @@ export function register(
 			// use waitForInitialization to catch launch darkly failures
 			return ldClient.waitForInitialization().catch(error => {
 				console.error(error);
-				return {}; // return empty flags on connection error
+				return new Promise((resolve) => resolve({})); // return empty flags on error
 			});
 		} catch (error) {
 			console.error(
@@ -60,7 +60,7 @@ export function register(
 					error,
 					member: user,
 				});
-				return {}; // return empty flags on error
+				return new Promise((resolve) => resolve({})); // return empty flags on error
 			});
 		}
 	});
