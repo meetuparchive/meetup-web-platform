@@ -21,34 +21,10 @@ export function register(
 		console.log(
 			`Using fetched key ${(launchDarklySdkKey || '').substring(0, 5)}`
 		);
+		let ldClient;
 		try {
-			const ldClient = LaunchDarkly.init(options.ldkey || launchDarklySdkKey, {
+			ldClient = LaunchDarkly.init(options.ldkey || launchDarklySdkKey, {
 				offline: process.env.NODE_ENV === 'test',
-			});
-
-			server.expose('getFlags', (user: LaunchDarklyUser) => {
-				return ldClient.allFlagsState(user).then(
-					state => state.allValues(),
-					err => {
-						server.app.logger.error({
-							err,
-							member: user,
-						});
-						return {}; // return empty flags on error
-					}
-				);
-			});
-
-			// set up launchdarkly instance before continuing
-			if (ldClient.close) {
-				server.events.on('stop', ldClient.close);
-			}
-
-			// https://github.com/launchdarkly/node-client/issues/96
-			// use waitForInitialization to catch launch darkly failures
-			return ldClient.waitForInitialization().catch(error => {
-				console.error(error);
-				return new Promise((resolve) => resolve({})); // return empty flags on error
 			});
 		} catch (error) {
 			console.error(
@@ -60,9 +36,34 @@ export function register(
 					error,
 					member: user,
 				});
-				return new Promise((resolve) => resolve({})); // return empty flags on error
+				return new Promise(resolve => resolve({})); // return empty flags on error
 			});
 		}
+
+		server.expose('getFlags', (user: LaunchDarklyUser) => {
+			return ldClient.allFlagsState(user).then(
+				state => state.allValues(),
+				err => {
+					server.app.logger.error({
+						err,
+						member: user,
+					});
+					return {}; // return empty flags on error
+				}
+			);
+		});
+
+		// set up launchdarkly instance before continuing
+		if (ldClient.close) {
+			server.events.on('stop', ldClient.close);
+		}
+
+		// https://github.com/launchdarkly/node-client/issues/96
+		// use waitForInitialization to catch launch darkly failures
+		return ldClient.waitForInitialization().catch(error => {
+			console.error(error);
+			return new Promise(resolve => resolve({})); // return empty flags on error
+		});
 	});
 }
 
