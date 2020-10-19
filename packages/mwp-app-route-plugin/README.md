@@ -7,5 +7,4 @@ This plugin is mainly concerned with 2 things.
 #### Note:
 In order to properly access your LaunchDarkly flags the secret must exist within AWS Secrets Manager.
 
-The secret ID should be `LaunchDarkly` It should contain a key `apiAccessToken` 
-with the value being the LaunchDarkly SDK key.
+The Secret Name should be `LaunchDarkly` It should contain a key `apiAccessToken` with the value of the LD api key.
