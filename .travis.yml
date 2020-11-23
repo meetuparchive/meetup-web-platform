@@ -9,6 +9,7 @@ branches:
     only:
         - master # (PRs to master, master merges, master pushes)
         - next # consolidating branch for breaking changes
+        - 175624596_node12Upgrade
 
 env:
     global:
