@@ -32,6 +32,10 @@ exports[`generateCanonicalUrlLinkTags should generate locale <link />s for all l
 Array [
   <link
     href="http://www.mock-base-url.com/mockroute"
+    rel="canonical"
+  />,
+  <link
+    href="http://www.mock-base-url.com/mockroute"
     hrefLang="en"
     rel="alternate"
   />,
@@ -164,10 +168,6 @@ Array [
     href="http://www.mock-base-url.com/mockroute"
     hrefLang="x-default"
     rel="alternate"
-  />,
-  <link
-    href="http://www.mock-base-url.com/mockroute"
-    rel="canonical"
   />,
 ]
 `;

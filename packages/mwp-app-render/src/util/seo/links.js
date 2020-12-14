@@ -5,14 +5,21 @@ import locales from 'mwp-config/locales';
  * Generates array of React.element's of <link />'s containing canonical + locale urls for the path provided
  * @param  {String} baseUrl base url of the page (protocol + hostname)
  * @param  {String} localeCode   locale of user
+ * @param  {String} forcedLocaleCode   locale of group
  * @param  {String} route route currently being viewed
  * @return {String}  composed canonical url
  */
-export const generateCanonicalUrl = (baseUrl, localeCode, route) => {
-	if (localeCode === 'en-US') {
+export const generateCanonicalUrl = (
+	baseUrl,
+	localeCode,
+	route,
+	forcedLocaleCode
+) => {
+	const newLocaleCode = forcedLocaleCode || localeCode;
+	if (newLocaleCode === 'en-US') {
 		return `${baseUrl}${route}`;
 	}
-	return `${baseUrl}/${localeCode}${route}`;
+	return `${baseUrl}/${newLocaleCode}${route}`;
 };
 
 /**
@@ -20,10 +27,28 @@ export const generateCanonicalUrl = (baseUrl, localeCode, route) => {
  * canonical + locale urls for the path provided
  * @param  {String} baseUrl base url of the page (protocol + hostname)
  * @param  {String} localeCode   locale of user
+ * @param  {String} forcedLocaleCode  locale of group
  * @param  {String} route   redux'd route to the current page
  * @return {Array}  array of React.element's
  */
-export const generateCanonicalUrlLinkTags = (baseUrl, localeCode, route) => {
+export const generateCanonicalUrlLinkTags = (
+	baseUrl,
+	localeCode,
+	route,
+	forcedLocaleCode = ''
+) => {
+	let result = [
+		<link
+			rel="canonical"
+			href={generateCanonicalUrl(baseUrl, localeCode, route, forcedLocaleCode)}
+			key="canonical"
+		/>,
+	];
+
+	if (forcedLocaleCode) {
+		return result;
+	}
+
 	const localeLinks = locales.reduce((acc, locale) => {
 		const locationDependentTag = (
 			<link
@@ -60,7 +85,8 @@ export const generateCanonicalUrlLinkTags = (baseUrl, localeCode, route) => {
 		return [...acc, locationDependentTag];
 	}, []);
 
-	return [
+	result = [
+		...result,
 		...localeLinks,
 		<link
 			rel="alternate"
@@ -68,10 +94,7 @@ export const generateCanonicalUrlLinkTags = (baseUrl, localeCode, route) => {
 			href={`${baseUrl}${route}`}
 			key="default"
 		/>,
-		<link
-			rel="canonical"
-			href={generateCanonicalUrl(baseUrl, localeCode, route)}
-			key="canonical"
-		/>,
 	];
+
+	return result;
 };
