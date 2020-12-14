@@ -5,12 +5,17 @@ import locales from 'mwp-config/locales';
  * Generates array of React.element's of <link />'s containing canonical + locale urls for the path provided
  * @param  {String} baseUrl base url of the page (protocol + hostname)
  * @param  {String} localeCode   locale of user
- * @param  {String} groupLocaleCode   locale of group
+ * @param  {String} forcedLocaleCode   locale of group
  * @param  {String} route route currently being viewed
  * @return {String}  composed canonical url
  */
-export const generateCanonicalUrl = (baseUrl, localeCode, route, groupLocaleCode) => {
-	const newLocaleCode = groupLocaleCode || localeCode;
+export const generateCanonicalUrl = (
+	baseUrl,
+	localeCode,
+	route,
+	forcedLocaleCode
+) => {
+	const newLocaleCode = forcedLocaleCode || localeCode;
 	if (newLocaleCode === 'en-US') {
 		return `${baseUrl}${route}`;
 	}
@@ -22,7 +27,7 @@ export const generateCanonicalUrl = (baseUrl, localeCode, route, groupLocaleCode
  * canonical + locale urls for the path provided
  * @param  {String} baseUrl base url of the page (protocol + hostname)
  * @param  {String} localeCode   locale of user
- * @param  {String} groupLocaleCode  locale of group
+ * @param  {String} forcedLocaleCode  locale of group
  * @param  {String} route   redux'd route to the current page
  * @return {Array}  array of React.element's
  */
@@ -30,17 +35,17 @@ export const generateCanonicalUrlLinkTags = (
 	baseUrl,
 	localeCode,
 	route,
-	groupLocaleCode = ''
+	forcedLocaleCode = ''
 ) => {
 	let result = [
 		<link
 			rel="canonical"
-			href={generateCanonicalUrl(baseUrl, localeCode, route, groupLocaleCode)}
+			href={generateCanonicalUrl(baseUrl, localeCode, route, forcedLocaleCode)}
 			key="canonical"
 		/>,
 	];
 
-	if (groupLocaleCode) {
+	if (forcedLocaleCode) {
 		return result;
 	}
 
