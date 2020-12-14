@@ -170,6 +170,11 @@ exports[`SEOHead imageUrl applies meet script logo to og:image, twitter:image an
     more="mock"
   />
   <link
+    href="https://baseUrl.com/es-ES/mock/preview/route"
+    key="canonical"
+    rel="canonical"
+  />
+  <link
     href="https://baseUrl.com/mock/preview/route"
     hrefLang="en"
     key="en-US"
@@ -330,11 +335,6 @@ exports[`SEOHead imageUrl applies meet script logo to og:image, twitter:image an
     hrefLang="x-default"
     key="default"
     rel="alternate"
-  />
-  <link
-    href="https://baseUrl.com/es-ES/mock/preview/route"
-    key="canonical"
-    rel="canonical"
   />
   <script
     key="ldjson-0"
@@ -513,6 +513,11 @@ exports[`SEOHead renders component markup 1`] = `
     more="mock"
   />
   <link
+    href="https://baseUrl.com/es-ES/mock/preview/route"
+    key="canonical"
+    rel="canonical"
+  />
+  <link
     href="https://baseUrl.com/mock/preview/route"
     hrefLang="en"
     key="en-US"
@@ -673,11 +678,6 @@ exports[`SEOHead renders component markup 1`] = `
     hrefLang="x-default"
     key="default"
     rel="alternate"
-  />
-  <link
-    href="https://baseUrl.com/es-ES/mock/preview/route"
-    key="canonical"
-    rel="canonical"
   />
   <script
     key="ldjson-0"
@@ -877,6 +877,11 @@ exports[`SEOHead strips out undefined json values 1`] = `
     more="mock"
   />
   <link
+    href="https://baseUrl.com/es-ES/mock/preview/route"
+    key="canonical"
+    rel="canonical"
+  />
+  <link
     href="https://baseUrl.com/mock/preview/route"
     hrefLang="en"
     key="en-US"
@@ -1037,11 +1042,6 @@ exports[`SEOHead strips out undefined json values 1`] = `
     hrefLang="x-default"
     key="default"
     rel="alternate"
-  />
-  <link
-    href="https://baseUrl.com/es-ES/mock/preview/route"
-    key="canonical"
-    rel="canonical"
   />
   <script
     key="ldjson-0"
