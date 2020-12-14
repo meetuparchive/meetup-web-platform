@@ -40,54 +40,56 @@ export const generateCanonicalUrlLinkTags = (
 		/>,
 	];
 
-	if (!groupLocaleCode) {
-		const localeLinks = locales.reduce((acc, locale) => {
-			const locationDependentTag = (
-				<link
-					rel="alternate"
-					hrefLang={locale == 'en-US' ? 'en' : locale}
-					href={generateCanonicalUrl(baseUrl, locale, route)}
-					key={locale}
-				/>
-			);
+	if (groupLocaleCode) {
+		return result;
+	}
 
-			// Google recommends adding location-independent tags for each hreflang tag that includes a location
-			// We skip 'es' and 'es-ES' as they are already both supported in locales array
-			// and 'en-US' \ 'en-AU' as 'en' hreflang is rendered by default
-			if (
-				locale !== 'en-US' &&
-				locale !== 'en-AU' &&
-				locale !== 'es' &&
-				locale !== 'es-ES'
-			) {
-				const localeParts = locale.split('-');
-				if (localeParts.length === 2) {
-					const locationIndependentTag = (
-						<link
-							rel="alternate"
-							hrefLang={localeParts[0]}
-							href={generateCanonicalUrl(baseUrl, locale, route)}
-							key={localeParts[0]}
-						/>
-					);
-
-					return [...acc, locationDependentTag, locationIndependentTag];
-				}
-			}
-			return [...acc, locationDependentTag];
-		}, []);
-
-		result = [
-			...result,
-			...localeLinks,
+	const localeLinks = locales.reduce((acc, locale) => {
+		const locationDependentTag = (
 			<link
 				rel="alternate"
-				hrefLang="x-default"
-				href={`${baseUrl}${route}`}
-				key="default"
-			/>,
-		];
-	}
+				hrefLang={locale == 'en-US' ? 'en' : locale}
+				href={generateCanonicalUrl(baseUrl, locale, route)}
+				key={locale}
+			/>
+		);
+
+		// Google recommends adding location-independent tags for each hreflang tag that includes a location
+		// We skip 'es' and 'es-ES' as they are already both supported in locales array
+		// and 'en-US' \ 'en-AU' as 'en' hreflang is rendered by default
+		if (
+			locale !== 'en-US' &&
+			locale !== 'en-AU' &&
+			locale !== 'es' &&
+			locale !== 'es-ES'
+		) {
+			const localeParts = locale.split('-');
+			if (localeParts.length === 2) {
+				const locationIndependentTag = (
+					<link
+						rel="alternate"
+						hrefLang={localeParts[0]}
+						href={generateCanonicalUrl(baseUrl, locale, route)}
+						key={localeParts[0]}
+					/>
+				);
+
+				return [...acc, locationDependentTag, locationIndependentTag];
+			}
+		}
+		return [...acc, locationDependentTag];
+	}, []);
+
+	result = [
+		...result,
+		...localeLinks,
+		<link
+			rel="alternate"
+			hrefLang="x-default"
+			href={`${baseUrl}${route}`}
+			key="default"
+		/>,
+	];
 
 	return result;
 };
