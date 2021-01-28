@@ -6,7 +6,7 @@ var urlRegex = new RegExp(
 );
 
 const getRelAttr = (followedExternalDomains, link, target) => {
-	if (!followedExternalDomains.length) {
+	if (!followedExternalDomains) {
 		return target === '_blank' ? 'rel="nofollow noopener noreferrer"' : '';
 	}
 	try {
@@ -31,7 +31,7 @@ const getRelAttr = (followedExternalDomains, link, target) => {
  * @param {String} href string of link passed through options
  * @return {String} The HTML link tag
  */
-const createLink = (options: Object, followedExternalDomains: Array<string> = []) => (
+const createLink = (options: Object, followedExternalDomains?: Array<string>) => (
 	href: string
 ): string => {
 	const target = options.target || '';
@@ -54,7 +54,7 @@ const createLink = (options: Object, followedExternalDomains: Array<string> = []
 export default function linkify(
 	text: string,
 	options?: Object = {},
-	followedExternalDomains: Array<string>
+	followedExternalDomains?: Array<string>
 ): string {
 	if (!text) {
 		return '';
