@@ -156,3 +156,27 @@ describe('url matching', () => {
 		});
 	});
 });
+
+describe('rel attribute', () => {
+	it('should not render a rel attribute', () => {
+		const expectedLink =
+			'<a class="link" href="https://www.meetup.com" title="https://www.meetup.com" target="" >https://www.meetup.com</a>';
+		expect(linkify('https://www.meetup.com', {}, ['youtube.com'])).toBe(
+			expectedLink
+		);
+	});
+	it('should render a "ugc" rel attribute', () => {
+		const expectedLink =
+			'<a class="link" href="https://www.youtube.com" title="https://www.youtube.com" target="" rel="ugc">https://www.youtube.com</a>';
+		expect(linkify('https://www.youtube.com', {}, ['youtube.com'])).toBe(
+			expectedLink
+		);
+	});
+	it('should render a "nofollow ugc" rel attribute', () => {
+		const expectedLink =
+			'<a class="link" href="https://www.non-existing-webstie-12345.com" title="https://www.non-existing-webstie-12345.com" target="" rel="nofollow ugc">https://www.non-existing-webstie-12345.com</a>';
+		expect(
+			linkify('https://www.non-existing-webstie-12345.com', {}, ['youtube.com'])
+		).toBe(expectedLink);
+	});
+});
