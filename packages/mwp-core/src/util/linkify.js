@@ -5,8 +5,8 @@ var urlRegex = new RegExp(
 	/(?:(?:(?:[a-z]+:)?\/\/)|www\.)(?:\S+(?::\S*)?@)?(?:localhost|(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])){3}|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:[/?#]([^\s"()]|[(][^\s"]*?[)])*)?/gi
 );
 
-const createRelTag = (isDomainLogicEnabled, domains, link, target) => {
-	if (!isDomainLogicEnabled) {
+const getRelAttr = (followedExternalDomains, link, target) => {
+	if (!followedExternalDomains.length) {
 		return target === '_blank' ? 'rel="nofollow noopener noreferrer"' : '';
 	}
 	try {
@@ -14,7 +14,7 @@ const createRelTag = (isDomainLogicEnabled, domains, link, target) => {
 		const domain = urlObj.hostname.replace('www.', '');
 		if (domain === 'meetup.com') {
 			return '';
-		} else if (domains.includes(domain)) {
+		} else if (followedExternalDomains.includes(domain)) {
 			return 'rel="ugc"';
 		}
 		return 'rel="nofollow ugc"';
@@ -31,16 +31,14 @@ const createRelTag = (isDomainLogicEnabled, domains, link, target) => {
  * @param {String} href string of link passed through options
  * @return {String} The HTML link tag
  */
-const createLink = (
-	options: Object,
-	isDomainLogicEnabled?: boolean,
-	domains: Array<string> = []
-) => (href: string): string => {
+const createLink = (options: Object, followedExternalDomains: Array<string> = []) => (
+	href: string
+): string => {
 	const target = options.target || '';
 	const targetAttr = `target="${target}"`;
 	const hasProtocolRE = /^(?:https?:|ws:|ftp:)?\/\//;
 	const link = hasProtocolRE.test(href) ? href : `http://${href}`;
-	const relAttr = createRelTag(isDomainLogicEnabled, domains, link, target);
+	const relAttr = getRelAttr(followedExternalDomains, link, target);
 
 	return `<a class="link" href="${link}" title="${href}" ${targetAttr} ${relAttr}>${href}</a>`;
 };
@@ -56,11 +54,10 @@ const createLink = (
 export default function linkify(
 	text: string,
 	options?: Object = {},
-	isDomainLogicEnabled?: boolean,
-	domains: Array<string>
+	followedExternalDomains: Array<string>
 ): string {
 	if (!text) {
 		return '';
 	}
-	return text.replace(urlRegex, createLink(options, isDomainLogicEnabled, domains));
+	return text.replace(urlRegex, createLink(options, followedExternalDomains));
 }
