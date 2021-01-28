@@ -174,7 +174,9 @@ describe('rel attribute', () => {
 	});
 	it('should render a "nofollow ugc" rel attribute', () => {
 		const expectedLink =
-			'<a class="link" href="https://www.vk.com" title="https://www.vk.com" target="" rel="nofollow ugc">https://www.vk.com</a>';
-		expect(linkify('https://www.vk.com', {}, ['youtube.com'])).toBe(expectedLink);
+			'<a class="link" href="https://www.non-existing-webstie-12345.com" title="https://www.non-existing-webstie-12345.com" target="" rel="nofollow ugc">https://www.non-existing-webstie-12345.com</a>';
+		expect(
+			linkify('https://www.non-existing-webstie-12345.com', {}, ['youtube.com'])
+		).toBe(expectedLink);
 	});
 });
