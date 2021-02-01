@@ -75,21 +75,16 @@ export const SEOHeadComponent = ({
 		</script>
 	));
 
-	const getRobotsContent = (robots, forcedRobotsContent) => {
-		if (forcedRobotsContent) {
-			return forcedRobotsContent;
-		}
-		return robots ? 'index, follow' : 'noindex, nofollow';
-	};
+	let robotsContent = robots ? 'index, follow' : 'noindex, nofollow';
+	if (forcedRobotsContent) {
+		robotsContent = forcedRobotsContent;
+	}
 
 	return (
 		<Helmet defaultTitle="Meetup" titleTemplate="%s | Meetup">
 			<title>{pageTitle}</title>
 			<link rel="image_src" href={imageUrl} />
-			<meta
-				name="robots"
-				content={getRobotsContent(robots, forcedRobotsContent)}
-			/>
+			<meta name="robots" content={robotsContent} />
 			{metaTags}
 			{canonicalUrlLinkTags}
 			{ldJsonTags}
