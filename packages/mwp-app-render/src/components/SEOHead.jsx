@@ -26,7 +26,6 @@ import {
  * @param {Array} pageMeta Optional meta tag data, for example -- [{name: 'yandex', value: 12345},{name: 'bing', value: 12345}]
  * @param {String} pageTitle Content for the page's title tag
  * @param {Boolean} robots Instructs search engines whether or not we'd like them to crawl the pages and its links
- * @param {String} forcedRobotsContent overrides robots content when is not empty
  * @param {String} route The current route
  * @module SEOHead
  */
@@ -43,7 +42,6 @@ export const SEOHeadComponent = ({
 	pageMeta,
 	pageTitle,
 	robots,
-	forcedRobotsContent,
 	route,
 }) => {
 	const metaData = generateMetaData({
@@ -75,16 +73,14 @@ export const SEOHeadComponent = ({
 		</script>
 	));
 
-	let robotsContent = robots ? 'index, follow' : 'noindex, nofollow';
-	if (forcedRobotsContent) {
-		robotsContent = forcedRobotsContent;
-	}
-
 	return (
 		<Helmet defaultTitle="Meetup" titleTemplate="%s | Meetup">
 			<title>{pageTitle}</title>
 			<link rel="image_src" href={imageUrl} />
-			<meta name="robots" content={robotsContent} />
+			<meta
+				name="robots"
+				content={robots ? 'index, follow' : 'noindex, nofollow'}
+			/>
 			{metaTags}
 			{canonicalUrlLinkTags}
 			{ldJsonTags}
