@@ -37,10 +37,16 @@ const createLink = (options: Object, followedExternalDomains?: Array<string>) =>
 	const target = options.target || '';
 	const targetAttr = `target="${target}"`;
 	const hasProtocolRE = /^(?:https?:|ws:|ftp:)?\/\//;
+	const hasMeetupHttpLinkRE = /http:\/\/www.meetup/g;
+	const meetupHttps = 'https://www.meetup';
 	const link = hasProtocolRE.test(href) ? href : `http://${href}`;
+	const meetupLink = link.replace(hasMeetupHttpLinkRE, meetupHttps);
+	const isMeetupLinkUpdated = meetupLink !== link;
 	const relAttr = getRelAttr(followedExternalDomains, link, target);
 
-	return `<a class="link" href="${link}" title="${href}" ${targetAttr} ${relAttr}>${href}</a>`;
+	return isMeetupLinkUpdated
+		? `<a class="link" href="${meetupLink}" title="${meetupLink}" ${targetAttr} ${relAttr}>${meetupLink}</a>`
+		: `<a class="link" href="${link}" title="${href}" ${targetAttr} ${relAttr}>${href}</a>`;
 };
 
 /**
