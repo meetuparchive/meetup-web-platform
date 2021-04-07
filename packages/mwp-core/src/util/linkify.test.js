@@ -3,9 +3,9 @@ import linkify from './linkify';
 describe('linkify', () => {
 	const httpBase = 'http://www.meetup.com',
 		expectedLink =
-			'<a class="link" href="http://www.meetup.com" title="http://www.meetup.com" target="" >http://www.meetup.com</a>';
+			'<a class="link" href="https://www.meetup.com" title="https://www.meetup.com" target="" >https://www.meetup.com</a>';
 
-	it('should turn a link text with http into a HTML anchor with http', () => {
+	it('should turn a meetup link text with http into a HTML anchor with https', () => {
 		expect(linkify(httpBase)).toBe(expectedLink);
 	});
 	it('should turn a link text with https into a HTML anchor with https', () => {
@@ -16,7 +16,7 @@ describe('linkify', () => {
 	});
 	it('should turn a link text with a target into an HTML anchor with a target', () => {
 		const targetLink =
-			'<a class="link" href="http://www.meetup.com" title="http://www.meetup.com" target="foo" >http://www.meetup.com</a>';
+			'<a class="link" href="https://www.meetup.com" title="https://www.meetup.com" target="foo" >https://www.meetup.com</a>';
 		expect(linkify(httpBase, { target: 'foo' })).toBe(targetLink);
 	});
 	it('should turn a link text with a `_blank` target into an HTML anchor with `rel="nofollow noopener noreferrer"`', () => {
@@ -40,7 +40,7 @@ describe('linkify', () => {
 	it('should prefix a plain link with a protocol', () => {
 		const plainBase = 'www.meetup.com';
 		const expectedLink =
-			'<a class="link" href="http://www.meetup.com" title="www.meetup.com" target="" >www.meetup.com</a>';
+			'<a class="link" href="https://www.meetup.com" title="https://www.meetup.com" target="" >https://www.meetup.com</a>';
 		expect(linkify(plainBase)).toBe(expectedLink);
 	});
 });
