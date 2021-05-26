@@ -1,7 +1,7 @@
 import ApolloClient, { InMemoryCache } from 'apollo-boost';
 import fetch from 'isomorphic-fetch';
 
-const GRAPHQL_ENDPOINT = process.env.GRAPHQL_ENDPOINT || 'https://api.meetup.com/gql';
+const GRAPHQL_ENDPOINT = process.env.GRAPHQL_ENDPOINT || 'https://www.meetup.com/gql';
 
 let cachedClient;
 
