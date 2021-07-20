@@ -20,6 +20,7 @@ import {
 	getVariants,
 	parseBrowserIdCookie,
 	parseSiftSessionCookie,
+	parsePreferredTimeZoneCookie,
 } from '../util/cookieUtils';
 import { getLaunchDarklyUser } from '../util/launchDarkly';
 import getRedirect from '../util/getRedirect';
@@ -123,6 +124,7 @@ const getAppContext = (request: HapiRequest, enableServiceWorker: boolean) => {
 		clientIp,
 		siftSessionId: parseSiftSessionCookie(state),
 		isBot: isBot(request.headers['user-agent']),
+		preferredTimeZone: parsePreferredTimeZoneCookie(state),
 	};
 };
 
