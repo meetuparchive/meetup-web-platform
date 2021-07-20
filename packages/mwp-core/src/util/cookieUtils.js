@@ -31,8 +31,20 @@ export const parseMemberCookie = state => {
 };
 
 export const parsePreferredTimeZoneCookie = state => {
+	if (!state[PREFERRED_TIMEZONE_COOKIE]) {
+		return '';
+	}
 	const preferredTimeZone = querystring.parse(state[PREFERRED_TIMEZONE_COOKIE]);
-	return preferredTimeZone || '';
+
+	if (
+		typeof preferredTimeZone === 'object' &&
+		Object.keys(preferredTimeZone).length &&
+		Object.keys(preferredTimeZone)[0] === 'string' &&
+		Object.keys(preferredTimeZone)[0].length
+	) {
+		return Object.keys(preferredTimeZone)[0];
+	}
+	return '';
 };
 
 export const parseBrowserIdCookie = state => {
