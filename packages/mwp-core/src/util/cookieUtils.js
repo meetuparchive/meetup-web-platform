@@ -39,7 +39,7 @@ export const parsePreferredTimeZoneCookie = state => {
 	if (
 		typeof preferredTimeZone === 'object' &&
 		Object.keys(preferredTimeZone).length &&
-		Object.keys(preferredTimeZone)[0] === 'string' &&
+		typeof Object.keys(preferredTimeZone)[0] === 'string' &&
 		Object.keys(preferredTimeZone)[0].length
 	) {
 		return Object.keys(preferredTimeZone)[0];
