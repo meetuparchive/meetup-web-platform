@@ -55,11 +55,8 @@ export default (
 	// define component that consumes requestLanguage from context
 	const ContextEnhancedWithIntl = props => (
 		<AppContext.Consumer>
-			{appContext => (
-				<BaseWithIntl
-					{...props}
-					requestLanguage={appContext.requestLanguage}
-				/>
+			{value => (
+				<BaseWithIntl {...props} requestLanguage={value.requestLanguage} />
 			)}
 		</AppContext.Consumer>
 	);
