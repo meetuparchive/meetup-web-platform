@@ -2,6 +2,8 @@ import querystring from 'qs';
 import config from 'mwp-config';
 const appConfig = config.getServer().properties;
 
+const PREFERRED_TIMEZONE_COOKIE = 'MEETUP_PREFERRED_TIMEZONE';
+
 export const MEMBER_COOKIE = appConfig.api.isProd
 	? 'MEETUP_MEMBER'
 	: 'MEETUP_MEMBER_DEV';
@@ -26,6 +28,23 @@ export const parseMemberCookie = state => {
 	const member = querystring.parse(state[MEMBER_COOKIE]);
 	member.id = parseInt(member.id, 10) || 0;
 	return member;
+};
+
+export const parsePreferredTimeZoneCookie = state => {
+	if (!state[PREFERRED_TIMEZONE_COOKIE]) {
+		return '';
+	}
+	const preferredTimeZone = querystring.parse(state[PREFERRED_TIMEZONE_COOKIE]);
+
+	if (
+		typeof preferredTimeZone === 'object' &&
+		Object.keys(preferredTimeZone).length &&
+		Object.keys(preferredTimeZone)[0] === 'string' &&
+		Object.keys(preferredTimeZone)[0].length
+	) {
+		return Object.keys(preferredTimeZone)[0];
+	}
+	return '';
 };
 
 export const parseBrowserIdCookie = state => {
