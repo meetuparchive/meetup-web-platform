@@ -47,6 +47,14 @@ export const parsePreferredTimeZoneCookie = state => {
 	return '';
 };
 
+export const parseLocationRedirect = state => {
+	if (!state.locationRedirect) {
+		return '';
+	}
+
+	return querystring.parse(state.locationRedirect);
+};
+
 export const parseBrowserIdCookie = state => {
 	if (!state[BROWSER_ID_COOKIE]) {
 		return { id: '' };
