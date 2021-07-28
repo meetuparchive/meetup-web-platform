@@ -28,7 +28,7 @@ export const generateCanonicalUrl = (
  * @param  {String} baseUrl base url of the page (protocol + hostname)
  * @param  {String} localeCode   locale of user
  * @param  {String} forcedLocaleCode  locale of group
- * @param {String} groupCountry The group's country
+ * @param {Boolean} isGenerateAlternateLinks Defines if we need to generate alternate link tags for the page
  * @param  {String} route   redux'd route to the current page
  * @return {Array}  array of React.element's
  */
@@ -37,7 +37,7 @@ export const generateCanonicalUrlLinkTags = (
 	localeCode,
 	route,
 	forcedLocaleCode = '',
-	groupCountry
+	isGenerateAlternateLinks
 ) => {
 	let result = [
 		<link
@@ -87,18 +87,17 @@ export const generateCanonicalUrlLinkTags = (
 		return [...acc, locationDependentTag];
 	}, []);
 
-	const alternateLinks =
-		groupCountry === 'US' // if group is from US don't add alternate link tags
-			? ''
-			: [
-					...localeLinks,
-					<link
-						rel="alternate"
-						hrefLang="x-default"
-						href={`${baseUrl}${route}`}
-						key="default"
-					/>,
-			  ];
+	const alternateLinks = isGenerateAlternateLinks
+		? ''
+		: [
+				...localeLinks,
+				<link
+					rel="alternate"
+					hrefLang="x-default"
+					href={`${baseUrl}${route}`}
+					key="default"
+				/>,
+		  ];
 
 	result = [...result, ...alternateLinks];
 
