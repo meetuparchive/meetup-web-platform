@@ -88,8 +88,7 @@ export const generateCanonicalUrlLinkTags = (
 	}, []);
 
 	const alternateLinks = isGenerateAlternateLinks
-		? ''
-		: [
+		? [
 				...localeLinks,
 				<link
 					rel="alternate"
@@ -97,7 +96,8 @@ export const generateCanonicalUrlLinkTags = (
 					href={`${baseUrl}${route}`}
 					key="default"
 				/>,
-		  ];
+		  ]
+		: '';
 
 	result = [...result, ...alternateLinks];
 
