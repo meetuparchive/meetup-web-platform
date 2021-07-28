@@ -4,12 +4,14 @@ describe('generateCanonicalUrlLinkTags', () => {
 	const MOCK_BASE_URL = 'http://www.mock-base-url.com';
 	const MOCK_ROUTE = '/mockroute';
 	const MOCK_LOCALE_CODE = 'fr-FR';
+	const MOCK_IS_GENERATE_ALTERNATE_LINKS = true;
 
 	it('should generate locale <link />s for all locales', () => {
 		const canonicalUrlMetaTags = generateCanonicalUrlLinkTags(
 			MOCK_BASE_URL,
 			'en-US',
-			MOCK_ROUTE
+			MOCK_ROUTE,
+			MOCK_IS_GENERATE_ALTERNATE_LINKS
 		);
 		expect(canonicalUrlMetaTags).toMatchSnapshot();
 	});
@@ -18,7 +20,8 @@ describe('generateCanonicalUrlLinkTags', () => {
 		const canonicalUrlMetaTags = generateCanonicalUrlLinkTags(
 			MOCK_BASE_URL,
 			MOCK_LOCALE_CODE,
-			MOCK_ROUTE
+			MOCK_ROUTE,
+			MOCK_IS_GENERATE_ALTERNATE_LINKS
 		);
 		expect(
 			canonicalUrlMetaTags.filter(el => el.props.rel === 'canonical')
@@ -29,7 +32,8 @@ describe('generateCanonicalUrlLinkTags', () => {
 		const canonicalUrlMetaTags = generateCanonicalUrlLinkTags(
 			MOCK_BASE_URL,
 			'en-US',
-			MOCK_ROUTE
+			MOCK_ROUTE,
+			MOCK_IS_GENERATE_ALTERNATE_LINKS
 		);
 		expect(
 			canonicalUrlMetaTags.filter(el => el.props.rel === 'canonical')
@@ -40,10 +44,21 @@ describe('generateCanonicalUrlLinkTags', () => {
 		const canonicalUrlMetaTags = generateCanonicalUrlLinkTags(
 			MOCK_BASE_URL,
 			MOCK_LOCALE_CODE,
-			MOCK_ROUTE
+			MOCK_ROUTE,
+			MOCK_IS_GENERATE_ALTERNATE_LINKS
 		);
 		expect(
 			canonicalUrlMetaTags.filter(el => el.props.hrefLang === 'x-default')
 		).toMatchSnapshot();
+	});
+
+	it('should not generate locale <link />s when isGenerateAlternateLinks = false', () => {
+		const canonicalUrlMetaTags = generateCanonicalUrlLinkTags(
+			MOCK_BASE_URL,
+			'en-US',
+			MOCK_ROUTE,
+			false
+		);
+		expect(canonicalUrlMetaTags).toMatchSnapshot();
 	});
 });
