@@ -51,4 +51,14 @@ describe('generateCanonicalUrlLinkTags', () => {
 			canonicalUrlMetaTags.filter(el => el.props.hrefLang === 'x-default')
 		).toMatchSnapshot();
 	});
+
+	it('should not generate locale <link />s when isGenerateAlternateLinks = false', () => {
+		const canonicalUrlMetaTags = generateCanonicalUrlLinkTags(
+			MOCK_BASE_URL,
+			'en-US',
+			MOCK_ROUTE,
+			false
+		);
+		expect(canonicalUrlMetaTags).toMatchSnapshot();
+	});
 });
