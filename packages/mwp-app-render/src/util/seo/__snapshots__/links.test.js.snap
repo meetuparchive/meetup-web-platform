@@ -171,3 +171,12 @@ Array [
   />,
 ]
 `;
+
+exports[`generateCanonicalUrlLinkTags should not generate locale <link />s when isGenerateAlternateLinks = false 1`] = `
+Array [
+  <link
+    href="http://www.mock-base-url.com/mockroute"
+    rel="canonical"
+  />,
+]
+`;
