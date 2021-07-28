@@ -28,6 +28,7 @@ import {
  * @param {Boolean} robots Instructs search engines whether or not we'd like them to crawl the pages and its links
  * @param {String} forcedRobotsContent overrides robots content when is not empty
  * @param {String} route The current route
+ * @param {String} groupCountry The group's country
  * @module SEOHead
  */
 export const SEOHeadComponent = ({
