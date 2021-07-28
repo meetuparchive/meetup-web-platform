@@ -46,6 +46,7 @@ export const SEOHeadComponent = ({
 	robots,
 	forcedRobotsContent,
 	route,
+	groupCountry,
 }) => {
 	const metaData = generateMetaData({
 		appPath: `meetup:/${route}`,
@@ -66,7 +67,8 @@ export const SEOHeadComponent = ({
 		baseUrl,
 		localeCode,
 		route,
-		forcedLocaleCode
+		forcedLocaleCode,
+		groupCountry
 	);
 
 	const ldJsonTags = ldJson.map((jsonObj, index) => (
