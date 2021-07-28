@@ -36,8 +36,8 @@ export const generateCanonicalUrlLinkTags = (
 	baseUrl,
 	localeCode,
 	route,
-	forcedLocaleCode = '',
-	isGenerateAlternateLinks
+	isGenerateAlternateLinks,
+	forcedLocaleCode = ''
 ) => {
 	let result = [
 		<link

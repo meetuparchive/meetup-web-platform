@@ -67,8 +67,8 @@ export const SEOHeadComponent = ({
 		baseUrl,
 		localeCode,
 		route,
-		forcedLocaleCode,
-		isGenerateAlternateLinks
+		isGenerateAlternateLinks,
+		forcedLocaleCode
 	);
 
 	const ldJsonTags = ldJson.map((jsonObj, index) => (
