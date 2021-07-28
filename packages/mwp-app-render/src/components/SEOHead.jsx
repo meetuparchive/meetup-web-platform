@@ -113,6 +113,7 @@ SEOHeadComponent.propTypes = {
 	pageTitle: PropTypes.string,
 	robots: PropTypes.bool,
 	route: PropTypes.string.isRequired,
+	isGenerateAlternateLinks: PropTypes.bool,
 };
 
 SEOHeadComponent.defaultProps = {
@@ -122,6 +123,7 @@ SEOHeadComponent.defaultProps = {
 	ldJson: [],
 	localeCode: 'en-US',
 	robots: true,
+	isGenerateAlternateLinks: true,
 };
 
 export default SEOHeadComponent;
