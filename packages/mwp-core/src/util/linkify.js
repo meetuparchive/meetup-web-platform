@@ -23,6 +23,16 @@ const getRelAttr = (followedExternalDomains, link, target) => {
 	}
 };
 
+export const getSubDomain = url => {
+	if (!url || !url.includes('//')) {
+		return 'www';
+	}
+
+	const [, domain] = url.split('//');
+	const [, , subdomain] = domain.split('.').reverse();
+	return subdomain || 'www';
+};
+
 /**
  * Generates HTML link tag element with target
  *
@@ -37,8 +47,8 @@ const createLink = (options: Object, followedExternalDomains?: Array<string>) =>
 	const target = options.target || '';
 	const targetAttr = `target="${target}"`;
 	const hasProtocolRE = /^(?:https?:|ws:|ftp:)?\/\//;
-	const hasMeetupHttpLinkRE = /http:\/\/www.meetup/g;
-	const meetupHttps = 'https://www.meetup';
+	const hasMeetupHttpLinkRE = /https?:\/\/(.+?\.)?meetup/g;
+	const meetupHttps = `https://${getSubDomain(href)}.meetup`;
 	const link = hasProtocolRE.test(href) ? href : `http://${href}`;
 	const meetupLink = link.replace(hasMeetupHttpLinkRE, meetupHttps);
 	const isMeetupLinkUpdated = meetupLink !== link;
