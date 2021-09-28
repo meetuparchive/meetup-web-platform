@@ -5,8 +5,13 @@ describe('getSubDomain', () => {
 		expect(getSubDomain()).toBe('www');
 		expect(getSubDomain(`meetup.com`)).toBe('www');
 		expect(getSubDomain(`http://meetup.com`)).toBe('www');
+		expect(getSubDomain(`https://meetup.com`)).toBe('www');
 		expect(getSubDomain(`http://www.meetup.com`)).toBe('www');
+		expect(getSubDomain(`https://www.meetup.com`)).toBe('www');
 		expect(getSubDomain(`http://secure.meetup.com`)).toBe('secure');
+		expect(getSubDomain(`https://secure.meetup.com`)).toBe('secure');
+		expect(getSubDomain(`http://www.amazon.co.uk`)).toBe('www');
+		expect(getSubDomain(`https://www.amazon.co.uk`)).toBe('www');
 	});
 });
 
