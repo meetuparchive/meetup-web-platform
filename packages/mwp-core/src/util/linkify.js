@@ -23,7 +23,7 @@ const getRelAttr = (followedExternalDomains, link, target) => {
 	}
 };
 
-export const getSubDomain = url => {
+export const getSubDomain = (url: string) => {
 	if (!url || !url.includes('//')) {
 		return 'www';
 	}
