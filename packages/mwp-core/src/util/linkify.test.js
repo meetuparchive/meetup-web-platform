@@ -1,19 +1,40 @@
-import linkify from './linkify';
+import linkify, { getSubDomain } from './linkify';
+
+describe('getSubDomain', () => {
+	it('should return corrent url subdomain', () => {
+		expect(getSubDomain()).toBe('www');
+		expect(getSubDomain(`meetup.com`)).toBe('www');
+		expect(getSubDomain(`http://meetup.com`)).toBe('www');
+		expect(getSubDomain(`https://meetup.com`)).toBe('www');
+		expect(getSubDomain(`http://www.meetup.com`)).toBe('www');
+		expect(getSubDomain(`https://www.meetup.com`)).toBe('www');
+		expect(getSubDomain(`http://secure.meetup.com`)).toBe('secure');
+		expect(getSubDomain(`https://secure.meetup.com`)).toBe('secure');
+		expect(getSubDomain(`http://www.amazon.co.uk`)).toBe('www');
+		expect(getSubDomain(`https://www.amazon.co.uk`)).toBe('www');
+	});
+});
 
 describe('linkify', () => {
-	const httpBase = 'http://www.meetup.com',
-		expectedLink =
-			'<a class="link" href="https://www.meetup.com" title="https://www.meetup.com" target="" >https://www.meetup.com</a>';
+	const httpBase = 'http://www.meetup.com';
+	const secureBase = 'https://secure.meetup.com';
+	const expectedLink =
+		'<a class="link" href="https://www.meetup.com" title="https://www.meetup.com" target="" >https://www.meetup.com</a>';
 
 	it('should turn a meetup link text with http into a HTML anchor with https', () => {
 		expect(linkify(httpBase)).toBe(expectedLink);
 	});
+
+	it('should turn a meetup link text with http and without www into a HTML anchor with https and www', () => {
+		expect(linkify('http://meetup.com')).toBe(expectedLink);
+	});
+
 	it('should turn a link text with https into a HTML anchor with https', () => {
-		const secureBase = 'https://secure.meetup.com';
 		const expectedSecureLink =
 			'<a class="link" href="https://secure.meetup.com" title="https://secure.meetup.com" target="" >https://secure.meetup.com</a>';
 		expect(linkify(secureBase)).toBe(expectedSecureLink);
 	});
+
 	it('should turn a link text with a target into an HTML anchor with a target', () => {
 		const targetLink =
 			'<a class="link" href="https://www.meetup.com" title="https://www.meetup.com" target="foo" >https://www.meetup.com</a>';
