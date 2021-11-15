@@ -9,6 +9,5 @@
     "timeout": 100
   },
   "csrf_secret": "asdfasdfasdfasdfasdfasdfasdfasdf",
-  "cookie_encrypt_secret": "asdfasdfasdfasdfasdfasdfasdfasdf",
-  "photo_scaler_salt": "asdfasdfasdfasdfasdfasdfasdfasdf"
+  "cookie_encrypt_secret": "asdfasdfasdfasdfasdfasdfasdfasdf"
 }
