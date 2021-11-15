@@ -13,7 +13,6 @@ const {
 	secretDefault,
 	validateCookieSecret,
 	validateCsrfSecret,
-	validatePhotoScalerSalt,
 	validateProtocol,
 } = require('./util');
 
@@ -108,12 +107,6 @@ const schema = Object.assign({}, envSchema, {
 		format: validateCsrfSecret,
 		default: secretDefault,
 		env: 'CSRF_SECRET',
-		sensitive: true,
-	},
-	photo_scaler_salt: {
-		format: validatePhotoScalerSalt,
-		default: process.env.NODE_ENV === 'test' ? secretDefault : null,
-		env: 'PHOTO_SCALER_SALT',
 		sensitive: true,
 	},
 });

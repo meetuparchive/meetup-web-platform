@@ -1,3 +1,7 @@
+## [26.0]
+
+-   **Removed** `PHOTO_SCALAR_SALT` no longer required for the new photo-uploader.
+
 ## [25.2]
 
 -   **Improved** upgraded node to v10.22.1
