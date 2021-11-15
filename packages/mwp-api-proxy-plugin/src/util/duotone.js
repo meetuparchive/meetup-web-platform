@@ -104,6 +104,22 @@ export function generateSignedDuotoneUrl(salt, [light, dark]) {
 }
 
 /**
+ * Build the complete "[ref]: urlroot" object containing signed url roots for
+ * all the supported duotone pairs
+ *
+ * @param {String} PHOTO_SCALER_SALT **Secret** salt for generating signed urls
+ */
+export const getDuotoneUrls = (duotones, PHOTO_SCALER_SALT) => {
+	return duotones.reduce(
+		(duotoneMap, [light, dark]) => ({
+			...duotoneMap,
+			...generateSignedDuotoneUrl(PHOTO_SCALER_SALT, [light, dark]),
+		}),
+		{}
+	);
+};
+
+/**
  * From a provided set of signed duotone URLs, create a function that injects
  * the full duotone URL into a group object with the key `duotoneUrl`.
  *

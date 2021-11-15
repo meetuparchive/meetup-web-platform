@@ -5,6 +5,7 @@ const CSRF_SECRET_ERROR = 'CSRF Secret must be a random 32+ char string';
 const OAUTH_SECRET_ERROR = 'Invalid OAUTH Secret';
 const OAUTH_KEY_ERROR = 'Invalid OAUTH Key';
 const COOKIE_SECRET_ERROR = 'Cookie Secret must be a random 32+ char string';
+const SALT_ERROR = 'Invalid Photo Scaler Salt';
 
 const validateCookieSecret = secret => {
 	if (!secret || secret.toString().length < 32) {
@@ -27,6 +28,12 @@ const validateOauthSecret = secret => {
 const validateOauthKey = key => {
 	if (!key || key.toString().length < 1) {
 		throw new Error(OAUTH_KEY_ERROR);
+	}
+};
+
+const validatePhotoScalerSalt = salt => {
+	if (!salt || salt.toString().length < 1) {
+		throw new Error(SALT_ERROR);
 	}
 };
 
@@ -57,11 +64,13 @@ module.exports = {
 	OAUTH_SECRET_ERROR,
 	OAUTH_KEY_ERROR,
 	COOKIE_SECRET_ERROR,
+	SALT_ERROR,
 	secretDefault,
 	validateCookieSecret,
 	validateCsrfSecret,
 	validateOauthKey,
 	validateOauthSecret,
+	validatePhotoScalerSalt,
 	validateProtocol,
 	validateServerHost,
 };

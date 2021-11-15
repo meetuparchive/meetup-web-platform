@@ -3,8 +3,10 @@ const {
 	COOKIE_SECRET_ERROR,
 	CSRF_SECRET_ERROR,
 	PROTOCOL_ERROR,
+	SALT_ERROR,
 	validateCookieSecret,
 	validateCsrfSecret,
+	validatePhotoScalerSalt,
 	validateProtocol,
 } = require('./util');
 
@@ -43,6 +45,7 @@ describe('config', () => {
 		expect(config.app_server.protocol).toBeTruthy();
 		expect(config.isDev).toBeDefined();
 		expect(config.isProd).toBeDefined();
+		expect(config.photo_scaler_salt).toBeTruthy();
 	});
 });
 
@@ -69,5 +72,17 @@ describe('validateCsrfSecret', () => {
 	it('throws error when secret is missing or less than 32 characters', () => {
 		expect(() => validateCsrfSecret(null)).toThrowError(CSRF_SECRET_ERROR);
 		expect(() => validateCsrfSecret(string31)).toThrowError(CSRF_SECRET_ERROR);
+	});
+});
+
+describe('validatePhotoScalerSalt', () => {
+	it('does not error when salt is 1 char or more', () => {
+		expect(() => validatePhotoScalerSalt(string1)).not.toThrow();
+		expect(() => validatePhotoScalerSalt(string36)).not.toThrow();
+	});
+
+	it('throws error when salt is missing or empty', () => {
+		expect(() => validatePhotoScalerSalt(null)).toThrowError(SALT_ERROR);
+		expect(() => validatePhotoScalerSalt('')).toThrowError(SALT_ERROR);
 	});
 });
