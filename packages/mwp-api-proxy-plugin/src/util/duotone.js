@@ -109,11 +109,10 @@ export function generateSignedDuotoneUrl(salt, [light, dark]) {
  *
  * @param {String} PHOTO_SCALER_SALT **Secret** salt for generating signed urls
  */
-export const getDuotoneUrls = (duotones, PHOTO_SCALER_SALT) => {
+export const getDuotoneUrls = (duotones) => {
 	return duotones.reduce(
 		(duotoneMap, [light, dark]) => ({
 			...duotoneMap,
-			...generateSignedDuotoneUrl(PHOTO_SCALER_SALT, [light, dark]),
 		}),
 		{}
 	);
