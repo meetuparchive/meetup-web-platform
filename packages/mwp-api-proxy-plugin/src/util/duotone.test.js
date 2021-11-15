@@ -10,6 +10,7 @@ import {
 	apiResponseDuotoneSetter,
 	duotoneRef,
 	makeSign,
+	getDuotoneUrls,
 	groupDuotoneSetter,
 	generateSignedDuotoneUrl,
 } from './duotone';
@@ -37,6 +38,16 @@ describe('generateSignedDuotoneUrl', () => {
 				large: expect.any(String),
 			},
 		});
+	});
+});
+
+describe('getDuotoneUrls', () => {
+	const duotones = [MOCK_DUOTONE, MOCK_DUOTONE_2];
+	it('generates an object with a prop for each duotone ref', () => {
+		const duotoneUrls = getDuotoneUrls(duotones, MOCK_SALT);
+		const refArray = duotones.map(dt => duotoneRef(...dt));
+		expect(duotoneUrls).toEqual(jasmine.any(Object));
+		expect(Object.keys(duotoneUrls)).toEqual(refArray);
 	});
 });
 
