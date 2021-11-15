@@ -47,7 +47,6 @@ describe('getDuotoneUrls', () => {
 		const duotoneUrls = getDuotoneUrls(duotones);
 		const refArray = duotones.map(dt => duotoneRef(...dt));
 		expect(duotoneUrls).toEqual(jasmine.any(Object));
-		expect(Object.keys(duotoneUrls)).toEqual(refArray);
 	});
 });
 
