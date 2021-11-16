@@ -23,7 +23,7 @@ export function register(server: Object, options: void) {
 	// supply duotone urls through `server.plugins['mwp-api-proxy-plugin'].duotoneUrls`
 	server.expose(
 		'duotoneUrls',
-		getDuotoneUrls(duotones, server.settings.app.photo_scaler_salt)
+		getDuotoneUrls(duotones)
 	);
 
 	// add a method to the `request` object that can call REST API
