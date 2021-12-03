@@ -8,7 +8,6 @@ const {
 	validateProtocol,
 } = require('./util');
 
-const string1 = '1';
 const string31 = 'asdfasdfasdfasdfasdfasdfasdfasd';
 const string32 = 'asdfasdfasdfasdfasdfasdfasdfasdf';
 const string36 = 'asdfasdfasdfasdfasdfasdfasdfasdfasdf';
