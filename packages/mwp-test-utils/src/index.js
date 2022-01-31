@@ -54,12 +54,6 @@ export async function getServer() {
 		logger: MOCK_LOGGER,
 	};
 
-	server.plugins = {
-		'mwp-api-proxy-plugin': {
-			duotoneUrls: [],
-		},
-	};
-
 	await server.decorate('request', 'trackActivity', () => ({}));
 	await server.decorate('request', 'getLangPrefixPath', () => '/');
 	await server.decorate('request', 'getLanguage', () => 'en-US');
