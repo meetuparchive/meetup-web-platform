@@ -1,11 +1,8 @@
 // @flow
 // Implicit dependency: tracking plugin providing request.trackActivity method
 
-import { apiResponseDuotoneSetter } from './util/duotone';
 import { makeSendQuery } from './util/send';
 import { makeReceiver } from './util/receive';
-
-import { API_PROXY_PLUGIN_NAME } from './config';
 
 /*
  * This function transforms a single request to the application server into a
@@ -17,9 +14,6 @@ import { API_PROXY_PLUGIN_NAME } from './config';
  * receiving the responses is in './util/receive'
  */
 const apiProxy = (request: HapiRequest) => {
-	const setApiResponseDuotones = apiResponseDuotoneSetter(
-		request.server.plugins[API_PROXY_PLUGIN_NAME].duotoneUrls
-	);
 	return (
 		queries: Array<Query>,
 		activityInfo: ActivityInfo
@@ -53,9 +47,7 @@ const apiProxy = (request: HapiRequest) => {
 			const receive = receiver(query);
 
 			// now send the query and return the Promise of resolved responses
-			return sendQuery(query)
-				.then(receive)
-				.then(setApiResponseDuotones);
+			return sendQuery(query).then(receive);
 		});
 
 		// wait for all requests to respond
