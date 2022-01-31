@@ -186,6 +186,18 @@ describe('rel attribute', () => {
 			expectedLink
 		);
 	});
+	it('should not render a rel attribute for meetupstatic', () => {
+		const expectedLink =
+			'<a class="link" href="https://secure.meetupstatic.com" title="https://secure.meetupstatic.com" target="" >https://secure.meetupstatic.com</a>';
+		expect(linkify('https://secure.meetupstatic.com', {}, ['youtube.com'])).toBe(
+			expectedLink
+		);
+	});
+	it('should not render a rel attribute for meetu.ps', () => {
+		const expectedLink =
+			'<a class="link" href="https://meetu.ps" title="https://meetu.ps" target="" >https://meetu.ps</a>';
+		expect(linkify('https://meetu.ps', {}, ['youtube.com'])).toBe(expectedLink);
+	});
 	it('should render a "ugc" rel attribute', () => {
 		const expectedLink =
 			'<a class="link" href="https://www.youtube.com" title="https://www.youtube.com" target="" rel="ugc">https://www.youtube.com</a>';
