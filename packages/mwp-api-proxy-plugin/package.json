@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "dependencies": {
-    "ajv": "5.5.2",
+    "ajv": "8.10.0",
     "boom": "7.3.0",
     "isbot": "2.3.0",
     "joi": "14.3.1",
