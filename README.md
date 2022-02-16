@@ -2,7 +2,6 @@
 
 [![npm version](https://badge.fury.io/js/mwp-core.svg)](https://badge.fury.io/js/mwp-core)
 [![Build Status](https://travis-ci.com/meetup/meetup-web-platform.svg?branch=master)](https://travis-ci.com/meetup/meetup-web-platform)
-[![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=meetup/meetup-web-platform)](https://dependabot.com)
 [![Coverage Status](https://coveralls.io/repos/github/meetup/meetup-web-platform/badge.svg?branch=master)](https://coveralls.io/github/meetup/meetup-web-platform?branch=master)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
