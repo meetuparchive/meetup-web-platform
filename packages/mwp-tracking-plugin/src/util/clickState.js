@@ -18,6 +18,11 @@ const BrowserCookies = JSCookie.withConverter({
 export const setClickCookie = clickTracking => {
 	const domain = window.location.host.replace(/[^.]+/, '').replace(/:\d+/, ''); // strip leading subdomain, e.g. www or beta2 and trailing port
 	const cookieVal = JSON.stringify(clickTracking);
+	BrowserCookies.set(COOKIE_NAME, cookieVal, {
+		domain,
+		secure: true,
+		sameSite: 'lax',
+	});
 };
 export const getClickCookie = () => BrowserCookies.getJSON(COOKIE_NAME);
 
