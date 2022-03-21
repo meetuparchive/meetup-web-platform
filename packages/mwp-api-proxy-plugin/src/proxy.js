@@ -2,7 +2,15 @@
 // Implicit dependency: tracking plugin providing request.trackActivity method
 
 import { makeSendQuery } from './util/send';
-import { makeReceiver } from './util/receive';
+import { makeReceiver, makeApiResponseToQueryResponse } from './util/receive';
+
+// ALLOWED EXTERNAL DOMAINS
+const domains = ['meetuphq.io', 'meetup.com'];
+const getEndPoint = query => {
+	if (!query.endpoint) return '';
+	if (typeof query.endpoint === 'string') return query.endpoint;
+	return '';
+};
 
 /*
  * This function transforms a single request to the application server into a
@@ -44,6 +52,28 @@ const apiProxy = (request: HapiRequest) => {
 
 		// create an array of in-flight API request Promises
 		const apiRequests = queries.map(query => {
+			const endPoint = getEndPoint(query);
+			if (endPoint && endPoint.includes('://')) {
+				try {
+					const url = new URL(endPoint);
+					if (!domains.some(domain => url.host.endsWith(domain))) {
+						// return null instead of querying external api
+						return Promise.resolve(
+							makeApiResponseToQueryResponse(query)({
+								value: null,
+								error: 'Access denied',
+								meta: {
+									endpoint: endPoint,
+									statusCode: 403,
+								},
+							})
+						);
+					}
+				} catch (err) {
+					// do nothing
+				}
+			}
+
 			const receive = receiver(query);
 
 			// now send the query and return the Promise of resolved responses
