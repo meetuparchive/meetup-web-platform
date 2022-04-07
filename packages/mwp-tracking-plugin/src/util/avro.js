@@ -31,13 +31,15 @@ const logTrackingData = () => {
 			Promise.resolve();
 		};
 	} else {
-		return async (serializedRecord) => {
-			const res = await fetch(`https://analytics-tracking.meetup.com/data?records=${serializedRecord}`);
-			console.log(res)
+		return async serializedRecord => {
+			const res = await fetch(
+				`https://analytics-tracking.meetup.com/data?records=${serializedRecord}`
+			);
+			console.log(res);
 			return true;
-		}
+		};
 	}
-}
+};
 
 const getLogAWSKinesis = (): (string => Promise<void>) => {
 	if (process.env.NODE_ENV !== 'production') {

@@ -17,8 +17,7 @@ const BrowserCookies = JSCookie.withConverter({
 });
 
 export const setClickCookie = clickTracking => {
-	clickTracking
-		.history
+	clickTracking.history
 		.filter(click => click)
 		.map(clickToClickRecord(request))
 		.forEach(avro.loggers.awsclick);
