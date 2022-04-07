@@ -25,6 +25,20 @@ const getCrossAccountCredentials = async () => {
 	});
 };
 
+const logTrackingData = () => {
+	if (process.env.NODE_ENV !== 'production') {
+		return async (serializedRecord: string) => {
+			Promise.resolve();
+		};
+	} else {
+		return async (serializedRecord) => {
+			const res = await fetch(`https://analytics-tracking.meetup.com/data?records=${serializedRecord}`);
+			console.log(res)
+			return true;
+		}
+	}
+}
+
 const getLogAWSKinesis = (): (string => Promise<void>) => {
 	if (process.env.NODE_ENV !== 'production') {
 		return async (serializedRecord: string) => {
@@ -256,7 +270,7 @@ const loggers = {
 		deserializers.awsactivity,
 		logAWSKinesis
 	),
-	awsclick: logger(serializers.awsclick, deserializers.awsclick, logAWSKinesis),
+	awsclick: logger(serializers.awsclick, deserializers.awsclick, logTrackingData()),
 };
 
 module.exports = {
