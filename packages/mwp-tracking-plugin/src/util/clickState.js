@@ -1,4 +1,5 @@
 import JSCookie from 'js-cookie';
+import { clickToClickRecord } from './clickReader';
 
 /*
  * This module provides utilities for managing click tracking data in a cookie
@@ -16,8 +17,10 @@ const BrowserCookies = JSCookie.withConverter({
 });
 
 export const setClickCookie = clickTracking => {
-	const domain = window.location.host.replace(/[^.]+/, '').replace(/:\d+/, ''); // strip leading subdomain, e.g. www or beta2 and trailing port
-	const cookieVal = JSON.stringify(clickTracking);
+	clickTracking.history
+		.filter(click => click)
+		.map(clickToClickRecord(request))
+		.forEach(avro.loggers.awsclick);
 };
 export const getClickCookie = () => BrowserCookies.getJSON(COOKIE_NAME);
 
