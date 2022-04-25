@@ -32,13 +32,11 @@ const logTrackingData = () => {
 			Promise.resolve();
 		};
 	} else {
-		return async serializedRecord => {
-			console.log(serializedRecord);
+		return async (serializedRecord: string) => {
 			try {
-				const res = await fetch(
+				await fetch(
 					`https://analytics-tracking.meetup.com/data?records=${serializedRecord}`
 				);
-				console.log(res);
 				return true;
 			} catch (error) {
 				console.log(error);
