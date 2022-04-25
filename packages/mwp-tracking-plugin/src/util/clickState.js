@@ -1,5 +1,6 @@
 import JSCookie from 'js-cookie';
 import { clickToClickRecord } from './clickReader';
+import avro from './avro';
 
 /*
  * This module provides utilities for managing click tracking data in a cookie
@@ -16,16 +17,16 @@ const BrowserCookies = JSCookie.withConverter({
 		),
 });
 
-export const setClickCookie = clickTracking => {
+export const setClickCookie = (clickTracking, memberId) => {
 	clickTracking.history
 		.filter(click => click)
-		.map(clickToClickRecord(request))
+		.map(clickToClickRecord(null, memberId))
 		.forEach(avro.loggers.awsclick);
 };
 export const getClickCookie = () => BrowserCookies.getJSON(COOKIE_NAME);
 
-export const appendClick = clickData =>
-	setClickCookie(reducer(getClickCookie(), clickData));
+export const appendClick = (clickData, memberId) =>
+	setClickCookie(reducer(getClickCookie(), clickData), memberId);
 
 export const DEFAULT_CLICK_TRACK = { history: [] };
 

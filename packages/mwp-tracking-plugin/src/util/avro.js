@@ -26,17 +26,23 @@ const getCrossAccountCredentials = async () => {
 };
 
 const logTrackingData = () => {
+	// eslint-disable-next-line
 	if (process.env.NODE_ENV !== 'production') {
 		return async (serializedRecord: string) => {
 			Promise.resolve();
 		};
 	} else {
 		return async serializedRecord => {
-			const res = await fetch(
-				`https://analytics-tracking.meetup.com/data?records=${serializedRecord}`
-			);
-			console.log(res);
-			return true;
+			console.log(serializedRecord);
+			try {
+				const res = await fetch(
+					`https://analytics-tracking.meetup.com/data?records=${serializedRecord}`
+				);
+				console.log(res);
+				return true;
+			} catch (error) {
+				console.log(error);
+			}
 		};
 	}
 };
