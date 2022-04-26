@@ -7,16 +7,28 @@ import avro from './avro';
  */
 
 const getMemberIdFromCookie = () => {
-	const memberObj = JSCookie.parse('MEETUP_MEMBER');
-	memberObj.id = memberObj.id ? parseInt(memberObj.id, 10) : 0;
-	return memberObj;
+	const memberId = JSCookie.get('memberId');
+	if (memberId) {
+		return parseInt(memberId, 10);
+	}
+	return null;
 };
 
 export const setClickCookie = clickData => {
 	const memberId = getMemberIdFromCookie();
+	console.log("wut")
 	if (clickData) {
-		const formatted = clickToClickRecord(null, memberId)(clickData);
-		avro.loggers.awsclick(formatted);
+		const stringifiedRecord = JSON.stringify({
+			record: {...clickData, memberId},
+			metadata: {
+				memberId: memberId,
+				//browserId: getBrowserIdFromCookie(),
+				referer: window.document.referrer,
+				url: window.location.href
+			}
+		  });
+		console.log("in clickstate", stringifiedRecord)
+		avro.loggers.browserClick(stringifiedRecord);
 	}
 };
 
