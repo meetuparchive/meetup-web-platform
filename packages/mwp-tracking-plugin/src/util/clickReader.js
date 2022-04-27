@@ -1,3 +1,4 @@
+import uuidv1 from 'uuid/v1';
 import { parseIdCookie, getISOStringNow } from './trackingUtils'; // TODO: provide this info through new plugin
 import avro from './avro';
 import { COOKIE_NAME } from './clickState';
@@ -8,6 +9,8 @@ import { COOKIE_NAME } from './clickState';
  */
 
 const isProd = process.env.NODE_ENV === 'production';
+const getMemberIdCookieName = isProdEnv =>
+	isProdEnv ? 'MEETUP_MEMBER' : 'MEETUP_MEMBER_DEV';
 export const clickCookieOptions = {
 	isSecure: isProd,
 	isHttpOnly: false,
@@ -15,14 +18,23 @@ export const clickCookieOptions = {
 	path: '/',
 };
 
-export const clickToClickRecord = request => click => {
-	const memberCookieName = request.server.settings.app.api.isProd
-		? 'MEETUP_MEMBER'
-		: 'MEETUP_MEMBER_DEV';
+export const clickToClickRecord = (request, memberIdString) => click => {
+	let memberId;
+	if (request) {
+		memberId = parseIdCookie(
+			request.state[
+				getMemberIdCookieName(request.server.settings.app.api.isProd)
+			],
+			true
+		);
+	} else {
+		memberId = parseInt(memberIdString, 10);
+	}
+
 	return {
 		timestamp: click.timestamp || getISOStringNow(),
-		requestId: request.id,
-		memberId: parseIdCookie(request.state[memberCookieName], true), // force integer
+		requestId: request ? request.id : uuidv1(),
+		memberId, // force integer
 		lineage: click.lineage,
 		linkText: click.linkText || '',
 		coordX: click.coords[0] || 0,

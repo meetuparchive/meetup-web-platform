@@ -25,6 +25,28 @@ const getCrossAccountCredentials = async () => {
 	});
 };
 
+const logTrackingData = () => {
+	// eslint-disable-next-line
+	if (process.env.NODE_ENV !== 'production') {
+		return async (serializedRecord: string) => {
+			Promise.resolve();
+		};
+	} else {
+		return async (serializedRecord: string) => {
+			try {
+				const encodedRecord = Buffer.from(serializedRecord).toString(
+					'base64'
+				);
+				const img = new window.Image();
+				img.src = `https://analytics-tracking.meetup.com/data?records=${encodedRecord}`;
+				return true;
+			} catch (error) {
+				console.log(error);
+			}
+		};
+	}
+};
+
 const getLogAWSKinesis = (): (string => Promise<void>) => {
 	if (process.env.NODE_ENV !== 'production') {
 		return async (serializedRecord: string) => {
@@ -194,6 +216,36 @@ const chapinEnvelopeDeserializer: Object => Deserializer = schema => {
 	};
 };
 
+const nextSerializer: Object => Serializer = schema => {
+	const analyticsSource = 'WEB';
+
+	return data => {
+		const { record, metadata } = JSON.parse(data);
+		const viewId = uuidv1();
+		const analytics = {
+			timestamp: Date.now(),
+			schemaFullname: `${schema.namespace}.${schema.name}`,
+			schemaVersion: schema.doc,
+			source: analyticsSource,
+			data: JSON.stringify(record),
+		};
+		const payload = {
+			records: [analytics],
+			viewId,
+			...metadata,
+		};
+		return JSON.stringify(payload);
+	};
+};
+
+const nextDeserializer: Object => Deserializer = schema => {
+	return serialized => {
+		const payload = JSON.parse(serialized);
+		const record = JSON.parse(payload.records[0].data);
+		return record;
+	};
+};
+
 type Serializer = Object => string;
 type Deserializer = string => Object;
 
@@ -244,17 +296,24 @@ const serializers = {
 	awsavro: chapinEnvelopeSerializer,
 	awsactivity: chapinEnvelopeSerializer(schemas.activity),
 	awsclick: chapinEnvelopeSerializer(schemas.click),
+	browserClick: nextSerializer(schemas.click),
 };
 const deserializers = {
 	avro: avroDeserializer,
 	awsactivity: chapinEnvelopeDeserializer(schemas.activity),
 	awsclick: chapinEnvelopeDeserializer(schemas.click),
+	browserClick: nextDeserializer(schemas.click),
 };
 const loggers = {
 	awsactivity: logger(
 		serializers.awsactivity,
 		deserializers.awsactivity,
 		logAWSKinesis
+	),
+	browserClick: logger(
+		serializers.browserClick,
+		deserializers.browserClick,
+		logTrackingData()
 	),
 	awsclick: logger(serializers.awsclick, deserializers.awsclick, logAWSKinesis),
 };
