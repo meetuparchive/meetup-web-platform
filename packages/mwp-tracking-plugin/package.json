@@ -10,8 +10,7 @@
   "scripts": {
     "build": "babel src --out-dir lib --ignore test.js,test.jsx --source-maps --root-mode upward",
     "lint": "eslint . --ext .js,.jsx --fix",
-    "test": "yarn run test:unit",
-    "test:unit": "NODE_ENV=test jest --config jest.config.json"
+    "test": "cd ../../ && yarn test:unit ./packages/mwp-tracking-plugin/"
   },
   "repository": {
     "type": "git",
