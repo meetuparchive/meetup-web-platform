@@ -234,8 +234,7 @@ const nextSerializer: Object => Serializer = schema => {
 			viewId,
 			...metadata,
 		};
-		const encodingForNewPattern = JSON.stringify(payload);
-		return encodingForNewPattern;
+		return JSON.stringify(payload);
 	};
 };
 
