@@ -27,20 +27,18 @@ const getCrossAccountCredentials = async () => {
 
 const logTrackingData = () => {
 	// eslint-disable-next-line
-	if (process.env.NODE_ENV !== 'production' && false) {
+	if (process.env.NODE_ENV !== 'production') {
 		return async (serializedRecord: string) => {
 			Promise.resolve();
 		};
 	} else {
 		return async (serializedRecord: string) => {
 			try {
-				
-				const encodedRecord = Buffer.from(serializedRecord).toString('base64')
-				console.log(encodedRecord)
-				const res = await fetch(
-					`https://analytics-tracking.meetup.com/data?records=${encodedRecord}`
+				const encodedRecord = Buffer.from(serializedRecord).toString(
+					'base64'
 				);
-				console.log(res)
+				const img = new window.Image();
+				img.src = `https://analytics-tracking.meetup.com/data?records=${encodedRecord}`;
 				return true;
 			} catch (error) {
 				console.log(error);
@@ -221,9 +219,8 @@ const chapinEnvelopeDeserializer: Object => Deserializer = schema => {
 const nextSerializer: Object => Serializer = schema => {
 	const analyticsSource = 'WEB';
 
-	return (data) => {
-		const {record, metadata} = JSON.parse(data);
-		console.log("in serializer", record, metadata)
+	return data => {
+		const { record, metadata } = JSON.parse(data);
 		const viewId = uuidv1();
 		const analytics = {
 			timestamp: Date.now(),
@@ -232,22 +229,19 @@ const nextSerializer: Object => Serializer = schema => {
 			source: analyticsSource,
 			data: JSON.stringify(record),
 		};
-		console.log(data.metadata)
 		const payload = {
 			records: [analytics],
-			...metadata
-		}
+			viewId,
+			...metadata,
+		};
 		const encodingForNewPattern = JSON.stringify(payload);
-		console.log(encodingForNewPattern);
 		return encodingForNewPattern;
-		
 	};
 };
 
 const nextDeserializer: Object => Deserializer = schema => {
 	return serialized => {
 		const payload = JSON.parse(serialized);
-		console.log(payload)
 		const record = JSON.parse(payload.records[0].data);
 		return record;
 	};
@@ -286,7 +280,6 @@ const logger = (
 	deserializer: Deserializer,
 	logFunc: Function
 ) => (record: Object) => {
-	console.log("in logger", record)
 	const serializedRecord = serializer(record);
 	const deserializedRecord = deserializer(serializedRecord);
 	logFunc(serializedRecord);
@@ -318,7 +311,11 @@ const loggers = {
 		deserializers.awsactivity,
 		logAWSKinesis
 	),
-	browserClick: logger(serializers.browserClick, deserializers.browserClick, logTrackingData()),
+	browserClick: logger(
+		serializers.browserClick,
+		deserializers.browserClick,
+		logTrackingData()
+	),
 	awsclick: logger(serializers.awsclick, deserializers.awsclick, logAWSKinesis),
 };
 
