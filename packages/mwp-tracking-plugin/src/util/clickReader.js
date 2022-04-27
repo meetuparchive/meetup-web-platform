@@ -18,14 +18,19 @@ export const clickCookieOptions = {
 	path: '/',
 };
 
-export const clickToClickRecord = (request, memberId) => click => {
+export const clickToClickRecord = (request, memberIdString) => click => {
+	let memberId;
 	if (request) {
 		memberId = parseIdCookie(
 			request.state[
 				getMemberIdCookieName(request.server.settings.app.api.isProd)
-			]
+			],
+			true
 		);
+	} else {
+		memberId = parseInt(memberIdString, 10);
 	}
+
 	return {
 		timestamp: click.timestamp || getISOStringNow(),
 		requestId: request ? request.id : uuidv1(),
