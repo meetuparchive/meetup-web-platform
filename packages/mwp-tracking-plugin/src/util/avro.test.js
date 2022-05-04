@@ -123,11 +123,10 @@ describe('Click tracking', () => {
 		const expectedTrackedInfo = {
 			...trackInfo,
 			tag: '', // not used in our click data - defaults to empty string
-			// not used in our click data - defaults to empty string
-			serverTime: '',
-			eventRef: null,
-			eventSource: null,
+			serverTime: '', // not used in our click data - defaults to empty string
 			viewId: null,
+			eventRef: null, // not used in our click data (web-next or chapstick)
+			eventSource: null, // not used in our click data (web-next or chapstick)
 		};
 		expect(recordedInfo).toEqual(expectedTrackedInfo);
 	});
