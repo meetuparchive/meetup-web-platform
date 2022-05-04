@@ -39,6 +39,12 @@ export const setClickCookie = clickData => {
 				coordY: clickData.coords[1],
 				timestamp: clickData.timestamp,
 				tag: clickData.tag,
+				elementName: clickData.elementName || null,
+				containerName: clickData.containerName || null,
+				eventRef: clickData.eventRef || null,
+				eventSource: clickData.eventSource || null,
+				recId: clickData.recId || null,
+				recSource: clickData.recSource || null,
 				memberId,
 			},
 			metadata: {

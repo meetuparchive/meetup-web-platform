@@ -1,4 +1,4 @@
-import { getISOStringNow } from './trackingUtils';
+import { getISOStringNow, getOriginalEventId, getEventSource } from './trackingUtils';
 
 const DATA_ATTR = 'clicktrack';
 
@@ -84,6 +84,68 @@ function getLineage(lineage, el) {
 	return getLineage(lineage, el.parentNode);
 }
 
+function getElementName(element) {
+	/* Recursively search for the closest element with a dataset elementName field. */
+	const searchElementName = el => {
+		if (!el.tagName || el === window.document.body) {
+			return '';
+		}
+
+		if (el.dataset && el.dataset.elementName) {
+			return el.dataset.elementName;
+		}
+		return searchElementName(el.parentNode);
+	};
+
+	return searchElementName(element);
+}
+
+function getContainerName(element) {
+	/* Recursively search for the closest element with a dataset elementName field. */
+	const searchElementName = el => {
+		if (!el.tagName || el === window.document.body) {
+			return '';
+		}
+
+		if (el.dataset && el.dataset.containerName) {
+			return el.dataset.containerName;
+		}
+		return searchElementName(el.parentNode);
+	};
+
+	return searchElementName(element);
+}
+
+function getRecommendationId(el) {
+	if (!el) {
+		return '';
+	}
+	if (el.dataset && el.dataset.recommendationid) {
+		return el.dataset.recommendationid;
+	}
+	return getRecommendationId(el.parentElement);
+}
+
+function getRecommendationSource(el) {
+	if (!el) {
+		return '';
+	}
+	if (el.dataset && el.dataset.recommendationsource) {
+		return el.dataset.recommendationsource;
+	}
+	return getRecommendationSource(el.parentElement);
+}
+
+function getEventRef(el) {
+	if (!el) {
+		return '';
+	}
+	if (el.dataset && el.dataset.eventref) {
+		return el.dataset.eventref;
+	}
+	return getEventRef(el.parentElement);
+}
+
 function getTrackClick() {
 	/**
 	 * Event handler that emits data about each in-page click
@@ -115,6 +177,11 @@ function getTrackClick() {
 			const x = Math.round(targetPosition.left - docMidlineOffset);
 			const y = Math.round(targetPosition.top);
 			const data = _getData(e);
+			const elementName = getElementName(el);
+			const containerName = getContainerName(el);
+			const recId = getRecommendationId(el);
+			const recSource = getRecommendationSource(el);
+			const eventRef = getEventRef(el);
 
 			// 2. Create click action with metadata
 			return {
@@ -123,6 +190,20 @@ function getTrackClick() {
 				linkText: linkText,
 				coords: [x, y],
 				tag: data,
+				elementName,
+				containerName,
+				...(recId
+					? {
+							recId,
+							recSource,
+					  }
+					: {}),
+				...(eventRef
+					? {
+							eventRef: getOriginalEventId(eventRef),
+							eventSource: getEventSource(eventRef),
+					  }
+					: {}),
 			};
 		} catch (err) {
 			console.error(err);

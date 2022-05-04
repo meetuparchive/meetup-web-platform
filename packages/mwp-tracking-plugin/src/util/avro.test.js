@@ -106,6 +106,8 @@ describe('Click tracking', () => {
 		lineage: 'div#foo',
 		linkText: 'hello world',
 		coords: [23, 45],
+		elementName: 'test',
+		containerName: 'test-container',
 	};
 
 	it('encodes chapinEnvelope output from clickToClickRecord', () => {
@@ -121,6 +123,10 @@ describe('Click tracking', () => {
 		const expectedTrackedInfo = {
 			...trackInfo,
 			tag: '', // not used in our click data - defaults to empty string
+			serverTime: '', // not used in our click data - defaults to empty string
+			viewId: null,
+			eventRef: null, // not used in our click data (web-next or chapstick)
+			eventSource: null, // not used in our click data (web-next or chapstick)
 		};
 		expect(recordedInfo).toEqual(expectedTrackedInfo);
 	});
