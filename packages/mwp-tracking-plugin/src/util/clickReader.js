@@ -40,6 +40,12 @@ export const clickToClickRecord = (request, memberIdString) => click => {
 		coordX: click.coords[0] || 0,
 		coordY: click.coords[1] || 0,
 		tag: click.tag,
+		elementName: click.elementName || null,
+		containerName: click.containerName || null,
+		eventRef: click.eventRef || null,
+		eventSource: click.eventSource || null,
+		recId: click.recId || null,
+		recSource: click.recSource || null,
 	};
 };
 
