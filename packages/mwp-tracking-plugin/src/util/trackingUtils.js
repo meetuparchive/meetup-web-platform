@@ -69,3 +69,13 @@ export const getISOStringWithUTCOffset = (zonedDateTime: ZonedDateTime) =>
 // Get current time as an ISO Date Time String with UTC offset
 export const getISOStringNow = (tz: string = 'America/New_York') =>
 	getISOStringWithUTCOffset(ZonedDateTime.now(ZoneId.of(tz)));
+
+export const EVENT_SOURCES = {
+	buildMeetup: 'build_meetup',
+	chapstick: 'chapstick',
+};
+
+const isChapstickEvent = id => id.includes('!chp');
+export const getOriginalEventId = id => (isChapstickEvent(id) ? id.slice(0, -4) : id);
+export const getEventSource = id =>
+	isChapstickEvent(id) ? EVENT_SOURCES.chapstick : EVENT_SOURCES.buildMeetup;

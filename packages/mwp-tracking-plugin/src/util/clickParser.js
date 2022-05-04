@@ -1,4 +1,4 @@
-import { getISOStringNow } from './trackingUtils';
+import { getISOStringNow, getOriginalEventId, getEventSource } from './trackingUtils';
 
 const DATA_ATTR = 'clicktrack';
 
@@ -136,6 +136,16 @@ function getRecommendationSource(el) {
 	return getRecommendationSource(el.parentElement);
 }
 
+function getEventRef(el) {
+	if (!el) {
+		return '';
+	}
+	if (el.dataset && el.dataset.eventref) {
+		return el.dataset.eventref;
+	}
+	return getEventRef(el.parentElement);
+}
+
 function getTrackClick() {
 	/**
 	 * Event handler that emits data about each in-page click
@@ -171,6 +181,7 @@ function getTrackClick() {
 			const containerName = getContainerName(el);
 			const recId = getRecommendationId(el);
 			const recSource = getRecommendationSource(el);
+			const eventRef = getEventRef(el);
 
 			// 2. Create click action with metadata
 			return {
@@ -185,6 +196,12 @@ function getTrackClick() {
 					? {
 							recId,
 							recSource,
+					  }
+					: {}),
+				...(eventRef
+					? {
+							eventRef: getOriginalEventId(eventRef),
+							eventSource: getEventSource(eventRef),
 					  }
 					: {}),
 			};
