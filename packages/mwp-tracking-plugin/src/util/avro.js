@@ -90,7 +90,7 @@ const click = {
 	namespace: 'com.meetup.base.avro',
 	type: 'record',
 	name: 'Click',
-	doc: 'v2',
+	doc: 'v7',
 	fields: [
 		{ name: 'timestamp', type: 'string' },
 		{ name: 'requestId', type: 'string' },
@@ -100,6 +100,14 @@ const click = {
 		{ name: 'coordX', type: 'int' },
 		{ name: 'coordY', type: 'int' },
 		{ name: 'tag', type: 'string', default: '' },
+		{ name: 'serverTime', type: 'string', default: '' },
+		{ name: 'viewId', type: ['null', 'string'], default: null },
+		{ name: 'elementName', type: ['null', 'string'], default: null },
+		{ name: 'containerName', type: ['null', 'string'], default: null },
+		{ name: 'recSource', type: ['null', 'string'], default: null },
+		{ name: 'recId', type: ['null', 'string'], default: null },
+		{ name: 'eventRef', type: ['null', 'string'], default: null },
+		{ name: 'eventSource', type: ['null', 'string'], default: null },
 	],
 };
 
