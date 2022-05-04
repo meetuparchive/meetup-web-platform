@@ -75,7 +75,8 @@ export const EVENT_SOURCES = {
 	chapstick: 'chapstick',
 };
 
-const isChapstickEvent = id => id.includes('!chp');
-export const getOriginalEventId = id => (isChapstickEvent(id) ? id.slice(0, -4) : id);
-export const getEventSource = id =>
+const isChapstickEvent = (id: string): boolean => id.includes('!chp');
+export const getOriginalEventId = (id: string): string =>
+	isChapstickEvent(id) ? id.slice(0, -4) : id;
+export const getEventSource = (id: string): string =>
 	isChapstickEvent(id) ? EVENT_SOURCES.chapstick : EVENT_SOURCES.buildMeetup;
