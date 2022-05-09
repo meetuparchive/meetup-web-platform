@@ -18,7 +18,7 @@
     },
     "homepage": "https://github.com/meetup/meetup-web-platform#readme",
     "dependencies": {
-        "convict": "4.0.1",
+        "convict": "6.2.3",
         "stylelint": "9.4.0",
         "stylelint-order": "1.0.0",
         "stylelint-scss": "3.3.0"

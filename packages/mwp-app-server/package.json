@@ -26,7 +26,7 @@
   },
   "homepage": "https://github.com/meetup/meetup-web-platform#readme",
   "dependencies": {
-    "convict": "4.0.1",
+    "convict": "6.2.3",
     "electrode-csrf-jwt": "git+https://github.com/meetup/electrode-csrf-jwt.git#793431729d8fb4ee315f28709f323f198b25d460",
     "hapi": "18.1.0",
     "inert": "5.1.3",
