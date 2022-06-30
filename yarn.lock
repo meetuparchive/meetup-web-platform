@@ -2510,19 +2510,19 @@ avsc@5.1.1:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/avsc/-/avsc-5.1.1.tgz#45cf97b44cfcb9c6e707b209a99b76a7d637d139"
 
-aws-sdk@2.589.0:
-  version "2.589.0"
-  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.589.0.tgz#0c77ae195f9fa92624fb66be55d5507559e99997"
-  integrity sha512-jC/2vsiSvqm25A/aMjRrG6NJnikunjUnFFGlgPFvKu0CpUwXADO0Bzp2wCpHKDjq3+PcOHpBYU9CpvHTHNGdPg==
+aws-sdk@2.1166.0:
+  version "2.1166.0"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.1166.0.tgz#9bc5ceb3690d2747b941a2e2b8ebacfffb412f41"
+  integrity sha512-9CJQpMtIv2sxvwYTcMCfuCGU8t5qEppnvmo0uFFOm+1Q1uEv5sPg95wQH3Gfj4Mmv4FKWFofgTLksn0u2pDxsw==
   dependencies:
-    buffer "4.9.1"
+    buffer "4.9.2"
     events "1.1.1"
     ieee754 "1.1.13"
-    jmespath "0.15.0"
+    jmespath "0.16.0"
     querystring "0.2.0"
     sax "1.2.1"
     url "0.10.3"
-    uuid "3.3.2"
+    uuid "8.0.0"
     xml2js "0.4.19"
 
 aws-sign2@~0.7.0:
@@ -2870,10 +2870,10 @@ buffer-from@^1.0.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/buffer-from/-/buffer-from-1.1.1.tgz#32713bc028f75c02fdb710d7c7bcec1f2c6070ef"
 
-buffer@4.9.1:
-  version "4.9.1"
-  resolved "https://registry.yarnpkg.com/buffer/-/buffer-4.9.1.tgz#6d1bb601b07a4efced97094132093027c95bc298"
-  integrity sha1-bRu2AbB6TvztlwlBMgkwJ8lbwpg=
+buffer@4.9.2:
+  version "4.9.2"
+  resolved "https://registry.yarnpkg.com/buffer/-/buffer-4.9.2.tgz#230ead344002988644841ab0244af8c44bbe3ef8"
+  integrity sha512-xq+q3SRMOxGivLhBNaUdC64hDTQwejJ+H0T/NB1XMtTVEwNTrfFF3gAxiyW0Bu/xWEGhjVKgUcMhCrUy2+uCWg==
   dependencies:
     base64-js "^1.0.2"
     ieee754 "^1.1.4"
@@ -6310,10 +6310,10 @@ jest@24.8.0:
     import-local "^2.0.0"
     jest-cli "^24.8.0"
 
-jmespath@0.15.0:
-  version "0.15.0"
-  resolved "https://registry.yarnpkg.com/jmespath/-/jmespath-0.15.0.tgz#a3f222a9aae9f966f5d27c796510e28091764217"
-  integrity sha1-o/Iiqarp+Wb10nx5ZRDigJF2Qhc=
+jmespath@0.16.0:
+  version "0.16.0"
+  resolved "https://registry.yarnpkg.com/jmespath/-/jmespath-0.16.0.tgz#b15b0a85dfd4d930d43e69ed605943c802785076"
+  integrity sha512-9FzQjJ7MATs1tSpnco1K6ayiYE3figslrXA72G2HQ/n76RzvYlofyi5QM+iX4YRs/pu3yzxlVQSST23+dMDknw==
 
 joi@13.x.x:
   version "13.6.0"
@@ -10499,6 +10499,11 @@ util.promisify@^1.0.0:
 uuid@3.3.2, uuid@^3.0.1, uuid@^3.1.0, uuid@^3.2.1, uuid@^3.3.2:
   version "3.3.2"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.3.2.tgz#1b4af4955eb3077c501c23872fc6513811587131"
+
+uuid@8.0.0:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.0.0.tgz#bc6ccf91b5ff0ac07bbcdbf1c7c4e150db4dbb6c"
+  integrity sha512-jOXGuXZAWdsTH7eZLtyXMqUb9EcWMGZNbL9YcGBJl4MH4nrxHmZJhEHvyLFrkxo+28uLb/NYRcStH48fnD0Vzw==
 
 validate-npm-package-license@^3.0.1, validate-npm-package-license@^3.0.3:
   version "3.0.4"
