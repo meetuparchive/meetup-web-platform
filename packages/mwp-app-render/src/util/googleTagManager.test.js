@@ -43,6 +43,21 @@ describe('gtmPush()', () => {
 		window.dataLayer = [];
 
 		gtmPush(MOCK_VARS);
-		expect(window.dataLayer).toContain(MOCK_VARS);
+		expect(window.dataLayer).toContainEqual(MOCK_VARS);
+	});
+
+	it('should extend event mocked variables payload with isTestAccount: Yes', () => {
+		const IS_TEST_ACCOUNT_VARS = { isTestAccount: 'Yes' };
+		global.window = {};
+		window.dataLayer = [];
+		window.sessionStorage = {
+			getItem: () => 'Yes',
+		};
+
+		gtmPush(MOCK_VARS);
+		expect(window.dataLayer).toContainEqual({
+			...MOCK_VARS,
+			...IS_TEST_ACCOUNT_VARS,
+		});
 	});
 });
