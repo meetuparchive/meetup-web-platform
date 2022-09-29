@@ -12,6 +12,9 @@ const GTM_PUBLIC_AUTH =
 // preview ID for the GTM Environment (production/development)
 const GTM_PREVIEW_ID = process.env.NODE_ENV === 'production' ? 'env-1' : 'env-265';
 
+// Session storage flag for isTestAccount (test accounts has @meetup.org domain in emails)
+export const IS_TEST_ACCOUNT_FLAG = 'isTestAccount';
+
 /**
  * @description Gets dataLayer initialization snippet with initial values provided
  * It's important to use this snippet before getGoogleTagManagerSnippet()
@@ -21,13 +24,31 @@ export const getDataLayerInitSnippet = (data: { [string]: string }): string =>
 	`dataLayer=[${data ? JSON.stringify(data) : ''}]`;
 
 /**
+ * @description Gets the additional "isTestAccount" field which should be added to gtmPush event payload
+ * in case if user use the test account (email end with @meetup.org)
+ */
+const getIsTestAccount = () => {
+	if (typeof window !== 'undefined') {
+		const isTestAccount =
+			window.sessionStorage &&
+			window.sessionStorage.getItem(IS_TEST_ACCOUNT_FLAG);
+		return isTestAccount && isTestAccount === 'Yes' ? { isTestAccount } : {};
+	}
+	return {};
+};
+
+/**
  * @description Method for passing additional variables to GTM
  * @see {@link https://developers.google.com/tag-manager/devguide}
  */
 export const gtmPush = (data: { [string]: string }) => {
 	if (typeof window !== 'undefined') {
 		window.dataLayer = window.dataLayer || [];
-		window.dataLayer.push(data);
+		const extendedEvent = {
+			...data,
+			...getIsTestAccount(),
+		};
+		window.dataLayer.push(extendedEvent);
 	}
 };
 
