@@ -48,6 +48,7 @@ export const SEOHeadComponent = ({
 	forcedRobotsContent,
 	route,
 	isGenerateAlternateLinks,
+	maxImagePreviewSetting,
 }) => {
 	const metaData = generateMetaData({
 		appPath: `meetup:/${route}`,
