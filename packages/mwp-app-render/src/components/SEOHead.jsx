@@ -29,6 +29,7 @@ import {
  * @param {String} forcedRobotsContent overrides robots content when is not empty
  * @param {String} route The current route
  * @param {Boolean} isGenerateAlternateLinks Defines if we need to generate alternate link tags for the page
+ * @param {String} maxImagePreviewSetting It's a value for the Max Image Preview tag 
  * @module SEOHead
  */
 export const SEOHeadComponent = ({
@@ -93,6 +94,7 @@ export const SEOHeadComponent = ({
 				name="robots"
 				content={getRobotsContent(robots, forcedRobotsContent)}
 			/>
+			{maxImagePreviewSetting && <meta name="robots" content={`max-image-preview:${maxImagePreviewSetting}`}/>}
 			{metaTags}
 			{canonicalUrlLinkTags}
 			{ldJsonTags}
@@ -114,6 +116,7 @@ SEOHeadComponent.propTypes = {
 	robots: PropTypes.bool,
 	route: PropTypes.string.isRequired,
 	isGenerateAlternateLinks: PropTypes.bool,
+	maxImagePreviewSetting: PropTypes.oneOf(['none', 'standard', 'large']),
 };
 
 SEOHeadComponent.defaultProps = {
