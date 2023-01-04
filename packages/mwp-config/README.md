@@ -1,6 +1,6 @@
 # Config
 
-This is the 'master' config for all Meetup Web Platform applications. It is
+This is the 'main' config for all Meetup Web Platform applications. It is
 intended to consolidate both buildtime and runtime configuration properties and
 rules, including Babel and Webpack configuration, Node server config, and
 configuration needed to to interface with external services such as Travis CI

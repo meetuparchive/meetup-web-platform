@@ -48,7 +48,7 @@ const _getMethodEpic = method => {
 			console.warn(
 				`This application is using Post/Delete middleware through ${type}.
 	See the platform Queries Recipes docs for refactoring options:
-	https://github.com/meetup/meetup-web-platform/blob/master/docs/Queries.md#recipes`
+	https://github.com/meetup/meetup-web-platform/blob/main/docs/Queries.md#recipes`
 			);
 		}
 		const actionCreator = method === 'delete' ? 'del' : method;

@@ -85,7 +85,7 @@ const debugLog = deserializedRecord =>
 	console.log(JSON.stringify(deserializedRecord));
 
 // currently the schema is manually copied from
-// https://github.dev.meetup.com/meetup/meetup/blob/master/modules/base/src/main/versioned_avro/Click_v2.avsc
+// https://github.dev.meetup.com/meetup/meetup/blob/main/modules/base/src/main/versioned_avro/Click_v2.avsc
 const click = {
 	namespace: 'com.meetup.base.avro',
 	type: 'record',
@@ -112,7 +112,7 @@ const click = {
 };
 
 // currently the schema is manually copied from
-// https://github.com/meetup/meetup/blob/master/modules/base/src/main/versioned_avro/Activity_v8.avsc
+// https://github.com/meetup/meetup/blob/main/modules/base/src/main/versioned_avro/Activity_v8.avsc
 const activity = {
 	namespace: 'com.meetup.base.avro',
 	type: 'record',

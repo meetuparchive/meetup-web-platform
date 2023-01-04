@@ -51,7 +51,7 @@ class PageWrap extends React.Component {
 
 		// Parse localeCode for ISO 639-1 languages code.
 		// (ie. 'en', 'it', etc)
-		// @see https://github.com/meetup/swarm-sasstools/blob/master/scss/utils/helpers/_i18n.scss
+		// @see https://github.com/meetup/swarm-sasstools/blob/main/scss/utils/helpers/_i18n.scss
 		const lang = localeCode.substring(0, 2);
 
 		return (
