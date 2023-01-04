@@ -1,8 +1,8 @@
 # Web Platform Components <!-- omit in toc -->
 
 [![npm version](https://badge.fury.io/js/mwp-core.svg)](https://badge.fury.io/js/mwp-core)
-[![Build Status](https://travis-ci.com/meetup/meetup-web-platform.svg?branch=master)](https://travis-ci.com/meetup/meetup-web-platform)
-[![Coverage Status](https://coveralls.io/repos/github/meetup/meetup-web-platform/badge.svg?branch=master)](https://coveralls.io/github/meetup/meetup-web-platform?branch=master)
+[![Build Status](https://travis-ci.com/meetup/meetup-web-platform.svg?branch=main)](https://travis-ci.com/meetup/meetup-web-platform)
+[![Coverage Status](https://coveralls.io/repos/github/meetup/meetup-web-platform/badge.svg?branch=main)](https://coveralls.io/github/meetup/meetup-web-platform?branch=main)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
 This is the base platform for serving Meetup web apps including the public
@@ -34,10 +34,10 @@ In general, application-specific code will live outside of this package.
 # Releases
 
 This package uses semver versioning to tag releases, although the patch version
-is determined exclusively by the Travis build number for pushes to `master`.
+is determined exclusively by the Travis build number for pushes to `main`.
 Major and minor versions are hard-coded into the [Makefile](Makefile#L2).
 
-Manual pushes to `master` and PR merges to master will be built by Travis, and
+Manual pushes to `main` and PR merges to main will be built by Travis, and
 will kick off the yarn publish routine. The currently-published version of the
 package is shown on the repo homepage on GitHub in a badge at the top of the
 README.

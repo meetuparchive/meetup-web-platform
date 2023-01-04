@@ -73,7 +73,7 @@
 -   **New Feature** `AppContext` context provider for server-side request data.
     This feature supersedes accessing `state.config` through Redux in favor
     of a more conventional React context implementation. Check out
-    [the docs](https://github.com/meetup/meetup-web-platform/blob/master/packages/mwp-app-render/README.md#server-config-values-appcontext)
+    [the docs](https://github.com/meetup/meetup-web-platform/blob/main/packages/mwp-app-render/README.md#server-config-values-appcontext)
     for more info.
 
     `withIntl` has been refactored to use this interface instead of `react-redux`
@@ -544,7 +544,7 @@
     Use the `meta.method` field in your Query objects to determine the request
     method, and use `componentWillReceiveProps` to process the API result [as
     described in the
-    docs](https://github.com/meetup/meetup-web-platform/blob/master/docs/Queries.md#recipes)
+    docs](https://github.com/meetup/meetup-web-platform/blob/main/docs/Queries.md#recipes)
 
 ## [2.0]
 

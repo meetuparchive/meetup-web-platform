@@ -52,7 +52,7 @@ The server has access to the original browser HTTP request and passes informatio
 about it into the React application through the `AppContext` React Context provider.
 
 The available properties are documented in the
-[`type AppContext`](https://github.com/meetup/meetup-web-platform/blob/master/flow-typed/platform.js#L10)
+[`type AppContext`](https://github.com/meetup/meetup-web-platform/blob/main/flow-typed/platform.js#L10)
 
 To access these properties, import the `AppContext` component and use the [React
 Context Consumer API](https://reactjs.org/docs/context.html#contextconsumer)
