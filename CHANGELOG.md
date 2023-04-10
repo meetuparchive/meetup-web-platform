@@ -1,3 +1,8 @@
+## [26.1]
+
+-   **Improved** add github action
+
+photo-uploader.
 ## [26.0]
 
 -   **Removed** `PHOTO_SCALAR_SALT` no longer required for the new photo-uploader.
