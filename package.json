@@ -104,7 +104,6 @@
   "resolutions": {
     "semver": "6.0.0"
   },
-  "private": true,
   "workspaces": [
     "packages/*"
   ]
