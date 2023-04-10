@@ -39,7 +39,7 @@ jobs:
           yarn flow
           yarn test
 
-      - name: Release ${{ github.run_number }}-beta
+      - name: Beta release
         if: github.event_name == 'pull_request'
         uses: nick-invision/retry@v2
         with:
@@ -55,7 +55,7 @@ jobs:
         env:
           CI_BUILD_NUMBER: ${{ github.run_number }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Release ${{ github.run_number }}
+      - name: Stable release
         if: github.ref == 'refs/heads/main'
         uses: nick-invision/retry@v2
         with:
