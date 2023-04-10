@@ -14,7 +14,7 @@
   },
   "scripts": {
     "build": "lerna run build",
-    "publish": "lerna publish --yes --force-publish --skip-git --npm-tag $NPM_TAG --repo-version $GIT_TAG",
+    "npm-release": "lerna publish --yes --force-publish --skip-git --npm-tag $NPM_TAG --repo-version $GIT_TAG",
     "lint": "eslint . --ext .js,.jsx --fix",
     "typecheck": "flow",
     "test": "yarn && yarn build && yarn test:unit",
