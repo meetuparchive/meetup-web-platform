@@ -1,3 +1,7 @@
+## [27.0]
+
+-   **Removed** ld dependency
+
 ## [26.0]
 
 -   **Removed** `PHOTO_SCALAR_SALT` no longer required for the new photo-uploader.
