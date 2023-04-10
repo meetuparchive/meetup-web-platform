@@ -51,7 +51,7 @@ jobs:
             git config --global user.email "revenue-guardians@meetup.com"
             git config --global user.name "meetcvs"
             npm version $GIT_TAG -m "Version $GIT_TAG built by Github action"
-            yarn publish
+            lerna publish --yes --force-publish --skip-git --npm-tag $NPM_TAG --repo-version $GIT_TAG
         env:
           CI_BUILD_NUMBER: ${{ github.run_number }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -67,7 +67,7 @@ jobs:
             git config --global user.email "revenue-guardians@meetup.com"
             git config --global user.name "meetcvs"
             npm version $GIT_TAG -m "Version $GIT_TAG built by Github action"
-            yarn publish
+            lerna publish --yes --force-publish --skip-git --npm-tag $NPM_TAG --repo-version $GIT_TAG
         env:
           CI_BUILD_NUMBER: ${{ github.run_number }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
