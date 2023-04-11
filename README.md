@@ -1,9 +1,7 @@
 # Web Platform Components <!-- omit in toc -->
 
 [![npm version](https://badge.fury.io/js/mwp-core.svg)](https://badge.fury.io/js/mwp-core)
-[![Build Status](https://travis-ci.com/meetup/meetup-web-platform.svg?branch=main)](https://travis-ci.com/meetup/meetup-web-platform)
-[![Coverage Status](https://coveralls.io/repos/github/meetup/meetup-web-platform/badge.svg?branch=main)](https://coveralls.io/github/meetup/meetup-web-platform?branch=main)
-[![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
+[![main](https://github.com/meetup/meetup-web-platform/actions/workflows/main.yml/badge.svg)](https://github.com/meetup/meetup-web-platform/actions/workflows/main.yml)
 
 This is the base platform for serving Meetup web apps including the public
 website and admin. It provides a Hapi webserver and a set of conventions for
