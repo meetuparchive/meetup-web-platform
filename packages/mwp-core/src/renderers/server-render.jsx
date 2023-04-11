@@ -22,7 +22,6 @@ import {
 	parseSiftSessionCookie,
 	parsePreferredTimeZoneCookie,
 } from '../util/cookieUtils';
-import { getLaunchDarklyUser } from '../util/launchDarkly';
 import getRedirect from '../util/getRedirect';
 
 const DOCTYPE = '<!DOCTYPE html>';
@@ -259,25 +258,6 @@ const makeRenderer = (renderConfig: {
 			return Promise.resolve(createStore(reducer, initialState));
 		};
 
-		// otherwise render using the API and React router
-		// addFlags is called twice in order to ensure that
-		// there is a full member object available in state
-		// feature flags can be selected based on member id,
-		// email, and other properties.
-		// feature flags based on member id are available before the store is populated.
-		const addFlags = (populatedStore, member) => {
-			// Populate a LaunchDarklyUser object from member and request details
-			const launchDarklyUser = getLaunchDarklyUser(member, request);
-			return request.server.plugins['mwp-app-route']
-				.getFlags(launchDarklyUser)
-				.then(flags =>
-					populatedStore.dispatch({
-						type: 'UPDATE_FLAGS',
-						payload: flags,
-					})
-				);
-		};
-
 		const checkReady = state =>
 			state.preRenderChecklist.every(isReady => isReady);
 		const populateStore = store =>
@@ -291,35 +271,15 @@ const makeRenderer = (renderConfig: {
 					// we need to use the _latest_ version of the member object
 					// which is why memberObj is defined after the checkReady call.
 					const memberObj = (store.getState().api.self || {}).value || {};
-					addFlags(store, memberObj).then(() => {
-						resolve(store);
-					});
 					return;
 				}
-				const unsubscribe = store.subscribe(() => {
-					if (checkReady(store.getState())) {
-						// we need to use the _latest_ version of the member object
-						// which is why memberObj is defined after the checkReady call.
-						const memberObj =
-							(store.getState().api.self || {}).value || {};
-						addFlags(store, memberObj).then(() => {
-							resolve(store);
-							unsubscribe();
-						});
-					}
-				});
 			});
 
 		return routesPromise.then(resolvedRoutes =>
 			initializeStore(resolvedRoutes).then(store => {
-				// the initial addFlags call will only be key'd by member ID
-				return addFlags(store, {
-					id: parseMemberCookie(request.state).id,
-				})
-					.then(() => populateStore(store))
-					.then(store =>
-						getRouterRenderer({
-							request,
+				return populateStore(store).then(store =>
+					getRouterRenderer({
+						request,
 							h,
 							appContext,
 							routes: resolvedRoutes,
