@@ -154,7 +154,7 @@ const getRouterRenderer = async ({
 		url?: string,
 		permanent?: boolean,
 	} = {};
-	console.log('about to render app markup');
+
 	try {
 		appMarkup = await renderToStringWithData(
 			<ServerApp
@@ -173,7 +173,7 @@ const getRouterRenderer = async ({
 		// now we can re-throw and let the caller handle the error
 		throw err;
 	}
-	console.log('appMarkup', appMarkup);
+
 	const sideEffects = resolveSideEffects();
 
 	const externalRedirect = getRedirect(sideEffects.redirect);
@@ -258,30 +258,37 @@ const makeRenderer = (renderConfig: {
 			return Promise.resolve(createStore(reducer, initialState));
 		};
 
+		const checkReady = state =>
+			state.preRenderChecklist.every(isReady => isReady);
 		const populateStore = store =>
-			new Promise(resolve => {
+			new Promise((resolve, reject) => {
 				// dispatch SERVER_RENDER to kick off API middleware
 				const { pathname, search, hash } = request.url;
 				const location = { pathname, search, hash };
 				store.dispatch({ type: SERVER_RENDER, payload: location });
 
-				resolve(store);
+				if (checkReady(store.getState())) {
+					// we need to use the _latest_ version of the member object
+					// which is why memberObj is defined after the checkReady call.
+					const memberObj = (store.getState().api.self || {}).value || {};
+					return;
+				}
 			});
 
 		return routesPromise.then(resolvedRoutes =>
 			initializeStore(resolvedRoutes).then(store => {
-				return populateStore(store).then(store => {
-					return getRouterRenderer({
+				return populateStore(store).then(store =>
+					getRouterRenderer({
 						request,
-						h,
-						appContext,
-						routes: resolvedRoutes,
-						store,
-						scripts,
-						cssLinks,
-						client,
-					});
-				});
+							h,
+							appContext,
+							routes: resolvedRoutes,
+							store,
+							scripts,
+							cssLinks,
+							client,
+						})
+					);
 			})
 		);
 	};
