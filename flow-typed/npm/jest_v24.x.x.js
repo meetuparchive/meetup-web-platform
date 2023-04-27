@@ -39,7 +39,7 @@ type JestMockFn<TArguments: $ReadOnlyArray<*>, TReturn> = {
    * Removes the mock and restores the initial implementation. This is useful
    * when you want to mock functions in certain test cases and restore the
    * original implementation in others. Beware that mockFn.mockRestore only
-   * works when mock was created with jest.spyOn. Thus you have to take care of
+   * works when mock was created with jest.jest.spyOn. Thus you have to take care of
    * restoration yourself when manually assigning jest.fn().
    */
   mockRestore(): void,
@@ -912,7 +912,7 @@ type JestObjectType = {
    * Creates a mock function similar to jest.fn but also tracks calls to
    * object[methodName].
    */
-  spyOn(
+  jest.spyOn(
     object: Object,
     methodName: string,
     accessType?: 'get' | 'set'
@@ -1161,7 +1161,7 @@ declare var expect: {
 
 // TODO handle return type
 // http://jasmine.github.io/2.4/introduction.html#section-Spies
-declare function spyOn(value: mixed, method: string): Object;
+declare function jest.spyOn(value: mixed, method: string): Object;
 
 /** Holds all functions related to manipulating test runner */
 declare var jest: JestObjectType;
