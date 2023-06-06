@@ -15,6 +15,9 @@ const GTM_PREVIEW_ID = process.env.NODE_ENV === 'production' ? 'env-1' : 'env-26
 // Session storage flag for isTestAccount (test accounts has @meetup.org domain in emails)
 export const IS_TEST_ACCOUNT_FLAG = 'isTestAccount';
 
+// Session storage flag for pricing experiment value
+export const PRICING_EXPERIMENT_GROUP_FLAG = 'pricingExperimentGroup';
+
 /**
  * @description Gets dataLayer initialization snippet with initial values provided
  * It's important to use this snippet before getGoogleTagManagerSnippet()
@@ -38,6 +41,19 @@ const getIsTestAccount = () => {
 };
 
 /**
+ * @description Gets the additional "pricingExperimentGroup" field which should be added to gtmPush event payload
+ */
+const getPricingExperimentGroup = () => {
+	if (typeof window !== 'undefined') {
+		const experimentGroup =
+			window.sessionStorage &&
+			window.sessionStorage.getItem(PRICING_EXPERIMENT_GROUP_FLAG);
+		return experimentGroup ? { experimentGroup } : {};
+	}
+	return {};
+};
+
+/**
  * @description Method for passing additional variables to GTM
  * @see {@link https://developers.google.com/tag-manager/devguide}
  */
@@ -47,6 +63,7 @@ export const gtmPush = (data: { [string]: string }) => {
 		const extendedEvent = {
 			...data,
 			...getIsTestAccount(),
+			...getPricingExperimentGroup()
 		};
 		window.dataLayer.push(extendedEvent);
 	}
