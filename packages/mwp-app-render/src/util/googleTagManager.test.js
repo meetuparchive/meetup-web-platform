@@ -2,6 +2,8 @@ import {
 	getGoogleTagManagerSnippet,
 	getDataLayerInitSnippet,
 	gtmPush,
+	IS_TEST_ACCOUNT_FLAG,
+	PRICING_EXPERIMENT_GROUP_FLAG,
 } from './googleTagManager';
 
 describe('getGoogleTagManagerSnippet()', () => {
@@ -46,18 +48,29 @@ describe('gtmPush()', () => {
 		expect(window.dataLayer).toContainEqual(MOCK_VARS);
 	});
 
-	it('should extend event mocked variables payload with isTestAccount: Yes', () => {
+	it('should extend event mocked variables payload with isTestAccount: Yes and experimentGroup: control', () => {
 		const IS_TEST_ACCOUNT_VARS = { isTestAccount: 'Yes' };
+		const PRICING_EXPERIMENT_GROUP_VARS = { experimentGroup: 'control' };
 		global.window = {};
 		window.dataLayer = [];
 		window.sessionStorage = {
-			getItem: () => 'Yes',
+			getItem: jest.fn().mockImplementation(key => {
+				if (key === IS_TEST_ACCOUNT_FLAG) {
+					return 'Yes';
+				}
+				if (key === PRICING_EXPERIMENT_GROUP_FLAG) {
+					return 'control';
+				}
+
+				return null;
+			}),
 		};
 
 		gtmPush(MOCK_VARS);
 		expect(window.dataLayer).toContainEqual({
 			...MOCK_VARS,
 			...IS_TEST_ACCOUNT_VARS,
+			...PRICING_EXPERIMENT_GROUP_VARS,
 		});
 	});
 });
