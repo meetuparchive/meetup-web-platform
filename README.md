@@ -1,3 +1,5 @@
+# Deprecated <!-- omit in toc -->
+
 # Web Platform Components <!-- omit in toc -->
 
 [![npm version](https://badge.fury.io/js/mwp-core.svg)](https://badge.fury.io/js/mwp-core)
