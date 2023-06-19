@@ -187,12 +187,13 @@ export const makeLogResponse = request => ([response, body]) => {
 		request: {
 			headers,
 			method,
+			body: requestBody,
 			uri: { href: url },
 		},
 		statusCode,
 	} = response;
 	const logBase = {
-		externalRequest: { headers, method, url }, // request to https://api.meetup.com/
+		externalRequest: { headers, method, url, requestBody }, // request to https://api.meetup.com/
 	};
 
 	if (
